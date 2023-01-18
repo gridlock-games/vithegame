@@ -28,11 +28,18 @@
             PerfectBlock
         }
 
+        private enum AttackDirection {
+            Front,
+            Left,
+            Right,
+            Back
+        }
+
         private const float MIN_RAND_PITCH = 0.8f;
         private const float MAX_RAND_PITCH = 1.2f;
 
         private const float TRANSITION = 0.15f;
-        private const float INPUT_BUFFER_TIME = 0.35f;
+        private const float INPUT_BUFFER_TIME = 0.10f;
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
@@ -81,7 +88,7 @@
         private GameObject modelWeapon;
         private GameObject modelShield;
 
-        private MeleeClip currentMeleeClip;
+        public MeleeClip currentMeleeClip;
         private HashSet<int> targetsEvaluated;
 
         private float startBlockingTime = -100f;
@@ -386,7 +393,15 @@
 
         public void StopAttack()
         {
-            this.comboSystem.Stop();
+
+            if(this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true) {
+                if (this.inputBuffer.HasInput())
+                {
+                    this.inputBuffer.ConsumeInput();
+                }
+                this.comboSystem.Stop();
+                this.currentMeleeClip.Stop(this);
+            }
         }
 
         public int GetCurrentPhase()
@@ -501,6 +516,12 @@
 
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack)
         {
+            Vector3 attackerDelta = (attacker.transform.position + attacker.Character.characterLocomotion.characterController.center) - (this.transform.position + this.Character.characterLocomotion.characterController.center);
+            Quaternion lookAttacker = Quaternion.LookRotation(attackerDelta);
+
+            
+            float attackAngleH = lookAttacker.eulerAngles.y;
+
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
 
@@ -574,12 +595,12 @@
             }
 
             this.AddPoise(-attack.poiseDamage);
-            bool isFrontalAttack = attackAngle >= 90f;
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
             bool isKnockback = this.Poise <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
-                isFrontalAttack,
+                hitLocation,
                 isKnockback
             );
 
@@ -655,5 +676,24 @@
 
             return time;
         }
+    
+        private MeleeWeapon.HitLocation GetHitLocation(float attackAngleH) {
+            MeleeWeapon.HitLocation hitLocation;
+
+            if(attackAngleH <= 67.50f || attackAngleH >= 337.50f) {
+                hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
+            } else if(attackAngleH > 67.50f && attackAngleH < 157.50f) {
+                hitLocation = MeleeWeapon.HitLocation.RightMiddle;
+            } else if(attackAngleH < 337.50f && attackAngleH > 247.50f) {
+                hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
+            } else {
+                hitLocation = MeleeWeapon.HitLocation.BackMiddle;
+            }
+
+            print(hitLocation);
+
+            return hitLocation; 
+        }
+    
     }
 }

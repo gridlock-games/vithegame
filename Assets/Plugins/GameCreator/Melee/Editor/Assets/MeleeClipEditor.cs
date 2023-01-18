@@ -71,6 +71,7 @@
         private SerializedProperty spInterruptible;
         private SerializedProperty spVulnerability;
         private SerializedProperty spPosture;
+        private SerializedProperty spAnimationSpeed;
 
         private SerializedProperty spAttackPhase;
 
@@ -103,6 +104,7 @@
             this.spAvatarMask = this.serializedObject.FindProperty("avatarMask");
             this.spTransitionIn = this.serializedObject.FindProperty("transitionIn");
             this.spTransitionOut = this.serializedObject.FindProperty("transitionOut");
+            this.spAnimationSpeed = this.serializedObject.FindProperty("animSpeed");
 
             this.spMovementForward = this.serializedObject.FindProperty("movementForward");
             this.spMovementSides = this.serializedObject.FindProperty("movementSides");
@@ -262,6 +264,7 @@
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spTransitionIn);
                     EditorGUILayout.PropertyField(this.spTransitionOut);
+                    EditorGUILayout.PropertyField(this.spAnimationSpeed);
 
                     EditorGUILayout.EndVertical();
                 }
@@ -558,8 +561,10 @@
                 );
             }
 
+            MeleeClip meleeClip = this.target as MeleeClip;
+
             AnimationClip clip = this.spAnimationClip.objectReferenceValue as AnimationClip;
-            float clipLength = clip.length;
+            float clipLength = clip.length / meleeClip.animSpeed;
 
             Rect rectScrub = GUILayoutUtility.GetRect(
                 0f, 9999f,

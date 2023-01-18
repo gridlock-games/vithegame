@@ -24,6 +24,13 @@
             Camera = 100,
         }
 
+        public enum HitLocation
+        {
+            FrontUpper, FrontMiddle, FrontLower, LeftMiddle, RightMiddle,
+            BackUpper, BackMiddle, BackLower, JuggleFront, JuggleBack, KnockDownFront, KnockDownBack
+
+        }
+
         public const CharacterAnimation.Layer LAYER_STANCE = CharacterAnimation.Layer.Layer1;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -56,6 +63,10 @@
         public List<MeleeClip> airborneHitReactionsBehind = new List<MeleeClip>();
 
         public List<MeleeClip> knockbackReaction = new List<MeleeClip>();
+
+        public List<MeleeClip> groundHitReactionsBackMiddle = new List<MeleeClip>();
+        public List<MeleeClip> groundHitReactionsLeftMiddle = new List<MeleeClip>();
+        public List<MeleeClip> groundHitReactionsRightMiddle = new List<MeleeClip>();
 
         // combo system:
         public List<Combo> combos = new List<Combo>();
@@ -105,9 +116,9 @@
             return instance;
         }
 
-        public MeleeClip GetHitReaction(bool isGrounded, bool frontalAttack, bool isKnockback)
+        public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback)
         {
-            int index;
+            int index = 0;
             MeleeClip meleeClip = null;
 
             if (isKnockback)
@@ -119,48 +130,36 @@
                 return this.knockbackReaction[index];
             }
 
-            switch (isGrounded)
-            {
-                case true:
-                    switch (frontalAttack)
-                    {
-                        case true:
-                            index = UnityEngine.Random.Range(0, this.groundHitReactionsFront.Count - 1);
-                            if (this.groundHitReactionsFront.Count != 1 && index == this.prevRandomHit) index++;
-                            this.prevRandomHit = index;
 
-                            meleeClip = this.groundHitReactionsFront[index];
-                            break;
-
-                        case false:
-                            index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
-                            if (this.groundHitReactionsBehind.Count != 1 && index == this.prevRandomHit) index++;
-                            this.prevRandomHit = index;
-
-                            meleeClip = this.groundHitReactionsBehind[index];
-                            break;
-                    }
+            switch(location) {
+                case HitLocation.LeftMiddle:
+                    meleeClip = this.groundHitReactionsLeftMiddle[0];
                     break;
 
-                case false:
-                    switch (frontalAttack)
-                    {
-                        case true:
-                            index = UnityEngine.Random.Range(0, this.airborneHitReactionsFront.Count);
-                            if (this.airborneHitReactionsFront.Count != 1 && index == this.prevRandomHit) index++;
-                            this.prevRandomHit = index;
+                case HitLocation.RightMiddle:
+                    meleeClip = this.groundHitReactionsRightMiddle[0];
+                    break;
 
-                            meleeClip = this.airborneHitReactionsFront[index];
-                            break;
+                case HitLocation.FrontUpper:
+                case HitLocation.FrontMiddle:
+                case HitLocation.FrontLower:
+                    index = UnityEngine.Random.Range(0, this.groundHitReactionsFront.Count - 1);
 
-                        case false:
-                            index = UnityEngine.Random.Range(0, this.airborneHitReactionsBehind.Count);
-                            if (this.airborneHitReactionsBehind.Count != 1 && index == this.prevRandomHit) index++;
-                            this.prevRandomHit = index;
+                    meleeClip = this.groundHitReactionsFront[index];
+                    break;
 
-                            meleeClip = this.airborneHitReactionsBehind[index];
-                            break;
-                    }
+                case HitLocation.BackMiddle:
+                case HitLocation.BackUpper:
+                case HitLocation.BackLower:
+                    index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
+
+                    meleeClip = this.groundHitReactionsBehind[index];
+                    break;
+                
+                default:
+                    index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
+
+                    meleeClip = this.groundHitReactionsBehind[index];
                     break;
             }
 

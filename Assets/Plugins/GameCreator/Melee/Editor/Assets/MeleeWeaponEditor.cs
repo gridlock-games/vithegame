@@ -51,6 +51,8 @@
         private SerializedProperty spGroundHitReactionBehind;
         private SerializedProperty spAirborneHitReactionFront;
         private SerializedProperty spAirborneHitReactionBehind;
+        private SerializedProperty spGroundHitReactionsLeftMiddle;
+        private SerializedProperty spGroundHitReactionsRightMiddle;
         private SerializedProperty spKnockbackReactions;
 
         private SerializedProperty spCombos;
@@ -59,6 +61,8 @@
         private ReorderableList groundHitReactionsBehindList;
         private ReorderableList airborneHitReactionsFrontList;
         private ReorderableList airborneHitReactionsBehindList;
+        private ReorderableList groundHitReactionsLeftMiddle;
+        private ReorderableList groundHitReactionsRightMiddle;
         private ReorderableList knockbackReactionsList;
 
         private ReorderableList comboList;
@@ -101,6 +105,9 @@
             this.spGroundHitReactionBehind = this.serializedObject.FindProperty("groundHitReactionsBehind");
             this.spAirborneHitReactionFront = this.serializedObject.FindProperty("airborneHitReactionsFront");
             this.spAirborneHitReactionBehind = this.serializedObject.FindProperty("airborneHitReactionsBehind");
+            
+            this.spGroundHitReactionsLeftMiddle = this.serializedObject.FindProperty("groundHitReactionsLeftMiddle");
+            this.spGroundHitReactionsRightMiddle = this.serializedObject.FindProperty("groundHitReactionsRightMiddle");
             this.spKnockbackReactions = this.serializedObject.FindProperty("knockbackReaction");
 
             this.groundHitReactionsFrontList = new ReorderableList(
@@ -133,17 +140,33 @@
                 true, true, true, true
             );
 
+            this.groundHitReactionsLeftMiddle = new ReorderableList(
+                this.serializedObject,
+                this.spGroundHitReactionsLeftMiddle,
+                true, true, true, true
+            );
+
+            this.groundHitReactionsRightMiddle = new ReorderableList(
+                this.serializedObject,
+                this.spGroundHitReactionsRightMiddle,
+                true, true, true, true
+            );
+
             this.groundHitReactionsFrontList.drawHeaderCallback += this.PaintHitGroundFront_Title;
             this.groundHitReactionsBehindList.drawHeaderCallback += this.PaintHitGroundBehind_Title;
             this.airborneHitReactionsFrontList.drawHeaderCallback += this.PaintHitAirFront_Title;
             this.airborneHitReactionsBehindList.drawHeaderCallback += this.PaintHitAirBehind_Title;
             this.knockbackReactionsList.drawHeaderCallback += this.PaintKnockback_Title;
+            this.groundHitReactionsLeftMiddle.drawHeaderCallback += this.PaintHitGroundLeft_Title;
+            this.groundHitReactionsRightMiddle.drawHeaderCallback += this.PaintHitGroundRight_Title;
 
             this.groundHitReactionsFrontList.drawElementCallback += this.PaintHitGroundFront_Element;
             this.groundHitReactionsBehindList.drawElementCallback += this.PaintHitGroundBehind_Element;
             this.airborneHitReactionsFrontList.drawElementCallback += this.PaintHitAirFront_Element;
             this.airborneHitReactionsBehindList.drawElementCallback += this.PaintHitAirBehind_Element;
             this.knockbackReactionsList.drawElementCallback += this.PaintHitKnockback_Element;
+            this.groundHitReactionsLeftMiddle.drawElementCallback += this.PaintHitGroundLeft_Element;
+            this.groundHitReactionsRightMiddle.drawElementCallback += this.PaintHitGroundRight_Element;
 
             this.spCombos = this.serializedObject.FindProperty("combos");
 
@@ -191,6 +214,12 @@
 
             EditorGUILayout.Space();
             this.airborneHitReactionsBehindList.DoLayoutList();
+
+            EditorGUILayout.Space();
+            this.groundHitReactionsLeftMiddle.DoLayoutList();
+
+            EditorGUILayout.Space();
+            this.groundHitReactionsRightMiddle.DoLayoutList();
 
             EditorGUILayout.Space();
             this.knockbackReactionsList.DoLayoutList();
@@ -290,6 +319,16 @@
             EditorGUI.LabelField(rect, "Hit Reaction - Airborne & Behind");
         }
 
+        private void PaintHitGroundLeft_Title(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Hit Reaction - Grounded & Left");
+        }
+
+        private void PaintHitGroundRight_Title(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Hit Reaction - Grounded & Right");
+        }
+
         private void PaintKnockback_Title(Rect rect)
         {
             EditorGUI.LabelField(rect, "Hit Reaction - Knockback");
@@ -343,6 +382,32 @@
 
             EditorGUI.PropertyField(
                 rect, this.spAirborneHitReactionBehind.GetArrayElementAtIndex(index),
+                GC_REACTION, true
+            );
+        }
+
+        private void PaintHitGroundLeft_Element(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            rect = new Rect(
+                rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
+                rect.width, EditorGUIUtility.singleLineHeight
+            );
+
+            EditorGUI.PropertyField(
+                rect, this.spGroundHitReactionsLeftMiddle.GetArrayElementAtIndex(index),
+                GC_REACTION, true
+            );
+        }
+
+        private void PaintHitGroundRight_Element(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            rect = new Rect(
+                rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
+                rect.width, EditorGUIUtility.singleLineHeight
+            );
+
+            EditorGUI.PropertyField(
+                rect, this.spGroundHitReactionsRightMiddle.GetArrayElementAtIndex(index),
                 GC_REACTION, true
             );
         }

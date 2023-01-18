@@ -69,6 +69,8 @@
         public float poiseDamage = 2f;
         public float defenseDamage = 1f;
 
+        public float animSpeed = 1.0f;
+
         // properties:
         public Interrupt interruptible = Interrupt.Interruptible;
         public Vulnerable vulnerability = Vulnerable.Vulnerable;
@@ -100,7 +102,7 @@
 
             melee.Character.GetCharacterAnimator().StopGesture(0.1f);
             melee.Character.GetCharacterAnimator().CrossFadeGesture(
-                this.animationClip, 1.0f, this.avatarMask,
+                this.animationClip, this.animSpeed, this.avatarMask,
                 this.transitionIn, this.transitionOut
             );
 
@@ -108,7 +110,7 @@
 
             melee.Character.RootMovement(
                 this.movementMultiplier,
-                duration,
+                duration / this.animSpeed,
                 this.gravityInfluence,
                 this.movementForward,
                 this.movementSides,
@@ -116,6 +118,18 @@
             );
 
             this.ExecuteActionsOnStart(melee.Blade.GetImpactPosition(), melee.gameObject);
+        }
+
+        public void Stop(CharacterMelee melee)
+        {
+            melee.Character.RootMovement(
+                0,
+                0,
+                this.gravityInfluence,
+                this.movementForward,
+                this.movementSides,
+                this.movementVertical
+            );
         }
 
         public void ExecuteHitPause()
