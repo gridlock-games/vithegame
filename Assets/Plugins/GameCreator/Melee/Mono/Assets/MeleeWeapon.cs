@@ -68,6 +68,15 @@
         public List<MeleeClip> groundHitReactionsLeftMiddle = new List<MeleeClip>();
         public List<MeleeClip> groundHitReactionsRightMiddle = new List<MeleeClip>();
 
+        public MeleeClip dodgeF = new MeleeClip();
+        public MeleeClip dodgeFL = new MeleeClip();
+        public MeleeClip dodgeFR = new MeleeClip();
+        public MeleeClip dodgeB = new MeleeClip();
+        public MeleeClip dodgeBL = new MeleeClip();
+        public MeleeClip dodgeBR = new MeleeClip();
+        public MeleeClip dodgeL = new MeleeClip();
+        public MeleeClip dodgeR = new MeleeClip();
+
         // combo system:
         public List<Combo> combos = new List<Combo>();
 

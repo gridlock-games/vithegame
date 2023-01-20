@@ -7,6 +7,7 @@
     using GameCreator.Core;
     using GameCreator.Characters;
     using GameCreator.Variables;
+    using GameCreator.Melee;
 
     #if UNITY_EDITOR
     using UnityEditor;
@@ -50,6 +51,17 @@
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             CharacterAnimator animator = characterTarget.GetCharacterAnimator();
             Vector3 moveDirection = Vector3.zero;
+
+            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
+
+            if (melee != null)
+			{
+				if(melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true) {
+                    melee.StopAttack();
+					animator.StopGesture(0f);
+                    melee.currentMeleeClip = null;
+				}
+			}
 
             switch (this.direction)
             {

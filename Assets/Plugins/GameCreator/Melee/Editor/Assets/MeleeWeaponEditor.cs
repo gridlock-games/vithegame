@@ -26,6 +26,7 @@
         private Section sectionGeneral;
         private Section sectionModel;
         private Section sectionEffects;
+        private Section sectionDodges;
 
         private SerializedProperty spName;
         private SerializedProperty spDescription;
@@ -55,6 +56,15 @@
         private SerializedProperty spGroundHitReactionsRightMiddle;
         private SerializedProperty spKnockbackReactions;
 
+        public SerializedProperty spDodgeF;
+        public SerializedProperty spDodgeFL;
+        public SerializedProperty spDodgeFR;
+        public SerializedProperty spDodgeB;
+        public SerializedProperty spDodgeBL;
+        public SerializedProperty spDodgeBR;
+        public SerializedProperty spDodgeL;
+        public SerializedProperty spDodgeR;
+
         private SerializedProperty spCombos;
 
         private ReorderableList groundHitReactionsFrontList;
@@ -64,9 +74,7 @@
         private ReorderableList groundHitReactionsLeftMiddle;
         private ReorderableList groundHitReactionsRightMiddle;
         private ReorderableList knockbackReactionsList;
-
         private ReorderableList comboList;
-
         // PROPERTIES: ----------------------------------------------------------------------------
 
         
@@ -80,6 +88,8 @@
             this.sectionGeneral = new Section("General", this.LoadIcon("General"), this.Repaint);
             this.sectionModel = new Section("Weapon Model", this.LoadIcon("Sword"), this.Repaint);
             this.sectionEffects = new Section("Effects", this.LoadIcon("Effects"), this.Repaint);
+            this.sectionDodges = new Section("Dodge Animations", this.LoadIcon("General"), this.Repaint);
+
 
             this.spName = this.serializedObject.FindProperty("weaponName");
             this.spDescription = this.serializedObject.FindProperty("weaponDescription");
@@ -109,6 +119,15 @@
             this.spGroundHitReactionsLeftMiddle = this.serializedObject.FindProperty("groundHitReactionsLeftMiddle");
             this.spGroundHitReactionsRightMiddle = this.serializedObject.FindProperty("groundHitReactionsRightMiddle");
             this.spKnockbackReactions = this.serializedObject.FindProperty("knockbackReaction");
+
+            this.spDodgeF = this.serializedObject.FindProperty("dodgeF");
+            this.spDodgeFL = this.serializedObject.FindProperty("dodgeFL");
+            this.spDodgeFR = this.serializedObject.FindProperty("dodgeFR");
+            this.spDodgeB = this.serializedObject.FindProperty("dodgeB");
+            this.spDodgeBL = this.serializedObject.FindProperty("dodgeBL");
+            this.spDodgeBR = this.serializedObject.FindProperty("dodgeBR");
+            this.spDodgeL = this.serializedObject.FindProperty("dodgeL");
+            this.spDodgeR = this.serializedObject.FindProperty("dodgeR");
 
             this.groundHitReactionsFrontList = new ReorderableList(
                 this.serializedObject,
@@ -201,6 +220,9 @@
             this.comboList.DoLayoutList();
 
             EditorGUILayout.Space();
+            this.PaintDodge_Element();
+
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Hit Reactions", EditorStyles.boldLabel);
 
             EditorGUILayout.Space();
@@ -225,6 +247,8 @@
             this.knockbackReactionsList.DoLayoutList();
 
             this.serializedObject.ApplyModifiedProperties();
+
+            
         }
 
         private void PaintSectionGeneral()
@@ -332,6 +356,38 @@
         private void PaintKnockback_Title(Rect rect)
         {
             EditorGUI.LabelField(rect, "Hit Reaction - Knockback");
+        }
+
+        private void PaintDodge_Title(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Dodge Animations");
+        }
+
+        private void PaintDodge_Element()
+        {
+            this.sectionDodges.PaintSection();
+            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionDodges.state.faded))
+            {
+                if (group.visible)
+                {
+                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+
+                    EditorGUILayout.PropertyField(this.spDodgeB);
+                    EditorGUILayout.PropertyField(this.spDodgeBL);
+                    EditorGUILayout.PropertyField(this.spDodgeBR);
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(this.spDodgeF);
+                    EditorGUILayout.PropertyField(this.spDodgeFL);
+                    EditorGUILayout.PropertyField(this.spDodgeFR);
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(this.spDodgeL);
+                    EditorGUILayout.PropertyField(this.spDodgeR);
+
+                    EditorGUILayout.EndVertical();
+                }
+            }
         }
 
         private void PaintHitGroundFront_Element(Rect rect, int index, bool isActive, bool isFocused)
