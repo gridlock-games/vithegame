@@ -1,4 +1,4 @@
-﻿namespace GameCreator.Melee
+namespace GameCreator.Melee
 {
     using System;
     using System.Collections;
@@ -39,7 +39,7 @@
         private const float MAX_RAND_PITCH = 1.2f;
 
         private const float TRANSITION = 0.15f;
-        private const float INPUT_BUFFER_TIME = 0.10f;
+        protected const float INPUT_BUFFER_TIME = 0.35f;
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
@@ -51,8 +51,8 @@
         public MeleeWeapon previousWeapon;
         public MeleeShield previousShield;
 
-        private ComboSystem comboSystem;
-        private InputBuffer inputBuffer;
+        protected ComboSystem comboSystem;
+        protected InputBuffer inputBuffer;
 
         public float Poise { get; protected set; }
         private float poiseDelayCooldown;
@@ -64,37 +64,37 @@
         public float Defense { get; protected set; }
         private float defenseDelayCooldown;
 
-        public bool IsDrawing { get; private set; }
-        public bool IsSheathing { get; private set; }
+        public bool IsDrawing { get; protected set; }
+        public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
         public bool IsBlocking  { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
-        public bool IsStaggered => this.isStaggered && Time.time <= this.staggerEndtime;
-        public bool IsInvincible => this.isInvincible && Time.time <= this.invincibilityEndTime;
-        public bool IsUninterruptable => this.isUninterruptable && Time.time <= this.uninterruptableEndTime;
+        public bool IsStaggered => this.isStaggered && GetTime() <= this.staggerEndtime;
+        public bool IsInvincible => this.isInvincible && GetTime() <= this.invincibilityEndTime;
+        public bool IsUninterruptable => this.isUninterruptable && GetTime() <= this.uninterruptableEndTime;
 
-        public event Action<MeleeWeapon> EventDrawWeapon;
-        public event Action<MeleeWeapon> EventSheatheWeapon;
+        public Action<MeleeWeapon> EventDrawWeapon;
+        public Action<MeleeWeapon> EventSheatheWeapon;
         public event Action<MeleeClip> EventAttack;
-        public event Action EventStagger;
+        public event Action<float> EventStagger;
         public event Action EventBreakDefense;
         public event Action<bool> EventBlock;
         public event Action<bool> EventFocus;
 
         // PRIVATE PROPERTIES: --------------------------------------------------------------------
 
-        private GameObject modelWeapon;
-        private GameObject modelShield;
+        protected GameObject modelWeapon;
+        protected GameObject modelShield;
 
         public MeleeClip currentMeleeClip;
-        private HashSet<int> targetsEvaluated;
+        protected HashSet<int> targetsEvaluated;
 
         private float startBlockingTime = -100f;
 
-        private bool isStaggered;
-        private float staggerEndtime;
+        protected bool isStaggered;
+        protected float staggerEndtime;
 
         private bool isInvincible;
         private float invincibilityEndTime;
@@ -104,13 +104,13 @@
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
-        public Character Character { get; private set; }
-        public CharacterAnimator CharacterAnimator { get; private set; }
-        public BladeComponent Blade { get; private set; }
+        public Character Character { get; protected set; }
+        public CharacterAnimator CharacterAnimator { get; protected set; }
+        public BladeComponent Blade { get; protected set; }
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
-        public void Awake()
+        protected virtual void Awake()
         {
             this.Character = GetComponent<Character>();
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
@@ -119,7 +119,7 @@
 
         // UPDATE: --------------------------------------------------------------------------------
 
-        private void Update()
+        protected virtual void Update()
         {
             this.UpdatePoise();
             this.UpdateDefense();
@@ -211,7 +211,7 @@
             }
         }
 
-        private void UpdatePoise()
+        protected void UpdatePoise()
         {
             this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
             if (this.poiseDelayCooldown > float.Epsilon) return;
@@ -220,7 +220,7 @@
             this.Poise = Mathf.Min(this.Poise, this.maxPoise.GetValue(gameObject));
         }
 
-        private void UpdateDefense()
+        protected void UpdateDefense()
         {
             if (!this.currentShield) return;
 
@@ -369,7 +369,7 @@
                 this.EventBlock.Invoke(true);
             }
 
-            this.startBlockingTime = Time.time;
+            this.startBlockingTime = GetTime();
             this.IsBlocking = true;
         }
 
@@ -382,7 +382,7 @@
             this.IsBlocking = false;
         }
 
-        public void Execute(ActionKey actionKey)
+        public virtual void Execute(ActionKey actionKey)
         {
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
@@ -431,23 +431,23 @@
             if (!this.IsStaggered && posture == MeleeClip.Posture.Stagger)
             {
                 this.comboSystem.Stop();
-                if (EventStagger != null) EventStagger.Invoke();
+                if (EventStagger != null) EventStagger.Invoke(duration);
             }
 
             this.isStaggered = posture == MeleeClip.Posture.Stagger;
-            this.staggerEndtime = Time.time + duration;
+            this.staggerEndtime = GetTime() + duration;
         }
 
         public void SetInvincibility(float duration)
         {
             this.isInvincible = true;
-            this.invincibilityEndTime = Time.time + duration;
+            this.invincibilityEndTime = GetTime() + duration;
         }
 
         public void SetUninterruptable(float duration)
         {
             this.isUninterruptable = true;
-            this.uninterruptableEndTime = Time.time + duration;
+            this.uninterruptableEndTime = GetTime() + duration;
         }
 
         public void SetPoise(float value)
@@ -547,7 +547,7 @@
                 this.AddDefense(-attack.defenseDamage);
                 if (this.Defense > 0)
                 {
-                    if (Time.time < this.startBlockingTime + this.currentShield.perfectBlockWindow)
+                    if (GetTime() < this.startBlockingTime + this.currentShield.perfectBlockWindow)
                     {
                         if (attacker != null)
                         {
@@ -625,6 +625,11 @@
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        protected virtual float GetTime()
+        {
+            return Time.time;
+        }
+
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
             this.PlayAudio(audio);
@@ -635,7 +640,7 @@
             }
         }
 
-        private bool CanAttack()
+        protected bool CanAttack()
         {
             if (this.IsSheathing) return false;
             if (this.IsDrawing) return false;
@@ -643,7 +648,7 @@
             return true;
         }
 
-        private float ResetState(CharacterState state, CharacterAnimation.Layer layer)
+        protected float ResetState(CharacterState state, CharacterAnimation.Layer layer)
         {
             float time = TRANSITION;
             if (state != null)
@@ -660,7 +665,7 @@
             return time;
         }
 
-        private float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer)
+        protected float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer)
         {
             float time = TRANSITION;
             if (state != null)

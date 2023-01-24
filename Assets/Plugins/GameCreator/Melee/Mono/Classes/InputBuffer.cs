@@ -6,8 +6,8 @@
 	{
         public float timeWindow;
 
-        private float inputTime;
-        private CharacterMelee.ActionKey key;
+        protected float inputTime;
+        protected CharacterMelee.ActionKey key;
 
         // CONSTRUCTOR: ---------------------------------------------------------------------------
 
@@ -21,13 +21,13 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void AddInput(CharacterMelee.ActionKey key)
+        public virtual void AddInput(CharacterMelee.ActionKey key)
         {
             this.key = key;
             this.inputTime = Time.time;
         }
 
-        public bool HasInput()
+        public virtual bool HasInput()
         {
             if (this.inputTime <= 0f) return false;
             return Time.time - this.inputTime <= this.timeWindow;
