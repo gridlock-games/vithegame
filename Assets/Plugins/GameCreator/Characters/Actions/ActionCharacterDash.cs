@@ -43,6 +43,15 @@
         public AnimationClip dashClipRight;
         public AnimationClip dashClipLeft;
 
+        private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
+            new Keyframe(0f, 0f),
+            new Keyframe(1f, 0f)
+        };
+
+        private AnimationCurve spMovementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+        private AnimationCurve spMovementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+        private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
             Character characterTarget = this.character.GetCharacter(target);
@@ -54,6 +63,8 @@
 
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
 
+            MeleeWeapon meleeweapon = new MeleeWeapon();
+
             if (melee != null)
 			{
 				if(melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true) {
@@ -61,6 +72,8 @@
 					animator.StopGesture(0f);
                     melee.currentMeleeClip = null;
 				}
+
+                meleeweapon = melee.currentWeapon;
 			}
 
             switch (this.direction)
@@ -103,21 +116,61 @@
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
             AnimationClip clip = null;
 
-            if (angle <= 45f && angle >= -45f) clip = this.dashClipForward;
-            else if (angle < 135f && angle > 45f) clip = this.dashClipLeft;
-            else if (angle > -135f && angle < -45f) clip = dashClipRight;
-            else clip = this.dashClipBackward;
+            float speed = 1.0f;
 
-            bool isDashing = characterTarget.Dash(
-                moveDirection.normalized,
-                this.impulse.GetValue(target),
-                this.duration.GetValue(target),
-                this.drag
-            );
+            MeleeClip dodgeMeleeClip;
 
-            if (isDashing && clip != null && animator != null)
+            #region Compute Angle
+            if (angle <= 15f && angle >= -15f) {
+                dodgeMeleeClip = meleeweapon.dodgeF;
+                clip = meleeweapon.dodgeF.animationClip;
+                speed = meleeweapon.dodgeF.animSpeed;
+            } else if (angle < 80f && angle > 15f) {
+                dodgeMeleeClip = meleeweapon.dodgeFL;
+                clip = meleeweapon.dodgeFL.animationClip;
+                speed = meleeweapon.dodgeFL.animSpeed;
+            } else if (angle > -80f && angle < -15f) {
+                dodgeMeleeClip = meleeweapon.dodgeFR;
+                clip = meleeweapon.dodgeFR.animationClip;
+                speed = meleeweapon.dodgeFR.animSpeed;
+            } else if (angle > 80f && angle < 100f) {
+                dodgeMeleeClip = meleeweapon.dodgeL;
+                clip = meleeweapon.dodgeL.animationClip;
+                speed = meleeweapon.dodgeL.animSpeed;
+            } else if (angle < -80f && angle > -100f) {
+                dodgeMeleeClip = meleeweapon.dodgeR;
+                clip = meleeweapon.dodgeR.animationClip;
+                speed = meleeweapon.dodgeR.animSpeed;
+            } else if (angle < -100f && angle > -170f) {
+                dodgeMeleeClip = meleeweapon.dodgeBR;
+                clip = meleeweapon.dodgeBR.animationClip;
+                speed = meleeweapon.dodgeBR.animSpeed;
+            } else if (angle > 100f && angle < 170f) {
+                dodgeMeleeClip = meleeweapon.dodgeBL;
+                clip = meleeweapon.dodgeBL.animationClip;
+                speed = meleeweapon.dodgeBL.animSpeed;
+            } else {
+                dodgeMeleeClip = meleeweapon.dodgeB;
+                clip = meleeweapon.dodgeB.animationClip;
+                speed = meleeweapon.dodgeB.animSpeed;
+            }
+
+            #endregion
+
+            float duration = clip.length - (clip.length * 0.50f);
+
+            if (clip != null && animator != null)
             {
-                animator.CrossFadeGesture(clip, 1f, null, 0.05f, 0.5f);
+                characterTarget.characterLocomotion.RootMovement(
+                    1.0f, 
+                    duration, 
+                    1.0f,
+                    dodgeMeleeClip.movementForward, 
+                    dodgeMeleeClip.movementSides,
+                    dodgeMeleeClip.movementVertical 
+                );
+
+                animator.CrossFadeGesture(clip, speed, null, 0.15f, 0.4f);
             }
 
             return true;
