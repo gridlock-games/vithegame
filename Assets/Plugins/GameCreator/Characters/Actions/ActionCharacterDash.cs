@@ -162,7 +162,7 @@
             if (clip != null && animator != null)
             {
                 characterTarget.characterLocomotion.RootMovement(
-                    1.0f, 
+                    dodgeMeleeClip.movementMultiplier, 
                     duration, 
                     1.0f,
                     dodgeMeleeClip.movementForward, 
