@@ -439,7 +439,7 @@ MonoBehaviour:
       index: 0
   maxPoise:
     optionIndex: 0
-    value: 100
+    value: 99999
     global:
       allowTypesMask: 4
       name: 
@@ -455,7 +455,7 @@ MonoBehaviour:
       index: 0
   poiseRecoveryRate:
     optionIndex: 0
-    value: 10
+    value: 99999
     global:
       allowTypesMask: 4
       name: 
@@ -482,10 +482,10 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
-  m_Radius: 0.3
+  m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &36426726
@@ -2935,10 +2935,10 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
-  m_Radius: 0.3
+  m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &477465821
@@ -8791,6 +8791,8 @@ GameObject:
   - component: {fileID: 1351844917}
   - component: {fileID: 1351844916}
   - component: {fileID: 1351844919}
+  - component: {fileID: 1351844921}
+  - component: {fileID: 1351844920}
   m_Layer: 3
   m_Name: Actions
   m_TagString: Untagged
@@ -8863,6 +8865,8 @@ MonoBehaviour:
   actions:
   - {fileID: 1351844916}
   - {fileID: 1351844919}
+  - {fileID: 1351844921}
+  - {fileID: 1351844920}
   executingIndex: -1
   isExecuting: 0
 --- !u!114 &1351844918
@@ -8918,6 +8922,53 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   active: 1
+--- !u!114 &1351844920
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351844914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e9cbe49ce69d4c39800705e0941d8c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  character:
+    target: 2
+    character: {fileID: 36426727}
+    local:
+      allowTypesMask: 512
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    global:
+      allowTypesMask: 512
+      name: 
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+    eventChangeVariable:
+      m_PersistentCalls:
+        m_Calls: []
+  blocking: 0
+--- !u!114 &1351844921
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351844914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093bbc6a7c1334b37ac569a948728c55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  waitTime: 1
 --- !u!1 &1363758534
 GameObject:
   m_ObjectHideFlags: 0
@@ -9574,7 +9625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7955029cd5c842e4baaec94dc6d35ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 1
+  isExpanded: 0
   source: 0
   actions: {fileID: 473910353}
   variable:
@@ -10967,12 +11018,12 @@ MonoBehaviour:
     values:
     - {fileID: 1750274980}
   items:
-  - option: 0
-    conditions: {fileID: 2133249071}
-    actions: {fileID: 0}
   - option: 1
     conditions: {fileID: 0}
     actions: {fileID: 809569170}
+  - option: 0
+    conditions: {fileID: 2133249071}
+    actions: {fileID: 0}
   - option: 0
     conditions: {fileID: 292606562}
     actions: {fileID: 0}
@@ -11665,7 +11716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80584c3e2560c48f59ea4d2919d9c6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 1
+  isExpanded: 0
   source: 0
   actions: {fileID: 473910353}
   variable:
@@ -12359,7 +12410,6 @@ GameObject:
   - component: {fileID: 2133249069}
   - component: {fileID: 2133249068}
   - component: {fileID: 2133249067}
-  - component: {fileID: 2133249066}
   - component: {fileID: 2133249072}
   m_Layer: 3
   m_Name: CanAttack
@@ -12384,51 +12434,6 @@ Transform:
   m_Father: {fileID: 1750274979}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2133249066
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2133249064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 670bb82f9646e4e9f88a9fd84e371457, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isExpanded: 0
-  comparison: 0
-  variable:
-    variableType: 1
-    global:
-      allowTypesMask: 8
-      name: 
-    local:
-      allowTypesMask: 8
-      name: isDodging
-      targetType: 2
-      targetObject: {fileID: 477465818}
-    list:
-      targetType: 3
-      targetObject: {fileID: 0}
-      select: 1
-      index: 0
-  compareTo:
-    optionIndex: 0
-    value: 0
-    global:
-      allowTypesMask: 8
-      name: 
-    local:
-      allowTypesMask: 8
-      name: 
-      targetType: 2
-      targetObject: {fileID: 0}
-    list:
-      targetType: 3
-      targetObject: {fileID: 0}
-      select: 1
-      index: 0
 --- !u!114 &2133249067
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -12510,7 +12515,6 @@ MonoBehaviour:
   conditions:
   - {fileID: 2133249068}
   - {fileID: 2133249067}
-  - {fileID: 2133249066}
   - {fileID: 2133249072}
 --- !u!114 &2133249070
 MonoBehaviour:
@@ -12564,7 +12568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a95db2fb4d59941d8b61f2b367a576d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 1
+  isExpanded: 0
   character:
     target: 2
     character: {fileID: 477465822}
