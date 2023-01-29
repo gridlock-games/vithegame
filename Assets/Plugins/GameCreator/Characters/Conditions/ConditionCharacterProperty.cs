@@ -21,6 +21,7 @@
             IsRunning,
             IsGrounded,
             IsOnAir,
+            IsDashing,
             CanRun,
             CanJump
         }
@@ -70,6 +71,11 @@
                 case CharacterProperty.CanJump:
                     if (character.characterLocomotion != null)
                         result = character.characterLocomotion.canJump;
+                    break;
+
+                case CharacterProperty.IsDashing:
+                    if (character.characterLocomotion != null)
+                        result = character.characterLocomotion.isDashing;
                     break;
             }
 

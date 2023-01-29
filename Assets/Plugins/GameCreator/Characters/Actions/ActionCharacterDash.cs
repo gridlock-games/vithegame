@@ -159,6 +159,13 @@
 
             float duration = clip.length - (clip.length * 0.50f);
 
+            bool isDashing = characterTarget.Dash(
+                moveDirection.normalized,
+                this.impulse.GetValue(target),
+                0.15f,
+                1.0f
+            );
+
             if (clip != null && animator != null)
             {
                 characterTarget.characterLocomotion.RootMovement(

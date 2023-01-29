@@ -70,6 +70,7 @@
 
         public bool canRun = true;
         public bool canJump = true;
+        public bool isDashing = false;
         public float jumpForce = 6.0f;
         public int jumpTimes = 1;
         public float timeBetweenJumps = 0.5f;
@@ -150,7 +151,7 @@
 
         public void Dash(Vector3 direction, float impulse, float duration, float drag)
         {
-            this.SetDirectionalDirection(Vector3.zero);
+            // this.SetDirectionalDirection(Vector3.zero);
             this.currentLocomotionSystem.Dash(direction, impulse, duration, drag);
         }
 
@@ -417,6 +418,7 @@
             this.character.characterState.isGrounded = isGrounded ? 1f : 0f;
             this.character.characterState.isSliding = isSliding ? 1f : 0f;
             this.character.characterState.isDashing = this.currentLocomotionSystem.isDashing ? 1f : 0f;
+            this.isDashing = this.currentLocomotionSystem.isDashing ? true : false;
             this.character.characterState.normal = this.terrainNormal;
         }
     }

@@ -48,14 +48,6 @@
                 this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
                 this.characterLocomotion.characterController.transform.rotation = targetRotation;
             }
-            else if (this.isDashing)
-            {
-                targetDirection = this.dashVelocity;
-                targetRotation = this.characterLocomotion.characterController.transform.rotation;
-
-                this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
-                this.characterLocomotion.characterController.transform.rotation = targetRotation;
-            }
             else
             {
                 this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);

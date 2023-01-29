@@ -20,7 +20,8 @@
             InputForward,
             InputBackwards,
             InputLeft,
-            InputRight
+            InputRight,
+            IsDashing
         }
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
@@ -272,6 +273,12 @@
                         {
                             return candidates[i];
                         }
+                        break;
+
+                    case Condition.IsDashing:
+                        float isDashing = this.melee.Character.characterState.isDashing;
+                        if(isDashing == 1.0f) return candidates[i];
+
                         break;
                 }
             }

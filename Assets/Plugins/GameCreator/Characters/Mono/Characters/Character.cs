@@ -162,6 +162,10 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public bool isCharacterDashing() {
+            return this.characterLocomotion.isDashing;
+        }
+
         public State GetCharacterState()
         {
             return this.characterState;
@@ -241,7 +245,7 @@
             if (this.characterLocomotion.isBusy) return false;
 
             this.characterLocomotion.Dash(direction, impulse, duration, drag);
-            if (this.animator != null) this.animator.Dash();
+            // if (this.animator != null) this.animator.Dash();
             if (this.onDash != null) this.onDash.Invoke();
             return true;
         }
