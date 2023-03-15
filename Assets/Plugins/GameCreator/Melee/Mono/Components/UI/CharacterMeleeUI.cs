@@ -26,6 +26,9 @@
         public Text defenseTextCurrentValue;
         public Text defenseTextMaxValue;
 
+        [Header("WeaponUI")]
+        public Image weaponImageFill;
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         private void Start()
@@ -36,6 +39,11 @@
         private void Update()
         {
             this.UpdateUI();
+        }
+
+        private void LateUpdate()
+        {
+            this.UpdateWeaponUI();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -67,6 +75,15 @@
             if (this.defenseImageFill) this.defenseImageFill.fillAmount = percentDefense;
             if (this.defenseTextCurrentValue) this.defenseTextCurrentValue.text = this.melee.Defense.ToString("0.00");
             if (this.defenseTextMaxValue) this.defenseTextMaxValue.text = maxDefense.ToString("0.00");
+        }
+
+        /*
+        * Update image of currently equipped Weapon
+        */
+        private void UpdateWeaponUI() {
+            if(this.melee.currentWeapon && this.melee.currentWeapon.weaponImage) { 
+                this.weaponImageFill.sprite = this.melee.currentWeapon.weaponImage;
+            }
         }
     }
 }

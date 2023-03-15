@@ -3,6 +3,7 @@
 	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
+	using UnityEngine.UI;
 	using UnityEngine.Events;
 	using GameCreator.Core;
     using GameCreator.Characters;
@@ -58,6 +59,7 @@
         private SerializedProperty spDrawPreviousWeapon;
         private SerializedProperty spMeleeWeapon;
         private SerializedProperty spMeleeShield;
+        private SerializedProperty spWeaponImageUI;
 
         protected override void OnEnableEditorChild()
         {
@@ -78,7 +80,7 @@
 
             EditorGUI.BeginDisabledGroup(this.spDrawPreviousWeapon.boolValue);
             EditorGUILayout.PropertyField(this.spMeleeWeapon);
-            EditorGUILayout.PropertyField(this.spMeleeShield);
+            EditorGUILayout.PropertyField(this.spMeleeShield); 
             EditorGUI.EndDisabledGroup();
 
             this.serializedObject.ApplyModifiedProperties();

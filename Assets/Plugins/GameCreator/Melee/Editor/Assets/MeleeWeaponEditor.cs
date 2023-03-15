@@ -34,6 +34,7 @@
         private SerializedProperty spDefaultShield;
         private SerializedProperty spCharacterState;
         private SerializedProperty spAvatarMask;
+        private SerializedProperty spWeaponImage;
 
         private SerializedProperty spPrefab;
         private SerializedProperty spAttachment;
@@ -97,6 +98,7 @@
             this.spDefaultShield = this.serializedObject.FindProperty("defaultShield");
             this.spCharacterState = this.serializedObject.FindProperty("characterState");
             this.spAvatarMask = this.serializedObject.FindProperty("characterMask");
+            this.spWeaponImage = this.serializedObject.FindProperty("weaponImage");
 
             this.spPrefab = this.serializedObject.FindProperty("prefab");
             this.spAttachment = this.serializedObject.FindProperty("attachment");
@@ -269,6 +271,7 @@
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spCharacterState);
                     EditorGUILayout.PropertyField(this.spAvatarMask);
+                    EditorGUILayout.PropertyField(this.spWeaponImage);
 
                     EditorGUILayout.EndVertical();
                 }

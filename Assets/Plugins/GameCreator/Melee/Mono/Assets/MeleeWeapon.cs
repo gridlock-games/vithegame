@@ -4,6 +4,7 @@
     using System.Collections;
 	using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.UI;
     using GameCreator.Characters;
     using GameCreator.Core;
     using GameCreator.Localization;
@@ -42,6 +43,7 @@
         public MeleeShield defaultShield;
         public CharacterState characterState;
         public AvatarMask characterMask;
+        public Sprite weaponImage;
 
         // 3d model:
         public GameObject prefab;
