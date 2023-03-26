@@ -3825,6 +3825,7 @@ GameObject:
   - component: {fileID: 578120304}
   - component: {fileID: 578120303}
   - component: {fileID: 578120308}
+  - component: {fileID: 578120309}
   m_Layer: 3
   m_Name: CanAttack
   m_TagString: Untagged
@@ -3916,6 +3917,7 @@ MonoBehaviour:
   conditions:
   - {fileID: 578120299}
   - {fileID: 578120302}
+  - {fileID: 578120309}
 --- !u!114 &578120301
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3931,7 +3933,7 @@ MonoBehaviour:
   description: NotDashing
   conditionsList: {fileID: 578120300}
   actions: {fileID: 1671397419}
-  isExpanded: 0
+  isExpanded: 1
   onCheckConditions:
     m_PersistentCalls:
       m_Calls: []
@@ -3983,7 +3985,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4c0c4ae399eb46f2bd2b9c0835f3938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
+  isExpanded: 1
   target:
     target: 2
     character: {fileID: 477465822}
@@ -4102,7 +4104,7 @@ MonoBehaviour:
   description: isDashing
   conditionsList: {fileID: 578120306}
   actions: {fileID: 438217737}
-  isExpanded: 1
+  isExpanded: 0
   onCheckConditions:
     m_PersistentCalls:
       m_Calls: []
@@ -4150,6 +4152,51 @@ MonoBehaviour:
       name: 
     local:
       allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+--- !u!114 &578120309
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 578120296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 670bb82f9646e4e9f88a9fd84e371457, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  comparison: 0
+  variable:
+    variableType: 1
+    global:
+      allowTypesMask: 8
+      name: 
+    local:
+      allowTypesMask: 8
+      name: isDodging
+      targetType: 2
+      targetObject: {fileID: 477465818}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  compareTo:
+    optionIndex: 0
+    value: 0
+    global:
+      allowTypesMask: 8
+      name: 
+    local:
+      allowTypesMask: 8
       name: 
       targetType: 2
       targetObject: {fileID: 0}
@@ -5162,8 +5209,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 093bbc6a7c1334b37ac569a948728c55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
-  waitTime: 0.5
+  isExpanded: 1
+  waitTime: 1
 --- !u!114 &655139408
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -5176,7 +5223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d234afa27d82846abbf91e13c4f5eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
+  isExpanded: 1
   valueFrom: 2
   global:
     allowTypesMask: -1
@@ -6351,7 +6398,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   drawPreviousWeapon: 0
-  meleeWeapon: {fileID: 11400000, guid: 9bdee39b8a4026a4782c353203b62ece, type: 2}
+  meleeWeapon: {fileID: 11400000, guid: cc8efbf120c4edd41bda302fcd44bbf6, type: 2}
   meleeShield: {fileID: 0}
 --- !u!114 &840414617
 MonoBehaviour:
@@ -11181,6 +11228,7 @@ GameObject:
   - component: {fileID: 1671397418}
   - component: {fileID: 1671397417}
   - component: {fileID: 1671397420}
+  - component: {fileID: 1671397421}
   m_Layer: 3
   m_Name: Actions
   m_TagString: Untagged
@@ -11251,6 +11299,7 @@ MonoBehaviour:
   actions:
   - {fileID: 1671397420}
   - {fileID: 1671397417}
+  - {fileID: 1671397421}
   executingIndex: -1
   isExecuting: 0
 --- !u!114 &1671397419
@@ -11285,7 +11334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7955029cd5c842e4baaec94dc6d35ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 1
+  isExpanded: 0
   source: 0
   actions: {fileID: 1568715462}
   variable:
@@ -11304,6 +11353,21 @@ MonoBehaviour:
       select: 1
       index: 0
   stopImmidiately: 1
+--- !u!114 &1671397421
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671397415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd9e621b1ec874c8daa5bd0d1aaede64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  logType: 0
+  message: HIIIII
 --- !u!1 &1687771562
 GameObject:
   m_ObjectHideFlags: 0
@@ -11851,7 +11915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 842a04b05a7094a5ea359d4cb24d968a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
+  isExpanded: 1
   character:
     target: 2
     character: {fileID: 477465822}
@@ -13661,6 +13725,7 @@ GameObject:
   - component: {fileID: 2133249068}
   - component: {fileID: 2133249067}
   - component: {fileID: 2133249072}
+  - component: {fileID: 2133249073}
   m_Layer: 3
   m_Name: CanAttack
   m_TagString: Untagged
@@ -13766,6 +13831,7 @@ MonoBehaviour:
   - {fileID: 2133249068}
   - {fileID: 2133249067}
   - {fileID: 2133249072}
+  - {fileID: 2133249073}
 --- !u!114 &2133249070
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -13847,6 +13913,51 @@ MonoBehaviour:
       name: 
     local:
       allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+--- !u!114 &2133249073
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133249064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 670bb82f9646e4e9f88a9fd84e371457, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 0
+  comparison: 0
+  variable:
+    variableType: 1
+    global:
+      allowTypesMask: 8
+      name: 
+    local:
+      allowTypesMask: 8
+      name: isDodging
+      targetType: 2
+      targetObject: {fileID: 477465818}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  compareTo:
+    optionIndex: 0
+    value: 0
+    global:
+      allowTypesMask: 8
+      name: 
+    local:
+      allowTypesMask: 8
       name: 
       targetType: 2
       targetObject: {fileID: 0}
