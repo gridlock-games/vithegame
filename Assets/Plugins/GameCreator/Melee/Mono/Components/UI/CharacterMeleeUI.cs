@@ -81,9 +81,10 @@
         * Update image of currently equipped Weapon
         */
         private void UpdateWeaponUI() {
-            if(this.melee.currentWeapon && this.melee.currentWeapon.weaponImage) { 
-                this.weaponImageFill.sprite = this.melee.currentWeapon.weaponImage;
-            }
+            if (!melee) { return; }
+            if (!melee.currentWeapon) { return; }
+            if (!melee.currentWeapon.weaponImage) { return; }
+            weaponImageFill.sprite = melee.currentWeapon.weaponImage;
         }
     }
 }
