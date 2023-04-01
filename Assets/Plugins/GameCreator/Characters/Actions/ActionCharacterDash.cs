@@ -157,7 +157,7 @@
 
             #endregion
 
-            float duration = clip.length - (clip.length * 0.50f);
+            float duration = (clip.length - (clip.length * 0.50f)) / speed;
 
             bool isDashing = characterTarget.Dash(
                 moveDirection.normalized,
