@@ -3,6 +3,7 @@
     using UnityEngine;
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
+    using Unity.Netcode;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -75,7 +76,7 @@
             }
 
             HookPlayer hookPlayer = gameObject.GetComponent<HookPlayer>();
-            if (hookPlayer == null) gameObject.AddComponent<HookPlayer>();
+            //if (hookPlayer == null) gameObject.AddComponent<HookPlayer>();
 
             if (ON_LOAD_SCENE_DATA != null && ON_LOAD_SCENE_DATA.active)
             {
@@ -122,37 +123,36 @@
             this.CharacterUpdate();
         }
 
+        protected NetworkVariable<Vector3> moveInput = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         protected virtual void UpdateInputDirectional()
         {
-            Vector3 targetDirection = Vector3.zero;
-            if (!this.IsControllable()) return;
+            if (IsOwner)
+            {
+                if (Application.isMobilePlatform ||
+                    TouchStickManager.FORCE_USAGE ||
+                    this.forceDisplayTouchstick)
+                {
+                    Vector2 touchDirection = TouchStickManager.Instance.GetDirection(this);
+                    moveInput.Value = new Vector3(touchDirection.x, 0.0f, touchDirection.y);
+                }
 
-            if (Application.isMobilePlatform || 
-                TouchStickManager.FORCE_USAGE ||
-                this.forceDisplayTouchstick)
-            {
-                Vector2 touchDirection = TouchStickManager.Instance.GetDirection(this);
-                targetDirection = new Vector3(touchDirection.x, 0.0f, touchDirection.y);
-            }
-            else
-            {
-                targetDirection = new Vector3(
+                moveInput.Value = new Vector3(
                     Input.GetAxisRaw(AXIS_H),
                     0.0f,
                     Input.GetAxisRaw(AXIS_V)
                 );
             }
 
+            if (!IsServer) { return; }
+
+            Vector3 targetDirection = Vector3.zero;
+            if (!this.IsControllable()) return;
+
+            targetDirection = moveInput.Value;
+
             this.ComputeMovement(targetDirection);
 
-            Camera maincam = this.GetMainCamera();
-            if (maincam == null) return;
-
-            Vector3 moveDirection = (
-                Quaternion.Euler(0, maincam.transform.rotation.eulerAngles.y, 0) * 
-                this.direction
-            );
-
+            Vector3 moveDirection = transform.rotation * moveInput.Value;
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 

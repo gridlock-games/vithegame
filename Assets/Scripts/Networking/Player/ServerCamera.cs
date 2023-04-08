@@ -25,10 +25,8 @@ namespace LightPat.Player
             transform.Translate(new Vector3(moveInput.x, 0, moveInput.y) * moveSpeed);
 
             Vector2 lookInput = Vector2.zero;
-            if (Input.GetKey(KeyCode.UpArrow)) { lookInput.y = 1; }
-            if (Input.GetKey(KeyCode.DownArrow)) { lookInput.y = -1; }
-            if (Input.GetKey(KeyCode.RightArrow)) { lookInput.x = 1; }
-            if (Input.GetKey(KeyCode.LeftArrow)) { lookInput.x = -1; }
+            lookInput.x = Input.GetAxis("Mouse X");
+            lookInput.y = Input.GetAxis("Mouse Y");
             lookInput *= sensitivity;
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x - lookInput.y, transform.localEulerAngles.y + lookInput.x, transform.localEulerAngles.z);
 
