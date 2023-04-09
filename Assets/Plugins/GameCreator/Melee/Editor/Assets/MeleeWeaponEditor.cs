@@ -15,6 +15,7 @@
         private static readonly Color ACTIVE_LAYER = new Color(0, 0, 0, 0.3f);
 
         private static readonly GUIContent GC_REACTION = new GUIContent("Hit Reaction");
+        private static readonly GUIContent GC_WM = new GUIContent("Weapon Model");
 
         private const float PADDING = 4f;
         private const float SPACING = 2f;
@@ -30,6 +31,7 @@
 
         private SerializedProperty spName;
         private SerializedProperty spDescription;
+        private SerializedProperty spMeleeWeaponName;
 
         private SerializedProperty spDefaultShield;
         private SerializedProperty spCharacterState;
@@ -76,6 +78,10 @@
         private ReorderableList groundHitReactionsRightMiddle;
         private ReorderableList knockbackReactionsList;
         private ReorderableList comboList;
+
+        private SerializedProperty spWeaponModels;
+        // private ReorderableList weaponModelsList;
+        
         // PROPERTIES: ----------------------------------------------------------------------------
 
         
@@ -91,9 +97,12 @@
             this.sectionEffects = new Section("Effects", this.LoadIcon("Effects"), this.Repaint);
             this.sectionDodges = new Section("Dodge Animations", this.LoadIcon("General"), this.Repaint);
 
+            
+            
 
             this.spName = this.serializedObject.FindProperty("weaponName");
             this.spDescription = this.serializedObject.FindProperty("weaponDescription");
+            this.spMeleeWeaponName = this.serializedObject.FindProperty("meleeWeaponName");
 
             this.spDefaultShield = this.serializedObject.FindProperty("defaultShield");
             this.spCharacterState = this.serializedObject.FindProperty("characterState");
@@ -189,6 +198,7 @@
             this.groundHitReactionsLeftMiddle.drawElementCallback += this.PaintHitGroundLeft_Element;
             this.groundHitReactionsRightMiddle.drawElementCallback += this.PaintHitGroundRight_Element;
 
+            //combo
             this.spCombos = this.serializedObject.FindProperty("combos");
 
             this.comboList = new ReorderableList(
@@ -201,6 +211,20 @@
             this.comboList.drawHeaderCallback += this.PaintCombo_Header;
             this.comboList.drawElementBackgroundCallback += this.PaintCombo_ElementBg;
             this.comboList.drawElementCallback += this.PaintCombo_Element;
+
+            //weapon model
+             this.spWeaponModels = this.serializedObject.FindProperty("weaponModels");
+             //
+             // this.weaponModelsList = new ReorderableList(
+             //     this.serializedObject,
+             //     this.spWeaponModels,
+             //     true, true, true, true
+             // );
+             //
+             // this.weaponModelsList.drawHeaderCallback += this.PaintWeaponModel_Header;
+             // this.weaponModelsList.drawElementCallback += this.PaintWeaponModel_Element;
+            
+           
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -211,6 +235,10 @@
 
             GUILayout.Space(SPACING);
             this.PaintSectionGeneral();
+            
+            EditorGUILayout.Space();
+            // this.weaponModelsList.DoLayoutList();
+            EditorGUILayout.Space(5f);
 
             GUILayout.Space(SPACING);
             this.PaintSectionModel();
@@ -264,6 +292,7 @@
 
                     EditorGUILayout.PropertyField(this.spName);
                     EditorGUILayout.PropertyField(this.spDescription);
+                    EditorGUILayout.PropertyField(this.spMeleeWeaponName);
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spDefaultShield);
@@ -273,6 +302,7 @@
                     EditorGUILayout.PropertyField(this.spAvatarMask);
                     EditorGUILayout.PropertyField(this.spWeaponImage);
 
+                    EditorGUILayout.PropertyField(this.spWeaponModels);
                     EditorGUILayout.EndVertical();
                 }
             }
@@ -392,7 +422,7 @@
                 }
             }
         }
-
+        
         private void PaintHitGroundFront_Element(Rect rect, int index, bool isActive, bool isFocused)
         {
             rect = new Rect(
@@ -515,5 +545,25 @@
             this.serializedObject.ApplyModifiedProperties();
             this.serializedObject.Update();
         }
+        
+        //Weapon model methods
+        
+        // private void PaintWeaponModel_Header(Rect rect)
+        // {
+        //     EditorGUI.LabelField(rect, "Weapon Model");
+        // }
+        //
+        // private void PaintWeaponModel_Element(Rect rect, int index, bool isActive, bool isFocused)
+        // {
+        //     rect = new Rect(
+        //         rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
+        //         rect.width, EditorGUIUtility.singleLineHeight
+        //     );
+        //
+        //     EditorGUI.PropertyField(
+        //         rect, this.spWeaponModels.GetArrayElementAtIndex(index),
+        //         GC_WM, true
+        //     );
+        // }
     }
 }

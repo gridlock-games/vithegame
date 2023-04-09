@@ -47,7 +47,9 @@ namespace GameCreator.Melee
 
         public MeleeWeapon currentWeapon;
         public MeleeShield currentShield;
-
+        
+        
+        
         public MeleeWeapon previousWeapon;
         public MeleeShield previousShield;
 
@@ -85,6 +87,7 @@ namespace GameCreator.Melee
 
         // PRIVATE PROPERTIES: --------------------------------------------------------------------
 
+        protected List<GameObject> modelWeapons;
         protected GameObject modelWeapon;
         protected GameObject modelShield;
 
@@ -107,6 +110,8 @@ namespace GameCreator.Melee
         public Character Character { get; protected set; }
         public CharacterAnimator CharacterAnimator { get; protected set; }
         public BladeComponent Blade { get; protected set; }
+        
+        public List<BladeComponent> Blades { get; protected set; }
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
@@ -263,7 +268,8 @@ namespace GameCreator.Melee
             yield return wait;
 
             if (this.EventSheatheWeapon != null) this.EventSheatheWeapon.Invoke(this.currentWeapon);
-            if (this.modelWeapon != null) Destroy(this.modelWeapon);
+            // if (this.modelWeapon != null) Destroy(this.modelWeapon);
+            if (this.modelWeapons != null) foreach (var model in modelWeapons) Destroy(model);
             if (this.modelShield != null) Destroy(this.modelShield);
 
             this.OnSheatheWeapon();
@@ -321,9 +327,18 @@ namespace GameCreator.Melee
 
                 if (this.EventDrawWeapon != null) this.EventDrawWeapon.Invoke(this.currentWeapon);
 
-                this.modelWeapon = this.currentWeapon.EquipWeapon(this.CharacterAnimator);
-                this.Blade = this.modelWeapon.GetComponentInChildren<BladeComponent>();
-                if (this.Blade != null) this.Blade.Setup(this);
+                this.modelWeapons = this.currentWeapon.EquipNewWeapon(this.CharacterAnimator);
+                this.Blades = new List<BladeComponent>();
+                foreach(var model in modelWeapons)
+                {
+                    var blade = model.GetComponent<BladeComponent>();
+                    Blades.Add(blade);
+                    if (blade != null) blade.Setup(this);
+                }
+                
+                // this.modelWeapon = this.currentWeapon.EquipWeapon(this.CharacterAnimator);
+                // this.Blade = this.modelWeapon.GetComponentInChildren<BladeComponent>();
+                // if (this.Blade != null) this.Blade.Setup(this);
 
                 this.OnDrawWeapon();
 

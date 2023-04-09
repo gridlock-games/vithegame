@@ -1,4 +1,6 @@
-﻿namespace GameCreator.Melee
+﻿using System.Linq;
+
+namespace GameCreator.Melee
 {
     using System;
     using System.Collections;
@@ -39,13 +41,16 @@
         // general:
         [LocStringNoPostProcess] public LocString weaponName = new LocString("Weapon Name");
         [LocStringNoPostProcess] public LocString weaponDescription = new LocString("Weapon Description");
-
+        
+        public string meleeWeaponName;
+        
         public MeleeShield defaultShield;
         public CharacterState characterState;
         public AvatarMask characterMask;
         public Sprite weaponImage;
 
         // 3d model:
+        public List<WeaponModel> weaponModels = new List<WeaponModel>();
         public GameObject prefab;
         public WeaponBone attachment = WeaponBone.RightHand;
         public Vector3 positionOffset;
@@ -91,12 +96,60 @@
         private int prevRandomHit = -1;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public List<GameObject> EquipNewWeapon(CharacterAnimator character)
+        {
+            if (weaponModels.Count == 0) return null;
+            var weaponObjectsList = (from item in weaponModels from obj in item.weaponModelDatas select obj).ToList();
 
+            var instances = new List<GameObject>();
+        
+            
+            //if (weaponObjectsList.Count == 0) return null;
+            if (character == null) return null;
+
+            foreach (var model in weaponObjectsList)
+            {
+                GameObject instance = Instantiate(model.prefabWeapon);
+                instances.Add(instance);
+                instance.transform.localScale = model.prefabWeapon.transform.localScale;
+                
+                Transform bone = null;
+                switch (model.attachmentWeapon)
+                {
+                    case WeaponBone.Root:
+                        bone = character.transform;
+                        break;
+        
+                    case WeaponBone.Camera:
+                        bone = HookCamera.Instance.transform;
+                        break;
+        
+                    default:
+                        bone = character.animator.GetBoneTransform((HumanBodyBones)model.attachmentWeapon);
+                        break;
+        
+                }
+        
+                if (!bone) return null;
+                instance.transform.SetParent(bone);
+                Debug.Log(instance.gameObject.transform.parent.name);
+                Debug.Log(bone.transform.name);
+        
+                instance.transform.localPosition = model.positionOffsetWeapon;
+                instance.transform.localRotation = Quaternion.Euler(model.rotationOffsetWeapon);
+            }
+            
+            return instances;
+        }
+        
+        
+        
         public GameObject EquipWeapon(CharacterAnimator character)
         {
             if (this.prefab == null) return null;
             if (character == null) return null;
-
+            
             Transform bone = null;
             switch (this.attachment)
             {
