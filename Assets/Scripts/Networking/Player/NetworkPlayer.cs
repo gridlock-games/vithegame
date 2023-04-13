@@ -37,7 +37,8 @@ namespace LightPat.Player
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 // If we are not the local player, display the name tag
-                nameTag.SetText(ClientManager.Singleton.GetClient(OwnerClientId).clientName);
+                if (ClientManager.Singleton)
+                    nameTag.SetText(ClientManager.Singleton.GetClient(OwnerClientId).clientName);
             }
         }
 
