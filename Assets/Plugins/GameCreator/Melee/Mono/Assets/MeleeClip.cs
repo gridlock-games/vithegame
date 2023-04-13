@@ -118,6 +118,10 @@
             );
 
             this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
+
+            // if(melee.Blade) {
+            //     this.ExecuteActionsOnStart(melee.Blades[0].GetImpactPosition(), melee.gameObject);
+            // }
         }
 
         public void Stop(CharacterMelee melee)
