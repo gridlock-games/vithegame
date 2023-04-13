@@ -117,7 +117,7 @@
                 this.movementVertical
             );
 
-            this.ExecuteActionsOnStart(melee.Blade.GetImpactPosition(), melee.gameObject);
+            this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
         }
 
         public void Stop(CharacterMelee melee)

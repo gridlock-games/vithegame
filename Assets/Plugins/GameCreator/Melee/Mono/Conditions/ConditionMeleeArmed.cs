@@ -22,7 +22,7 @@
 		public override bool Check(GameObject target)
 		{
 			Character _character = this.character.GetCharacter(target);
-			if (character == null) return condition == Armed.IsArmed ? false : true;
+			if (character == null || _character == null) return condition == Armed.IsArmed ? false : true;
 
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee == null) return condition == Armed.IsArmed ? false : true;
