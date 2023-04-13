@@ -7,7 +7,7 @@ using LightPat.Core;
 
 namespace LightPat.Player
 {
-    public class OnPlayerSpawn : NetworkBehaviour
+    public class NetworkPlayer : NetworkBehaviour
     {
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
@@ -38,6 +38,22 @@ namespace LightPat.Player
                 Destroy(playerCamera);
                 // If we are not the local player, display the name tag
                 nameTag.SetText(ClientManager.Singleton.GetClient(OwnerClientId).clientName);
+            }
+        }
+
+        [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
+        private float _hudRefreshRate = 1f;
+        private float _timer;
+
+        private void Update()
+        {
+            if (!IsOwner) { return; }
+
+            if (Time.unscaledTime > _timer)
+            {
+                int fps = (int)(1f / Time.unscaledDeltaTime);
+                fpsCounterDisplay.SetText("FPS: " + fps);
+                _timer = Time.unscaledTime + _hudRefreshRate;
             }
         }
     }
