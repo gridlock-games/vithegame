@@ -157,6 +157,32 @@
             if (this.animator != null) Destroy(this.animator.gameObject);
         }
 
+        //public struct State : INetworkSerializable
+        //{
+        //    public Vector3 forwardSpeed;
+        //    public float sidesSpeed;
+        //    public float pivotSpeed;
+        //    public bool targetLock;
+        //    public float isGrounded;
+        //    public float isSliding;
+        //    public float isDashing;
+        //    public float verticalSpeed;
+        //    public Vector3 normal;
+
+        //    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        //    {
+        //        serializer.SerializeValue(ref forwardSpeed);
+        //        serializer.SerializeValue(ref sidesSpeed);
+        //        serializer.SerializeValue(ref pivotSpeed);
+        //        serializer.SerializeValue(ref targetLock);
+        //        serializer.SerializeValue(ref isGrounded);
+        //        serializer.SerializeValue(ref isSliding);
+        //        serializer.SerializeValue(ref isDashing);
+        //        serializer.SerializeValue(ref verticalSpeed);
+        //        serializer.SerializeValue(ref normal);
+        //    }
+        //}
+
         // UPDATE: --------------------------------------------------------------------------------
 
         private void Update()
@@ -180,6 +206,7 @@
             Quaternion rotation = this.characterRotation.Update();
 
 			Character.State state = this.character.GetCharacterState();
+            Debug.Log(state.forwardSpeed);
             Vector3 direction = (!this.character.enabled || state.forwardSpeed.magnitude < 0.01f
                 ? Vector3.zero
                 : state.forwardSpeed
