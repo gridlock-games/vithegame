@@ -54,14 +54,23 @@
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
         [ServerRpc]
-        void DodgeServerRpc()
+        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation)
         {
-            Debug.Log("Server Dodge");
+            GameObject target = new GameObject("OnSpacebar");
+            target.transform.position = targetPosition;
+            target.transform.rotation = targetRotation;
+
+            InstantExecute(target, null, -1);
         }
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            if (!IsServer) { DodgeServerRpc(); }
+            if (!IsServer) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
+
+            //foreach (var c in target.GetComponents(typeof(Component)))
+            //{
+            //    Debug.Log(c);
+            //}
 
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
