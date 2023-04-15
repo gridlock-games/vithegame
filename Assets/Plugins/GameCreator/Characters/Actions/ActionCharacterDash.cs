@@ -53,9 +53,16 @@
         private AnimationCurve spMovementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        [ServerRpc]
+        void DodgeServerRpc()
+        {
+            Debug.Log("Server Dodge");
+        }
+
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            Debug.Log(target + " " + actions + " " + index);
+            if (!IsServer) { DodgeServerRpc(); }
+
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
 
