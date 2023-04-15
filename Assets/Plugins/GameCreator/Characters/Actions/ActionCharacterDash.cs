@@ -117,6 +117,8 @@
             AnimationClip clip = null;
 
             float speed = 1.0f;
+            float transitionIn = 0.25f;
+            float transitionOut = 0.25f;
 
             MeleeClip dodgeMeleeClip;
 
@@ -125,39 +127,56 @@
                 dodgeMeleeClip = meleeweapon.dodgeF;
                 clip = meleeweapon.dodgeF.animationClip;
                 speed = meleeweapon.dodgeF.animSpeed;
+                transitionIn = meleeweapon.dodgeF.transitionIn;
+                transitionOut = meleeweapon.dodgeF.transitionOut;
             } else if (angle < 80f && angle > 15f) {
                 dodgeMeleeClip = meleeweapon.dodgeFL;
                 clip = meleeweapon.dodgeFL.animationClip;
                 speed = meleeweapon.dodgeFL.animSpeed;
+                transitionIn = meleeweapon.dodgeFL.transitionIn;
+                transitionOut = meleeweapon.dodgeFL.transitionOut;
             } else if (angle > -80f && angle < -15f) {
                 dodgeMeleeClip = meleeweapon.dodgeFR;
                 clip = meleeweapon.dodgeFR.animationClip;
                 speed = meleeweapon.dodgeFR.animSpeed;
+                transitionIn = meleeweapon.dodgeFR.transitionIn;
+                transitionOut = meleeweapon.dodgeFR.transitionOut;
             } else if (angle > 80f && angle < 100f) {
                 dodgeMeleeClip = meleeweapon.dodgeL;
                 clip = meleeweapon.dodgeL.animationClip;
                 speed = meleeweapon.dodgeL.animSpeed;
+                transitionIn = meleeweapon.dodgeL.transitionIn;
+                transitionOut = meleeweapon.dodgeL.transitionOut;
             } else if (angle < -80f && angle > -100f) {
                 dodgeMeleeClip = meleeweapon.dodgeR;
                 clip = meleeweapon.dodgeR.animationClip;
                 speed = meleeweapon.dodgeR.animSpeed;
+                transitionIn = meleeweapon.dodgeR.transitionIn;
+                transitionOut = meleeweapon.dodgeR.transitionOut;
             } else if (angle < -100f && angle > -170f) {
                 dodgeMeleeClip = meleeweapon.dodgeBR;
                 clip = meleeweapon.dodgeBR.animationClip;
                 speed = meleeweapon.dodgeBR.animSpeed;
+                transitionIn = meleeweapon.dodgeBR.transitionIn;
+                transitionOut = meleeweapon.dodgeBR.transitionOut;
             } else if (angle > 100f && angle < 170f) {
                 dodgeMeleeClip = meleeweapon.dodgeBL;
                 clip = meleeweapon.dodgeBL.animationClip;
                 speed = meleeweapon.dodgeBL.animSpeed;
+                transitionIn = meleeweapon.dodgeBL.transitionIn;
+                transitionOut = meleeweapon.dodgeBL.transitionOut;
             } else {
                 dodgeMeleeClip = meleeweapon.dodgeB;
                 clip = meleeweapon.dodgeB.animationClip;
                 speed = meleeweapon.dodgeB.animSpeed;
+                transitionIn = meleeweapon.dodgeF.transitionIn;
+                transitionOut = meleeweapon.dodgeF.transitionOut;
             }
+
 
             #endregion
 
-            float duration = ((clip.length - (clip.length * 0.50f)) / (speed)) * .75f;
+            float duration = ((clip.length) * 0.40f);
 
             bool isDashing = characterTarget.Dash(
                 moveDirection.normalized,
@@ -177,7 +196,9 @@
                     dodgeMeleeClip.movementVertical 
                 );
 
-                animator.CrossFadeGesture(clip, speed, null, 0.15f, 0.4f);
+                float transiition = ((clip.length) / (speed)) * 0.18f;
+
+                animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
             }
 
             return true;

@@ -26,7 +26,7 @@
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
             Character _character = this.character.GetCharacter(target);
-            if (character == null) return true;
+            if (this.character == null || _character == null) return true;
 
             CharacterMelee melee = _character.GetComponent<CharacterMelee>();
             if (melee != null)
