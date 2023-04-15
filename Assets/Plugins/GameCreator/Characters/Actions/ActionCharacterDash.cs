@@ -8,6 +8,7 @@
     using GameCreator.Characters;
     using GameCreator.Variables;
     using GameCreator.Melee;
+    using Unity.Netcode;
 
     #if UNITY_EDITOR
     using UnityEditor;
@@ -54,6 +55,7 @@
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
+            Debug.Log(target + " " + actions + " " + index);
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
 

@@ -3,13 +3,14 @@
 	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
+    using Unity.Netcode;
 
 	#if UNITY_EDITOR
 	using UnityEditor;
 	#endif
 
 	[ExecuteInEditMode]
-	public abstract class IAction : MonoBehaviour 
+	public abstract class IAction : NetworkBehaviour
 	{
         public virtual bool InstantExecute(GameObject target, IAction[] actions, int index)
         {

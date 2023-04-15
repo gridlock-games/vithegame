@@ -206,7 +206,7 @@
             Quaternion rotation = this.characterRotation.Update();
 
 			Character.State state = this.character.GetCharacterState();
-            Debug.Log(state.forwardSpeed);
+
             Vector3 direction = (!this.character.enabled || state.forwardSpeed.magnitude < 0.01f
                 ? Vector3.zero
                 : state.forwardSpeed
