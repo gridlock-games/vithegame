@@ -54,9 +54,9 @@
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
         [ServerRpc]
-        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation)
+        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
         {
-            GameObject target = new GameObject("OnSpacebar");
+            GameObject target = new GameObject(targetName);
             target.transform.position = targetPosition;
             target.transform.rotation = targetRotation;
 
@@ -68,7 +68,7 @@
             // We only want dodges to happen on the server, then since the animator and positions are already being synced elsewhere you don't have to run this logic on any clients
             if (!IsServer)
             {
-                if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
+                if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
                 return false;
             }
 

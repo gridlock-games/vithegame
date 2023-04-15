@@ -6,6 +6,7 @@
 	using UnityEngine.Events;
 	using GameCreator.Core;
     using GameCreator.Characters;
+	using Unity.Netcode;
 
     [AddComponentMenu("")]
 	public class ActionMeleeAttack : IAction
@@ -13,7 +14,40 @@
 		public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
 		public CharacterMelee.ActionKey key = CharacterMelee.ActionKey.A;
 
+		[ServerRpc]
+		void MeleeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
+		{
+			MeleeClientRpc(targetPosition, targetRotation, targetName);
+			GameObject target = new GameObject(targetName);
+			target.transform.position = targetPosition;
+			target.transform.rotation = targetRotation;
+			InstantExecuteLocally(target);
+		}
+
+		[ClientRpc]
+		void MeleeClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
+        {
+			GameObject target = new GameObject(targetName);
+			target.transform.position = targetPosition;
+			target.transform.rotation = targetRotation;
+			InstantExecuteLocally(target);
+		}
+
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
+        {
+			if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+			return false;
+
+			//Character _character = this.character.GetCharacter(target);
+			//if (character == null) return true;
+
+			//CharacterMelee melee = _character.GetComponent<CharacterMelee>();
+			//if (melee != null) melee.Execute(this.key);
+
+			//return true;
+        }
+
+		public bool InstantExecuteLocally(GameObject target)
         {
 			Character _character = this.character.GetCharacter(target);
 			if (character == null) return true;
