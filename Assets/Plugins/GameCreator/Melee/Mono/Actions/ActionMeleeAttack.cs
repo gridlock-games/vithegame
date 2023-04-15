@@ -37,14 +37,6 @@
         {
 			if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
 			return false;
-
-			//Character _character = this.character.GetCharacter(target);
-			//if (character == null) return true;
-
-			//CharacterMelee melee = _character.GetComponent<CharacterMelee>();
-			//if (melee != null) melee.Execute(this.key);
-
-			//return true;
         }
 
 		public bool InstantExecuteLocally(GameObject target)

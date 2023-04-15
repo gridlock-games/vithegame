@@ -408,8 +408,8 @@ namespace GameCreator.Melee
 
         public void StopAttack()
         {
-
-            if(this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true) {
+            if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
+            {
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();

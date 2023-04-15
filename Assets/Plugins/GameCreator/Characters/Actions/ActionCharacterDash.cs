@@ -56,22 +56,30 @@
         [ServerRpc]
         void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
         {
+            DodgeClientRpc(targetPosition, targetRotation, targetName);
             GameObject target = new GameObject(targetName);
             target.transform.position = targetPosition;
             target.transform.rotation = targetRotation;
+            InstantExecuteLocally(target);
+        }
 
-            InstantExecute(target, null, -1);
+        [ClientRpc]
+        void DodgeClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
+        {
+            GameObject target = new GameObject(targetName);
+            target.transform.position = targetPosition;
+            target.transform.rotation = targetRotation;
+            InstantExecuteLocally(target);
         }
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            // We only want dodges to happen on the server, then since the animator and positions are already being synced elsewhere you don't have to run this logic on any clients
-            if (!IsServer)
-            {
-                if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
-                return false;
-            }
+            if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+            return false;
+        }
 
+        public bool InstantExecuteLocally(GameObject target)
+        {
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
 
@@ -84,16 +92,17 @@
             MeleeWeapon meleeweapon = new MeleeWeapon();
 
             if (melee != null)
-			{
-				if(melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true) {
+            {
+                if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
+                {
                     melee.StopAttack();
-					animator.StopGesture(0f);
+                    animator.StopGesture(0f);
                     melee.currentMeleeClip = null;
-				}
+                }
 
                 meleeweapon = melee.currentWeapon;
-			}
-            
+            }
+
             switch (this.direction)
             {
                 case Direction.CharacterMovement3D:
@@ -127,7 +136,7 @@
             }
 
             Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward), 
+                characterTarget.transform.TransformDirection(Vector3.forward),
                 PLANE
             );
 
@@ -139,35 +148,50 @@
             MeleeClip dodgeMeleeClip;
 
             #region Compute Angle
-            if (angle <= 15f && angle >= -15f) {
+            if (angle <= 15f && angle >= -15f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeF;
                 clip = meleeweapon.dodgeF.animationClip;
                 speed = meleeweapon.dodgeF.animSpeed;
-            } else if (angle < 80f && angle > 15f) {
+            }
+            else if (angle < 80f && angle > 15f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeFL;
                 clip = meleeweapon.dodgeFL.animationClip;
                 speed = meleeweapon.dodgeFL.animSpeed;
-            } else if (angle > -80f && angle < -15f) {
+            }
+            else if (angle > -80f && angle < -15f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeFR;
                 clip = meleeweapon.dodgeFR.animationClip;
                 speed = meleeweapon.dodgeFR.animSpeed;
-            } else if (angle > 80f && angle < 100f) {
+            }
+            else if (angle > 80f && angle < 100f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeL;
                 clip = meleeweapon.dodgeL.animationClip;
                 speed = meleeweapon.dodgeL.animSpeed;
-            } else if (angle < -80f && angle > -100f) {
+            }
+            else if (angle < -80f && angle > -100f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeR;
                 clip = meleeweapon.dodgeR.animationClip;
                 speed = meleeweapon.dodgeR.animSpeed;
-            } else if (angle < -100f && angle > -170f) {
+            }
+            else if (angle < -100f && angle > -170f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeBR;
                 clip = meleeweapon.dodgeBR.animationClip;
                 speed = meleeweapon.dodgeBR.animSpeed;
-            } else if (angle > 100f && angle < 170f) {
+            }
+            else if (angle > 100f && angle < 170f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeBL;
                 clip = meleeweapon.dodgeBL.animationClip;
                 speed = meleeweapon.dodgeBL.animSpeed;
-            } else {
+            }
+            else
+            {
                 dodgeMeleeClip = meleeweapon.dodgeB;
                 clip = meleeweapon.dodgeB.animationClip;
                 speed = meleeweapon.dodgeB.animSpeed;
@@ -187,12 +211,12 @@
             if (clip != null && animator != null)
             {
                 characterTarget.characterLocomotion.RootMovement(
-                    dodgeMeleeClip.movementMultiplier, 
-                    duration, 
+                    dodgeMeleeClip.movementMultiplier,
+                    duration,
                     1.0f,
-                    dodgeMeleeClip.movementForward, 
+                    dodgeMeleeClip.movementForward,
                     dodgeMeleeClip.movementSides,
-                    dodgeMeleeClip.movementVertical 
+                    dodgeMeleeClip.movementVertical
                 );
 
                 animator.CrossFadeGesture(clip, speed, null, 0.15f, 0.4f);
