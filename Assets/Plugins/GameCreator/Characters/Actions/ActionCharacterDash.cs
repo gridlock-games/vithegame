@@ -65,7 +65,12 @@
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            if (!IsServer) { DodgeServerRpc(target.transform.position, target.transform.rotation); return false; }
+            // We only want dodges to happen on the server, then since the animator and positions are already being synced elsewhere you don't have to run this logic on any clients
+            if (!IsServer)
+            {
+                if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
+                return false;
+            }
 
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
