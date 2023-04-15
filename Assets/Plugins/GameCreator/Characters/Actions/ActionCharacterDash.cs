@@ -65,7 +65,7 @@
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            if (!IsServer) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
+            if (!IsServer) { DodgeServerRpc(target.transform.position, target.transform.rotation); return false; }
 
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
