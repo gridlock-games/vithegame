@@ -67,11 +67,6 @@
         {
             if (!IsServer) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
 
-            //foreach (var c in target.GetComponents(typeof(Component)))
-            //{
-            //    Debug.Log(c);
-            //}
-
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
 
@@ -93,7 +88,7 @@
 
                 meleeweapon = melee.currentWeapon;
 			}
-
+            
             switch (this.direction)
             {
                 case Direction.CharacterMovement3D:
