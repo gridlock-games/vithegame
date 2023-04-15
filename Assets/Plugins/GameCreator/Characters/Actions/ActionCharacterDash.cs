@@ -8,6 +8,7 @@
     using GameCreator.Characters;
     using GameCreator.Variables;
     using GameCreator.Melee;
+    using Unity.Netcode;
 
     #if UNITY_EDITOR
     using UnityEditor;
@@ -52,8 +53,25 @@
         private AnimationCurve spMovementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        [ServerRpc]
+        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            GameObject target = new GameObject("OnSpacebar");
+            target.transform.position = targetPosition;
+            target.transform.rotation = targetRotation;
+
+            InstantExecute(target, null, -1);
+        }
+
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
+            // We only want dodges to happen on the server, then since the animator and positions are already being synced elsewhere you don't have to run this logic on any clients
+            if (!IsServer)
+            {
+                if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation); }
+                return false;
+            }
+
             Character characterTarget = this.character.GetCharacter(target);
             if (characterTarget == null) return true;
 
@@ -75,7 +93,7 @@
 
                 meleeweapon = melee.currentWeapon;
 			}
-
+            
             switch (this.direction)
             {
                 case Direction.CharacterMovement3D:
