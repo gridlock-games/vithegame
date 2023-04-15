@@ -8,6 +8,7 @@
     using GameCreator.Characters;
     using GameCreator.Variables;
     using GameCreator.Melee;
+    using Unity.Netcode;
 
     #if UNITY_EDITOR
     using UnityEditor;
@@ -52,10 +53,34 @@
         private AnimationCurve spMovementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        [ServerRpc]
+        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
+        {
+            GameObject target = new GameObject(targetName);
+            target.transform.position = targetPosition;
+            target.transform.rotation = targetRotation;
+            DodgeClientRpc(targetPosition, targetRotation, targetName, InstantExecuteLocally(target));
+        }
+
+        [ClientRpc]
+        void DodgeClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, float angle)
+        {
+            GameObject target = new GameObject(targetName);
+            target.transform.position = targetPosition;
+            target.transform.rotation = targetRotation;
+            InstantExecuteLocally(target, angle);
+        }
+
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
+            if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+            return false;
+        }
+
+        public float InstantExecuteLocally(GameObject target)
+        {
             Character characterTarget = this.character.GetCharacter(target);
-            if (characterTarget == null) return true;
+            if (characterTarget == null) return 0;
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             CharacterAnimator animator = characterTarget.GetCharacterAnimator();
@@ -66,15 +91,16 @@
             MeleeWeapon meleeweapon = new MeleeWeapon();
 
             if (melee != null)
-			{
-				if(melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true) {
+            {
+                if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
+                {
                     melee.StopAttack();
-					animator.StopGesture(0f);
+                    animator.StopGesture(0f);
                     melee.currentMeleeClip = null;
-				}
+                }
 
                 meleeweapon = melee.currentWeapon;
-			}
+            }
 
             switch (this.direction)
             {
@@ -109,7 +135,7 @@
             }
 
             Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward), 
+                characterTarget.transform.TransformDirection(Vector3.forward),
                 PLANE
             );
 
@@ -123,7 +149,154 @@
             MeleeClip dodgeMeleeClip;
 
             #region Compute Angle
-            if (angle <= 15f && angle >= -15f) {
+            if (angle <= 15f && angle >= -15f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeF;
+                clip = meleeweapon.dodgeF.animationClip;
+                speed = meleeweapon.dodgeF.animSpeed;
+            }
+            else if (angle < 80f && angle > 15f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeFL;
+                clip = meleeweapon.dodgeFL.animationClip;
+                speed = meleeweapon.dodgeFL.animSpeed;
+            }
+            else if (angle > -80f && angle < -15f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeFR;
+                clip = meleeweapon.dodgeFR.animationClip;
+                speed = meleeweapon.dodgeFR.animSpeed;
+            }
+            else if (angle > 80f && angle < 100f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeL;
+                clip = meleeweapon.dodgeL.animationClip;
+                speed = meleeweapon.dodgeL.animSpeed;
+            }
+            else if (angle < -80f && angle > -100f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeR;
+                clip = meleeweapon.dodgeR.animationClip;
+                speed = meleeweapon.dodgeR.animSpeed;
+            }
+            else if (angle < -100f && angle > -170f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeBR;
+                clip = meleeweapon.dodgeBR.animationClip;
+                speed = meleeweapon.dodgeBR.animSpeed;
+            }
+            else if (angle > 100f && angle < 170f)
+            {
+                dodgeMeleeClip = meleeweapon.dodgeBL;
+                clip = meleeweapon.dodgeBL.animationClip;
+                speed = meleeweapon.dodgeBL.animSpeed;
+            }
+            else
+            {
+                dodgeMeleeClip = meleeweapon.dodgeB;
+                clip = meleeweapon.dodgeB.animationClip;
+                speed = meleeweapon.dodgeB.animSpeed;
+            }
+
+            #endregion
+
+            float duration = ((clip.length - (clip.length * 0.50f)) / (speed)) * .75f;
+
+            bool isDashing = characterTarget.Dash(
+                moveDirection.normalized,
+                this.impulse.GetValue(target),
+                duration,
+                1.0f
+            );
+
+            if (clip != null && animator != null)
+            {
+                characterTarget.characterLocomotion.RootMovement(
+                    dodgeMeleeClip.movementMultiplier,
+                    duration,
+                    1.0f,
+                    dodgeMeleeClip.movementForward,
+                    dodgeMeleeClip.movementSides,
+                    dodgeMeleeClip.movementVertical
+                );
+
+                animator.CrossFadeGesture(clip, speed, null, 0.15f, 0.4f);
+            }
+
+            return angle;
+        }
+
+        public float InstantExecuteLocally(GameObject target, float angle)
+        {
+            Character characterTarget = this.character.GetCharacter(target);
+            if (characterTarget == null) return 0;
+
+            CharacterLocomotion locomotion = characterTarget.characterLocomotion;
+            CharacterAnimator animator = characterTarget.GetCharacterAnimator();
+            Vector3 moveDirection = Vector3.zero;
+
+            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
+
+            MeleeWeapon meleeweapon = new MeleeWeapon();
+
+            if (melee != null)
+            {
+                if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
+                {
+                    melee.StopAttack();
+                    animator.StopGesture(0f);
+                    melee.currentMeleeClip = null;
+                }
+
+                meleeweapon = melee.currentWeapon;
+            }
+
+            switch (this.direction)
+            {
+                case Direction.CharacterMovement3D:
+                    moveDirection = locomotion.GetMovementDirection();
+                    break;
+
+                case Direction.TowardsTarget:
+                    Transform targetTransform = this.target.GetTransform(target);
+                    if (targetTransform != null)
+                    {
+                        moveDirection = targetTransform.position - characterTarget.transform.position;
+                        moveDirection.Scale(PLANE);
+                    }
+                    break;
+
+                case Direction.TowardsPosition:
+                    Vector3 targetPosition = this.position.GetPosition(target);
+                    moveDirection = targetPosition - characterTarget.transform.position;
+                    moveDirection.Scale(PLANE);
+                    break;
+
+                case Direction.MovementSidescrollXY:
+                    moveDirection = locomotion.GetMovementDirection();
+                    moveDirection.Scale(new Vector3(1, 1, 0));
+                    break;
+
+                case Direction.MovementSidescrollZY:
+                    moveDirection = locomotion.GetMovementDirection();
+                    moveDirection.Scale(new Vector3(0, 1, 1));
+                    break;
+            }
+
+            Vector3 charDirection = Vector3.Scale(
+                characterTarget.transform.TransformDirection(Vector3.forward),
+                PLANE
+            );
+
+            AnimationClip clip = null;
+
+            float speed = 1.0f;
+
+            MeleeClip dodgeMeleeClip;
+
+            #region Compute Angle
+            if (angle <= 15f && angle >= -15f)
+            {
                 dodgeMeleeClip = meleeweapon.dodgeF;
                 clip = meleeweapon.dodgeF.animationClip;
                 speed = meleeweapon.dodgeF.animSpeed;
@@ -188,12 +361,12 @@
             if (clip != null && animator != null)
             {
                 characterTarget.characterLocomotion.RootMovement(
-                    dodgeMeleeClip.movementMultiplier, 
-                    duration, 
+                    dodgeMeleeClip.movementMultiplier,
+                    duration,
                     1.0f,
-                    dodgeMeleeClip.movementForward, 
+                    dodgeMeleeClip.movementForward,
                     dodgeMeleeClip.movementSides,
-                    dodgeMeleeClip.movementVertical 
+                    dodgeMeleeClip.movementVertical
                 );
 
                 float transiition = ((clip.length) / (speed)) * 0.18f;
@@ -201,10 +374,10 @@
                 animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
             }
 
-            return true;
+            return angle;
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public static new string NAME = "Character/Character Dash";
         private const string TITLE_NAME = "Character {0} dash {1}";
 

@@ -8,12 +8,13 @@
     using UnityEngine.SceneManagement;
     using GameCreator.Core;
     using System;
+    using Unity.Netcode;
 
     [RequireComponent(typeof(CharacterController))]
     [AddComponentMenu("Game Creator/Characters/Character", 100)]
     public class Character : GlobalID, IGameSave
     {
-        [System.Serializable]
+        [Serializable]
         public class State
         {
             public Vector3 forwardSpeed;
@@ -36,6 +37,63 @@
                 this.isDashing = 0.0f;
                 this.verticalSpeed = 0f;
                 this.normal = Vector3.zero;
+            }
+            
+            public State(Vector3 forwardSpeed, float sidesSpeed, float pivotSpeed, bool targetLock, float isGrounded, float isSliding, float isDashing, float verticalSpeed, Vector3 normal)
+            {
+                this.forwardSpeed = forwardSpeed;
+                this.sidesSpeed = sidesSpeed;
+                this.pivotSpeed = pivotSpeed;
+                this.targetLock = targetLock;
+                this.isGrounded = isGrounded;
+                this.isSliding = isSliding;
+                this.isDashing = isDashing;
+                this.verticalSpeed = verticalSpeed;
+                this.normal = normal;
+            }
+        }
+
+        public struct NetworkedState : INetworkSerializable
+        {
+            public Vector3 forwardSpeed;
+            public float sidesSpeed;
+            public float pivotSpeed;
+            public bool targetLock;
+            public float isGrounded;
+            public float isSliding;
+            public float isDashing;
+            public float verticalSpeed;
+            public Vector3 normal;
+
+            public NetworkedState(State charState)
+            {
+                this.forwardSpeed = charState.forwardSpeed;
+                this.sidesSpeed = charState.sidesSpeed;
+                this.pivotSpeed = charState.pivotSpeed;
+                this.targetLock = charState.targetLock;
+                this.isGrounded = charState.isGrounded;
+                this.isSliding = charState.isSliding;
+                this.isDashing = charState.isDashing;
+                this.verticalSpeed = charState.verticalSpeed;
+                this.normal = charState.normal;
+            }
+
+            public State ConvertToState()
+            {
+                return new State(forwardSpeed, sidesSpeed, pivotSpeed, targetLock, isGrounded, isSliding, isDashing, verticalSpeed, normal);
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref forwardSpeed);
+                serializer.SerializeValue(ref sidesSpeed);
+                serializer.SerializeValue(ref pivotSpeed);
+                serializer.SerializeValue(ref targetLock);
+                serializer.SerializeValue(ref isGrounded);
+                serializer.SerializeValue(ref isSliding);
+                serializer.SerializeValue(ref isDashing);
+                serializer.SerializeValue(ref verticalSpeed);
+                serializer.SerializeValue(ref normal);
             }
         }
 
@@ -166,9 +224,14 @@
             return this.characterLocomotion.isDashing;
         }
 
+        private NetworkVariable<NetworkedState> networkedState = new NetworkVariable<NetworkedState>();
         public State GetCharacterState()
         {
-            return this.characterState;
+            if (IsServer)
+            {
+                networkedState.Value = new NetworkedState(characterState);
+            }
+            return networkedState.Value.ConvertToState();
         }
 
         public void SetRagdoll(bool active, bool autoStand = false)
@@ -214,7 +277,7 @@
 
         public int GetCharacterMotion()
         {
-            if (this.characterState == null) return 0;
+            //if (this.characterState == null) return 0;
             if (this.characterLocomotion == null) return 0;
 
             float speed = Mathf.Abs(this.characterState.forwardSpeed.magnitude);
@@ -229,7 +292,7 @@
 
         public bool IsGrounded()
         {
-            if (this.characterState == null) return true;
+            //if (this.characterState == null) return true;
             return Mathf.Approximately(this.characterState.isGrounded, 1.0f);
         }
 
