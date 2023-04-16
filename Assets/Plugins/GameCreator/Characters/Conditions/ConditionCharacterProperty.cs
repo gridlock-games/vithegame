@@ -22,6 +22,7 @@
             IsGrounded,
             IsOnAir,
             IsDashing,
+            IsNotDashing,
             CanRun,
             CanJump
         }
@@ -36,6 +37,7 @@
             Character character = this.target.GetCharacter(target);
             if (character == null) return true;
             bool result = true;
+            bool isNotDashing = false;
 
             switch (this.property)
             {
@@ -76,6 +78,13 @@
                 case CharacterProperty.IsDashing:
                     if (character.characterLocomotion != null)
                         result = character.characterLocomotion.isDashing;
+                    break;
+
+                case CharacterProperty.IsNotDashing:
+                    if (character.characterLocomotion != null)
+                        isNotDashing = character.characterLocomotion.isDashing ? false : true;
+
+                        result = isNotDashing;
                     break;
             }
 

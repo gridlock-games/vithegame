@@ -34,6 +34,9 @@
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
 		{
 			var gameObject = StartRaycastFrom.GetGameObject(target);
+
+			if(gameObject == null) return false;
+			
 			var RayDistance = RaycastLength.GetValue(target);
 
 			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
