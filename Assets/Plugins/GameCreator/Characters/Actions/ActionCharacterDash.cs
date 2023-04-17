@@ -240,6 +240,7 @@
                 animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
             }
 
+            Destroy(target);
             return angle;
         }
 
@@ -393,6 +394,7 @@
                 animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
             }
 
+            Destroy(target);
             return angle;
         }
 

@@ -47,6 +47,7 @@
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee != null) melee.Execute(this.key);
 
+			Destroy(target);
 			return true;
         }
 
