@@ -296,6 +296,8 @@ namespace GameCreator.Melee
             this.Character.characterLocomotion.isBusy = false;
         }
 
+        public void TestDraw() => StartCoroutine(Draw(this.currentWeapon,  currentShield));
+
         public IEnumerator Draw(MeleeWeapon weapon, MeleeShield shield = null)
         {
             if (this.Character.characterLocomotion.isBusy) yield break;
@@ -316,6 +318,7 @@ namespace GameCreator.Melee
                 if (this.currentWeapon.characterState != null)
                 {
                     CharacterState state = this.currentWeapon.characterState;
+                    Debug.Log(currentWeapon.characterState.name);
                     float time = this.ChangeState(
                         this.currentWeapon.characterState,
                         this.currentWeapon.characterMask,

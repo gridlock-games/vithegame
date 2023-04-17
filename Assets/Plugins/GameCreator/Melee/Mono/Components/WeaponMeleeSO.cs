@@ -14,4 +14,14 @@ public class WeaponMeleeSO : ScriptableObject
 public class WeaponData
 {
     public MeleeWeapon meleeWeapon;
+    public WeaponType weaponType;
+}
+
+public enum WeaponType
+{
+    GREATSWORD,
+    LANCE,
+    HAMMER,
+    SWORD,
+    DAGGER
 }
