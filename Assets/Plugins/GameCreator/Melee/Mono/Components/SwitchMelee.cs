@@ -48,8 +48,6 @@ namespace GameCreator.Melee
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
             {
-                
-
                 // If there is a melee weapon assigned to this weaponType and the weaponType is present in our scriptable object
                 bool weaponIsValid = false;
                 foreach (var weaponData in _weaponMeleeSO.weaponCollections)
