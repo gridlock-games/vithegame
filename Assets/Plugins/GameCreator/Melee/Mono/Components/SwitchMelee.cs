@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace GameCreator.Melee
 {
-    public class SwitchMelee : MonoBehaviour
+    public class SwitchMelee : NetworkBehaviour
     {
         [SerializeField] private CharacterMelee _characterMelee;
         [SerializeField] private WeaponMeleeSO _weaponMeleeSO;
-        private WeaponType _currentWeaponType;
-
         [SerializeField] private GameObject _rightHand;
         [SerializeField] private GameObject _leftHand;
 
@@ -24,6 +23,11 @@ namespace GameCreator.Melee
             { KeyCode.Alpha4, WeaponType.LANCE },
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
+
+        private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; }
+        public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
+        private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
 
         private void Start()
         {
@@ -60,8 +64,7 @@ namespace GameCreator.Melee
                 if (weaponIsValid)
                 {
                     // Get the weapon type corresponding to the pressed key
-                    _currentWeaponType = _keyToWeaponType[key];
-                    SwitchWeapon();
+                    _currentWeaponType.Value = _keyToWeaponType[key];
                 }
                 break;
             }
@@ -76,7 +79,7 @@ namespace GameCreator.Melee
             UnequipWeapon();
 
             // Find the weapon from the WeaponMeleeSO asset based on the current weapon type
-            var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == _currentWeaponType);
+            var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == _currentWeaponType.Value);
             if (weapon != null)
             {
                 // Equip the new weapon and update the currentWeapon property of CharacterMelee
@@ -86,7 +89,7 @@ namespace GameCreator.Melee
                 _characterMelee.TestDraw();
 
                 _characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
-                Debug.Log($"{_currentWeaponType.ToString()} _currentWeaponType");
+                Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");
             }
         }
 
