@@ -133,17 +133,12 @@ namespace GameCreator.Melee
         
                 if (!bone) return null;
                 instance.transform.SetParent(bone);
-                Debug.Log(instance.gameObject.transform.parent.name);
-                Debug.Log(bone.transform.name);
-        
                 instance.transform.localPosition = model.positionOffsetWeapon;
                 instance.transform.localRotation = Quaternion.Euler(model.rotationOffsetWeapon);
             }
             
             return instances;
         }
-        
-        
         
         public GameObject EquipWeapon(CharacterAnimator character)
         {

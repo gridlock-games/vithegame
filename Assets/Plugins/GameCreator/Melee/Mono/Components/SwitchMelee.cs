@@ -24,10 +24,11 @@ namespace GameCreator.Melee
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
 
-        private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
         public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
+        [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
         private void Start()
         {
@@ -44,6 +45,7 @@ namespace GameCreator.Melee
         {
             // Only check for keyboard input if a key is currently pressed down
             if (!Input.anyKeyDown) return;
+            if (!IsLocalPlayer) return;
 
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
@@ -62,7 +64,9 @@ namespace GameCreator.Melee
                 if (weaponIsValid)
                 {
                     // Get the weapon type corresponding to the pressed key
-                    _currentWeaponType.Value = _keyToWeaponType[key];
+                    if (IsServer) { _currentWeaponType.Value = _keyToWeaponType[key]; }
+                    else { ChangeWeaponTypeServerRpc(_keyToWeaponType[key]); }
+                    // SwitchWeapon() call occurs in OnCurrentWeaponTypeChange() method
                 }
                 break;
             }
@@ -87,7 +91,7 @@ namespace GameCreator.Melee
                 _characterMelee.TestDraw();
 
                 _characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
-                Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");
+                //Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");
             }
         }
 
@@ -99,14 +103,14 @@ namespace GameCreator.Melee
             if (asd != null)
             {
                 Destroy(asd.gameObject);
-                Debug.Log($"{asd.gameObject.name} weaponClone");
+                //Debug.Log($"{asd.gameObject.name} weaponClone");
             }
             
             var qwe = _leftHand.GetComponentInChildren<BladeComponent>();
             if (qwe != null)
             {
                 Destroy(qwe.gameObject);
-                Debug.Log($"{qwe.gameObject.name} weaponClone");
+                //Debug.Log($"{qwe.gameObject.name} weaponClone");
             }
         }
     }

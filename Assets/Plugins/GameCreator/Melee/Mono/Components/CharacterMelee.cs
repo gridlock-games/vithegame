@@ -318,7 +318,6 @@ namespace GameCreator.Melee
                 if (this.currentWeapon.characterState != null)
                 {
                     CharacterState state = this.currentWeapon.characterState;
-                    Debug.Log(currentWeapon.characterState.name);
                     float time = this.ChangeState(
                         this.currentWeapon.characterState,
                         this.currentWeapon.characterMask,
