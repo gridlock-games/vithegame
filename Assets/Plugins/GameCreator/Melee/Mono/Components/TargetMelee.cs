@@ -4,8 +4,9 @@
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
+    using Unity.Netcode;
 
-    public class TargetMelee : MonoBehaviour
+    public class TargetMelee : NetworkBehaviour
     {
         private Dictionary<int, CharacterMelee> trackers = new Dictionary<int, CharacterMelee>();
 
