@@ -9,6 +9,7 @@ namespace GameCreator.Melee
     using UnityEngine.Audio;
     using GameCreator.Variables;
     using GameCreator.Pool;
+    using Unity.Netcode;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -368,7 +369,43 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
-        public void StartBlocking()
+        private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
+
+        public override void OnNetworkSpawn() { isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange; }
+        public override void OnNetworkDespawn() { isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange; }
+
+        void OnIsBlockingNetworkedChange(bool prev, bool current)
+        {
+            if (current) // Start blocking
+            {
+                if (this.currentShield.defendState != null)
+                {
+                    this.CharacterAnimator.SetState(
+                        this.currentShield.defendState,
+                        this.currentShield.defendMask,
+                        1f, 0.15f, 1f,
+                        LAYER_DEFEND
+                    );
+                }
+
+                if (!this.IsBlocking && this.EventBlock != null)
+                {
+                    this.EventBlock.Invoke(true);
+                }
+
+                this.startBlockingTime = GetTime();
+                this.IsBlocking = true;
+            }
+            else // Stop blocking
+            {
+                if (this.EventBlock != null) this.EventBlock.Invoke(false);
+                this.CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
+                this.IsBlocking = false;
+            }
+        }
+
+        [ServerRpc]
+        public void StartBlockingServerRpc()
         {
             if (this.Character.characterLocomotion.isBusy) return;
 
@@ -378,32 +415,16 @@ namespace GameCreator.Melee
             if (this.IsAttacking) return;
 
             if (this.currentShield == null) return;
-            if (this.currentShield.defendState != null)
-            {
-                this.CharacterAnimator.SetState(
-                    this.currentShield.defendState,
-                    this.currentShield.defendMask,
-                    1f, 0.15f, 1f,
-                    LAYER_DEFEND
-                );
-            }
 
-            if (!this.IsBlocking && this.EventBlock != null)
-            {
-                this.EventBlock.Invoke(true);
-            }
-
-            this.startBlockingTime = GetTime();
-            this.IsBlocking = true;
+            isBlockingNetworked.Value = true;
         }
 
-        public void StopBlocking()
+        [ServerRpc]
+        public void StopBlockingServerRpc()
         {
             if (!this.IsBlocking) return;
 
-            if (this.EventBlock != null) this.EventBlock.Invoke(false);
-            this.CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
-            this.IsBlocking = false;
+            isBlockingNetworked.Value = false;
         }
 
         public virtual void Execute(ActionKey actionKey)
@@ -411,7 +432,7 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.StopBlocking();
+            this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
@@ -623,7 +644,7 @@ namespace GameCreator.Melee
                 else
                 {
                     this.Defense = 0f;
-                    this.StopBlocking();
+                    this.StopBlockingServerRpc();
 
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
                 }

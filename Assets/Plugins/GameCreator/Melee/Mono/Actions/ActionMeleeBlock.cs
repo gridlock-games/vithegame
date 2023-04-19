@@ -28,14 +28,15 @@
         {
 			Character _character = this.character.GetCharacter(target);
 			if (character == null) return true;
+            if (!_character.IsOwner) return true;
 
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee != null)
             {
                 switch (this.blocking)
                 {
-                    case Block.StartBlocking: melee.StartBlocking(); break;
-                    case Block.StopBlocking: melee.StopBlocking(); break;
+                    case Block.StartBlocking: melee.StartBlockingServerRpc(); break;
+                    case Block.StopBlocking: melee.StopBlockingServerRpc(); break;
                 }
             }
 
