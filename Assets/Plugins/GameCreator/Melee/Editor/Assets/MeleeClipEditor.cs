@@ -71,6 +71,7 @@
         private SerializedProperty spInterruptible;
         private SerializedProperty spVulnerability;
         private SerializedProperty spPosture;
+        private SerializedProperty spAffectedBones;
         private SerializedProperty spAnimationSpeed;
 
         private SerializedProperty spAttackPhase;
@@ -94,6 +95,7 @@
         private void OnEnable()
         {
             this.instance = this.target as MeleeClip;
+            this.spAffectedBones = this.serializedObject.FindProperty("affectedBones");
 
             this.sectionAnimation = new Section("Animation", this.LoadIcon("Animation"), this.Repaint);
             this.sectionMotion = new Section("Motion", this.LoadIcon("Animation"), this.Repaint);
@@ -201,6 +203,7 @@
             }
 
             this.serializedObject.Update();
+            EditorGUILayout.PropertyField(spAffectedBones);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();

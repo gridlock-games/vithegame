@@ -1,6 +1,7 @@
 ﻿namespace GameCreator.Melee
 {
     using System.Collections;
+    using System.Collections.Generic;
     using GameCreator.Core;
     using UnityEngine;
 
@@ -89,6 +90,8 @@
 
         public IActionsList actionsOnExecute;
         public IActionsList actionsOnHit;
+
+        public List<MeleeWeapon.WeaponBone> affectedBones = new List<MeleeWeapon.WeaponBone>();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
