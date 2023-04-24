@@ -196,8 +196,8 @@ public class ActionIdentifyTarget : IAction
 		{
 			return string.Format(
                 NODE_TITLE, 
-                "",// this.action.ToString(),
-                ""// this.bone.ToString()
+                this.action.ToString(),
+                this.bone.ToString()
             );
 		}
 
