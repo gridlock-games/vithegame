@@ -67,7 +67,7 @@ public class ActionIdentifyTarget : IAction
 
         m_HitDetect = Physics.BoxCast(gameObject.transform.position + Vector3.up, gameObject.transform.localScale, gameObject.transform.forward, out hit, gameObject.transform.rotation, 10.0f);
 
-        Debug.DrawRay(gameObject.transform.position + Vector3.up, transform.forward * 10.0f);
+        Debug.DrawRay(gameObject.transform.position + Vector3.up, transform.forward * 10.0f, Color.red, 5);
         //Draw a cube at the maximum distance
         // Debug.DrawWireCube(transform.position + transform.forward * 10.0f, transform.localScale);
 
@@ -103,6 +103,8 @@ public class ActionIdentifyTarget : IAction
                 executioner.gameObject.transform.position - targetChar.gameObject.transform.position
             );
 
+            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, executioner.transform.up);
+
             rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
             this.duration = Vector3.Angle(
                 targetChar.transform.TransformDirection(Vector3.forward),
@@ -110,11 +112,11 @@ public class ActionIdentifyTarget : IAction
             ) / targetChar.characterLocomotion.angularSpeed;
 
             targetChar.characterLocomotion.SetRotation(rotationDirection);
+            targetChar.transform.rotation = targetRotation;
         }
 
         if (executioner != null && targetChar != null)
         {
-
             characterMeleeA = executioner.GetComponent<CharacterMelee>();
             characterMeleeB = targetChar.GetComponent<CharacterMelee>();
             if (characterMeleeA != null && characterMeleeB != null)
@@ -122,7 +124,6 @@ public class ActionIdentifyTarget : IAction
                 meleeClipExecution.Play(characterMeleeA);
                 meleeClipExecuted.Play(characterMeleeB);
 
-                
                 this.StoreHitColliderTo.Set(null, null);
                 return true;
             }
@@ -132,7 +133,6 @@ public class ActionIdentifyTarget : IAction
 
         return true;
     }
-
 
     void OnDrawGizmos()
     {
