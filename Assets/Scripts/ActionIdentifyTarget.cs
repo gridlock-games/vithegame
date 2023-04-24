@@ -18,9 +18,7 @@ public class ActionIdentifyTarget : IAction
 {
     public enum Action
     {
-        Attach,
-        Detach,
-        Remove
+        Attach
     }
 
     public TargetCharacter characterExecutioner = new TargetCharacter();
