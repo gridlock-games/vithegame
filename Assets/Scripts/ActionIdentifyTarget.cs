@@ -65,9 +65,19 @@ public class ActionIdentifyTarget : IAction
 
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        m_HitDetect = Physics.BoxCast(gameObject.transform.position + Vector3.up, gameObject.transform.localScale, gameObject.transform.forward, out hit, gameObject.transform.rotation, 10.0f);
+        m_HitDetect = false;
+        RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, 10, -1, QueryTriggerInteraction.Ignore);
+        Debug.DrawRay(transform.position + Vector3.up, transform.forward * 10, Color.red, RayDistance);
+        System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+        foreach (RaycastHit rayHit in allHits)
+        {
+            if (rayHit.transform == transform) { continue; }
 
-        Debug.DrawRay(gameObject.transform.position + Vector3.up, transform.forward * 10.0f, Color.red, RayDistance);
+            m_HitDetect = true;
+            hit = rayHit;
+            break;
+        }
+
         //Draw a cube at the maximum distance
         // Debug.DrawWireCube(transform.position + transform.forward * 10.0f, transform.localScale);
 
