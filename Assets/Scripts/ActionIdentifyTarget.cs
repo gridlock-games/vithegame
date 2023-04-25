@@ -67,7 +67,7 @@ public class ActionIdentifyTarget : IAction
 
         m_HitDetect = Physics.BoxCast(gameObject.transform.position + Vector3.up, gameObject.transform.localScale, gameObject.transform.forward, out hit, gameObject.transform.rotation, 10.0f);
 
-        Debug.DrawRay(gameObject.transform.position + Vector3.up, transform.forward * 10.0f, Color.red, 5);
+        Debug.DrawRay(gameObject.transform.position + Vector3.up, transform.forward * 10.0f, Color.red, RayDistance);
         //Draw a cube at the maximum distance
         // Debug.DrawWireCube(transform.position + transform.forward * 10.0f, transform.localScale);
 

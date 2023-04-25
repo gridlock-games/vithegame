@@ -666,6 +666,8 @@ namespace GameCreator.Melee
             } else {
                 attackAngleComputed = AttackDirection.Back;
             } 
+
+
             #endregion
 
 
