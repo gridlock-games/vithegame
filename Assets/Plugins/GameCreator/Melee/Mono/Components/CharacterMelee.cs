@@ -439,7 +439,7 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.StopBlockingServerRpc();
+            if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
@@ -568,6 +568,8 @@ namespace GameCreator.Melee
 
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, BladeComponent blade)
         {
+            if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
+
             Character assailant = attacker.Character;
             CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
             BladeComponent meleeWeapon = melee.Blades[0];
@@ -651,7 +653,7 @@ namespace GameCreator.Melee
                 else
                 {
                     this.Defense = 0f;
-                    this.StopBlockingServerRpc();
+                    if (IsOwner) this.StopBlockingServerRpc();
 
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
                 }
@@ -702,7 +704,38 @@ namespace GameCreator.Melee
                 hitReaction.Play(this);
             }
 
+            OnReceiveAttackClientRpc(attack.poiseDamage, attackAngleH);
             return HitResult.ReceiveDamage;
+        }
+
+        [ClientRpc]
+        void OnReceiveAttackClientRpc(float poiseDamage, float attackAngleH)
+        {
+            this.AddPoise(-poiseDamage);
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
+            bool isKnockback = this.Poise <= float.Epsilon;
+
+            MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
+                this.Character.IsGrounded(),
+                hitLocation,
+                isKnockback
+            );
+
+            // TODO
+            //this.ExecuteEffects(
+            //    blade.GetImpactPosition(),
+            //    isKnockback
+            //        ? attacker.currentWeapon.audioImpactKnockback
+            //        : attacker.currentWeapon.audioImpactNormal,
+            //    isKnockback
+            //        ? attacker.currentWeapon.prefabImpactKnockback
+            //        : attacker.currentWeapon.prefabImpactNormal
+            //);
+
+            if (!this.IsUninterruptable)
+            {
+                hitReaction.Play(this);
+            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
