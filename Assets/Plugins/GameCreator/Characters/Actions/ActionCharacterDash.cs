@@ -97,6 +97,7 @@
                     melee.StopAttack();
                     animator.StopGesture(0f);
                     melee.currentMeleeClip = null;
+                    
                 }
 
                 meleeweapon = melee.currentWeapon;
@@ -225,6 +226,8 @@
                 (duration + 1.10f),
                 1.0f
             );
+
+            if (melee != null) melee.SetInvincibility(clip.length - (clip.length * 0.50f));
 
             if (clip != null && animator != null)
             {
