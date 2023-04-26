@@ -156,6 +156,8 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
+            if (!IsServer) { return; }
+
             this.IsAttacking = false;
 
             if (this.comboSystem != null)
@@ -187,6 +189,10 @@ namespace GameCreator.Melee
                             if (targetMelee != null)
                             {
                                 hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
+                                if (hitResult == HitResult.ReceiveDamage)
+                                {
+                                    targetMelee.HP.Value -= 10;
+                                }
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = (
@@ -371,6 +377,7 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
+        public NetworkVariable<int> HP = new NetworkVariable<int>(100);
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
         public override void OnNetworkSpawn() { isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange; }
