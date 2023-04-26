@@ -195,9 +195,7 @@ namespace GameCreator.Melee
                                 }
                             }
 
-                            IgniterMeleeOnReceiveAttack[] triggers = (
-                                hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>()
-                            );
+                            IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
 
                             bool hitSomething = triggers.Length > 0;
                             if (hitSomething)
