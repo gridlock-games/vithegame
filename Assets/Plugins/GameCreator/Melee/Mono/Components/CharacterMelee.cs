@@ -191,7 +191,7 @@ namespace GameCreator.Melee
                                 hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                 if (hitResult == HitResult.ReceiveDamage)
                                 {
-                                    targetMelee.HP.Value -= 10;
+                                    targetMelee.HP.Value -= attack.baseDamage;
                                 }
                             }
 

@@ -69,6 +69,7 @@
 
         public float poiseDamage = 2f;
         public float defenseDamage = 1f;
+        public int baseDamage = 10;
 
         public float animSpeed = 1.0f;
 
