@@ -51,6 +51,15 @@ namespace LightPat.Player
         {
             if (!IsSpawned) { return; }
 
+            if (Camera.main)
+            {
+                nameTag.transform.LookAt(Camera.main.transform);
+                nameTag.transform.rotation *= Quaternion.Euler(0, 180, 0);
+
+                HPTag.transform.LookAt(Camera.main.transform);
+                HPTag.transform.rotation *= Quaternion.Euler(0, 180, 0);
+            }
+
             HPTag.SetText(GetComponent<GameCreator.Melee.CharacterMelee>().HP.Value.ToString() + "/100");
 
             if (!IsOwner) { return; }
