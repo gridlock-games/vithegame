@@ -67,6 +67,7 @@
 
         private SerializedProperty spPoiseDamage;
         private SerializedProperty spDefenseDamage;
+        private SerializedProperty spBaseDamage;
 
         private SerializedProperty spInterruptible;
         private SerializedProperty spVulnerability;
@@ -125,6 +126,7 @@
 
             this.spPoiseDamage = this.serializedObject.FindProperty("poiseDamage");
             this.spDefenseDamage = this.serializedObject.FindProperty("defenseDamage");
+            this.spBaseDamage = this.serializedObject.FindProperty("baseDamage");
 
             this.spInterruptible = this.serializedObject.FindProperty("interruptible");
             this.spVulnerability = this.serializedObject.FindProperty("vulnerability");
@@ -358,6 +360,7 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
                     EditorGUILayout.PropertyField(this.spPoiseDamage);
+                    EditorGUILayout.PropertyField(this.spBaseDamage);
 
                     EditorGUI.indentLevel--;
                     EditorGUI.EndDisabledGroup();

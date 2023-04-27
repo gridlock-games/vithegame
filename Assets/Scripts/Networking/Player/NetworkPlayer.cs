@@ -12,6 +12,7 @@ namespace LightPat.Player
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private TextMeshPro nameTag;
+        [SerializeField] private TextMeshPro HPTag;
 
         public override void OnNetworkSpawn()
         {
@@ -29,8 +30,8 @@ namespace LightPat.Player
                 playerCamera.GetComponent<AudioListener>().enabled = true;
                 // Add the hook player component
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
-                // If we are the local player, destroy the name tag
-                Destroy(nameTag.gameObject);
+                // If we are the local player, make sure our name isn't being displayed
+                nameTag.SetText("");
             }
             else // If we are not this instance's player object
             {
@@ -48,6 +49,19 @@ namespace LightPat.Player
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
+            if (Camera.main)
+            {
+                nameTag.transform.LookAt(Camera.main.transform);
+                nameTag.transform.rotation *= Quaternion.Euler(0, 180, 0);
+
+                HPTag.transform.LookAt(Camera.main.transform);
+                HPTag.transform.rotation *= Quaternion.Euler(0, 180, 0);
+            }
+
+            HPTag.SetText(GetComponent<GameCreator.Melee.CharacterMelee>().HP.Value.ToString() + "/100");
+
             if (!IsOwner) { return; }
 
             if (Time.unscaledTime > _timer)
