@@ -6,9 +6,10 @@ namespace GameCreator.Characters
 	using System.Collections.Generic;
 	using UnityEngine;
 	using GameCreator.Core.Hooks;
+	using Unity.Netcode;
 
 	[AddComponentMenu("")]
-	public class CharacterHeadTrack : MonoBehaviour, IToggleIK
+	public class CharacterHeadTrack : NetworkBehaviour, IToggleIK
 	{
         private const float AIM_DISTANCE = 10f;
         private const float VISION_ANGLE = 220f;
@@ -141,6 +142,8 @@ namespace GameCreator.Characters
 
 		private void OnAnimatorIK (int layerIndex) 
 		{
+			if (!IsOwner) return;
+
             if (this.animator == null || !this.animator.isHuman) return;
             this.eventBeforeIK.Invoke(layerIndex);
 
