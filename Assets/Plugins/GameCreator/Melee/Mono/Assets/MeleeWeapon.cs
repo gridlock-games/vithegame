@@ -84,6 +84,10 @@ namespace GameCreator.Melee
         public MeleeClip dodgeL = new MeleeClip();
         public MeleeClip dodgeR = new MeleeClip();
 
+        // grabs
+        public MeleeClip grabAttack;
+        public MeleeClip grabReaction;
+
         // combo system:
         public List<Combo> combos = new List<Combo>();
 

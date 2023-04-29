@@ -29,6 +29,7 @@ namespace LightPat.Player
                 playerCamera.GetComponent<AudioListener>().enabled = true;
                 // Add the hook player component
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
+                
                 // If we are the local player, destroy the name tag
                 Destroy(nameTag.gameObject);
             }

@@ -23,6 +23,8 @@
             IsOnAir,
             IsDashing,
             IsNotDashing,
+            IsBusy,
+            IsNotBusy,
             CanRun,
             CanJump
         }
@@ -38,6 +40,7 @@
             if (character == null) return true;
             bool result = true;
             bool isNotDashing = false;
+            bool isNotBusy = false;
 
             switch (this.property)
             {
@@ -85,6 +88,17 @@
                         isNotDashing = character.characterLocomotion.isDashing ? false : true;
 
                         result = isNotDashing;
+                    break;
+
+                case CharacterProperty.IsBusy:
+                    if (character.characterLocomotion != null)
+                        result = character.characterLocomotion.isBusy;
+                    break;
+                case CharacterProperty.IsNotBusy:
+                    if (character.characterLocomotion != null)
+                        isNotBusy = character.characterLocomotion.isBusy ? false : true;
+
+                        result = isNotBusy;
                     break;
             }
 

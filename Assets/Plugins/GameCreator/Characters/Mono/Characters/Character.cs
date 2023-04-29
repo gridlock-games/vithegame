@@ -313,6 +313,13 @@
             return true;
         }
 
+        public bool Grab(float duration) {
+            if (this.characterLocomotion.isBusy) return false;
+
+
+            return true;
+        }
+
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)
         {

@@ -148,6 +148,7 @@ namespace GameCreator.Melee
                         this.targetsEvaluated = new HashSet<int>();
 
                         this.currentMeleeClip.Play(this);
+                        
                         if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
                     }
                 }
@@ -654,23 +655,6 @@ namespace GameCreator.Melee
             #endregion
 
 
-            AttackDirection attackAngleComputed = AttackDirection.Front;
-            
-            #region Get Attack Direction
-            if(attackAngleH <= 67.50f || attackAngleH >= 337.50f) {
-                attackAngleComputed = AttackDirection.Front;
-            } else if(attackAngleH > 67.50f && attackAngleH < 157.50f) {
-                 attackAngleComputed = AttackDirection.Right;
-            } else if(attackAngleH < 337.50f && attackAngleH > 247.50f) {
-                 attackAngleComputed = AttackDirection.Left;
-            } else {
-                attackAngleComputed = AttackDirection.Back;
-            } 
-
-
-            #endregion
-
-
             this.AddPoise(-attack.poiseDamage);
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
             bool isKnockback = this.Poise <= float.Epsilon;
@@ -763,21 +747,21 @@ namespace GameCreator.Melee
         {
             MeleeWeapon.HitLocation hitLocation;
 
-            if (attackAngleH <= 67.50f || attackAngleH >= 337.50f)
+            if (attackAngleH <= 145.00f || attackAngleH >= 365.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
             }
-            else if (attackAngleH > 67.50f && attackAngleH < 157.50f)
+            else if (attackAngleH > 145.00f && attackAngleH < 185.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.RightMiddle;
             }
-            else if (attackAngleH < 337.50f && attackAngleH > 247.50f)
+            else if (attackAngleH < 325.00f && attackAngleH > 185.00f)
             {
-                hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
+                hitLocation = MeleeWeapon.HitLocation.BackMiddle;
             }
             else
             {
-                hitLocation = MeleeWeapon.HitLocation.BackMiddle;
+                hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
             }
 
             print(hitLocation);
