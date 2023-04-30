@@ -12,6 +12,7 @@ namespace LightPat.Player
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
+        [SerializeField] private GameObject playerHUD;
 
         public override void OnNetworkSpawn()
         {
@@ -36,6 +37,7 @@ namespace LightPat.Player
                 worldSpaceLabel.SetActive(true);
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
+                Destroy(playerHUD);
                 // If we are not the local player, display the name tag
             }
         }
