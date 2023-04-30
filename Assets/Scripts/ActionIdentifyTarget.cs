@@ -127,6 +127,11 @@ public class ActionIdentifyTarget : IAction
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
 
+            // Change Camera Input and Player Controls
+            var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
+            executioner.characterLocomotion.Grab(direction, false);
+            targetChar.characterLocomotion.Grab(direction, false);
+
             // Handle Melee Clips
             CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
             CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
@@ -139,11 +144,6 @@ public class ActionIdentifyTarget : IAction
             bool isGrabbing = characterMeleeA.Grab(characterMeleeB);
 
             if(!isGrabbing) return false;
-
-            // Change Camera Input and Player Controls
-            var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
-            bool isGrabbingLocoA = executioner.characterLocomotion.Grab(direction, false);
-            bool isGrabbingLocoB = targetChar.characterLocomotion.Grab(direction, false);
 
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executioner, targetChar));
             return true;
