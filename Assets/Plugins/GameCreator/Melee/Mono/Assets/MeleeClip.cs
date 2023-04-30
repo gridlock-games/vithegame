@@ -105,15 +105,20 @@
             if (this.interruptible == Interrupt.Uninterruptible) melee.SetUninterruptable(this.Length);
             if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(this.Length);
 
-            if(this.isAttack) {
-                CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
-                this.disableOrbitDuration = (this.animationClip.length * 0.35f);
-
-                if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+            if (this.isAttack)
+            {
+                if (Camera.main.TryGetComponent(out CameraController camController))
                 {
-                    CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+                    CameraMotor motor = camController.currentCameraMotor;
 
-                    CoroutinesManager.Instance.StartCoroutine(this.EnableOrbitRoutine());
+                    this.disableOrbitDuration = (this.animationClip.length * 0.35f);
+
+                    if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+                    {
+                        CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
+                        CoroutinesManager.Instance.StartCoroutine(this.EnableOrbitRoutine());
+                    }
                 }
             }
 
