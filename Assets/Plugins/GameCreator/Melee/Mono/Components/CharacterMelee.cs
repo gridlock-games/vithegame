@@ -46,6 +46,8 @@ namespace GameCreator.Melee
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
+        private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MeleeWeapon currentWeapon;
@@ -593,15 +595,7 @@ namespace GameCreator.Melee
                 return HitResult.Ignore;
             }
 
-            Vector3 bladeDelta = blade.transform.position - (this.transform.position + this.Character.characterLocomotion.characterController.center);
-            Quaternion look = Quaternion.LookRotation(bladeDelta);
-
-            Vector3 attackerDelta = (attacker.transform.position + attacker.Character.characterLocomotion.characterController.center) - (this.transform.position + this.Character.characterLocomotion.characterController.center);
-            Quaternion lookAttacker = Quaternion.LookRotation(attackerDelta);
-
-            float attackAngleV = look.eulerAngles.x;
-            float attackAngleH = lookAttacker.eulerAngles.y;
-
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
             #region Attack and Defense handlers
 
@@ -671,7 +665,7 @@ namespace GameCreator.Melee
 
 
             this.AddPoise(-attack.poiseDamage);
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = this.Poise <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
@@ -696,15 +690,15 @@ namespace GameCreator.Melee
                 hitReaction.Play(this);
             }
 
-            OnReceiveAttackClientRpc(attack.poiseDamage, attackAngleH);
+            OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle);
             return HitResult.ReceiveDamage;
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(float poiseDamage, float attackAngleH)
+        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle)
         {
             this.AddPoise(-poiseDamage);
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = this.Poise <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
@@ -789,25 +783,27 @@ namespace GameCreator.Melee
             return time;
         }
 
-        private MeleeWeapon.HitLocation GetHitLocation(float attackAngleH)
+        private MeleeWeapon.HitLocation GetHitLocation(float attackVectorAngle)
         {
             MeleeWeapon.HitLocation hitLocation;
 
-            if (attackAngleH <= 145.00f || attackAngleH >= 365.00f)
+            print(attackVectorAngle);
+
+            if (attackVectorAngle <= 45.00f && attackVectorAngle >= -45.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
             }
-            else if (attackAngleH > 145.00f && attackAngleH < 185.00f)
+            else if (attackVectorAngle > 45.00f && attackVectorAngle < 135.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.RightMiddle;
             }
-            else if (attackAngleH < 325.00f && attackAngleH > 185.00f)
+            else if (attackVectorAngle < -45.00f && attackVectorAngle > -135.00f)
             {
-                hitLocation = MeleeWeapon.HitLocation.BackMiddle;
+                hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
             }
             else
             {
-                hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
+                hitLocation = MeleeWeapon.HitLocation.BackMiddle;
             }
 
             print(hitLocation);

@@ -15,6 +15,16 @@ using GameCreator.Camera;
     using UnityEditor;
 #endif
 
+public class PreserveRotation {
+
+    public PreserveRotation ( Quaternion targetRotation, Vector3 rotationDirection) {
+        this.quaternion = targetRotation;
+        this.vector3 = rotationDirection;
+    }
+    public Quaternion quaternion {get; private set;}
+    public Vector3 vector3 {get; private set;}
+}
+
 [AddComponentMenu("")]
 public class ActionIdentifyTarget : IAction
 {
@@ -84,14 +94,14 @@ public class ActionIdentifyTarget : IAction
                 {
                     this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 
-                    print(hit.transform.name);
+                    // print(hit.transform.name);
                 }
             }
             else
             {
                 this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 
-                print(hit.transform.name);
+                // print(hit.transform.name);
             }
         }
 
@@ -100,23 +110,14 @@ public class ActionIdentifyTarget : IAction
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
 
+        
+        PreserveRotation rotationConfig = Rotation(GrabPlaceholder.gameObject, targetChar);
+
         #region RotateCharacter
         if (targetChar != null && executioner != null)
         {
-            Vector3 rotationDirection = (
-                executioner.gameObject.transform.position - targetChar.gameObject.transform.position
-            );
-
-            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, executioner.transform.up);
-
-            rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
-            this.duration = Vector3.Angle(
-                targetChar.transform.TransformDirection(Vector3.forward),
-                rotationDirection
-            ) / targetChar.characterLocomotion.angularSpeed;
-
-            targetChar.characterLocomotion.SetRotation(rotationDirection);
-            targetChar.transform.rotation = targetRotation;
+            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
+            targetChar.transform.rotation = rotationConfig.quaternion;
         }
         #endregion
 
@@ -126,6 +127,7 @@ public class ActionIdentifyTarget : IAction
         {
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
+            targetChar.transform.rotation = rotationConfig.quaternion;
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
@@ -188,6 +190,29 @@ public class ActionIdentifyTarget : IAction
         yield return 0;
     }
 
+
+    private PreserveRotation Rotation(GameObject anchor, Character targetChar) {
+
+         Vector3 rotationDirection = (
+            anchor.transform.position - targetChar.gameObject.transform.position
+        );
+
+        Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, anchor.transform.up);
+
+        rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
+
+        this.duration = Vector3.Angle(
+            targetChar.transform.TransformDirection(Vector3.forward),
+            rotationDirection
+        ) / targetChar.characterLocomotion.angularSpeed;
+
+        targetChar.characterLocomotion.SetRotation(rotationDirection);
+
+        PreserveRotation preserveRotation = new PreserveRotation(targetRotation, rotationDirection);
+
+        return preserveRotation;
+
+    }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
