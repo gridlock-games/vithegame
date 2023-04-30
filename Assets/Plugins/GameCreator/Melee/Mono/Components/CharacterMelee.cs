@@ -204,6 +204,10 @@ namespace GameCreator.Melee
                                 {
                                     targetMelee.HP.Value -= attack.baseDamage;
                                 }
+                                else if (hitResult == HitResult.AttackBlock | hitResult == HitResult.PerfectBlock)
+                                {
+                                    // TODO
+                                }
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();

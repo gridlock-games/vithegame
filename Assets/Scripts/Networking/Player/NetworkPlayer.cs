@@ -30,6 +30,7 @@ namespace LightPat.Player
                 playerCamera.GetComponent<AudioListener>().enabled = true;
                 // Add the hook player component
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
+                playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
             }
             else // If we are not this instance's player object
