@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 using TMPro;
-using LightPat.Core;
+using GameCreator.Melee;
+using UnityEngine.UI;
 
 namespace LightPat.UI
 {
@@ -11,12 +11,16 @@ namespace LightPat.UI
     {
         public TextMeshPro nameDisplay;
 
-        public float rotationSpeed = 0.4f;
-        public float animationSpeed = 0.02f;
-        public float viewDistance = 10f;
+        public float rotationSpeed = 0.6f;
+        public float animationSpeed = 0.1f;
+        public float viewDistance = 5f;
 
-        Vector3 positionOffset;
+        public Slider healthSlider;
+
+        CharacterMelee melee;
         Transform target;
+        Vector3 positionOffset;
+        Vector3 originalScale;
 
         private void OnEnable()
         {
@@ -26,8 +30,13 @@ namespace LightPat.UI
             target = transform.parent;
             positionOffset = transform.localPosition;
             transform.SetParent(null, true);
-            
+
+            melee = target.GetComponent<CharacterMelee>();
+            healthSlider.gameObject.SetActive(melee != null);
+
             name = "World Space Label for " + target.name;
+
+            originalScale = transform.localScale;
         }
 
         private void LateUpdate()
@@ -44,13 +53,19 @@ namespace LightPat.UI
 
             transform.position = target.position + positionOffset;
 
-            Quaternion rotTarget = Quaternion.LookRotation(Camera.main.transform.position - transform.position);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotTarget, rotationSpeed);
+            Quaternion rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
+            transform.rotation = rotTarget;
 
             if (Vector3.Distance(Camera.main.transform.position, transform.position) > viewDistance)
                 transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * animationSpeed);
             else
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * animationSpeed);
+                transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
+
+            if (melee)
+            {
+                healthSlider.transform.rotation = rotTarget;
+                healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
+            }
         }
     }
 }
