@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using GameCreator.Core;
     using UnityEngine;
+    using GameCreator.Camera;
 
     [CreateAssetMenu(
         fileName = "Melee Clip",
@@ -72,6 +73,7 @@
         public int baseDamage = 10;
 
         public float animSpeed = 1.0f;
+        private float disableOrbitDuration = 0.0f;
 
         // properties:
         public Interrupt interruptible = Interrupt.Interruptible;
@@ -94,12 +96,26 @@
 
         public List<MeleeWeapon.WeaponBone> affectedBones = new List<MeleeWeapon.WeaponBone>();
 
+        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Play(CharacterMelee melee)
         {
             if (this.interruptible == Interrupt.Uninterruptible) melee.SetUninterruptable(this.Length);
             if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(this.Length);
+
+            if(this.isAttack) {
+                CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+                this.disableOrbitDuration = (this.animationClip.length * 0.35f);
+
+                if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+                {
+                    CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
+                    CoroutinesManager.Instance.StartCoroutine(this.EnableOrbitRoutine());
+                }
+            }
 
             melee.SetPosture(this.posture, this.Length);
             melee.PlayAudio(this.soundEffect);
@@ -122,10 +138,6 @@
             );
 
             this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
-
-            // if(melee.Blade) {
-            //     this.ExecuteActionsOnStart(melee.Blades[0].GetImpactPosition(), melee.gameObject);
-            // }
         }
 
         public void Stop(CharacterMelee melee)
@@ -187,6 +199,27 @@
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private IEnumerator EnableOrbitRoutine()
+        {
+            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+            {
+                float initTime = Time.time;
+                CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
+                while (initTime + this.disableOrbitDuration >= Time.time)
+                {
+                    adventureMotor.orbitSpeed = 200.00f;
+
+                    yield return null;
+                }
+                
+                adventureMotor.orbitSpeed = 15.00f;
+            }
+
+            yield return 0;
+        }
 
         private IEnumerator ExecuteHitPause(float duration)
         {

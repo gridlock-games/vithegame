@@ -55,14 +55,14 @@
 					{
 						this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 				
-						print(hit.transform.name);
+						// print(hit.transform.name);
 					}
 				}
 				else
 				{
 					this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 				
-					print(hit.transform.name);
+					// print(hit.transform.name);
 				}
 			}
 			

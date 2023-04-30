@@ -3,13 +3,14 @@ namespace GameCreator.Melee
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using GameCreator.Core;
-    using GameCreator.Characters;
     using UnityEngine;
     using UnityEngine.Audio;
+    using Unity.Netcode;
+    using GameCreator.Core;
+    using GameCreator.Characters;
     using GameCreator.Variables;
     using GameCreator.Pool;
-    using Unity.Netcode;
+    using static GameCreator.Melee.MeleeClip;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -45,6 +46,8 @@ namespace GameCreator.Melee
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
+        private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MeleeWeapon currentWeapon;
@@ -74,6 +77,10 @@ namespace GameCreator.Melee
         public bool IsAttacking { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
+
+
+        public bool IsGrabbing { get; private set; }
+        public bool IsGrabbed { get; private set; }
 
         public bool IsStaggered => this.isStaggered && GetTime() <= this.staggerEndtime;
         public bool IsInvincible => this.isInvincible && GetTime() <= this.invincibilityEndTime;
@@ -106,6 +113,9 @@ namespace GameCreator.Melee
 
         private bool isUninterruptable;
         private float uninterruptableEndTime;
+
+        private float anim_ExecuterDuration = 0.0f;
+        private float anim_ExecutedDuration = 0.0f;
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -148,6 +158,7 @@ namespace GameCreator.Melee
                         this.targetsEvaluated = new HashSet<int>();
 
                         this.currentMeleeClip.Play(this);
+                        
                         if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
                     }
                 }
@@ -584,15 +595,7 @@ namespace GameCreator.Melee
                 return HitResult.Ignore;
             }
 
-            Vector3 bladeDelta = blade.transform.position - (this.transform.position + this.Character.characterLocomotion.characterController.center);
-            Quaternion look = Quaternion.LookRotation(bladeDelta);
-
-            Vector3 attackerDelta = (attacker.transform.position + attacker.Character.characterLocomotion.characterController.center) - (this.transform.position + this.Character.characterLocomotion.characterController.center);
-            Quaternion lookAttacker = Quaternion.LookRotation(attackerDelta);
-
-            float attackAngleV = look.eulerAngles.x;
-            float attackAngleH = lookAttacker.eulerAngles.y;
-
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
             #region Attack and Defense handlers
 
@@ -661,25 +664,8 @@ namespace GameCreator.Melee
             #endregion
 
 
-            AttackDirection attackAngleComputed = AttackDirection.Front;
-            
-            #region Get Attack Direction
-            if(attackAngleH <= 67.50f || attackAngleH >= 337.50f) {
-                attackAngleComputed = AttackDirection.Front;
-            } else if(attackAngleH > 67.50f && attackAngleH < 157.50f) {
-                 attackAngleComputed = AttackDirection.Right;
-            } else if(attackAngleH < 337.50f && attackAngleH > 247.50f) {
-                 attackAngleComputed = AttackDirection.Left;
-            } else {
-                attackAngleComputed = AttackDirection.Back;
-            } 
-
-
-            #endregion
-
-
             this.AddPoise(-attack.poiseDamage);
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = this.Poise <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
@@ -704,15 +690,15 @@ namespace GameCreator.Melee
                 hitReaction.Play(this);
             }
 
-            OnReceiveAttackClientRpc(attack.poiseDamage, attackAngleH);
+            OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle);
             return HitResult.ReceiveDamage;
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(float poiseDamage, float attackAngleH)
+        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle)
         {
             this.AddPoise(-poiseDamage);
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackAngleH);
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = this.Poise <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
@@ -797,19 +783,21 @@ namespace GameCreator.Melee
             return time;
         }
 
-        private MeleeWeapon.HitLocation GetHitLocation(float attackAngleH)
+        private MeleeWeapon.HitLocation GetHitLocation(float attackVectorAngle)
         {
             MeleeWeapon.HitLocation hitLocation;
 
-            if (attackAngleH <= 67.50f || attackAngleH >= 337.50f)
+            print(attackVectorAngle);
+
+            if (attackVectorAngle <= 45.00f && attackVectorAngle >= -45.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
             }
-            else if (attackAngleH > 67.50f && attackAngleH < 157.50f)
+            else if (attackVectorAngle > 45.00f && attackVectorAngle < 135.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.RightMiddle;
             }
-            else if (attackAngleH < 337.50f && attackAngleH > 247.50f)
+            else if (attackVectorAngle < -45.00f && attackVectorAngle > -135.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.LeftMiddle;
             }
@@ -821,6 +809,51 @@ namespace GameCreator.Melee
             print(hitLocation);
 
             return hitLocation;
+        }
+
+        public bool Grab(CharacterMelee targetCharacter) {
+            CharacterMelee executorCharacter = this;
+
+            MeleeWeapon executorWeapon = this.currentWeapon;
+
+            if(targetCharacter == null || executorCharacter == null) return false;
+
+            this.anim_ExecuterDuration = (executorWeapon.grabAttack.animationClip.length);
+            this.anim_ExecutedDuration = (executorWeapon.grabReaction.animationClip.length);
+
+            // Cancel any Melee input
+            targetCharacter.StopAttack();
+            executorCharacter.StopAttack();
+
+            // Make Character Invincible
+            targetCharacter.SetInvincibility(anim_ExecuterDuration);
+            executorCharacter.SetInvincibility(anim_ExecutedDuration);
+
+            // Set posture to stagger to prevent melee from doing any execution
+            executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
+            targetCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
+
+            executorWeapon.grabAttack.Play(executorCharacter);
+            executorWeapon.grabReaction.Play(targetCharacter);
+
+            CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executorCharacter, targetCharacter));
+
+            return true;
+        }
+
+        public IEnumerator PostGrabRoutine(CharacterMelee executorCharacter, CharacterMelee targetCharacter)
+        {
+            float initTime = Time.time;
+
+            while (initTime + this.anim_ExecutedDuration >= Time.time) {
+
+                yield return null;
+            }
+
+            this.anim_ExecuterDuration = 0.00f;
+            this.anim_ExecutedDuration = 0.00f;
+
+            yield return 0;
         }
 
     }

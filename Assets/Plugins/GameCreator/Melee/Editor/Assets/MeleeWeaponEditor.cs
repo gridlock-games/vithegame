@@ -29,6 +29,8 @@
         private Section sectionEffects;
         private Section sectionDodges;
 
+        private Section sectionGrabs;
+
         private SerializedProperty spName;
         private SerializedProperty spDescription;
         private SerializedProperty spMeleeWeaponName;
@@ -79,6 +81,10 @@
         private ReorderableList knockbackReactionsList;
         private ReorderableList comboList;
 
+        
+        public SerializedProperty spGrabAttack;
+        public SerializedProperty spGrabReaction;
+
         private SerializedProperty spWeaponModels;
         // private ReorderableList weaponModelsList;
         
@@ -96,8 +102,11 @@
             this.sectionModel = new Section("Weapon Model", this.LoadIcon("Sword"), this.Repaint);
             this.sectionEffects = new Section("Effects", this.LoadIcon("Effects"), this.Repaint);
             this.sectionDodges = new Section("Dodge Animations", this.LoadIcon("General"), this.Repaint);
+            this.sectionGrabs = new Section("Grab Animations", this.LoadIcon("Effects"), this.Repaint);
 
-            
+
+            this.spGrabAttack = this.serializedObject.FindProperty("grabAttack");
+            this.spGrabReaction = this.serializedObject.FindProperty("grabReaction");
             
 
             this.spName = this.serializedObject.FindProperty("weaponName");
@@ -251,6 +260,9 @@
 
             EditorGUILayout.Space();
             this.PaintDodge_Element();
+
+            EditorGUILayout.Space();
+            this.PaintGrab_Element();
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Hit Reactions", EditorStyles.boldLabel);
@@ -421,6 +433,27 @@
                     EditorGUILayout.EndVertical();
                 }
             }
+        }
+
+        private void PaintGrab_Element()
+        {
+            this.sectionGrabs.PaintSection();
+            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionGrabs.state.faded))
+            {
+                if(group.visible)
+                {
+                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+
+                    EditorGUILayout.PropertyField(this.spGrabAttack);
+                    EditorGUILayout.PropertyField(this.spGrabReaction);
+
+                    
+
+                    EditorGUILayout.EndVertical();
+                }
+            }
+
+
         }
         
         private void PaintHitGroundFront_Element(Rect rect, int index, bool isActive, bool isFocused)

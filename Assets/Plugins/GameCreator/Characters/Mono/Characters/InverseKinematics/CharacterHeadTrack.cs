@@ -283,24 +283,5 @@ namespace GameCreator.Characters
 				this.transform = HookCamera.Instance.transform;
 			}
 		}
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // GIZMOS: --------------------------------------------------------------------------------
-
-        void OnDrawGizmosSelected()
-        {
-            if (this.trackInfo.characterAnimator != null && this.trackInfo.characterAnimator.useSmartHeadIK)
-            {
-                float radius = 0.3f;
-                Vector3 position = this.trackInfo.headTransform.position;
-                Vector3 direction = this.trackInfo.character.characterLocomotion.GetAimDirection();
-
-                Gizmos.color = new Color(Color.yellow.r, Color.yellow.g, Color.yellow.b, 0.25f);
-                Gizmos.DrawWireSphere(position, radius);
-
-                Gizmos.color = new Color(Color.yellow.r, Color.yellow.g, Color.yellow.b, 0.75f);
-                Gizmos.DrawCube(position + (direction * radius), Vector3.one * 0.02f);
-            }
-        }
     }
 }

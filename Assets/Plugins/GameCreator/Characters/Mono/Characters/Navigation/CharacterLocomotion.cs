@@ -421,5 +421,22 @@
             this.isDashing = this.currentLocomotionSystem.isDashing ? true : false;
             this.character.characterState.normal = this.terrainNormal;
         }
+
+        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
+            try {
+                // This is to ensure that the target is not an NPC
+                PlayerCharacter isPlayer = this.character.GetComponent<PlayerCharacter>();
+
+                this.isControllable = isControllable;
+                this.isBusy = !isControllable;
+                this.overrideFaceDirection = isPlayer ? direction : CharacterLocomotion.OVERRIDE_FACE_DIRECTION.None;
+                
+
+                return true;
+            } catch {
+
+                return false;
+            }
+        }
     }
 }
