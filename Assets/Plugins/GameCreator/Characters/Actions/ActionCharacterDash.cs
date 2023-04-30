@@ -61,7 +61,7 @@
             target.transform.rotation = targetRotation;
 
             Character characterTarget = this.character.GetCharacter(target);
-            if (characterTarget == null) return;
+            if (characterTarget == null) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
@@ -107,6 +107,7 @@
 
             DodgeClientRpc(targetPosition, targetRotation, targetName, moveDirection, angle);
             if (!IsHost) { InstantExecuteLocally(target, moveDirection, angle); }
+            Destroy(target);
         }
 
         [ClientRpc]
@@ -116,6 +117,7 @@
             target.transform.position = targetPosition;
             target.transform.rotation = targetRotation;
             InstantExecuteLocally(target, moveDirection, angle);
+            Destroy(target);
         }
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
