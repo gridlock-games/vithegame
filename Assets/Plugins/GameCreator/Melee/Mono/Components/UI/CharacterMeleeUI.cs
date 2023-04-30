@@ -7,7 +7,7 @@
     using GameCreator.Core;
     using GameCreator.Characters;
     using GameCreator.Variables;
-
+    
     [AddComponentMenu("UI/Game Creator/Character Melee UI", 0)]
     public class CharacterMeleeUI : MonoBehaviour
     {
@@ -15,6 +15,10 @@
 
         public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
         private CharacterMelee melee;
+
+        [Header("Health")]
+        public float currentHP = 100;
+        public Slider healthSlider;
 
         [Header("Poise")]
         public Image poiseImageFill;
@@ -33,7 +37,7 @@
 
         private void Start()
         {
-            this.UpdateUI();
+            melee = GetComponentInParent<CharacterMelee>();
         }
 
         private void Update()
@@ -50,14 +54,8 @@
 
         private void UpdateUI()
         {
-            if (!this.melee)
-            {
-                Character _character = this.character.GetCharacter(gameObject);
-                if (!_character) return;
-
-                this.melee = _character.GetComponent<CharacterMelee>();
-                if (!this.melee) return;
-            }
+            float healthPercent = currentHP / melee.maxHealth;
+            healthSlider.value = healthPercent;
 
             float maxPoise = this.melee.maxPoise.GetValue(melee.gameObject);
             float percentPoise = this.melee.Poise / maxPoise;

@@ -60,7 +60,7 @@ namespace LightPat.Player
                 HPTag.transform.rotation *= Quaternion.Euler(0, 180, 0);
             }
 
-            HPTag.SetText(GetComponent<GameCreator.Melee.CharacterMelee>().HP.Value.ToString() + "/100");
+            HPTag.SetText(GetComponent<GameCreator.Melee.CharacterMelee>().GetHP().ToString() + "/100");
 
             if (!IsOwner) { return; }
 
