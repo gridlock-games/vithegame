@@ -18,8 +18,6 @@ using GameCreator.Camera;
 [AddComponentMenu("")]
 public class ActionIdentifyTarget : IAction
 {
-
-    GameObject cameraMotor;
     public TargetCharacter characterExecutioner = new TargetCharacter();
     public TargetCharacter characterTarget = new TargetCharacter();
 
@@ -37,16 +35,12 @@ public class ActionIdentifyTarget : IAction
     bool m_HitDetect;
 
     RaycastHit hit;
-    public MeleeClip meleeClipExecution;
-    public MeleeClip meleeClipExecuted;
 
     // +--------------------------------------------------------------------------------------+
     // | Privates                                                                               |
     // +--------------------------------------------------------------------------------------+
 
     private float duration = 1.00f;
-    private CharacterMelee characterMeleeA;
-    private CharacterMelee characterMeleeB;
 
     private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
@@ -58,9 +52,6 @@ public class ActionIdentifyTarget : IAction
     // Start is called before the first frame update
     public override bool InstantExecute(GameObject target, IAction[] actions, int index)
     {
-
-        this.anim_ExecuterDuration = (this.meleeClipExecution.animationClip.length);
-        this.anim_ExecutedDuration = (this.meleeClipExecuted.animationClip.length);
 
         #region FireRayCast
         var gameObject = StartRaycastFrom.GetGameObject(target);
@@ -109,29 +100,7 @@ public class ActionIdentifyTarget : IAction
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
 
-        #region SetTargetParent
-
-        if (this.GrabPlaceholder != null && targetChar != null && executioner != null)
-        {
-
-            this.chrCtrl_target = targetChar.GetComponent<CharacterController>();
-            this.chrCtrl_executioner = executioner.GetComponent<CharacterController>();
-
-            chrCtrl_executioner.radius = 0.05f;
-            chrCtrl_target.radius = 0.05f;
-
-            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
-
-            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
-            
-
-            targetChar.transform.position = GrabPlaceholder.transform.position;
-        }
-
-        #endregion
-
-        #region HandleMeleeClip
-
+        #region RotateCharacter
         if (targetChar != null && executioner != null)
         {
             Vector3 rotationDirection = (
@@ -149,37 +118,44 @@ public class ActionIdentifyTarget : IAction
             targetChar.characterLocomotion.SetRotation(rotationDirection);
             targetChar.transform.rotation = targetRotation;
         }
+        #endregion
+
+        
 
         if (executioner != null && targetChar != null)
         {
-            characterMeleeA = executioner.GetComponent<CharacterMelee>();
-            characterMeleeB = targetChar.GetComponent<CharacterMelee>();
-            if (characterMeleeA != null && characterMeleeB != null)
-            {
-                characterMeleeA.SetPosture(Posture.Stagger, anim_ExecutedDuration);
-                characterMeleeB.SetPosture(Posture.Stagger, anim_ExecutedDuration);
+            // Teleport Target to GrabPlaceholder
+            targetChar.transform.position = GrabPlaceholder.transform.position;
 
-                characterMeleeA.StopAttack();
-                characterMeleeB.StopAttack();
+            // Handle Melee Clips
+            CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
+            CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
 
-                meleeClipExecution.Play(characterMeleeA);
-                meleeClipExecuted.Play(characterMeleeB);
+            if(!characterMeleeA || !characterMeleeB) return false;
 
-                this.StoreHitColliderTo.Set(null, null);
+            this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
+            this.anim_ExecutedDuration = (characterMeleeA.currentWeapon.grabReaction.animationClip.length);
 
-                CoroutinesManager.Instance.StartCoroutine(this.EnableOrbitRoutine(executioner, targetChar));
-                return true;
-            }
-            return false;
+            bool isGrabbing = characterMeleeA.Grab(characterMeleeB);
+
+            if(!isGrabbing) return false;
+
+            // Change Camera Input and Player Controls
+            var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
+            bool isGrabbingLocoA = executioner.characterLocomotion.Grab(direction, false);
+            bool isGrabbingLocoB = targetChar.characterLocomotion.Grab(direction, false);
+
+            CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executioner, targetChar));
+            return true;
         }
-        #endregion
 
         return true;
     }
 
-    public IEnumerator EnableOrbitRoutine(Character executioner, Character targetChar)
+    public IEnumerator PostGrabRoutine(Character executioner, Character targetChar)
     {
         CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+
         if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
         {
             float initTime = Time.time;
@@ -191,32 +167,22 @@ public class ActionIdentifyTarget : IAction
 
             while (initTime + this.anim_ExecutedDuration >= Time.time)
             {
-                var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
-                executioner.characterLocomotion.isBusy = true;
-                executioner.characterLocomotion.overrideFaceDirection = direction;
-                executioner.characterLocomotion.isControllable = false;
-                targetChar.characterLocomotion.isBusy = true;
-                targetChar.characterLocomotion.overrideFaceDirection = direction;
-                // targetChar.characterLocomotion.isControllable = false;
+                // Reduce Collider Radius
+                chrCtrl_executioner.radius = 0.05f;
+                chrCtrl_target.radius = 0.05f;
 
-
-                targetChar.transform.SetParent(null, true);
                 yield return null;
             }
 
-            var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
-            executioner.characterLocomotion.overrideFaceDirection = directionUpdate;
-            executioner.characterLocomotion.isBusy = false;
-            // THIS IS FOR THE TARGET
-            // targetChar.characterLocomotion.overrideFaceDirection = directionUpdate;
-            // targetChar.characterLocomotion.isControllable = true;
-            targetChar.characterLocomotion.isBusy = false;
-
+            // Revert Collider Radius
             chrCtrl_executioner.radius = 0.50f;
             chrCtrl_target.radius = 0.50f;
 
             
-            executioner.characterLocomotion.isControllable = true;
+            // Update Camera Input and Player Controls
+            var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
+            executioner.characterLocomotion.Grab(directionUpdate, true);
+            targetChar.characterLocomotion.Grab(directionUpdate, true);
         }
 
         yield return 0;
@@ -257,8 +223,6 @@ public class ActionIdentifyTarget : IAction
 
         private SerializedProperty spCharacterExecutioner;
 		private SerializedProperty spCharacterTarget;
-        private SerializedProperty spmeleeClipExecution;
-        private SerializedProperty spmeleeClipExecuted;
 
         private SerializedProperty spattachRayCastFrom;
         private SerializedProperty sprayCastLength;
@@ -280,8 +244,6 @@ public class ActionIdentifyTarget : IAction
 		{
             this.spCharacterExecutioner = this.serializedObject.FindProperty("characterExecutioner");
             this.spCharacterTarget = this.serializedObject.FindProperty("characterTarget");
-            this.spmeleeClipExecuted = this.serializedObject.FindProperty("meleeClipExecuted");
-            this.spmeleeClipExecution = this.serializedObject.FindProperty("meleeClipExecution");
 
             this.spattachRayCastFrom = this.serializedObject.FindProperty("StartRaycastFrom");
             this.sprayCastLength = this.serializedObject.FindProperty("RaycastLength");
@@ -295,8 +257,6 @@ public class ActionIdentifyTarget : IAction
 		{
             this.spCharacterExecutioner = null;
             this.spCharacterTarget = null;
-            this.spmeleeClipExecuted = null;
-            this.spmeleeClipExecution = null;
             this.spGrabPlaceholder = null;
 		}
 
@@ -311,19 +271,15 @@ public class ActionIdentifyTarget : IAction
             EditorGUILayout.PropertyField(this.spRayCastLayer);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Executioner", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(this.spCharacterExecutioner);
-            EditorGUILayout.PropertyField(this.spmeleeClipExecution);
             EditorGUILayout.PropertyField(this.spGrabPlaceholder);
 
             
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Executed", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(this.spCharacterTarget);
-            EditorGUILayout.PropertyField(this.spmeleeClipExecuted);
 
 			this.serializedObject.ApplyModifiedProperties();
 		}
 
 #endif
 }
-
