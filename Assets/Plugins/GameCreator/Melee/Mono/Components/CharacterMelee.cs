@@ -590,6 +590,13 @@ namespace GameCreator.Melee
 
         // CALLBACK METHODS: ----------------------------------------------------------------------
 
+        public void OnDodge()
+        {
+            if (!IsServer) { Debug.LogError("OnDodge() should only be called on the server."); return; }
+
+            AddPoise(-10);
+        }
+
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, BladeComponent blade)
         {
             if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
