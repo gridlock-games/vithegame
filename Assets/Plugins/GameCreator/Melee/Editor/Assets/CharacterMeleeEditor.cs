@@ -11,6 +11,7 @@
         private SerializedProperty spCurrentWeapon;
         private SerializedProperty spCurrentShield;
 
+        private SerializedProperty spMaxHealth;
         private SerializedProperty spPoiseDelay;
         private SerializedProperty spPoiseMax;
         private SerializedProperty spPoiseRecovery;
@@ -22,6 +23,7 @@
             this.spCurrentWeapon = this.serializedObject.FindProperty("currentWeapon");
             this.spCurrentShield = this.serializedObject.FindProperty("currentShield");
 
+            this.spMaxHealth = this.serializedObject.FindProperty("maxHealth");
             this.spPoiseDelay = this.serializedObject.FindProperty("delayPoise");
             this.spPoiseMax = this.serializedObject.FindProperty("maxPoise");
             this.spPoiseRecovery = this.serializedObject.FindProperty("poiseRecoveryRate");
@@ -39,6 +41,7 @@
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(this.spMaxHealth);
             EditorGUILayout.PropertyField(this.spPoiseDelay);
             EditorGUILayout.PropertyField(this.spPoiseMax);
             EditorGUILayout.PropertyField(this.spPoiseRecovery);

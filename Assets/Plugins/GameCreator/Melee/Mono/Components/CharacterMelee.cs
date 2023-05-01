@@ -204,6 +204,10 @@ namespace GameCreator.Melee
                                 {
                                     targetMelee.HP.Value -= attack.baseDamage;
                                 }
+                                else if (hitResult == HitResult.AttackBlock | hitResult == HitResult.PerfectBlock)
+                                {
+                                    // TODO
+                                }
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
@@ -386,10 +390,16 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
-        public NetworkVariable<int> HP = new NetworkVariable<int>(100);
+        public int maxHealth = 100;
+        private NetworkVariable<int> HP = new NetworkVariable<int>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
-        public override void OnNetworkSpawn() { isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange; }
+        public int GetHP()
+        {
+            return HP.Value;
+        }
+
+        public override void OnNetworkSpawn() { HP.Value = maxHealth; isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange; }
         public override void OnNetworkDespawn() { isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange; }
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
