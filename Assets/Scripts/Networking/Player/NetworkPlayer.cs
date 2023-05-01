@@ -32,6 +32,8 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
+
+                Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
             {
