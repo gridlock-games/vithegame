@@ -724,12 +724,17 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
             if (!this.IsUninterruptable)
             {
-                if (hitReaction != null)
-                    hitReaction.Play(this);
+                hitReaction.Play(this);
             }
 
             //OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle, bladeImpactPosition, assailant.NetworkObjectId);
             return HitResult.ReceiveDamage;
+        }
+
+        [ClientRpc]
+        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle, Vector3 bladeImpactPosition, ulong attackNetObjId)
+        {
+            // TODO
         }
 
         //[ClientRpc]
