@@ -590,6 +590,16 @@ namespace GameCreator.Melee
 
         // CALLBACK METHODS: ----------------------------------------------------------------------
 
+        public void OnLightAttack()
+        { }
+
+        public void OnHeavyAttack()
+        {
+            if (!IsServer) { Debug.LogError("OnHeavyAttack() should only be called on the server."); return; }
+
+            AddPoise(-20);
+        }
+
         public void OnDodge()
         {
             if (!IsServer) { Debug.LogError("OnDodge() should only be called on the server."); return; }
