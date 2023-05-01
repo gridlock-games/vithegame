@@ -61,7 +61,7 @@ namespace GameCreator.Melee
         protected ComboSystem comboSystem;
         protected InputBuffer inputBuffer;
 
-        public float Poise { get; protected set; }
+        public NetworkVariable<float> Poise { get; private set; } = new NetworkVariable<float>();
         private float poiseDelayCooldown;
 
         public NumberProperty delayPoise = new NumberProperty(1f);
@@ -138,8 +138,11 @@ namespace GameCreator.Melee
 
         protected virtual void Update()
         {
-            this.UpdatePoise();
-            this.UpdateDefense();
+            if (IsServer)
+            {
+                this.UpdatePoise();
+                this.UpdateDefense();
+            }
 
             if (this.comboSystem != null)
             {
@@ -250,8 +253,8 @@ namespace GameCreator.Melee
             this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
             if (this.poiseDelayCooldown > float.Epsilon) return;
 
-            this.Poise += this.poiseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Poise = Mathf.Min(this.Poise, this.maxPoise.GetValue(gameObject));
+            this.Poise.Value += this.poiseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Poise.Value = Mathf.Min(this.Poise.Value, this.maxPoise.GetValue(gameObject));
         }
 
         protected void UpdateDefense()
@@ -526,12 +529,12 @@ namespace GameCreator.Melee
         public void SetPoise(float value)
         {
             this.poiseDelayCooldown = this.delayPoise.GetValue(gameObject);
-            this.Poise = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
+            this.Poise.Value = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
         }
 
         public void AddPoise(float value)
         {
-            this.SetPoise(this.Poise + value);
+            this.SetPoise(this.Poise.Value + value);
         }
 
         public void SetDefense(float value)
@@ -676,7 +679,7 @@ namespace GameCreator.Melee
 
             this.AddPoise(-attack.poiseDamage);
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise <= float.Epsilon;
+            bool isKnockback = this.Poise.Value <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
