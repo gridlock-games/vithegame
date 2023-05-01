@@ -45,6 +45,9 @@ namespace LightPat.Player
             }
         }
 
+        [SerializeField] private GameObject pauseMenuPrefab;
+        private GameObject pauseInstance;
+
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
         private float _hudRefreshRate = 1f;
         private float _timer;
@@ -66,7 +69,17 @@ namespace LightPat.Player
             // Pause menu
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log("Escape");
+                if (!pauseInstance)
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                    pauseInstance = Instantiate(pauseMenuPrefab);
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    pauseInstance.GetComponent<Menu>().DestroyAllMenus();
+                    Destroy(pauseInstance);
+                }
             }
         }
     }

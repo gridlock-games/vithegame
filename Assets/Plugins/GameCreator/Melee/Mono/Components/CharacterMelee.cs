@@ -620,6 +620,9 @@ namespace GameCreator.Melee
             BladeComponent meleeWeapon = melee.Blades[0];
             Character player = this.Character.GetComponent<PlayerCharacter>();
 
+            Vector3 bladeImpactPosition = blade.GetImpactPosition();
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.Ignore;
@@ -680,7 +683,7 @@ namespace GameCreator.Melee
                     if (blockReaction != null) blockReaction.Play(this);
 
                     this.ExecuteEffects(
-                        blade.GetImpactPosition(),
+                        bladeImpactPosition,
                         this.currentShield.audioBlock,
                         this.currentShield.prefabImpactBlock
                     );
@@ -690,6 +693,17 @@ namespace GameCreator.Melee
                 }
                 else if (Poise.Value >= 30)
                 {
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+
                     this.Defense.Value = 0f;
 
                     AddPoise(-30);
@@ -717,7 +731,6 @@ namespace GameCreator.Melee
                 isKnockback
             );
 
-            Vector3 bladeImpactPosition = blade.GetImpactPosition();
             this.ExecuteEffects(
                 bladeImpactPosition,
                 isKnockback
@@ -733,49 +746,125 @@ namespace GameCreator.Melee
             {
                 hitReaction.Play(this);
             }
-
-            //OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle, bladeImpactPosition, assailant.NetworkObjectId);
             return HitResult.ReceiveDamage;
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle, Vector3 bladeImpactPosition, ulong attackNetObjId)
+        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition)
         {
-            // TODO
+            CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CharacterMelee>();
+            MeleeClip attack = attacker.comboSystem.GetCurrentClip();
+
+            Character assailant = attacker.Character;
+            CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
+            BladeComponent meleeWeapon = melee.Blades[0];
+            Character player = this.Character.GetComponent<PlayerCharacter>();
+
+            if (this.currentWeapon == null) return;
+
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
+
+            #region Attack and Defense handlers
+
+            float attackAngle = Vector3.Angle(
+                 attacker.transform.TransformDirection(Vector3.forward),
+                 this.transform.TransformDirection(Vector3.forward)
+             );
+
+            float defenseAngle = this.currentShield != null
+                ? this.currentShield.defenseAngle.GetValue(gameObject)
+                : 0f;
+
+            if (this.currentShield != null &&
+                attack.isBlockable && this.IsBlocking &&
+                180f - attackAngle < defenseAngle / 2f)
+            {
+                if (this.Defense.Value > 0)
+                {
+                    if (GetTime() < this.startBlockingTime + this.currentShield.perfectBlockWindow)
+                    {
+                        if (attacker != null)
+                        {
+                            MeleeClip attackerReaction = this.Character.IsGrounded()
+                                ? this.currentShield.groundPerfectBlockReaction
+                                : this.currentShield.airbornPerfectBlockReaction;
+
+                            attackerReaction.Play(attacker);
+                        }
+
+                        if (this.currentShield.perfectBlockClip != null)
+                        {
+                            this.currentShield.perfectBlockClip.Play(this);
+                        }
+
+                        this.ExecuteEffects(
+                            this.Blade.GetImpactPosition(),
+                            this.currentShield.audioPerfectBlock,
+                            this.currentShield.prefabImpactPerfectBlock
+                        );
+
+                        this.comboSystem.OnPerfectBlock();
+                        return;
+                    }
+
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+                    return;
+                }
+                else if (Poise.Value >= 30)
+                {
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+                    return;
+                }
+                else
+                {
+                    if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                }
+            }
+            #endregion
+
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+            bool isKnockback = this.Poise.Value <= float.Epsilon;
+
+            MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
+                this.Character.IsGrounded(),
+                hitLocation,
+                isKnockback
+            );
+
+            this.ExecuteEffects(
+                bladeImpactPosition,
+                isKnockback
+                    ? attacker.currentWeapon.audioImpactKnockback
+                    : attacker.currentWeapon.audioImpactNormal,
+                isKnockback
+                    ? attacker.currentWeapon.prefabImpactKnockback
+                    : attacker.currentWeapon.prefabImpactNormal
+            );
+
+            attack.ExecuteHitPause();
+            if (!this.IsUninterruptable)
+            {
+                hitReaction.Play(this);
+            }
         }
-
-        //[ClientRpc]
-        //void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle, Vector3 bladeImpactPosition, ulong attackNetObjId)
-        //{
-        //    this.AddPoise(-poiseDamage);
-        //    MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-        //    bool isKnockback = this.Poise <= float.Epsilon;
-
-        //    MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
-        //        this.Character.IsGrounded(),
-        //        hitLocation,
-        //        isKnockback
-        //    );
-
-        //    CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackNetObjId].GetComponent<CharacterMelee>();
-
-        //    this.ExecuteEffects(
-        //        bladeImpactPosition,
-        //        isKnockback
-        //            ? attacker.currentWeapon.audioImpactKnockback
-        //            : attacker.currentWeapon.audioImpactNormal,
-        //        isKnockback
-        //            ? attacker.currentWeapon.prefabImpactKnockback
-        //            : attacker.currentWeapon.prefabImpactNormal
-        //    );
-
-        //    attack.ExecuteHitPause();
-        //    if (!this.IsUninterruptable)
-        //    {
-        //        Debug.Log(hitReaction);
-        //        hitReaction.Play(this);
-        //    }
-        //}
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
