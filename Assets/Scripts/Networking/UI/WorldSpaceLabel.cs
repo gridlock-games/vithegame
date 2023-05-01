@@ -36,7 +36,7 @@ namespace LightPat.UI
             melee = target.GetComponent<CharacterMelee>();
             healthSlider.gameObject.SetActive(melee != null);
 
-            if (target.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+            if (target.TryGetComponent(out NetworkObject netObj))
             {
                 if (netObj.IsPlayerObject)
                 {
