@@ -87,6 +87,8 @@ namespace GameCreator.Melee
         // grabs
         public MeleeClip grabAttack;
         public MeleeClip grabReaction;
+        public CharacterState grabReactionState;
+        public Vector3 grabPlaceholderPosition;
 
         // combo system:
         public List<Combo> combos = new List<Combo>();
@@ -94,6 +96,11 @@ namespace GameCreator.Melee
         // impacts:
         public GameObject prefabImpactNormal;
         public GameObject prefabImpactKnockback;
+
+
+        // recovery:
+        public MeleeClip recoveryStandUp;
+        public MeleeClip recoveryStandDown;
 
         // PRIVATE PROPERTIES: --------------------------------------------------------------------
 

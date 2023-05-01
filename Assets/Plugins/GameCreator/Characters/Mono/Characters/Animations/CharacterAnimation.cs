@@ -46,7 +46,7 @@
                 ? defaultState.GetRuntimeAnimatorController()
                 : characterAnimator.animator.runtimeAnimatorController;
 
-            this.Setup();
+            this.Setup(false);
         }
 
         public void OnDestroy()
@@ -54,10 +54,10 @@
             if (!this.graph.Equals(null)) this.graph.Destroy();
         }
 
-        public void ChangeRuntimeController(RuntimeAnimatorController controller = null)
+        public void ChangeRuntimeController(RuntimeAnimatorController controller = null, bool isSkipAnim = false)
         {
             if (controller != null) this.runtimeController = controller;
-            this.Setup();
+            this.Setup(isSkipAnim);
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -357,7 +357,7 @@
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void Setup()
+        private void Setup(bool isSkipAnim)
         {
             if (!this.runtimeController) throw new Exception(ERR_NORTC);
             
@@ -382,7 +382,7 @@
 
             output.SetSourcePlayable(this.mixerGesturesOutput, 0);
 
-            this.graph.Play();
+            if(isSkipAnim == false) this.graph.Play();
         }
 
         private void SetupSectionDefaultStates()
