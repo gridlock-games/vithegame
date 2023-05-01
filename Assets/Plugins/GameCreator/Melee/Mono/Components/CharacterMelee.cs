@@ -27,7 +27,8 @@ namespace GameCreator.Melee
             Ignore,
             ReceiveDamage,
             AttackBlock,
-            PerfectBlock
+            PerfectBlock,
+            PoiseBlock
         }
 
         private enum AttackDirection
@@ -204,13 +205,9 @@ namespace GameCreator.Melee
                             {
                                 hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                 if (hitResult == HitResult.ReceiveDamage)
-                                {
                                     targetMelee.HP.Value -= attack.baseDamage;
-                                }
-                                else if (hitResult == HitResult.AttackBlock | hitResult == HitResult.PerfectBlock)
-                                {
-                                    // TODO
-                                }
+                                else if (hitResult == HitResult.PoiseBlock)
+                                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
@@ -259,6 +256,7 @@ namespace GameCreator.Melee
 
         protected void UpdateDefense()
         {
+            if (this.IsBlocking) return;
             if (!this.currentShield) return;
 
             this.defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
@@ -683,9 +681,17 @@ namespace GameCreator.Melee
                     this.comboSystem.OnBlock();
                     return HitResult.AttackBlock;
                 }
+                else if (Poise.Value >= 30)
+                {
+                    this.Defense.Value = 0f;
+
+                    AddPoise(-30);
+                    return HitResult.PoiseBlock;
+                }
                 else
                 {
                     this.Defense.Value = 0f;
+                    this.Poise.Value = 0f;
                     if (IsOwner) this.StopBlockingServerRpc();
 
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
@@ -718,8 +724,8 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
             if (!this.IsUninterruptable)
             {
-                Debug.Log(hitReaction);
-                hitReaction.Play(this);
+                if (hitReaction != null)
+                    hitReaction.Play(this);
             }
 
             //OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle, bladeImpactPosition, assailant.NetworkObjectId);
