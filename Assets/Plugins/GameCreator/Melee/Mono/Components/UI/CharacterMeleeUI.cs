@@ -43,7 +43,7 @@
         private void UpdateUI()
         {
             healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
-            if (melee.currentShield) defenseSlider.value = melee.Defense / melee.currentShield.maxDefense.GetValue(gameObject);
+            if (melee.currentShield) defenseSlider.value = melee.Defense.Value / melee.currentShield.maxDefense.GetValue(gameObject);
             poiseSlider.value = melee.Poise / melee.maxPoise.GetValue(gameObject);
         }
 

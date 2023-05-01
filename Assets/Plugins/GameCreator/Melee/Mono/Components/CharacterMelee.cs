@@ -68,7 +68,7 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        public float Defense { get; protected set; }
+        public NetworkVariable<float> Defense { get; protected set; } = new NetworkVariable<float>();
         private float defenseDelayCooldown;
 
         public bool IsDrawing { get; protected set; }
@@ -261,8 +261,8 @@ namespace GameCreator.Melee
             this.defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
             if (this.defenseDelayCooldown > float.Epsilon) return;
 
-            this.Defense += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Defense = Mathf.Min(this.Defense, this.currentShield.maxDefense.GetValue(gameObject));
+            this.Defense.Value += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Defense.Value = Mathf.Min(this.Defense.Value, this.currentShield.maxDefense.GetValue(gameObject));
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -539,12 +539,12 @@ namespace GameCreator.Melee
             if (!this.currentShield) return;
 
             this.defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
-            this.Defense = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
+            this.Defense.Value = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
         }
 
         public void AddDefense(float value)
         {
-            this.SetDefense(this.Defense + value);
+            this.SetDefense(this.Defense.Value + value);
         }
 
         public void SetTargetFocus(TargetMelee target)
@@ -623,7 +623,7 @@ namespace GameCreator.Melee
                 180f - attackAngle < defenseAngle / 2f)
             {
                 this.AddDefense(-attack.defenseDamage);
-                if (this.Defense > 0)
+                if (this.Defense.Value > 0)
                 {
                     if (GetTime() < this.startBlockingTime + this.currentShield.perfectBlockWindow)
                     {
@@ -665,7 +665,7 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    this.Defense = 0f;
+                    this.Defense.Value = 0f;
                     if (IsOwner) this.StopBlockingServerRpc();
 
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
@@ -684,8 +684,9 @@ namespace GameCreator.Melee
                 isKnockback
             );
 
+            Vector3 bladeImpactPosition = blade.GetImpactPosition();
             this.ExecuteEffects(
-                blade.GetImpactPosition(),
+                bladeImpactPosition,
                 isKnockback
                     ? attacker.currentWeapon.audioImpactKnockback
                     : attacker.currentWeapon.audioImpactNormal,
@@ -697,42 +698,46 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
             if (!this.IsUninterruptable)
             {
+                Debug.Log(hitReaction);
                 hitReaction.Play(this);
             }
 
-            OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle);
+            //OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle, bladeImpactPosition, assailant.NetworkObjectId);
             return HitResult.ReceiveDamage;
         }
 
-        [ClientRpc]
-        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle)
-        {
-            this.AddPoise(-poiseDamage);
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise <= float.Epsilon;
+        //[ClientRpc]
+        //void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle, Vector3 bladeImpactPosition, ulong attackNetObjId)
+        //{
+        //    this.AddPoise(-poiseDamage);
+        //    MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+        //    bool isKnockback = this.Poise <= float.Epsilon;
 
-            MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
-                this.Character.IsGrounded(),
-                hitLocation,
-                isKnockback
-            );
+        //    MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
+        //        this.Character.IsGrounded(),
+        //        hitLocation,
+        //        isKnockback
+        //    );
 
-            // TODO
-            //this.ExecuteEffects(
-            //    blade.GetImpactPosition(),
-            //    isKnockback
-            //        ? attacker.currentWeapon.audioImpactKnockback
-            //        : attacker.currentWeapon.audioImpactNormal,
-            //    isKnockback
-            //        ? attacker.currentWeapon.prefabImpactKnockback
-            //        : attacker.currentWeapon.prefabImpactNormal
-            //);
+        //    CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackNetObjId].GetComponent<CharacterMelee>();
 
-            if (!this.IsUninterruptable)
-            {
-                hitReaction.Play(this);
-            }
-        }
+        //    this.ExecuteEffects(
+        //        bladeImpactPosition,
+        //        isKnockback
+        //            ? attacker.currentWeapon.audioImpactKnockback
+        //            : attacker.currentWeapon.audioImpactNormal,
+        //        isKnockback
+        //            ? attacker.currentWeapon.prefabImpactKnockback
+        //            : attacker.currentWeapon.prefabImpactNormal
+        //    );
+
+        //    attack.ExecuteHitPause();
+        //    if (!this.IsUninterruptable)
+        //    {
+        //        Debug.Log(hitReaction);
+        //        hitReaction.Play(this);
+        //    }
+        //}
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
