@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.AI;
+    using UnityEngine.UI;
     using UnityEngine.Events;
     using GameCreator.Core;
     using GameCreator.Variables;
@@ -11,6 +12,16 @@
     [System.Serializable]
     public class CharacterLocomotion
     {
+        public enum CHARACTER_AILMENTS {
+            None,
+            WasGrabbed,
+            IsKnockedDown,
+            isKnockedUp,
+            IsStunned,
+            Reset,
+            Dead
+        }
+
         public enum ANIM_CONSTRAINT
         {
             NONE,
@@ -96,6 +107,7 @@
         private float lastJumpTime = 0f;
         private int jumpChain = 0;
 
+        public CHARACTER_AILMENTS ailment { get; private set; }
         [HideInInspector] public Character character;
 
         [HideInInspector] public ANIM_CONSTRAINT animatorConstraint = ANIM_CONSTRAINT.NONE;
@@ -422,7 +434,7 @@
             this.character.characterState.normal = this.terrainNormal;
         }
 
-        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
+        public bool UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
             try {
                 // This is to ensure that the target is not an NPC
                 PlayerCharacter isPlayer = this.character.GetComponent<PlayerCharacter>();
@@ -437,6 +449,13 @@
 
                 return false;
             }
+        }
+
+        public CHARACTER_AILMENTS Ailment(CHARACTER_AILMENTS ailment) {
+            this.ailment = ailment;
+
+            Debug.Log(this.ailment);
+            return this.ailment;
         }
     }
 }

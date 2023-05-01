@@ -7,6 +7,7 @@
     using UnityEngine.AI;
     using UnityEngine.SceneManagement;
     using GameCreator.Core;
+    using GameCreator.Melee;
     using System;
     using Unity.Netcode;
 
@@ -129,12 +130,15 @@
         public class DashEvent : UnityEvent { }
         public class StepEvent : UnityEvent<CharacterLocomotion.STEP> { }
         public class IsControllableEvent : UnityEvent<bool> { }
+        public class AilmentUpdateEvent : UnityEvent<CharacterLocomotion.CHARACTER_AILMENTS>{ }
 
         protected const string ERR_NOCAM = "No Main Camera found.";
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterLocomotion characterLocomotion;
+
+        public CharacterLocomotion.CHARACTER_AILMENTS characterAilment {get; private set;}
 
         public State characterState = new State();
         private CharacterAnimator animator;
@@ -144,6 +148,7 @@
         public LandEvent onLand = new LandEvent();
         public DashEvent onDash = new DashEvent();
         public StepEvent onStep = new StepEvent();
+        public AilmentUpdateEvent onAilmentEvent = new AilmentUpdateEvent();
 
         public IsControllableEvent onIsControllable = new IsControllableEvent();
 
@@ -313,11 +318,46 @@
             return true;
         }
 
-        public bool Grab(float duration) {
-            if (this.characterLocomotion.isBusy) return false;
-
-
+        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
+            if (this.characterLocomotion == null) return false;
+            this.characterLocomotion.UpdateDirectionControl(direction, isControllable);
             return true;
+        }
+
+        public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState) {
+            this.characterAilment = this.characterLocomotion.Ailment(ailment);
+            CharacterMelee melee = this.GetComponent<CharacterMelee>();
+
+            switch(ailment) {
+                case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
+                    melee.currentWeapon.recoveryStandUp.Play(melee);
+                    CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(melee.currentWeapon.recoveryStandUp.animationClip.length, melee));
+                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                    ailment = CharacterLocomotion.CHARACTER_AILMENTS.None;
+                break;
+            }
+
+            this.characterAilment = this.characterAilment != ailment ? this.characterLocomotion.Ailment(ailment) : this.characterAilment;
+            this.onAilmentEvent.Invoke(ailment);
+
+        }
+
+        private IEnumerator ResetDefaultState(float duration, CharacterMelee melee) {
+
+            float initTime = Time.time;
+
+            while (initTime + (duration * 0.80) >= Time.time) {
+                yield return null;
+            }
+
+            melee.ChangeState(
+                melee.currentWeapon.characterState,
+                melee.currentWeapon.characterMask,
+                MeleeWeapon.LAYER_STANCE,
+                this.GetCharacterAnimator()
+            );
+
+            yield return 0;
         }
 
         public void RootMovement(float impulse, float duration, float gravityInfluence,

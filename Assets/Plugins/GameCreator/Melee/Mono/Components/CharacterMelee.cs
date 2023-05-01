@@ -171,6 +171,11 @@ namespace GameCreator.Melee
 
             this.IsAttacking = false;
 
+            if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
+                Debug.Log(this.Character + ": " + this.Character.characterAilment);
+                this.isStaggered = true;
+            }
+
             if (this.comboSystem != null)
             {
                 int phase = this.comboSystem.GetCurrentPhase();
@@ -339,7 +344,8 @@ namespace GameCreator.Melee
                     float time = this.ChangeState(
                         this.currentWeapon.characterState,
                         this.currentWeapon.characterMask,
-                        MeleeWeapon.LAYER_STANCE
+                        MeleeWeapon.LAYER_STANCE,
+                        null
                     );
 
                     if (state.enterClip != null) wait = new WaitForSeconds(time);
@@ -588,6 +594,7 @@ namespace GameCreator.Melee
 
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.Ignore;
 
             if (blade == null)
             {
@@ -766,7 +773,7 @@ namespace GameCreator.Melee
             return time;
         }
 
-        protected float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer)
+        public float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer, CharacterAnimator animator)
         {
             float time = TRANSITION;
             if (state != null)
@@ -778,6 +785,10 @@ namespace GameCreator.Melee
 
                 time = Mathf.Max(TRANSITION, time) * 0.5f;
                 this.CharacterAnimator.SetState(state, mask, 1f, time, 1f, layer);
+
+                if(animator != null) {
+                    animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), false);
+                }
             }
 
             return time;
@@ -821,10 +832,22 @@ namespace GameCreator.Melee
             this.anim_ExecuterDuration = (executorWeapon.grabAttack.animationClip.length);
             this.anim_ExecutedDuration = (executorWeapon.grabReaction.animationClip.length);
 
+            executorCharacter.IsGrabbing = true;
+            targetCharacter.IsGrabbed = true;
+
+
+            // Change State
+            targetCharacter.ChangeState(
+                executorCharacter.currentWeapon.grabReactionState,
+                targetCharacter.currentWeapon.characterMask,
+                MeleeWeapon.LAYER_STANCE,
+                targetCharacter.Character.GetCharacterAnimator()
+            );
+            
             // Cancel any Melee input
             targetCharacter.StopAttack();
             executorCharacter.StopAttack();
-
+            
             // Make Character Invincible
             targetCharacter.SetInvincibility(anim_ExecuterDuration);
             executorCharacter.SetInvincibility(anim_ExecutedDuration);
@@ -847,8 +870,12 @@ namespace GameCreator.Melee
 
             while (initTime + this.anim_ExecutedDuration >= Time.time) {
 
+
                 yield return null;
             }
+
+            executorCharacter.IsGrabbing = true;
+            targetCharacter.IsGrabbed = true;
 
             this.anim_ExecuterDuration = 0.00f;
             this.anim_ExecutedDuration = 0.00f;
