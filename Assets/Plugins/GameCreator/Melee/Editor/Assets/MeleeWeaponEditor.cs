@@ -31,6 +31,8 @@
 
         private Section sectionGrabs;
 
+        private Section sectionRecoveryStates;
+
         private SerializedProperty spName;
         private SerializedProperty spDescription;
         private SerializedProperty spMeleeWeaponName;
@@ -84,6 +86,10 @@
         
         public SerializedProperty spGrabAttack;
         public SerializedProperty spGrabReaction;
+        public SerializedProperty spGrabeReactionState;
+        public SerializedProperty spGrabPlaceholderPosition;
+        public SerializedProperty spStandFaceUp;
+        public SerializedProperty spStandFaceDown;
 
         private SerializedProperty spWeaponModels;
         // private ReorderableList weaponModelsList;
@@ -104,9 +110,16 @@
             this.sectionDodges = new Section("Dodge Animations", this.LoadIcon("General"), this.Repaint);
             this.sectionGrabs = new Section("Grab Animations", this.LoadIcon("Effects"), this.Repaint);
 
+            
+            this.sectionRecoveryStates = new Section("Ailment Recovery Animations", this.LoadIcon("Effects"), this.Repaint);
 
             this.spGrabAttack = this.serializedObject.FindProperty("grabAttack");
             this.spGrabReaction = this.serializedObject.FindProperty("grabReaction");
+            this.spGrabeReactionState = this.serializedObject.FindProperty("grabReactionState");
+            this.spGrabPlaceholderPosition = this.serializedObject.FindProperty("grabPlaceholderPosition");
+
+            this.spStandFaceUp = this.serializedObject.FindProperty("recoveryStandUp");
+            this.spStandFaceDown = this.serializedObject.FindProperty("recoveryStandDown");
             
 
             this.spName = this.serializedObject.FindProperty("weaponName");
@@ -263,6 +276,12 @@
 
             EditorGUILayout.Space();
             this.PaintGrab_Element();
+
+            
+
+            EditorGUILayout.Space();
+            this.PaintAilmentRecovery_Element();
+
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Hit Reactions", EditorStyles.boldLabel);
@@ -446,7 +465,8 @@
 
                     EditorGUILayout.PropertyField(this.spGrabAttack);
                     EditorGUILayout.PropertyField(this.spGrabReaction);
-
+                    EditorGUILayout.PropertyField(this.spGrabeReactionState);
+                    EditorGUILayout.PropertyField(this.spGrabPlaceholderPosition);
                     
 
                     EditorGUILayout.EndVertical();
@@ -454,6 +474,21 @@
             }
 
 
+        }
+
+        private void PaintAilmentRecovery_Element()
+        {
+            this.sectionRecoveryStates.PaintSection();
+            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionRecoveryStates.state.faded))
+            {
+                if(group.visible)
+                {
+                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+
+                    EditorGUILayout.PropertyField(this.spStandFaceUp);
+                    EditorGUILayout.EndVertical();
+                }
+            }
         }
         
         private void PaintHitGroundFront_Element(Rect rect, int index, bool isActive, bool isFocused)

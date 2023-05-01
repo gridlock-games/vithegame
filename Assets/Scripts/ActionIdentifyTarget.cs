@@ -74,41 +74,40 @@ public class ActionIdentifyTarget : IAction
 
         m_HitDetect = false;
         RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, 10, -1, QueryTriggerInteraction.Ignore);
-        Debug.DrawRay(transform.position + Vector3.up, transform.forward * RayDistance, Color.red, RayDistance);
+        Debug.DrawRay(transform.position + Vector3.up, transform.forward * RayDistance, Color.red, 1.0f);
         System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+        LayerMask layer = this.RaycastLayer;
 
         foreach (RaycastHit rayHit in allHits)
         {
             if (rayHit.transform == transform) { continue; }
 
-            m_HitDetect = true;
-            hit = rayHit;
-            break;
-        }
-
-        if (m_HitDetect)
-        {
-            if (CheckForTag == true)
-            {
-                if (hit.collider.CompareTag(this.TagName))
-                {
-                    this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
-
-                    // print(hit.transform.name);
-                }
-            }
-            else
-            {
-                this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
-
-                // print(hit.transform.name);
+        
+            if(rayHit.collider.gameObject.tag == "Character") {
+                m_HitDetect = true;
+                hit = rayHit;
+                break;
             }
         }
+
+        // Make sure that there detected target
+        if (m_HitDetect == false) return false;
+
+       this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 
         #endregion
 
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
+
+
+        //Check if Target and Executioner should be able to enter Grab Phase
+        if(targetChar.characterLocomotion.isBusy || 
+            executioner.characterLocomotion.isBusy || 
+            (targetChar.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)) {
+                return false;
+        }
 
         
         PreserveRotation rotationConfig = Rotation(GrabPlaceholder.gameObject, targetChar);
@@ -123,23 +122,28 @@ public class ActionIdentifyTarget : IAction
 
         
 
+        // Handle Melee Clips
+        CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
+        CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
+
+        if(!characterMeleeA || !characterMeleeB) return false;
+
         if (executioner != null && targetChar != null)
         {
+
+            GrabPlaceholder.transform.localPosition = characterMeleeA.currentWeapon.grabPlaceholderPosition;
+
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
             targetChar.transform.rotation = rotationConfig.quaternion;
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
-            executioner.characterLocomotion.Grab(direction, false);
-            targetChar.characterLocomotion.Grab(direction, false);
+            executioner.Grab(direction, false);
+            targetChar.Grab(direction, false);
+            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, characterMeleeA.currentWeapon.grabReactionState );
 
-            // Handle Melee Clips
-            CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
-            CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
-
-            if(!characterMeleeA || !characterMeleeB) return false;
-
+            // GetAnim Duration
             this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
             this.anim_ExecutedDuration = (characterMeleeA.currentWeapon.grabReaction.animationClip.length);
 
@@ -172,7 +176,6 @@ public class ActionIdentifyTarget : IAction
                 // Reduce Collider Radius
                 chrCtrl_executioner.radius = 0.05f;
                 chrCtrl_target.radius = 0.05f;
-
                 yield return null;
             }
 
@@ -180,11 +183,10 @@ public class ActionIdentifyTarget : IAction
             chrCtrl_executioner.radius = 0.50f;
             chrCtrl_target.radius = 0.50f;
 
-            
             // Update Camera Input and Player Controls
             var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
-            executioner.characterLocomotion.Grab(directionUpdate, true);
-            targetChar.characterLocomotion.Grab(directionUpdate, true);
+            executioner.Grab(directionUpdate, true);
+            // targetChar.Grab(directionUpdate, true);
         }
 
         yield return 0;

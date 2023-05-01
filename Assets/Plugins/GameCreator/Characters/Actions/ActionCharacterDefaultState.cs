@@ -21,7 +21,7 @@
             if (_animator == null) return true;
 
             if (this.state == null) return true;
-            _animator.ResetControllerTopology(this.state.GetRuntimeAnimatorController());
+            _animator.ResetControllerTopology(this.state.GetRuntimeAnimatorController(), false);
 
             return true;
         }
