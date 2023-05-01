@@ -32,6 +32,8 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
+
+                Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
             {
@@ -53,11 +55,18 @@ namespace LightPat.Player
 
             if (!IsOwner) { return; }
 
+            // FPS Counter
             if (Time.unscaledTime > _timer)
             {
                 int fps = (int)(1f / Time.unscaledDeltaTime);
                 fpsCounterDisplay.SetText("FPS: " + fps);
                 _timer = Time.unscaledTime + _hudRefreshRate;
+            }
+
+            // Pause menu
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("Escape");
             }
         }
     }

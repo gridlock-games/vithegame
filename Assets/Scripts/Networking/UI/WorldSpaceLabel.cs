@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using GameCreator.Melee;
 using UnityEngine.UI;
+using Unity.Netcode;
+using LightPat.Core;
 
 namespace LightPat.UI
 {
@@ -26,13 +28,26 @@ namespace LightPat.UI
         {
             if (!transform.parent) return;
 
-            nameDisplay.SetText(transform.parent.name);
             target = transform.parent;
+            nameDisplay.SetText(target.name);
             positionOffset = transform.localPosition;
             transform.SetParent(null, true);
 
             melee = target.GetComponent<CharacterMelee>();
             healthSlider.gameObject.SetActive(melee != null);
+
+            if (target.TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsPlayerObject)
+                {
+                    if (ClientManager.Singleton)
+                    {
+                        string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
+                        nameDisplay.SetText(clientName);
+                        target.name = clientName;
+                    }
+                }
+            }
 
             name = "World Space Label for " + target.name;
 

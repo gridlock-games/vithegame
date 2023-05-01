@@ -4894,6 +4894,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 2125649933}
   _leftHand: {fileID: 1004038907}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &186245377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9304,6 +9306,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 1767955261}
   _leftHand: {fileID: 1917281664}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &355859815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13241,6 +13245,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 355112749}
   _leftHand: {fileID: 1110927896}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &501756111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27491,6 +27497,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 334365993}
   _leftHand: {fileID: 1129315044}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!1 &997046961
 GameObject:
   m_ObjectHideFlags: 0
@@ -39090,6 +39098,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 213301543}
   _leftHand: {fileID: 833637103}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &1483047655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40468,6 +40478,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 2074814515}
   _leftHand: {fileID: 1652284849}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &1520010378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43094,6 +43106,8 @@ MonoBehaviour:
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
   _rightHand: {fileID: 1674806229}
   _leftHand: {fileID: 1314960276}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &1614367835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48385,8 +48399,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterMelee: {fileID: 1794773151}
   _weaponMeleeSO: {fileID: 11400000, guid: efc1cb0bd9b41634eb037cd67287dfb5, type: 2}
-  _rightHand: {fileID: 0}
-  _leftHand: {fileID: 0}
+  _rightHand: {fileID: 2799648}
+  _leftHand: {fileID: 197818461}
+  _currentWeaponType:
+    m_InternalValue: 0
 --- !u!114 &1794773150
 MonoBehaviour:
   m_ObjectHideFlags: 0

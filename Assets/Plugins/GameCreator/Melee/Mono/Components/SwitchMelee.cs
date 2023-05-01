@@ -24,19 +24,13 @@ namespace GameCreator.Melee
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
 
-        private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
-        public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; }
+        public NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
+        public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(); }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
         private void Start()
-        {
-            Initialize();
-        }
-
-        // Initialize the component by getting the CharacterMelee component
-        void Initialize()
         {
             _characterMelee = GetComponent<CharacterMelee>();
         }

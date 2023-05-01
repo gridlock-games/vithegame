@@ -61,7 +61,9 @@
             target.transform.rotation = targetRotation;
 
             Character characterTarget = this.character.GetCharacter(target);
-            if (characterTarget == null) { Destroy(target); return; }
+            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
+            if (characterTarget == null | melee == null) { Destroy(target); return; }
+            if (melee.Poise.Value <= 10) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
@@ -104,6 +106,9 @@
             );
 
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
+
+            // Call back method in CharacterMelee to subtract poise
+            melee.OnDodge();
 
             DodgeClientRpc(targetPosition, targetRotation, targetName, moveDirection, angle);
             if (!IsHost) { InstantExecuteLocally(target, moveDirection, angle); }

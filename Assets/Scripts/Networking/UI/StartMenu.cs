@@ -30,7 +30,7 @@ namespace LightPat.UI
             string targetIP = clientIPAddressInput.text;
             if (targetIP == "Pat's House" | targetIP == "")
             {
-                targetIP = "75.76.59.93"; // Pat's IP
+                targetIP = "65.25.100.229"; // Pat's IP
             }
 
             if (playerNameInput.text == "")
