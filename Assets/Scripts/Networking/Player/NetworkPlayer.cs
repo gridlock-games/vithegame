@@ -53,11 +53,18 @@ namespace LightPat.Player
 
             if (!IsOwner) { return; }
 
+            // FPS Counter
             if (Time.unscaledTime > _timer)
             {
                 int fps = (int)(1f / Time.unscaledDeltaTime);
                 fpsCounterDisplay.SetText("FPS: " + fps);
                 _timer = Time.unscaledTime + _hudRefreshRate;
+            }
+
+            // Pause menu
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("Escape");
             }
         }
     }
