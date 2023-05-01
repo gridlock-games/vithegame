@@ -181,7 +181,7 @@ namespace GameCreator.Melee
 
                     foreach (var blade in this.Blades)
                     {
-                        // if (!this.currentMeleeClip.affectedBones.Contains(blade.bone)) continue;
+                        if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
 
                         GameObject[] hits = blade.CaptureHits();
 
