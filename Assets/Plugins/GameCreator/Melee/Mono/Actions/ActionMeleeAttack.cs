@@ -17,11 +17,30 @@
 		[ServerRpc]
 		void MeleeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
 		{
-			MeleeClientRpc(targetPosition, targetRotation, targetName);
 			GameObject target = new GameObject(targetName);
 			target.transform.position = targetPosition;
 			target.transform.rotation = targetRotation;
-			InstantExecuteLocally(target);
+
+			Character _character = this.character.GetCharacter(target);
+			if (character == null) { Destroy(target); return; }
+
+			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
+			if (melee == null) { Destroy(target); return; }
+
+			if (key == CharacterMelee.ActionKey.A) // Light Attack
+			{
+				melee.OnLightAttack();
+			}
+			else if (key == CharacterMelee.ActionKey.B) // Heavy Attack
+			{
+				if (melee.Poise.Value <= 20) { Destroy(target); return; }
+
+				melee.OnHeavyAttack();
+			}
+
+			MeleeClientRpc(targetPosition, targetRotation, targetName);
+			if (!IsHost) InstantExecuteLocally(target);
+			Destroy(target);
 		}
 
 		[ClientRpc]
@@ -31,6 +50,7 @@
 			target.transform.position = targetPosition;
 			target.transform.rotation = targetRotation;
 			InstantExecuteLocally(target);
+			Destroy(target);
 		}
 
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
@@ -45,9 +65,9 @@
 			if (character == null) return true;
 
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
-			if (melee != null) melee.Execute(this.key);
+			if (melee == null) return true;
 
-			Destroy(target);
+			melee.Execute(this.key);
 			return true;
         }
 

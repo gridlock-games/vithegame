@@ -27,7 +27,8 @@ namespace GameCreator.Melee
             Ignore,
             ReceiveDamage,
             AttackBlock,
-            PerfectBlock
+            PerfectBlock,
+            PoiseBlock
         }
 
         private enum AttackDirection
@@ -61,14 +62,14 @@ namespace GameCreator.Melee
         protected ComboSystem comboSystem;
         protected InputBuffer inputBuffer;
 
-        public float Poise { get; protected set; }
+        public NetworkVariable<float> Poise { get; private set; } = new NetworkVariable<float>();
         private float poiseDelayCooldown;
 
         public NumberProperty delayPoise = new NumberProperty(1f);
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        public float Defense { get; protected set; }
+        public NetworkVariable<float> Defense { get; protected set; } = new NetworkVariable<float>();
         private float defenseDelayCooldown;
 
         public bool IsDrawing { get; protected set; }
@@ -138,8 +139,11 @@ namespace GameCreator.Melee
 
         protected virtual void Update()
         {
-            this.UpdatePoise();
-            this.UpdateDefense();
+            if (IsServer)
+            {
+                this.UpdatePoise();
+                this.UpdateDefense();
+            }
 
             if (this.comboSystem != null)
             {
@@ -171,6 +175,11 @@ namespace GameCreator.Melee
 
             this.IsAttacking = false;
 
+            if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
+                Debug.Log(this.Character + ": " + this.Character.characterAilment);
+                this.isStaggered = true;
+            }
+
             if (this.comboSystem != null)
             {
                 int phase = this.comboSystem.GetCurrentPhase();
@@ -201,13 +210,9 @@ namespace GameCreator.Melee
                             {
                                 hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                 if (hitResult == HitResult.ReceiveDamage)
-                                {
                                     targetMelee.HP.Value -= attack.baseDamage;
-                                }
-                                else if (hitResult == HitResult.AttackBlock | hitResult == HitResult.PerfectBlock)
-                                {
-                                    // TODO
-                                }
+                                else if (hitResult == HitResult.PoiseBlock)
+                                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
@@ -250,19 +255,20 @@ namespace GameCreator.Melee
             this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
             if (this.poiseDelayCooldown > float.Epsilon) return;
 
-            this.Poise += this.poiseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Poise = Mathf.Min(this.Poise, this.maxPoise.GetValue(gameObject));
+            this.Poise.Value += this.poiseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Poise.Value = Mathf.Min(this.Poise.Value, this.maxPoise.GetValue(gameObject));
         }
 
         protected void UpdateDefense()
         {
+            if (this.IsBlocking) return;
             if (!this.currentShield) return;
 
             this.defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
             if (this.defenseDelayCooldown > float.Epsilon) return;
 
-            this.Defense += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Defense = Mathf.Min(this.Defense, this.currentShield.maxDefense.GetValue(gameObject));
+            this.Defense.Value += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Defense.Value = Mathf.Min(this.Defense.Value, this.currentShield.maxDefense.GetValue(gameObject));
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -343,7 +349,8 @@ namespace GameCreator.Melee
                     float time = this.ChangeState(
                         this.currentWeapon.characterState,
                         this.currentWeapon.characterMask,
-                        MeleeWeapon.LAYER_STANCE
+                        MeleeWeapon.LAYER_STANCE,
+                        null
                     );
 
                     if (state.enterClip != null) wait = new WaitForSeconds(time);
@@ -526,12 +533,12 @@ namespace GameCreator.Melee
         public void SetPoise(float value)
         {
             this.poiseDelayCooldown = this.delayPoise.GetValue(gameObject);
-            this.Poise = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
+            this.Poise.Value = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
         }
 
         public void AddPoise(float value)
         {
-            this.SetPoise(this.Poise + value);
+            this.SetPoise(this.Poise.Value + value);
         }
 
         public void SetDefense(float value)
@@ -539,12 +546,12 @@ namespace GameCreator.Melee
             if (!this.currentShield) return;
 
             this.defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
-            this.Defense = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
+            this.Defense.Value = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
         }
 
         public void AddDefense(float value)
         {
-            this.SetDefense(this.Defense + value);
+            this.SetDefense(this.Defense.Value + value);
         }
 
         public void SetTargetFocus(TargetMelee target)
@@ -587,6 +594,23 @@ namespace GameCreator.Melee
 
         // CALLBACK METHODS: ----------------------------------------------------------------------
 
+        public void OnLightAttack()
+        { }
+
+        public void OnHeavyAttack()
+        {
+            if (!IsServer) { Debug.LogError("OnHeavyAttack() should only be called on the server."); return; }
+
+            AddPoise(-20);
+        }
+
+        public void OnDodge()
+        {
+            if (!IsServer) { Debug.LogError("OnDodge() should only be called on the server."); return; }
+
+            AddPoise(-10);
+        }
+
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, BladeComponent blade)
         {
             if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
@@ -596,8 +620,12 @@ namespace GameCreator.Melee
             BladeComponent meleeWeapon = melee.Blades[0];
             Character player = this.Character.GetComponent<PlayerCharacter>();
 
+            Vector3 bladeImpactPosition = blade.GetImpactPosition();
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.Ignore;
 
             if (blade == null)
             {
@@ -623,7 +651,7 @@ namespace GameCreator.Melee
                 180f - attackAngle < defenseAngle / 2f)
             {
                 this.AddDefense(-attack.defenseDamage);
-                if (this.Defense > 0)
+                if (this.Defense.Value > 0)
                 {
                     if (GetTime() < this.startBlockingTime + this.currentShield.perfectBlockWindow)
                     {
@@ -655,7 +683,7 @@ namespace GameCreator.Melee
                     if (blockReaction != null) blockReaction.Play(this);
 
                     this.ExecuteEffects(
-                        blade.GetImpactPosition(),
+                        bladeImpactPosition,
                         this.currentShield.audioBlock,
                         this.currentShield.prefabImpactBlock
                     );
@@ -663,9 +691,28 @@ namespace GameCreator.Melee
                     this.comboSystem.OnBlock();
                     return HitResult.AttackBlock;
                 }
+                else if (Poise.Value >= 30)
+                {
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+
+                    this.Defense.Value = 0f;
+
+                    AddPoise(-30);
+                    return HitResult.PoiseBlock;
+                }
                 else
                 {
-                    this.Defense = 0f;
+                    this.Defense.Value = 0f;
+                    this.Poise.Value = 0f;
                     if (IsOwner) this.StopBlockingServerRpc();
 
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
@@ -676,7 +723,7 @@ namespace GameCreator.Melee
 
             this.AddPoise(-attack.poiseDamage);
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise <= float.Epsilon;
+            bool isKnockback = this.Poise.Value <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -685,7 +732,7 @@ namespace GameCreator.Melee
             );
 
             this.ExecuteEffects(
-                blade.GetImpactPosition(),
+                bladeImpactPosition,
                 isKnockback
                     ? attacker.currentWeapon.audioImpactKnockback
                     : attacker.currentWeapon.audioImpactNormal,
@@ -699,17 +746,102 @@ namespace GameCreator.Melee
             {
                 hitReaction.Play(this);
             }
-
-            OnReceiveAttackClientRpc(attack.poiseDamage, attackVectorAngle);
             return HitResult.ReceiveDamage;
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(float poiseDamage, float attackVectorAngle)
+        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition)
         {
-            this.AddPoise(-poiseDamage);
+            CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CharacterMelee>();
+            MeleeClip attack = attacker.comboSystem.GetCurrentClip();
+
+            Character assailant = attacker.Character;
+            CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
+            BladeComponent meleeWeapon = melee.Blades[0];
+            Character player = this.Character.GetComponent<PlayerCharacter>();
+
+            if (this.currentWeapon == null) return;
+
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
+
+            #region Attack and Defense handlers
+
+            float attackAngle = Vector3.Angle(
+                 attacker.transform.TransformDirection(Vector3.forward),
+                 this.transform.TransformDirection(Vector3.forward)
+             );
+
+            float defenseAngle = this.currentShield != null
+                ? this.currentShield.defenseAngle.GetValue(gameObject)
+                : 0f;
+
+            if (this.currentShield != null &&
+                attack.isBlockable && this.IsBlocking &&
+                180f - attackAngle < defenseAngle / 2f)
+            {
+                if (this.Defense.Value > 0)
+                {
+                    if (GetTime() < this.startBlockingTime + this.currentShield.perfectBlockWindow)
+                    {
+                        if (attacker != null)
+                        {
+                            MeleeClip attackerReaction = this.Character.IsGrounded()
+                                ? this.currentShield.groundPerfectBlockReaction
+                                : this.currentShield.airbornPerfectBlockReaction;
+
+                            attackerReaction.Play(attacker);
+                        }
+
+                        if (this.currentShield.perfectBlockClip != null)
+                        {
+                            this.currentShield.perfectBlockClip.Play(this);
+                        }
+
+                        this.ExecuteEffects(
+                            this.Blade.GetImpactPosition(),
+                            this.currentShield.audioPerfectBlock,
+                            this.currentShield.prefabImpactPerfectBlock
+                        );
+
+                        this.comboSystem.OnPerfectBlock();
+                        return;
+                    }
+
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+                    return;
+                }
+                else if (Poise.Value >= 30)
+                {
+                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
+                    if (blockReaction != null) blockReaction.Play(this);
+
+                    this.ExecuteEffects(
+                        bladeImpactPosition,
+                        this.currentShield.audioBlock,
+                        this.currentShield.prefabImpactBlock
+                    );
+
+                    this.comboSystem.OnBlock();
+                    return;
+                }
+                else
+                {
+                    if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                }
+            }
+            #endregion
+
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise <= float.Epsilon;
+            bool isKnockback = this.Poise.Value <= float.Epsilon;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -717,17 +849,17 @@ namespace GameCreator.Melee
                 isKnockback
             );
 
-            // TODO
-            //this.ExecuteEffects(
-            //    blade.GetImpactPosition(),
-            //    isKnockback
-            //        ? attacker.currentWeapon.audioImpactKnockback
-            //        : attacker.currentWeapon.audioImpactNormal,
-            //    isKnockback
-            //        ? attacker.currentWeapon.prefabImpactKnockback
-            //        : attacker.currentWeapon.prefabImpactNormal
-            //);
+            this.ExecuteEffects(
+                bladeImpactPosition,
+                isKnockback
+                    ? attacker.currentWeapon.audioImpactKnockback
+                    : attacker.currentWeapon.audioImpactNormal,
+                isKnockback
+                    ? attacker.currentWeapon.prefabImpactKnockback
+                    : attacker.currentWeapon.prefabImpactNormal
+            );
 
+            attack.ExecuteHitPause();
             if (!this.IsUninterruptable)
             {
                 hitReaction.Play(this);
@@ -776,7 +908,7 @@ namespace GameCreator.Melee
             return time;
         }
 
-        protected float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer)
+        public float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer, CharacterAnimator animator)
         {
             float time = TRANSITION;
             if (state != null)
@@ -788,6 +920,10 @@ namespace GameCreator.Melee
 
                 time = Mathf.Max(TRANSITION, time) * 0.5f;
                 this.CharacterAnimator.SetState(state, mask, 1f, time, 1f, layer);
+
+                if(animator != null) {
+                    animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), false);
+                }
             }
 
             return time;
@@ -831,10 +967,22 @@ namespace GameCreator.Melee
             this.anim_ExecuterDuration = (executorWeapon.grabAttack.animationClip.length);
             this.anim_ExecutedDuration = (executorWeapon.grabReaction.animationClip.length);
 
+            executorCharacter.IsGrabbing = true;
+            targetCharacter.IsGrabbed = true;
+
+
+            // Change State
+            targetCharacter.ChangeState(
+                executorCharacter.currentWeapon.grabReactionState,
+                targetCharacter.currentWeapon.characterMask,
+                MeleeWeapon.LAYER_STANCE,
+                targetCharacter.Character.GetCharacterAnimator()
+            );
+            
             // Cancel any Melee input
             targetCharacter.StopAttack();
             executorCharacter.StopAttack();
-
+            
             // Make Character Invincible
             targetCharacter.SetInvincibility(anim_ExecuterDuration);
             executorCharacter.SetInvincibility(anim_ExecutedDuration);
@@ -857,8 +1005,12 @@ namespace GameCreator.Melee
 
             while (initTime + this.anim_ExecutedDuration >= Time.time) {
 
+
                 yield return null;
             }
+
+            executorCharacter.IsGrabbing = true;
+            targetCharacter.IsGrabbed = true;
 
             this.anim_ExecuterDuration = 0.00f;
             this.anim_ExecutedDuration = 0.00f;

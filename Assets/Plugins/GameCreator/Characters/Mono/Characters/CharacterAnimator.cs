@@ -416,9 +416,9 @@
             this.characterAnimation.ChangeStateWeight((int)layer, weight);
         }
 
-        public void ResetControllerTopology(RuntimeAnimatorController runtimeController)
+        public void ResetControllerTopology(RuntimeAnimatorController runtimeController, bool isSkipAnim = false)
         {
-            this.characterAnimation.ChangeRuntimeController(runtimeController);
+            this.characterAnimation.ChangeRuntimeController(runtimeController, isSkipAnim);
         }
 
         public CharacterAttachments GetCharacterAttachments()
@@ -469,7 +469,7 @@
             {
                 this.animator = instanceAnimator;
                 this.animator.applyRootMotion = false;
-                this.ResetControllerTopology(runtimeController);
+                this.ResetControllerTopology(runtimeController, false);
             }
 
             if (this.autoInitializeRagdoll)

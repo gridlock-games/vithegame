@@ -256,9 +256,6 @@ namespace LightPat.UI
                 startButton.SetActive(false);
                 WaitingToStartText.SetActive(false);
             }
-
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
         }
     }
 }

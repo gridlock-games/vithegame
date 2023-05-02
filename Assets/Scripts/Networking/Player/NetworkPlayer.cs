@@ -32,6 +32,8 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
+
+                Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
             {
@@ -43,6 +45,9 @@ namespace LightPat.Player
             }
         }
 
+        [SerializeField] private GameObject pauseMenuPrefab;
+        private GameObject pauseInstance;
+
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
         private float _hudRefreshRate = 1f;
         private float _timer;
@@ -53,11 +58,28 @@ namespace LightPat.Player
 
             if (!IsOwner) { return; }
 
+            // FPS Counter
             if (Time.unscaledTime > _timer)
             {
                 int fps = (int)(1f / Time.unscaledDeltaTime);
                 fpsCounterDisplay.SetText("FPS: " + fps);
                 _timer = Time.unscaledTime + _hudRefreshRate;
+            }
+
+            // Pause menu
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (!pauseInstance)
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                    pauseInstance = Instantiate(pauseMenuPrefab);
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    pauseInstance.GetComponent<Menu>().DestroyAllMenus();
+                    Destroy(pauseInstance);
+                }
             }
         }
     }
