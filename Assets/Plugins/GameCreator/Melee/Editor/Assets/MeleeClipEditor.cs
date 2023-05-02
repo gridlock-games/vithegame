@@ -8,6 +8,7 @@
     using System.IO;
 
     [CustomEditor(typeof(MeleeClip))]
+    [CanEditMultipleObjects]
 	public class MeleeClipEditor : IMeleeEditor
 	{
         private const float SEC_2_FPS = 30f;

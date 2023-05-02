@@ -94,9 +94,7 @@
         public IActionsList actionsOnExecute;
         public IActionsList actionsOnHit;
 
-        public List<MeleeWeapon.WeaponBone> affectedBones = new List<MeleeWeapon.WeaponBone>();
-
-        
+        public List<MeleeWeapon.WeaponBone> affectedBones = new List<MeleeWeapon.WeaponBone> { MeleeWeapon.WeaponBone.RightHand };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
