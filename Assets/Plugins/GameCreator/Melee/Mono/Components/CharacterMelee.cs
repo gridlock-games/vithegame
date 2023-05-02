@@ -943,8 +943,6 @@ namespace GameCreator.Melee
         {
             MeleeWeapon.HitLocation hitLocation;
 
-            print(attackVectorAngle);
-
             if (attackVectorAngle <= 45.00f && attackVectorAngle >= -45.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
@@ -961,8 +959,6 @@ namespace GameCreator.Melee
             {
                 hitLocation = MeleeWeapon.HitLocation.BackMiddle;
             }
-
-            print(hitLocation);
 
             return hitLocation;
         }
