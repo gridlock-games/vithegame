@@ -27,17 +27,6 @@
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee == null) { Destroy(target); return; }
 
-			if (key == CharacterMelee.ActionKey.A) // Light Attack
-			{
-				melee.OnLightAttack();
-			}
-			else if (key == CharacterMelee.ActionKey.B) // Heavy Attack
-			{
-				if (melee.Poise.Value <= 20) { Destroy(target); return; }
-
-				melee.OnHeavyAttack();
-			}
-
 			MeleeClientRpc(targetPosition, targetRotation, targetName);
 			if (!IsHost) InstantExecuteLocally(target);
 			Destroy(target);
