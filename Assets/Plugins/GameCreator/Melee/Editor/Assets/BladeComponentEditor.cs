@@ -28,6 +28,8 @@
         private SerializedProperty spEventAttackEnd;
         private SerializedProperty spEventAttackActivation;
         private SerializedProperty spEventAttackRecovery;
+        
+        private SerializedProperty spWeaponBone;
 
         // INITIALIZER: ---------------------------------------------------------------------------
 
@@ -56,6 +58,8 @@
             this.spEventAttackEnd = this.serializedObject.FindProperty("EventAttackEnd");
             this.spEventAttackActivation = this.serializedObject.FindProperty("EventAttackActivation");
             this.spEventAttackRecovery = this.serializedObject.FindProperty("EventAttackRecovery");
+            
+            this.spWeaponBone = this.serializedObject.FindProperty("weaponBone");
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -126,6 +130,7 @@
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(this.spEventAttackRecovery);
 
+            EditorGUILayout.PropertyField(this.spWeaponBone);
 
             this.serializedObject.ApplyModifiedProperties();
         }

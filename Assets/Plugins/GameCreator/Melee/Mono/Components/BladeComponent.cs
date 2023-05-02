@@ -78,6 +78,8 @@
         private readonly RaycastHit[] bufferRaycastHits = new RaycastHit[20];
         
         private BoxData[] boxInterframeCaptures = new BoxData[20];
+        
+        public MeleeWeapon.WeaponBone weaponBone = MeleeWeapon.WeaponBone.RightHand;
 
         // trail
         private WeaponTrail weaponTrail;
