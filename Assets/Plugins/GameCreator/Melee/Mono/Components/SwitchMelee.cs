@@ -11,6 +11,7 @@ namespace GameCreator.Melee
     {
         [SerializeField] private CharacterMelee _characterMelee;
         [SerializeField] private WeaponMeleeSO _weaponMeleeSO;
+        [SerializeField] private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
 
         private LimbReferences limbs;
 
@@ -24,7 +25,6 @@ namespace GameCreator.Melee
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
 
-        public NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
         public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(); }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
