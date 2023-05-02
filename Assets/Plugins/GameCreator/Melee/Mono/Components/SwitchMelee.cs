@@ -11,8 +11,9 @@ namespace GameCreator.Melee
     {
         [SerializeField] private CharacterMelee _characterMelee;
         [SerializeField] private WeaponMeleeSO _weaponMeleeSO;
-        [SerializeField] private GameObject _rightHand;
-        [SerializeField] private GameObject _leftHand;
+        [SerializeField] private NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
+
+        private LimbReferences limbs;
 
         // Map keyboard keys to weapon types
         private readonly Dictionary<KeyCode, WeaponType> _keyToWeaponType = new Dictionary<KeyCode, WeaponType>()
@@ -24,15 +25,15 @@ namespace GameCreator.Melee
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
 
-        public NetworkVariable<WeaponType> _currentWeaponType = new NetworkVariable<WeaponType>();
         public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(); }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
-        private void Start()
+        private void Awake()
         {
             _characterMelee = GetComponent<CharacterMelee>();
+            limbs = GetComponentInChildren<LimbReferences>();
         }
 
         private void Update()
@@ -69,8 +70,9 @@ namespace GameCreator.Melee
         // Switch the character's melee weapon to the one specified by _currentWeaponType
         void SwitchWeapon()
         {
+            if (!limbs) { Debug.LogError("No LimbReferences Component in Children of " + gameObject.name + ". This object will not be able to switch weapons"); return; }
             //SetupWeaponType();
-            
+
             // Unequip the current weapon before switching
             UnequipWeapon();
 
@@ -93,14 +95,14 @@ namespace GameCreator.Melee
         //TO BE REFACTORED ON SHIELD
         void UnequipWeapon()
         {
-            var asd = _rightHand.GetComponentInChildren<BladeComponent>();
+            var asd = limbs.rightHand.GetComponentInChildren<BladeComponent>();
             if (asd != null)
             {
                 Destroy(asd.gameObject);
                 //Debug.Log($"{asd.gameObject.name} weaponClone");
             }
             
-            var qwe = _leftHand.GetComponentInChildren<BladeComponent>();
+            var qwe = limbs.leftHand.GetComponentInChildren<BladeComponent>();
             if (qwe != null)
             {
                 Destroy(qwe.gameObject);

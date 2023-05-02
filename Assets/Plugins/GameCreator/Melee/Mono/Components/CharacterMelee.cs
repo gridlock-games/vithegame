@@ -158,11 +158,21 @@ namespace GameCreator.Melee
                     {
                         this.inputBuffer.ConsumeInput();
 
+                        if (key == ActionKey.A) // Light Attack
+                        {
+                            OnLightAttack();
+                        }
+                        else if (key == ActionKey.B) // Heavy Attack
+                        {
+                            if (Poise.Value <= 20) { return; }
+                            OnHeavyAttack();
+                        }
+
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
                         this.currentMeleeClip.Play(this);
-                        
+
                         if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
                     }
                 }
@@ -933,8 +943,6 @@ namespace GameCreator.Melee
         {
             MeleeWeapon.HitLocation hitLocation;
 
-            print(attackVectorAngle);
-
             if (attackVectorAngle <= 45.00f && attackVectorAngle >= -45.00f)
             {
                 hitLocation = MeleeWeapon.HitLocation.FrontMiddle;
@@ -951,8 +959,6 @@ namespace GameCreator.Melee
             {
                 hitLocation = MeleeWeapon.HitLocation.BackMiddle;
             }
-
-            print(hitLocation);
 
             return hitLocation;
         }

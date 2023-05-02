@@ -238,15 +238,15 @@ namespace LightPat.Core
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
 
-            //foreach (TeamSpawnPoint teamSpawnPoint in FindObjectOfType<GameLogicManager>().spawnPoints)
-            //{
-            //    if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
-            //    {
-            //        spawnPosition = teamSpawnPoint.spawnPosition;
-            //        spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-            //        break;
-            //    }
-            //}
+            foreach (TeamSpawnPoint teamSpawnPoint in FindObjectOfType<GameLogicManager>().spawnPoints)
+            {
+                if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                {
+                    spawnPosition = teamSpawnPoint.spawnPosition;
+                    spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                    break;
+                }
+            }
 
             GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
 
