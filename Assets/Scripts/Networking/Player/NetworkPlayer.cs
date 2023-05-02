@@ -46,6 +46,7 @@ namespace LightPat.Player
         }
 
         [SerializeField] private GameObject pauseMenuPrefab;
+        [SerializeField] private GameObject triggersParent;
         private GameObject pauseInstance;
 
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
@@ -71,11 +72,13 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
+                    triggersParent.SetActive(false);
                     Cursor.lockState = CursorLockMode.None;
                     pauseInstance = Instantiate(pauseMenuPrefab);
                 }
                 else
                 {
+                    triggersParent.SetActive(true);
                     Cursor.lockState = CursorLockMode.Locked;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
