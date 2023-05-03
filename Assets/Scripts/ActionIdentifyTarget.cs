@@ -116,7 +116,7 @@ public class ActionIdentifyTarget : IAction
         if (targetChar != null && executioner != null)
         {
             targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
-            targetChar.transform.rotation = rotationConfig.quaternion;
+            // targetChar.transform.rotation = rotationConfig.quaternion;
         }
         #endregion
 
@@ -130,18 +130,18 @@ public class ActionIdentifyTarget : IAction
 
         if (executioner != null && targetChar != null)
         {
-
+            // Sync placeholder position per weapon
             GrabPlaceholder.transform.localPosition = characterMeleeA.currentWeapon.grabPlaceholderPosition;
-
-            // Teleport Target to GrabPlaceholder
-            targetChar.transform.position = GrabPlaceholder.transform.position;
-            targetChar.transform.rotation = rotationConfig.quaternion;
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
             executioner.Grab(direction, false);
             targetChar.Grab(direction, false);
             targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, characterMeleeA.currentWeapon.grabReactionState );
+
+            // Teleport Target to GrabPlaceholder
+            targetChar.transform.position = GrabPlaceholder.transform.position;
+            targetChar.transform.rotation = rotationConfig.quaternion;
 
             // GetAnim Duration
             this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
@@ -186,7 +186,6 @@ public class ActionIdentifyTarget : IAction
             // Update Camera Input and Player Controls
             var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
             executioner.Grab(directionUpdate, true);
-            // targetChar.Grab(directionUpdate, true);
         }
 
         yield return 0;
