@@ -101,15 +101,11 @@ public class ActionIdentifyTarget : IAction
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
 
-
         //Check if Target and Executioner should be able to enter Grab Phase
-        if(targetChar.characterLocomotion.isBusy || 
-            executioner.characterLocomotion.isBusy || 
-            (targetChar.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)) {
-                return false;
+        if(targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy) {
+            return false;
         }
-
-        
+  
         PreserveRotation rotationConfig = Rotation(GrabPlaceholder.gameObject, targetChar);
 
         #region RotateCharacter
@@ -119,8 +115,6 @@ public class ActionIdentifyTarget : IAction
             // targetChar.transform.rotation = rotationConfig.quaternion;
         }
         #endregion
-
-        
 
         // Handle Melee Clips
         CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
