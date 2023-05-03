@@ -216,7 +216,7 @@ namespace GameCreator.Melee
                             CharacterMelee targetMelee = hits[i].GetComponent<CharacterMelee>();
                             MeleeClip attack = this.comboSystem.GetCurrentClip();
 
-                            if (targetMelee != null)
+                            if (targetMelee != null && targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
                             {
                                 hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                 if (hitResult == HitResult.ReceiveDamage)
