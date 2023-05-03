@@ -331,8 +331,8 @@
             switch(ailment) {
                 case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
                     melee.currentWeapon.recoveryStandUp.Play(melee);
+                    float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f; // 125% of the length
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(melee.currentWeapon.recoveryStandUp.animationClip.length, melee));
-                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
                     ailment = CharacterLocomotion.CHARACTER_AILMENTS.None;
                 break;
             }
@@ -356,6 +356,8 @@
                 MeleeWeapon.LAYER_STANCE,
                 this.GetCharacterAnimator()
             );
+            
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
             yield return 0;
         }

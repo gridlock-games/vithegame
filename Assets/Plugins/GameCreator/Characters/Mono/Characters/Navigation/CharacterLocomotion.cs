@@ -442,8 +442,6 @@
                 this.isControllable = isControllable;
                 this.isBusy = !isControllable;
                 this.overrideFaceDirection = isPlayer ? direction : CharacterLocomotion.OVERRIDE_FACE_DIRECTION.None;
-                
-
                 return true;
             } catch {
 
