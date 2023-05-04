@@ -7,6 +7,7 @@ using Unity.Netcode;
 using TMPro;
 using System.Net;
 using System.Net.Sockets;
+using UnityEngine.Rendering;
 
 namespace LightPat.UI
 {
@@ -85,6 +86,16 @@ namespace LightPat.UI
             }
         }
 
+        private void StartServer(string targetIP)
+        {
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+            if (NetworkManager.Singleton.StartServer())
+            {
+                Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+                NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+            }
+        }
+
         public void StartHost()
         {
             if (playerNameInput.text == "")
@@ -99,6 +110,15 @@ namespace LightPat.UI
             {
                 Debug.Log("Hosting local game");
                 NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+            }
+        }
+
+        private void Update()
+        {
+            // If we are a headless build
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+            {
+                StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
             }
         }
     }
