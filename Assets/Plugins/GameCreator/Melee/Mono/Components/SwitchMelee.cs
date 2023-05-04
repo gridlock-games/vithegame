@@ -36,11 +36,13 @@ namespace GameCreator.Melee
             limbs = GetComponentInChildren<LimbReferences>();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
+
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;
+            if (_characterMelee.IsAttacking) return;
 
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
