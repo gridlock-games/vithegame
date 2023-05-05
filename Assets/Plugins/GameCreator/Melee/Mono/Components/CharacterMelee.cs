@@ -158,16 +158,19 @@ namespace GameCreator.Melee
                     {
                         this.inputBuffer.ConsumeInput();
 
-                        if (key == ActionKey.A) // Light Attack
+                        if (IsServer)
                         {
-                            OnLightAttack();
+                            if (key == ActionKey.A) // Light Attack
+                            {
+                                OnLightAttack();
+                            }
+                            else if (key == ActionKey.B) // Heavy Attack
+                            {
+                                if (Poise.Value <= 20) { return; }
+                                OnHeavyAttack();
+                            }
                         }
-                        else if (key == ActionKey.B) // Heavy Attack
-                        {
-                            if (Poise.Value <= 20) { return; }
-                            OnHeavyAttack();
-                        }
-
+                        
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
@@ -181,8 +184,6 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            if (!IsServer) { return; }
-
             this.IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
@@ -195,6 +196,8 @@ namespace GameCreator.Melee
                 int phase = this.comboSystem.GetCurrentPhase();
                 this.IsAttacking = phase >= 0f;
 
+                // Only want hit registration on server
+                if (!IsServer) { return; }
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
 
@@ -605,7 +608,9 @@ namespace GameCreator.Melee
         // CALLBACK METHODS: ----------------------------------------------------------------------
 
         public void OnLightAttack()
-        { }
+        {
+            if (!IsServer) { Debug.LogError("OnLightAttack() should only be called on the server."); return; }
+        }
 
         public void OnHeavyAttack()
         {
