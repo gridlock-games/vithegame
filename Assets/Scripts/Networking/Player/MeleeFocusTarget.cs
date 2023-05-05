@@ -30,7 +30,7 @@ namespace LightPat.Player
             Vector3 direction = characterCamera.forward;
             Core.ExtDebug.DrawBoxCastOnHit(origin, boxCastHalfExtents, orientation, direction, boxCastDistance, Color.green);
 
-            if (!melee.IsAttacking.Value) return;
+            if (!melee.IsAttacking) return;
 
             // Get all hits in boxcast
             RaycastHit[] allHits = Physics.BoxCastAll(origin, boxCastHalfExtents, direction, orientation, boxCastDistance);

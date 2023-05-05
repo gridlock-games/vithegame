@@ -41,7 +41,7 @@ namespace GameCreator.Melee
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;
-            if (_characterMelee.IsAttacking.Value) return;
+            if (_characterMelee.IsAttacking) return;
 
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))

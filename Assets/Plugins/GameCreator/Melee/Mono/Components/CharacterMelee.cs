@@ -75,7 +75,7 @@ namespace GameCreator.Melee
         public bool IsDrawing { get; protected set; }
         public bool IsSheathing { get; protected set; }
 
-        public NetworkVariable<bool> IsAttacking { get; private set; } = new NetworkVariable<bool>();
+        public bool IsAttacking { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
@@ -158,16 +158,19 @@ namespace GameCreator.Melee
                     {
                         this.inputBuffer.ConsumeInput();
 
-                        if (key == ActionKey.A) // Light Attack
+                        if (IsServer)
                         {
-                            OnLightAttack();
+                            if (key == ActionKey.A) // Light Attack
+                            {
+                                OnLightAttack();
+                            }
+                            else if (key == ActionKey.B) // Heavy Attack
+                            {
+                                if (Poise.Value <= 20) { return; }
+                                OnHeavyAttack();
+                            }
                         }
-                        else if (key == ActionKey.B) // Heavy Attack
-                        {
-                            if (Poise.Value <= 20) { return; }
-                            OnHeavyAttack();
-                        }
-
+                        
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
@@ -181,9 +184,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            if (!IsServer) { return; }
-
-            this.IsAttacking.Value = false;
+            this.IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
                 Debug.Log(this.Character + ": " + this.Character.characterAilment);
@@ -193,8 +194,10 @@ namespace GameCreator.Melee
             if (this.comboSystem != null)
             {
                 int phase = this.comboSystem.GetCurrentPhase();
-                this.IsAttacking.Value = phase >= 0f;
+                this.IsAttacking = phase >= 0f;
 
+                // Only want hit registration on server
+                if (!IsServer) { return; }
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
 
@@ -287,7 +290,7 @@ namespace GameCreator.Melee
         {
             if (this.Character.characterLocomotion.isBusy) yield break;
             if (!this.CanAttack()) yield break;
-            if (this.IsAttacking.Value) yield break;
+            if (this.IsAttacking) yield break;
 
             this.ReleaseTargetFocus();
 
@@ -339,7 +342,7 @@ namespace GameCreator.Melee
         public IEnumerator Draw(MeleeWeapon weapon, MeleeShield shield = null)
         {
             if (this.Character.characterLocomotion.isBusy) yield break;
-            if (this.IsAttacking.Value) yield break;
+            if (this.IsAttacking) yield break;
             if (!this.CanAttack()) yield break;
 
             yield return this.Sheathe();
@@ -457,7 +460,7 @@ namespace GameCreator.Melee
             if (this.IsDrawing) return;
             if (this.IsSheathing) return;
             if (this.IsStaggered) return;
-            if (this.IsAttacking.Value) return;
+            if (this.IsAttacking) return;
 
             if (this.currentShield == null) return;
 
