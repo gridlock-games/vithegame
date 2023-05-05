@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace LightPat.Player
 {
@@ -31,6 +32,12 @@ namespace LightPat.Player
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x - lookInput.y, transform.localEulerAngles.y + lookInput.x, transform.localEulerAngles.z);
 
             fps = Mathf.RoundToInt((float)1.0 / Time.deltaTime);
+
+            foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                if (clientPair.Value.PlayerObject)
+                    clientPair.Value.PlayerObject.GetComponent<NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+            }
         }
 
         private void OnGUI()

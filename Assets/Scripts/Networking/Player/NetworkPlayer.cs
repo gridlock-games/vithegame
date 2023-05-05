@@ -14,6 +14,8 @@ namespace LightPat.Player
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
 
+        [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
         public override void OnNetworkSpawn()
         {
             if (IsLocalPlayer) // This checks if we are this instance's player object
@@ -49,6 +51,7 @@ namespace LightPat.Player
         [SerializeField] private GameObject triggersParent;
         private GameObject pauseInstance;
 
+        [SerializeField] private TextMeshProUGUI pingDisplay;
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
         private float _hudRefreshRate = 1f;
         private float _timer;
@@ -58,6 +61,8 @@ namespace LightPat.Player
             if (!IsSpawned) { return; }
 
             if (!IsOwner) { return; }
+
+            pingDisplay.SetText("Ping: " + roundTripTime.Value + " ms");
 
             // FPS Counter
             if (Time.unscaledTime > _timer)

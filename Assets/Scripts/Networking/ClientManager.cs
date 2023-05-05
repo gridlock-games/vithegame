@@ -90,7 +90,8 @@ namespace LightPat.Core
         {
             if (IsClient) { yield break; }
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-            Instantiate(serverCameraPrefab);
+            GameObject cameraObject = Instantiate(serverCameraPrefab);
+            cameraObject.GetComponent<NetworkObject>().Spawn(true);
         }
 
         private void Awake()
