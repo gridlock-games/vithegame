@@ -22,13 +22,15 @@ namespace LightPat.Player
 
         private void Update()
         {
+            if (!IsLocalPlayer) return;
+
             // Visualize boxcast
             Vector3 origin = transform.position;
             Quaternion orientation = characterCamera.rotation;
             Vector3 direction = characterCamera.forward;
             Core.ExtDebug.DrawBoxCastOnHit(origin, boxCastHalfExtents, orientation, direction, boxCastDistance, Color.green);
 
-            if (!melee.IsAttacking) return;
+            if (!melee.IsAttacking.Value) return;
 
             // Get all hits in boxcast
             RaycastHit[] allHits = Physics.BoxCastAll(origin, boxCastHalfExtents, direction, orientation, boxCastDistance);
@@ -54,8 +56,7 @@ namespace LightPat.Player
             relativePos.y = 0;
             transform.rotation = Quaternion.LookRotation(relativePos);
 
-            if (IsLocalPlayer)
-                Debug.Log(Time.time + " Locked onto " + target);
+            Debug.Log(Time.time + " Locked onto " + target);
         }
     }
 }

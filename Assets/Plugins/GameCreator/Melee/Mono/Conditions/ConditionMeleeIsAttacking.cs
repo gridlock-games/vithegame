@@ -29,8 +29,8 @@
 
             switch (this.attacking)
             {
-				case Attacking.IsAttacking: return melee.IsAttacking;
-				case Attacking.IsNotAttacking: return !melee.IsAttacking;
+				case Attacking.IsAttacking: return melee.IsAttacking.Value;
+				case Attacking.IsNotAttacking: return !melee.IsAttacking.Value;
 			}
 
 			return false;
