@@ -35,6 +35,8 @@ namespace LightPat.Player
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
 
+                gameObject.transform.position = new Vector3(-5,0,-5);
+
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object

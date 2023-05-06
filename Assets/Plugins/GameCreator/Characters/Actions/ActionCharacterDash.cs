@@ -241,7 +241,7 @@
 
             bool isDashing = characterTarget.Dash(
                 moveDirection.normalized,
-                this.impulse.GetValue(target),
+                0f,
                 duration,
                 1.0f
             );
