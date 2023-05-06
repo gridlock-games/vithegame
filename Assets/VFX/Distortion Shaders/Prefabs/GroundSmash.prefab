@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2532448897518523204}
   - component: {fileID: 2532448897518523205}
   - component: {fileID: 2532448897518523206}
+  - component: {fileID: 2532448897518523259}
   m_Layer: 8
   m_Name: ShockWave Distortion
   m_TagString: Untagged
@@ -230,7 +231,7 @@ VisualEffect:
           m_PostInfinity: 2
           m_RotationOrder: 4
         m_Name: StrengthOverLifeTime
-        m_Overridden: 1
+        m_Overridden: 0
     m_Gradient:
       m_Array: []
     m_NamedObject:
@@ -289,6 +290,20 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &2532448897518523259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2532448897518523207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73e088b1dd5294b438e92f680eca1e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particle: {fileID: 2532448897518523205}
+  overwrite_timer: 0
 --- !u!1 &8089264222545033813
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,6 +315,7 @@ GameObject:
   - component: {fileID: 8089264222545033816}
   - component: {fileID: 8089264222545033815}
   - component: {fileID: 8089264222545033814}
+  - component: {fileID: 8089264222545033817}
   m_Layer: 0
   m_Name: GroundSmash
   m_TagString: Untagged
@@ -445,7 +461,7 @@ VisualEffect:
       m_Array: []
     m_NamedObject:
       m_Array:
-      - m_Value: {fileID: 0}
+      - m_Value: {fileID: 2800000, guid: 4a79483994d1c1140aa425d6af6c1b2d, type: 3}
         m_Name: MainTexture
         m_Overridden: 1
       - m_Value: {fileID: 2800000, guid: bd9f61390ba93af4db0bdabb481a7be4, type: 3}
@@ -499,3 +515,17 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &8089264222545033817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089264222545033813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73e088b1dd5294b438e92f680eca1e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particle: {fileID: 8089264222545033815}
+  overwrite_timer: 0
