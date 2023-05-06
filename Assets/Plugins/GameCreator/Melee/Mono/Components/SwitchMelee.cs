@@ -86,7 +86,7 @@ namespace GameCreator.Melee
                 
                 _characterMelee.TestDraw();
 
-                _characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
+                // _characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
                 //Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");
             }
         }

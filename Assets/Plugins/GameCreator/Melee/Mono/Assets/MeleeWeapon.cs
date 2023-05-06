@@ -203,11 +203,13 @@ namespace GameCreator.Melee
 
             switch(location) {
                 case HitLocation.LeftMiddle:
-                    meleeClip = this.groundHitReactionsLeftMiddle[0];
+                    index = UnityEngine.Random.Range(0, this.groundHitReactionsLeftMiddle.Count - 1);
+                    meleeClip = this.groundHitReactionsLeftMiddle[index];
                     break;
 
                 case HitLocation.RightMiddle:
-                    meleeClip = this.groundHitReactionsRightMiddle[0];
+                    index = UnityEngine.Random.Range(0, this.groundHitReactionsRightMiddle.Count - 1);
+                    meleeClip = this.groundHitReactionsRightMiddle[index];
                     break;
 
                 case HitLocation.FrontUpper:
