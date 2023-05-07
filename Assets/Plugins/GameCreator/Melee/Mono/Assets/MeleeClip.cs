@@ -42,6 +42,7 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public AnimationClip animationClip;
+        public AnimationClip attackDodgeClip;
         public AvatarMask avatarMask;
         public float transitionIn = 0.25f;
         public float transitionOut = 0.25f;
@@ -54,14 +55,26 @@
         [Range(0f, 1f)] public float gravityInfluence = 1f;
         public float movementMultiplier = 1.0f;
 
+        // Dodge Attack Purposes:
+        public AnimationCurve movementForward_OnAttack = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+        public AnimationCurve movementSides_OnAttack = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+        public AnimationCurve movementVertical_OnAttack = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
+        [Range(0f, 1f)] public float gravityInfluence_OnAttack = 1f;
+        public float movementMultiplier_OnAttack = 1.0f;
+
+
         // audio:
         public AudioClip soundEffect;
 
         // hit pause:
-        public bool hitPause = true;
+        public bool hitPause = false;
         [Range(0f, 1f)]
         public float hitPauseAmount = 0.05f;
         public float hitPauseDuration = 0.05f;
+
+        // dodge:
+        public bool isDodge = false;
 
         // attack:
         public bool isAttack = true;

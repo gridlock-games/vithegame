@@ -47,15 +47,24 @@
         private Section sectionCombat;
 
         private SerializedProperty spAnimationClip;
+        private SerializedProperty spAttackDodgeClip;
         private SerializedProperty spAvatarMask;
         private SerializedProperty spTransitionIn;
         private SerializedProperty spTransitionOut;
 
+        // Original
         private SerializedProperty spMovementForward;
         private SerializedProperty spMovementSides;
         private SerializedProperty spMovementVertical;
         private SerializedProperty spGravityInfluence;
         private SerializedProperty spMovementMultiplier;
+
+        // Attack Dodge
+        private SerializedProperty spMovementForward_OnAttack;
+        private SerializedProperty spMovementSides_OnAttack;
+        private SerializedProperty spMovementVertical_OnAttack;
+        private SerializedProperty spGravityInfluence_OnAttack;
+        private SerializedProperty spMovementMultiplier_OnAttack;
 
         private SerializedProperty spSoundEffect;
         private SerializedProperty spPushForce;
@@ -64,6 +73,7 @@
         private SerializedProperty spHitPauseDuration;
 
         private SerializedProperty spIsAttack;
+        private SerializedProperty spIsDodge;
         private SerializedProperty spIsBlockable;
 
         private SerializedProperty spPoiseDamage;
@@ -105,16 +115,26 @@
             this.sectionCombat = new Section("Combat", this.LoadIcon("Animation"), this.Repaint);
 
             this.spAnimationClip = this.serializedObject.FindProperty("animationClip");
+            this.spAttackDodgeClip = this.serializedObject.FindProperty("attackDodgeClip");
             this.spAvatarMask = this.serializedObject.FindProperty("avatarMask");
             this.spTransitionIn = this.serializedObject.FindProperty("transitionIn");
             this.spTransitionOut = this.serializedObject.FindProperty("transitionOut");
             this.spAnimationSpeed = this.serializedObject.FindProperty("animSpeed");
 
+            // Original
             this.spMovementForward = this.serializedObject.FindProperty("movementForward");
             this.spMovementSides = this.serializedObject.FindProperty("movementSides");
             this.spMovementVertical = this.serializedObject.FindProperty("movementVertical");
             this.spGravityInfluence = this.serializedObject.FindProperty("gravityInfluence");
             this.spMovementMultiplier = this.serializedObject.FindProperty("movementMultiplier");
+
+
+            // On Attack Dodge
+            this.spMovementForward_OnAttack = this.serializedObject.FindProperty("movementForward_OnAttack");
+            this.spMovementSides_OnAttack = this.serializedObject.FindProperty("movementSides_OnAttack");
+            this.spMovementVertical_OnAttack = this.serializedObject.FindProperty("movementVertical_OnAttack");
+            this.spGravityInfluence_OnAttack = this.serializedObject.FindProperty("gravityInfluence_OnAttack");
+            this.spMovementMultiplier_OnAttack = this.serializedObject.FindProperty("movementMultiplier_OnAttack");
 
             this.spSoundEffect = this.serializedObject.FindProperty("soundEffect");
             this.spPushForce = this.serializedObject.FindProperty("pushForce");
@@ -123,6 +143,7 @@
             this.spHitPauseDuration = this.serializedObject.FindProperty("hitPauseDuration");
 
             this.spIsAttack = this.serializedObject.FindProperty("isAttack");
+            this.spIsDodge = this.serializedObject.FindProperty("isDodge"); 
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
 
             this.spPoiseDamage = this.serializedObject.FindProperty("poiseDamage");
@@ -285,6 +306,15 @@
                 if (group.visible)
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+                    
+
+                    EditorGUILayout.PropertyField(this.spIsDodge);
+
+                    
+                    if(this.spIsDodge.boolValue) {
+                        EditorGUILayout.Space();
+                        EditorGUILayout.LabelField("Dodge from Idle", EditorStyles.boldLabel);
+                    }
 
                     EditorGUILayout.PropertyField(this.spMovementForward);
                     EditorGUILayout.PropertyField(this.spMovementSides);
@@ -303,13 +333,48 @@
                         !(this.spAnimationClip.objectReferenceValue as AnimationClip).hasRootCurves);
                     if (GUI.Button(buttonRect, "Extract Root Motion"))
                     {
-                        this.ExtractRootMotion();
+                        this.ExtractRootMotion(false);
                     }
                     EditorGUI.EndDisabledGroup();
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spMovementMultiplier);
                     EditorGUILayout.PropertyField(this.spGravityInfluence);
+
+                    if(this.spIsDodge.boolValue) {
+                        EditorGUILayout.Space();
+                        EditorGUILayout.Space();
+                        EditorGUILayout.LabelField("Dodge from Attack", EditorStyles.boldLabel);
+                        EditorGUILayout.Space();
+                        
+                        EditorGUILayout.PropertyField(this.spAttackDodgeClip);
+                        EditorGUILayout.Space();
+
+                        EditorGUILayout.PropertyField(this.spMovementForward_OnAttack);
+                        EditorGUILayout.PropertyField(this.spMovementSides_OnAttack);
+                        EditorGUILayout.PropertyField(this.spMovementVertical_OnAttack);
+
+                        Rect buttonRectDodge = GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.button);
+                        buttonRectDodge = new Rect(
+                            buttonRectDodge.x + EditorGUIUtility.labelWidth,
+                            buttonRectDodge.y,
+                            buttonRectDodge.width - EditorGUIUtility.labelWidth,
+                            buttonRectDodge.height
+                        );
+
+                        if (GUI.Button(buttonRectDodge, "Extract Root Motion"))
+                        {
+                            this.ExtractRootMotion(true);
+                        }
+                        EditorGUI.EndDisabledGroup();
+
+                        EditorGUILayout.Space();
+                        EditorGUILayout.PropertyField(this.spMovementMultiplier_OnAttack);
+                        EditorGUILayout.PropertyField(this.spGravityInfluence_OnAttack);
+                        
+                        EditorGUILayout.Space();
+                        EditorGUILayout.Space();
+                    }
 
                     EditorGUILayout.EndVertical();
                 }
@@ -478,9 +543,9 @@
 
         // EXTRACT: ------------------------------------------------------------------------------
 
-        private void ExtractRootMotion()
+        private void ExtractRootMotion(bool isAttackDodge)
         {
-            AnimationClip animationClip = this.spAnimationClip.objectReferenceValue as AnimationClip;
+            AnimationClip animationClip = !isAttackDodge ? this.spAnimationClip.objectReferenceValue as AnimationClip : this.spAttackDodgeClip.objectReferenceValue as AnimationClip;
             if (animationClip != null)
             {
                 if (animationClip.hasRootCurves)
@@ -497,7 +562,12 @@
                             );
 
                             curve = this.ProcessRootCurve(curve);
-                            this.spMovementSides.animationCurveValue = curve;
+
+                            if(!isAttackDodge) {
+                                this.spMovementSides.animationCurveValue = curve;
+                            }else {
+                                this.spMovementSides_OnAttack.animationCurveValue = curve;
+                            }
                         }
 
                         if (curves[i].propertyName == "RootT.y")
@@ -508,7 +578,12 @@
                             );
 
                             curve = this.ProcessRootCurve(curve);
-                            this.spMovementVertical.animationCurveValue = curve;
+
+                            if(!isAttackDodge) {
+                                this.spMovementVertical.animationCurveValue = curve;
+                            }else {
+                                this.spMovementVertical_OnAttack.animationCurveValue = curve;
+                            }
                         }
 
                         if (curves[i].propertyName == "RootT.z")
@@ -519,7 +594,12 @@
                             );
 
                             curve = this.ProcessRootCurve(curve);
-                            this.spMovementForward.animationCurveValue = curve;
+
+                            if(!isAttackDodge) {
+                                this.spMovementForward.animationCurveValue = curve;
+                            }else {
+                                this.spMovementForward_OnAttack.animationCurveValue = curve;
+                            }
                         }
                     }
                 }
@@ -555,6 +635,15 @@
             {
                 EditorGUILayout.HelpBox(
                     "No Animation Clip is set",
+                    MessageType.Warning
+                );
+                return;
+            }
+
+            if (!this.spAttackDodgeClip.objectReferenceValue)
+            {
+                EditorGUILayout.HelpBox(
+                    "No Dodge Animation Clip is set",
                     MessageType.Warning
                 );
                 return;

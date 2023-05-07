@@ -53,6 +53,9 @@
         private AnimationCurve spMovementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         private AnimationCurve spMovementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        private AnimationClip meleeAnimationClip;
+        private AnimationCurve meleeAnimationClipRootCurve = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
         [ServerRpc]
         void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
         {
@@ -163,7 +166,8 @@
             if (angle <= 15f && angle >= -15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeF;
-                clip = meleeweapon.dodgeF.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeF.animSpeed;
                 transitionIn = meleeweapon.dodgeF.transitionIn;
                 transitionOut = meleeweapon.dodgeF.transitionOut;
@@ -171,7 +175,8 @@
             else if (angle < 80f && angle > 15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeFL;
-                clip = meleeweapon.dodgeFL.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeFL.animSpeed;
                 transitionIn = meleeweapon.dodgeFL.transitionIn;
                 transitionOut = meleeweapon.dodgeFL.transitionOut;
@@ -179,7 +184,8 @@
             else if (angle > -80f && angle < -15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeFR;
-                clip = meleeweapon.dodgeFR.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeFR.animSpeed;
                 transitionIn = meleeweapon.dodgeFR.transitionIn;
                 transitionOut = meleeweapon.dodgeFR.transitionOut;
@@ -187,7 +193,8 @@
             else if (angle > 80f && angle < 100f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeL;
-                clip = meleeweapon.dodgeL.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeL.animSpeed;
                 transitionIn = meleeweapon.dodgeL.transitionIn;
                 transitionOut = meleeweapon.dodgeL.transitionOut;
@@ -195,7 +202,8 @@
             else if (angle < -80f && angle > -100f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeR;
-                clip = meleeweapon.dodgeR.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeR.animSpeed;
                 transitionIn = meleeweapon.dodgeR.transitionIn;
                 transitionOut = meleeweapon.dodgeR.transitionOut;
@@ -203,7 +211,8 @@
             else if (angle < -100f && angle > -170f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeBR;
-                clip = meleeweapon.dodgeBR.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeBR.animSpeed;
                 transitionIn = meleeweapon.dodgeBR.transitionIn;
                 transitionOut = meleeweapon.dodgeBR.transitionOut;
@@ -211,7 +220,8 @@
             else if (angle > 100f && angle < 170f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeBL;
-                clip = meleeweapon.dodgeBL.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeBL.animSpeed;
                 transitionIn = meleeweapon.dodgeBL.transitionIn;
                 transitionOut = meleeweapon.dodgeBL.transitionOut;
@@ -219,16 +229,15 @@
             else
             {
                 dodgeMeleeClip = meleeweapon.dodgeB;
-                clip = meleeweapon.dodgeB.animationClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeB.animSpeed;
                 transitionIn = meleeweapon.dodgeF.transitionIn;
                 transitionOut = meleeweapon.dodgeF.transitionOut;
             }
-
-
             #endregion
 
-            float duration = ((clip.length - (clip.length * 0.50f)) / (speed)) * .75f;
+            float duration = ((clip.length - (clip.length * 0.50f)) / (speed)) * .95f;
 
             bool isDashing = characterTarget.Dash(
                 moveDirection.normalized,
@@ -240,18 +249,89 @@
             if (clip != null && animator != null)
             {
                 characterTarget.characterLocomotion.RootMovement(
-                    dodgeMeleeClip.movementMultiplier,
+                    !melee.IsAttacking ? dodgeMeleeClip.movementMultiplier : dodgeMeleeClip.movementMultiplier_OnAttack,
                     duration,
                     1.0f,
-                    dodgeMeleeClip.movementForward,
-                    dodgeMeleeClip.movementSides,
-                    dodgeMeleeClip.movementVertical
+                    !melee.IsAttacking ? dodgeMeleeClip.movementForward : dodgeMeleeClip.movementForward_OnAttack,
+                    !melee.IsAttacking ? dodgeMeleeClip.movementSides  : dodgeMeleeClip.movementSides_OnAttack,
+                    !melee.IsAttacking ? dodgeMeleeClip.movementVertical  : dodgeMeleeClip.movementVertical_OnAttack
                 );
 
                 animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
             }
 
             return true;
+        }
+
+        // EXTRACT: ------------------------------------------------------------------------------
+
+        private void ExtractRootMotion()
+        {
+            AnimationClip animationClip = this.meleeAnimationClip as AnimationClip;
+            if (animationClip != null)
+            {
+                if (animationClip.hasRootCurves)
+                {
+                    EditorCurveBinding[] curves = AnimationUtility.GetCurveBindings(animationClip);
+
+                    for (int i = 0; i < curves.Length; ++i)
+                    {
+                        if (curves[i].propertyName == "RootT.x")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+
+                            curve = this.ProcessRootCurve(curve);
+                            this.spMovementSides = curve;
+                        }
+
+                        if (curves[i].propertyName == "RootT.y")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+
+                            curve = this.ProcessRootCurve(curve);
+                            this.spMovementVertical = curve;
+                        }
+
+                        if (curves[i].propertyName == "RootT.z")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+
+                            curve = this.ProcessRootCurve(curve);
+                            this.spMovementForward = curve;
+                        }
+                    }
+                }
+            }
+        }
+
+        private AnimationCurve ProcessRootCurve(AnimationCurve source)
+        {
+            float value = source.Evaluate(0f);
+            float duration = source.keys[source.length - 1].time;
+            AnimationCurve result = new AnimationCurve();
+
+            for (int i = 0; i < source.keys.Length; ++i)
+            {
+                result.AddKey(new Keyframe(
+                    source.keys[i].time / duration,
+                    source.keys[i].value - value,
+                    source.keys[i].inTangent,
+                    source.keys[i].outTangent,
+                    source.keys[i].inWeight,
+                    source.keys[i].outWeight
+                ));
+            }
+
+            return result;
         }
 
 #if UNITY_EDITOR
