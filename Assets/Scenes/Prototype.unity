@@ -6599,6 +6599,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 501756116}
     m_Modifications:
+    - target: {fileID: 892490822227458897, guid: 1744833e50687b34792a2b0f0515efec,
+        type: 3}
+      propertyPath: isExpanded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 892490822227458897, guid: 1744833e50687b34792a2b0f0515efec,
+        type: 3}
+      propertyPath: stateAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: ea87a983ece14ee448ce2740ddce8304,
+        type: 2}
     - target: {fileID: 892490823149361989, guid: 1744833e50687b34792a2b0f0515efec,
         type: 3}
       propertyPath: isExpanded
@@ -34498,31 +34509,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 186245382}
     m_Modifications:
-    - target: {fileID: 1528272901, guid: 1744833e50687b34792a2b0f0515efec, type: 3}
-      propertyPath: isExpanded
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 892490823149361989, guid: 1744833e50687b34792a2b0f0515efec,
+    - target: {fileID: 892490822227458897, guid: 1744833e50687b34792a2b0f0515efec,
         type: 3}
-      propertyPath: isExpanded
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 892490823149361989, guid: 1744833e50687b34792a2b0f0515efec,
-        type: 3}
-      propertyPath: meleeWeapon
+      propertyPath: stateAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 7811dba48327139488547a8364511fe1,
+      objectReference: {fileID: 11400000, guid: 0d07f9e9d2d5e1f4c8556f82c214cda2,
         type: 2}
     - target: {fileID: 892490823149361989, guid: 1744833e50687b34792a2b0f0515efec,
         type: 3}
       propertyPath: character.character
       value: 
       objectReference: {fileID: 186245381}
-    - target: {fileID: 892490823149362009, guid: 1744833e50687b34792a2b0f0515efec,
-        type: 3}
-      propertyPath: variable.local.targetObject
-      value: 
-      objectReference: {fileID: 186245375}
     - target: {fileID: 892490823293452934, guid: 1744833e50687b34792a2b0f0515efec,
         type: 3}
       propertyPath: m_Name
@@ -71964,6 +71961,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1794773155}
     m_Modifications:
+    - target: {fileID: 482414582, guid: 1744833e50687b34792a2b0f0515efec, type: 3}
+      propertyPath: variable.local.targetObject
+      value: 
+      objectReference: {fileID: 1794773148}
+    - target: {fileID: 892490822227458890, guid: 1744833e50687b34792a2b0f0515efec,
+        type: 3}
+      propertyPath: variable.local.targetObject
+      value: 
+      objectReference: {fileID: 1794773148}
+    - target: {fileID: 892490822227458897, guid: 1744833e50687b34792a2b0f0515efec,
+        type: 3}
+      propertyPath: isExpanded
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 892490823149361989, guid: 1744833e50687b34792a2b0f0515efec,
         type: 3}
       propertyPath: character.character

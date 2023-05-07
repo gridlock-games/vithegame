@@ -16,10 +16,12 @@ public class ConditionCharacterAilment : ICondition
     // Update is called once per frame
     public override bool Check(GameObject target)
     {
-        Character character = this.target.GetCharacter(gameObject);
-        if (character == null) return true;
+        Character character = this.target.GetCharacter(target);
+        if (character == null) return false;
 
-        return true;
+        bool hasAilment = false;
+
+        return this.characterAilments == character.characterAilment;
     }
 
     // +--------------------------------------------------------------------------------------+

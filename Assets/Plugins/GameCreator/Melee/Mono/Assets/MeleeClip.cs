@@ -30,6 +30,12 @@
             Stagger,
         }
 
+        public enum AttackType {
+            None,
+            Stun,
+            Knockdown
+        }
+
         // STATIC & CONSTS: -----------------------------------------------------------------------
 
         private const int HITPAUSE_TIME_LAYER = 80;
@@ -78,6 +84,7 @@
 
         // attack:
         public bool isAttack = true;
+        public AttackType attackType = AttackType.None;
         public bool isBlockable = true;
         public float pushForce = 50f;
 
