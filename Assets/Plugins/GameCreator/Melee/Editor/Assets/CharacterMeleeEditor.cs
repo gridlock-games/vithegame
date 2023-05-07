@@ -1,4 +1,6 @@
-﻿namespace GameCreator.Melee
+﻿using UnityEditorInternal;
+
+namespace GameCreator.Melee
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -16,6 +18,12 @@
         private SerializedProperty spPoiseMax;
         private SerializedProperty spPoiseRecovery;
 
+        private SerializedProperty spHitRenderer;
+        private SerializedProperty spDefaultMaterials;
+        private SerializedProperty spHitMaterials;
+        private SerializedProperty spMeshColorResetDelay;
+        
+
         // INITIALIZER: ---------------------------------------------------------------------------
 
         private void OnEnable()
@@ -27,6 +35,11 @@
             this.spPoiseDelay = this.serializedObject.FindProperty("delayPoise");
             this.spPoiseMax = this.serializedObject.FindProperty("maxPoise");
             this.spPoiseRecovery = this.serializedObject.FindProperty("poiseRecoveryRate");
+           
+            this.spHitRenderer = this.serializedObject.FindProperty("hitRenderer");
+            this.spDefaultMaterials = this.serializedObject.FindProperty("defaultMaterials");
+            this.spHitMaterials = this.serializedObject.FindProperty("hitMaterials");
+            this.spMeshColorResetDelay = this.serializedObject.FindProperty("meshColorResetDelay");
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -45,6 +58,12 @@
             EditorGUILayout.PropertyField(this.spPoiseDelay);
             EditorGUILayout.PropertyField(this.spPoiseMax);
             EditorGUILayout.PropertyField(this.spPoiseRecovery);
+            
+            EditorGUILayout.Space(15);
+            EditorGUILayout.PropertyField(this.spHitRenderer);
+            EditorGUILayout.PropertyField(this.spDefaultMaterials);
+            EditorGUILayout.PropertyField(this.spHitMaterials);
+            EditorGUILayout.PropertyField(this.spMeshColorResetDelay);
 
             this.serializedObject.ApplyModifiedProperties();
         }
