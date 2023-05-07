@@ -336,10 +336,7 @@
             if (this.characterLocomotion == null) return false;
 
             PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-
-            // target.characterLocomotion.SetRotation(rotationConfig.vector3);
             target.transform.rotation = rotationConfig.quaternion;
-
 
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
