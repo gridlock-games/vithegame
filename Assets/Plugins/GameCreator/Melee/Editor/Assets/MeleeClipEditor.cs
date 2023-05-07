@@ -640,15 +640,6 @@
                 return;
             }
 
-            if (!this.spAttackDodgeClip.objectReferenceValue)
-            {
-                EditorGUILayout.HelpBox(
-                    "No Dodge Animation Clip is set",
-                    MessageType.Warning
-                );
-                return;
-            }
-
             if (!REF_OBJECT || !REF_OBJECT.animator)
             {
                 EditorGUILayout.HelpBox(
