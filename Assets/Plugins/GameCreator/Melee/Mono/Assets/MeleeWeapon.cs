@@ -89,6 +89,11 @@ namespace GameCreator.Melee
         public MeleeClip grabReaction;
         public Vector3 grabPlaceholderPosition;
 
+        // knockdown
+
+        public MeleeClip knockbackF;
+        public MeleeClip knockbackB;
+
         // combo system:
         public List<Combo> combos = new List<Combo>();
 

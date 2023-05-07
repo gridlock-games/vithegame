@@ -155,6 +155,8 @@
         public bool save;
         protected SaveData initSaveData = new SaveData();
 
+        private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         protected override void Awake()
@@ -330,8 +332,15 @@
             return true;
         }
 
-        public bool Knockdown() {
+        public bool Knockdown(Character attacker, Character target) {
             if (this.characterLocomotion == null) return false;
+
+            PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+
+            // target.characterLocomotion.SetRotation(rotationConfig.vector3);
+            target.transform.rotation = rotationConfig.quaternion;
+
+
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
             return true;
@@ -392,6 +401,24 @@
             yield return 0;
         }
 
+        private PreserveRotation Rotation(GameObject anchor, Character targetChar) {
+
+            Vector3 rotationDirection = (
+                anchor.transform.position - targetChar.gameObject.transform.position
+            );
+
+            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, anchor.transform.up);
+
+            rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
+
+            targetChar.characterLocomotion.SetRotation(rotationDirection);
+
+            PreserveRotation preserveRotation = new PreserveRotation(targetRotation, rotationDirection);
+
+            return preserveRotation;
+
+        }
+        
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)
         {
@@ -513,5 +540,14 @@
             transform.position = container.position;
             transform.rotation = container.rotation;
         }
+    }
+
+    public class PreserveRotation {
+        public PreserveRotation ( Quaternion targetRotation, Vector3 rotationDirection) {
+            this.quaternion = targetRotation;
+            this.vector3 = rotationDirection;
+        }
+        public Quaternion quaternion {get; private set;}
+        public Vector3 vector3 {get; private set;}
     }
 }
