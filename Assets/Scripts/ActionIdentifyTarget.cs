@@ -131,7 +131,7 @@ public class ActionIdentifyTarget : IAction
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
             executioner.Grab(direction, false);
             targetChar.Grab(direction, false);
-            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, characterMeleeA.currentWeapon.grabReactionState );
+            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null );
 
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;

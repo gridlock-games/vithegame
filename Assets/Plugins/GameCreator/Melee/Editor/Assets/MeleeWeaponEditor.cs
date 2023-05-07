@@ -86,13 +86,15 @@
         
         public SerializedProperty spGrabAttack;
         public SerializedProperty spGrabReaction;
-        public SerializedProperty spGrabeReactionState;
         public SerializedProperty spGrabPlaceholderPosition;
         public SerializedProperty spStandFaceUp;
         public SerializedProperty spStandFaceDown;
+        public SerializedProperty spRecoveryStun;
+
+        public SerializedProperty spKnockbackF;
+        public SerializedProperty spKnockbackB;
 
         private SerializedProperty spWeaponModels;
-        // private ReorderableList weaponModelsList;
         
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -115,10 +117,13 @@
 
             this.spGrabAttack = this.serializedObject.FindProperty("grabAttack");
             this.spGrabReaction = this.serializedObject.FindProperty("grabReaction");
-            this.spGrabeReactionState = this.serializedObject.FindProperty("grabReactionState");
             this.spGrabPlaceholderPosition = this.serializedObject.FindProperty("grabPlaceholderPosition");
 
+            this.spKnockbackB = this.serializedObject.FindProperty("knockbackB"); 
+            this.spKnockbackF = this.serializedObject.FindProperty("knockbackF"); 
+
             this.spStandFaceUp = this.serializedObject.FindProperty("recoveryStandUp");
+            this.spRecoveryStun = this.serializedObject.FindProperty("recoveryStun");
             this.spStandFaceDown = this.serializedObject.FindProperty("recoveryStandDown");
             
 
@@ -465,7 +470,6 @@
 
                     EditorGUILayout.PropertyField(this.spGrabAttack);
                     EditorGUILayout.PropertyField(this.spGrabReaction);
-                    EditorGUILayout.PropertyField(this.spGrabeReactionState);
                     EditorGUILayout.PropertyField(this.spGrabPlaceholderPosition);
                     
 
@@ -486,6 +490,9 @@
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
 
                     EditorGUILayout.PropertyField(this.spStandFaceUp);
+                    EditorGUILayout.PropertyField(this.spRecoveryStun);
+                    EditorGUILayout.PropertyField(this.spKnockbackF);
+                    EditorGUILayout.PropertyField(this.spKnockbackB);
                     EditorGUILayout.EndVertical();
                 }
             }

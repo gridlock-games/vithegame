@@ -155,6 +155,8 @@
         public bool save;
         protected SaveData initSaveData = new SaveData();
 
+        private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         protected override void Awake()
@@ -313,7 +315,6 @@
             if (this.characterLocomotion.isBusy) return false;
 
             this.characterLocomotion.Dash(direction, impulse, duration, drag);
-            // if (this.animator != null) this.animator.Dash();
             if (this.onDash != null) this.onDash.Invoke();
             return true;
         }
@@ -324,16 +325,54 @@
             return true;
         }
 
+        public bool Stun() {
+            if (this.characterLocomotion == null) return false;
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
+            return true;
+        }
+
+        public bool Knockdown(Character attacker, Character target) {
+            if (this.characterLocomotion == null) return false;
+
+            PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+
+            // target.characterLocomotion.SetRotation(rotationConfig.vector3);
+            target.transform.rotation = rotationConfig.quaternion;
+
+
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
+            return true;
+        }
+
+        public bool CancelAilment() {
+            if (this.characterLocomotion == null) return false;
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+            return true;
+        }
+
         public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState) {
+            CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             this.characterAilment = this.characterLocomotion.Ailment(ailment);
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
+            
+            float recoveryAnimDuration = 0f;
+
             switch(ailment) {
-                case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
+                case CharacterLocomotion.CHARACTER_AILMENTS.Reset: // ONLY USE RESET IF COMING FROM GRAB OR KNOCKDOWN
                     melee.currentWeapon.recoveryStandUp.Play(melee);
-                    float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f; // 125% of the length
+                    recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f; // 125% of the length
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(melee.currentWeapon.recoveryStandUp.animationClip.length, melee));
-                    ailment = CharacterLocomotion.CHARACTER_AILMENTS.None;
+                break;
+
+                case CharacterLocomotion.CHARACTER_AILMENTS.None: 
+                    if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                        melee.currentWeapon.recoveryStun.Play(melee);
+                        recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.15f;
+                    }
+                    CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                 break;
             }
 
@@ -342,8 +381,7 @@
 
         }
 
-        private IEnumerator ResetDefaultState(float duration, CharacterMelee melee) {
-
+        private IEnumerator ResetDefaultState(float duration,CharacterMelee melee) {
             float initTime = Time.time;
 
             while (initTime + (duration * 0.80) >= Time.time) {
@@ -358,10 +396,29 @@
             );
             
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+            this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
 
             yield return 0;
         }
 
+        private PreserveRotation Rotation(GameObject anchor, Character targetChar) {
+
+            Vector3 rotationDirection = (
+                anchor.transform.position - targetChar.gameObject.transform.position
+            );
+
+            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, anchor.transform.up);
+
+            rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
+
+            targetChar.characterLocomotion.SetRotation(rotationDirection);
+
+            PreserveRotation preserveRotation = new PreserveRotation(targetRotation, rotationDirection);
+
+            return preserveRotation;
+
+        }
+        
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)
         {
@@ -483,5 +540,14 @@
             transform.position = container.position;
             transform.rotation = container.rotation;
         }
+    }
+
+    public class PreserveRotation {
+        public PreserveRotation ( Quaternion targetRotation, Vector3 rotationDirection) {
+            this.quaternion = targetRotation;
+            this.vector3 = rotationDirection;
+        }
+        public Quaternion quaternion {get; private set;}
+        public Vector3 vector3 {get; private set;}
     }
 }
