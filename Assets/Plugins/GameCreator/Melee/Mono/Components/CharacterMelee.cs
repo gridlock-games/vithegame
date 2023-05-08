@@ -436,8 +436,26 @@ namespace GameCreator.Melee
             return HP.Value;
         }
 
-        public override void OnNetworkSpawn() { HP.Value = maxHealth; isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange; }
-        public override void OnNetworkDespawn() { isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange; }
+        public override void OnNetworkSpawn()
+        {
+            HP.Value = maxHealth;
+            isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
+            HP.OnValueChanged += OnHPChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
+            HP.OnValueChanged -= OnHPChanged;
+        }
+
+        private void OnHPChanged(int prev, int current)
+        {
+            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+            {
+                hitRenderer.RenderHit();
+            }
+        }
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
         {
@@ -671,11 +689,6 @@ namespace GameCreator.Melee
             }
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
-
-            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-            {
-                hitRenderer.RenderHit();
-            }
 
             #region Attack and Defense handlers
 

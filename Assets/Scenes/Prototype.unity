@@ -1408,6 +1408,7 @@ GameObject:
   m_Component:
   - component: {fileID: 116332117}
   - component: {fileID: 116332118}
+  - component: {fileID: 116332119}
   m_Layer: 0
   m_Name: VV_Hair.002
   m_TagString: Untagged
@@ -1635,6 +1636,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0005326569, y: 0.554375, z: -0.12431654}
     m_Extent: {x: 0.1268158, y: 0.057160318, z: 0.1865646}
   m_DirtyAABB: 0
+--- !u!114 &116332119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116332116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &116678199
 GameObject:
   m_ObjectHideFlags: 0
@@ -3546,6 +3562,7 @@ GameObject:
   m_Component:
   - component: {fileID: 209693422}
   - component: {fileID: 209693423}
+  - component: {fileID: 209693424}
   m_Layer: 0
   m_Name: VV_Hair.003
   m_TagString: Untagged
@@ -3773,6 +3790,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0013622083, y: 0.730721, z: -0.16971922}
     m_Extent: {x: 0.1098613, y: 0.14207423, z: 0.1310254}
   m_DirtyAABB: 0
+--- !u!114 &209693424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209693421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &211845070
 GameObject:
   m_ObjectHideFlags: 0
@@ -3922,6 +3954,7 @@ GameObject:
   m_Component:
   - component: {fileID: 211886196}
   - component: {fileID: 211886197}
+  - component: {fileID: 211886198}
   m_Layer: 0
   m_Name: VV_Sheath
   m_TagString: Untagged
@@ -4149,6 +4182,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.257514, y: -0.023092523, z: 0.050104976}
     m_Extent: {x: 0.09518969, y: 0.13249545, z: 0.16333018}
   m_DirtyAABB: 0
+--- !u!114 &211886198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211886195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &212739199
 GameObject:
   m_ObjectHideFlags: 0
@@ -4229,6 +4277,7 @@ GameObject:
   m_Component:
   - component: {fileID: 217025406}
   - component: {fileID: 217025407}
+  - component: {fileID: 217025408}
   m_Layer: 0
   m_Name: VV_Chain
   m_TagString: Untagged
@@ -4456,6 +4505,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0022037327, y: 0.4889096, z: 0.085466176}
     m_Extent: {x: 0.17990735, y: 0.10449384, z: 0.118180156}
   m_DirtyAABB: 0
+--- !u!114 &217025408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217025405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &225924984
 GameObject:
   m_ObjectHideFlags: 0
@@ -4861,6 +4925,7 @@ GameObject:
   m_Component:
   - component: {fileID: 245322464}
   - component: {fileID: 245322465}
+  - component: {fileID: 245322466}
   m_Layer: 0
   m_Name: VV_Belt_Fascia
   m_TagString: Untagged
@@ -5088,6 +5153,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00009703636, y: -0.19224453, z: 0.1957139}
     m_Extent: {x: 0.13679335, y: 0.31049585, z: 0.085450396}
   m_DirtyAABB: 0
+--- !u!114 &245322466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245322463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &251720836
 GameObject:
   m_ObjectHideFlags: 0
@@ -5600,6 +5680,7 @@ GameObject:
   m_Component:
   - component: {fileID: 265080775}
   - component: {fileID: 265080776}
+  - component: {fileID: 265080777}
   m_Layer: 0
   m_Name: VV_Eyebrows
   m_TagString: Untagged
@@ -5827,6 +5908,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00000013038516, y: 0.7878034, z: 0.0075077936}
     m_Extent: {x: 0.063881665, y: 0.015043825, z: 0.017805431}
   m_DirtyAABB: 0
+--- !u!114 &265080777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265080774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &270861373
 GameObject:
   m_ObjectHideFlags: 0
@@ -7097,6 +7193,7 @@ GameObject:
   m_Component:
   - component: {fileID: 359132217}
   - component: {fileID: 359132218}
+  - component: {fileID: 359132219}
   m_Layer: 0
   m_Name: VV_Helmet1
   m_TagString: Untagged
@@ -7324,6 +7421,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0034780502, y: 0.7672424, z: -0.044386692}
     m_Extent: {x: 0.22708586, y: 0.06545287, z: 0.106244676}
   m_DirtyAABB: 0
+--- !u!114 &359132219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359132216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &359693164
 GameObject:
   m_ObjectHideFlags: 0
@@ -8339,6 +8451,7 @@ GameObject:
   m_Component:
   - component: {fileID: 408726921}
   - component: {fileID: 408726922}
+  - component: {fileID: 408726923}
   m_Layer: 0
   m_Name: VV_Belt
   m_TagString: Untagged
@@ -8566,6 +8679,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0025541782, y: 0.09371769, z: 0.029868394}
     m_Extent: {x: 0.33436242, y: 0.28797978, z: 0.29728448}
   m_DirtyAABB: 0
+--- !u!114 &408726923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408726920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &412247040
 GameObject:
   m_ObjectHideFlags: 0
@@ -9049,6 +9177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 459423490}
   - component: {fileID: 459423491}
+  - component: {fileID: 459423492}
   m_Layer: 0
   m_Name: VV_Head
   m_TagString: Untagged
@@ -9276,6 +9405,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0038908385, y: 0.7441455, z: -0.083654396}
     m_Extent: {x: 0.124712914, y: 0.13845181, z: 0.1367642}
   m_DirtyAABB: 0
+--- !u!114 &459423492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459423489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &468452202
 GameObject:
   m_ObjectHideFlags: 0
@@ -9998,6 +10142,7 @@ GameObject:
   m_Component:
   - component: {fileID: 503044269}
   - component: {fileID: 503044270}
+  - component: {fileID: 503044271}
   m_Layer: 0
   m_Name: VV_Belt_Handbags
   m_TagString: Untagged
@@ -10225,6 +10370,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.014848828, y: 0.036549486, z: 0.02766043}
     m_Extent: {x: 0.3278921, y: 0.18896127, z: 0.3351493}
   m_DirtyAABB: 0
+--- !u!114 &503044271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 503044268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &503074863
 GameObject:
   m_ObjectHideFlags: 0
@@ -10643,6 +10803,7 @@ GameObject:
   m_Component:
   - component: {fileID: 548654638}
   - component: {fileID: 548654639}
+  - component: {fileID: 548654640}
   m_Layer: 0
   m_Name: VV_Shoulders
   m_TagString: Untagged
@@ -10870,6 +11031,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0003850162, y: 0.5504962, z: -0.11429171}
     m_Extent: {x: 0.44286832, y: 0.31052816, z: 0.23019032}
   m_DirtyAABB: 0
+--- !u!114 &548654640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548654637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &552314554
 GameObject:
   m_ObjectHideFlags: 0
@@ -12346,6 +12522,7 @@ GameObject:
   m_Component:
   - component: {fileID: 643011636}
   - component: {fileID: 643011637}
+  - component: {fileID: 643011638}
   m_Layer: 0
   m_Name: VV_Hair_Head
   m_TagString: Untagged
@@ -12573,6 +12750,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0028895065, y: 0.79286563, z: -0.11469357}
     m_Extent: {x: 0.14542317, y: 0.12256339, z: 0.14779218}
   m_DirtyAABB: 0
+--- !u!114 &643011638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643011635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &644354121
 GameObject:
   m_ObjectHideFlags: 0
@@ -13355,6 +13547,7 @@ GameObject:
   m_Component:
   - component: {fileID: 667497243}
   - component: {fileID: 667497244}
+  - component: {fileID: 667497245}
   m_Layer: 0
   m_Name: VV_Boots_Armor2
   m_TagString: Untagged
@@ -13582,6 +13775,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000003874302, y: -0.80880857, z: 0.03760738}
     m_Extent: {x: 0.36822945, y: 0.22763932, z: 0.17472509}
   m_DirtyAABB: 0
+--- !u!114 &667497245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 667497242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &667757610
 GameObject:
   m_ObjectHideFlags: 0
@@ -14059,6 +14267,7 @@ GameObject:
   m_Component:
   - component: {fileID: 700650992}
   - component: {fileID: 700650993}
+  - component: {fileID: 700650994}
   m_Layer: 0
   m_Name: VV_Arm_Armor_Metal
   m_TagString: Untagged
@@ -14286,6 +14495,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.6273733, y: 0.24053717, z: -0.012099832}
     m_Extent: {x: 0.20946151, y: 0.24158275, z: 0.20121923}
   m_DirtyAABB: 0
+--- !u!114 &700650994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700650991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &701144845
 GameObject:
   m_ObjectHideFlags: 0
@@ -14486,6 +14710,7 @@ GameObject:
   m_Component:
   - component: {fileID: 709423105}
   - component: {fileID: 709423106}
+  - component: {fileID: 709423107}
   m_Layer: 0
   m_Name: VV_Pants
   m_TagString: Untagged
@@ -14713,6 +14938,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0005977154, y: -0.2624156, z: -0.020702265}
     m_Extent: {x: 0.30625302, y: 0.43334264, z: 0.23068672}
   m_DirtyAABB: 0
+--- !u!114 &709423107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709423104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &718093154
 GameObject:
   m_ObjectHideFlags: 0
@@ -15949,6 +16189,7 @@ GameObject:
   m_Component:
   - component: {fileID: 825773752}
   - component: {fileID: 825773753}
+  - component: {fileID: 825773754}
   m_Layer: 0
   m_Name: VV_Belts
   m_TagString: Untagged
@@ -16176,6 +16417,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0006316453, y: 0.4240141, z: -0.06711596}
     m_Extent: {x: 0.36142498, y: 0.28581977, z: 0.31491295}
   m_DirtyAABB: 0
+--- !u!114 &825773754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825773751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &827916763
 GameObject:
   m_ObjectHideFlags: 0
@@ -20468,6 +20724,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1125753424}
   - component: {fileID: 1125753425}
+  - component: {fileID: 1125753426}
   m_Layer: 0
   m_Name: VV_Mount
   m_TagString: Untagged
@@ -20695,6 +20952,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0008276887, y: 0.687134, z: -0.02052304}
     m_Extent: {x: 0.055774488, y: 0.043033957, z: 0.04769668}
   m_DirtyAABB: 0
+--- !u!114 &1125753426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125753423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1129315044
 GameObject:
   m_ObjectHideFlags: 0
@@ -20845,6 +21117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1147002000}
   - component: {fileID: 1147002001}
+  - component: {fileID: 1147002002}
   m_Layer: 0
   m_Name: VV_Hair.001
   m_TagString: Untagged
@@ -21072,6 +21345,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.006877281, y: 0.6409818, z: -0.11890007}
     m_Extent: {x: 0.14715981, y: 0.1862953, z: 0.20751455}
   m_DirtyAABB: 0
+--- !u!114 &1147002002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147001999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1147351609
 GameObject:
   m_ObjectHideFlags: 0
@@ -21962,6 +22250,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1218529837}
   - component: {fileID: 1218529838}
+  - component: {fileID: 1218529839}
   m_Layer: 0
   m_Name: VV_Hand_Belts
   m_TagString: Untagged
@@ -22189,6 +22478,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.015562683, y: 0.39138684, z: -0.11265421}
     m_Extent: {x: 0.4312971, y: 0.15225986, z: 0.39008784}
   m_DirtyAABB: 0
+--- !u!114 &1218529839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218529836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1219359139
 GameObject:
   m_ObjectHideFlags: 0
@@ -23778,6 +24082,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1355334592}
   - component: {fileID: 1355334593}
+  - component: {fileID: 1355334594}
   m_Layer: 0
   m_Name: VV_Belt_Skirt
   m_TagString: Untagged
@@ -24005,6 +24310,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0075265467, y: -0.14396515, z: -0.027974606}
     m_Extent: {x: 0.31603864, y: 0.32380047, z: 0.27171627}
   m_DirtyAABB: 0
+--- !u!114 &1355334594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355334591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1361046541
 GameObject:
   m_ObjectHideFlags: 0
@@ -24680,6 +25000,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1460530918}
   - component: {fileID: 1460530919}
+  - component: {fileID: 1460530920}
   m_Layer: 0
   m_Name: VV_Boots_Fur
   m_TagString: Untagged
@@ -24907,6 +25228,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0036213398, y: -0.62719345, z: -0.001981333}
     m_Extent: {x: 0.35305846, y: 0.105782986, z: 0.16725664}
   m_DirtyAABB: 0
+--- !u!114 &1460530920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1460530917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1463180714
 GameObject:
   m_ObjectHideFlags: 0
@@ -26309,6 +26645,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1537292440}
   - component: {fileID: 1537292441}
+  - component: {fileID: 1537292442}
   m_Layer: 0
   m_Name: VV_Beard
   m_TagString: Untagged
@@ -26536,6 +26873,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0000105425715, y: 0.6859823, z: -0.01640493}
     m_Extent: {x: 0.1385985, y: 0.10248798, z: 0.08951546}
   m_DirtyAABB: 0
+--- !u!114 &1537292442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537292439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1540148031
 GameObject:
   m_ObjectHideFlags: 0
@@ -26578,6 +26930,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1543251676}
   - component: {fileID: 1543251677}
+  - component: {fileID: 1543251678}
   m_Layer: 0
   m_Name: VV_Eye
   m_TagString: Untagged
@@ -26805,6 +27158,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000116178766, y: 0.7633359, z: -0.008651979}
     m_Extent: {x: 0.04973928, y: 0.029279768, z: 0.04844243}
   m_DirtyAABB: 0
+--- !u!114 &1543251678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543251675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1547178667
 GameObject:
   m_ObjectHideFlags: 0
@@ -27195,6 +27563,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1572778915}
   - component: {fileID: 1572778916}
+  - component: {fileID: 1572778917}
   m_Layer: 0
   m_Name: VV_Arm_Armor
   m_TagString: Untagged
@@ -27422,6 +27791,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.004416883, y: 0.25383312, z: -0.012302488}
     m_Extent: {x: 0.69880587, y: 0.17430753, z: 0.17174602}
   m_DirtyAABB: 0
+--- !u!114 &1572778917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572778914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1572904482
 GameObject:
   m_ObjectHideFlags: 0
@@ -27763,6 +28147,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1594357679}
   - component: {fileID: 1594357680}
+  - component: {fileID: 1594357681}
   m_Layer: 0
   m_Name: VV_Body
   m_TagString: Untagged
@@ -27990,6 +28375,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0000022649765, y: -0.19622177, z: -0.03493452}
     m_Extent: {x: 0.77530026, y: 0.96896, z: 0.3838756}
   m_DirtyAABB: 0
+--- !u!114 &1594357681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594357678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1594755508
 GameObject:
   m_ObjectHideFlags: 0
@@ -30110,6 +30510,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1677767222}
   - component: {fileID: 1677767223}
+  - component: {fileID: 1677767224}
   m_Layer: 0
   m_Name: VV_Boots_Armor1
   m_TagString: Untagged
@@ -30337,6 +30738,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0038713813, y: -0.5852221, z: 0.14184363}
     m_Extent: {x: 0.32635912, y: 0.19218932, z: 0.1186945}
   m_DirtyAABB: 0
+--- !u!114 &1677767224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677767221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1681148900
 GameObject:
   m_ObjectHideFlags: 0
@@ -30662,6 +31078,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1706346458}
   - component: {fileID: 1706346459}
+  - component: {fileID: 1706346460}
   m_Layer: 0
   m_Name: VV_Cape_Fur
   m_TagString: Untagged
@@ -30889,6 +31306,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.008373722, y: 0.5064983, z: -0.11029643}
     m_Extent: {x: 0.39863294, y: 0.26904756, z: 0.31663296}
   m_DirtyAABB: 0
+--- !u!114 &1706346460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706346457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1709883047
 GameObject:
   m_ObjectHideFlags: 0
@@ -31153,6 +31585,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1732593510}
   - component: {fileID: 1732593511}
+  - component: {fileID: 1732593512}
   m_Layer: 0
   m_Name: VV_Boots
   m_TagString: Untagged
@@ -31380,6 +31813,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0000066906214, y: -0.8643758, z: 0.10373597}
     m_Extent: {x: 0.43662894, y: 0.32730255, z: 0.26926547}
   m_DirtyAABB: 0
+--- !u!114 &1732593512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1732593509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1735629460
 GameObject:
   m_ObjectHideFlags: 0
@@ -33078,6 +33526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1836959600}
   - component: {fileID: 1836959601}
+  - component: {fileID: 1836959602}
   m_Layer: 0
   m_Name: VV_Cape
   m_TagString: Untagged
@@ -33305,6 +33754,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0018203855, y: 0.5256313, z: -0.09139231}
     m_Extent: {x: 0.42091644, y: 0.26807824, z: 0.32892513}
   m_DirtyAABB: 0
+--- !u!114 &1836959602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1836959599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1836985601
 GameObject:
   m_ObjectHideFlags: 0
@@ -34167,6 +34631,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1903113694}
   - component: {fileID: 1903113695}
+  - component: {fileID: 1903113696}
   m_Layer: 0
   m_Name: VV_Eye_Glass
   m_TagString: Untagged
@@ -34394,6 +34859,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00036800466, y: 0.76329064, z: -0.010286689}
     m_Extent: {x: 0.05041872, y: 0.018654734, z: 0.019866208}
   m_DirtyAABB: 0
+--- !u!114 &1903113696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903113693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &1903513538
 GameObject:
   m_ObjectHideFlags: 0
@@ -36112,6 +36592,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2017643457}
   - component: {fileID: 2017643458}
+  - component: {fileID: 2017643459}
   m_Layer: 0
   m_Name: VV_Helmet2
   m_TagString: Untagged
@@ -36339,6 +36820,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00000013411045, y: 0.8093062, z: 0.009408046}
     m_Extent: {x: 0.10160491, y: 0.1232298, z: 0.12183891}
   m_DirtyAABB: 0
+--- !u!114 &2017643459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017643456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &2018285786
 GameObject:
   m_ObjectHideFlags: 0
@@ -51673,6 +52169,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2099373627}
   - component: {fileID: 2099373628}
+  - component: {fileID: 2099373629}
   m_Layer: 0
   m_Name: VV_Belt_Fur
   m_TagString: Untagged
@@ -51900,6 +52397,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00010737777, y: 0.24068213, z: 0.01491496}
     m_Extent: {x: 0.3559058, y: 0.17983484, z: 0.3249328}
   m_DirtyAABB: 0
+--- !u!114 &2099373629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099373626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &2100157808
 GameObject:
   m_ObjectHideFlags: 0
@@ -52006,6 +52518,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2103828136}
   - component: {fileID: 2103828137}
+  - component: {fileID: 2103828138}
   m_Layer: 0
   m_Name: VV_Helmet3
   m_TagString: Untagged
@@ -52233,6 +52746,21 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00034418702, y: 0.765266, z: -0.09561605}
     m_Extent: {x: 0.12346715, y: 0.14731175, z: 0.15730602}
   m_DirtyAABB: 0
+--- !u!114 &2103828138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103828135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &2109727228
 GameObject:
   m_ObjectHideFlags: 0
@@ -52374,6 +52902,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2123708988}
   - component: {fileID: 2123708989}
+  - component: {fileID: 2123708990}
   m_Layer: 0
   m_Name: VV_Eyelashes
   m_TagString: Untagged
@@ -52601,6 +53130,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000016763806, y: 0.7671641, z: 0.004918573}
     m_Extent: {x: 0.050369263, y: 0.008080661, z: 0.0147248525}
   m_DirtyAABB: 0
+--- !u!114 &2123708990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123708987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1317ab5eeb317184a946631982a4ad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitMaterials:
+  - {fileID: 2100000, guid: 67a971863e8d94abda9ef8fe18b3e2d3, type: 2}
+  meshColorResetDelay: 0.75
 --- !u!1 &2124002910
 GameObject:
   m_ObjectHideFlags: 0
