@@ -222,23 +222,23 @@ namespace GameCreator.Melee
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
-                                
+                                Debug.Log(attack.attackType);
                                 // Set Ailments here
                                 switch(attack.attackType) {
                                     case AttackType.Stun:
                                         targetMelee.Character.Stun();
-                                    break;
+                                        break;
                                     case AttackType.Knockdown:
                                         targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                                        targetMelee.Knockdown();
-                                    break;
+                                        break;
                                     case AttackType.None:
                                         if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                                             targetMelee.Character.CancelAilment();
-                                    break;
+                                        break;
                                 }
 
-                                if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None) {
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
+                                {
                                         hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                         if (hitResult == HitResult.ReceiveDamage)
                                             targetMelee.HP.Value -= attack.baseDamage;
@@ -1043,9 +1043,6 @@ namespace GameCreator.Melee
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executorCharacter, targetCharacter));
 
             return true;
-        }
-
-        public void Knockdown() {
         }
 
         public IEnumerator PostGrabRoutine(CharacterMelee executorCharacter, CharacterMelee targetCharacter)
