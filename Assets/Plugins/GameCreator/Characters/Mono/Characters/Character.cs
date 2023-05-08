@@ -344,12 +344,18 @@
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                 }
 
-                this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
+                StartCoroutine(StartKnockdownAfter1Frame());
                 return true;
             } else {
                 return false;
             }
+        }
+
+        private IEnumerator StartKnockdownAfter1Frame()
+        {
+            yield return null;
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
         }
 
         public bool CancelAilment() {

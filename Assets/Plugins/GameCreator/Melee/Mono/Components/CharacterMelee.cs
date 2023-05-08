@@ -222,7 +222,6 @@ namespace GameCreator.Melee
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
-                                Debug.Log(attack.attackType);
                                 // Set Ailments here
                                 switch(attack.attackType) {
                                     case AttackType.Stun:
