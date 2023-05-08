@@ -265,6 +265,7 @@
 
         // EXTRACT: ------------------------------------------------------------------------------
 
+        # if UNITY_EDITOR
         private void ExtractRootMotion()
         {
             AnimationClip animationClip = this.meleeAnimationClip as AnimationClip;
@@ -312,6 +313,7 @@
                 }
             }
         }
+        #endif
 
         private AnimationCurve ProcessRootCurve(AnimationCurve source)
         {
