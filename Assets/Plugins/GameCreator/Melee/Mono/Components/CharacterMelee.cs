@@ -45,6 +45,8 @@ namespace GameCreator.Melee
         private const float TRANSITION = 0.15f;
         protected const float INPUT_BUFFER_TIME = 0.35f;
 
+        protected const float STUN_TIMEOUT_DURATION = 5.0f;
+
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
@@ -228,7 +230,7 @@ namespace GameCreator.Melee
                                     break;
                                     case AttackType.Knockdown:
                                         targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                                        targetMelee.Knockdown(targetMelee);
+                                        targetMelee.Knockdown();
                                     break;
                                     case AttackType.None:
                                         if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
@@ -1029,8 +1031,7 @@ namespace GameCreator.Melee
             executorCharacter.StopAttack();
             
             // Make Character Invincible
-            targetCharacter.SetInvincibility(anim_ExecutedDuration + 5.0f);
-            executorCharacter.SetInvincibility(anim_ExecutedDuration + 1.0f);
+            targetCharacter.SetInvincibility(99999);
 
             // Set posture to stagger to prevent melee from doing any execution
             executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
@@ -1044,22 +1045,21 @@ namespace GameCreator.Melee
             return true;
         }
 
-        public void Knockdown(CharacterMelee targetMelee) {
-            float duration = this.currentWeapon.knockbackF.animationClip.length + 5.0f;
-            this.SetInvincibility(duration);
+        public void Knockdown() {
         }
+
         public IEnumerator PostGrabRoutine(CharacterMelee executorCharacter, CharacterMelee targetCharacter)
         {
             float initTime = Time.time;
 
             while (initTime + this.anim_ExecutedDuration >= Time.time) {
-
+                executorCharacter.IsGrabbing = true;
+                targetCharacter.IsGrabbed = true;
 
                 yield return null;
             }
 
-            executorCharacter.IsGrabbing = true;
-            targetCharacter.IsGrabbed = true;
+            executorCharacter.SetInvincibility(2);
 
             this.anim_ExecuterDuration = 0.00f;
             this.anim_ExecutedDuration = 0.00f;
