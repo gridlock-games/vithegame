@@ -1031,7 +1031,7 @@ namespace GameCreator.Melee
             executorCharacter.StopAttack();
             
             // Make Character Invincible
-            targetCharacter.SetInvincibility(99999);
+            targetCharacter.SetInvincibility(9999999999f);
 
             // Set posture to stagger to prevent melee from doing any execution
             executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
@@ -1059,7 +1059,7 @@ namespace GameCreator.Melee
                 yield return null;
             }
 
-            executorCharacter.SetInvincibility(2);
+            executorCharacter.SetInvincibility(2.0f);
 
             this.anim_ExecuterDuration = 0.00f;
             this.anim_ExecutedDuration = 0.00f;
