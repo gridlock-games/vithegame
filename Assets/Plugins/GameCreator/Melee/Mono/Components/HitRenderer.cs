@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LightPat.Core
+namespace GameCreator.Melee
 {
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public class HitRenderer : MonoBehaviour
@@ -13,7 +13,7 @@ namespace LightPat.Core
         private SkinnedMeshRenderer skinnedMeshRenderer;
         private Material[] defaultMaterialList;
 
-        public void Invoke()
+        public void RenderHit()
         {
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay));
         }

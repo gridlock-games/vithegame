@@ -672,6 +672,11 @@ namespace GameCreator.Melee
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
+            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+            {
+                hitRenderer.RenderHit();
+            }
+
             #region Attack and Defense handlers
 
            float attackAngle = Vector3.Angle(
