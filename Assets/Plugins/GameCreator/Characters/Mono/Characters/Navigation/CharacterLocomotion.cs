@@ -16,7 +16,7 @@
             None,
             WasGrabbed,
             IsKnockedDown,
-            isKnockedUp,
+            IsKnockedUp,
             IsStunned,
             Reset,
             Dead
