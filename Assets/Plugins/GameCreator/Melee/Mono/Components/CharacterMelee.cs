@@ -53,11 +53,15 @@ namespace GameCreator.Melee
 
         public MeleeWeapon currentWeapon;
         public MeleeShield currentShield;
-
-
-
+        
         public MeleeWeapon previousWeapon;
         public MeleeShield previousShield;
+        
+        
+        public SkinnedMeshRenderer hitRenderer;
+        public Material[] defaultMaterials;
+        public Material[] hitMaterials;
+        public float meshColorResetDelay = 0.75f;
 
         protected ComboSystem comboSystem;
         protected InputBuffer inputBuffer;
@@ -133,6 +137,11 @@ namespace GameCreator.Melee
             this.Character = GetComponent<Character>();
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
+        }
+        
+        void Start()
+        {
+            GetDefaultMaterials();
         }
 
         // UPDATE: --------------------------------------------------------------------------------
@@ -674,6 +683,12 @@ namespace GameCreator.Melee
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
+            if (hitRenderer != null)
+            {
+                hitRenderer.materials = hitMaterials;
+                StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay));
+            }
+            
             #region Attack and Defense handlers
 
            float attackAngle = Vector3.Angle(
@@ -1049,6 +1064,18 @@ namespace GameCreator.Melee
             this.anim_ExecutedDuration = 0.00f;
 
             yield return 0;
+        }
+        
+        private void GetDefaultMaterials()
+        {
+            defaultMaterials = hitRenderer.materials;
+            Debug.Log(defaultMaterials.Length);
+        }
+        
+        private IEnumerator ResetMeshColorAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            hitRenderer.materials = defaultMaterials;
         }
 
     }
