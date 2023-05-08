@@ -340,11 +340,17 @@
                 PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                 target.transform.rotation = rotationConfig.quaternion;
                 
-                if(this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockdownAfter1Frame());
+                }
+                else
+                {
+                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
                 }
 
-                StartCoroutine(StartKnockdownAfter1Frame());
                 return true;
             } else {
                 return false;
