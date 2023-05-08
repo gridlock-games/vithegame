@@ -55,8 +55,6 @@ namespace LightPat.Player
             Vector3 relativePos = target.position - characterCamera.position;
             relativePos.y = 0;
             transform.rotation = Quaternion.LookRotation(relativePos);
-
-            Debug.Log(Time.time + " Locked onto " + target);
         }
     }
 }

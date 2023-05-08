@@ -106,7 +106,7 @@ public class ActionIdentifyTarget : IAction
             return false;
         }
   
-        PreserveRotation rotationConfig = Rotation(GrabPlaceholder.gameObject, targetChar);
+        PreserveRotation rotationConfig = Rotation(executioner.gameObject, targetChar);
 
         #region RotateCharacter
         if (targetChar != null && executioner != null)
@@ -131,11 +131,13 @@ public class ActionIdentifyTarget : IAction
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
             executioner.Grab(direction, false);
             targetChar.Grab(direction, false);
-            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, characterMeleeA.currentWeapon.grabReactionState );
+            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null );
 
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
             targetChar.transform.rotation = rotationConfig.quaternion;
+            
+            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
 
             // GetAnim Duration
             this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);

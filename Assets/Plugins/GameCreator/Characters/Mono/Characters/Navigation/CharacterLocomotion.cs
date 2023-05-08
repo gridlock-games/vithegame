@@ -163,7 +163,6 @@
 
         public void Dash(Vector3 direction, float impulse, float duration, float drag)
         {
-            // this.SetDirectionalDirection(Vector3.zero);
             this.currentLocomotionSystem.Dash(direction, impulse, duration, drag);
         }
 

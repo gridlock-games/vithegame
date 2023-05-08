@@ -166,6 +166,7 @@ namespace GameCreator.Melee
                     if (meleeClip)
                     {
                         this.inputBuffer.ConsumeInput();
+                        bool checkDash = this.Character.characterLocomotion.isDashing;
 
                         if (IsServer)
                         {
@@ -228,13 +229,31 @@ namespace GameCreator.Melee
                             CharacterMelee targetMelee = hits[i].GetComponent<CharacterMelee>();
                             MeleeClip attack = this.comboSystem.GetCurrentClip();
 
-                            if (targetMelee != null && targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
+                            if (targetMelee != null && !targetMelee.IsInvincible)
                             {
-                                hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
-                                if (hitResult == HitResult.ReceiveDamage)
-                                    targetMelee.HP.Value -= attack.baseDamage;
-                                else if (hitResult == HitResult.PoiseBlock)
-                                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                                
+                                // Set Ailments here
+                                switch(attack.attackType) {
+                                    case AttackType.Stun:
+                                        targetMelee.Character.Stun();
+                                    break;
+                                    case AttackType.Knockdown:
+                                        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                                        targetMelee.Knockdown(targetMelee);
+                                    break;
+                                    case AttackType.None:
+                                        if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+                                            targetMelee.Character.CancelAilment();
+                                    break;
+                                }
+
+                                if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None) {
+                                        hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
+                                        if (hitResult == HitResult.ReceiveDamage)
+                                            targetMelee.HP.Value -= attack.baseDamage;
+                                        else if (hitResult == HitResult.PoiseBlock)
+                                            targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                                }
                             }
 
                             IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
@@ -649,7 +668,12 @@ namespace GameCreator.Melee
 
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
-            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.Ignore;
+            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) {
+                return HitResult.Ignore;
+            }
+            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
+                return HitResult.Ignore;
+            }
 
             if (blade == null)
             {
@@ -772,7 +796,9 @@ namespace GameCreator.Melee
             );
 
             attack.ExecuteHitPause();
-            if (!this.IsUninterruptable)
+
+            // Play Reaction Clip only if the attackType is not an Ailment
+            if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
                 hitReaction.Play(this);
             }
@@ -890,7 +916,8 @@ namespace GameCreator.Melee
             );
 
             attack.ExecuteHitPause();
-            if (!this.IsUninterruptable)
+            // Play Reaction Clip only if the attackType is not an Ailment
+            if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
                 hitReaction.Play(this);
             }
@@ -995,23 +1022,14 @@ namespace GameCreator.Melee
 
             executorCharacter.IsGrabbing = true;
             targetCharacter.IsGrabbed = true;
-
-
-            // Change State
-            targetCharacter.ChangeState(
-                executorCharacter.currentWeapon.grabReactionState,
-                targetCharacter.currentWeapon.characterMask,
-                MeleeWeapon.LAYER_STANCE,
-                targetCharacter.Character.GetCharacterAnimator()
-            );
             
             // Cancel any Melee input
             targetCharacter.StopAttack();
             executorCharacter.StopAttack();
             
             // Make Character Invincible
-            targetCharacter.SetInvincibility(anim_ExecuterDuration);
-            executorCharacter.SetInvincibility(anim_ExecutedDuration);
+            targetCharacter.SetInvincibility(anim_ExecutedDuration + 5.0f);
+            executorCharacter.SetInvincibility(anim_ExecutedDuration + 1.0f);
 
             // Set posture to stagger to prevent melee from doing any execution
             executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
@@ -1025,6 +1043,10 @@ namespace GameCreator.Melee
             return true;
         }
 
+        public void Knockdown(CharacterMelee targetMelee) {
+            float duration = this.currentWeapon.knockbackF.animationClip.length + 5.0f;
+            this.SetInvincibility(duration);
+        }
         public IEnumerator PostGrabRoutine(CharacterMelee executorCharacter, CharacterMelee targetCharacter)
         {
             float initTime = Time.time;
