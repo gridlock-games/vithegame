@@ -230,14 +230,18 @@ namespace GameCreator.Melee
                                     case AttackType.Knockdown:
                                         targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
                                         break;
+                                    case AttackType.Knockedup:
+                                        targetMelee.Character.Knockup(this.Character, targetMelee.Character);
+                                        break;
                                     case AttackType.None:
                                         if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                                             targetMelee.Character.CancelAilment();
                                         break;
                                 }
 
-                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
-                                {
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
                                         hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                         if (hitResult == HitResult.ReceiveDamage)
                                             targetMelee.HP.Value -= attack.baseDamage;
@@ -778,13 +782,17 @@ namespace GameCreator.Melee
 
 
             this.AddPoise(-attack.poiseDamage);
+
+            
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise.Value <= float.Epsilon;
+            bool isKnockback =  this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
+            bool isKnockup = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,
-                isKnockback
+                isKnockback,
+                isKnockup
             );
 
             this.ExecuteEffects(
@@ -899,12 +907,14 @@ namespace GameCreator.Melee
             #endregion
 
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Poise.Value <= float.Epsilon;
+            bool isKnockback = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
+            bool isKnockup = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,
-                isKnockback
+                isKnockback,
+                isKnockup
             );
 
             this.ExecuteEffects(

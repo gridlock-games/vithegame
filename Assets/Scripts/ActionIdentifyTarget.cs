@@ -170,14 +170,16 @@ public class ActionIdentifyTarget : IAction
             while (initTime + this.anim_ExecutedDuration >= Time.time)
             {
                 // Reduce Collider Radius
-                chrCtrl_executioner.radius = 0.05f;
-                chrCtrl_target.radius = 0.05f;
+                chrCtrl_executioner.radius = 0.02f;
+                chrCtrl_target.radius = 0.02f;
+                chrCtrl_target.center = new Vector3(-0.5f, 1f, 0f);
                 yield return null;
             }
 
             // Revert Collider Radius
             chrCtrl_executioner.radius = 0.50f;
             chrCtrl_target.radius = 0.50f;
+            chrCtrl_target.center = new Vector3(0, 1, 0);
 
             // Update Camera Input and Player Controls
             var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;

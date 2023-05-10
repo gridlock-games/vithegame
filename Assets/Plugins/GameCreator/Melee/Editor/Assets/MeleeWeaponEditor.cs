@@ -62,6 +62,7 @@
         private SerializedProperty spGroundHitReactionsLeftMiddle;
         private SerializedProperty spGroundHitReactionsRightMiddle;
         private SerializedProperty spKnockbackReactions;
+        private SerializedProperty spKnockupReactions;
 
         public SerializedProperty spDodgeF;
         public SerializedProperty spDodgeFL;
@@ -81,6 +82,7 @@
         private ReorderableList groundHitReactionsLeftMiddle;
         private ReorderableList groundHitReactionsRightMiddle;
         private ReorderableList knockbackReactionsList;
+        private ReorderableList knockupReactionsList;
         private ReorderableList comboList;
 
         
@@ -92,7 +94,7 @@
         public SerializedProperty spRecoveryStun;
 
         public SerializedProperty spKnockbackF;
-        public SerializedProperty spKnockbackB;
+        public SerializedProperty spKnockupF;
 
         private SerializedProperty spWeaponModels;
         
@@ -119,7 +121,7 @@
             this.spGrabReaction = this.serializedObject.FindProperty("grabReaction");
             this.spGrabPlaceholderPosition = this.serializedObject.FindProperty("grabPlaceholderPosition");
 
-            this.spKnockbackB = this.serializedObject.FindProperty("knockbackB"); 
+            this.spKnockupF = this.serializedObject.FindProperty("knockupF"); 
             this.spKnockbackF = this.serializedObject.FindProperty("knockbackF"); 
 
             this.spStandFaceUp = this.serializedObject.FindProperty("recoveryStandUp");
@@ -157,6 +159,7 @@
             this.spGroundHitReactionsLeftMiddle = this.serializedObject.FindProperty("groundHitReactionsLeftMiddle");
             this.spGroundHitReactionsRightMiddle = this.serializedObject.FindProperty("groundHitReactionsRightMiddle");
             this.spKnockbackReactions = this.serializedObject.FindProperty("knockbackReaction");
+            this.spKnockupReactions = this.serializedObject.FindProperty("knockupReaction");
 
             this.spDodgeF = this.serializedObject.FindProperty("dodgeF");
             this.spDodgeFL = this.serializedObject.FindProperty("dodgeFL");
@@ -197,6 +200,13 @@
                 true, true, true, true
             );
 
+            this.knockupReactionsList = new ReorderableList(
+                this.serializedObject,
+                this.spKnockupReactions,
+                true, true, true, true
+
+            );
+
             this.groundHitReactionsLeftMiddle = new ReorderableList(
                 this.serializedObject,
                 this.spGroundHitReactionsLeftMiddle,
@@ -214,6 +224,7 @@
             this.airborneHitReactionsFrontList.drawHeaderCallback += this.PaintHitAirFront_Title;
             this.airborneHitReactionsBehindList.drawHeaderCallback += this.PaintHitAirBehind_Title;
             this.knockbackReactionsList.drawHeaderCallback += this.PaintKnockback_Title;
+            this.knockupReactionsList.drawHeaderCallback += this.PaintKnockup_Title;
             this.groundHitReactionsLeftMiddle.drawHeaderCallback += this.PaintHitGroundLeft_Title;
             this.groundHitReactionsRightMiddle.drawHeaderCallback += this.PaintHitGroundRight_Title;
 
@@ -222,6 +233,7 @@
             this.airborneHitReactionsFrontList.drawElementCallback += this.PaintHitAirFront_Element;
             this.airborneHitReactionsBehindList.drawElementCallback += this.PaintHitAirBehind_Element;
             this.knockbackReactionsList.drawElementCallback += this.PaintHitKnockback_Element;
+            this.knockupReactionsList.drawElementCallback += this.PaintHitKnockup_Element;
             this.groundHitReactionsLeftMiddle.drawElementCallback += this.PaintHitGroundLeft_Element;
             this.groundHitReactionsRightMiddle.drawElementCallback += this.PaintHitGroundRight_Element;
 
@@ -311,6 +323,9 @@
 
             EditorGUILayout.Space();
             this.knockbackReactionsList.DoLayoutList();
+
+            EditorGUILayout.Space();
+            this.knockupReactionsList.DoLayoutList();
 
             this.serializedObject.ApplyModifiedProperties();
 
@@ -427,6 +442,11 @@
             EditorGUI.LabelField(rect, "Hit Reaction - Knockback");
         }
 
+        private void PaintKnockup_Title(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Hit Reaction - Knockup");
+        }
+
         private void PaintDodge_Title(Rect rect)
         {
             EditorGUI.LabelField(rect, "Dodge Animations");
@@ -492,7 +512,7 @@
                     EditorGUILayout.PropertyField(this.spStandFaceUp);
                     EditorGUILayout.PropertyField(this.spRecoveryStun);
                     EditorGUILayout.PropertyField(this.spKnockbackF);
-                    EditorGUILayout.PropertyField(this.spKnockbackB);
+                    EditorGUILayout.PropertyField(this.spKnockupF);
                     EditorGUILayout.EndVertical();
                 }
             }
@@ -587,6 +607,22 @@
                 rect, this.spKnockbackReactions.GetArrayElementAtIndex(index),
                 GC_REACTION, true
             );
+
+        }
+        
+        private void PaintHitKnockup_Element(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            rect = new Rect(
+                rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
+                rect.width, EditorGUIUtility.singleLineHeight
+            );
+
+            EditorGUI.PropertyField(
+                rect, this.spKnockupReactions.GetArrayElementAtIndex(index),
+                GC_REACTION, true
+            );
+
+            
         }
 
         // COMBO METHODS: -------------------------------------------------------------------------
