@@ -30,7 +30,7 @@ namespace GameCreator.Melee
         public enum HitLocation
         {
             FrontUpper, FrontMiddle, FrontLower, LeftMiddle, RightMiddle,
-            BackUpper, BackMiddle, BackLower, JuggleFront, JuggleBack, KnockDownFront, KnockDownBack
+            BackUpper, BackMiddle, BackLower, JuggleFront, JuggleBack, KnockDownFront, KnockUpFront
 
         }
 
@@ -70,6 +70,7 @@ namespace GameCreator.Melee
         public List<MeleeClip> airborneHitReactionsBehind = new List<MeleeClip>();
 
         public List<MeleeClip> knockbackReaction = new List<MeleeClip>();
+        public List<MeleeClip> knockupReaction = new List<MeleeClip>();
 
         public List<MeleeClip> groundHitReactionsBackMiddle = new List<MeleeClip>();
         public List<MeleeClip> groundHitReactionsLeftMiddle = new List<MeleeClip>();
@@ -92,7 +93,7 @@ namespace GameCreator.Melee
         // knockdown
 
         public MeleeClip knockbackF;
-        public MeleeClip knockbackB;
+        public MeleeClip knockupF;
 
         // combo system:
         public List<Combo> combos = new List<Combo>();
@@ -191,10 +192,19 @@ namespace GameCreator.Melee
             return instance;
         }
 
-        public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback)
+        public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback, bool isKnockup)
         {
             int index = 0;
             MeleeClip meleeClip = null;
+
+            if (isKnockup)
+            {
+                index = UnityEngine.Random.Range(0, this.knockupReaction.Count - 1);
+                if (this.knockupReaction.Count != 1 && index == this.prevRandomHit) index++;
+                this.prevRandomHit = index;
+
+                return this.knockupReaction[index];
+            }
 
             if (isKnockback)
             {

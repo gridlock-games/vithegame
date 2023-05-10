@@ -335,6 +335,28 @@
             }
         }
 
+        public bool Knockup(Character attacker, Character target) {
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                target.transform.rotation = rotationConfig.quaternion;
+                
+                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                {
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockdownAfterXFrame(0f));
+                } 
+                else
+                {
+                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         public bool Knockdown(Character attacker, Character target) {
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
                 PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
@@ -343,7 +365,7 @@
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockdownAfter1Frame());
+                    StartCoroutine(StartKnockdownAfterXFrame(0f));
                 }
                 else
                 {
@@ -357,9 +379,12 @@
             }
         }
 
-        private IEnumerator StartKnockdownAfter1Frame()
+        private IEnumerator StartKnockdownAfterXFrame(float duration)
         {
-            yield return null;
+            float initTime = Time.time;
+            while (initTime + duration >= Time.time) {
+                yield return null;
+            }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
         }
@@ -382,9 +407,10 @@
             switch(ailment) {
                 case CharacterLocomotion.CHARACTER_AILMENTS.Reset: // ONLY USE RESET IF COMING FROM GRAB OR KNOCKDOWN
                     if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
-                        melee.SetInvincibility(9999999999f);
                         melee.currentWeapon.recoveryStun.Play(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
+                    } else if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                        StartCoroutine(StartKnockdownAfterXFrame(2.0f));
                     } else {
                         melee.currentWeapon.recoveryStandUp.Play(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
@@ -398,7 +424,9 @@
                 break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
-                    melee.SetInvincibility(9999999999f);
+                    if(melee.currentWeapon.knockbackReaction[0])
+                        melee.currentWeapon.knockbackReaction[0].Play(melee);
+                    melee.SetInvincibility(6.50f);
                 break;
             }
 

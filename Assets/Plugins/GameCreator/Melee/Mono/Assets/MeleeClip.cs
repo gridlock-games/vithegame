@@ -33,7 +33,8 @@
         public enum AttackType {
             None,
             Stun,
-            Knockdown
+            Knockdown,
+            Knockedup
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------
