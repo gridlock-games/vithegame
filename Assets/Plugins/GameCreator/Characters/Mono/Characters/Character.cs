@@ -336,15 +336,17 @@
         }
 
         public bool Knockup(Character attacker, Character target) {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || 
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+
                 PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                 target.transform.rotation = rotationConfig.quaternion;
-                
-                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
-                {
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockdownAfterXFrame(0f));
-                } 
+
+                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None && 
+                    this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        StartCoroutine(StartKnockupAfterDuration(0f));
+                }
                 else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
@@ -358,14 +360,16 @@
         }
 
         public bool Knockdown(Character attacker, Character target) {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || 
+            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned|| 
+            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
                 PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                 target.transform.rotation = rotationConfig.quaternion;
                 
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockdownAfterXFrame(0f));
+                    StartCoroutine(StartKnockdownAfterDuration(0f));
                 }
                 else
                 {
@@ -379,7 +383,9 @@
             }
         }
 
-        private IEnumerator StartKnockdownAfterXFrame(float duration)
+        /* Pause for a given duration if the target character is coming from another ailment.
+        Ailments: Stun, Knockup*/
+        private IEnumerator StartKnockdownAfterDuration(float duration)
         {
             float initTime = Time.time;
             while (initTime + duration >= Time.time) {
@@ -387,6 +393,32 @@
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
+        }
+
+        /* Pause for a given duration if the target character is coming from another ailment
+        Ailments: Stun*/
+        private IEnumerator StartKnockupAfterDuration(float duration)
+        {
+            float initTime = Time.time;
+            while (initTime + duration >= Time.time) {
+                yield return null;
+            }
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
+        }
+
+        /* This is needed so that the character won't immediatley go through 
+        the stand up sequence when the stun duration is over*/
+        private IEnumerator RecoverFromKnockupAfterDuration(float duration,CharacterMelee melee)
+        { 
+            float initTime = Time.time;
+            melee.SetInvincibility(duration);
+            while (initTime + duration >= Time.time) {
+                yield return null;
+            }
+            melee.currentWeapon.recoveryStandUp.Play(melee);
+            float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+            CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
         }
 
         public bool CancelAilment() {
@@ -405,32 +437,36 @@
             float recoveryAnimDuration = 0f;
 
             switch(ailment) {
-                case CharacterLocomotion.CHARACTER_AILMENTS.Reset: // ONLY USE RESET IF COMING FROM GRAB OR KNOCKDOWN
+                // All Ailments should end with reset except Stun which can be cancelled
+                case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
+                    /*Stun has an if handling since it has its own standup sequence*/
                     if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
                         melee.currentWeapon.recoveryStun.Play(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
-                    } else if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
-                        StartCoroutine(StartKnockdownAfterXFrame(2.0f));
+                        CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     } else {
-                        melee.currentWeapon.recoveryStandUp.Play(melee);
-                        recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                        /*Knockup has an if handling to prevent character from immediately standing up*/
+                        if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                            StartCoroutine(RecoverFromKnockupAfterDuration(1.5f, melee)); 
+                        } else {
+                            melee.currentWeapon.recoveryStandUp.Play(melee);
+                            recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                            CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                        }
                     } 
-                    this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.Reset;
-                    CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
-                break;
+                    break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.None: 
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
-                break;
+                    break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
                     if(melee.currentWeapon.knockbackReaction[0])
                         melee.currentWeapon.knockbackReaction[0].Play(melee);
                     melee.SetInvincibility(6.50f);
-                break;
+                    break;
             }
 
-            
             this.characterAilment = prevAilment != ailment ? this.characterLocomotion.Ailment(ailment) : prevAilment;
             this.onAilmentEvent.Invoke(ailment);
         }
