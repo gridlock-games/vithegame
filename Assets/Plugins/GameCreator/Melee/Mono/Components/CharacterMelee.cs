@@ -234,8 +234,9 @@ namespace GameCreator.Melee
                                         targetMelee.Character.Knockup(this.Character, targetMelee.Character);
                                         break;
                                     case AttackType.None:
-                                        if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+                                        if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
                                             targetMelee.Character.CancelAilment();
+                                        }
                                         break;
                                 }
 
