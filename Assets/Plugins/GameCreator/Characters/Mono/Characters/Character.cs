@@ -337,17 +337,19 @@
 
         public bool Knockup(Character attacker, Character target) {
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || 
-                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned || 
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
 
                 PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                 target.transform.rotation = rotationConfig.quaternion;
 
-                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None && 
-                    this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockupAfterDuration(0f));
-                }
-                else
+                } else if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        StartCoroutine(StartKnockupAfterDuration(.05f));
+                } else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
