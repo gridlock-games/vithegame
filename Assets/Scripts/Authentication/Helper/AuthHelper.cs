@@ -1,9 +1,31 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class AuthHelper 
 {
+    
+    /// <summary>
+    /// Check if user exist in firebase if user exist get data
+    /// </summary>
+    /// <param name="textfile"></param>
+    /// <param name="email"></param>
+    /// <param name="secret"></param>
+    /// <returns></returns>
+    public static UserModel GetUserData(string textfile, string email, string secret)
+    {
+        var emailToUser = JsonConvert.DeserializeObject<Dictionary<string, object>>(textfile);
+        foreach (var info in emailToUser)
+        {
+            if (Decrypt(Convert.FromBase64String(info.Key), secret) != email) continue;
+            var _obj = (JObject) info.Value;
+            return JsonConvert.DeserializeObject<UserModel>(_obj["data"].ToString());
+        }
+        return null;
+    }
+    
     public static byte[] Encrypt(string plainText, string key)
     {
         var iv = new byte[16];
