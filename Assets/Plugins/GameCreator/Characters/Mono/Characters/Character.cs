@@ -326,9 +326,22 @@
         }
 
         public bool Stun() {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None){
-                this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None|| 
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp){
+
+                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None || 
+                    this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                {
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockdownAfterDuration(0f));
+                }
+                else
+                {
+                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
+                }
+
+
                 return true;
             } else {
                 return false;
@@ -466,6 +479,15 @@
                     if(melee.currentWeapon.knockbackReaction[0])
                         melee.currentWeapon.knockbackReaction[0].Play(melee);
                     melee.SetInvincibility(6.50f);
+                    break;
+                
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsWallBound:
+                    melee.StopAttack();
+                    if(melee.currentWeapon.knockbackReaction[1])
+                        melee.currentWeapon.knockbackReaction[1].Play(melee);
+                    
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockupAfterDuration(0.5f));
                     break;
             }
 
