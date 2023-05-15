@@ -162,8 +162,26 @@
 
         private void OnAilmentChange(CharacterLocomotion.CHARACTER_AILMENTS prev, CharacterLocomotion.CHARACTER_AILMENTS current)
         {
-            //characterAilment = current;
-            Debug.Log(current);
+            if (IsServer) { return; }
+
+            switch (current)
+            {
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
+                    Stun();
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
+                    Knockdown(this, null);
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
+                    Knockup(this, null);
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed:
+                    Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.None:
+                    if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
+                    break;
+            }
         }
 
         public override void OnNetworkSpawn() { characterAilmentNetworked.OnValueChanged += OnAilmentChange; }
@@ -355,7 +373,6 @@
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
                 }
 
-
                 return true;
             }
             else
@@ -370,9 +387,11 @@
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
-
-                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                target.transform.rotation = rotationConfig.quaternion;
+                if (target)
+                {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                }
 
                 if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                 {
@@ -404,8 +423,12 @@
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
-                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                target.transform.rotation = rotationConfig.quaternion;
+                // If the target is null, that means we are calling this from a client, rather than the server
+                if (target)
+                {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                }
 
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
@@ -425,6 +448,8 @@
                 return false;
             }
         }
+
+        [ClientRpc] public void UpdateRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams) { transform.rotation = newRotation; }
 
         /* Pause for a given duration if the target character is coming from another ailment.
         Ailments: Stun, Knockup*/
@@ -575,7 +600,7 @@
 
             //Debug.Log("After Reset: " + this.characterAilment);
 
-            melee.knockedUpHitCount.Value = 0;
+            if (IsServer) { melee.knockedUpHitCount.Value = 0; }
 
             this.onAilmentEvent.Invoke(this.characterAilment);
 
