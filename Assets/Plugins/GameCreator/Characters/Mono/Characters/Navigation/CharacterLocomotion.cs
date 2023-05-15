@@ -452,7 +452,7 @@
         public CHARACTER_AILMENTS Ailment(CHARACTER_AILMENTS ailment) {
             this.ailment = ailment;
 
-            Debug.Log(this.ailment);
+            //Debug.Log(this.ailment);
             return this.ailment;
         }
     }
