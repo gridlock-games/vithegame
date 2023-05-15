@@ -524,6 +524,8 @@
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
             Debug.Log("After Reset: " + this.characterAilment);
+            
+            melee.knockedUpHitCount.Value = 0;
 
             this.onAilmentEvent.Invoke(this.characterAilment);
 

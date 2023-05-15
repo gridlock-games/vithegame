@@ -183,12 +183,12 @@ namespace GameCreator.Melee
             }
         }
 
+        public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
         private void LateUpdate()
         {
             this.IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
-                Debug.Log(this.Character + ": " + this.Character.characterAilment);
                 this.isStaggered = true;
             }
 
@@ -199,6 +199,15 @@ namespace GameCreator.Melee
 
                 // Only want hit registration on server
                 if (!IsServer) { return; }
+
+                //if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None) { knockedUpHitCount.Value = 0; }
+                
+                if (knockedUpHitCount.Value >= 4)
+                {
+                    knockedUpHitCount.Value = 0;
+                    Character.CancelAilment();
+                }
+
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
 
@@ -238,6 +247,12 @@ namespace GameCreator.Melee
                                             targetMelee.Character.CancelAilment();
                                         }
                                         break;
+                                }
+
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                                {
+                                    targetMelee.knockedUpHitCount.Value++;
+                                    Debug.Log(targetMelee.knockedUpHitCount.Value);
                                 }
 
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
@@ -281,7 +296,6 @@ namespace GameCreator.Melee
                             this.targetsEvaluated.Add(hitInstanceID);
                         }
                     }
-
                 }
             }
         }
