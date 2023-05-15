@@ -100,6 +100,7 @@ namespace GameCreator.Melee
 
         // impacts:
         public GameObject prefabImpactNormal;
+        public GameObject prefabImpactHit;
         public GameObject prefabImpactKnockback;
 
 

@@ -946,9 +946,16 @@ namespace GameCreator.Melee
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
             this.PlayAudio(audio);
+
+
             if (prefab != null)
             {
                 GameObject impact = PoolManager.Instance.Pick(prefab);
+                impact.transform.position = position;
+            }
+
+            if (currentWeapon.prefabImpactHit != null) {
+                GameObject impact = PoolManager.Instance.Pick(currentWeapon.prefabImpactHit);
                 impact.transform.position = position;
             }
         }

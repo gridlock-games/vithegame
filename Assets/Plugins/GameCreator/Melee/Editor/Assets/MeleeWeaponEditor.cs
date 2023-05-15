@@ -53,6 +53,7 @@
         private SerializedProperty spAudioImpactKnockback;
 
         private SerializedProperty spPrefabImpactNormal;
+        private SerializedProperty spPrefabImpactHit;
         private SerializedProperty spPrefabImpactKnockback;
 
         private SerializedProperty spGroundHitReactionFront;
@@ -149,6 +150,7 @@
             this.spAudioImpactKnockback = this.serializedObject.FindProperty("audioImpactKnockback");
 
             this.spPrefabImpactNormal = this.serializedObject.FindProperty("prefabImpactNormal");
+            this.spPrefabImpactHit  = this.serializedObject.FindProperty("prefabImpactHit");
             this.spPrefabImpactKnockback = this.serializedObject.FindProperty("prefabImpactKnockback");
 
             this.spGroundHitReactionFront = this.serializedObject.FindProperty("groundHitReactionsFront");
@@ -398,6 +400,7 @@
 
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spPrefabImpactNormal);
+                    EditorGUILayout.PropertyField(this.spPrefabImpactHit);
                     EditorGUILayout.PropertyField(this.spPrefabImpactKnockback);
 
                     EditorGUILayout.EndVertical();

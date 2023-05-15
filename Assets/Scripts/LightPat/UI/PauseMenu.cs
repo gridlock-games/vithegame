@@ -33,6 +33,11 @@ namespace LightPat.UI
             AudioListener.volume = volumeSlider.value;
         }
 
+        public void RestartLevel()
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
+
         private void Start()
         {
             volumeSlider.value = AudioListener.volume;
