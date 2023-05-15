@@ -19,7 +19,8 @@
             IsKnockedUp,
             IsStunned,
             Reset,
-            Dead
+            Dead,
+            IsWallBound
         }
 
         public enum ANIM_CONSTRAINT
