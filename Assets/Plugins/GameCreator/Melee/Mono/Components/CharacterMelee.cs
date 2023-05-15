@@ -183,6 +183,7 @@ namespace GameCreator.Melee
             }
         }
 
+        public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
         private void LateUpdate()
         {
@@ -206,6 +207,7 @@ namespace GameCreator.Melee
                 {
                     knockedUpHitCount.Value = 0;
                     Character.CancelAilment();
+                    EventKnockedUpHitLimitReached.Invoke();
                 }
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
@@ -249,11 +251,7 @@ namespace GameCreator.Melee
                                         break;
                                 }
 
-                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
-                                {
-                                    targetMelee.knockedUpHitCount.Value++;
-                                    Debug.Log(targetMelee.knockedUpHitCount.Value);
-                                }
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { targetMelee.knockedUpHitCount.Value++; }
 
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
