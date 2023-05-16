@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Assets.SimpleGoogleSignIn;
 using Proyecto26;
 using UnityEngine;
@@ -9,8 +10,12 @@ public class AuthenticationController : MonoBehaviour
     private const string secretId = "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";
     private const string firebaseURL = "https://vithegame-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
+    public string email;
 
     public UserModel _user;
+    
+    
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -23,7 +28,7 @@ public class AuthenticationController : MonoBehaviour
     // Callback on getting data and save as user model
     private void GetResponse(RequestException error, ResponseHelper data)
     {
-        _user = AuthHelper.GetUserData(data.Text, "ejoshua.naranjo@gmail.com", secretId);
+        _user = AuthHelper.GetUserData(data.Text, email, secretId);
     }
 
 
@@ -49,6 +54,12 @@ public class AuthenticationController : MonoBehaviour
     private void PostUserdata(UserModel user)
     {
         var _encrypt = AuthHelper.Encrypt(user.email, secretId);
-        RestClient.Put($"{firebaseURL}{Convert.ToBase64String(_encrypt)}/data.json", user);
+        var _encryptdata = Convert.ToBase64String(_encrypt);
+        if (_encryptdata.Contains('/'))
+        {
+            _encryptdata = _encryptdata.Replace('/', '-');
+        }
+        
+        RestClient.Put($"{firebaseURL}{_encryptdata}/data.json", user);
     }
 }

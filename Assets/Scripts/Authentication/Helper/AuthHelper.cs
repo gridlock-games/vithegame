@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 public class AuthHelper 
 {
@@ -19,7 +20,12 @@ public class AuthHelper
         var emailToUser = JsonConvert.DeserializeObject<Dictionary<string, object>>(textfile);
         foreach (var info in emailToUser)
         {
-            if (Decrypt(Convert.FromBase64String(info.Key), secret) != email) continue;
+            var _datakey = info.Key;
+            if (info.Key.Contains('-'))
+            {
+                _datakey = info.Key.Replace('-', '/');
+            }
+            if (Decrypt(Convert.FromBase64String(_datakey), secret) != email) continue;
             var _obj = (JObject) info.Value;
             return JsonConvert.DeserializeObject<UserModel>(_obj["data"].ToString());
         }
