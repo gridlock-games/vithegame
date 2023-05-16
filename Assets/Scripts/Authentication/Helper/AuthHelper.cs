@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,6 +18,7 @@ public class AuthHelper
     /// <returns></returns>
     public static UserModel GetUserData(string textfile, string email, string secret)
     {
+        if (textfile == "null") return null;
         var emailToUser = JsonConvert.DeserializeObject<Dictionary<string, object>>(textfile);
         foreach (var info in emailToUser)
         {

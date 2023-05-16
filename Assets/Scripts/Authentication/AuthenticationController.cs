@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Assets.SimpleGoogleSignIn;
 using Proyecto26;
 using UnityEngine;
@@ -10,25 +9,28 @@ public class AuthenticationController : MonoBehaviour
     private const string secretId = "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";
     private const string firebaseURL = "https://vithegame-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-    public string email;
-
-    public UserModel _user;
+    [SerializeField] private GameObject signInPage;
     
-    
-    
-    private void Update()
+    private void Start()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        //check if data already cached if not activate sign in page
+        if (PlayerPrefs.HasKey("email"))
         {
-            RestClient.Get($"{firebaseURL}.json", GetResponse);
+            RestClient.Get($"{firebaseURL}.json", GetCacheResponse);
+            return;
         }
+        signInPage.SetActive(true);
     }
 
-    
     // Callback on getting data and save as user model
-    private void GetResponse(RequestException error, ResponseHelper data)
+    private void GetCacheResponse(RequestException error, ResponseHelper helper)
     {
-        _user = AuthHelper.GetUserData(data.Text, email, secretId);
+        var data = AuthHelper.GetUserData(helper.Text, PlayerPrefs.GetString("email"), secretId);
+        if (data == null)
+        {
+            return;
+        }
+        PostUserdata(data);
     }
 
 
@@ -38,28 +40,44 @@ public class AuthenticationController : MonoBehaviour
         {
             if (success)
             {
-                var user = new UserModel
+                //Check if data already exist in firebase. data equal to null post new data.
+                RestClient.Get($"{firebaseURL}.json", (exception, helper) =>
                 {
-                    account_name = info.name,
-                    email = info.email,
-                    display_picture = info.picture,
-                    last_login = DateTime.Now.ToString("MM/dd/yyyy")
-                };
-                PostUserdata(user);
+                    var data = AuthHelper.GetUserData(helper.Text, info.email, secretId);
+                    if (data == null)
+                    {
+                        data = new UserModel
+                        {
+                            account_name = info.name,
+                            email = info.email,
+                            display_picture = info.picture,
+                            date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+                        };
+                        PostUserdata(data);
+                        return;
+                    }
+
+                    PostUserdata(data);
+                });
                 return;
             }
+            //if Google login fail
+            Debug.LogError(error);
         });
     }
 
-    private void PostUserdata(UserModel user)
+    private void PostUserdata(UserModel data)
     {
-        var _encrypt = AuthHelper.Encrypt(user.email, secretId);
+        var _encrypt = AuthHelper.Encrypt(data.email, secretId);
         var _encryptdata = Convert.ToBase64String(_encrypt);
         if (_encryptdata.Contains('/'))
         {
             _encryptdata = _encryptdata.Replace('/', '-');
         }
-        
-        RestClient.Put($"{firebaseURL}{_encryptdata}/data.json", user);
+        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+        RestClient.Put($"{firebaseURL}{_encryptdata}/data.json", data, (exception, helper) =>
+        {
+            DataManager.Instance.LoginSuccess(data);
+        });
     }
 }
