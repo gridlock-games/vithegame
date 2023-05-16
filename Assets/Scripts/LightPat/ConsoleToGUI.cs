@@ -30,7 +30,12 @@ namespace LightPat.Core
         {
             output = logString;
             stack = stackTrace;
-            myLog = output + "\n" + myLog;
+
+            if (type == LogType.Error)
+                myLog = output + "\n" + stack + "\n" + myLog;
+            else
+                myLog = output + "\n" + myLog;
+
             if (myLog.Length > 1000)
             {
                 myLog = myLog.Substring(0, 1000);

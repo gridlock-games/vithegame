@@ -18,6 +18,8 @@ namespace GameCreator.Melee
         private SerializedProperty spPoiseMax;
         private SerializedProperty spPoiseRecovery;
 
+        private SerializedProperty spEventKnockedUpHitLimitReached;
+
         // INITIALIZER: ---------------------------------------------------------------------------
 
         private void OnEnable()
@@ -29,6 +31,8 @@ namespace GameCreator.Melee
             this.spPoiseDelay = this.serializedObject.FindProperty("delayPoise");
             this.spPoiseMax = this.serializedObject.FindProperty("maxPoise");
             this.spPoiseRecovery = this.serializedObject.FindProperty("poiseRecoveryRate");
+
+            this.spEventKnockedUpHitLimitReached = this.serializedObject.FindProperty("EventKnockedUpHitLimitReached");
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -47,6 +51,9 @@ namespace GameCreator.Melee
             EditorGUILayout.PropertyField(this.spPoiseDelay);
             EditorGUILayout.PropertyField(this.spPoiseMax);
             EditorGUILayout.PropertyField(this.spPoiseRecovery);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(this.spEventKnockedUpHitLimitReached);
 
             this.serializedObject.ApplyModifiedProperties();
         }
