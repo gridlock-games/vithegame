@@ -175,9 +175,6 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                     Knockup(this, null);
                     break;
-                case CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed:
-                    Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
                     break;
