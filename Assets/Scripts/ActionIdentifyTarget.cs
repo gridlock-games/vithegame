@@ -147,12 +147,12 @@ public class ActionIdentifyTarget : IAction
 
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executioner, targetChar));
 
-            GrabClientRpc(targetPosition, targetRotation, targetName, executioner.NetworkObjectId, targetChar.NetworkObjectId);
+            GrabClientRpc(targetPosition, targetRotation, targetName, executioner.NetworkObjectId, targetChar.NetworkObjectId, rotationConfig.quaternion);
         }
     }
 
     [ClientRpc]
-    void GrabClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, ulong executionerNetObjId, ulong targetNetObjId)
+    void GrabClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, ulong executionerNetObjId, ulong targetNetObjId, Quaternion targetCharRotation)
     {
         GameObject target = new GameObject(targetName);
         target.transform.position = targetPosition;
@@ -164,13 +164,11 @@ public class ActionIdentifyTarget : IAction
         //Check if Target and Executioner should be able to enter Grab Phase
         if (targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy) { Destroy(target); return; }
 
-        PreserveRotation rotationConfig = Rotation(executioner.gameObject, targetChar);
-
         #region RotateCharacter
         if (targetChar != null && executioner != null)
         {
-            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
-            targetChar.transform.rotation = rotationConfig.quaternion;
+            targetChar.characterLocomotion.SetRotation(targetCharRotation.eulerAngles);
+            targetChar.transform.rotation = targetCharRotation;
         }
         #endregion
 
@@ -193,9 +191,9 @@ public class ActionIdentifyTarget : IAction
 
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
-            targetChar.transform.rotation = rotationConfig.quaternion;
+            targetChar.transform.rotation = targetCharRotation;
 
-            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
+            targetChar.characterLocomotion.SetRotation(targetCharRotation.eulerAngles);
 
             // GetAnim Duration
             this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
