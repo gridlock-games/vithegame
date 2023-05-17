@@ -100,6 +100,7 @@
         public Interrupt interruptible = Interrupt.Interruptible;
         public Vulnerable vulnerability = Vulnerable.Vulnerable;
         public Posture posture = Posture.Steady;
+        public bool isOrbitLocked = false;
 
         public AnimationCurve attackPhase = new AnimationCurve(
             new Keyframe(0.00f, 0f),

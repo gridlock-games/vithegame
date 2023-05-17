@@ -177,6 +177,8 @@ namespace GameCreator.Melee
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
+                        this.Blades.ForEach(blade => blade.isOrbitLocked = meleeClip.isOrbitLocked);
+
                         this.currentMeleeClip.Play(this);
 
                         if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
@@ -205,7 +207,6 @@ namespace GameCreator.Melee
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
-
                     foreach (var blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
