@@ -182,11 +182,22 @@
 
         private float GetInputAngle()
         {
-            float inputH = Input.GetAxisRaw(AXIS_H);
-            float inputV = Input.GetAxisRaw(AXIS_V);
-
+            float inputH;
+            float inputV;
+            if (melee.Character.TryGetComponent(out Characters.PlayerCharacter playerCharacter))
+            {
+                inputH = playerCharacter.GetMoveInputValue().x;
+                inputV = playerCharacter.GetMoveInputValue().z;
+            }
+            else
+            {
+                inputH = Input.GetAxisRaw(AXIS_H);
+                inputV = Input.GetAxisRaw(AXIS_V);
+            }
+            
             Vector3 input = new Vector3(inputH, 0.0f, inputV);
-            Vector3 direction = HookCamera.Instance.transform.TransformDirection(input);
+            //Vector3 direction = HookCamera.Instance.transform.TransformDirection(input);
+            Vector3 direction = melee.transform.TransformDirection(input);
 
             direction.Scale(PLANE);
             if (direction.sqrMagnitude <= 0.1f) return 1000;
