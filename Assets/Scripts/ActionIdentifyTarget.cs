@@ -216,36 +216,28 @@ public class ActionIdentifyTarget : IAction
 
     public IEnumerator PostGrabRoutine(Character executioner, Character targetChar)
     {
-        CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+        float initTime = Time.time;
 
-        if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+        this.chrCtrl_target = targetChar.GetComponent<CharacterController>();
+        this.chrCtrl_executioner = executioner.GetComponent<CharacterController>();
+
+        while (initTime + this.anim_ExecutedDuration >= Time.time)
         {
-            float initTime = Time.time;
-
-            this.chrCtrl_target = targetChar.GetComponent<CharacterController>();
-            this.chrCtrl_executioner = executioner.GetComponent<CharacterController>();
-
-            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
-
-            while (initTime + this.anim_ExecutedDuration >= Time.time)
-            {
-                // Reduce Collider Radius
-                chrCtrl_executioner.radius = 0.02f;
-                chrCtrl_target.radius = 0.02f;
-                chrCtrl_target.center = new Vector3(-0.5f, 1f, 0f);
-                yield return null;
-            }
-
-            // Revert Collider Radius
-            chrCtrl_executioner.radius = 0.50f;
-            chrCtrl_target.radius = 0.50f;
-            chrCtrl_target.center = new Vector3(0, 1, 0);
-
-            // Update Camera Input and Player Controls
-            var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
-            executioner.Grab(directionUpdate, true);
+            // Reduce Collider Radius
+            chrCtrl_executioner.radius = 0.02f;
+            chrCtrl_target.radius = 0.02f;
+            chrCtrl_target.center = new Vector3(-0.5f, 1f, 0f);
+            yield return null;
         }
 
+        // Revert Collider Radius
+        chrCtrl_executioner.radius = 0.50f;
+        chrCtrl_target.radius = 0.50f;
+        chrCtrl_target.center = new Vector3(0, 1, 0);
+
+        // Update Camera Input and Player Controls
+        var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
+        executioner.Grab(directionUpdate, true);
         yield return 0;
     }
 
