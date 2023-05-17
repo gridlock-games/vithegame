@@ -141,11 +141,10 @@
             CharacterAnimator animator = characterTarget.GetCharacterAnimator();
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
 
-            CameraMotor motor = null;
             CameraMotorTypeAdventure adventureMotor = null;
             if (IsOwner)
             {
-                motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+                CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
             
