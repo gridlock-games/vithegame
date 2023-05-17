@@ -75,7 +75,7 @@ public class ActionIdentifyTarget : IAction
         var RayDistance = RaycastLength.GetValue(target);
 
         m_HitDetect = false;
-        RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, 10, -1, QueryTriggerInteraction.Ignore);
+        RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, RayDistance, -1, QueryTriggerInteraction.Ignore);
         Debug.DrawRay(transform.position + Vector3.up, transform.forward * RayDistance, Color.red, 1.0f);
         System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 

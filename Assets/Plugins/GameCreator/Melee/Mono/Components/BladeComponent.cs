@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
 	using System.Collections.Generic;
+    using GameCreator.Camera;
 	using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.UI;
@@ -88,6 +89,8 @@
         public int trailGranularity = 60;
         public float trailDuration = 0.5f;
 
+        public bool isOrbitLocked = false;
+
         #if UNITY_EDITOR
         private float capturingHitsTime;
         #endif
@@ -126,6 +129,9 @@
             int currPhase = this.Melee.GetCurrentPhase();
             if (currPhase == this.prevPhase) return;
 
+            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
             switch (currPhase)
             {
                 case -1:
@@ -139,11 +145,13 @@
                     break;
 
                 case  1:
+                    if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
                     break;
 
                 case  2:
+                    if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
                     this.EventAttackRecovery.Invoke();
                     break;
