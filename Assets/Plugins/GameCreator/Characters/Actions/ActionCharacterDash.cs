@@ -8,6 +8,7 @@
     using GameCreator.Characters;
     using GameCreator.Variables;
     using GameCreator.Melee;
+    using GameCreator.Camera;
     using Unity.Netcode;
 
     #if UNITY_EDITOR
@@ -140,12 +141,17 @@
             CharacterAnimator animator = characterTarget.GetCharacterAnimator();
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
 
+
+            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
             MeleeWeapon meleeweapon = new MeleeWeapon();
 
             if (melee != null)
             {
                 if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
                 {
+                    if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     melee.StopAttack();
                     animator.StopGesture(0f);
                     melee.currentMeleeClip = null;
