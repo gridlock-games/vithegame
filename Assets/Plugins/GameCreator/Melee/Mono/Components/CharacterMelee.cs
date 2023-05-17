@@ -47,6 +47,8 @@ namespace GameCreator.Melee
 
         protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
+        private int KNOCK_UP_FOLLOWUP_LIMIT = 4;
+
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
@@ -201,15 +203,6 @@ namespace GameCreator.Melee
                 // Only want hit registration on server
                 if (!IsServer) { return; }
 
-                //if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None) { knockedUpHitCount.Value = 0; }
-                
-                if (knockedUpHitCount.Value >= 4)
-                {
-                    knockedUpHitCount.Value = 0;
-                    Character.CancelAilment();
-                    EventKnockedUpHitLimitReached.Invoke();
-                }
-
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
 
@@ -233,13 +226,23 @@ namespace GameCreator.Melee
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
+                                Debug.Log(targetMelee+ " Knockup Count: " + targetMelee.knockedUpHitCount.Value);
+                                if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
+                                {
+                                    targetMelee.knockedUpHitCount.Value = 0;
+                                    if(attack.attackType != AttackType.Knockdown)
+                                        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                                    targetMelee.EventKnockedUpHitLimitReached.Invoke();
+                                }
+
                                 // Set Ailments here
                                 switch(attack.attackType) {
                                     case AttackType.Stun:
                                         targetMelee.Character.Stun();
                                         break;
                                     case AttackType.Knockdown:
-                                        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                                        if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
+                                            targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
                                         break;
                                     case AttackType.Knockedup:
                                         targetMelee.Character.Knockup(this.Character, targetMelee.Character);
@@ -251,7 +254,9 @@ namespace GameCreator.Melee
                                         break;
                                 }
 
-                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { targetMelee.knockedUpHitCount.Value++; }
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
+                                    targetMelee.knockedUpHitCount.Value++; 
+                                }
 
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
