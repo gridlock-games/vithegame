@@ -262,7 +262,6 @@ namespace GameCreator.Melee
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
                                     hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
-                                    Debug.Log(hitResult);
                                     if (hitResult == HitResult.ReceiveDamage)
                                         targetMelee.HP.Value -= attack.baseDamage;
                                     else if (hitResult == HitResult.PoiseBlock)

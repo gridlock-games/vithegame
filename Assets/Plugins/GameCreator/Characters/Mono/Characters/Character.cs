@@ -175,6 +175,9 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                     Knockup(this, null);
                     break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
+                    UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Reset, null);
+                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
                     break;
