@@ -120,7 +120,6 @@ public class ActionIdentifyTarget : IAction
         }
         #endregion
 
-
         if (executioner != null && targetChar != null)
         {
             // Sync placeholder position per weapon
