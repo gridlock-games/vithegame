@@ -804,8 +804,8 @@ namespace GameCreator.Melee
 
             
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback =  this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
-            bool isKnockup = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isKnockback = attack.attackType == AttackType.Knockdown;
+            bool isKnockup = attack.attackType == AttackType.Knockedup;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -926,8 +926,8 @@ namespace GameCreator.Melee
             #endregion
 
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
-            bool isKnockup = this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isKnockback = attack.attackType == AttackType.Knockdown;
+            bool isKnockup = attack.attackType == AttackType.Knockedup;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -964,7 +964,6 @@ namespace GameCreator.Melee
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
             this.PlayAudio(audio);
-
 
             if (prefab != null)
             {

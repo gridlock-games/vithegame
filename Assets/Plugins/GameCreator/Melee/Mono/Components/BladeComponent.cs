@@ -7,6 +7,7 @@
 	using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.UI;
+    using Unity.Netcode;
 
     public class BladeComponent : MonoBehaviour
 	{
@@ -120,6 +121,12 @@
             }
         }
 
+        private NetworkObject parentNetObj;
+        private void OnTransformParentChanged()
+        {
+            parentNetObj = GetComponentInParent<NetworkObject>();
+        }
+
         // UPDATE METHOD: -------------------------------------------------------------------------
 
         private void Update()
@@ -129,9 +136,13 @@
             int currPhase = this.Melee.GetCurrentPhase();
             if (currPhase == this.prevPhase) return;
 
-            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
-            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
-
+            CameraMotorTypeAdventure adventureMotor = null;
+            if (parentNetObj.IsOwner)
+            {
+                CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+                adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+            }
+            
             switch (currPhase)
             {
                 case -1:

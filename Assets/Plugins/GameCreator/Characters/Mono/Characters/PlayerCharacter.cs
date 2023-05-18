@@ -123,6 +123,8 @@
             this.CharacterUpdate();
         }
 
+        public Vector3 GetMoveInputValue() { return moveInput.Value; }
+
         protected NetworkVariable<Vector3> moveInput = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         protected virtual void UpdateInputDirectional()
         {
