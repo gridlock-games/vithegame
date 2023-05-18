@@ -13,6 +13,7 @@ namespace LightPat.Core
         public GameObject serverCameraPrefab;
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
+        private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
@@ -55,8 +56,22 @@ namespace LightPat.Core
         public override void OnNetworkSpawn()
         {
             lobbyLeaderId.OnValueChanged += OnLobbyLeaderChanged;
-            if (IsServer) { RefreshLobbyLeader(); }
+            randomSeed.OnValueChanged += OnRandomSeedChange;
+            
+            if (IsServer)
+            {
+                RefreshLobbyLeader();
+                randomSeed.Value = Random.Range(0, 100);
+            }
         }
+
+        public override void OnNetworkDespawn()
+        {
+            lobbyLeaderId.OnValueChanged -= OnLobbyLeaderChanged;
+            randomSeed.OnValueChanged -= OnRandomSeedChange;
+        }
+
+        private void OnRandomSeedChange(int prev, int current) { Random.InitState(current); }
 
         private void RefreshLobbyLeader()
         {
@@ -103,8 +118,8 @@ namespace LightPat.Core
             }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); };
-            NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); };
+            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); Random.InitState(randomSeed.Value); };
+            NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); Random.InitState(randomSeed.Value); };
         }
 
         private IEnumerator ClientConnectCallback(ulong clientId)

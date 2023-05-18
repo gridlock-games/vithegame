@@ -227,7 +227,6 @@ namespace GameCreator.Melee
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
-                                Debug.Log(targetMelee+ " Knockup Count: " + targetMelee.knockedUpHitCount.Value);
                                 if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
                                 {
                                     targetMelee.knockedUpHitCount.Value = 0;
@@ -262,11 +261,15 @@ namespace GameCreator.Melee
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
-                                        hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
-                                        if (hitResult == HitResult.ReceiveDamage)
-                                            targetMelee.HP.Value -= attack.baseDamage;
-                                        else if (hitResult == HitResult.PoiseBlock)
-                                            targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                                    hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
+                                    if (hitResult == HitResult.ReceiveDamage)
+                                        targetMelee.HP.Value -= attack.baseDamage;
+                                    else if (hitResult == HitResult.PoiseBlock)
+                                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                                }
+                                else
+                                {
+                                    targetMelee.HP.Value -= attack.baseDamage;
                                 }
                             }
 
@@ -688,6 +691,12 @@ namespace GameCreator.Melee
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, BladeComponent blade)
         {
             if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
+            
+            if (blade == null)
+            {
+                Debug.LogError("No BladeComponent found. Add one in your Weapon Asset", this);
+                return HitResult.Ignore;
+            }
 
             Character assailant = attacker.Character;
             CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
@@ -698,19 +707,9 @@ namespace GameCreator.Melee
             OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
 
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
+            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.ReceiveDamage;
+            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
-            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) {
-                return HitResult.Ignore;
-            }
-            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
-                return HitResult.Ignore;
-            }
-
-            if (blade == null)
-            {
-                Debug.LogError("No BladeComponent found. Add one in your Weapon Asset", this);
-                return HitResult.Ignore;
-            }
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
@@ -804,8 +803,8 @@ namespace GameCreator.Melee
 
             
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = attack.attackType == AttackType.Knockdown;
-            bool isKnockup = attack.attackType == AttackType.Knockedup;
+            bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
+            bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -926,8 +925,8 @@ namespace GameCreator.Melee
             #endregion
 
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = attack.attackType == AttackType.Knockdown;
-            bool isKnockup = attack.attackType == AttackType.Knockedup;
+            bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
+            bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),

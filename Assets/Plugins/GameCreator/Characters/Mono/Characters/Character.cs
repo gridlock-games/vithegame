@@ -586,7 +586,7 @@
             if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
                 this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
-                if (IsServer) { characterAilmentNetworked.Value = characterAilment; }
+                //if (IsServer) { characterAilmentNetworked.Value = characterAilment; }
             }
 
             if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
@@ -594,8 +594,6 @@
             }
 
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
-
-            //Debug.Log("After Reset: " + this.characterAilment);
 
             if (IsServer) { melee.knockedUpHitCount.Value = 0; }
 
