@@ -101,8 +101,14 @@ public class ActionIdentifyTarget : IAction
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
 
+        // Handle Melee Clips
+        CharacterMelee executionerMelee = executioner.GetComponent<CharacterMelee>();
+        CharacterMelee targetMelee = targetChar.GetComponent<CharacterMelee>();
+
+        if (!executionerMelee || !targetMelee) { Destroy(target); return; }
+
         //Check if Target and Executioner should be able to enter Grab Phase
-        if (targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy) { Destroy(target); return; }
+        if (targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy || targetMelee.IsInvincible) { Destroy(target); return; }
 
         PreserveRotation rotationConfig = Rotation(executioner.gameObject, targetChar);
 
@@ -114,16 +120,11 @@ public class ActionIdentifyTarget : IAction
         }
         #endregion
 
-        // Handle Melee Clips
-        CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
-        CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
-
-        if (!characterMeleeA || !characterMeleeB) { Destroy(target); return; }
 
         if (executioner != null && targetChar != null)
         {
             // Sync placeholder position per weapon
-            GrabPlaceholder.transform.localPosition = characterMeleeA.currentWeapon.grabPlaceholderPosition;
+            GrabPlaceholder.transform.localPosition = executionerMelee.currentWeapon.grabPlaceholderPosition;
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
@@ -138,10 +139,10 @@ public class ActionIdentifyTarget : IAction
             targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
 
             // GetAnim Duration
-            this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
-            this.anim_ExecutedDuration = (characterMeleeA.currentWeapon.grabReaction.animationClip.length);
+            this.anim_ExecuterDuration = (executionerMelee.currentWeapon.grabAttack.animationClip.length);
+            this.anim_ExecutedDuration = (executionerMelee.currentWeapon.grabReaction.animationClip.length);
 
-            bool isGrabbing = characterMeleeA.Grab(characterMeleeB);
+            bool isGrabbing = executionerMelee.Grab(targetMelee);
 
             if (!isGrabbing) { Destroy(target); return; }
 
