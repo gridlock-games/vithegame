@@ -18,8 +18,8 @@ namespace LightPat.Core
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> currentScale = new NetworkVariable<Vector3>(Vector3.one, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-        float positionSpeed;
-        float rotationSpeed;
+        float positionSpeed = 10;
+        float rotationSpeed = 10;
 
         public void SetParent(NetworkObject newParent)
         {

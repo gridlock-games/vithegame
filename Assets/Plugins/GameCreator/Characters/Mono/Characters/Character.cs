@@ -164,6 +164,13 @@
         {
             if (IsServer) { return; }
 
+            StartCoroutine(ExecuteAilmentChangeAfter1Frame(current));
+        }
+
+        private IEnumerator ExecuteAilmentChangeAfter1Frame(CharacterLocomotion.CHARACTER_AILMENTS current)
+        {
+            yield return null;
+
             switch (current)
             {
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
