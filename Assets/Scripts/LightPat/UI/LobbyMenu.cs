@@ -170,7 +170,7 @@ namespace LightPat.UI
             bool enableTeams = (GameMode)System.Enum.Parse(typeof(GameMode), gameModeDropdown.options[gameModeDropdown.value].text) != GameMode.Duel;
             changeTeamButton.interactable = enableTeams;
 
-            // Put main camera in right spot
+            // Put main camera in right spot to view player model
             if (playerModel)
                 Camera.main.transform.position = playerModel.transform.position + cameraPositionOffset;
 
@@ -199,7 +199,7 @@ namespace LightPat.UI
                 if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red) { teamColor = Color.red; }
                 else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue) { teamColor = Color.blue; }
                 nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
-                nameIcon.GetComponentInChildren<Button>().gameObject.SetActive(enableTeams);
+                nameIcon.GetComponentInChildren<Button>(true).gameObject.SetActive(enableTeams);
 
                 // Change color of ready icon
                 if (valuePair.Value.ready)

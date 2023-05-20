@@ -198,13 +198,6 @@ namespace LightPat.Core
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void ChangeColorsServerRpc(ulong clientId, Color[] newColors)
-        {
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeColors(newColors);
-            SynchronizeClientDictionaries();
-        }
-
-        [ServerRpc(RequireOwnership = false)]
         public void ChangeSpawnWeaponsServerRpc(ulong clientId, int[] newSpawnWeaponIndexes)
         {
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeSpawnWeapons(newSpawnWeaponIndexes);
@@ -275,7 +268,6 @@ namespace LightPat.Core
         public bool ready;
         public int playerPrefabOptionIndex;
         public Team team;
-        public Color[] colors;
         public int[] spawnWeapons;
         public int kills;
         public int deaths;
@@ -287,7 +279,6 @@ namespace LightPat.Core
             ready = false;
             playerPrefabOptionIndex = 0;
             team = Team.Red;
-            colors = new Color[1];
             spawnWeapons = new int[0];
             kills = 0;
             deaths = 0;
@@ -312,13 +303,6 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.team = newTeam;
-            return copy;
-        }
-
-        public ClientData ChangeColors(Color[] newColorArray)
-        {
-            ClientData copy = this;
-            copy.colors = newColorArray;
             return copy;
         }
 
@@ -356,7 +340,6 @@ namespace LightPat.Core
             serializer.SerializeValue(ref ready);
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref team);
-            serializer.SerializeValue(ref colors);
             serializer.SerializeValue(ref spawnWeapons);
             serializer.SerializeValue(ref kills);
             serializer.SerializeValue(ref deaths);

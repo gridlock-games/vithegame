@@ -19,6 +19,11 @@ namespace LightPat.Core
             }
 
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
+
+            foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
+            {
+
+            }
         }
     }
 }
