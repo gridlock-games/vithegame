@@ -17,7 +17,7 @@ namespace LightPat.UI
         public Vector3 iconSpacing;
         public GameObject startButton;
         public GameObject readyButton;
-        public GameObject changeTeamButton;
+        public Button changeTeamButton;
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
         public TMP_Dropdown playerModelDropdown;
@@ -166,6 +166,10 @@ namespace LightPat.UI
                 }
             }
 
+            // If our game mode is not set to duel, enable teams
+            bool enableTeams = (GameMode)System.Enum.Parse(typeof(GameMode), gameModeDropdown.options[gameModeDropdown.value].text) != GameMode.Duel;
+            changeTeamButton.interactable = enableTeams;
+
             // Put main camera in right spot
             if (playerModel)
                 Camera.main.transform.position = playerModel.transform.position + cameraPositionOffset;
@@ -192,15 +196,10 @@ namespace LightPat.UI
 
                 // Set the color of the team button
                 Color teamColor = Color.black;
-                if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red)
-                {
-                    teamColor = Color.red;
-                }
-                else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue)
-                {
-                    teamColor = Color.blue;
-                }
-                nameIcon.GetComponentInChildren<Button>().GetComponent<Image>().color = teamColor;
+                if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red) { teamColor = Color.red; }
+                else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue) { teamColor = Color.blue; }
+                nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
+                nameIcon.GetComponentInChildren<Button>().gameObject.SetActive(enableTeams);
 
                 // Change color of ready icon
                 if (valuePair.Value.ready)
@@ -208,18 +207,14 @@ namespace LightPat.UI
                     Color newColor = new Color(0, 255, 0, 255);
                     nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
-                    {
                         readyButton.GetComponent<Image>().color = newColor;
-                    }
                 }
                 else
                 {
                     Color newColor = new Color(255, 0, 0, 255);
                     nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
-                    {
                         readyButton.GetComponent<Image>().color = newColor;
-                    }
                 }
                 
                 // Only make crown icon visible on the lobby leader
