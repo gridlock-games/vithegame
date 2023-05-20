@@ -164,13 +164,19 @@
         {
             if (IsServer) { return; }
 
-            StartCoroutine(ExecuteAilmentChangeAfter1Frame(current));
+            StartCoroutine(ExecuteAilmentChange(current));
         }
 
-        private IEnumerator ExecuteAilmentChangeAfter1Frame(CharacterLocomotion.CHARACTER_AILMENTS current)
+        private IEnumerator ExecuteAilmentChange(CharacterLocomotion.CHARACTER_AILMENTS current)
         {
             yield return null;
 
+            if (current == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown & characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+            {
+                Debug.Log(Time.time);
+                yield return new WaitUntil(() => characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None);
+            }
+            
             switch (current)
             {
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
