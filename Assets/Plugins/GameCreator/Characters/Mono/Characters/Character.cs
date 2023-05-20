@@ -173,7 +173,6 @@
 
             if (current == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown & characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
-                Debug.Log(Time.time);
                 yield return new WaitUntil(() => characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None);
             }
             
