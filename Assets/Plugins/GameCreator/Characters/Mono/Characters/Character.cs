@@ -402,12 +402,8 @@
                     target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                 }
 
-                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
-                {
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockupAfterDuration(0f));
-                }
-                else if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
+                        this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                     StartCoroutine(StartKnockupAfterDuration(.05f));
