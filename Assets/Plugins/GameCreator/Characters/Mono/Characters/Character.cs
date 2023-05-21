@@ -39,7 +39,7 @@
                 this.verticalSpeed = 0f;
                 this.normal = Vector3.zero;
             }
-            
+
             public State(Vector3 forwardSpeed, float sidesSpeed, float pivotSpeed, bool targetLock, float isGrounded, float isSliding, float isDashing, float verticalSpeed, Vector3 normal)
             {
                 this.forwardSpeed = forwardSpeed;
@@ -130,7 +130,7 @@
         public class DashEvent : UnityEvent { }
         public class StepEvent : UnityEvent<CharacterLocomotion.STEP> { }
         public class IsControllableEvent : UnityEvent<bool> { }
-        public class AilmentUpdateEvent : UnityEvent<CharacterLocomotion.CHARACTER_AILMENTS>{ }
+        public class AilmentUpdateEvent : UnityEvent<CharacterLocomotion.CHARACTER_AILMENTS> { }
 
         protected const string ERR_NOCAM = "No Main Camera found.";
 
@@ -138,7 +138,8 @@
 
         public CharacterLocomotion characterLocomotion;
 
-        public CharacterLocomotion.CHARACTER_AILMENTS characterAilment {get; private set;}
+        public CharacterLocomotion.CHARACTER_AILMENTS characterAilment { get; private set; }
+        private NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS> characterAilmentNetworked = new NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS>();
 
         public State characterState = new State();
         private CharacterAnimator animator;
@@ -158,6 +159,42 @@
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
         // INITIALIZERS: --------------------------------------------------------------------------
+
+        private void OnAilmentChange(CharacterLocomotion.CHARACTER_AILMENTS prev, CharacterLocomotion.CHARACTER_AILMENTS current)
+        {
+            if (IsServer) { return; }
+
+            StartCoroutine(ExecuteAilmentChange(current));
+        }
+
+        private IEnumerator ExecuteAilmentChange(CharacterLocomotion.CHARACTER_AILMENTS current)
+        {
+            yield return null;
+
+            if (current == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown & characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+            {
+                yield return new WaitUntil(() => characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None);
+            }
+            
+            switch (current)
+            {
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
+                    Stun();
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
+                    Knockdown(this, null);
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
+                    Knockup(this, null);
+                    break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.None:
+                    if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
+                    break;
+            }
+        }
+
+        public override void OnNetworkSpawn() { characterAilmentNetworked.OnValueChanged += OnAilmentChange; }
+        public override void OnNetworkDespawn() { characterAilmentNetworked.OnValueChanged -= OnAilmentChange; }
 
         protected override void Awake()
         {
@@ -227,7 +264,8 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public bool isCharacterDashing() {
+        public bool isCharacterDashing()
+        {
             return this.characterLocomotion.isDashing;
         }
 
@@ -289,7 +327,7 @@
 
             float speed = Mathf.Abs(this.characterState.forwardSpeed.magnitude);
             if (Mathf.Approximately(speed, 0.0f)) return 0;
-            else if (this.characterLocomotion.canRun && speed > this.characterLocomotion.runSpeed/2.0f)
+            else if (this.characterLocomotion.canRun && speed > this.characterLocomotion.runSpeed / 2.0f)
             {
                 return 2;
             }
@@ -319,17 +357,20 @@
             return true;
         }
 
-        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
+        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable)
+        {
             if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
             this.characterLocomotion.UpdateDirectionControl(direction, isControllable);
             return true;
         }
 
-        public bool Stun() {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None|| 
-                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp){
+        public bool Stun()
+        {
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+            {
 
-                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None || 
+                if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None ||
                     this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
@@ -341,46 +382,63 @@
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
                 }
 
-
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
 
-        public bool Knockup(Character attacker, Character target) {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || 
-                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned || 
-                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
+        public bool Knockup(Character attacker, Character target)
+        {
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+            {
+                if (target)
+                {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                }
 
-                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                target.transform.rotation = rotationConfig.quaternion;
-
-                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
-                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartKnockupAfterDuration(0f));
-                } else if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
-                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartKnockupAfterDuration(.05f));
-                } else
+                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+                {
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockupAfterDuration(0f));
+                }
+                else if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                {
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                    StartCoroutine(StartKnockupAfterDuration(.05f));
+                }
+                else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
 
-        public bool Knockdown(Character attacker, Character target) {
-            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None || 
-            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned|| 
-            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
-                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                target.transform.rotation = rotationConfig.quaternion;
-                
+        public bool Knockdown(Character attacker, Character target)
+        {
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+            this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+            {
+                // If the target is null, that means we are calling this from a client, rather than the server
+                if (target)
+                {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                }
+
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
@@ -393,17 +451,22 @@
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
+
+        [ClientRpc] public void UpdateRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams) { transform.rotation = newRotation; }
 
         /* Pause for a given duration if the target character is coming from another ailment.
         Ailments: Stun, Knockup*/
         private IEnumerator StartKnockdownAfterDuration(float duration)
         {
             float initTime = Time.time;
-            while (initTime + duration >= Time.time) {
+            while (initTime + duration >= Time.time)
+            {
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
@@ -415,7 +478,8 @@
         private IEnumerator StartKnockupAfterDuration(float duration)
         {
             float initTime = Time.time;
-            while (initTime + duration >= Time.time) {
+            while (initTime + duration >= Time.time)
+            {
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
@@ -424,11 +488,12 @@
 
         /* This is needed so that the character won't immediatley go through 
         the stand up sequence when the stun duration is over*/
-        private IEnumerator RecoverFromKnockupAfterDuration(float duration,CharacterMelee melee)
-        { 
+        private IEnumerator RecoverFromKnockupAfterDuration(float duration, CharacterMelee melee)
+        {
             float initTime = Time.time;
             melee.SetInvincibility(duration);
-            while (initTime + duration >= Time.time) {
+            while (initTime + duration >= Time.time)
+            {
                 yield return null;
             }
             melee.currentWeapon.recoveryStandUp.Play(melee);
@@ -436,70 +501,85 @@
             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
         }
 
-        public bool CancelAilment() {
-            if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
+        public bool CancelAilment()
+        {
+            if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
                 this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
 
-        public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState) {
+        public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState)
+        {
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
             float recoveryAnimDuration = 0f;
 
-            switch(ailment) {
+            switch (ailment)
+            {
                 // All Ailments should end with reset except Stun which can be cancelled
                 case CharacterLocomotion.CHARACTER_AILMENTS.Reset:
                     /*Stun has an if handling since it has its own standup sequence*/
-                    if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                    if (prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+                    {
                         melee.currentWeapon.recoveryStun.Play(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
                         CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
-                    } else {
+                    }
+                    else
+                    {
                         /*Knockup has an if handling to prevent character from immediately standing up*/
-                        if(prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
-                            StartCoroutine(RecoverFromKnockupAfterDuration(1.5f, melee)); 
-                        } else {
+                        if (prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                        {
+                            StartCoroutine(RecoverFromKnockupAfterDuration(1.5f, melee));
+                        }
+                        else
+                        {
                             melee.currentWeapon.recoveryStandUp.Play(melee);
                             recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
                             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                         }
-                    } 
+                    }
                     break;
 
-                case CharacterLocomotion.CHARACTER_AILMENTS.None: 
+                case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
-                    if(melee.currentWeapon.knockbackReaction[0])
+                    if (melee.currentWeapon.knockbackReaction[0])
                         melee.currentWeapon.knockbackReaction[0].Play(melee);
                     melee.SetInvincibility(6.50f);
                     break;
-                
+
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsWallBound:
                     melee.StopAttack();
-                    if(melee.currentWeapon.knockbackReaction[1])
+                    if (melee.currentWeapon.knockbackReaction[1])
                         melee.currentWeapon.knockbackReaction[1].Play(melee);
-                    
+
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                     StartCoroutine(StartKnockupAfterDuration(0.5f));
                     break;
             }
 
             this.characterAilment = prevAilment != ailment ? this.characterLocomotion.Ailment(ailment) : prevAilment;
+            if (IsServer) { characterAilmentNetworked.Value = characterAilment; }
             this.onAilmentEvent.Invoke(ailment);
         }
 
-        private IEnumerator ResetDefaultState(float duration,CharacterMelee melee) {
+        private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
+        {
             float initTime = Time.time;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
-            while (initTime + (duration * 0.80f) >= Time.time) {
+            while (initTime + (duration * 0.80f) >= Time.time)
+            {
                 yield return null;
             }
 
@@ -510,27 +590,32 @@
                 this.GetCharacterAnimator()
             );
 
-            if(prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+            {
                 melee.SetInvincibility(1.0f);
             }
 
-            if(prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
+            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
                 this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
+                //if (IsServer) { characterAilmentNetworked.Value = characterAilment; }
             }
 
-            if(prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { 
+            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
+            {
             }
-            
+
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
-            Debug.Log("After Reset: " + this.characterAilment);
+            if (IsServer) { melee.knockedUpHitCount.Value = 0; }
 
             this.onAilmentEvent.Invoke(this.characterAilment);
 
             yield return 0;
         }
 
-        private PreserveRotation Rotation(GameObject anchor, Character targetChar) {
+        private PreserveRotation Rotation(GameObject anchor, Character targetChar)
+        {
 
             Vector3 rotationDirection = (
                 anchor.transform.position - targetChar.gameObject.transform.position
@@ -545,7 +630,7 @@
             return preserveRotation;
 
         }
-        
+
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)
         {
@@ -579,7 +664,7 @@
         {
             WaitForSeconds wait = new WaitForSeconds(seconds);
             yield return wait;
-            
+
             int jumpChain = this.characterLocomotion.Jump(force);
             if (jumpChain >= 0 && this.animator != null)
             {
@@ -669,12 +754,14 @@
         }
     }
 
-    public class PreserveRotation {
-        public PreserveRotation ( Quaternion targetRotation, Vector3 rotationDirection) {
+    public class PreserveRotation
+    {
+        public PreserveRotation(Quaternion targetRotation, Vector3 rotationDirection)
+        {
             this.quaternion = targetRotation;
             this.vector3 = rotationDirection;
         }
-        public Quaternion quaternion {get; private set;}
-        public Vector3 vector3 {get; private set;}
+        public Quaternion quaternion { get; private set; }
+        public Vector3 vector3 { get; private set; }
     }
 }

@@ -73,6 +73,7 @@
         private SerializedProperty spHitPauseDuration;
 
         private SerializedProperty spIsAttack;
+        private SerializedProperty spIsOrbitLocked;
         private SerializedProperty spAttackType;
         private SerializedProperty spIsDodge;
         private SerializedProperty spIsBlockable;
@@ -144,6 +145,7 @@
             this.spHitPauseDuration = this.serializedObject.FindProperty("hitPauseDuration");
 
             this.spIsAttack = this.serializedObject.FindProperty("isAttack");
+            this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
             this.spAttackType = this.serializedObject.FindProperty("attackType");
             this.spIsDodge = this.serializedObject.FindProperty("isDodge"); 
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
@@ -426,6 +428,7 @@
                     EditorGUI.indentLevel++;
 
                     EditorGUILayout.PropertyField(this.spIsBlockable);
+                    EditorGUILayout.PropertyField(this.spIsOrbitLocked);
                     EditorGUILayout.PropertyField(this.spAttackType);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
                     EditorGUILayout.PropertyField(this.spPoiseDamage);

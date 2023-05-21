@@ -10,6 +10,7 @@ using GameCreator.Core.Math;
 using GameCreator.Core.Hooks;
 using GameCreator.Characters;
 using GameCreator.Camera;
+using Unity.Netcode;
 
 #if UNITY_EDITOR
     using UnityEditor;
@@ -59,32 +60,31 @@ public class ActionIdentifyTarget : IAction
     private CharacterController chrCtrl_target;
     private CharacterController chrCtrl_executioner;
 
-    // Start is called before the first frame update
-    public override bool InstantExecute(GameObject target, IAction[] actions, int index)
+    [ServerRpc]
+    void GrabServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
     {
+        GameObject target = new GameObject(targetName);
+        target.transform.position = targetPosition;
+        target.transform.rotation = targetRotation;
 
         #region FireRayCast
         var gameObject = StartRaycastFrom.GetGameObject(target);
 
-        if (gameObject == null) return false;
+        if (gameObject == null) { Destroy(target); return; }
 
         var RayDistance = RaycastLength.GetValue(target);
 
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
         m_HitDetect = false;
-        RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, 10, -1, QueryTriggerInteraction.Ignore);
+        RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, RayDistance, -1, QueryTriggerInteraction.Ignore);
         Debug.DrawRay(transform.position + Vector3.up, transform.forward * RayDistance, Color.red, 1.0f);
         System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-        LayerMask layer = this.RaycastLayer;
 
         foreach (RaycastHit rayHit in allHits)
         {
             if (rayHit.transform == transform) { continue; }
 
-        
-            if(rayHit.collider.gameObject.tag == "Character") {
+            if (rayHit.collider.gameObject.CompareTag("Character") | rayHit.collider.gameObject.CompareTag("Player"))
+            {
                 m_HitDetect = true;
                 hit = rayHit;
                 break;
@@ -92,27 +92,83 @@ public class ActionIdentifyTarget : IAction
         }
 
         // Make sure that there detected target
-        if (m_HitDetect == false) return false;
+        if (m_HitDetect == false) { Destroy(target); return; }
 
-       this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
+        this.StoreHitColliderTo.Set(hit.collider.gameObject, gameObject);
 
         #endregion
 
         Character executioner = this.characterExecutioner.GetCharacter(target);
         Character targetChar = this.characterTarget.GetCharacter(target);
 
+        // Handle Melee Clips
+        CharacterMelee executionerMelee = executioner.GetComponent<CharacterMelee>();
+        CharacterMelee targetMelee = targetChar.GetComponent<CharacterMelee>();
+
+        if (!executionerMelee || !targetMelee) { Destroy(target); return; }
+
         //Check if Target and Executioner should be able to enter Grab Phase
-        if(targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy) {
-            return false;
-        }
-  
+        if (targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy || targetMelee.IsInvincible) { Destroy(target); return; }
+
         PreserveRotation rotationConfig = Rotation(executioner.gameObject, targetChar);
 
         #region RotateCharacter
         if (targetChar != null && executioner != null)
         {
             targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
-            // targetChar.transform.rotation = rotationConfig.quaternion;
+            targetChar.transform.rotation = rotationConfig.quaternion;
+        }
+        #endregion
+
+        if (executioner != null && targetChar != null)
+        {
+            // Sync placeholder position per weapon
+            GrabPlaceholder.transform.localPosition = executionerMelee.currentWeapon.grabPlaceholderPosition;
+
+            // Change Camera Input and Player Controls
+            var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
+            executioner.Grab(direction, false);
+            targetChar.Grab(direction, false);
+            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null);
+
+            // Teleport Target to GrabPlaceholder
+            targetChar.transform.position = GrabPlaceholder.transform.position;
+            targetChar.transform.rotation = rotationConfig.quaternion;
+
+            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
+
+            // GetAnim Duration
+            this.anim_ExecuterDuration = (executionerMelee.currentWeapon.grabAttack.animationClip.length);
+            this.anim_ExecutedDuration = (executionerMelee.currentWeapon.grabReaction.animationClip.length);
+
+            bool isGrabbing = executionerMelee.Grab(targetMelee);
+
+            if (!isGrabbing) { Destroy(target); return; }
+
+            CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executioner, targetChar));
+
+            GrabClientRpc(targetPosition, targetRotation, targetName, executioner.NetworkObjectId, targetChar.NetworkObjectId, rotationConfig.quaternion);
+        }
+    }
+
+    [ClientRpc]
+    void GrabClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, ulong executionerNetObjId, ulong targetNetObjId, Quaternion targetCharRotation)
+    {
+        GameObject target = new GameObject(targetName);
+        target.transform.position = targetPosition;
+        target.transform.rotation = targetRotation;
+
+        Character executioner = NetworkManager.SpawnManager.SpawnedObjects[executionerNetObjId].GetComponent<Character>();
+        Character targetChar = NetworkManager.SpawnManager.SpawnedObjects[targetNetObjId].GetComponent<Character>();
+
+        //Check if Target and Executioner should be able to enter Grab Phase
+        if (targetChar.characterLocomotion.isBusy || executioner.characterLocomotion.isBusy) { Destroy(target); return; }
+
+        #region RotateCharacter
+        if (targetChar != null && executioner != null)
+        {
+            targetChar.characterLocomotion.SetRotation(targetCharRotation.eulerAngles);
+            targetChar.transform.rotation = targetCharRotation;
         }
         #endregion
 
@@ -120,7 +176,7 @@ public class ActionIdentifyTarget : IAction
         CharacterMelee characterMeleeA = executioner.GetComponent<CharacterMelee>();
         CharacterMelee characterMeleeB = targetChar.GetComponent<CharacterMelee>();
 
-        if(!characterMeleeA || !characterMeleeB) return false;
+        if (!characterMeleeA || !characterMeleeB) { Destroy(target); return; }
 
         if (executioner != null && targetChar != null)
         {
@@ -131,13 +187,13 @@ public class ActionIdentifyTarget : IAction
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
             executioner.Grab(direction, false);
             targetChar.Grab(direction, false);
-            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null );
+            targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null);
 
             // Teleport Target to GrabPlaceholder
             targetChar.transform.position = GrabPlaceholder.transform.position;
-            targetChar.transform.rotation = rotationConfig.quaternion;
-            
-            targetChar.characterLocomotion.SetRotation(rotationConfig.vector3);
+            targetChar.transform.rotation = targetCharRotation;
+
+            targetChar.characterLocomotion.SetRotation(targetCharRotation.eulerAngles);
 
             // GetAnim Duration
             this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
@@ -145,47 +201,43 @@ public class ActionIdentifyTarget : IAction
 
             bool isGrabbing = characterMeleeA.Grab(characterMeleeB);
 
-            if(!isGrabbing) return false;
+            if (!isGrabbing) { Destroy(target); return; }
 
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executioner, targetChar));
-            return true;
         }
+    }
 
-        return true;
+    // Start is called before the first frame update
+    public override bool InstantExecute(GameObject target, IAction[] actions, int index)
+    {
+        if (IsOwner) { GrabServerRpc(target.transform.position, target.transform.rotation, target.name); }
+        return false;
     }
 
     public IEnumerator PostGrabRoutine(Character executioner, Character targetChar)
     {
-        CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+        float initTime = Time.time;
 
-        if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
+        this.chrCtrl_target = targetChar.GetComponent<CharacterController>();
+        this.chrCtrl_executioner = executioner.GetComponent<CharacterController>();
+
+        while (initTime + this.anim_ExecutedDuration >= Time.time)
         {
-            float initTime = Time.time;
-
-            this.chrCtrl_target = targetChar.GetComponent<CharacterController>();
-            this.chrCtrl_executioner = executioner.GetComponent<CharacterController>();
-
-            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
-
-            while (initTime + this.anim_ExecutedDuration >= Time.time)
-            {
-                // Reduce Collider Radius
-                chrCtrl_executioner.radius = 0.02f;
-                chrCtrl_target.radius = 0.02f;
-                chrCtrl_target.center = new Vector3(-0.5f, 1f, 0f);
-                yield return null;
-            }
-
-            // Revert Collider Radius
-            chrCtrl_executioner.radius = 0.50f;
-            chrCtrl_target.radius = 0.50f;
-            chrCtrl_target.center = new Vector3(0, 1, 0);
-
-            // Update Camera Input and Player Controls
-            var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
-            executioner.Grab(directionUpdate, true);
+            // Reduce Collider Radius
+            chrCtrl_executioner.radius = 0.02f;
+            chrCtrl_target.radius = 0.02f;
+            chrCtrl_target.center = new Vector3(-0.5f, 1f, 0f);
+            yield return null;
         }
 
+        // Revert Collider Radius
+        chrCtrl_executioner.radius = 0.50f;
+        chrCtrl_target.radius = 0.50f;
+        chrCtrl_target.center = new Vector3(0, 1, 0);
+
+        // Update Camera Input and Player Controls
+        var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
+        executioner.Grab(directionUpdate, true);
         yield return 0;
     }
 
