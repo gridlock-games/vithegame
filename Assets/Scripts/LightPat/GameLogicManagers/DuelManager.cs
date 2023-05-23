@@ -111,7 +111,35 @@ namespace LightPat.Core
             StartCoroutine(WaitForRoundEndCountdown());
         }
 
-        bool timerEnded;
+        private bool roundEndCountdownRunning;
+        private IEnumerator WaitForRoundEndCountdown()
+        {
+            roundEndCountdownRunning = true;
+            yield return new WaitUntil(() => countdownTime.Value <= 0);
+
+            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
+            {
+                NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
+
+                playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
+
+                foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
+                {
+                    if (teamSpawnPoint.team == clientPair.Value.team)
+                    {
+                        playerObject.transform.position = teamSpawnPoint.spawnPosition;
+                        playerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        break;
+                    }
+                }
+            }
+
+            countdownTime.Value = 3;
+            roundTimeInSeconds.Value = 10;
+            roundEndCountdownRunning = false;
+        }
+
+        private bool timerEnded;
         private void OnTimerEnd()
         {
             if (timerEnded) { return; }
@@ -148,31 +176,6 @@ namespace LightPat.Core
         {
             yield return new WaitUntil(() => roundTimeInSeconds.Value > 0);
             timerEnded = false;
-        }
-
-        private bool roundEndCountdownRunning;
-        private IEnumerator WaitForRoundEndCountdown()
-        {
-            roundEndCountdownRunning = true;
-            yield return new WaitUntil(() => countdownTime.Value <= 0);
-
-            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
-            {
-                foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
-                {
-                    if (teamSpawnPoint.team == clientPair.Value.team)
-                    {
-                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-                        playerObject.transform.position = teamSpawnPoint.spawnPosition;
-                        playerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                        break;
-                    }
-                }
-            }
-
-            countdownTime.Value = 3;
-            roundTimeInSeconds.Value = 10;
-            roundEndCountdownRunning = false;
         }
 
         private void OnGameEnd()

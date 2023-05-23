@@ -458,9 +458,12 @@ namespace GameCreator.Melee
         private NetworkVariable<int> HP = new NetworkVariable<int>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
-        public int GetHP()
+        public int GetHP() { return HP.Value; }
+
+        public void ResetHP()
         {
-            return HP.Value;
+            if (!IsServer) { Debug.LogError("ResetHP() should only be called on the server"); return; }
+            HP.Value = maxHealth;
         }
 
         public override void OnNetworkSpawn()
@@ -478,9 +481,12 @@ namespace GameCreator.Melee
 
         private void OnHPChanged(int prev, int current)
         {
-            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+            if (current < prev)
             {
-                hitRenderer.RenderHit();
+                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+                {
+                    hitRenderer.RenderHit();
+                }
             }
 
             if (current <= 0 & prev > 0) { SendMessage("OnDeath"); }
