@@ -488,6 +488,13 @@ namespace GameCreator.Melee
                     hitRenderer.RenderHit();
                 }
             }
+            else if (current > prev)
+            {
+                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+                {
+                    hitRenderer.RenderHeal();
+                }
+            }
 
             if (current <= 0 & prev > 0) { SendMessage("OnDeath"); }
         }

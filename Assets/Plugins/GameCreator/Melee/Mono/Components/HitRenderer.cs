@@ -8,6 +8,7 @@ namespace GameCreator.Melee
     public class HitRenderer : MonoBehaviour
     {
         [SerializeField] private Material[] hitMaterials;
+        [SerializeField] private Material[] healMaterials;
         [SerializeField] private float meshColorResetDelay = 0.75f;
 
         private SkinnedMeshRenderer skinnedMeshRenderer;
@@ -15,7 +16,12 @@ namespace GameCreator.Melee
 
         public void RenderHit()
         {
-            StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay));
+            StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, hitMaterials));
+        }
+
+        public void RenderHeal()
+        {
+            StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, healMaterials));
         }
 
         void Start()
@@ -24,9 +30,9 @@ namespace GameCreator.Melee
             defaultMaterialList = skinnedMeshRenderer.materials;
         }
 
-        private IEnumerator ResetMeshColorAfterDelay(float delay)
+        private IEnumerator ResetMeshColorAfterDelay(float delay, Material[] materialChanges)
         {
-            skinnedMeshRenderer.materials = hitMaterials;
+            skinnedMeshRenderer.materials = materialChanges;
             yield return new WaitForSeconds(delay);
             skinnedMeshRenderer.materials = defaultMaterialList;
         }
