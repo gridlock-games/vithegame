@@ -9,6 +9,8 @@ namespace LightPat.Core
     {
         public TeamSpawnPoint[] spawnPoints = new TeamSpawnPoint[0];
 
+        public virtual void OnPlayerDeath(Team team) { }
+
         private void OnDrawGizmos()
         {
             foreach (TeamSpawnPoint spawnPoint in spawnPoints)

@@ -9,12 +9,16 @@ namespace LightPat.Player
 {
     public class NetworkPlayer : NetworkBehaviour
     {
+        [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
 
-        [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+        private NetworkVariable<int> kills = new NetworkVariable<int>();
+        private NetworkVariable<int> deaths = new NetworkVariable<int>();
+        private NetworkVariable<float> damageDone = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()
         {
@@ -91,6 +95,11 @@ namespace LightPat.Player
                     Destroy(pauseInstance);
                 }
             }
+        }
+
+        void OnDeath()
+        {
+            NetworkManager.SpawnManager.SpawnedObjects[ClientManager.Singleton.gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(ClientManager.Singleton.GetClient(OwnerClientId).team);
         }
     }
 }

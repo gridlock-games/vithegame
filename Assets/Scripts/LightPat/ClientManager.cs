@@ -11,6 +11,7 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject serverCameraPrefab;
+        public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
@@ -101,10 +102,11 @@ namespace LightPat.Core
             SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
-        private IEnumerator SpawnServerCamera(string sceneName)
+        private IEnumerator WaitForServerSceneChange(string sceneName)
         {
             if (IsClient) { yield break; }
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
             GameObject cameraObject = Instantiate(serverCameraPrefab);
         }
 
@@ -204,30 +206,6 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
-        public void AddKills(ulong clientId, int killsToAdd)
-        {
-            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
-            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeKills(clientDataDictionary[clientId].kills + killsToAdd);
-            SynchronizeClientDictionaries();
-        }
-
-        public void AddDeaths(ulong clientId, int deathsToAdd)
-        {
-            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
-            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDeaths(clientDataDictionary[clientId].deaths + deathsToAdd);
-            SynchronizeClientDictionaries();
-        }
-
-        public void AddDamage(ulong clientId, float damageToAdd)
-        {
-            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
-            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDamageDone(clientDataDictionary[clientId].damageDone + damageToAdd);
-            SynchronizeClientDictionaries();
-        }
-
         [ServerRpc(RequireOwnership = false)]
         public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers)
         {
@@ -235,7 +213,7 @@ namespace LightPat.Core
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
             if (spawnPlayers)
             {
-                StartCoroutine(SpawnServerCamera(sceneName));
+                StartCoroutine(WaitForServerSceneChange(sceneName));
                 SpawnAllPlayersOnSceneChangeClientRpc(sceneName);
             }
         }
@@ -246,13 +224,17 @@ namespace LightPat.Core
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
 
-            foreach (TeamSpawnPoint teamSpawnPoint in FindObjectOfType<GameLogicManager>().spawnPoints)
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
-                if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
+                foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
                 {
-                    spawnPosition = teamSpawnPoint.spawnPosition;
-                    spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                    break;
+                    if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                    {
+                        spawnPosition = teamSpawnPoint.spawnPosition;
+                        spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        break;
+                    }
                 }
             }
 
@@ -269,9 +251,6 @@ namespace LightPat.Core
         public int playerPrefabOptionIndex;
         public Team team;
         public int[] spawnWeapons;
-        public int kills;
-        public int deaths;
-        public float damageDone;
 
         public ClientData(string clientName)
         {
@@ -280,9 +259,6 @@ namespace LightPat.Core
             playerPrefabOptionIndex = 0;
             team = Team.Red;
             spawnWeapons = new int[0];
-            kills = 0;
-            deaths = 0;
-            damageDone = 0;
         }
 
         public ClientData ToggleReady()
@@ -313,27 +289,6 @@ namespace LightPat.Core
             return copy;
         }
 
-        public ClientData ChangeKills(int newKills)
-        {
-            ClientData copy = this;
-            copy.kills = newKills;
-            return copy;
-        }
-
-        public ClientData ChangeDeaths(int newDeaths)
-        {
-            ClientData copy = this;
-            copy.deaths = newDeaths;
-            return copy;
-        }
-
-        public ClientData ChangeDamageDone(float newDamageDone)
-        {
-            ClientData copy = this;
-            copy.damageDone = newDamageDone;
-            return copy;
-        }
-
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref clientName);
@@ -341,9 +296,6 @@ namespace LightPat.Core
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref team);
             serializer.SerializeValue(ref spawnWeapons);
-            serializer.SerializeValue(ref kills);
-            serializer.SerializeValue(ref deaths);
-            serializer.SerializeValue(ref damageDone);
         }
     }
 }

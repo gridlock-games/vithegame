@@ -482,6 +482,8 @@ namespace GameCreator.Melee
             {
                 hitRenderer.RenderHit();
             }
+
+            if (current <= 0 & prev > 0) { SendMessage("OnDeath"); }
         }
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
