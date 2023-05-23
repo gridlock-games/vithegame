@@ -47,7 +47,7 @@ namespace GameCreator.Melee
 
         protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
-        private int KNOCK_UP_FOLLOWUP_LIMIT = 100;
+        private int KNOCK_UP_FOLLOWUP_LIMIT = 6;
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
