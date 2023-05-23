@@ -65,8 +65,11 @@
             target.transform.rotation = targetRotation;
 
             Character characterTarget = this.character.GetCharacter(target);
+            if (characterTarget == null) { Destroy(target); return; }
+            if (characterTarget.disableActions.Value) { Destroy(target); return; }
+
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
-            if (characterTarget == null | melee == null) { Destroy(target); return; }
+            if (melee == null) { Destroy(target); return; }
             if (melee.Poise.Value <= 10) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;

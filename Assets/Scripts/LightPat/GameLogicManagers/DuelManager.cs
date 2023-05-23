@@ -62,7 +62,7 @@ namespace LightPat.Core
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                     if (playerObject)
-                        playerObject.GetComponent<GameCreator.Characters.PlayerCharacter>().allowPlayerMovement.Value = !timerDisplay.enabled;
+                        playerObject.GetComponent<GameCreator.Characters.Character>().disableActions.Value = timerDisplay.enabled;
                     else
                         allPlayersSpawned.Value = false;
                 }

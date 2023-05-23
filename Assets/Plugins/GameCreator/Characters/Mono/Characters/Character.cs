@@ -156,6 +156,8 @@
         public bool save;
         protected SaveData initSaveData = new SaveData();
 
+        public NetworkVariable<bool> disableActions = new NetworkVariable<bool>();
+
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
         // INITIALIZERS: --------------------------------------------------------------------------
