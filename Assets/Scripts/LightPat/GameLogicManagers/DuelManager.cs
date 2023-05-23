@@ -8,15 +8,21 @@ namespace LightPat.Core
 {
     public class DuelManager : GameLogicManager
     {
+        public int scoreToWin = 3;
+
         [SerializeField] private TextMeshProUGUI redScoreText;
         [SerializeField] private TextMeshProUGUI blueScoreText;
         [SerializeField] private TextMeshProUGUI countdownText;
         [SerializeField] private TextMeshProUGUI timerDisplay;
-        [SerializeField] private NetworkVariable<float> countdownTime = new NetworkVariable<float>();
-        [SerializeField] private NetworkVariable<float> roundTimeInSeconds = new NetworkVariable<float>();
+        [SerializeField] private TextMeshProUGUI gameEndDisplay;
 
+        private NetworkVariable<float> countdownTime = new NetworkVariable<float>(3);
+        private NetworkVariable<float> roundTimeInSeconds = new NetworkVariable<float>(10);
+        
         private NetworkVariable<int> redScore = new NetworkVariable<int>();
         private NetworkVariable<int> blueScore = new NetworkVariable<int>();
+
+        private NetworkVariable<bool> allPlayersSpawned = new NetworkVariable<bool>();
 
         public override void OnPlayerDeath(Team team)
         {
@@ -44,23 +50,24 @@ namespace LightPat.Core
         private void OnScoreChange(int prev, int current)
         {
             OnRoundEnd();
+            if (current >= scoreToWin) { OnGameEnd(); }
         }
 
         private void Update()
         {
             if (IsServer)
             {
-                bool allPlayersSpawned = true;
+                allPlayersSpawned.Value = true;
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                     if (playerObject)
                         playerObject.GetComponent<GameCreator.Characters.PlayerCharacter>().allowPlayerMovement.Value = !timerDisplay.enabled;
                     else
-                        allPlayersSpawned = false;
+                        allPlayersSpawned.Value = false;
                 }
 
-                if (!allPlayersSpawned) { return; }
+                if (!allPlayersSpawned.Value) { return; }
 
                 if (countdownTime.Value > 0)
                 {
@@ -73,7 +80,7 @@ namespace LightPat.Core
                     if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
                 }
 
-                if (roundTimeInSeconds.Value <= 0) { OnRoundEnd(); }
+                if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
             }
 
             if (countdownTime.Value > 0)
@@ -97,17 +104,103 @@ namespace LightPat.Core
         private void OnRoundEnd()
         {
             if (!IsServer) { return; }
-            countdownTime.Value = 3;
-            roundTimeInSeconds.Value = 180;
+            if (roundEndCountdownRunning) { return; }
 
-            foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+            countdownTime.Value = 3;
+
+            StartCoroutine(WaitForRoundEndCountdown());
+        }
+
+        bool timerEnded;
+        private void OnTimerEnd()
+        {
+            if (timerEnded) { return; }
+            timerEnded = true;
+
+            Team winningTeam = Team.Environment;
+            int lastHP = -1;
+            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
+            {
+                NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
+                int currentHP = playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
+                if (currentHP > lastHP)
+                {
+                    winningTeam = clientPair.Value.team;
+                }
+                else if (currentHP == lastHP)
+                {
+                    winningTeam = Team.Environment;
+                }
+                lastHP = currentHP;
+            }
+
+            if (winningTeam == Team.Red)
+                redScore.Value += 1;
+            else if (winningTeam == Team.Blue)
+                blueScore.Value += 1;
+            else
+                OnRoundEnd();
+
+            StartCoroutine(WaitForTimerReset());
+        }
+
+        private IEnumerator WaitForTimerReset()
+        {
+            yield return new WaitUntil(() => roundTimeInSeconds.Value > 0);
+            timerEnded = false;
+        }
+
+        private bool roundEndCountdownRunning;
+        private IEnumerator WaitForRoundEndCountdown()
+        {
+            roundEndCountdownRunning = true;
+            yield return new WaitUntil(() => countdownTime.Value <= 0);
+
+            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
                 {
-                    NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.transform.position = teamSpawnPoint.spawnPosition;
-                    NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                    break;
+                    if (teamSpawnPoint.team == clientPair.Value.team)
+                    {
+                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
+                        playerObject.transform.position = teamSpawnPoint.spawnPosition;
+                        playerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        break;
+                    }
                 }
+            }
+
+            countdownTime.Value = 3;
+            roundTimeInSeconds.Value = 10;
+            roundEndCountdownRunning = false;
+        }
+
+        private void OnGameEnd()
+        {
+            // Display game end message
+            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
+            {
+                if (redScore.Value >= scoreToWin)
+                {
+                    if (clientPair.Value.team == Team.Red)
+                    {
+                        gameEndDisplay.SetText(clientPair.Value.clientName + " wins!");
+                        break;
+                    }
+                }
+                else if (blueScore.Value >= scoreToWin)
+                {
+                    if (clientPair.Value.team == Team.Blue)
+                    {
+                        gameEndDisplay.SetText(clientPair.Value.clientName + " wins!");
+                        break;
+                    }
+                }
+            }
+
+            if (IsServer)
+            {
+                countdownTime.Value = 3;
             }
         }
     }
