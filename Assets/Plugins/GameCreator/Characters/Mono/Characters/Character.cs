@@ -548,19 +548,15 @@
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     break;
 
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
+                    if (melee.currentWeapon.knockupF)
+                        melee.currentWeapon.knockupF.Play(melee);
+                    break;
+
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
                     if (melee.currentWeapon.knockbackReaction[0])
                         melee.currentWeapon.knockbackReaction[0].Play(melee);
                     melee.SetInvincibility(6.50f);
-                    break;
-
-                case CharacterLocomotion.CHARACTER_AILMENTS.IsWallBound:
-                    melee.StopAttack();
-                    if (melee.currentWeapon.knockbackReaction[1])
-                        melee.currentWeapon.knockbackReaction[1].Play(melee);
-
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockupAfterDuration(0.5f));
                     break;
             }
 
