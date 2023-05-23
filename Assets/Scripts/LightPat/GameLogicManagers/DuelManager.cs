@@ -80,13 +80,11 @@ namespace LightPat.Core
             {
                 countdownText.enabled = true;
                 timerDisplay.enabled = false;
-                allowPlayerMovement.Value = false;
             }
             else
             {
                 countdownText.enabled = false;
                 timerDisplay.enabled = true;
-                allowPlayerMovement.Value = true;
             }
 
             countdownText.SetText(countdownTime.Value.ToString("F0"));

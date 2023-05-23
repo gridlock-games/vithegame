@@ -9,8 +9,6 @@ namespace LightPat.Core
     {
         public TeamSpawnPoint[] spawnPoints = new TeamSpawnPoint[0];
 
-        protected NetworkVariable<bool> allowPlayerMovement = new NetworkVariable<bool>();
-
         public virtual void OnPlayerDeath(Team team) { }
 
         private void OnDrawGizmos()
