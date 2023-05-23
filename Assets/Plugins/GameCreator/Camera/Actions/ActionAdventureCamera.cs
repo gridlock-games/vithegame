@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using GameCreator.Core;
+    using GameCreator.Variables;
 
 	#if UNITY_EDITOR
 	using UnityEditor;
@@ -25,6 +26,9 @@
 
         [Indent] public Vector3 targetOffset = Vector3.zero;
         [Indent] public Vector3 pivotOffset = Vector3.zero;
+        
+        [VariableFilter(Variable.DataType.Number)]
+        public VariableProperty target;
 
         // EXECUTABLE: ----------------------------------------------------------------------------
 
@@ -59,7 +63,8 @@
                 while (initTime + this.duration >= Time.time)
                 {
                     float t = Mathf.Clamp01((Time.time - initTime) / this.duration);
-                    adventureMotor.targetOffset = Vector3.Lerp(aTargetOffset, bTargetOffset, t);
+                    var distance = this.target;
+                    adventureMotor.targetOffset = new Vector3(10f, 0f, 10f);
                     adventureMotor.pivotOffset = Vector3.Lerp(aPivotOffset, bPivotOffset, t);
 
                     yield return null;
@@ -95,6 +100,7 @@
         private SerializedProperty spDuration;
         private SerializedProperty spTargetOffset;
         private SerializedProperty spPivotOffset;
+        private SerializedProperty spTargetObject;
 
         // INSPECTOR METHODS: ---------------------------------------------------------------------
 
@@ -121,6 +127,7 @@
             this.spDuration = this.serializedObject.FindProperty("duration");
             this.spTargetOffset = this.serializedObject.FindProperty("targetOffset");
             this.spPivotOffset = this.serializedObject.FindProperty("pivotOffset");
+            this.spTargetObject = this.serializedObject.FindProperty("target");
         }
 
 		protected override void OnDisableEditorChild ()
@@ -135,6 +142,7 @@
             this.spDuration = null;
             this.spTargetOffset = null;
             this.spPivotOffset = null;
+            this.spTargetObject = null;
         }
 
 		public override void OnInspectorGUI()
@@ -156,7 +164,8 @@
             EditorGUILayout.PropertyField(this.spChangeTargetOffset);
             if (this.spChangeTargetOffset.boolValue)
             {
-                EditorGUILayout.PropertyField(this.spTargetOffset);
+                // EditorGUILayout.PropertyField(this.spTargetOffset);
+                EditorGUILayout.PropertyField(this.spTargetObject);
             }
 
             EditorGUILayout.PropertyField(this.spChangePivotOffset);
