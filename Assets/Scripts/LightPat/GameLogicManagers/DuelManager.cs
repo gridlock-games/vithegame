@@ -29,25 +29,64 @@ namespace LightPat.Core
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            redScore.OnValueChanged += OnScoreChange;
+            blueScore.OnValueChanged += OnScoreChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            redScore.OnValueChanged -= OnScoreChange;
+            blueScore.OnValueChanged -= OnScoreChange;
+        }
+
+        private void OnScoreChange(int prev, int current)
+        {
+            OnRoundEnd();
+        }
+
         private void Update()
         {
             if (IsServer)
             {
+                bool allPlayersSpawned = true;
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                {
+                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                    if (playerObject)
+                        playerObject.GetComponent<GameCreator.Characters.PlayerCharacter>().allowPlayerMovement.Value = !timerDisplay.enabled;
+                    else
+                        allPlayersSpawned = false;
+                }
+
+                if (!allPlayersSpawned) { return; }
+
                 if (countdownTime.Value > 0)
                 {
                     countdownTime.Value -= Time.deltaTime;
                     if (countdownTime.Value < 0) { countdownTime.Value = 0; }
-                    
-                    countdownText.enabled = true;
-                    timerDisplay.enabled = false;
                 }
                 else
                 {
                     roundTimeInSeconds.Value -= Time.deltaTime;
-
-                    countdownText.enabled = false;
-                    timerDisplay.enabled = true;
+                    if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
                 }
+
+                if (roundTimeInSeconds.Value <= 0) { OnRoundEnd(); }
+            }
+
+            if (countdownTime.Value > 0)
+            {
+                countdownText.enabled = true;
+                timerDisplay.enabled = false;
+                allowPlayerMovement.Value = false;
+            }
+            else
+            {
+                countdownText.enabled = false;
+                timerDisplay.enabled = true;
+                allowPlayerMovement.Value = true;
             }
 
             countdownText.SetText(countdownTime.Value.ToString("F0"));
@@ -55,6 +94,23 @@ namespace LightPat.Core
 
             redScoreText.SetText(redScore.Value.ToString());
             blueScoreText.SetText(blueScore.Value.ToString());
+        }
+
+        private void OnRoundEnd()
+        {
+            if (!IsServer) { return; }
+            countdownTime.Value = 3;
+            roundTimeInSeconds.Value = 180;
+
+            foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+            {
+                foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
+                {
+                    NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.transform.position = teamSpawnPoint.spawnPosition;
+                    NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                    break;
+                }
+            }
         }
     }
 }

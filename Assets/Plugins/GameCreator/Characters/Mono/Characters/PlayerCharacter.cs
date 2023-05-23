@@ -53,6 +53,8 @@
         public float acceleration = 4f;
         public float deceleration = 2f;
 
+        public NetworkVariable<bool> allowPlayerMovement = new NetworkVariable<bool>();
+
         private bool forceDisplayTouchstick = false;
 
         // INITIALIZERS: --------------------------------------------------------------------------
@@ -143,6 +145,8 @@
                     0.0f,
                     Input.GetAxisRaw(AXIS_V)
                 );
+                
+                if (allowPlayerMovement.Value) { moveInput.Value = Vector3.zero; }
             }
 
             if (!IsServer) { return; }
