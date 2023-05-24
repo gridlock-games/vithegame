@@ -22,12 +22,14 @@ namespace LightPat.Player
 
         public override void OnNetworkSpawn()
         {
+            GetComponent<GameCreator.Characters.PlayerCharacter>().enabled = true;
             if (IsLocalPlayer) // This checks if we are this instance's player object
             {
                 // Activate the camera motor object and set the parent to the root
                 cameraMotor.SetActive(true);
                 cameraMotor.transform.SetParent(null, true);
                 // Need to add the hook camera component to the player camera. The camera controller component relies on the hook camera component, so you also add that
+                playerCamera.SetActive(true);
                 playerCamera.transform.SetParent(null, true);
                 playerCamera.AddComponent<GameCreator.Core.Hooks.HookCamera>();
                 var camControl = playerCamera.AddComponent<GameCreator.Camera.CameraController>();
@@ -38,9 +40,6 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
-
-                gameObject.transform.position = new Vector3(1,0,1);
-
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
@@ -50,6 +49,17 @@ namespace LightPat.Player
                 Destroy(playerCamera);
                 Destroy(playerHUD);
                 // If we are not the local player, display the name tag
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsLocalPlayer)
+            {
+                Destroy(cameraMotor);
+                Destroy(playerCamera);
+                Destroy(playerHUD);
+                Cursor.lockState = CursorLockMode.None;
             }
         }
 

@@ -52,14 +52,16 @@ namespace LightPat.Core
 
         private void OnRedScoreChange(int prev, int current)
         {
-            OnRoundEnd(Team.Red);
-            if (current >= scoreToWin) { OnGameEnd(); }
+            bool gameOver = current >= scoreToWin;
+            OnRoundEnd(Team.Red, gameOver);
+            if (gameOver) { OnGameEnd(); }
         }
 
         private void OnBlueScoreChange(int prev, int current)
         {
-            OnRoundEnd(Team.Blue);
-            if (current >= scoreToWin) { OnGameEnd(); }
+            bool gameOver = current >= scoreToWin;
+            OnRoundEnd(Team.Blue, gameOver);
+            if (gameOver) { OnGameEnd(); }
         }
 
         private void Update()
@@ -110,7 +112,7 @@ namespace LightPat.Core
             blueScoreText.SetText(blueScore.Value.ToString());
         }
 
-        private void OnRoundEnd(Team winningTeam)
+        private void OnRoundEnd(Team winningTeam, bool gameOver)
         {
             if (!IsServer) { return; }
             if (roundEndCountdownRunning) { return; }
@@ -131,9 +133,11 @@ namespace LightPat.Core
                 }
             }
 
-            countdownTime.Value = 3;
-
-            StartCoroutine(WaitForRoundEndCountdown());
+            if (!gameOver)
+            {
+                countdownTime.Value = 3;
+                StartCoroutine(WaitForRoundEndCountdown());
+            }
         }
 
         private bool roundEndCountdownRunning;
@@ -145,7 +149,7 @@ namespace LightPat.Core
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 GameCreator.Characters.Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<GameCreator.Characters.Character>();
-                playerChar.CancelAilment();
+                //playerChar.CancelAilment();
                 playerChar.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
                 
                 foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
@@ -193,7 +197,7 @@ namespace LightPat.Core
             else if (winningTeam == Team.Blue)
                 blueScore.Value += 1;
             else
-                OnRoundEnd(winningTeam);
+                OnRoundEnd(winningTeam, false);
 
             StartCoroutine(WaitForTimerReset());
         }
@@ -231,7 +235,15 @@ namespace LightPat.Core
             {
                 countdownTimeMessage.Value = "Returning to lobby...";
                 countdownTime.Value = 3;
+                Debug.Log("Game End");
+                StartCoroutine(ReturnToLobby());
             }
+        }
+
+        private IEnumerator ReturnToLobby()
+        {
+            yield return new WaitUntil(() => countdownTime.Value <= 0);
+            NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }
 }
