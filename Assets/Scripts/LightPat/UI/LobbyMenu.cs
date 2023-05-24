@@ -18,9 +18,11 @@ namespace LightPat.UI
         public GameObject startButton;
         public GameObject readyButton;
         public Button changeTeamButton;
+        public Button startGameButton;
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
         public TMP_Dropdown playerModelDropdown;
+        public TextMeshProUGUI errorDisplay;
         [Header("Loadout dropdowns")]
         public TMP_Dropdown primaryWeaponDropdown;
         public TMP_Dropdown secondaryWeaponDropdown;
@@ -49,9 +51,13 @@ namespace LightPat.UI
             loadingGame = true;
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
+            {
                 ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true);
+            }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
+            {
                 ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Deathmatch", true);
+            }
         }
 
         public void UpdateWeaponLoadout()
@@ -233,6 +239,37 @@ namespace LightPat.UI
                     playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
                 }
             }
+
+            bool canStartGame = false;
+            if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
+            {
+                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
+                if (clientIdArray.Length < 2)
+                {
+                    errorDisplay.SetText("Duel requires there to be at least 2 players in the lobby");
+                }
+                else if (clientIdArray.Length > 2)
+                {
+                    errorDisplay.SetText("Duel requires there to be only 2 players in the lobby");
+                }
+                else
+                {
+                    errorDisplay.SetText("");
+
+                    canStartGame = true;
+
+                    int counter = 0;
+                    foreach (ulong clientId in clientIdArray)
+                    {
+                        if (counter == 0)
+                            ClientManager.Singleton.ChangeTeamServerRpc(clientId, Team.Red);
+                        else if (counter == 1)
+                            ClientManager.Singleton.ChangeTeamServerRpc(clientId, Team.Blue);
+                        counter++;
+                    }
+                }
+            }
+            startGameButton.interactable = canStartGame;
 
             if (everyoneIsReady)
             {
