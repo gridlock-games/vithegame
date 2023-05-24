@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.Netcode;
+using Unity.Collections;
 
 namespace LightPat.Core
 {
@@ -24,6 +25,8 @@ namespace LightPat.Core
 
         private NetworkVariable<bool> allPlayersSpawned = new NetworkVariable<bool>();
 
+        private NetworkVariable<FixedString32Bytes> countdownTimeMessage = new NetworkVariable<FixedString32Bytes>("Starting the duel!");
+
         public override void OnPlayerDeath(Team team)
         {
             if (IsServer)
@@ -37,19 +40,25 @@ namespace LightPat.Core
 
         public override void OnNetworkSpawn()
         {
-            redScore.OnValueChanged += OnScoreChange;
-            blueScore.OnValueChanged += OnScoreChange;
+            redScore.OnValueChanged += OnRedScoreChange;
+            blueScore.OnValueChanged += OnBlueScoreChange;
         }
 
         public override void OnNetworkDespawn()
         {
-            redScore.OnValueChanged -= OnScoreChange;
-            blueScore.OnValueChanged -= OnScoreChange;
+            redScore.OnValueChanged -= OnRedScoreChange;
+            blueScore.OnValueChanged -= OnBlueScoreChange;
         }
 
-        private void OnScoreChange(int prev, int current)
+        private void OnRedScoreChange(int prev, int current)
         {
-            OnRoundEnd();
+            OnRoundEnd(Team.Red);
+            if (current >= scoreToWin) { OnGameEnd(); }
+        }
+
+        private void OnBlueScoreChange(int prev, int current)
+        {
+            OnRoundEnd(Team.Blue);
             if (current >= scoreToWin) { OnGameEnd(); }
         }
 
@@ -94,17 +103,33 @@ namespace LightPat.Core
                 timerDisplay.enabled = true;
             }
 
-            countdownText.SetText(countdownTime.Value.ToString("F0"));
+            countdownText.SetText(countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0"));
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
             redScoreText.SetText(redScore.Value.ToString());
             blueScoreText.SetText(blueScore.Value.ToString());
         }
 
-        private void OnRoundEnd()
+        private void OnRoundEnd(Team winningTeam)
         {
             if (!IsServer) { return; }
             if (roundEndCountdownRunning) { return; }
+
+            if (winningTeam == Team.Environment)
+            {
+                countdownTimeMessage.Value = "This round was a draw!";
+            }
+            else
+            {
+                foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
+                {
+                    if (clientPair.Value.team == winningTeam)
+                    {
+                        countdownTimeMessage.Value = clientPair.Value.clientName + " won the round!";
+                        break;
+                    }
+                }
+            }
 
             countdownTime.Value = 3;
 
@@ -134,6 +159,7 @@ namespace LightPat.Core
                 }
             }
 
+            countdownTimeMessage.Value = "Get ready for the next round!";
             countdownTime.Value = 3;
             roundTimeInSeconds.Value = 10;
             roundEndCountdownRunning = false;
@@ -167,7 +193,7 @@ namespace LightPat.Core
             else if (winningTeam == Team.Blue)
                 blueScore.Value += 1;
             else
-                OnRoundEnd();
+                OnRoundEnd(winningTeam);
 
             StartCoroutine(WaitForTimerReset());
         }
@@ -203,6 +229,7 @@ namespace LightPat.Core
 
             if (IsServer)
             {
+                countdownTimeMessage.Value = "Returning to lobby...";
                 countdownTime.Value = 3;
             }
         }
