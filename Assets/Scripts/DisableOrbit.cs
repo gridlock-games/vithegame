@@ -25,7 +25,7 @@ namespace GameCreator.Camera
             
             Character character = target.GetComponent<Character>();
             this.melee = target.GetComponent<CharacterMelee>();
-            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            CameraMotor motor = CameraMotor.MAIN_MOTOR;
             if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
             {
                 CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
@@ -39,7 +39,7 @@ namespace GameCreator.Camera
 
         public IEnumerator EnableOrbitRoutine()
         {
-            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            CameraMotor motor = CameraMotor.MAIN_MOTOR;
             if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
             {
                 float initTime = Time.time;

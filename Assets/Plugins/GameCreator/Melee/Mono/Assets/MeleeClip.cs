@@ -127,9 +127,9 @@
 
             if (this.isAttack)
             {
-                if (Camera.main.TryGetComponent(out CameraController camController))
+                if (CameraMotor.MAIN_MOTOR)
                 {
-                    CameraMotor motor = camController.currentCameraMotor;
+                    CameraMotor motor = CameraMotor.MAIN_MOTOR;
 
                     this.disableOrbitDuration = (this.animationClip.length * 0.35f);
 
@@ -227,7 +227,7 @@
 
         private IEnumerator EnableOrbitRoutine()
         {
-            CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+            CameraMotor motor = CameraMotor.MAIN_MOTOR;
             if (motor != null && motor.cameraMotorType.GetType() == typeof(CameraMotorTypeAdventure))
             {
                 float initTime = Time.time;
