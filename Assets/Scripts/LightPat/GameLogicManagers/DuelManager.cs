@@ -119,16 +119,16 @@ namespace LightPat.Core
 
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
-                NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-
-                playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
-
+                GameCreator.Characters.Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<GameCreator.Characters.Character>();
+                playerChar.CancelAilment();
+                playerChar.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
+                
                 foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
                 {
                     if (teamSpawnPoint.team == clientPair.Value.team)
                     {
-                        playerObject.transform.position = teamSpawnPoint.spawnPosition;
-                        playerObject.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        playerChar.transform.position = teamSpawnPoint.spawnPosition;
+                        playerChar.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
                         break;
                     }
                 }

@@ -505,9 +505,14 @@
 
         public bool CancelAilment()
         {
-            if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+            if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
             {
                 this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                return true;
+            }
+            else if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
+                this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Reset, null);
                 return true;
             }
             else
