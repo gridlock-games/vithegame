@@ -199,7 +199,10 @@ namespace LightPat.Core
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
+            foreach (ulong id in clientDataDictionary.Keys)
+            {
+                clientDataDictionary[id] = clientDataDictionary[clientId].SetReady(false);
+            }
             SynchronizeClientDictionaries();
 
             if (spawnPlayers)
