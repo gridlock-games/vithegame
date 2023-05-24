@@ -33,26 +33,13 @@ namespace LightPat.Core
             }
         }
 
-        public Dictionary<ulong, ClientData> GetClientDataDictionary()
-        {
-            return clientDataDictionary;
-        }
+        public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
-        public ClientData GetClient(ulong clientId)
-        {
-            return clientDataDictionary[clientId];
-        }
+        public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
-        public void QueueClient(ulong clientId, ClientData clientData)
-        {
-            queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData));
-        }
+        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void UpdateGameModeServerRpc(GameMode newGameMode)
-        {
-            gameMode.Value = newGameMode;
-        }
+        [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
         public override void OnNetworkSpawn()
         {
@@ -211,6 +198,10 @@ namespace LightPat.Core
         {
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
+            SynchronizeClientDictionaries();
+
             if (spawnPlayers)
             {
                 StartCoroutine(WaitForServerSceneChange(sceneName));
@@ -265,6 +256,13 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.ready = !copy.ready;
+            return copy;
+        }
+
+        public ClientData SetReady(bool status)
+        {
+            ClientData copy = this;
+            copy.ready = status;
             return copy;
         }
 
