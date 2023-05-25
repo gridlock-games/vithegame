@@ -190,7 +190,7 @@
                     Knockup(this, null);
                     break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
-                    if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
+                    CancelAilment();
                     break;
             }
         }
