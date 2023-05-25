@@ -149,7 +149,7 @@ namespace LightPat.Core
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 GameCreator.Characters.Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<GameCreator.Characters.Character>();
-                //playerChar.CancelAilment();
+                playerChar.CancelAilment();
                 playerChar.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
                 
                 foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
@@ -235,7 +235,6 @@ namespace LightPat.Core
             {
                 countdownTimeMessage.Value = "Returning to lobby...";
                 countdownTime.Value = 3;
-                Debug.Log("Game End");
                 StartCoroutine(ReturnToLobby());
             }
         }
