@@ -34,7 +34,8 @@
             None,
             Stun,
             Knockdown,
-            Knockedup
+            Knockedup,
+            Heavy
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------
@@ -85,6 +86,7 @@
 
         // attack:
         public bool isAttack = true;
+        public bool isHeavy = false;
         public AttackType attackType = AttackType.None;
         public bool isBlockable = true;
         public float pushForce = 50f;
