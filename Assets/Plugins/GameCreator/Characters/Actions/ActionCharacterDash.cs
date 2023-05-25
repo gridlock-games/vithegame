@@ -147,7 +147,7 @@
             CameraMotorTypeAdventure adventureMotor = null;
             if (IsOwner)
             {
-                CameraMotor motor = Camera.main.GetComponent<CameraController>().currentCameraMotor;
+                CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
             

@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.VFX;
 
 namespace GameCreator.Melee
 {
@@ -30,10 +31,20 @@ namespace GameCreator.Melee
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
+        [SerializeField] private VisualEffect _switchWeaponVFX;
+        private bool isSwapped = false;
+        
+
         private void Awake()
         {
             _characterMelee = GetComponent<CharacterMelee>();
             limbs = GetComponentInChildren<LimbReferences>();
+            _switchWeaponVFX = GetComponentInChildren<VisualEffect>();
+        }
+
+        private void Start()
+        {
+            _switchWeaponVFX.Stop();
         }
 
         private void LateUpdate()
@@ -53,6 +64,7 @@ namespace GameCreator.Melee
                 {
                     if (weaponData.weaponType == _keyToWeaponType[key])
                     {
+                        _switchWeaponVFX.Play();
                         if (weaponData.meleeWeapon) { weaponIsValid = true; }
                         break;
                     }
@@ -69,6 +81,14 @@ namespace GameCreator.Melee
             }
         }
 
+        // public IEnumerator SpawnParticleCoroutine()
+        // {
+        //     Debug.Log("SpawnParticleCoroutine");
+        //     _switchWeaponVFX.Play();
+        //     yield return new WaitForSeconds(2f);
+        //     _switchWeaponVFX.Stop();
+        // }
+
         // Switch the character's melee weapon to the one specified by _currentWeaponType
         void SwitchWeapon()
         {
@@ -78,6 +98,7 @@ namespace GameCreator.Melee
             // Unequip the current weapon before switching
             UnequipWeapon();
 
+            
             // Find the weapon from the WeaponMeleeSO asset based on the current weapon type
             var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == _currentWeaponType.Value);
             if (weapon != null)

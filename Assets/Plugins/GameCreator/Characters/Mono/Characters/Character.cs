@@ -404,12 +404,8 @@
                     target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                 }
 
-                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
-                {
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockupAfterDuration(0f));
-                }
-                else if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
+                        this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                     StartCoroutine(StartKnockupAfterDuration(.05f));
@@ -554,19 +550,15 @@
                     CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     break;
 
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
+                    if (melee.currentWeapon.knockupF)
+                        melee.currentWeapon.knockupF.Play(melee);
+                    break;
+
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
                     if (melee.currentWeapon.knockbackReaction[0])
                         melee.currentWeapon.knockbackReaction[0].Play(melee);
                     melee.SetInvincibility(6.50f);
-                    break;
-
-                case CharacterLocomotion.CHARACTER_AILMENTS.IsWallBound:
-                    melee.StopAttack();
-                    if (melee.currentWeapon.knockbackReaction[1])
-                        melee.currentWeapon.knockbackReaction[1].Play(melee);
-
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockupAfterDuration(0.5f));
                     break;
             }
 
