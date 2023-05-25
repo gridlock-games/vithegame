@@ -58,12 +58,10 @@ namespace LylekGames.Tools
             if (!mainCamera)
             {
                 Debug.LogError("MainCamera has not been assigned.");
-                Debug.Break();
             }
             if (!focusPoint)
             {
                 Debug.LogError("FocusPoint has not been assigned. This should a centered point on your character. See the Readme for details.");
-                Debug.Break();
             }
 
             mainCamera.nearClipPlane = 0.01f;
@@ -129,6 +127,7 @@ namespace LylekGames.Tools
         }
         public void EndCollision()
         {
+            Debug.Log("EndCollision");
             if (duplicate != null)
                 duplicate.enabled = false;
             mainCamera.enabled = true;
@@ -174,6 +173,7 @@ namespace LylekGames.Tools
                         duplicate.transform.SetParent(mainCamera.transform.parent);
                     }
 
+                    Debug.Log("CheckCollision");
                     mainCamera.enabled = false;
                     duplicate.enabled = true;
                 }

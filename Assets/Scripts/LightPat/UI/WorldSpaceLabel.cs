@@ -56,8 +56,6 @@ namespace LightPat.UI
 
         private void LateUpdate()
         {
-            if (!Camera.main) { return; }
-
             if (target == null)
             {
                 Destroy(gameObject);
@@ -68,6 +66,7 @@ namespace LightPat.UI
 
             transform.position = target.position + positionOffset;
 
+            if (!Camera.main) { return; }
             Quaternion rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
             transform.rotation = rotTarget;
 
