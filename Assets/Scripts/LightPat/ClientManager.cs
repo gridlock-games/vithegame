@@ -179,9 +179,21 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
+        public void ChangeTeamOnServer(ulong clientId, Team newTeam)
+        {
+            if (!IsServer) { Debug.LogError("ChangeTeamOnServer() should only be called on the server."); return; }
+            ChangeTeam(clientId, newTeam);
+        }
+
         [ServerRpc(RequireOwnership = false)]
         public void ChangeTeamServerRpc(ulong clientId, Team newTeam)
         {
+            ChangeTeam(clientId, newTeam);
+        }
+
+        private void ChangeTeam(ulong clientId, Team newTeam)
+        {
+            if (clientDataDictionary[clientId].team == newTeam) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeTeam(newTeam);
             SynchronizeClientDictionaries();
         }

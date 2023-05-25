@@ -88,7 +88,6 @@ namespace LightPat.UI
             bool nextTeam = false;
             bool reached = false;
             ulong localClientId = NetworkManager.Singleton.LocalClientId;
-            Team originalTeam = ClientManager.Singleton.GetClient(localClientId).team;
             foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
             {
                 if (nextTeam)
@@ -258,14 +257,17 @@ namespace LightPat.UI
 
                     canStartGame = true;
 
-                    int counter = 0;
-                    foreach (ulong clientId in clientIdArray)
+                    if (NetworkManager.Singleton.IsServer)
                     {
-                        if (counter == 0)
-                            ClientManager.Singleton.ChangeTeamServerRpc(clientId, Team.Red);
-                        else if (counter == 1)
-                            ClientManager.Singleton.ChangeTeamServerRpc(clientId, Team.Blue);
-                        counter++;
+                        int counter = 0;
+                        foreach (ulong clientId in clientIdArray)
+                        {
+                            if (counter == 0)
+                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
+                            else if (counter == 1)
+                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
+                            counter++;
+                        }
                     }
                 }
             }
