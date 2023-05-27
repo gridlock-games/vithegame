@@ -14,11 +14,11 @@
 
         // OVERRIDE METHODS: ----------------------------------------------------------------------
 
-        public override CharacterLocomotion.LOCOMOTION_SYSTEM Update()
+        public override KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion> Update()
         {
             if (!this.characterLocomotion.characterController.enabled)
             {
-                return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
+                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, Quaternion.identity);
             }
 
             base.Update();
@@ -59,8 +59,8 @@
             {
                 this.characterLocomotion.navmeshAgent.enabled = false;
             }
-
-            return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
+            
+            return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, targetRotation);
         }
 
         public override void OnDestroy()

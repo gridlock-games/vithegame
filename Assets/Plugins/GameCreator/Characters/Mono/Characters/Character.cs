@@ -248,11 +248,17 @@
             this.CharacterUpdate();
         }
 
+        protected NetworkVariable<Quaternion> targetOwnerRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        
         protected void CharacterUpdate()
         {
             if (this.ragdoll != null && this.ragdoll.GetState() != CharacterRagdoll.State.Normal) return;
 
-            this.characterLocomotion.Update();
+            Quaternion targetRotation = this.characterLocomotion.Update();
+            if (IsOwner)
+                targetOwnerRotation.Value = targetRotation;
+            if (OwnerClientId == 1)
+                Debug.Log(targetOwnerRotation.Value.eulerAngles);
         }
 
         private void LateUpdate()

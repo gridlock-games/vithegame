@@ -24,7 +24,7 @@
 
         // OVERRIDE METHODS: ----------------------------------------------------------------------
 
-        public override CharacterLocomotion.LOCOMOTION_SYSTEM Update()
+        public override KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion> Update()
         {
             base.Update();
             if (!this.move)
@@ -44,7 +44,7 @@
                 Quaternion rotation = this.UpdateRotation(forward);
                 this.characterLocomotion.character.transform.rotation = rotation;
 
-                return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
+                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, rotation);
 
                 /*
                 if (!this.usingNavmesh)
@@ -65,7 +65,7 @@
                 agent.enabled = true;
 
                 CharacterController controller = this.characterLocomotion.characterController;
-                if (agent.pathPending) return CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent;
+                if (agent.pathPending) return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent, Quaternion.identity); ;
 
                 if (!agent.hasPath || agent.pathStatus != NavMeshPathStatus.PathComplete)
                 {
@@ -79,7 +79,7 @@
                         this.Stopping();
                     }
 
-                    return CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent;
+                    return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent, Quaternion.identity);
                 }
 
 
@@ -106,7 +106,7 @@
                 }
 
                 this.UpdateNavmeshAnimationConstraints();
-                return CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent;
+                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent, Quaternion.identity);
             }
             else
             {
@@ -146,7 +146,7 @@
                     this.Slowing(remainingDistance);
                 }
 
-                return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
+                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, targetRot);
             }
         }
 

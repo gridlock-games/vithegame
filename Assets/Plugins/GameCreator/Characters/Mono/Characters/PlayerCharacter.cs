@@ -120,6 +120,7 @@
                 this.directionVelocity = Vector3.zero;
             }
 
+            transform.rotation = targetOwnerRotation.Value;
             this.CharacterUpdate();
         }
 

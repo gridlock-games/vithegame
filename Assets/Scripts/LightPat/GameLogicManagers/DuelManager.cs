@@ -157,7 +157,7 @@ namespace LightPat.Core
                     if (teamSpawnPoint.team == clientPair.Value.team)
                     {
                         playerChar.transform.position = teamSpawnPoint.spawnPosition;
-                        playerChar.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        playerChar.UpdateRotationClientRpc(Quaternion.Euler(teamSpawnPoint.spawnRotation), new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
                         break;
                     }
                 }
