@@ -22,7 +22,7 @@
 
         // OVERRIDE METHODS: ----------------------------------------------------------------------
 
-        public override KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion> Update()
+        public override CharacterLocomotion.LOCOMOTION_SYSTEM Update()
         {
             base.Update();
 
@@ -51,12 +51,10 @@
                     this.characterLocomotion.characterController.Move(defaultDirection);
                 }
 
-                CharacterLocomotion.LOCOMOTION_SYSTEM locomotionSystemType = (this.usingNavmesh
+                return (this.usingNavmesh
                     ? CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent
                     : CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController
                 );
-
-                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(locomotionSystemType, Quaternion.identity);
             }
 
             this.isFollowing = true;
@@ -83,7 +81,7 @@
                 agent.updateRotation = true;
 
                 this.UpdateNavmeshAnimationConstraints();
-                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent, Quaternion.identity);
+                return CharacterLocomotion.LOCOMOTION_SYSTEM.NavigationMeshAgent;
             }
             else
             {
@@ -114,7 +112,7 @@
                     this.characterLocomotion.navmeshAgent.Warp(position);
                 }
 
-                return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, Quaternion.identity);
+                return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
             }
         }
 

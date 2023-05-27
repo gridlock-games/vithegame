@@ -1187,7 +1187,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh51114
+  m_Name: pb_Mesh33692
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1351,7 +1351,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh51052
+  m_Name: pb_Mesh33620
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1509,12 +1509,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1250882871 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
-    type: 3}
-  m_PrefabInstance: {fileID: 245917049}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1316772814
 GameObject:
   m_ObjectHideFlags: 0
@@ -1623,26 +1617,12 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 245917049}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1250882871}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91c5337897bdb4fdd80ef69fcef1511a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!136 &1488470789
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1250882871}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.51
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1534571468
 GameObject:
   m_ObjectHideFlags: 0

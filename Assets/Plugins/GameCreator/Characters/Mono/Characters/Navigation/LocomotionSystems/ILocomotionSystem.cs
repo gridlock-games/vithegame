@@ -131,7 +131,7 @@
 
         // ABSTRACT & VIRTUAL METHODS: ------------------------------------------------------------
 
-        public virtual KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion> Update()
+        public virtual CharacterLocomotion.LOCOMOTION_SYSTEM Update()
         {
             if (this.isRootMoving)
             {
@@ -154,8 +154,8 @@
                     this.isDashing = false;
                 }
             }
-            
-            return new KeyValuePair<CharacterLocomotion.LOCOMOTION_SYSTEM, Quaternion>(CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController, Quaternion.identity);
+
+            return CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController;
         }
 
         public abstract void OnDestroy();
@@ -196,7 +196,7 @@
 
                 Quaternion srcRotation = this.characterLocomotion.character.transform.rotation;
                 Quaternion dstRotation = Quaternion.LookRotation(camDirection);
-                
+
                 targetRotation = Quaternion.RotateTowards(
                     srcRotation,
                     dstRotation,

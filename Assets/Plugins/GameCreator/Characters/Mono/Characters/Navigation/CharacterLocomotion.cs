@@ -138,15 +138,12 @@
 
         // UPDATE: --------------------------------------------------------------------------------
 
-        public Quaternion Update()
+        public void Update()
         {
-            Quaternion targetRotation = Quaternion.identity;
             this.currentLocomotionType = LOCOMOTION_SYSTEM.CharacterController;
             if (this.currentLocomotionSystem != null)
             {
-                var locomotionPair = this.currentLocomotionSystem.Update();
-                this.currentLocomotionType = locomotionPair.Key;
-                targetRotation = locomotionPair.Value;
+                this.currentLocomotionType = this.currentLocomotionSystem.Update();
             }
 
             switch (this.currentLocomotionType)
@@ -161,8 +158,6 @@
             }
 
             this.UpdateCharacterState(this.currentLocomotionType);
-
-            return targetRotation;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
