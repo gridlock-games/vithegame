@@ -203,6 +203,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3, type: 3}
+--- !u!1 &371409404 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
+    type: 3}
+  m_PrefabInstance: {fileID: 245917049}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &493848754
 GameObject:
   m_ObjectHideFlags: 0
@@ -1617,12 +1623,27 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 245917049}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 371409404}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91c5337897bdb4fdd80ef69fcef1511a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1488470789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371409404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2e1369bd3e64034a8772719f5a99051, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interpolate: 1
+  positionThreshold: 0.001
+  rotAngleThreshold: 0.001
 --- !u!1 &1534571468
 GameObject:
   m_ObjectHideFlags: 0

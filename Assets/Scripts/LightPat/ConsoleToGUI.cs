@@ -54,7 +54,10 @@ namespace LightPat.Core
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.BackQuote))
+            {
                 enableDisplay = !enableDisplay;
+                myLog = "";
+            }
         }
     }
 }

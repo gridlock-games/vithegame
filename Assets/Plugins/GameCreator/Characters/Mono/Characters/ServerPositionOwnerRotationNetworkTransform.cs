@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-namespace LightPat.Core
+namespace GameCreator.Characters
 {
     public class ServerPositionOwnerRotationNetworkTransform : NetworkBehaviour
     {
@@ -21,6 +21,22 @@ namespace LightPat.Core
         float positionSpeed = 10;
         float rotationSpeed = 10;
 
+        public Vector3 GetPosition() { return currentPosition.Value; }
+        public Quaternion GetRotation() { return currentRotation.Value; }
+        public Vector3 GetScale() { return currentScale.Value; }
+
+        public void GetNextRotation()
+        {
+            StartCoroutine(NextRotation());
+        }
+
+        private IEnumerator NextRotation()
+        {
+            int prevTick = tickCount;
+            yield return new WaitUntil(() => tickCount > prevTick+100);
+            Debug.Log(transform.eulerAngles);
+        }
+
         public void SetParent(NetworkObject newParent)
         {
             if (newParent == null)
@@ -34,6 +50,7 @@ namespace LightPat.Core
             transformParentId.OnValueChanged += OnTransformParentIdChange;
             currentPosition.OnValueChanged += OnPositionChanged;
             currentRotation.OnValueChanged += OnRotationChanged;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
         public override void OnNetworkDespawn()
@@ -41,7 +58,11 @@ namespace LightPat.Core
             transformParentId.OnValueChanged -= OnTransformParentIdChange;
             currentPosition.OnValueChanged -= OnPositionChanged;
             currentRotation.OnValueChanged -= OnRotationChanged;
+            NetworkManager.NetworkTickSystem.Tick -= Tick;
         }
+
+        private int tickCount;
+        private void Tick() { tickCount++; }
 
         void OnTransformParentIdChange(int previous, int current)
         {

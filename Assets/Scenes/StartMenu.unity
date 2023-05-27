@@ -1579,7 +1579,7 @@ MonoBehaviour:
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
-    PacketDelayMS: 0
+    PacketDelayMS: 30
     PacketJitterMS: 0
     PacketDropRate: 0
 --- !u!1 &687772150
@@ -2819,6 +2819,8 @@ MonoBehaviour:
   - {fileID: 8084000840041510518, guid: d93cdd940a7bd0546badd73310c20c36, type: 3}
   serverCameraPrefab: {fileID: 2298131365329834814, guid: 5ef6a7dcb7705a5439eb702be894f48e,
     type: 3}
+  gameLogicManagerNetObjId:
+    m_InternalValue: 0
 --- !u!1 &1558033848
 GameObject:
   m_ObjectHideFlags: 0
