@@ -64,14 +64,14 @@ namespace GameCreator.Melee
         protected ComboSystem comboSystem;
         protected InputBuffer inputBuffer;
 
-        public NetworkVariable<float> Poise { get; private set; } = new NetworkVariable<float>();
+        private NetworkVariable<float> Poise = new NetworkVariable<float>();
         private float poiseDelayCooldown;
 
         public NumberProperty delayPoise = new NumberProperty(1f);
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        public NetworkVariable<float> Defense { get; protected set; } = new NetworkVariable<float>();
+        private NetworkVariable<float> Defense = new NetworkVariable<float>();
         private float defenseDelayCooldown;
 
         public bool IsDrawing { get; protected set; }
@@ -460,10 +460,26 @@ namespace GameCreator.Melee
 
         public int GetHP() { return HP.Value; }
 
+        public float GetDefense() { return Defense.Value; }
+
+        public float GetPoise() { return Poise.Value; }
+
         public void ResetHP()
         {
             if (!IsServer) { Debug.LogError("ResetHP() should only be called on the server"); return; }
             HP.Value = maxHealth;
+        }
+
+        public void ResetDefense()
+        {
+            if (!IsServer) { Debug.LogError("ResetDefense() should only be called on the server"); return; }
+            Defense.Value = maxHealth;
+        }
+
+        public void ResetPoise()
+        {
+            if (!IsServer) { Debug.LogError("ResetPoise() should only be called on the server"); return; }
+            Poise.Value = maxHealth;
         }
 
         public override void OnNetworkSpawn()

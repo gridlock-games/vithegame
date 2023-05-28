@@ -70,7 +70,7 @@
 
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
             if (melee == null) { Destroy(target); return; }
-            if (melee.Poise.Value <= 10) { Destroy(target); return; }
+            if (melee.GetPoise() <= 10) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
