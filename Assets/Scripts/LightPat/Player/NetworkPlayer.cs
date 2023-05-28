@@ -126,21 +126,20 @@ namespace LightPat.Player
         // Messages from Character Melee
         void OnDamageDealt(int damage)
         {
-            if (!ClientManager.Singleton) { return; }
             ClientManager.Singleton.AddDamage(OwnerClientId, damage);
         }
 
         void OnKill(CharacterMelee victim)
         {
-            if (!ClientManager.Singleton) { return; }
             ClientManager.Singleton.AddKills(OwnerClientId, 1);
         }
 
         void OnDeath(CharacterMelee killer)
         {
-            if (!ClientManager.Singleton) { return; }
             ClientManager.Singleton.AddDeaths(OwnerClientId, 1);
-            NetworkManager.SpawnManager.SpawnedObjects[ClientManager.Singleton.gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(ClientManager.Singleton.GetClient(OwnerClientId).team);
+
+            if (ClientManager.Singleton)
+                NetworkManager.SpawnManager.SpawnedObjects[ClientManager.Singleton.gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(ClientManager.Singleton.GetClient(OwnerClientId).team);
         }
     }
 }

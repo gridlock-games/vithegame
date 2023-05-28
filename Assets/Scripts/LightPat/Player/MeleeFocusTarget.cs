@@ -51,7 +51,6 @@ namespace LightPat.Player
             }
 
             if (!target) return;
-
             // If we have a target character, then look at them
             Vector3 relativePos = target.position - characterCamera.position;
             relativePos.y = 0;
