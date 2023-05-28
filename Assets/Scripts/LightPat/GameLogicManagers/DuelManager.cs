@@ -193,8 +193,12 @@ namespace LightPat.Core
             {
                 Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<Character>();
                 playerChar.CancelAilment();
-                playerChar.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
-                
+
+                GameCreator.Melee.CharacterMelee charMelee = playerChar.GetComponent<GameCreator.Melee.CharacterMelee>();
+                charMelee.ResetHP();
+                charMelee.ResetDefense();
+                charMelee.ResetPoise();
+
                 foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
                 {
                     if (teamSpawnPoint.team == clientPair.Value.team)

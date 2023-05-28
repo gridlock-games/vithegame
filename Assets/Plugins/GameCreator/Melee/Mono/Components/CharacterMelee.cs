@@ -473,13 +473,13 @@ namespace GameCreator.Melee
         public void ResetDefense()
         {
             if (!IsServer) { Debug.LogError("ResetDefense() should only be called on the server"); return; }
-            Defense.Value = maxHealth;
+            Defense.Value = 0;
         }
 
         public void ResetPoise()
         {
             if (!IsServer) { Debug.LogError("ResetPoise() should only be called on the server"); return; }
-            Poise.Value = maxHealth;
+            Poise.Value = 0;
         }
 
         public override void OnNetworkSpawn()
