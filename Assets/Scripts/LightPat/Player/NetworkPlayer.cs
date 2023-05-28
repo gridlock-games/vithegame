@@ -20,7 +20,7 @@ namespace LightPat.Player
 
         public override void OnNetworkSpawn()
         {
-            GetComponent<GameCreator.Characters.PlayerCharacter>().enabled = true;
+            GetComponent<PlayerCharacter>().enabled = true;
             if (IsLocalPlayer) // This checks if we are this instance's player object
             {
                 // Activate the camera motor object and set the parent to the root

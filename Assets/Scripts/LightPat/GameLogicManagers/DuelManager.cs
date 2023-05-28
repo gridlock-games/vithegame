@@ -153,8 +153,13 @@ namespace LightPat.Core
             countdownText.SetText(countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0"));
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
-            redScoreText.SetText(redScore.Value.ToString());
-            blueScoreText.SetText(blueScore.Value.ToString());
+            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
+            {
+                if (clientPair.Value.team == Team.Red)
+                    redScoreText.SetText(clientPair.Value.clientName + ": " + redScore.Value.ToString());
+                else if (clientPair.Value.team == Team.Blue)
+                    blueScoreText.SetText(clientPair.Value.clientName + ": " + blueScore.Value.ToString());
+            }
         }
 
         private void OnRoundEnd(Team winningTeam, bool gameOver)
@@ -283,7 +288,7 @@ namespace LightPat.Core
             if (IsServer)
             {
                 countdownTimeMessage.Value = "Returning to lobby...";
-                countdownTime.Value = 3;
+                countdownTime.Value = 10;
                 StartCoroutine(ReturnToLobby());
             }
         }
