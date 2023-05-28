@@ -86,7 +86,7 @@ namespace LightPat.Core
         private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName)
         {
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-            SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
+            SpawnPlayerServerRpc(NetworkManager.LocalClientId);
         }
 
         private IEnumerator WaitForServerSceneChange(string sceneName)
@@ -212,13 +212,6 @@ namespace LightPat.Core
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
             NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 
-            // Copy the dictionary keys by using to array so that we don't modify it as we are iterating
-            foreach (ulong id in clientDataDictionary.Keys.ToArray())
-            {
-                clientDataDictionary[id] = clientDataDictionary[clientId].SetReady(false);
-            }
-            SynchronizeClientDictionaries();
-
             if (spawnPlayers)
             {
                 StartCoroutine(WaitForServerSceneChange(sceneName));
@@ -229,6 +222,9 @@ namespace LightPat.Core
         [ServerRpc(RequireOwnership = false)]
         void SpawnPlayerServerRpc(ulong clientId)
         {
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
+            SynchronizeClientDictionaries();
+
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
 
