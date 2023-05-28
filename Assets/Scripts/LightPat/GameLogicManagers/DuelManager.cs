@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Unity.Netcode;
 using Unity.Collections;
+using GameCreator.Characters;
 
 namespace LightPat.Core
 {
@@ -42,12 +43,14 @@ namespace LightPat.Core
         {
             redScore.OnValueChanged += OnRedScoreChange;
             blueScore.OnValueChanged += OnBlueScoreChange;
+            countdownTime.OnValueChanged += OnCountdownTimerChange;
         }
 
         public override void OnNetworkDespawn()
         {
             redScore.OnValueChanged -= OnRedScoreChange;
             blueScore.OnValueChanged -= OnBlueScoreChange;
+            countdownTime.OnValueChanged -= OnCountdownTimerChange;
         }
 
         private void OnRedScoreChange(int prev, int current)
@@ -64,6 +67,40 @@ namespace LightPat.Core
             if (gameOver) { OnGameEnd(); }
         }
 
+        private void OnCountdownTimerChange(float prev, float current)
+        {
+            if (!IsClient) { return; }
+
+            if (prev > 0 & current <= 0)
+            {
+                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
+                if (localPlayer)
+                {
+                    if (changeLocomotionControlCoroutine != null)
+                        StopCoroutine(changeLocomotionControlCoroutine);
+                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true));
+                }
+            }
+            else if (prev <= 0 & current > 0)
+            {
+                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
+                if (localPlayer)
+                {
+                    if (changeLocomotionControlCoroutine != null)
+                        StopCoroutine(changeLocomotionControlCoroutine);
+                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false));
+                }
+            }
+        }
+
+        Coroutine changeLocomotionControlCoroutine;
+        private IEnumerator ChangeLocomotionControlOnAilmentReset(Character playerChar, CharacterLocomotion.OVERRIDE_FACE_DIRECTION newFaceDirection, bool isControllable)
+        {
+            yield return new WaitUntil(() => playerChar.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None & playerChar.resetDefaultStateRunning == false);
+            yield return null;
+            playerChar.characterLocomotion.UpdateDirectionControl(newFaceDirection, isControllable);
+        }
+
         private void Update()
         {
             if (IsServer)
@@ -73,7 +110,7 @@ namespace LightPat.Core
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                     if (playerObject)
-                        playerObject.GetComponent<GameCreator.Characters.Character>().disableActions.Value = !timerDisplay.enabled;
+                        playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
                     else
                         allPlayersSpawned.Value = false;
                 }
@@ -148,7 +185,7 @@ namespace LightPat.Core
 
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
-                GameCreator.Characters.Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<GameCreator.Characters.Character>();
+                Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<Character>();
                 playerChar.CancelAilment();
                 playerChar.GetComponent<GameCreator.Melee.CharacterMelee>().ResetHP();
                 
@@ -157,7 +194,7 @@ namespace LightPat.Core
                     if (teamSpawnPoint.team == clientPair.Value.team)
                     {
                         playerChar.transform.position = teamSpawnPoint.spawnPosition;
-                        playerChar.transform.rotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        playerChar.UpdateRotationClientRpc(Quaternion.Euler(teamSpawnPoint.spawnRotation), new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
                         break;
                     }
                 }

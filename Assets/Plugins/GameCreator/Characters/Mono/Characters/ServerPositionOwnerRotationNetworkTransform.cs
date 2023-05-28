@@ -25,18 +25,6 @@ namespace GameCreator.Characters
         public Quaternion GetRotation() { return currentRotation.Value; }
         public Vector3 GetScale() { return currentScale.Value; }
 
-        public void GetNextRotation()
-        {
-            StartCoroutine(NextRotation());
-        }
-
-        private IEnumerator NextRotation()
-        {
-            int prevTick = tickCount;
-            yield return new WaitUntil(() => tickCount > prevTick+100);
-            Debug.Log(transform.eulerAngles);
-        }
-
         public void SetParent(NetworkObject newParent)
         {
             if (newParent == null)
