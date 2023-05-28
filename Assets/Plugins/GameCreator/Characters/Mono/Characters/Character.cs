@@ -634,7 +634,6 @@
             {
             }
 
-            Debug.Log(Time.time + " Direction control reset");
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
             if (IsServer) { melee.knockedUpHitCount.Value = 0; }

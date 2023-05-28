@@ -141,7 +141,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = true;
+            response.Approved = SceneManager.GetActiveScene().name == "Lobby";
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -157,7 +157,8 @@ namespace LightPat.Core
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
 
-            QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
+            if (response.Approved)
+                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
         }
 
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
