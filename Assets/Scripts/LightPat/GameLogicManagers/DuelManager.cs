@@ -11,6 +11,7 @@ namespace LightPat.Core
     public class DuelManager : GameLogicManager
     {
         public int scoreToWin = 3;
+        public float roundTimeAmount = 180;
 
         [SerializeField] private TextMeshProUGUI redScoreText;
         [SerializeField] private TextMeshProUGUI blueScoreText;
@@ -19,7 +20,7 @@ namespace LightPat.Core
         [SerializeField] private TextMeshProUGUI gameEndDisplay;
 
         private NetworkVariable<float> countdownTime = new NetworkVariable<float>(3);
-        private NetworkVariable<float> roundTimeInSeconds = new NetworkVariable<float>(10);
+        private NetworkVariable<float> roundTimeInSeconds = new NetworkVariable<float>(1);
         
         private NetworkVariable<int> redScore = new NetworkVariable<int>();
         private NetworkVariable<int> blueScore = new NetworkVariable<int>();
@@ -41,6 +42,7 @@ namespace LightPat.Core
 
         public override void OnNetworkSpawn()
         {
+            roundTimeInSeconds.Value = roundTimeAmount;
             redScore.OnValueChanged += OnRedScoreChange;
             blueScore.OnValueChanged += OnBlueScoreChange;
             countdownTime.OnValueChanged += OnCountdownTimerChange;
@@ -212,7 +214,7 @@ namespace LightPat.Core
 
             countdownTimeMessage.Value = "Get ready for the next round!";
             countdownTime.Value = 3;
-            roundTimeInSeconds.Value = 10;
+            roundTimeInSeconds.Value = roundTimeAmount;
             roundEndCountdownRunning = false;
         }
 
