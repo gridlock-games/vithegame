@@ -34,7 +34,8 @@
             None,
             Stun,
             Knockdown,
-            Knockedup
+            Knockedup,
+            Heavy
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------
@@ -58,6 +59,10 @@
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         public AnimationCurve movementSides = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
         public AnimationCurve movementVertical = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
+        // Lunge Attack Purposes:
+        public AnimationCurve movementForward_OnLunge = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+        public AnimationCurve movementSides_OnLunge = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
         [Range(0f, 1f)] public float gravityInfluence = 1f;
         public float movementMultiplier = 1.0f;
@@ -85,6 +90,7 @@
 
         // attack:
         public bool isAttack = true;
+        public bool isHeavy = false;
         public AttackType attackType = AttackType.None;
         public bool isBlockable = true;
         public float pushForce = 50f;
@@ -93,15 +99,20 @@
         public float defenseDamage = 1f;
         public int baseDamage = 10;
 
-        public float animSpeed = 1.0f;
-        private float disableOrbitDuration = 0.0f;
 
         // properties:
         public Interrupt interruptible = Interrupt.Interruptible;
         public Vulnerable vulnerability = Vulnerable.Vulnerable;
         public Posture posture = Posture.Steady;
         public bool isOrbitLocked = false;
+        public bool isLunge = false;
+        private float disableOrbitDuration = 0.0f;
+        public bool isModifyFocus = false;
+        public Vector3 boxCastHalfExtents = new Vector3(2.0f, 1.0f, 2.0f);
 
+
+        // animation:
+        public float animSpeed = 1.0f;
         public AnimationCurve attackPhase = new AnimationCurve(
             new Keyframe(0.00f, 0f),
             new Keyframe(0.25f, 1f),
@@ -145,25 +156,40 @@
             melee.SetPosture(this.posture, this.Length);
             melee.PlayAudio(this.soundEffect);
 
+            float duration = Mathf.Max(0, this.animationClip.length - this.transitionOut);
+
+            if(isAttack) { 
+
+                AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
+                AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
+                melee.Character.RootMovement(
+                    this.movementMultiplier,
+                    duration / this.animSpeed,
+                    this.gravityInfluence,
+                    newMovementForwardCurve,
+                    newMovementSidesCurve,
+                    this.movementVertical
+                );
+            } else {
+                melee.Character.RootMovement(
+                    this.movementMultiplier,
+                    duration / this.animSpeed,
+                    this.gravityInfluence,
+                    this.movementForward,
+                    this.movementSides,
+                    this.movementVertical
+                );
+            }
+
             melee.Character.GetCharacterAnimator().StopGesture(0.1f);
             melee.Character.GetCharacterAnimator().CrossFadeGesture(
                 this.animationClip, this.animSpeed, this.avatarMask,
                 this.transitionIn, this.transitionOut
             );
 
-            float duration = Mathf.Max(0, this.animationClip.length - this.transitionOut);
-
-            melee.Character.RootMovement(
-                this.movementMultiplier,
-                duration / this.animSpeed,
-                this.gravityInfluence,
-                this.movementForward,
-                this.movementSides,
-                this.movementVertical
-            );
-
             this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
         }
+
 
         public void Stop(CharacterMelee melee)
         {

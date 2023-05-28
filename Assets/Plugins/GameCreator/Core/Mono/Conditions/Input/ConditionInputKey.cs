@@ -16,13 +16,21 @@
 		{
 			BeingPressed,
 			JustPressed,
-			JustReleased
+			JustReleased,
+			PressedTwice
 		}
 
 		// PROPERTIES: -------------------------------------------------------------------------------------------------
 
 		public KeyCode key = KeyCode.Space;
 		public STATE state = STATE.JustReleased;
+
+		public KeyCode targetKey = KeyCode.Space;
+        public float doublePressInterval = 0.3f;
+
+        private float lastKeyPressTime = 0f;
+
+		private bool isPressedTwice = false;
 
 		// EXECUTABLE: -------------------------------------------------------------------------------------------------
 		
@@ -33,11 +41,24 @@
 			{
 			case STATE.BeingPressed : result = Input.GetKey(this.key); break;
 			case STATE.JustPressed  : result = Input.GetKeyDown(this.key); break;
-			case STATE.JustReleased : result = Input.GetKeyUp(this.key); break;
+			case STATE.JustReleased : result = isPressedTwice; break;
 			}
 
 			return result;
 		}
+
+		void Update()
+        {
+            if (Input.GetKeyDown(this.key))
+            {
+                if (Time.time - lastKeyPressTime <= doublePressInterval)
+                {
+                    Debug.Log("Key " + this.key.ToString() + " pressed twice!");
+                    isPressedTwice = true;
+                }
+                lastKeyPressTime = Time.time;
+            }
+        }
 
 		// +-----------------------------------------------------------------------------------------------------------+
 		// | EDITOR                                                                                                    |
