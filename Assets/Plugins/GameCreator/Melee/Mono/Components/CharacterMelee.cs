@@ -1153,9 +1153,6 @@ namespace GameCreator.Melee
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
             
             if(GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) yield break;
-            
-            TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
-            SetTargetFocus(targetMelee);
 
             // If we have a target character, then look at them
             Vector3 relativePos = target.position - characterCamera.position;
@@ -1169,6 +1166,8 @@ namespace GameCreator.Melee
             // If our distance from target is < boxCastHalfExtents.z, then reduce/increase movementForwardCurve
             if (distance <= boxCastHalfExtents.z && clip.isLunge)
             {
+                TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
+                SetTargetFocus(targetMelee);
 
                 movementForward.keys = AdjustCurve(clipMovementForward, distance);
                 isLunging = true;
