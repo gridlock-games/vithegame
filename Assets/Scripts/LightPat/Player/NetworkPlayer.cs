@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using LightPat.Core;
+using GameCreator.Characters;
+using GameCreator.Melee;
 
 namespace LightPat.Player
 {
@@ -15,10 +17,6 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
-
-        private NetworkVariable<int> kills = new NetworkVariable<int>();
-        private NetworkVariable<int> deaths = new NetworkVariable<int>();
-        private NetworkVariable<float> damageDone = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()
         {
@@ -64,8 +62,9 @@ namespace LightPat.Player
         }
 
         [SerializeField] private GameObject pauseMenuPrefab;
-        [SerializeField] private GameObject triggersParent;
+        [SerializeField] private GameObject scoreboardPrefab;
         private GameObject pauseInstance;
+        private GameObject scoreboardInstance;
 
         [SerializeField] private TextMeshProUGUI pingDisplay;
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
@@ -93,22 +92,52 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
-                    triggersParent.SetActive(false);
+                    DisableActionsServerRpc(true);
                     Cursor.lockState = CursorLockMode.None;
                     pauseInstance = Instantiate(pauseMenuPrefab);
                 }
                 else
                 {
-                    triggersParent.SetActive(true);
+                    DisableActionsServerRpc(false);
                     Cursor.lockState = CursorLockMode.Locked;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
                 }
             }
+
+            if (!ClientManager.Singleton) { return; }
+
+            // Scoreboard
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (!scoreboardInstance)
+                    scoreboardInstance = Instantiate(scoreboardPrefab);
+            }
+            
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                if (scoreboardInstance)
+                    Destroy(scoreboardInstance);
+            }
         }
 
-        void OnDeath()
+        [ServerRpc] private void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
+
+        // Messages from Character Melee
+        void OnDamageDealt(int damage)
         {
+            ClientManager.Singleton.AddDamage(OwnerClientId, damage);
+        }
+
+        void OnKill(CharacterMelee victim)
+        {
+            ClientManager.Singleton.AddKills(OwnerClientId, 1);
+        }
+
+        void OnDeath(CharacterMelee killer)
+        {
+            ClientManager.Singleton.AddDeaths(OwnerClientId, 1);
+
             if (ClientManager.Singleton)
                 NetworkManager.SpawnManager.SpawnedObjects[ClientManager.Singleton.gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(ClientManager.Singleton.GetClient(OwnerClientId).team);
         }

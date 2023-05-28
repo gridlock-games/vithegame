@@ -20,18 +20,7 @@ namespace LightPat.Core
 
         private static ClientManager _singleton;
 
-        public static ClientManager Singleton
-        {
-            get
-            {
-                if (_singleton == null)
-                {
-                    Debug.Log("Client Manager is Null");
-                }
-
-                return _singleton;
-            }
-        }
+        public static ClientManager Singleton { get { return _singleton; } }
 
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
@@ -206,6 +195,30 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
+        public void AddKills(ulong clientId, int killsToAdd)
+        {
+            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeKills(clientDataDictionary[clientId].kills + killsToAdd);
+            SynchronizeClientDictionaries();
+        }
+
+        public void AddDeaths(ulong clientId, int deathsToAdd)
+        {
+            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDeaths(clientDataDictionary[clientId].deaths + deathsToAdd);
+            SynchronizeClientDictionaries();
+        }
+
+        public void AddDamage(ulong clientId, int damageToAdd)
+        {
+            if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDamageDone(clientDataDictionary[clientId].damageDealt + damageToAdd);
+            SynchronizeClientDictionaries();
+        }
+
         [ServerRpc(RequireOwnership = false)]
         public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers)
         {
@@ -255,6 +268,9 @@ namespace LightPat.Core
         public int playerPrefabOptionIndex;
         public Team team;
         public int[] spawnWeapons;
+        public int kills;
+        public int deaths;
+        public int damageDealt;
 
         public ClientData(string clientName)
         {
@@ -263,6 +279,9 @@ namespace LightPat.Core
             playerPrefabOptionIndex = 0;
             team = Team.Red;
             spawnWeapons = new int[0];
+            kills = 0;
+            deaths = 0;
+            damageDealt = 0;
         }
 
         public ClientData ToggleReady()
@@ -300,6 +319,27 @@ namespace LightPat.Core
             return copy;
         }
 
+        public ClientData ChangeKills(int newKills)
+        {
+            ClientData copy = this;
+            copy.kills = newKills;
+            return copy;
+        }
+
+        public ClientData ChangeDeaths(int newDeaths)
+        {
+            ClientData copy = this;
+            copy.deaths = newDeaths;
+            return copy;
+        }
+
+        public ClientData ChangeDamageDone(int newDamageDealt)
+        {
+            ClientData copy = this;
+            copy.damageDealt = newDamageDealt;
+            return copy;
+        }
+
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref clientName);
@@ -307,6 +347,9 @@ namespace LightPat.Core
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref team);
             serializer.SerializeValue(ref spawnWeapons);
+            serializer.SerializeValue(ref kills);
+            serializer.SerializeValue(ref deaths);
+            serializer.SerializeValue(ref damageDealt);
         }
     }
 }

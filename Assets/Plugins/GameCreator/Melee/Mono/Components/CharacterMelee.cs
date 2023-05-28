@@ -258,6 +258,7 @@ namespace GameCreator.Melee
                                     targetMelee.knockedUpHitCount.Value++; 
                                 }
 
+                                int previousHP = targetMelee.HP.Value;
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
@@ -270,6 +271,15 @@ namespace GameCreator.Melee
                                 else
                                 {
                                     targetMelee.HP.Value -= attack.baseDamage;
+                                }
+
+                                // Send messages for stats in NetworkPlayer script
+                                SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
+
+                                if (targetMelee.HP.Value <= 0 & previousHP > 0)
+                                {
+                                    targetMelee.SendMessage("OnDeath", this);
+                                    SendMessage("OnKill", targetMelee);
                                 }
                             }
 
@@ -511,8 +521,6 @@ namespace GameCreator.Melee
                     hitRenderer.RenderHeal();
                 }
             }
-
-            if (current <= 0 & prev > 0) { SendMessage("OnDeath"); }
         }
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
