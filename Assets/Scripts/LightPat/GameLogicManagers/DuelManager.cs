@@ -119,6 +119,12 @@ namespace LightPat.Core
 
                 if (countdownTime.Value > 0)
                 {
+                    foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                    {
+                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                        playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().SetInvincibility(countdownTime.Value);
+                    }
+
                     countdownTime.Value -= Time.deltaTime;
                     if (countdownTime.Value < 0) { countdownTime.Value = 0; }
                 }
