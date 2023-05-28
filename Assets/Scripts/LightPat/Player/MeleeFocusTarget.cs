@@ -39,7 +39,6 @@ namespace LightPat.Player
 
             // Iterate through box hits and find the first hit that has a CharacterMelee component
             Transform target = null;
-            RaycastHit targetHit = new RaycastHit();
             foreach (RaycastHit hit in allHits)
             {
                 if (hit.transform.root == transform) { continue; }
@@ -47,7 +46,6 @@ namespace LightPat.Player
                 {
                     Core.ExtDebug.DrawBoxCastOnHit(origin, boxCastHalfExtents, orientation, direction, hit.distance, Color.red);
                     target = hit.transform.root;
-                    targetHit = hit;
                     break;
                 }
             }
@@ -55,7 +53,7 @@ namespace LightPat.Player
             if (!target) return;
 
             // If we have a target character, then look at them
-            Vector3 relativePos = targetHit.point - characterCamera.position;
+            Vector3 relativePos = target.position - characterCamera.position;
             relativePos.y = 0;
             transform.rotation = Quaternion.LookRotation(relativePos);
         }
