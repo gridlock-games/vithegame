@@ -59,6 +59,10 @@
         private SerializedProperty spGravityInfluence;
         private SerializedProperty spMovementMultiplier;
 
+        // Lunge Attack Purposes:
+        private SerializedProperty spMovementForward_OnLunge;
+        private SerializedProperty spMovementSides_OnLunge;
+
         // Attack Dodge
         private SerializedProperty spMovementForward_OnAttack;
         private SerializedProperty spMovementSides_OnAttack;
@@ -73,8 +77,11 @@
         private SerializedProperty spHitPauseDuration;
 
         private SerializedProperty spIsAttack;
+        private SerializedProperty spIsModifyFocus;
+        private SerializedProperty spBoxCastHalfExtents;
         private SerializedProperty spIsHeavy;
         private SerializedProperty spIsOrbitLocked;
+        private SerializedProperty spIsLunge;
         private SerializedProperty spAttackType;
         private SerializedProperty spIsDodge;
         private SerializedProperty spIsBlockable;
@@ -131,6 +138,10 @@
             this.spGravityInfluence = this.serializedObject.FindProperty("gravityInfluence");
             this.spMovementMultiplier = this.serializedObject.FindProperty("movementMultiplier");
 
+            // Lunge Attack
+            this.spMovementForward_OnLunge = this.serializedObject.FindProperty("movementForward_OnLunge");
+            this.spMovementSides_OnLunge = this.serializedObject.FindProperty("movementSides_OnLunge");
+
 
             // On Attack Dodge
             this.spMovementForward_OnAttack = this.serializedObject.FindProperty("movementForward_OnAttack");
@@ -146,8 +157,11 @@
             this.spHitPauseDuration = this.serializedObject.FindProperty("hitPauseDuration");
 
             this.spIsAttack = this.serializedObject.FindProperty("isAttack");
+            this.spIsModifyFocus = this.serializedObject.FindProperty("isModifyFocus");
+            this.spBoxCastHalfExtents = this.serializedObject.FindProperty("boxCastHalfExtents");
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
+            this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spAttackType = this.serializedObject.FindProperty("attackType");
             this.spIsDodge = this.serializedObject.FindProperty("isDodge"); 
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
@@ -429,9 +443,31 @@
                     EditorGUI.BeginDisabledGroup(!this.spIsAttack.boolValue);
                     EditorGUI.indentLevel++;
 
+                    EditorGUILayout.PropertyField(this.spIsModifyFocus);
+                    
+                    EditorGUI.BeginDisabledGroup(!this.spIsModifyFocus.boolValue);
+                    
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(this.spBoxCastHalfExtents);
+                    EditorGUI.indentLevel--;
+                    
+                    EditorGUI.EndDisabledGroup();
+
+
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
+                    EditorGUILayout.PropertyField(this.spIsLunge);
+                    
+                    EditorGUI.BeginDisabledGroup(!this.spIsLunge.boolValue);
+                    
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(this.spMovementForward_OnLunge);
+                    EditorGUILayout.PropertyField(this.spMovementSides_OnLunge);
+                    EditorGUI.indentLevel--;
+                    
+                    EditorGUI.EndDisabledGroup();
+
                     EditorGUILayout.PropertyField(this.spAttackType);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
                     EditorGUILayout.PropertyField(this.spPoiseDamage);
@@ -617,6 +653,8 @@
 
         private AnimationCurve ProcessRootCurve(AnimationCurve source)
         {
+            
+            MeleeClip meleeClip = this.target as MeleeClip;
             float value = source.Evaluate(0f);
             float duration = source.keys[source.length - 1].time;
             AnimationCurve result = new AnimationCurve();

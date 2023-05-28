@@ -163,6 +163,8 @@
 
                 case  2:
                     if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
+                    Melee.isLunging = false;
+                    Melee.ReleaseTargetFocus();
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
                     this.EventAttackRecovery.Invoke();
                     break;
