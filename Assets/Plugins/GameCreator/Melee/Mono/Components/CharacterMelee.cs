@@ -120,6 +120,13 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
+        public bool isLunging = false;
+        private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
+            new Keyframe(0f, 0f),
+            new Keyframe(1f, 0f)
+        };
+        public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
         // ACCESSORS: -----------------------------------------------------------------------------
 
         public Character Character { get; protected set; }
@@ -136,6 +143,12 @@ namespace GameCreator.Melee
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
         }
+
+        // FOCUS TARGET: --------------------------------------------------------------------------
+
+        public Transform characterCamera;
+        public Vector3 boxCastHalfExtents = Vector3.one;
+        public float boxCastDistance = 2;
         
         // UPDATE: --------------------------------------------------------------------------------
 
@@ -173,6 +186,8 @@ namespace GameCreator.Melee
                                 OnHeavyAttack();
                             }
                         }
+                        
+                        StartCoroutine(FocusRoutine(meleeClip));
                         
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
@@ -1134,6 +1149,116 @@ namespace GameCreator.Melee
             this.anim_ExecutedDuration = 0.00f;
 
             yield return 0;
+        }
+
+
+        // Target Placement Compensation
+        private IEnumerator FocusRoutine(MeleeClip meleeClip) {
+
+            
+            MeleeClip clip = meleeClip;
+
+            Vector3 originalBoxCastHalfExtents = new Vector3(2.0f, 1.0f, 2.0f);
+
+            this.boxCastHalfExtents = clip.isModifyFocus ? clip.boxCastHalfExtents : originalBoxCastHalfExtents;
+
+            // Visualize boxcast
+            Vector3 origin = transform.position;
+            Quaternion orientation = characterCamera.rotation;
+            Vector3 direction = characterCamera.forward;
+            Debug.DrawRay(transform.position, direction * boxCastDistance, Color.green);
+
+            // Get all hits in boxcast
+            RaycastHit[] allHits = Physics.BoxCastAll(origin, this.boxCastHalfExtents, direction * boxCastDistance, orientation, boxCastDistance);
+            // Sort hits by distance
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            // Iterate through box hits and find the first hit that has a CharacterMelee component
+            Transform target = null;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                if (hit.transform.root.TryGetComponent(out CharacterMelee melee))
+                {
+                    target = hit.transform.root;
+                    break;
+                } else {
+                    target = null;
+                }
+            }
+
+            if (!target) yield break;
+
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
+            
+            if(GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) yield break;
+
+            // If we have a target character, then look at them
+            Vector3 relativePos = target.position - characterCamera.position;
+            relativePos.y = 0;
+            transform.rotation = Quaternion.LookRotation(relativePos);
+            
+
+            float distance = Vector3.Distance(transform.position, target.position);
+            AnimationCurve clipMovementForward = clip.movementForward;
+
+            // If our distance from target is < boxCastHalfExtents.z, then reduce/increase movementForwardCurve
+            if (distance <= boxCastHalfExtents.z && clip.isLunge)
+            {
+                TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
+                SetTargetFocus(targetMelee);
+
+                movementForward.keys = AdjustCurve(clipMovementForward, distance);
+                isLunging = true;
+            }
+
+            yield return null;
+        }
+
+        private Keyframe[] AdjustCurve(AnimationCurve curve, float newMaxDistance)
+        {
+            Keyframe[] keyframes = curve.keys;
+            float prvMaxDistance = keyframes[keyframes.Length - 1].value;
+            float sweetSpot = newMaxDistance > prvMaxDistance ? newMaxDistance * 0.60f : newMaxDistance * 0.75f;
+            float pctDiffPrvNew = ComputePercentageDifference(prvMaxDistance, sweetSpot);
+
+            
+            for (int i = 0; i < keyframes.Length; i++)
+            {
+                Keyframe keyframe = keyframes[i];
+                float keyVal = keyframe.value;
+
+                if(pctDiffPrvNew < 0f) {
+                    keyframe.value = Convert.ToSingle(keyVal) - (keyVal * Math.Abs(pctDiffPrvNew));
+                } else if ( pctDiffPrvNew > 0f) {
+                    keyframe.value +=  Convert.ToSingle(keyVal) * pctDiffPrvNew;
+                }
+                
+                keyframes[i] = keyframe;
+            }
+            
+            return keyframes;
+        }
+
+        private float ComputePercentageDifference(float oldValue, float newValue)
+        {
+            // Compute the difference between the old and new values
+            float difference = newValue - oldValue;
+
+            return (difference / oldValue);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if(characterCamera) {
+                Vector3 origin = transform.position;
+                Quaternion orientation = characterCamera.rotation;
+                Vector3 direction = characterCamera.forward;
+                
+                Gizmos.color = Color.yellow;
+                Gizmos.matrix = Matrix4x4.TRS(origin, orientation, Vector3.one);
+                Gizmos.DrawWireCube(Vector3.forward * boxCastDistance, this.boxCastHalfExtents);
+            }
         }
     }
 }

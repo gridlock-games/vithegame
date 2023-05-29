@@ -21,7 +21,8 @@
             InputBackwards,
             InputLeft,
             InputRight,
-            IsDashing
+            IsDashing,
+            InputWKeyTwice
         }
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
@@ -164,7 +165,6 @@
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
         private float GetRunningAngle()
         {
             float runSpeed = this.melee.Character.characterLocomotion.runSpeed - 0.15f;

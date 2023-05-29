@@ -22,15 +22,18 @@ namespace LightPat.Player
 
         private void Update()
         {
-            if (!IsLocalPlayer) return;
+            
+            StartCoroutine(FocusRoutine());
+        }
+
+        private IEnumerator FocusRoutine() {
 
             // Visualize boxcast
             Vector3 origin = transform.position;
             Quaternion orientation = characterCamera.rotation;
             Vector3 direction = characterCamera.forward;
-            Core.ExtDebug.DrawBoxCastOnHit(origin, boxCastHalfExtents, orientation, direction, boxCastDistance, Color.green);
 
-            if (!melee.IsAttacking) return;
+            if (!melee.IsAttacking) yield break;
 
             // Get all hits in boxcast
             RaycastHit[] allHits = Physics.BoxCastAll(origin, boxCastHalfExtents, direction, orientation, boxCastDistance);
@@ -44,17 +47,30 @@ namespace LightPat.Player
                 if (hit.transform.root == transform) { continue; }
                 if (hit.transform.root.TryGetComponent(out CharacterMelee melee))
                 {
-                    Core.ExtDebug.DrawBoxCastOnHit(origin, boxCastHalfExtents, orientation, direction, hit.distance, Color.red);
                     target = hit.transform.root;
                     break;
                 }
             }
 
-            if (!target) return;
+            if (!target) yield break;
+            
+
+            float distance = Vector3.Distance(melee.transform.position, target.position);
+            MeleeClip clip = melee.currentMeleeClip;
+
+            // If our distance from target is < 1.50f, then reduce rootmovement impulse
+            if (distance < 1.50f && clip.isLunge)
+            {
+                Debug.Log("1");
+                melee.isLunging = true;
+            }
+
             // If we have a target character, then look at them
             Vector3 relativePos = target.position - characterCamera.position;
             relativePos.y = 0;
             transform.rotation = Quaternion.LookRotation(relativePos);
+
+            yield return null;
         }
     }
 }

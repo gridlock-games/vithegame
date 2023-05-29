@@ -20,6 +20,10 @@ namespace GameCreator.Melee
 
         private SerializedProperty spEventKnockedUpHitLimitReached;
 
+        private SerializedProperty spCharacterCamera;
+        private SerializedProperty spBoxCastHalfExtents;
+        private SerializedProperty spBoxCastDistance;
+
         // INITIALIZER: ---------------------------------------------------------------------------
 
         private void OnEnable()
@@ -31,6 +35,11 @@ namespace GameCreator.Melee
             this.spPoiseDelay = this.serializedObject.FindProperty("delayPoise");
             this.spPoiseMax = this.serializedObject.FindProperty("maxPoise");
             this.spPoiseRecovery = this.serializedObject.FindProperty("poiseRecoveryRate");
+
+            
+            this.spCharacterCamera = this.serializedObject.FindProperty("characterCamera");
+            this.spBoxCastHalfExtents = this.serializedObject.FindProperty("boxCastHalfExtents");
+            this.spBoxCastDistance = this.serializedObject.FindProperty("boxCastDistance");
 
             this.spEventKnockedUpHitLimitReached = this.serializedObject.FindProperty("EventKnockedUpHitLimitReached");
         }
@@ -51,6 +60,13 @@ namespace GameCreator.Melee
             EditorGUILayout.PropertyField(this.spPoiseDelay);
             EditorGUILayout.PropertyField(this.spPoiseMax);
             EditorGUILayout.PropertyField(this.spPoiseRecovery);
+
+            
+
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(this.spCharacterCamera);
+            EditorGUILayout.PropertyField(this.spBoxCastHalfExtents);
+            EditorGUILayout.PropertyField(this.spBoxCastDistance);
 
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(this.spEventKnockedUpHitLimitReached);
