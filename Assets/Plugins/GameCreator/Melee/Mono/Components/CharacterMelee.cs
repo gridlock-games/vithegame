@@ -57,10 +57,10 @@ namespace GameCreator.Melee
 
         public MeleeWeapon currentWeapon;
         public MeleeShield currentShield;
-        
+
         public MeleeWeapon previousWeapon;
         public MeleeShield previousShield;
-        
+
         protected ComboSystem comboSystem;
         protected InputBuffer inputBuffer;
 
@@ -149,7 +149,7 @@ namespace GameCreator.Melee
         public Transform characterCamera;
         public Vector3 boxCastHalfExtents = Vector3.one;
         public float boxCastDistance = 2;
-        
+
         // UPDATE: --------------------------------------------------------------------------------
 
         protected virtual void Update()
@@ -186,9 +186,10 @@ namespace GameCreator.Melee
                                 OnHeavyAttack();
                             }
                         }
-                        
-                        StartCoroutine(FocusRoutine(meleeClip));
-                        
+
+                        if (IsOwner)
+                            FocusTarget(meleeClip);
+
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
@@ -208,7 +209,8 @@ namespace GameCreator.Melee
         {
             this.IsAttacking = false;
 
-            if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) {
+            if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
                 this.isStaggered = true;
             }
 
@@ -245,13 +247,14 @@ namespace GameCreator.Melee
                                 if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
                                 {
                                     targetMelee.knockedUpHitCount.Value = 0;
-                                    if(attack.attackType != AttackType.Knockdown)
+                                    if (attack.attackType != AttackType.Knockdown)
                                         targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
                                     targetMelee.EventKnockedUpHitLimitReached.Invoke();
                                 }
 
                                 // Set Ailments here
-                                switch(attack.attackType) {
+                                switch (attack.attackType)
+                                {
                                     case AttackType.Stun:
                                         targetMelee.Character.Stun();
                                         break;
@@ -263,20 +266,21 @@ namespace GameCreator.Melee
                                         targetMelee.Character.Knockup(this.Character, targetMelee.Character);
                                         break;
                                     case AttackType.None:
-                                        if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) {
+                                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                                             targetMelee.Character.CancelAilment();
-                                        }
                                         break;
                                 }
 
-                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { 
-                                    targetMelee.knockedUpHitCount.Value++; 
+                                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                                {
+                                    targetMelee.knockedUpHitCount.Value++;
                                 }
 
                                 int previousHP = targetMelee.HP.Value;
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown)
+                                {
                                     hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                     if (hitResult == HitResult.ReceiveDamage)
                                         targetMelee.HP.Value -= attack.baseDamage;
@@ -406,7 +410,7 @@ namespace GameCreator.Melee
             this.Character.characterLocomotion.isBusy = false;
         }
 
-        public void TestDraw() => StartCoroutine(Draw(this.currentWeapon,  currentShield));
+        public void DrawWeapon() => StartCoroutine(Draw(this.currentWeapon, currentShield));
 
         public IEnumerator Draw(MeleeWeapon weapon, MeleeShield shield = null)
         {
@@ -745,7 +749,7 @@ namespace GameCreator.Melee
         public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, BladeComponent blade)
         {
             if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
-            
+
             if (blade == null)
             {
                 Debug.LogError("No BladeComponent found. Add one in your Weapon Asset", this);
@@ -761,18 +765,18 @@ namespace GameCreator.Melee
             OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
 
             if (this.currentWeapon == null) return HitResult.ReceiveDamage;
-            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.ReceiveDamage;
-            if (this.Character.characterAilment ==  CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return HitResult.ReceiveDamage;
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.ReceiveDamage;
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return HitResult.ReceiveDamage;
             if (this.IsInvincible) return HitResult.Ignore;
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
             #region Attack and Defense handlers
 
-           float attackAngle = Vector3.Angle(
-                attacker.transform.TransformDirection(Vector3.forward),
-                this.transform.TransformDirection(Vector3.forward)
-            );
+            float attackAngle = Vector3.Angle(
+                 attacker.transform.TransformDirection(Vector3.forward),
+                 this.transform.TransformDirection(Vector3.forward)
+             );
 
             float defenseAngle = this.currentShield != null
                 ? this.currentShield.defenseAngle.GetValue(gameObject)
@@ -855,7 +859,7 @@ namespace GameCreator.Melee
 
             this.AddPoise(-attack.poiseDamage);
 
-            
+
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
@@ -1024,7 +1028,8 @@ namespace GameCreator.Melee
                 impact.transform.position = position;
             }
 
-            if (currentWeapon.prefabImpactHit != null) {
+            if (currentWeapon.prefabImpactHit != null)
+            {
                 GameObject impact = PoolManager.Instance.Pick(currentWeapon.prefabImpactHit);
                 impact.transform.position = position;
             }
@@ -1068,7 +1073,8 @@ namespace GameCreator.Melee
                 time = Mathf.Max(TRANSITION, time) * 0.5f;
                 this.CharacterAnimator.SetState(state, mask, 1f, time, 1f, layer);
 
-                if(animator != null) {
+                if (animator != null)
+                {
                     animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), false);
                 }
             }
@@ -1100,23 +1106,24 @@ namespace GameCreator.Melee
             return hitLocation;
         }
 
-        public bool Grab(CharacterMelee targetCharacter) {
+        public bool Grab(CharacterMelee targetCharacter)
+        {
             CharacterMelee executorCharacter = this;
 
             MeleeWeapon executorWeapon = this.currentWeapon;
 
-            if(targetCharacter == null || executorCharacter == null) return false;
+            if (targetCharacter == null || executorCharacter == null) return false;
 
             this.anim_ExecuterDuration = (executorWeapon.grabAttack.animationClip.length);
             this.anim_ExecutedDuration = (executorWeapon.grabReaction.animationClip.length);
 
             executorCharacter.IsGrabbing = true;
             targetCharacter.IsGrabbed = true;
-            
+
             // Cancel any Melee input
             targetCharacter.StopAttack();
             executorCharacter.StopAttack();
-            
+
             // Make Character Invincible
             targetCharacter.SetInvincibility(9999999999f);
 
@@ -1136,7 +1143,8 @@ namespace GameCreator.Melee
         {
             float initTime = Time.time;
 
-            while (initTime + this.anim_ExecutedDuration >= Time.time) {
+            while (initTime + this.anim_ExecutedDuration >= Time.time)
+            {
                 executorCharacter.IsGrabbing = true;
                 targetCharacter.IsGrabbed = true;
 
@@ -1151,11 +1159,9 @@ namespace GameCreator.Melee
             yield return 0;
         }
 
-
         // Target Placement Compensation
-        private IEnumerator FocusRoutine(MeleeClip meleeClip) {
-
-            
+        private void FocusTarget(MeleeClip meleeClip)
+        {
             MeleeClip clip = meleeClip;
 
             Vector3 originalBoxCastHalfExtents = new Vector3(2.0f, 1.0f, 2.0f);
@@ -1170,8 +1176,9 @@ namespace GameCreator.Melee
 
             // Get all hits in boxcast
             RaycastHit[] allHits = Physics.BoxCastAll(origin, this.boxCastHalfExtents, direction * boxCastDistance, orientation, boxCastDistance);
+            ExtDebug.DrawBoxCastOnHit(origin, this.boxCastHalfExtents, orientation, direction * boxCastDistance, boxCastDistance, Color.green, 1);
             // Sort hits by distance
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
             // Iterate through box hits and find the first hit that has a CharacterMelee component
             Transform target = null;
@@ -1180,24 +1187,22 @@ namespace GameCreator.Melee
                 if (hit.transform.root == transform) { continue; }
                 if (hit.transform.root.TryGetComponent(out CharacterMelee melee))
                 {
+                    ExtDebug.DrawBoxCastOnHit(origin, this.boxCastHalfExtents, orientation, direction * hit.distance, hit.distance, Color.red, 1);
                     target = hit.transform.root;
                     break;
-                } else {
-                    target = null;
                 }
             }
 
-            if (!target) yield break;
+            if (!target) return;
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
-            
-            if(GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) yield break;
+
+            if (GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) return;
 
             // If we have a target character, then look at them
             Vector3 relativePos = target.position - characterCamera.position;
             relativePos.y = 0;
             transform.rotation = Quaternion.LookRotation(relativePos);
-            
 
             float distance = Vector3.Distance(transform.position, target.position);
             AnimationCurve clipMovementForward = clip.movementForward;
@@ -1211,8 +1216,6 @@ namespace GameCreator.Melee
                 movementForward.keys = AdjustCurve(clipMovementForward, distance);
                 isLunging = true;
             }
-
-            yield return null;
         }
 
         private Keyframe[] AdjustCurve(AnimationCurve curve, float newMaxDistance)
@@ -1222,21 +1225,24 @@ namespace GameCreator.Melee
             float sweetSpot = newMaxDistance > prvMaxDistance ? newMaxDistance * 0.60f : newMaxDistance * 0.75f;
             float pctDiffPrvNew = ComputePercentageDifference(prvMaxDistance, sweetSpot);
 
-            
+
             for (int i = 0; i < keyframes.Length; i++)
             {
                 Keyframe keyframe = keyframes[i];
                 float keyVal = keyframe.value;
 
-                if(pctDiffPrvNew < 0f) {
+                if (pctDiffPrvNew < 0f)
+                {
                     keyframe.value = Convert.ToSingle(keyVal) - (keyVal * Math.Abs(pctDiffPrvNew));
-                } else if ( pctDiffPrvNew > 0f) {
-                    keyframe.value +=  Convert.ToSingle(keyVal) * pctDiffPrvNew;
                 }
-                
+                else if (pctDiffPrvNew > 0f)
+                {
+                    keyframe.value += Convert.ToSingle(keyVal) * pctDiffPrvNew;
+                }
+
                 keyframes[i] = keyframe;
             }
-            
+
             return keyframes;
         }
 
@@ -1250,11 +1256,12 @@ namespace GameCreator.Melee
 
         private void OnDrawGizmos()
         {
-            if(characterCamera) {
+            if (characterCamera)
+            {
                 Vector3 origin = transform.position;
                 Quaternion orientation = characterCamera.rotation;
                 Vector3 direction = characterCamera.forward;
-                
+
                 Gizmos.color = Color.yellow;
                 Gizmos.matrix = Matrix4x4.TRS(origin, orientation, Vector3.one);
                 Gizmos.DrawWireCube(Vector3.forward * boxCastDistance, this.boxCastHalfExtents);

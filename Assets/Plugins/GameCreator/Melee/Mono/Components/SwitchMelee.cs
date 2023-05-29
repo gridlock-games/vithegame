@@ -106,7 +106,7 @@ namespace GameCreator.Melee
                 _characterMelee.currentWeapon = weapon.meleeWeapon;
                 _characterMelee.currentShield = weapon.meleeWeapon.defaultShield;
                 
-                _characterMelee.TestDraw();
+                _characterMelee.DrawWeapon();
 
                 //_characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
                 //Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");
