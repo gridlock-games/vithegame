@@ -29,13 +29,14 @@ namespace LightPat.Core
 
         private NetworkVariable<FixedString32Bytes> countdownTimeMessage = new NetworkVariable<FixedString32Bytes>("Starting the duel!");
 
-        public override void OnPlayerDeath(Team team)
+        public override void OnPlayerKill(ulong killerClientId)
         {
             if (IsServer)
             {
-                if (team == Team.Red)
+                Team killerTeam = ClientManager.Singleton.GetClient(killerClientId).team;
+                if (killerTeam == Team.Red)
                     redScore.Value += 1;
-                else if (team == Team.Blue)
+                else if (killerTeam == Team.Blue)
                     blueScore.Value += 1;
             }
         }

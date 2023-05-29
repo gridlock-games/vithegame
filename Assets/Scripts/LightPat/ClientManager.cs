@@ -201,6 +201,8 @@ namespace LightPat.Core
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeKills(clientDataDictionary[clientId].kills + killsToAdd);
             SynchronizeClientDictionaries();
+
+            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerKill(clientId);
         }
 
         public void AddDeaths(ulong clientId, int deathsToAdd)
@@ -209,6 +211,8 @@ namespace LightPat.Core
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDeaths(clientDataDictionary[clientId].deaths + deathsToAdd);
             SynchronizeClientDictionaries();
+
+            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(clientId);
         }
 
         public void AddDamage(ulong clientId, int damageToAdd)

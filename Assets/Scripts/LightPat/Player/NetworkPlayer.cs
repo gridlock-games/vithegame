@@ -140,7 +140,6 @@ namespace LightPat.Player
         {
             if (!ClientManager.Singleton) { return; }
             ClientManager.Singleton.AddDeaths(OwnerClientId, 1);
-            NetworkManager.SpawnManager.SpawnedObjects[ClientManager.Singleton.gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(ClientManager.Singleton.GetClient(OwnerClientId).team);
         }
     }
 }
