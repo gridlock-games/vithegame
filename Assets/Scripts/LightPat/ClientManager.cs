@@ -11,6 +11,7 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject serverCameraPrefab;
+        public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
@@ -19,39 +20,15 @@ namespace LightPat.Core
 
         private static ClientManager _singleton;
 
-        public static ClientManager Singleton
-        {
-            get
-            {
-                if (_singleton == null)
-                {
-                    Debug.Log("Client Manager is Null");
-                }
+        public static ClientManager Singleton { get { return _singleton; } }
 
-                return _singleton;
-            }
-        }
+        public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
-        public Dictionary<ulong, ClientData> GetClientDataDictionary()
-        {
-            return clientDataDictionary;
-        }
+        public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
-        public ClientData GetClient(ulong clientId)
-        {
-            return clientDataDictionary[clientId];
-        }
+        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
-        public void QueueClient(ulong clientId, ClientData clientData)
-        {
-            queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData));
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void UpdateGameModeServerRpc(GameMode newGameMode)
-        {
-            gameMode.Value = newGameMode;
-        }
+        [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
         public override void OnNetworkSpawn()
         {
@@ -98,13 +75,14 @@ namespace LightPat.Core
         private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName)
         {
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-            SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
+            SpawnPlayerServerRpc(NetworkManager.LocalClientId);
         }
 
-        private IEnumerator SpawnServerCamera(string sceneName)
+        private IEnumerator WaitForServerSceneChange(string sceneName)
         {
             if (IsClient) { yield break; }
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
             GameObject cameraObject = Instantiate(serverCameraPrefab);
         }
 
@@ -152,7 +130,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = true;
+            response.Approved = SceneManager.GetActiveScene().name == "Lobby";
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -168,7 +146,8 @@ namespace LightPat.Core
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
 
-            QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
+            if (response.Approved)
+                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
         }
 
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
@@ -190,17 +169,22 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void ChangeTeamServerRpc(ulong clientId, Team newTeam)
+        public void ChangeTeamOnServer(ulong clientId, Team newTeam)
         {
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeTeam(newTeam);
-            SynchronizeClientDictionaries();
+            if (!IsServer) { Debug.LogError("ChangeTeamOnServer() should only be called on the server."); return; }
+            ChangeTeam(clientId, newTeam);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void ChangeColorsServerRpc(ulong clientId, Color[] newColors)
+        public void ChangeTeamServerRpc(ulong clientId, Team newTeam)
         {
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeColors(newColors);
+            ChangeTeam(clientId, newTeam);
+        }
+
+        private void ChangeTeam(ulong clientId, Team newTeam)
+        {
+            if (clientDataDictionary[clientId].team == newTeam) { return; }
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeTeam(newTeam);
             SynchronizeClientDictionaries();
         }
 
@@ -217,6 +201,8 @@ namespace LightPat.Core
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeKills(clientDataDictionary[clientId].kills + killsToAdd);
             SynchronizeClientDictionaries();
+
+            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerKill(clientId);
         }
 
         public void AddDeaths(ulong clientId, int deathsToAdd)
@@ -225,13 +211,15 @@ namespace LightPat.Core
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDeaths(clientDataDictionary[clientId].deaths + deathsToAdd);
             SynchronizeClientDictionaries();
+
+            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(clientId);
         }
 
-        public void AddDamage(ulong clientId, float damageToAdd)
+        public void AddDamage(ulong clientId, int damageToAdd)
         {
             if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDamageDone(clientDataDictionary[clientId].damageDone + damageToAdd);
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDamageDone(clientDataDictionary[clientId].damageDealt + damageToAdd);
             SynchronizeClientDictionaries();
         }
 
@@ -239,10 +227,11 @@ namespace LightPat.Core
         public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers)
         {
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
-            NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
             if (spawnPlayers)
             {
-                StartCoroutine(SpawnServerCamera(sceneName));
+                StartCoroutine(WaitForServerSceneChange(sceneName));
                 SpawnAllPlayersOnSceneChangeClientRpc(sceneName);
             }
         }
@@ -250,16 +239,23 @@ namespace LightPat.Core
         [ServerRpc(RequireOwnership = false)]
         void SpawnPlayerServerRpc(ulong clientId)
         {
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
+            SynchronizeClientDictionaries();
+
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
 
-            foreach (TeamSpawnPoint teamSpawnPoint in FindObjectOfType<GameLogicManager>().spawnPoints)
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
-                if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
+                foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
                 {
-                    spawnPosition = teamSpawnPoint.spawnPosition;
-                    spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                    break;
+                    if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                    {
+                        spawnPosition = teamSpawnPoint.spawnPosition;
+                        spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                        break;
+                    }
                 }
             }
 
@@ -275,11 +271,10 @@ namespace LightPat.Core
         public bool ready;
         public int playerPrefabOptionIndex;
         public Team team;
-        public Color[] colors;
         public int[] spawnWeapons;
         public int kills;
         public int deaths;
-        public float damageDone;
+        public int damageDealt;
 
         public ClientData(string clientName)
         {
@@ -287,17 +282,23 @@ namespace LightPat.Core
             ready = false;
             playerPrefabOptionIndex = 0;
             team = Team.Red;
-            colors = new Color[1];
             spawnWeapons = new int[0];
             kills = 0;
             deaths = 0;
-            damageDone = 0;
+            damageDealt = 0;
         }
 
         public ClientData ToggleReady()
         {
             ClientData copy = this;
             copy.ready = !copy.ready;
+            return copy;
+        }
+
+        public ClientData SetReady(bool status)
+        {
+            ClientData copy = this;
+            copy.ready = status;
             return copy;
         }
 
@@ -312,13 +313,6 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.team = newTeam;
-            return copy;
-        }
-
-        public ClientData ChangeColors(Color[] newColorArray)
-        {
-            ClientData copy = this;
-            copy.colors = newColorArray;
             return copy;
         }
 
@@ -343,10 +337,10 @@ namespace LightPat.Core
             return copy;
         }
 
-        public ClientData ChangeDamageDone(float newDamageDone)
+        public ClientData ChangeDamageDone(int newDamageDealt)
         {
             ClientData copy = this;
-            copy.damageDone = newDamageDone;
+            copy.damageDealt = newDamageDealt;
             return copy;
         }
 
@@ -356,11 +350,10 @@ namespace LightPat.Core
             serializer.SerializeValue(ref ready);
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref team);
-            serializer.SerializeValue(ref colors);
             serializer.SerializeValue(ref spawnWeapons);
             serializer.SerializeValue(ref kills);
             serializer.SerializeValue(ref deaths);
-            serializer.SerializeValue(ref damageDone);
+            serializer.SerializeValue(ref damageDealt);
         }
     }
 }

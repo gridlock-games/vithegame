@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-namespace LightPat.Core
+namespace GameCreator.Characters
 {
     public class ServerPositionOwnerRotationNetworkTransform : NetworkBehaviour
     {
@@ -20,6 +20,10 @@ namespace LightPat.Core
 
         float positionSpeed = 10;
         float rotationSpeed = 10;
+
+        public Vector3 GetPosition() { return currentPosition.Value; }
+        public Quaternion GetRotation() { return currentRotation.Value; }
+        public Vector3 GetScale() { return currentScale.Value; }
 
         public void SetParent(NetworkObject newParent)
         {

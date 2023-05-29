@@ -17,10 +17,12 @@ namespace LightPat.UI
         public Vector3 iconSpacing;
         public GameObject startButton;
         public GameObject readyButton;
-        public GameObject changeTeamButton;
+        public Button changeTeamButton;
+        public Button startGameButton;
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
         public TMP_Dropdown playerModelDropdown;
+        public TextMeshProUGUI errorDisplay;
         [Header("Loadout dropdowns")]
         public TMP_Dropdown primaryWeaponDropdown;
         public TMP_Dropdown secondaryWeaponDropdown;
@@ -49,9 +51,13 @@ namespace LightPat.UI
             loadingGame = true;
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
+            {
                 ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true);
+            }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
+            {
                 ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Deathmatch", true);
+            }
         }
 
         public void UpdateWeaponLoadout()
@@ -82,7 +88,6 @@ namespace LightPat.UI
             bool nextTeam = false;
             bool reached = false;
             ulong localClientId = NetworkManager.Singleton.LocalClientId;
-            Team originalTeam = ClientManager.Singleton.GetClient(localClientId).team;
             foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
             {
                 if (nextTeam)
@@ -166,7 +171,11 @@ namespace LightPat.UI
                 }
             }
 
-            // Put main camera in right spot
+            // If our game mode is not set to duel, enable teams
+            bool enableTeams = (GameMode)System.Enum.Parse(typeof(GameMode), gameModeDropdown.options[gameModeDropdown.value].text) != GameMode.Duel;
+            changeTeamButton.interactable = enableTeams;
+
+            // Put main camera in right spot to view player model
             if (playerModel)
                 Camera.main.transform.position = playerModel.transform.position + cameraPositionOffset;
 
@@ -192,15 +201,10 @@ namespace LightPat.UI
 
                 // Set the color of the team button
                 Color teamColor = Color.black;
-                if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red)
-                {
-                    teamColor = Color.red;
-                }
-                else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue)
-                {
-                    teamColor = Color.blue;
-                }
-                nameIcon.GetComponentInChildren<Button>().GetComponent<Image>().color = teamColor;
+                if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red) { teamColor = Color.red; }
+                else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue) { teamColor = Color.blue; }
+                nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
+                nameIcon.GetComponentInChildren<Button>(true).gameObject.SetActive(enableTeams);
 
                 // Change color of ready icon
                 if (valuePair.Value.ready)
@@ -208,18 +212,14 @@ namespace LightPat.UI
                     Color newColor = new Color(0, 255, 0, 255);
                     nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
-                    {
                         readyButton.GetComponent<Image>().color = newColor;
-                    }
                 }
                 else
                 {
                     Color newColor = new Color(255, 0, 0, 255);
                     nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
-                    {
                         readyButton.GetComponent<Image>().color = newColor;
-                    }
                 }
                 
                 // Only make crown icon visible on the lobby leader
@@ -238,6 +238,40 @@ namespace LightPat.UI
                     playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
                 }
             }
+
+            bool canStartGame = false;
+            if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
+            {
+                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
+                if (clientIdArray.Length < 2)
+                {
+                    errorDisplay.SetText("Duel requires there to be at least 2 players in the lobby");
+                }
+                else if (clientIdArray.Length > 2)
+                {
+                    errorDisplay.SetText("Duel requires there to be only 2 players in the lobby");
+                }
+                else
+                {
+                    errorDisplay.SetText("");
+
+                    canStartGame = true;
+
+                    if (NetworkManager.Singleton.IsServer)
+                    {
+                        int counter = 0;
+                        foreach (ulong clientId in clientIdArray)
+                        {
+                            if (counter == 0)
+                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
+                            else if (counter == 1)
+                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
+                            counter++;
+                        }
+                    }
+                }
+            }
+            startGameButton.interactable = canStartGame;
 
             if (everyoneIsReady)
             {

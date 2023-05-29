@@ -74,11 +74,11 @@ namespace GameCreator.Camera
             if (cameraController == null)
             {
                 Camera mainCamera = Camera.main ?? FindObjectOfType<Camera>();
-                if (mainCamera != null)
-                {
-                    cameraController = mainCamera.gameObject.AddComponent<CameraController>();
-                    cameraController.currentCameraMotor = this.cameraMotor;
-                }
+                //if (mainCamera != null)
+                //{
+                //    cameraController = mainCamera.gameObject.AddComponent<CameraController>();
+                //    cameraController.currentCameraMotor = this.cameraMotor;
+                //}
             }
 
             this.InitPreviewCamera();

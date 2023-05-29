@@ -156,6 +156,8 @@
         public bool save;
         protected SaveData initSaveData = new SaveData();
 
+        public NetworkVariable<bool> disableActions = new NetworkVariable<bool>();
+
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
         // INITIALIZERS: --------------------------------------------------------------------------
@@ -182,13 +184,13 @@
                     Stun();
                     break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
-                    Knockdown(this, null);
+                    Knockdown(null, this);
                     break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
-                    Knockup(this, null);
+                    Knockup(null, this);
                     break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
-                    if (characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned) { CancelAilment(); }
+                    CancelAilment();
                     break;
             }
         }
@@ -396,10 +398,9 @@
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
-                if (target)
+                if (IsServer)
                 {
-                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                    target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                 }
 
                 if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
@@ -411,7 +412,7 @@
                 else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, IsServer);
                 }
 
                 return true;
@@ -429,10 +430,9 @@
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
                 // If the target is null, that means we are calling this from a client, rather than the server
-                if (target)
+                if (IsServer)
                 {
-                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                    target.UpdateRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                    target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                 }
 
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
@@ -443,7 +443,7 @@
                 else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, IsServer);
                 }
 
                 return true;
@@ -454,7 +454,31 @@
             }
         }
 
-        [ClientRpc] public void UpdateRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams) { transform.rotation = newRotation; }
+        [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams)
+        {
+            //Vector3 rotationDirection = Vector3.Scale(targetRotation.eulerAngles, PLANE).normalized;
+            //this.characterLocomotion.SetRotation(targetRotation.eulerAngles);
+            transform.rotation = targetRotation;
+            //Debug.Log(targetRotation.eulerAngles + " ");
+        }
+
+        [ClientRpc]
+        private void UpdateAilmentRotationClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
+        {
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
+            PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
+            target.transform.rotation = rotationConfig.quaternion;
+            target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
+        }
+
+        private bool ailmentRotationRecieved;
+        [ServerRpc]
+        private void AilmentRotationHasBeenRecievedServerRpc(Vector3 targetEulerAngles)
+        {
+            transform.rotation = Quaternion.Euler(targetEulerAngles);
+            ailmentRotationRecieved = true;
+        }
 
         /* Pause for a given duration if the target character is coming from another ailment.
         Ailments: Stun, Knockup*/
@@ -466,7 +490,7 @@
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, IsServer);
         }
 
         /* Pause for a given duration if the target character is coming from another ailment
@@ -479,7 +503,7 @@
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, IsServer);
         }
 
         /* This is needed so that the character won't immediatley go through 
@@ -510,8 +534,19 @@
             }
         }
 
-        public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState)
+        public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState, bool waitForRotationRecieved = false)
         {
+            StartCoroutine(UpdateAilmentCoroutine(ailment, waitForRotationRecieved));
+        }
+
+        private IEnumerator UpdateAilmentCoroutine(CharacterLocomotion.CHARACTER_AILMENTS ailment, bool waitForRotationRecieved)
+        {
+            if (waitForRotationRecieved)
+            {
+                yield return new WaitUntil(() => ailmentRotationRecieved);
+                ailmentRotationRecieved = false;
+            }
+            
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
@@ -565,8 +600,10 @@
             this.onAilmentEvent.Invoke(ailment);
         }
 
+        public bool resetDefaultStateRunning { get; private set; }
         private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
         {
+            resetDefaultStateRunning = true;
             float initTime = Time.time;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
@@ -604,23 +641,25 @@
             this.onAilmentEvent.Invoke(this.characterAilment);
 
             yield return 0;
+
+            resetDefaultStateRunning = false;
         }
 
         private PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
+            ServerPositionOwnerRotationNetworkTransform anchorNetworkTransform = anchor.GetComponent<ServerPositionOwnerRotationNetworkTransform>();
+            ServerPositionOwnerRotationNetworkTransform targetNetworkTransform = targetChar.GetComponent<ServerPositionOwnerRotationNetworkTransform>();
 
-            Vector3 rotationDirection = (
-                anchor.transform.position - targetChar.gameObject.transform.position
-            );
+            Vector3 anchorPosition = anchorNetworkTransform ? anchorNetworkTransform.GetPosition() : anchor.transform.position;
+            Vector3 targetPosition = targetNetworkTransform ? targetNetworkTransform.GetPosition() : targetChar.transform.position;
+
+            Vector3 rotationDirection = anchorPosition - targetPosition;
 
             Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, anchor.transform.up);
             rotationDirection = Vector3.Scale(rotationDirection, PLANE).normalized;
             targetChar.characterLocomotion.SetRotation(rotationDirection);
 
-            PreserveRotation preserveRotation = new PreserveRotation(targetRotation, rotationDirection);
-
-            return preserveRotation;
-
+            return new PreserveRotation(targetRotation, rotationDirection);
         }
 
         public void RootMovement(float impulse, float duration, float gravityInfluence,

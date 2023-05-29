@@ -43,7 +43,7 @@
 			if (melee == null) return false;
 
 
-			float var1 = melee.Poise.Value;
+			float var1 = melee.GetPoise();
 			float var2 = this.compareTo.GetValue(target);
 
 			switch (this.comparison)

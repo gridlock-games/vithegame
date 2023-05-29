@@ -32,9 +32,7 @@ namespace GameCreator.Melee
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
         [SerializeField] private VisualEffect _switchWeaponVFX;
-        private bool isSwapped = false;
         
-
         private void Awake()
         {
             _characterMelee = GetComponent<CharacterMelee>();
@@ -44,7 +42,8 @@ namespace GameCreator.Melee
 
         private void Start()
         {
-            _switchWeaponVFX.Stop();
+            if (_switchWeaponVFX)
+                _switchWeaponVFX.Stop();
         }
 
         private void LateUpdate()
@@ -107,7 +106,7 @@ namespace GameCreator.Melee
                 _characterMelee.currentWeapon = weapon.meleeWeapon;
                 _characterMelee.currentShield = weapon.meleeWeapon.defaultShield;
                 
-                _characterMelee.TestDraw();
+                _characterMelee.DrawWeapon();
 
                 //_characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
                 //Debug.Log($"{_currentWeaponType.Value} _currentWeaponType");

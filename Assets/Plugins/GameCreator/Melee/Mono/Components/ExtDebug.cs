@@ -2,37 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LightPat.Core
+namespace GameCreator.Melee
 {
     public static class ExtDebug
     {
-        public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color)
+        public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color, float duration)
         {
-            DrawBox(new Box(origin, halfExtents, orientation), color);
+            DrawBox(new Box(origin, halfExtents, orientation), color, duration);
         }
 
-        public static void DrawBox(Box box, Color color)
+        public static void DrawBox(Box box, Color color, float duration)
         {
-            Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color);
-            Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color);
-            Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color);
-            Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color);
+            Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color, duration);
+            Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color, duration);
+            Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color, duration);
+            Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color, duration);
 
-            Debug.DrawLine(box.backTopLeft, box.backTopRight, color);
-            Debug.DrawLine(box.backTopRight, box.backBottomRight, color);
-            Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color);
-            Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color);
+            Debug.DrawLine(box.backTopLeft, box.backTopRight, color, duration);
+            Debug.DrawLine(box.backTopRight, box.backBottomRight, color, duration);
+            Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color, duration);
+            Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color, duration);
 
-            Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color);
-            Debug.DrawLine(box.frontTopRight, box.backTopRight, color);
-            Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color);
-            Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color);
+            Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color, duration);
+            Debug.DrawLine(box.frontTopRight, box.backTopRight, color, duration);
+            Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color, duration);
+            Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color, duration);
         }
 
-        public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Vector3 direction, float hitInfoDistance, Color color)
+        public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Vector3 direction, float hitInfoDistance, Color color, float duration)
         {
             origin = CastCenterOnCollision(origin, direction, hitInfoDistance);
-            DrawBox(origin, halfExtents, orientation, color);
+            DrawBox(origin, halfExtents, orientation, color, duration);
         }
 
         public struct Box

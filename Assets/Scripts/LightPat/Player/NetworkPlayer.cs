@@ -4,26 +4,30 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using LightPat.Core;
+using GameCreator.Characters;
+using GameCreator.Melee;
 
 namespace LightPat.Player
 {
     public class NetworkPlayer : NetworkBehaviour
     {
+        [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
 
-        [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
-
         public override void OnNetworkSpawn()
         {
+            GetComponent<PlayerCharacter>().enabled = true;
             if (IsLocalPlayer) // This checks if we are this instance's player object
             {
                 // Activate the camera motor object and set the parent to the root
                 cameraMotor.SetActive(true);
                 cameraMotor.transform.SetParent(null, true);
                 // Need to add the hook camera component to the player camera. The camera controller component relies on the hook camera component, so you also add that
+                playerCamera.SetActive(true);
                 playerCamera.transform.SetParent(null, true);
                 playerCamera.AddComponent<GameCreator.Core.Hooks.HookCamera>();
                 var camControl = playerCamera.AddComponent<GameCreator.Camera.CameraController>();
@@ -34,9 +38,6 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
                 Destroy(worldSpaceLabel);
-
-                gameObject.transform.position = new Vector3(1,0,1);
-
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
@@ -49,9 +50,21 @@ namespace LightPat.Player
             }
         }
 
+        public override void OnNetworkDespawn()
+        {
+            if (IsLocalPlayer)
+            {
+                Destroy(cameraMotor);
+                Destroy(playerCamera);
+                Destroy(playerHUD);
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
+
         [SerializeField] private GameObject pauseMenuPrefab;
-        [SerializeField] private GameObject triggersParent;
+        [SerializeField] private GameObject scoreboardPrefab;
         private GameObject pauseInstance;
+        private GameObject scoreboardInstance;
 
         [SerializeField] private TextMeshProUGUI pingDisplay;
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
@@ -79,18 +92,54 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
-                    triggersParent.SetActive(false);
+                    DisableActionsServerRpc(true);
                     Cursor.lockState = CursorLockMode.None;
                     pauseInstance = Instantiate(pauseMenuPrefab);
                 }
                 else
                 {
-                    triggersParent.SetActive(true);
+                    DisableActionsServerRpc(false);
                     Cursor.lockState = CursorLockMode.Locked;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
                 }
             }
+
+            if (!ClientManager.Singleton) { return; }
+
+            // Scoreboard
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (!scoreboardInstance)
+                    scoreboardInstance = Instantiate(scoreboardPrefab);
+            }
+            
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                if (scoreboardInstance)
+                    Destroy(scoreboardInstance);
+            }
+        }
+
+        [ServerRpc] private void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
+
+        // Messages from Character Melee
+        void OnDamageDealt(int damage)
+        {
+            if (!ClientManager.Singleton) { return; }
+            ClientManager.Singleton.AddDamage(OwnerClientId, damage);
+        }
+
+        void OnKill(CharacterMelee victim)
+        {
+            if (!ClientManager.Singleton) { return; }
+            ClientManager.Singleton.AddKills(OwnerClientId, 1);
+        }
+
+        void OnDeath(CharacterMelee killer)
+        {
+            if (!ClientManager.Singleton) { return; }
+            ClientManager.Singleton.AddDeaths(OwnerClientId, 1);
         }
     }
 }

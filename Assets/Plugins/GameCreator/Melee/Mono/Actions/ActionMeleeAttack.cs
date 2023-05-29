@@ -23,6 +23,7 @@
 
 			Character _character = this.character.GetCharacter(target);
 			if (character == null) { Destroy(target); return; }
+			if (_character.disableActions.Value) { Destroy(target); return; }
 
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee == null) { Destroy(target); return; }
