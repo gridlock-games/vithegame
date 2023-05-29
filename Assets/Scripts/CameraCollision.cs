@@ -66,6 +66,7 @@ namespace LylekGames.Tools
 
             mainCamera.nearClipPlane = 0.01f;
         }
+
         public void LateUpdate()
         {
             cameraPosition = mainCamera.transform.position;
@@ -78,79 +79,65 @@ namespace LylekGames.Tools
                 rayDirection = rayDirection / distance;
             }
 
-            RaycastHit hit;
-
-            if (Physics.SphereCast(focusPosition, detectionRadius, rayDirection, out hit, distance + cushionOffset, maskedLayers) || Physics.Raycast(focusPosition, rayDirection, out hit, distance + cushionOffset, maskedLayers))
+            if (Physics.SphereCast(focusPosition, detectionRadius, rayDirection, out RaycastHit hit, distance + cushionOffset, maskedLayers) || Physics.Raycast(focusPosition, rayDirection, out hit, distance + cushionOffset, maskedLayers))
             {
                 if (!IsTagged(hit.transform.gameObject))
                 {
                     CheckCollision(hit);
                 }
-                else if(checkMultipleCollisions)
+                else if (checkMultipleCollisions)
                 {
-                    RaycastHit[] hits;
-
-                    hits = Physics.SphereCastAll(focusPosition, detectionRadius, rayDirection, distance + cushionOffset, maskedLayers);
-
+                    RaycastHit[] hits = Physics.SphereCastAll(focusPosition, detectionRadius, rayDirection, distance + cushionOffset, maskedLayers);
                     bool col = false;
-
-                    foreach(RaycastHit h in hits)
+                    foreach (RaycastHit h in hits)
                     {
                         if (!IsTagged(h.transform.gameObject))
                         {
                             CheckCollision(h);
-
                             col = true;
+                            break;
                         }
                     }
 
-                    if(col == false && _collision == true)
-                    {
-                        EndCollision();
-                    }
+                    if (col == false && _collision == true) { EndCollision(); }
                 }
                 else
                 {
-                    if (_collision == true)
-                    {
-                        EndCollision();
-                    }
+                    if (_collision == true) { EndCollision(); }
                 }
             }
             else
             {
-                if (_collision == true)
-                {
-                    EndCollision();
-                }
+                if (_collision == true) { EndCollision(); }
             }
         }
+
         public void EndCollision()
         {
-            Debug.Log("EndCollision");
             if (duplicate != null)
                 duplicate.enabled = false;
             mainCamera.enabled = true;
 
             _collision = false;
         }
+
         public bool IsTagged(GameObject hit)
         {
             bool tagged = false;
 
             foreach (string tag in maskedTags)
             {
-                if (hit.transform.gameObject.tag == tag)
+                if (hit.transform.gameObject.CompareTag(tag))
                 {
                     tagged = true;
+                    break;
                 }
             }
             return tagged;
         }
+
         public void CheckCollision(RaycastHit hit)
         {
-            Debug.DrawLine(hit.point, focusPoint.transform.position);
-
             if (_collision == false)
             {
                 if (useCameraDuplicate)
@@ -173,7 +160,6 @@ namespace LylekGames.Tools
                         duplicate.transform.SetParent(mainCamera.transform.parent);
                     }
 
-                    Debug.Log("CheckCollision");
                     mainCamera.enabled = false;
                     duplicate.enabled = true;
                 }
@@ -186,25 +172,18 @@ namespace LylekGames.Tools
             if (useCameraDuplicate)
             {
                 if (distance <= cushionOffset)
-                {
                     duplicate.transform.position = focusPosition;
-                }
                 else
-                {
                     duplicate.transform.position = hit.point + (-rayDirection * cushionOffset);
-                }
+
                 duplicate.transform.rotation = mainCamera.transform.rotation;
             }
             else
             {
                 if (distance < cushionOffset)
-                {
                     mainCamera.transform.position = focusPosition;
-                }
                 else
-                {
                     mainCamera.transform.position = hit.point + (-rayDirection * cushionOffset);
-                }
             }
         }
     }
