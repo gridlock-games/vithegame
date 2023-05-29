@@ -38,7 +38,6 @@ namespace GameCreator.Characters
             transformParentId.OnValueChanged += OnTransformParentIdChange;
             currentPosition.OnValueChanged += OnPositionChanged;
             currentRotation.OnValueChanged += OnRotationChanged;
-            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
         public override void OnNetworkDespawn()
@@ -46,11 +45,7 @@ namespace GameCreator.Characters
             transformParentId.OnValueChanged -= OnTransformParentIdChange;
             currentPosition.OnValueChanged -= OnPositionChanged;
             currentRotation.OnValueChanged -= OnRotationChanged;
-            NetworkManager.NetworkTickSystem.Tick -= Tick;
         }
-
-        private int tickCount;
-        private void Tick() { tickCount++; }
 
         void OnTransformParentIdChange(int previous, int current)
         {
