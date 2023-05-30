@@ -147,30 +147,36 @@
                 if (disableActions.Value) { moveInput.Value = Vector3.zero; }
             }
 
-            //if (!IsServer) { return; }
-
-            Vector3 targetDirection = Vector3.zero;
-            if (!this.IsControllable()) return;
-
-            targetDirection = moveInput.Value;
-
-            this.ComputeMovement(targetDirection);
-
             PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
             Vector3 moveDirection;
-            if (!IsServer)
+            Vector3 targetDirection;
+            if (IsControllable())
             {
-                Vector3 relativePoint = networkTransform.GetPosition() - transform.position;
-                if (relativePoint.magnitude < 0.1f)
-                    moveDirection = Vector3.zero;
+                if (!IsServer)
+                {
+                    Vector3 relativePoint = networkTransform.GetPosition() - transform.position;
+                    if (relativePoint.magnitude < 0.1f)
+                        moveDirection = Vector3.zero;
+                    else
+                        moveDirection = relativePoint.normalized;
+                }
                 else
-                    moveDirection = relativePoint.normalized;
-            }
-            else
-            {
-                moveDirection = transform.rotation * moveInput.Value;
-            }
+                {
+                    moveDirection = transform.rotation * moveInput.Value;
+                }
 
+                targetDirection = IsServer ? moveInput.Value : moveDirection;
+            }
+            else // If not controllable
+            {
+                moveDirection = Vector3.zero;
+                targetDirection = Vector3.zero;
+            }
+            
+            this.ComputeMovement(targetDirection);
+
+            if (IsOwner)
+                Debug.Log(Time.time + " " + moveDirection);
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 
