@@ -175,8 +175,6 @@
             
             this.ComputeMovement(targetDirection);
 
-            if (IsOwner)
-                Debug.Log(Time.time + " " + moveDirection);
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 
