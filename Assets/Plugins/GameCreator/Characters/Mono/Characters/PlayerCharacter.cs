@@ -156,12 +156,21 @@
 
             this.ComputeMovement(targetDirection);
 
+            CharacterNetworkTransform networkTransform = GetComponent<CharacterNetworkTransform>();
             Vector3 moveDirection;
-            if (!IsOwner)
-                moveDirection = GetComponent<CharacterNetworkTransform>().GetRotation() * moveInput.Value;
+            if (!IsServer)
+            {
+                Vector3 relativePoint = networkTransform.GetPosition() - transform.position;
+                if (relativePoint.magnitude < 0.1f)
+                    moveDirection = Vector3.zero;
+                else
+                    moveDirection = relativePoint.normalized;
+            }
             else
+            {
                 moveDirection = transform.rotation * moveInput.Value;
-
+            }
+            
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 

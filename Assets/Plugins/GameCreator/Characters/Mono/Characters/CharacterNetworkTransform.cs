@@ -12,17 +12,14 @@ namespace GameCreator.Characters
         public float positionNetworkSendThreshold = 0.001f;
         [Range(0.001f, 360)]
         public float rotationAngleNetworkSendThreshold = 0.001f;
-
-        public float cor = 1;
-        [SerializeField] private NetworkVariable<float> positionCorrectionThreshold = new NetworkVariable<float>(1);
-        public float positionTeleportThreshold = 10;
+        [Range(1, 100)]
+        public int positionTeleportThreshold = 10;
 
         private NetworkVariable<int> transformParentId = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> currentScale = new NetworkVariable<Vector3>(Vector3.one, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-        float positionSpeed;
         float rotationSpeed = 10;
 
         public Vector3 GetPosition() { return currentPosition.Value; }
@@ -40,14 +37,12 @@ namespace GameCreator.Characters
         public override void OnNetworkSpawn()
         {
             transformParentId.OnValueChanged += OnTransformParentIdChange;
-            currentPosition.OnValueChanged += OnPositionChanged;
             currentRotation.OnValueChanged += OnRotationChanged;
         }
 
         public override void OnNetworkDespawn()
         {
             transformParentId.OnValueChanged -= OnTransformParentIdChange;
-            currentPosition.OnValueChanged -= OnPositionChanged;
             currentRotation.OnValueChanged -= OnRotationChanged;
         }
 
@@ -84,20 +79,6 @@ namespace GameCreator.Characters
             }
         }
 
-        void OnPositionChanged(Vector3 prevPosition, Vector3 newPosition)
-        {
-            if (!interpolate)
-            {
-                transform.localPosition = currentPosition.Value;
-            }
-            else
-            {
-                positionSpeed = Vector3.Distance(transform.localPosition, currentPosition.Value);
-                //if (positionSpeed < 10)
-                positionSpeed = 10;
-            }
-        }
-
         void OnRotationChanged(Quaternion prevRotation, Quaternion newRotation)
         {
             rotationSpeed = Quaternion.Angle(transform.localRotation, newRotation);
@@ -105,14 +86,10 @@ namespace GameCreator.Characters
                 transform.localRotation = currentRotation.Value;
         }
 
-        Vector3 lastPosition;
         Quaternion lastRotation;
         private void LateUpdate()
         {
             if (!IsSpawned) { return; }
-
-            if (IsServer)
-                positionCorrectionThreshold.Value = cor;
 
             // Rotation Syncing
             if (IsOwner)
@@ -147,37 +124,19 @@ namespace GameCreator.Characters
             }
             else // If we are not the server
             {
-                bool isMoving = transform.localPosition != lastPosition;
-
                 float localDistance = Vector3.Distance(transform.position, currentPosition.Value);
-                positionSpeed = localDistance > 4 ? localDistance : 4;
                 if (localDistance > positionTeleportThreshold)
                 {
                     if (IsOwner)
-                        Debug.Log(Time.time + "Teleporting");
+                        Debug.Log(Time.time + "Teleporting character: " + OwnerClientId + " - " + name);
                     transform.localPosition = currentPosition.Value;
                 }
-                else if (localDistance > positionCorrectionThreshold.Value)
-                {
-                    if (IsOwner)
-                        Debug.Log(Time.time + " " + positionSpeed + " " + localDistance + " " + positionCorrectionThreshold.Value);
-                    if (interpolate)
-                        transform.localPosition = Vector3.Lerp(lastPosition, currentPosition.Value, Time.deltaTime * positionSpeed);
-                    else
-                        transform.localPosition = currentPosition.Value;
-                }
-
-                if (!isMoving)
-                {
-                    if (IsOwner)
-                        Debug.Log(Time.time + "Not moving");
-                    transform.localPosition = Vector3.Lerp(lastPosition, currentPosition.Value, Time.deltaTime * positionSpeed);
-                }
-
-                lastPosition = transform.localPosition;
 
                 transform.localScale = currentScale.Value;
             }
+
+            if (IsOwner)
+                Debug.Log(transform.position + " " + currentPosition.Value);
         }
     }
 }
