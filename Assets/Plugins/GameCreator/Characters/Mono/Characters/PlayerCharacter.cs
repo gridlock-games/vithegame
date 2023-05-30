@@ -156,7 +156,7 @@
 
             this.ComputeMovement(targetDirection);
 
-            CharacterNetworkTransform networkTransform = GetComponent<CharacterNetworkTransform>();
+            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
             Vector3 moveDirection;
             if (!IsServer)
             {
@@ -170,7 +170,7 @@
             {
                 moveDirection = transform.rotation * moveInput.Value;
             }
-            
+
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 

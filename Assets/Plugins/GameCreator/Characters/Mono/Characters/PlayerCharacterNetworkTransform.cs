@@ -5,8 +5,8 @@ using Unity.Netcode;
 
 namespace GameCreator.Characters
 {
-    [RequireComponent(typeof(Character))]
-    public class CharacterNetworkTransform : NetworkBehaviour
+    [RequireComponent(typeof(PlayerCharacter))]
+    public class PlayerCharacterNetworkTransform : NetworkBehaviour
     {
         public bool interpolate = true;
         [Range(0.001f, 1)]
@@ -135,9 +135,6 @@ namespace GameCreator.Characters
 
                 transform.localScale = currentScale.Value;
             }
-
-            if (IsOwner)
-                Debug.Log(transform.position + " " + currentPosition.Value);
         }
     }
 }
