@@ -10,7 +10,7 @@
     using Unity.Netcode;
 
     [AddComponentMenu("Game Creator/Characters/Character Animator", 100)]
-    public class CharacterAnimator : NetworkBehaviour
+    public class CharacterAnimator : MonoBehaviour
     {
         private const float NORMAL_SMOOTH = 0.1f;
         private const float MAX_LAND_FORCE_SPEED = -10.0f;
@@ -150,9 +150,8 @@
             this.character.onLand.AddListener(this.OnLand);
         }
 
-        private new void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
             if (this.characterAnimation != null) this.characterAnimation.OnDestroy();
             if (this.animator != null) Destroy(this.animator.gameObject);
         }
@@ -211,69 +210,41 @@
 
             this.animator.transform.localRotation = rotation;
 
-            // If the object is spawned, we want to sync the animator's parameters to the values of the network variables (server authoritative)
-            // If the object is not spawned, we want to use the normal logic to make the player behave normally
-            if (IsSpawned)
-            {
-                if (IsServer)
-                {
-                    direction = Vector3.Scale(direction, Vector3.one * (1.0f / this.character.characterLocomotion.runSpeed));
+            if (!character.IsSpawned) { return; }
 
-                    float paramMoveForwardSpeed = this.paramValues[HASH_MOVE_FORWARD_SPEED].Get(direction.z, 0.1f);
-                    float paramMoveSidesSpeed = this.paramValues[HASH_MOVE_SIDES_SPEED].Get(direction.x, 0.2f);
-                    float paramMovementSpeed = this.paramValues[HASH_MOVEMENT_SPEED].Get(
-                        Vector3.Scale(direction, new Vector3(1, 0, 1)).magnitude,
-                        0.1f
-                    );
+            direction = Vector3.Scale(direction, Vector3.one * (1.0f / this.character.characterLocomotion.runSpeed));
 
-                    float paramMoveTurnSpeed = this.paramValues[HASH_MOVE_TURN_SPEED].Get(state.pivotSpeed, 0.1f);
-                    float paramVerticalSpeed = this.paramValues[HASH_VERTICAL_SPEED].Get(state.verticalSpeed, 0.2f);
-                    float paramIsGrounded = this.paramValues[HASH_IS_GROUNDED].Get(state.isGrounded, 0.1f);
-                    float paramIsSliding = this.paramValues[HASH_IS_SLIDING].Get(state.isSliding, 0.1f);
-                    float paramIsDashing = this.paramValues[HASH_IS_DASHING].Get(state.isDashing, 0.05f);
-                    float paramLandForce = this.paramValues[HASH_LAND_FORCE].Get(0f, 2f);
+            float paramMoveForwardSpeed = this.paramValues[HASH_MOVE_FORWARD_SPEED].Get(direction.z, 0.1f);
+            float paramMoveSidesSpeed = this.paramValues[HASH_MOVE_SIDES_SPEED].Get(direction.x, 0.2f);
+            float paramMovementSpeed = this.paramValues[HASH_MOVEMENT_SPEED].Get(
+                Vector3.Scale(direction, new Vector3(1, 0, 1)).magnitude,
+                0.1f
+            );
 
-                    float paramTimeScale = this.animator.updateMode == AnimatorUpdateMode.UnscaledTime
-                        ? 1f
-                        : Time.timeScale;
+            float paramMoveTurnSpeed = this.paramValues[HASH_MOVE_TURN_SPEED].Get(state.pivotSpeed, 0.1f);
+            float paramVerticalSpeed = this.paramValues[HASH_VERTICAL_SPEED].Get(state.verticalSpeed, 0.2f);
+            float paramIsGrounded = this.paramValues[HASH_IS_GROUNDED].Get(state.isGrounded, 0.1f);
+            float paramIsSliding = this.paramValues[HASH_IS_SLIDING].Get(state.isSliding, 0.1f);
+            float paramIsDashing = this.paramValues[HASH_IS_DASHING].Get(state.isDashing, 0.05f);
+            float paramLandForce = this.paramValues[HASH_LAND_FORCE].Get(0f, 2f);
 
-                    moveForwardSpeed.Value = paramMoveForwardSpeed;
-                    moveSidesSpeed.Value = paramMoveSidesSpeed;
-                    moveTurnSpeed.Value = paramMoveTurnSpeed;
-                    movementSpeed.Value = paramMovementSpeed;
-                    isGrounded.Value = paramIsGrounded;
-                    isSliding.Value = paramIsSliding;
-                    isDashing.Value = paramIsDashing;
-                    verticalSpeed.Value = paramVerticalSpeed;
-                    timeScale.Value = paramTimeScale;
-                    landForce.Value = paramLandForce;
-                }
+            float paramTimeScale = this.animator.updateMode == AnimatorUpdateMode.UnscaledTime
+                ? 1f
+                : Time.timeScale;
 
-                this.animator.SetFloat(HASH_MOVE_FORWARD_SPEED, moveForwardSpeed.Value);
-                this.animator.SetFloat(HASH_MOVE_SIDES_SPEED, moveSidesSpeed.Value);
-                this.animator.SetFloat(HASH_MOVE_TURN_SPEED, moveTurnSpeed.Value);
-                this.animator.SetFloat(HASH_MOVEMENT_SPEED, movementSpeed.Value);
-                this.animator.SetFloat(HASH_IS_GROUNDED, isGrounded.Value);
-                this.animator.SetFloat(HASH_IS_SLIDING, isSliding.Value);
-                this.animator.SetFloat(HASH_IS_DASHING, isDashing.Value);
-                this.animator.SetFloat(HASH_VERTICAL_SPEED, verticalSpeed.Value);
-                this.animator.SetFloat(HASH_TIME_SCALE, timeScale.Value * this.timeScaleCoefficient);
-                this.animator.SetFloat(HASH_LAND_FORCE, landForce.Value);
-            }
+            this.animator.SetFloat(HASH_MOVE_FORWARD_SPEED, paramMoveForwardSpeed);
+            this.animator.SetFloat(HASH_MOVE_SIDES_SPEED, paramMoveSidesSpeed);
+            this.animator.SetFloat(HASH_MOVE_TURN_SPEED, paramMoveTurnSpeed);
+            this.animator.SetFloat(HASH_MOVEMENT_SPEED, paramMovementSpeed);
+            this.animator.SetFloat(HASH_IS_GROUNDED, paramIsGrounded);
+            this.animator.SetFloat(HASH_IS_SLIDING, paramIsSliding);
+            this.animator.SetFloat(HASH_IS_DASHING, paramIsDashing);
+            this.animator.SetFloat(HASH_VERTICAL_SPEED, paramVerticalSpeed);
+            this.animator.SetFloat(HASH_TIME_SCALE, paramTimeScale * this.timeScaleCoefficient);
+            this.animator.SetFloat(HASH_LAND_FORCE, paramLandForce);
 
             this.Normals(state);
         }
-
-        private NetworkVariable<float> moveForwardSpeed = new NetworkVariable<float>();
-        private NetworkVariable<float> moveSidesSpeed = new NetworkVariable<float>();
-        private NetworkVariable<float> moveTurnSpeed = new NetworkVariable<float>();
-        private NetworkVariable<float> movementSpeed = new NetworkVariable<float>();
-        private NetworkVariable<float> isGrounded = new NetworkVariable<float>();
-        private NetworkVariable<float> isSliding = new NetworkVariable<float>();
-        private NetworkVariable<float> isDashing = new NetworkVariable<float>();
-        private NetworkVariable<float> verticalSpeed = new NetworkVariable<float>();
-        private NetworkVariable<float> timeScale = new NetworkVariable<float>();
-        private NetworkVariable<float> landForce = new NetworkVariable<float>();
 
         private void Normals(Character.State state)
         {

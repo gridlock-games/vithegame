@@ -5,6 +5,7 @@ using Unity.Netcode;
 
 namespace GameCreator.Characters
 {
+    [RequireComponent(typeof(Character))]
     public class CharacterNetworkTransform : NetworkBehaviour
     {
         public bool interpolate = true;
