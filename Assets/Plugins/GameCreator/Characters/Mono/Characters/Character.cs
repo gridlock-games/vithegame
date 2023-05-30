@@ -647,8 +647,8 @@
 
         private PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
-            ServerPositionOwnerRotationNetworkTransform anchorNetworkTransform = anchor.GetComponent<ServerPositionOwnerRotationNetworkTransform>();
-            ServerPositionOwnerRotationNetworkTransform targetNetworkTransform = targetChar.GetComponent<ServerPositionOwnerRotationNetworkTransform>();
+            CharacterNetworkTransform anchorNetworkTransform = anchor.GetComponent<CharacterNetworkTransform>();
+            CharacterNetworkTransform targetNetworkTransform = targetChar.GetComponent<CharacterNetworkTransform>();
 
             Vector3 anchorPosition = anchorNetworkTransform ? anchorNetworkTransform.GetPosition() : anchor.transform.position;
             Vector3 targetPosition = targetNetworkTransform ? targetNetworkTransform.GetPosition() : targetChar.transform.position;

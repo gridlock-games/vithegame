@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 namespace GameCreator.Characters
 {
-    public class ServerPositionOwnerRotationNetworkTransform : NetworkBehaviour
+    public class CharacterNetworkTransform : NetworkBehaviour
     {
         public bool interpolate = true;
         [Range(0.001f, 1)]
