@@ -21,6 +21,7 @@ namespace GameCreator.Characters
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> currentScale = new NetworkVariable<Vector3>(Vector3.one, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        PlayerCharacter _playerCharacter;
         float rotationSpeed = 10;
 
         public Vector3 GetPosition() { return currentPosition.Value; }
@@ -45,6 +46,11 @@ namespace GameCreator.Characters
         {
             transformParentId.OnValueChanged -= OnTransformParentIdChange;
             currentRotation.OnValueChanged -= OnRotationChanged;
+        }
+
+        private void Start()
+        {
+            _playerCharacter = GetComponent<PlayerCharacter>();
         }
 
         void OnTransformParentIdChange(int previous, int current)
@@ -125,6 +131,11 @@ namespace GameCreator.Characters
             }
             else // If we are not the server
             {
+                if (!_playerCharacter.IsControllable())
+                {
+                    transform.position = Vector3.Lerp(transform.position, currentPosition.Value, Time.deltaTime * 10);
+                }
+
                 float localDistance = Vector3.Distance(transform.position, currentPosition.Value);
                 if (localDistance > positionTeleportThreshold)
                 {
