@@ -147,7 +147,7 @@
                 if (disableActions.Value) { moveInput.Value = Vector3.zero; }
             }
 
-            if (!IsServer) { return; }
+            //if (!IsServer) { return; }
 
             Vector3 targetDirection = Vector3.zero;
             if (!this.IsControllable()) return;
@@ -156,7 +156,12 @@
 
             this.ComputeMovement(targetDirection);
 
-            Vector3 moveDirection = transform.rotation * moveInput.Value;
+            Vector3 moveDirection;
+            if (!IsOwner)
+                moveDirection = GetComponent<CharacterNetworkTransform>().GetRotation() * moveInput.Value;
+            else
+                moveDirection = transform.rotation * moveInput.Value;
+
             this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 

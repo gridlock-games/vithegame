@@ -6,6 +6,10 @@ namespace LightPat.Core
 {
     public class ConsoleToGUI : MonoBehaviour
     {
+        public bool ignoreInfo;
+        public bool ignoreWarnings;
+        public bool ignoreErrors;
+
         static string myLog = "";
         private string output;
         private string stack;
@@ -28,6 +32,10 @@ namespace LightPat.Core
 
         public void Log(string logString, string stackTrace, LogType type)
         {
+            if (ignoreInfo) { if (type == LogType.Log) { return; } }
+            if (ignoreWarnings) { if (type == LogType.Warning) { return; } }
+            if (ignoreErrors) { if (type == LogType.Error) { return; } }
+
             output = logString;
             stack = stackTrace;
 
