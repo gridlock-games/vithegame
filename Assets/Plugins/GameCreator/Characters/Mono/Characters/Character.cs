@@ -376,7 +376,7 @@
                     this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockdownAfterDuration(0f));
+                    StartCoroutine(StartKnockdownAfterDuration(0f, false));
                 }
                 else
                 {
@@ -398,21 +398,31 @@
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
+                bool waitForClientRotation = false;
                 if (IsServer)
                 {
-                    target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                    if (target.IsOwnedByServer)
+                    {
+                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                        target.transform.rotation = rotationConfig.quaternion;
+                    }
+                    else
+                    {
+                        target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                        waitForClientRotation = true;
+                    }
                 }
 
                 if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
                         this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockupAfterDuration(.05f));
+                    StartCoroutine(StartKnockupAfterDuration(.05f, waitForClientRotation));
                 }
                 else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, IsServer);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, waitForClientRotation);
                 }
 
                 return true;
@@ -430,20 +440,29 @@
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
             {
                 // If the target is null, that means we are calling this from a client, rather than the server
+                bool waitForClientRotation = false;
                 if (IsServer)
                 {
-                    target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                    if (target.IsOwnedByServer)
+                    {
+                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                        target.transform.rotation = rotationConfig.quaternion;
+                    }
+                    else
+                    {
+                        target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                        waitForClientRotation = true;
+                    }
                 }
-
                 if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                    StartCoroutine(StartKnockdownAfterDuration(0f));
+                    StartCoroutine(StartKnockdownAfterDuration(0f, waitForClientRotation));
                 }
                 else
                 {
                     this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, IsServer);
+                    this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, waitForClientRotation);
                 }
 
                 return true;
@@ -482,7 +501,7 @@
 
         /* Pause for a given duration if the target character is coming from another ailment.
         Ailments: Stun, Knockup*/
-        private IEnumerator StartKnockdownAfterDuration(float duration)
+        private IEnumerator StartKnockdownAfterDuration(float duration, bool waitForClientRotation)
         {
             float initTime = Time.time;
             while (initTime + duration >= Time.time)
@@ -490,12 +509,12 @@
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, IsServer);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, waitForClientRotation);
         }
 
         /* Pause for a given duration if the target character is coming from another ailment
         Ailments: Stun*/
-        private IEnumerator StartKnockupAfterDuration(float duration)
+        private IEnumerator StartKnockupAfterDuration(float duration, bool waitForClientRotation)
         {
             float initTime = Time.time;
             while (initTime + duration >= Time.time)
@@ -503,7 +522,7 @@
                 yield return null;
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, IsServer);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, waitForClientRotation);
         }
 
         /* This is needed so that the character won't immediatley go through 
