@@ -171,21 +171,24 @@ namespace GameCreator.Melee
 
                     if (meleeClip)
                     {
-                        this.inputBuffer.ConsumeInput();
-                        bool checkDash = this.Character.characterLocomotion.isDashing;
-
                         if (IsServer)
                         {
-                            if (key == ActionKey.A) // Light Attack
+                            if (meleeClip.isHeavy) // Heavy Attack
+                            {
+                                if (Poise.Value <= 20) { 
+                                    return; 
+                                }
+                                OnHeavyAttack();
+                            }
+                            else // Light Attack
                             {
                                 OnLightAttack();
                             }
-                            else if (key == ActionKey.B) // Heavy Attack
-                            {
-                                if (Poise.Value <= 20) { return; }
-                                OnHeavyAttack();
-                            }
                         }
+
+                        this.inputBuffer.ConsumeInput();
+                        bool checkDash = this.Character.characterLocomotion.isDashing;
+
 
                         if (IsOwner)
                             FocusTarget(meleeClip);
@@ -1206,6 +1209,11 @@ namespace GameCreator.Melee
 
             float distance = Vector3.Distance(transform.position, target.position);
             AnimationCurve clipMovementForward = clip.movementForward;
+
+            if(!clip.isLunge && clip.isModifyFocus) {
+                TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
+                SetTargetFocus(targetMelee);
+            }
 
             // If our distance from target is < boxCastHalfExtents.z, then reduce/increase movementForwardCurve
             if (distance <= boxCastHalfExtents.z && clip.isLunge)
