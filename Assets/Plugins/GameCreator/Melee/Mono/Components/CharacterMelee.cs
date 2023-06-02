@@ -47,7 +47,7 @@ namespace GameCreator.Melee
 
         protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
-        private int KNOCK_UP_FOLLOWUP_LIMIT = 6;
+        private int KNOCK_UP_FOLLOWUP_LIMIT = 9999;
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
@@ -92,6 +92,7 @@ namespace GameCreator.Melee
         public Action<MeleeWeapon> EventDrawWeapon;
         public Action<MeleeWeapon> EventSheatheWeapon;
         public event Action<MeleeClip> EventAttack;
+        // public event Action<MeleeClip> EventOnHitObstacle;
         public event Action<float> EventStagger;
         public event Action EventBreakDefense;
         public event Action<bool> EventBlock;
@@ -207,6 +208,7 @@ namespace GameCreator.Melee
         }
 
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
+        public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
         private void LateUpdate()
         {
@@ -244,6 +246,17 @@ namespace GameCreator.Melee
 
                             CharacterMelee targetMelee = hits[i].GetComponent<CharacterMelee>();
                             MeleeClip attack = this.comboSystem.GetCurrentClip();
+
+                            GameObject g = hits[i].gameObject;
+
+                            if(g.tag == "Obstacle") {
+                                Vector3 position_attackWp = blade.GetImpactPosition();
+                                Vector3 position_attacker = this.transform.position;
+                                Debug.Log(position_attackWp);
+                                // Instantiate(attack.attackSpawnVFX.GetGameObject(attack.gameObject), position_attacker - position_attackWp, Quaternion.identity);
+                                this.EventOnHitObstacle.Invoke();
+                                Debug.Log("Hit an Obstacle");
+                            }
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
@@ -332,6 +345,9 @@ namespace GameCreator.Melee
                                 }
                             }
 
+                            if(phase == 1) {
+                                attack.ExecuteActionsOnActivate(this.transform.position, this.gameObject);
+                            }
                             this.targetsEvaluated.Add(hitInstanceID);
                         }
                     }
@@ -989,6 +1005,8 @@ namespace GameCreator.Melee
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
+
+            
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,

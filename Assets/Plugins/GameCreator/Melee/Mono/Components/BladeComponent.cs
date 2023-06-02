@@ -152,6 +152,7 @@
 
                 case  0:
                     this.EventAttackStart.Invoke();
+                    // if(Melee.currentMeleeClip.ExecuteActionsOnActivate)
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
                     break;
 

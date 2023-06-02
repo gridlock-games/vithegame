@@ -122,9 +122,12 @@
 
         public float Length { get => this.animationClip == null ? 0f : this.animationClip.length; }
 
+        public TargetGameObject attackSpawnVFX = new TargetGameObject();
+
         private WaitForSecondsRealtime hitPauseCoroutine;
 
         public IActionsList actionsOnExecute;
+        public IActionsList actionOnActivate;
         public IActionsList actionsOnHit;
 
         public List<MeleeWeapon.WeaponBone> affectedBones = new List<MeleeWeapon.WeaponBone> { MeleeWeapon.WeaponBone.RightHand };
@@ -237,6 +240,24 @@
             {
                 GameObject actionsInstance = Instantiate<GameObject>(
                     this.actionsOnHit.gameObject,
+                    position,
+                    Quaternion.identity
+                );
+
+                actionsInstance.hideFlags = HideFlags.HideInHierarchy;
+                Actions actions = actionsInstance.GetComponent<Actions>();
+
+                if (!actions) return;
+                actions.Execute(target, null);
+            }
+        }
+
+        public void ExecuteActionsOnActivate(Vector3 position, GameObject target)
+        {
+            if (this.actionOnActivate)
+            {
+                GameObject actionsInstance = Instantiate<GameObject>(
+                    this.actionOnActivate.gameObject,
                     position,
                     Quaternion.identity
                 );

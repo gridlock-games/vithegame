@@ -31,6 +31,12 @@
 
         public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
 
+        public TargetGameObject dashParticle = new TargetGameObject();
+        public HumanBodyBones bone = HumanBodyBones.RightFoot;
+        public Space space = Space.Self;
+        public Vector3 positionAttach = Vector3.zero;
+        public Vector3 rotationAttach = Vector3.zero;
+
         public Direction direction = Direction.CharacterMovement3D;
         public TargetGameObject target = new TargetGameObject();
         public TargetPosition position = new TargetPosition();
@@ -258,8 +264,16 @@
                 1.0f
             );
 
+            CharacterAttachments attachments = animator.GetCharacterAttachments();
+
             if (clip != null && animator != null)
-            {
+            {   
+                if(attachments != null && this.dashParticle != null) {
+                    Vector3 spawnPosition = characterTarget.transform.position;
+
+                    Instantiate(this.dashParticle.GetGameObject(target), spawnPosition, Quaternion.identity);
+                } 
+
                 characterTarget.characterLocomotion.RootMovement(
                     !melee.IsAttacking ? dodgeMeleeClip.movementMultiplier : dodgeMeleeClip.movementMultiplier_OnAttack,
                     duration,
@@ -374,6 +388,7 @@
         private SerializedProperty spDashBackward;
         private SerializedProperty spDashRight;
         private SerializedProperty spDashLeft;
+        private SerializedProperty spDashParticle;
 
         protected override void OnEnableEditorChild()
         {
@@ -381,6 +396,7 @@
             this.spDirection = this.serializedObject.FindProperty("direction");
             this.spTarget = this.serializedObject.FindProperty("target");
             this.spPosition = this.serializedObject.FindProperty("position");
+            this.spDashParticle = this.serializedObject.FindProperty("dashParticle");
 
             this.spImpulse = this.serializedObject.FindProperty("impulse");
             this.spDuration = this.serializedObject.FindProperty("duration");
@@ -398,6 +414,7 @@
             this.spDirection = null;
             this.spTarget = null;
             this.spPosition = null;
+            this.spDashParticle = null;
 
             this.spImpulse = null;
             this.spDuration = null;
@@ -414,6 +431,8 @@
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(this.spCharacter);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(this.spDashParticle);
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(this.spDirection);

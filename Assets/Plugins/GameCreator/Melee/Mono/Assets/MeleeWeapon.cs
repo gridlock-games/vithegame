@@ -200,11 +200,23 @@ namespace GameCreator.Melee
 
             if (isKnockup)
             {
-                index = UnityEngine.Random.Range(0, this.knockupReaction.Count - 1);
+                index = UnityEngine.Random.Range(0, 2);
                 if (this.knockupReaction.Count != 1 && index == this.prevRandomHit) index++;
                 this.prevRandomHit = index;
 
-                return this.knockupReaction[index];
+                switch(location) {
+                    case HitLocation.RightMiddle:
+                        return this.knockupReaction[4];
+
+                    case HitLocation.LeftMiddle:
+                        return this.knockupReaction[3];
+
+                    case HitLocation.BackMiddle:
+                        return this.knockupReaction[5];
+                        
+                    default:
+                        return this.knockupReaction[index];
+                }
             }
 
             if (isKnockback)
