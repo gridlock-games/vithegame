@@ -210,6 +210,9 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
+
+        private bool hasInvokeSpawnOnActivate = false;
+        private int counter = 0;
         private void LateUpdate()
         {
             this.IsAttacking = false;
@@ -223,6 +226,7 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase();
                 this.IsAttacking = phase >= 0f;
+                hasInvokeSpawnOnActivate = false;
 
                 // Only want hit registration on server
                 if (!IsServer) { return; }
@@ -235,6 +239,8 @@ namespace GameCreator.Melee
 
                         GameObject[] hits = blade.CaptureHits();
 
+
+                        // This is section is for stuff assuming you've hit something
                         for (int i = 0; i < hits.Length; ++i)
                         {
                             int hitInstanceID = hits[i].GetInstanceID();
@@ -252,10 +258,6 @@ namespace GameCreator.Melee
                             if(g.tag == "Obstacle") {
                                 Vector3 position_attackWp = blade.GetImpactPosition();
                                 Vector3 position_attacker = this.transform.position;
-                                Debug.Log(position_attackWp);
-                                // Instantiate(attack.attackSpawnVFX.GetGameObject(attack.gameObject), position_attacker - position_attackWp, Quaternion.identity);
-                                this.EventOnHitObstacle.Invoke();
-                                Debug.Log("Hit an Obstacle");
                             }
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
@@ -345,9 +347,6 @@ namespace GameCreator.Melee
                                 }
                             }
 
-                            if(phase == 1) {
-                                attack.ExecuteActionsOnActivate(this.transform.position, this.gameObject);
-                            }
                             this.targetsEvaluated.Add(hitInstanceID);
                         }
                     }

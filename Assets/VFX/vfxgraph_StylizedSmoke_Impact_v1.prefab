@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3052887298989561047}
   - component: {fileID: 1088782405393040830}
   - component: {fileID: 7306881557692274631}
+  - component: {fileID: -152763647589318597}
   m_Layer: 0
   m_Name: vfxgraph_StylizedSmoke_Impact_v1
   m_TagString: Untagged
@@ -218,3 +219,16 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &-152763647589318597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4968336861700998245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a162edb52cf436d4d94365aaf7c15022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyDelay: 1.4
