@@ -129,7 +129,7 @@
 
         // UPDATE METHOD: -------------------------------------------------------------------------
 
-        private bool foobar = false;
+        private bool isActivated = false;
 
         private void Update()
         {
@@ -162,9 +162,9 @@
 
                 case  1:
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
-                    if(!foobar) {
+                    if(!isActivated && clip.affectedBones.Contains(this.weaponBone)) {
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
-                        foobar = true;
+                        isActivated = true;
                     }
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
@@ -191,7 +191,7 @@
                     this.transform.TransformPoint(this.pointB)
                 );
             }
-            foobar = false;
+            isActivated = false;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

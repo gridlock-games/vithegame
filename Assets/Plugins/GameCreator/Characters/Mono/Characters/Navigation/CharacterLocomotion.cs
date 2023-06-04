@@ -20,7 +20,8 @@
             IsStunned,
             Reset,
             Dead,
-            IsWallBound
+            IsWallBound,
+            IsStaggered
         }
 
         public enum ANIM_CONSTRAINT

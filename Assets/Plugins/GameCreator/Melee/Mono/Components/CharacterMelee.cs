@@ -236,9 +236,7 @@ namespace GameCreator.Melee
                     foreach (var blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
-
                         GameObject[] hits = blade.CaptureHits();
-
 
                         // This is section is for stuff assuming you've hit something
                         for (int i = 0; i < hits.Length; ++i)
@@ -255,6 +253,7 @@ namespace GameCreator.Melee
 
                             GameObject g = hits[i].gameObject;
 
+                            // This is for checking if we are hitting an environment object
                             if(g.tag == "Obstacle") {
                                 Vector3 position_attackWp = blade.GetImpactPosition();
                                 Vector3 position_attacker = this.transform.position;
@@ -274,7 +273,7 @@ namespace GameCreator.Melee
                                 switch (attack.attackType)
                                 {
                                     case AttackType.Stun:
-                                        targetMelee.Character.Stun();
+                                        targetMelee.Character.Stun(this.Character, targetMelee.Character);
                                         break;
                                     case AttackType.Knockdown:
                                         if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
@@ -283,9 +282,14 @@ namespace GameCreator.Melee
                                     case AttackType.Knockedup:
                                         targetMelee.Character.Knockup(this.Character, targetMelee.Character);
                                         break;
+                                    case AttackType.Stagger:
+                                        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
+                                        break;
                                     case AttackType.None:
-                                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
-                                            targetMelee.Character.CancelAilment();
+                                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                                            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered) {
+                                                targetMelee.Character.CancelAilment();
+                                            }
                                         break;
                                 }
 
@@ -297,7 +301,8 @@ namespace GameCreator.Melee
                                 int previousHP = targetMelee.HP.Value;
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown)
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown||
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                                 {
                                     hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                     if (hitResult == HitResult.ReceiveDamage)

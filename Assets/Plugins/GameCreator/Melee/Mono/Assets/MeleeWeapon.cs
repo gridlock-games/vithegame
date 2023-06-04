@@ -48,6 +48,7 @@ namespace GameCreator.Melee
         public CharacterState characterState;
         public AvatarMask characterMask;
         public Sprite weaponImage;
+        
 
         // 3d model:
         public List<WeaponModel> weaponModels = new List<WeaponModel>();
@@ -61,6 +62,13 @@ namespace GameCreator.Melee
         public AudioClip audioDraw;
         public AudioClip audioImpactNormal;
         public AudioClip audioImpactKnockback;
+
+
+        // abilities
+        public Ability abilityA = new Ability();
+        public Ability abilityB = new Ability();
+        public Ability abilityC = new Ability();
+        public Ability abilityRage = new Ability();
 
         // reactions:
         public List<MeleeClip> groundHitReactionsFront = new List<MeleeClip>();
@@ -94,6 +102,7 @@ namespace GameCreator.Melee
 
         public MeleeClip knockbackF;
         public MeleeClip knockupF;
+        public MeleeClip staggerF;
 
         // combo system:
         public List<Combo> combos = new List<Combo>();

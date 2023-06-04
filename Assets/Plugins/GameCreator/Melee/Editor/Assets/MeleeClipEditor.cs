@@ -359,9 +359,10 @@
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
                     
-
-                    EditorGUILayout.PropertyField(this.spIsDodge);
-
+                    
+                    if(!this.spIsAttack.boolValue) {
+                        EditorGUILayout.PropertyField(this.spIsDodge);
+                    }
                     
                     if(this.spIsDodge.boolValue) {
                         EditorGUILayout.Space();
@@ -475,10 +476,8 @@
                     EditorGUI.BeginDisabledGroup(!this.spIsAttack.boolValue);
                     EditorGUI.indentLevel++;
 
-
-                    EditorGUILayout.PropertyField(this.spAttackSpawnVFX);
-
-
+                    
+                    EditorGUILayout.PropertyField(this.spIsLunge);
                     EditorGUILayout.PropertyField(this.spIsModifyFocus);
                     
                     EditorGUI.BeginDisabledGroup(!this.spIsModifyFocus.boolValue);
@@ -493,16 +492,6 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
-                    EditorGUILayout.PropertyField(this.spIsLunge);
-                    
-                    EditorGUI.BeginDisabledGroup(!this.spIsLunge.boolValue);
-                    
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(this.spMovementForward_OnLunge);
-                    EditorGUILayout.PropertyField(this.spMovementSides_OnLunge);
-                    EditorGUI.indentLevel--;
-                    
-                    EditorGUI.EndDisabledGroup();
 
                     EditorGUILayout.PropertyField(this.spAttackType);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);

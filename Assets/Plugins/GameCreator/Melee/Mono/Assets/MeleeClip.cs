@@ -35,7 +35,8 @@
             Stun,
             Knockdown,
             Knockedup,
-            Heavy
+            Heavy,
+            Stagger
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------

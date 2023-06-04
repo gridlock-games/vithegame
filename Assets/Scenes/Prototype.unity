@@ -206,6 +206,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8533858845993444259, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
+        type: 3}
+      propertyPath: characterLocomotion.canUseNavigationMesh
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3, type: 3}
 --- !u!1 &371409404 stripped
@@ -809,6 +814,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8533858845993444259, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
+        type: 3}
+      propertyPath: characterLocomotion.canUseNavigationMesh
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3, type: 3}
 --- !u!114 &581108393 stripped
@@ -1299,7 +1309,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh309732
+  m_Name: pb_Mesh33782
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1463,7 +1473,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh309656
+  m_Name: pb_Mesh33706
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1956,7 +1966,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 8426559919659383932, guid: e6c85bfd803d0234b9a7f9e47d7a727b,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
     NetworkPrefabs: []
     TickRate: 120
@@ -2081,6 +2091,11 @@ PrefabInstance:
     - target: {fileID: 8533858845993444258, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8533858845993444259, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
+        type: 3}
+      propertyPath: characterLocomotion.canUseNavigationMesh
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

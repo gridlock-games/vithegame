@@ -20,6 +20,12 @@
         public Slider defenseSlider;
         public Slider poiseSlider;
         public Image weaponImageFill;
+        
+        public Image abilityAImageFill;
+        
+        public Image abilityBImageFill;
+        
+        public Image abilityCImageFill;
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
@@ -55,6 +61,12 @@
             if (!melee.currentWeapon) { return; }
             if (!melee.currentWeapon.weaponImage) { return; }
             weaponImageFill.sprite = melee.currentWeapon.weaponImage;
+            if(melee.currentWeapon.abilityA != null) {
+                abilityAImageFill.sprite = melee.currentWeapon.abilityA.skillImageFill;
+            }
+            if(melee.currentWeapon.abilityB != null) {
+                abilityBImageFill.sprite = melee.currentWeapon.abilityB.skillImageFill;
+            }
         }
     }
 }

@@ -28,6 +28,7 @@
         private Section sectionModel;
         private Section sectionEffects;
         private Section sectionDodges;
+        private Section sectionAbilities;
 
         private Section sectionGrabs;
 
@@ -41,6 +42,12 @@
         private SerializedProperty spCharacterState;
         private SerializedProperty spAvatarMask;
         private SerializedProperty spWeaponImage;
+
+        
+        private SerializedProperty spAbilityA;
+        private SerializedProperty spAbilityB;
+        private SerializedProperty spAbilityC;
+        private SerializedProperty spAbilityRage;
 
         private SerializedProperty spPrefab;
         private SerializedProperty spAttachment;
@@ -96,6 +103,7 @@
 
         public SerializedProperty spKnockbackF;
         public SerializedProperty spKnockupF;
+        public SerializedProperty spStaggerF;
 
         private SerializedProperty spWeaponModels;
         
@@ -112,6 +120,7 @@
             this.sectionGeneral = new Section("General", this.LoadIcon("General"), this.Repaint);
             this.sectionModel = new Section("Weapon Model", this.LoadIcon("Sword"), this.Repaint);
             this.sectionEffects = new Section("Effects", this.LoadIcon("Effects"), this.Repaint);
+            this.sectionAbilities = new Section("Abilities", this.LoadIcon("Sword"), this.Repaint);
             this.sectionDodges = new Section("Dodge Animations", this.LoadIcon("General"), this.Repaint);
             this.sectionGrabs = new Section("Grab Animations", this.LoadIcon("Effects"), this.Repaint);
 
@@ -124,6 +133,7 @@
 
             this.spKnockupF = this.serializedObject.FindProperty("knockupF"); 
             this.spKnockbackF = this.serializedObject.FindProperty("knockbackF"); 
+            this.spStaggerF = this.serializedObject.FindProperty("staggerF"); 
 
             this.spStandFaceUp = this.serializedObject.FindProperty("recoveryStandUp");
             this.spRecoveryStun = this.serializedObject.FindProperty("recoveryStun");
@@ -144,6 +154,11 @@
             this.spPosition = this.serializedObject.FindProperty("positionOffset");
             this.spRotation = this.serializedObject.FindProperty("rotationOffset");
 
+            this.spAbilityA = this.serializedObject.FindProperty("abilityA");
+            this.spAbilityB = this.serializedObject.FindProperty("abilityB");
+            this.spAbilityC = this.serializedObject.FindProperty("abilityC");
+            this.spAbilityRage = this.serializedObject.FindProperty("abilityRage");
+        
             this.spAudioSheathe = this.serializedObject.FindProperty("audioSheathe");
             this.spAudioDraw = this.serializedObject.FindProperty("audioDraw");
             this.spAudioImpactNormal = this.serializedObject.FindProperty("audioImpactNormal");
@@ -287,6 +302,9 @@
             GUILayout.Space(SPACING);
             this.PaintSectionEffects();
 
+            GUILayout.Space(SPACING);
+            this.PaintSectionAbilities();
+
             EditorGUILayout.Space();
             this.comboList.DoLayoutList();
 
@@ -377,6 +395,23 @@
                     EditorGUILayout.PropertyField(this.spPosition);
                     EditorGUILayout.PropertyField(this.spRotation);
 
+                    EditorGUILayout.EndVertical();
+                }
+            }
+        }
+
+        private void PaintSectionAbilities()
+        {
+            this.sectionAbilities.PaintSection();
+            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionAbilities.state.faded)) {
+                if (group.visible)
+                {
+                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+
+                    EditorGUILayout.PropertyField(this.spAbilityA);
+                    EditorGUILayout.PropertyField(this.spAbilityB);
+                    EditorGUILayout.PropertyField(this.spAbilityC);
+                    EditorGUILayout.PropertyField(this.spAbilityRage);
                     EditorGUILayout.EndVertical();
                 }
             }
@@ -516,6 +551,7 @@
                     EditorGUILayout.PropertyField(this.spRecoveryStun);
                     EditorGUILayout.PropertyField(this.spKnockbackF);
                     EditorGUILayout.PropertyField(this.spKnockupF);
+                    EditorGUILayout.PropertyField(this.spStaggerF);
                     EditorGUILayout.EndVertical();
                 }
             }
