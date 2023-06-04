@@ -129,11 +129,16 @@
 
         // UPDATE METHOD: -------------------------------------------------------------------------
 
+        private bool isActivated = false;
+
         private void Update()
         {
             if (!this.Melee) return;
+            
 
             int currPhase = this.Melee.GetCurrentPhase();
+            MeleeClip clip = this.Melee.currentMeleeClip;
+
             if (currPhase == this.prevPhase) return;
 
             CameraMotorTypeAdventure adventureMotor = null;
@@ -157,6 +162,10 @@
 
                 case  1:
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
+                    if(!isActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                        clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
+                        isActivated = true;
+                    }
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
                     break;
@@ -182,6 +191,7 @@
                     this.transform.TransformPoint(this.pointB)
                 );
             }
+            isActivated = false;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

@@ -24,5 +24,5 @@ public enum WeaponType
     HAMMER,
     SWORD,
     DAGGER,
-    BRAWLER
+    BRAWLER,
 }
