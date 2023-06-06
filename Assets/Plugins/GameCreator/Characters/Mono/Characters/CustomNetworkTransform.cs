@@ -87,7 +87,7 @@ namespace GameCreator.Characters
             SendMoveInputServerRpc(inputPayload);
             inputQueue.Enqueue(inputPayload);
 
-            int bufferIndex = ProcessInputQueue();
+            ProcessInputQueue();
 
             currentTick++;
         }
@@ -95,21 +95,6 @@ namespace GameCreator.Characters
         private int ProcessInputQueue()
         {
             int bufferIndex = -1;
-
-            if (inputQueue.Count == 0)
-            {
-                //InputPayload inputPayload = new InputPayload()
-                //{
-                //    tick = currentTick,
-                //    inputVector = currentMoveInput
-                //};
-
-                //bufferIndex = inputPayload.tick % BUFFER_SIZE;
-
-                //inputBuffer[bufferIndex] = inputPayload;
-                //StatePayload statePayload = ProcessMovement(inputPayload);
-                //stateBuffer[bufferIndex] = statePayload;
-            }
 
             while (inputQueue.Count > 0)
             {
@@ -130,13 +115,10 @@ namespace GameCreator.Characters
             lastProcessedState = latestServerState;
 
             int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
-            //Debug.Log(latestServerState.tick + " " + stateBuffer[serverStateBufferIndex].tick + " " + serverStateBufferIndex + " " + latestServerState.position + " " + stateBuffer[serverStateBufferIndex].position);
             float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
 
             if (positionError > 0.001f)
             {
-                Debug.Log("Positions out of sync " + positionError);
-
                 transform.position = latestServerState.position;
 
                 // Update buffer at index of latest server state
