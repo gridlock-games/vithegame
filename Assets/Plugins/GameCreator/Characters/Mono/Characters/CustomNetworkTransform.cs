@@ -37,16 +37,11 @@ namespace GameCreator.Characters
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
 
-        private Vector2 lastMoveInput;
         private int currentTick;
-
         private StatePayload[] stateBuffer;
         private InputPayload[] inputBuffer;
         private StatePayload latestServerState;
         private StatePayload lastProcessedState;
-        private float horizontalInput;
-        private float verticalInput;
-
         private Queue<InputPayload> inputQueue;
 
         public override void OnNetworkSpawn()
@@ -88,6 +83,10 @@ namespace GameCreator.Characters
                 HandleServerReconciliation();
             }
 
+            InputPayload inputPayload = new InputPayload() { tick = currentTick, inputVector = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)) };
+            SendMoveInputServerRpc(inputPayload);
+            inputQueue.Enqueue(inputPayload);
+
             int bufferIndex = ProcessInputQueue();
 
             currentTick++;
@@ -96,6 +95,22 @@ namespace GameCreator.Characters
         private int ProcessInputQueue()
         {
             int bufferIndex = -1;
+
+            if (inputQueue.Count == 0)
+            {
+                //InputPayload inputPayload = new InputPayload()
+                //{
+                //    tick = currentTick,
+                //    inputVector = currentMoveInput
+                //};
+
+                //bufferIndex = inputPayload.tick % BUFFER_SIZE;
+
+                //inputBuffer[bufferIndex] = inputPayload;
+                //StatePayload statePayload = ProcessMovement(inputPayload);
+                //stateBuffer[bufferIndex] = statePayload;
+            }
+
             while (inputQueue.Count > 0)
             {
                 InputPayload inputPayload = inputQueue.Dequeue();
@@ -105,8 +120,6 @@ namespace GameCreator.Characters
                 inputBuffer[bufferIndex] = inputPayload;
                 StatePayload statePayload = ProcessMovement(inputPayload);
                 stateBuffer[bufferIndex] = statePayload;
-
-                Debug.Log(stateBuffer[bufferIndex].tick + " " + stateBuffer[bufferIndex].position);
             }
 
             return bufferIndex;
@@ -117,6 +130,7 @@ namespace GameCreator.Characters
             lastProcessedState = latestServerState;
 
             int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
+            //Debug.Log(latestServerState.tick + " " + stateBuffer[serverStateBufferIndex].tick + " " + serverStateBufferIndex + " " + latestServerState.position + " " + stateBuffer[serverStateBufferIndex].position);
             float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
 
             if (positionError > 0.001f)
@@ -153,26 +167,9 @@ namespace GameCreator.Characters
             inputQueue = new Queue<InputPayload>();
         }
 
-        private void Update()
-        {
-            if (!IsOwner) return;
-
-            Vector2 moveInput = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V));
-
-            if (moveInput != lastMoveInput)
-            {
-                InputPayload inputPayload = new InputPayload() { tick = currentTick, inputVector = moveInput };
-                SendMoveInputServerRpc(inputPayload);
-                inputQueue.Enqueue(inputPayload);
-            }
-
-            lastMoveInput = moveInput;
-        }
-
         [ServerRpc]
         private void SendMoveInputServerRpc(InputPayload inputPayload)
         {
-            //Debug.Log(inputPayload.tick + " " + inputPayload.inputVector);
             inputQueue.Enqueue(inputPayload);
 
             // Send input to all clients that aren't the owner of this object
@@ -181,17 +178,12 @@ namespace GameCreator.Characters
             SendMoveInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
         }
 
-        [ClientRpc]
-        private void SendMoveInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams)
-        {
-            //Debug.Log(inputPayload.tick + " " + inputPayload.inputVector);
-            inputQueue.Enqueue(inputPayload);
-        }
+        [ClientRpc] private void SendMoveInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessMovement(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            transform.position += 1f / NetworkManager.NetworkTickSystem.TickRate * 5f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
+            transform.position += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
 
             return new StatePayload()
             {
