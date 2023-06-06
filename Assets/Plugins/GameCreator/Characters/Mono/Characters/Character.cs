@@ -771,11 +771,8 @@
 
         private PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
-            PlayerCharacterNetworkTransform anchorNetworkTransform = anchor.GetComponent<PlayerCharacterNetworkTransform>();
-            PlayerCharacterNetworkTransform targetNetworkTransform = targetChar.GetComponent<PlayerCharacterNetworkTransform>();
-
-            Vector3 anchorPosition = anchorNetworkTransform ? anchorNetworkTransform.GetPosition() : anchor.transform.position;
-            Vector3 targetPosition = targetNetworkTransform ? targetNetworkTransform.GetPosition() : targetChar.transform.position;
+            Vector3 anchorPosition = anchor.transform.position;
+            Vector3 targetPosition = targetChar.transform.position;
 
             Vector3 rotationDirection = anchorPosition - targetPosition;
 

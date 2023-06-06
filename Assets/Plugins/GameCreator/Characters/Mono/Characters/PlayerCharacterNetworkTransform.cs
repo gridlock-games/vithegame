@@ -2,150 +2,179 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace GameCreator.Characters
 {
     [RequireComponent(typeof(PlayerCharacter))]
     public class PlayerCharacterNetworkTransform : NetworkBehaviour
     {
-        public bool interpolate = true;
-        [Range(0.001f, 1)]
-        public float positionNetworkSendThreshold = 0.001f;
-        [Range(0.001f, 360)]
-        public float rotationAngleNetworkSendThreshold = 0.001f;
-        [Range(1, 100)]
-        public int positionTeleportThreshold = 10;
-
-        private NetworkVariable<int> transformParentId = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<Vector3> currentScale = new NetworkVariable<Vector3>(Vector3.one, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
-        PlayerCharacter _playerCharacter;
-        float rotationSpeed = 10;
-
-        public Vector3 GetPosition() { return currentPosition.Value; }
-        public Quaternion GetRotation() { return currentRotation.Value; }
-        public Vector3 GetScale() { return currentScale.Value; }
-
-        public void SetParent(NetworkObject newParent)
+        private struct InputPayload : INetworkSerializable
         {
-            if (newParent == null)
-                transformParentId.Value = -1;
-            else
-                transformParentId.Value = (int)newParent.NetworkObjectId;
+            public int tick;
+            public Vector2 inputVector;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref inputVector);
+            }
         }
+
+        private struct StatePayload : INetworkSerializable
+        {
+            public int tick;
+            public Vector3 position;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref position);
+            }
+        }
+
+        private const string AXIS_H = "Horizontal";
+        private const string AXIS_V = "Vertical";
+        private const int BUFFER_SIZE = 1024;
+
+        private int currentTick;
+        private StatePayload[] stateBuffer;
+        private InputPayload[] inputBuffer;
+        private StatePayload latestServerState;
+        private StatePayload lastProcessedState;
+        private Queue<InputPayload> inputQueue;
+
+        private PlayerCharacter playerCharacter;
 
         public override void OnNetworkSpawn()
         {
-            transformParentId.OnValueChanged += OnTransformParentIdChange;
-            currentRotation.OnValueChanged += OnRotationChanged;
+            if (IsServer)
+                NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
+            if (IsClient)
+                NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
         }
 
         public override void OnNetworkDespawn()
         {
-            transformParentId.OnValueChanged -= OnTransformParentIdChange;
-            currentRotation.OnValueChanged -= OnRotationChanged;
+            if (IsServer)
+                NetworkManager.NetworkTickSystem.Tick -= HandleServerTick;
+            if (IsClient)
+                NetworkManager.NetworkTickSystem.Tick -= HandleClientTick;
+        }
+
+        private void HandleServerTick()
+        {
+            int bufferIndex = ProcessInputQueue();
+
+            if (bufferIndex != -1)
+            {
+                SendStateToClientRpc(stateBuffer[bufferIndex]);
+            }
+
+            currentTick++;
+        }
+
+        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
+
+        private void HandleClientTick()
+        {
+            if (!latestServerState.Equals(default(StatePayload)) &&
+                (lastProcessedState.Equals(default(StatePayload)) ||
+                !latestServerState.Equals(lastProcessedState)))
+            {
+                HandleServerReconciliation();
+            }
+
+            InputPayload inputPayload = new InputPayload() { tick = currentTick, inputVector = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)) };
+            SendMoveInputServerRpc(inputPayload);
+            inputQueue.Enqueue(inputPayload);
+
+            ProcessInputQueue();
+
+            currentTick++;
+        }
+
+        private int ProcessInputQueue()
+        {
+            int bufferIndex = -1;
+
+            while (inputQueue.Count > 0)
+            {
+                InputPayload inputPayload = inputQueue.Dequeue();
+
+                bufferIndex = inputPayload.tick % BUFFER_SIZE;
+
+                inputBuffer[bufferIndex] = inputPayload;
+                StatePayload statePayload = ProcessMovement(inputPayload);
+                stateBuffer[bufferIndex] = statePayload;
+            }
+
+            return bufferIndex;
+        }
+
+        private void HandleServerReconciliation()
+        {
+            lastProcessedState = latestServerState;
+
+            int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
+            float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
+
+            if (positionError > 0.001f)
+            {
+                transform.position = latestServerState.position;
+
+                // Update buffer at index of latest server state
+                stateBuffer[serverStateBufferIndex] = latestServerState;
+
+                // Now re-simulate the rest of the ticks up to the current tick on the client
+                int tickToProcess = latestServerState.tick + 1;
+
+                while (tickToProcess < currentTick)
+                {
+                    int bufferIndex = tickToProcess % BUFFER_SIZE;
+
+                    // Process new movement with reconciled state
+                    StatePayload statePayload = ProcessMovement(inputBuffer[bufferIndex]);
+
+                    // Update buffer with recalculated state
+                    stateBuffer[bufferIndex] = statePayload;
+
+                    tickToProcess++;
+                }
+            }
         }
 
         private void Start()
         {
-            _playerCharacter = GetComponent<PlayerCharacter>();
+            stateBuffer = new StatePayload[BUFFER_SIZE];
+            inputBuffer = new InputPayload[BUFFER_SIZE];
+            inputQueue = new Queue<InputPayload>();
+            playerCharacter = GetComponent<PlayerCharacter>();
         }
 
-        void OnTransformParentIdChange(int previous, int current)
+        [ServerRpc]
+        private void SendMoveInputServerRpc(InputPayload inputPayload)
         {
-            if (previous != -1)
-            {
-                NetworkObject oldParent = NetworkManager.SpawnManager.SpawnedObjects[(ulong)previous];
-                foreach (Collider c in oldParent.GetComponentsInChildren<Collider>())
-                {
-                    foreach (Collider thisCol in GetComponentsInChildren<Collider>())
-                    {
-                        Physics.IgnoreCollision(c, thisCol, false);
-                    }
-                }
-            }
+            inputQueue.Enqueue(inputPayload);
 
-            if (current != -1)
-            {
-                NetworkObject newParent = NetworkManager.SpawnManager.SpawnedObjects[(ulong)current];
-                foreach (Collider c in newParent.GetComponentsInChildren<Collider>())
-                {
-                    foreach (Collider thisCol in GetComponentsInChildren<Collider>())
-                    {
-                        Physics.IgnoreCollision(c, thisCol, true);
-                    }
-                }
-
-                transform.SetParent(newParent.transform, true);
-            }
-            else
-            {
-                transform.SetParent(null, true);
-            }
+            // Send input to all clients that aren't the owner of this object
+            List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
+            clientIds.Remove(OwnerClientId);
+            SendMoveInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
         }
 
-        void OnRotationChanged(Quaternion prevRotation, Quaternion newRotation)
+        [ClientRpc] private void SendMoveInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
+
+        private StatePayload ProcessMovement(InputPayload input)
         {
-            rotationSpeed = Quaternion.Angle(transform.localRotation, newRotation);
-            if (!interpolate)
-                transform.localRotation = currentRotation.Value;
-        }
+            // Should always be in sync with same function on Client
+            transform.position += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
 
-        Quaternion lastRotation;
-        private void LateUpdate()
-        {
-            if (!IsSpawned) { return; }
-
-            // Rotation Syncing
-            if (IsOwner)
+            return new StatePayload()
             {
-                if (Quaternion.Angle(transform.localRotation, currentRotation.Value) > rotationAngleNetworkSendThreshold)
-                    currentRotation.Value = transform.localRotation;
-            }
-            else // If we are not the owner
-            {
-                if (interpolate)
-                {
-                    if (transformParentId.Value == -1) { transform.localRotation = Quaternion.Slerp(lastRotation, currentRotation.Value, Time.deltaTime * rotationSpeed); }
-                    else { transform.localRotation = Quaternion.Slerp(lastRotation, currentRotation.Value, Time.deltaTime * rotationSpeed); }
-                }
-                else
-                {
-                    if (transformParentId.Value == -1) { transform.localRotation = currentRotation.Value; }
-                    else { transform.localRotation = currentRotation.Value; }
-                }
-                lastRotation = transform.localRotation;
-
-                transform.localScale = currentScale.Value;
-            }
-
-            // Position Syncing
-            if (IsServer)
-            {
-                if (Vector3.Distance(transform.localPosition, currentPosition.Value) > positionNetworkSendThreshold)
-                    currentPosition.Value = transform.localPosition;
-                if (transform.localScale != currentScale.Value)
-                    currentScale.Value = transform.localScale;
-            }
-            else // If we are not the server
-            {
-                if (!_playerCharacter.IsControllable())
-                {
-                    transform.position = Vector3.Lerp(transform.position, currentPosition.Value, Time.deltaTime * 10);
-                }
-
-                float localDistance = Vector3.Distance(transform.position, currentPosition.Value);
-                if (localDistance > positionTeleportThreshold)
-                {
-                    if (IsOwner)
-                        Debug.Log(Time.time + "Teleporting character: " + OwnerClientId + " - " + name);
-                    transform.localPosition = currentPosition.Value;
-                }
-
-                transform.localScale = currentScale.Value;
-            }
+                tick = input.tick,
+                position = transform.position,
+            };
         }
     }
 }
