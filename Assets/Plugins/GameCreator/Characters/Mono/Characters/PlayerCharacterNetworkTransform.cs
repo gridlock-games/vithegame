@@ -33,6 +33,8 @@ namespace GameCreator.Characters
             }
         }
 
+        public Vector3 CurrentPosition { get; private set; }
+
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
@@ -121,7 +123,7 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                transform.position = latestServerState.position;
+                CurrentPosition = latestServerState.position;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
@@ -152,6 +154,11 @@ namespace GameCreator.Characters
             playerCharacter = GetComponent<PlayerCharacter>();
         }
 
+        private void Update()
+        {
+            Debug.Log(CurrentPosition);
+        }
+
         [ServerRpc]
         private void SendMoveInputServerRpc(InputPayload inputPayload)
         {
@@ -168,12 +175,12 @@ namespace GameCreator.Characters
         private StatePayload ProcessMovement(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            transform.position += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
+            CurrentPosition += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
 
             return new StatePayload()
             {
                 tick = input.tick,
-                position = transform.position,
+                position = CurrentPosition,
             };
         }
     }

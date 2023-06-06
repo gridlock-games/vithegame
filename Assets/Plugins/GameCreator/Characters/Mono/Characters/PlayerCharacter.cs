@@ -121,6 +121,8 @@
             }
 
             this.CharacterUpdate();
+            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
+            transform.position = Vector3.Lerp(transform.position, networkTransform.CurrentPosition, Time.deltaTime * 10);
         }
 
         public Vector3 GetMoveInputValue() { return moveInput.Value; }
