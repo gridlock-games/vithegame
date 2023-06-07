@@ -55,12 +55,15 @@
 
         private bool forceDisplayTouchstick = false;
 
+        private PlayerCharacterNetworkTransform networkTransform;
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         protected override void Awake()
         {
             if (!Application.isPlaying) return;
             this.CharacterAwake();
+            networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
 
             this.initSaveData = new SaveData()
             {
@@ -121,8 +124,18 @@
             }
 
             this.CharacterUpdate();
-            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-            transform.position = Vector3.Lerp(transform.position, networkTransform.CurrentPosition, Time.deltaTime * 10);
+
+            transform.position = networkTransform.CurrentPosition;
+        }
+
+        public Vector3 ProcessMovement(Vector3 inputVector)
+        {
+            Vector3 newPosition = networkTransform.CurrentPosition + 1f / NetworkManager.NetworkTickSystem.TickRate * inputVector;
+            //Vector3 newPosition = networkTransform.CurrentPosition + inputVector;
+
+            //Debug.Log(inputVector + " " + newPosition);
+
+            return newPosition;
         }
 
         public Vector3 GetMoveInputValue() { return moveInput.Value; }

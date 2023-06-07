@@ -25,11 +25,13 @@ namespace GameCreator.Characters
         {
             public int tick;
             public Vector3 position;
+            public Quaternion rotation;
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref position);
+                serializer.SerializeValue(ref rotation);
             }
         }
 
@@ -38,6 +40,9 @@ namespace GameCreator.Characters
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
+
+        private NetworkVariable<Quaternion> ownerRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private float rotationSpeed = 10;
 
         private int currentTick;
         private StatePayload[] stateBuffer;
@@ -87,9 +92,12 @@ namespace GameCreator.Characters
                 HandleServerReconciliation();
             }
 
-            InputPayload inputPayload = new InputPayload() { tick = currentTick, inputVector = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)) };
-            SendMoveInputServerRpc(inputPayload);
-            inputQueue.Enqueue(inputPayload);
+            if (IsOwner)
+            {
+                InputPayload inputPayload = new InputPayload() { tick = currentTick, inputVector = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)) };
+                SendMoveInputServerRpc(inputPayload);
+                inputQueue.Enqueue(inputPayload);
+            }
 
             ProcessInputQueue();
 
@@ -107,7 +115,7 @@ namespace GameCreator.Characters
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 inputBuffer[bufferIndex] = inputPayload;
-                StatePayload statePayload = ProcessMovement(inputPayload);
+                StatePayload statePayload = ProcessInput(inputPayload);
                 stateBuffer[bufferIndex] = statePayload;
             }
 
@@ -123,6 +131,8 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
+                Debug.Log(latestServerState.tick + " " + positionError);
+
                 CurrentPosition = latestServerState.position;
 
                 // Update buffer at index of latest server state
@@ -136,7 +146,7 @@ namespace GameCreator.Characters
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                     // Process new movement with reconciled state
-                    StatePayload statePayload = ProcessMovement(inputBuffer[bufferIndex]);
+                    StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
@@ -154,11 +164,6 @@ namespace GameCreator.Characters
             playerCharacter = GetComponent<PlayerCharacter>();
         }
 
-        private void Update()
-        {
-            Debug.Log(CurrentPosition);
-        }
-
         [ServerRpc]
         private void SendMoveInputServerRpc(InputPayload inputPayload)
         {
@@ -172,16 +177,28 @@ namespace GameCreator.Characters
 
         [ClientRpc] private void SendMoveInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
 
-        private StatePayload ProcessMovement(InputPayload input)
+        private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            CurrentPosition += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
+            CurrentPosition = playerCharacter.ProcessMovement(ownerRotation.Value * new Vector3(input.inputVector.x, 0, input.inputVector.y));
+            //CurrentPosition += 1f / NetworkManager.NetworkTickSystem.TickRate * 3f * new Vector3(input.inputVector.x, 0, input.inputVector.y);
 
             return new StatePayload()
             {
                 tick = input.tick,
                 position = CurrentPosition,
+                rotation = ownerRotation.Value
             };
+        }
+
+        private void LateUpdate()
+        {
+            if (!IsOwner) return;
+
+            if (IsOwner)
+                ownerRotation.Value = transform.rotation;
+            else
+                transform.rotation = ownerRotation.Value;
         }
     }
 }

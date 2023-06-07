@@ -46,12 +46,12 @@
             if (this.isRootMoving)
             {
                 //this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-                //this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                this.characterLocomotion.characterController.transform.rotation = targetRotation;
             }
             else
             {
                 //this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
-                //this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                this.characterLocomotion.characterController.transform.rotation = targetRotation;
             }
 
             if (this.characterLocomotion.navmeshAgent != null &&
