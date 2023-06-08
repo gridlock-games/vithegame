@@ -11,6 +11,7 @@ public class UserModel
     public string account_level;
     public string display_picture;
     public List<ShopAnalyticsModel> shopAnalytics = new List<ShopAnalyticsModel>();
+    public List<ShopAnalyticsModel> characterAnalytics = new List<ShopAnalyticsModel>();
     
     [Serializable]
     public class ShopAnalyticsModel
