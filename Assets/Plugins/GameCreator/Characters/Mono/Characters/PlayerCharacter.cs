@@ -1,5 +1,6 @@
 ﻿namespace GameCreator.Characters
 {
+    using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
@@ -105,7 +106,7 @@
 
             switch (this.inputType)
             {
-                case INPUT_TYPE.Directional: this.UpdateInputDirectional(); break;
+                //case INPUT_TYPE.Directional: this.UpdateInputDirectional(); break;
                 case INPUT_TYPE.PointAndClick: this.UpdateInputPointClick(); break;
                 case INPUT_TYPE.FollowPointer: this.UpdateInputFollowPointer(); break;
                 case INPUT_TYPE.SideScrollX: this.UpdateInputSideScroll(Vector3.right); break;
@@ -124,18 +125,51 @@
             }
 
             this.CharacterUpdate();
-
-            transform.position = networkTransform.CurrentPosition;
         }
 
-        public Vector3 ProcessMovement(Vector3 inputVector)
+        public KeyValuePair<Vector3, Quaternion> ProcessMovement(Vector3 inputVector, Quaternion inputRotation)
         {
-            Vector3 newPosition = networkTransform.CurrentPosition + 1f / NetworkManager.NetworkTickSystem.TickRate * inputVector;
-            //Vector3 newPosition = networkTransform.CurrentPosition + inputVector;
+            LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
-            //Debug.Log(inputVector + " " + newPosition);
+            Vector3 targetDirection = inputRotation * inputVector;
+            this.characterLocomotion.SetDirectionalDirection(targetDirection);
+            float speed = this.characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
+            Quaternion targetRotation = directionalLocSystem.UpdateRotation(targetDirection);
 
-            return newPosition;
+            directionalLocSystem.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
+            directionalLocSystem.UpdateSliding();
+
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, ILocomotionSystem.HORIZONTAL_PLANE), 1.0f);
+            targetDirection *= speed;
+
+            if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
+            targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
+
+            if (directionalLocSystem.isRootMoving)
+            {
+                //directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                //characterLocomotion.characterController.transform.rotation = targetRotation;
+            }
+            else
+            {
+                characterLocomotion.characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection);
+                if (IsOwner)
+                    characterLocomotion.characterController.transform.rotation = targetRotation;
+                else
+                    characterLocomotion.characterController.transform.rotation = inputRotation;
+                //characterLocomotion.SetRotation(Vector3.forward);
+            }
+
+            //Debug.Log(networkTransform.CurrentPosition + " " + transform.position + " " + networkTransform.CurrentRotation.eulerAngles);
+            //Debug.Log(targetDirection + " " + targetRotation.eulerAngles);
+            //Debug.Log(networkTransform.currentTick + " " + targetDirection);
+
+            //characterLocomotion.characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * inputVector);
+
+            //characterLocomotion.characterController.Move(Time.deltaTime * inputVector);
+            //this.ComputeMovement(IsServer ? transform.rotation * moveInput.Value : inputVector);
+
+            return new KeyValuePair<Vector3, Quaternion>(transform.position, transform.rotation);
         }
 
         public Vector3 GetMoveInputValue() { return moveInput.Value; }
@@ -162,13 +196,13 @@
                 if (disableActions.Value) { moveInput.Value = Vector3.zero; }
             }
 
-            Vector3 moveDirection = transform.rotation * moveInput.Value;
-            if (!IsControllable()) { moveDirection = Vector3.zero; }
-            Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
+            //Vector3 moveDirection = transform.rotation * moveInput.Value;
+            //if (!IsControllable()) { moveDirection = Vector3.zero; }
+            //Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
 
-            this.ComputeMovement(targetDirection);
+            //this.ComputeMovement(targetDirection);
 
-            this.characterLocomotion.SetDirectionalDirection(moveDirection);
+            //this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 
         protected virtual void UpdateInputTank()

@@ -37,7 +37,7 @@
 
         // CONSTANT PROPERTIES: -------------------------------------------------------------------
 
-		protected static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1,0,1);
+		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
 
         private const string AXIS_MOUSE_X = "Mouse X";
         private const string AXIS_MOUSE_Y = "Mouse Y";
@@ -54,7 +54,7 @@
         public float pivotSpeed;
 
         public bool isSliding;
-        protected Vector3 slideDirection = Vector3.zero;
+        public Vector3 slideDirection { get; protected set; } = Vector3.zero;
 
         public bool isDashing { private set; get; }
         protected Vector3 dashVelocity = Vector3.zero;
@@ -162,7 +162,7 @@
 
         // CHARACTER CONTROLLER METHODS: ----------------------------------------------------------
 
-        protected Quaternion UpdateRotation(Vector3 targetDirection)
+        public Quaternion UpdateRotation(Vector3 targetDirection)
         {
             Quaternion targetRotation = this.characterLocomotion.character.transform.rotation;
             this.aimDirection = this.characterLocomotion.character.transform.TransformDirection(Vector3.forward);
@@ -289,7 +289,7 @@
             return targetRotation;
         }
 
-        protected float CalculateSpeed(Vector3 targetDirection, bool isGrounded)
+        public float CalculateSpeed(Vector3 targetDirection, bool isGrounded)
         {
             float speed = (this.characterLocomotion.canRun
                 ? this.characterLocomotion.runSpeed
@@ -311,7 +311,7 @@
             return speed;
         }
 
-        protected virtual void UpdateAnimationConstraints(ref Vector3 targetDirection, ref Quaternion targetRotation)
+        public virtual void UpdateAnimationConstraints(ref Vector3 targetDirection, ref Quaternion targetRotation)
         {
             if (this.characterLocomotion.animatorConstraint == CharacterLocomotion.ANIM_CONSTRAINT.KEEP_MOVEMENT)
             {
@@ -329,7 +329,7 @@
             }
         }
 
-        protected virtual void UpdateSliding()
+        public virtual void UpdateSliding()
         {
             float slopeAngle = Vector3.Angle(Vector3.up, this.characterLocomotion.terrainNormal);
             bool frameSliding = (
@@ -358,7 +358,7 @@
             }
         }
 
-        protected void UpdateRootMovement(Vector3 verticalMovement)
+        public void UpdateRootMovement(Vector3 verticalMovement)
         {
             float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
@@ -370,7 +370,7 @@
                 deltaVertical - this.rootMoveDeltaVertical,
                 deltaForward - this.rootMoveDeltaForward
             );
-
+            
             movement += verticalMovement * this.rootMoveGravity * Time.deltaTime;
 
             this.characterLocomotion.characterController.Move(
