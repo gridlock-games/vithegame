@@ -207,7 +207,8 @@ namespace GameCreator.Characters
         [ServerRpc]
         private void SendMoveInputServerRpc(InputPayload inputPayload)
         {
-            inputQueue.Enqueue(inputPayload);
+            if (!IsHost)
+                inputQueue.Enqueue(inputPayload);
 
             // Send input to all clients that aren't the owner of this object
             List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
@@ -230,16 +231,6 @@ namespace GameCreator.Characters
                 position = CurrentPosition,
                 rotation = CurrentRotation
             };
-        }
-
-        //private void Update()
-        //{
-        //    Debug.Log(currentTick + " " + transform.position + " " + transform.eulerAngles);
-        //}
-
-        private void LateUpdate()
-        {
-            if (!IsOwner) return;
         }
     }
 }
