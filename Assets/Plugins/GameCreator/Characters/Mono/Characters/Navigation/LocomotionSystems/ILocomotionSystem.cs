@@ -365,13 +365,22 @@
             }
         }
 
+        int lastTickCalled;
         public void UpdateRootMovement(Vector3 verticalMovement)
         {
             float t;
-            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
-                t = (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>().currentTick - this.rootMoveStartTick) / (float)rootMoveTickDuration;
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                // If we have already called an update for this tick, return without moving the object
+                if (lastTickCalled == networkTransform.currentTick) { return; }
+
+                t = (networkTransform.currentTick - this.rootMoveStartTick) / (float)rootMoveTickDuration;
+                lastTickCalled = networkTransform.currentTick;
+            }
             else
+            {
                 t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+            }
 
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;

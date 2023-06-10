@@ -29,30 +29,34 @@
                 this.characterLocomotion.navmeshAgent.updateUpAxis = false;
             }
 
-            //Vector3 targetDirection = this.desiredDirection;
+            Vector3 targetDirection = this.desiredDirection;
 
-            //float speed = this.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
-            //Quaternion targetRotation = this.UpdateRotation(targetDirection);
+            float speed = this.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
+            Quaternion targetRotation = this.UpdateRotation(targetDirection);
 
-            //this.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
-            //this.UpdateSliding();
+            this.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
+            this.UpdateSliding();
 
-            //targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
-            //targetDirection *= speed;
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
+            targetDirection *= speed;
 
-            //if (this.isSliding) targetDirection = this.slideDirection;
-            //targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
+            if (this.isSliding) targetDirection = this.slideDirection;
+            targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
-            //if (this.isRootMoving)
-            //{
-            //    this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-            //    this.characterLocomotion.characterController.transform.rotation = targetRotation;
-            //}
-            //else
-            //{
-            //    this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
-            //    this.characterLocomotion.characterController.transform.rotation = targetRotation;
-            //}
+            // If there is no player character network transform component on this object
+            if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+            {
+                if (this.isRootMoving)
+                {
+                    this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                }
+                else
+                {
+                    this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
+                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                }
+            }
 
             if (this.characterLocomotion.navmeshAgent != null &&
                 this.characterLocomotion.navmeshAgent.isActiveAndEnabled)

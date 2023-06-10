@@ -106,7 +106,7 @@
 
             switch (this.inputType)
             {
-                //case INPUT_TYPE.Directional: this.UpdateInputDirectional(); break;
+                case INPUT_TYPE.Directional: this.UpdateInputDirectional(); break;
                 case INPUT_TYPE.PointAndClick: this.UpdateInputPointClick(); break;
                 case INPUT_TYPE.FollowPointer: this.UpdateInputFollowPointer(); break;
                 case INPUT_TYPE.SideScrollX: this.UpdateInputSideScroll(Vector3.right); break;
@@ -198,13 +198,13 @@
                 if (disableActions.Value) { moveInput.Value = Vector3.zero; }
             }
 
-            //Vector3 moveDirection = transform.rotation * moveInput.Value;
+            Vector3 moveDirection = transform.rotation * moveInput.Value;
             //if (!IsControllable()) { moveDirection = Vector3.zero; }
-            //Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
+            Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
 
-            //this.ComputeMovement(targetDirection);
+            this.ComputeMovement(targetDirection);
 
-            //this.characterLocomotion.SetDirectionalDirection(moveDirection);
+            this.characterLocomotion.SetDirectionalDirection(moveDirection);
         }
 
         protected virtual void UpdateInputTank()
