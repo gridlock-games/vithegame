@@ -145,10 +145,9 @@
             if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
-            //Debug.Log(directionalLocSystem.isRootMoving);
             if (directionalLocSystem.isRootMoving)
             {
-                //directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
                 if (IsOwner)
                     characterLocomotion.characterController.transform.rotation = targetRotation;
                 else

@@ -138,13 +138,12 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
+                Debug.Log(positionError);
+
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
+                CurrentPosition = latestServerState.position;
                 playerCharacter.characterLocomotion.characterController.enabled = true;
-
-                //CurrentPosition = latestServerState.position;
-                //transform.position = latestServerState.position;
-                //transform.rotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;

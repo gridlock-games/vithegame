@@ -75,9 +75,11 @@
         private float rootMoveDeltaVertical;
 
         private float rootMoveStartTime = -100f;
+        private int rootMoveStartTick;
         private float rootMoveImpulse;
         private float rootMoveGravity;
         private float rootMoveDuration;
+        private int rootMoveTickDuration;
 
         private float slidingValue;
         private float slidingSpeed;
@@ -112,6 +114,11 @@
             this.isRootMoving = true;
             this.rootMoveImpulse = impulse;
             this.rootMoveStartTime = Time.time;
+            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+            {
+                this.rootMoveStartTick = characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>().currentTick;
+                this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
+            }
             this.rootMoveDuration = duration;
             this.rootMoveGravity = gravityInfluence;
 
@@ -360,7 +367,12 @@
 
         public void UpdateRootMovement(Vector3 verticalMovement)
         {
-            float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+            float t;
+            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+                t = (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>().currentTick - this.rootMoveStartTick) / (float)rootMoveTickDuration;
+            else
+                t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
             float deltaVertical = this.rootMoveCurveVertical.Evaluate(t) * this.rootMoveImpulse;
@@ -371,8 +383,8 @@
                 deltaForward - this.rootMoveDeltaForward
             );
             
-            movement += verticalMovement * this.rootMoveGravity * Time.deltaTime;
-
+            movement += 1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate * this.rootMoveGravity * verticalMovement;
+            
             this.characterLocomotion.characterController.Move(
                 this.characterLocomotion.character.transform.TransformDirection(movement)
             );
