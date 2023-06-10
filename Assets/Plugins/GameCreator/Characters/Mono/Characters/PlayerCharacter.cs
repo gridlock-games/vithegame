@@ -145,10 +145,14 @@
             if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
+            //Debug.Log(directionalLocSystem.isRootMoving);
             if (directionalLocSystem.isRootMoving)
             {
                 //directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-                //characterLocomotion.characterController.transform.rotation = targetRotation;
+                if (IsOwner)
+                    characterLocomotion.characterController.transform.rotation = targetRotation;
+                else
+                    characterLocomotion.characterController.transform.rotation = inputRotation;
             }
             else
             {
@@ -157,7 +161,6 @@
                     characterLocomotion.characterController.transform.rotation = targetRotation;
                 else
                     characterLocomotion.characterController.transform.rotation = inputRotation;
-                //characterLocomotion.SetRotation(Vector3.forward);
             }
 
             //Debug.Log(networkTransform.CurrentPosition + " " + transform.position + " " + networkTransform.CurrentRotation.eulerAngles);

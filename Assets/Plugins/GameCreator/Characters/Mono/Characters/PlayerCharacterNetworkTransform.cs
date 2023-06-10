@@ -37,14 +37,14 @@ namespace GameCreator.Characters
             }
         }
 
-        public Vector3 CurrentPosition { get; private set; }
-        public Quaternion CurrentRotation { get; private set; }
+        //public Vector3 CurrentPosition { get; private set; }
+        //public Quaternion CurrentRotation { get; private set; }
+        private Vector3 CurrentPosition;
+        private Quaternion CurrentRotation;
 
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
-
-        private float rotationSpeed = 10;
 
         public int currentTick { get; private set; }
         private StatePayload[] stateBuffer;
@@ -126,11 +126,6 @@ namespace GameCreator.Characters
                 stateBuffer[bufferIndex] = statePayload;
             }
 
-            if (bufferIndex != -1)
-            {
-                Debug.Log(inputBuffer[bufferIndex].tick + " " + inputBuffer[bufferIndex].inputVector + " " + inputBuffer[bufferIndex].rotation.eulerAngles);
-            }
-
             return bufferIndex;
         }
 
@@ -143,10 +138,12 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log("Position Error: " + positionError);
-
-                CurrentPosition = latestServerState.position;
+                playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
+                playerCharacter.characterLocomotion.characterController.enabled = true;
+
+                //CurrentPosition = latestServerState.position;
+                //transform.position = latestServerState.position;
                 //transform.rotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
@@ -235,6 +232,11 @@ namespace GameCreator.Characters
                 rotation = CurrentRotation
             };
         }
+
+        //private void Update()
+        //{
+        //    Debug.Log(currentTick + " " + transform.position + " " + transform.eulerAngles);
+        //}
 
         private void LateUpdate()
         {
