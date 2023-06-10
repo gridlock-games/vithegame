@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
+using GameCreator.Core;
+using GameCreator.Characters;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -26,13 +28,20 @@ public class SceneUserDataManager : MonoBehaviour
     private int currentIndex = -1;
     public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
-
     private Boolean isPreviewActive = false;
+
+    private Vector3 cameraDesc_InitPos;
+    private Quaternion charDesc_InitRot; 
+    private Quaternion char_InitRot; 
 
     void Start()
     {
         this.datamanager = DataManager.Instance;
         mainCamera = Instantiate(cameraPrefab);
+
+        this.cameraDesc_InitPos = mainCamera.transform.position;
+        this.charDesc_InitRot = mainCamera.transform.rotation;
+
         this.InitDataReferences();
     }
     private void Update()
@@ -68,8 +77,12 @@ public class SceneUserDataManager : MonoBehaviour
             SelectNextObject();
         }
 
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            UnSelect();
+        }
+
     }
-    public void InitDataReferences()
+    private void InitDataReferences()
     {
         var _userdata = datamanager;
         if (_userdata)
@@ -82,7 +95,7 @@ public class SceneUserDataManager : MonoBehaviour
             this.SpawnGameObjectsHorizontally();
         }
     }
-    public void SpawnGameObjectsHorizontally()
+    private void SpawnGameObjectsHorizontally()
     {
         List<GameObject> placeholders = new List<GameObject>();
         for (int i = 0; i < characterModel.Length; i++)
@@ -150,12 +163,16 @@ public class SceneUserDataManager : MonoBehaviour
         if (selectedObject == null) return;
         if (selectedObject.tag != "Character") return;
 
+        char_InitRot = selectedObject.transform.rotation;
+
         // Destroy the previous spotlight if it exists
         if (currentSpotlight != null)
         {
             Destroy(currentSpotlight);
             Destroy(currentCharDesc);
         }
+        
+        selectedObject.transform.rotation = Quaternion.Euler(0f, -215f, 0f);
 
         // Instantiate a new spotlight
         currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
@@ -166,9 +183,24 @@ public class SceneUserDataManager : MonoBehaviour
         
         
         // Move the camera in front of the selected game object
-        Vector3 cameraPosition = selectedObject.transform.position + new Vector3(0f, 1.0f, 2.0f);
+        Vector3 cameraPosition = selectedObject.transform.position + new Vector3(1.0f, 1.0f, -2.0f);
         mainCamera.transform.position = cameraPosition;
-        mainCamera.transform.LookAt(selectedObject.transform);
+        mainCamera.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+    }
+
+    public void UnSelect() {
+        mainCamera.transform.position = this.cameraDesc_InitPos;
+        mainCamera.transform.rotation = this.charDesc_InitRot;
+
+        selectedObject.transform.rotation = char_InitRot;
+
+        if (currentSpotlight != null)
+        {
+            Destroy(currentSpotlight);
+        }
+
+        charDesc_Panel.SetActive(false);
+        isPreviewActive = false;
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")

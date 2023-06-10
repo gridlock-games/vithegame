@@ -664,7 +664,7 @@
             resetDefaultStateRunning = false;
         }
 
-        private PreserveRotation Rotation(GameObject anchor, Character targetChar)
+        public PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
             PlayerCharacterNetworkTransform anchorNetworkTransform = anchor.GetComponent<PlayerCharacterNetworkTransform>();
             PlayerCharacterNetworkTransform targetNetworkTransform = targetChar.GetComponent<PlayerCharacterNetworkTransform>();
