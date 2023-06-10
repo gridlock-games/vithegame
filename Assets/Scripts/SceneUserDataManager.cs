@@ -14,7 +14,9 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameTMP;
     [SerializeField] public GameObject spotlightPrefab;
     [SerializeField] public GameObject cameraPrefab;
-    [SerializeField] private GameObject charDesc;
+    [SerializeField] private GameObject charDesc_Panel;
+    [SerializeField] private TextMeshProUGUI charDesc_Name;
+    [SerializeField] private TextMeshProUGUI charDesc_Lore;
 
     private GameObject currentSpotlight;
     private GameObject currentCharDesc;
@@ -24,6 +26,8 @@ public class SceneUserDataManager : MonoBehaviour
     private int currentIndex = -1;
     public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
+
+    private Boolean isPreviewActive = false;
 
     void Start()
     {
@@ -88,7 +92,7 @@ public class SceneUserDataManager : MonoBehaviour
             string placeholderName = "Container-" + i;
             
             placeholderContainer.name = placeholderName;
-            GameObject placeholderObject = Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 180f, 0f));
+            // GameObject placeholderObject = Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 0f, 0f));
 
             GameObject playerObject = Instantiate(characterModel[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
 
@@ -137,11 +141,14 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void SelectGameObject(GameObject selectedObject)
     {
+
+        if(isPreviewActive) return;
+
         // Store the selected game object
         this.selectedObject = selectedObject;
 
         if (selectedObject == null) return;
-        if (selectedObject.tag != "Placeholder") return;
+        if (selectedObject.tag != "Character") return;
 
         // Destroy the previous spotlight if it exists
         if (currentSpotlight != null)
@@ -152,10 +159,14 @@ public class SceneUserDataManager : MonoBehaviour
 
         // Instantiate a new spotlight
         currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
+
+        charDesc_Panel.SetActive(true);
+
+        isPreviewActive = true;
         
         
         // Move the camera in front of the selected game object
-        Vector3 cameraPosition = selectedObject.transform.position - new Vector3(0f, -0.25f, 2.0f);
+        Vector3 cameraPosition = selectedObject.transform.position + new Vector3(0f, 1.0f, 2.0f);
         mainCamera.transform.position = cameraPosition;
         mainCamera.transform.LookAt(selectedObject.transform);
     }
