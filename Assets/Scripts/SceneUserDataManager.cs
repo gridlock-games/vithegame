@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -13,12 +14,15 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameTMP;
     [SerializeField] public GameObject spotlightPrefab;
     [SerializeField] public GameObject cameraPrefab;
+    [SerializeField] private GameObject charDesc;
 
     private GameObject currentSpotlight;
+    private GameObject currentCharDesc;
     private GameObject mainCamera;
     private GameObject selectedObject;
     private List<GameObject> placeholderObjects = new List<GameObject>();
     private int currentIndex = -1;
+    public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
 
     void Start()
@@ -27,7 +31,6 @@ public class SceneUserDataManager : MonoBehaviour
         mainCamera = Instantiate(cameraPrefab);
         this.InitDataReferences();
     }
-
     private void Update()
     {
         // Check for mouse click
@@ -75,21 +78,27 @@ public class SceneUserDataManager : MonoBehaviour
             this.SpawnGameObjectsHorizontally();
         }
     }
-
     public void SpawnGameObjectsHorizontally()
     {
         List<GameObject> placeholders = new List<GameObject>();
         for (int i = 0; i < characterModel.Length; i++)
         {
-
             Vector3 spawnPosition = startSpawnLoc.position + new Vector3(2.0f * i, 0f, 0f);
-            Instantiate(characterModel[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-            placeholderContainer.name = placeholderContainer.name + "-" + i;
-            Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 180f, 0f));
+
+            string placeholderName = "Container-" + i;
+            
+            placeholderContainer.name = placeholderName;
+            GameObject placeholderObject = Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 180f, 0f));
+
+            GameObject playerObject = Instantiate(characterModel[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
+
+            if (NetworkManager.Singleton.IsServer) {
+                playerObject.GetComponent<NetworkObject>().Spawn();
+            }
+
             placeholderObjects.Add(placeholderContainer);
         }
     }
-
     private void SelectPreviousObject()
     {
         if (placeholderObjects.Count == 0)
@@ -124,6 +133,31 @@ public class SceneUserDataManager : MonoBehaviour
 
         // Select the game object at the current index
         SelectGameObject(placeholderObjects[currentIndex]);
+    }
+
+    private void SelectGameObject(GameObject selectedObject)
+    {
+        // Store the selected game object
+        this.selectedObject = selectedObject;
+
+        if (selectedObject == null) return;
+        if (selectedObject.tag != "Placeholder") return;
+
+        // Destroy the previous spotlight if it exists
+        if (currentSpotlight != null)
+        {
+            Destroy(currentSpotlight);
+            Destroy(currentCharDesc);
+        }
+
+        // Instantiate a new spotlight
+        currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
+        
+        
+        // Move the camera in front of the selected game object
+        Vector3 cameraPosition = selectedObject.transform.position - new Vector3(0f, -0.25f, 2.0f);
+        mainCamera.transform.position = cameraPosition;
+        mainCamera.transform.LookAt(selectedObject.transform);
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
@@ -194,25 +228,6 @@ public class SceneUserDataManager : MonoBehaviour
         datamanager.PostUserdata(_userdata, false);
     }
 
-
-    private void SelectGameObject(GameObject selectedObject)
-    {
-        // Store the selected game object
-        this.selectedObject = selectedObject;
-
-        if (selectedObject == null) return;
-        if (selectedObject.tag != "Placeholder") return;
-
-        // Destroy the previous spotlight if it exists
-        if (currentSpotlight != null)
-        {
-            Destroy(currentSpotlight);
-        }
-
-        // Instantiate a new spotlight
-        currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
-        // currentSpotlight.GetComponent<FollowMouse>().TargetObject = selectedObject;
-    }
     private void OnDrawGizmosSelected()
     {
         if (selectedObject != null)
