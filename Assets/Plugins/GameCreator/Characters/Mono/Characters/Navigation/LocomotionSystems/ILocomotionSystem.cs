@@ -75,7 +75,6 @@
         private float rootMoveDeltaVertical;
 
         private float rootMoveStartTime = -100f;
-        private int rootMoveStartTick;
         private float rootMoveImpulse;
         private float rootMoveGravity;
         private float rootMoveDuration;
@@ -90,6 +89,32 @@
         );
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public struct RootMotionInformation
+        {
+            public int rootMoveTickDuration;
+            public float animationDuration;
+            public float animationStartTime;
+            public AnimationCurve rootMoveCurveForward;
+            public AnimationCurve rootMoveCurveSides;
+            public AnimationCurve rootMoveCurveVertical;
+            public float rootMoveImpulse;
+            public float rootMoveGravity;
+
+            public RootMotionInformation(int rootMoveTickDuration, float animationDuration, float animationStartTime,
+                AnimationCurve rootMoveCurveForward, AnimationCurve rootMoveCurveSides, AnimationCurve rootMoveCurveVertical,
+                float rootMoveImpulse, float rootMoveGravity)
+            {
+                this.rootMoveTickDuration = rootMoveTickDuration;
+                this.animationDuration = animationDuration;
+                this.animationStartTime = animationStartTime;
+                this.rootMoveCurveForward = rootMoveCurveForward;
+                this.rootMoveCurveSides = rootMoveCurveSides;
+                this.rootMoveCurveVertical = rootMoveCurveVertical;
+                this.rootMoveImpulse = rootMoveImpulse;
+                this.rootMoveGravity = rootMoveGravity;
+            }
+        }
 
         public void Setup(CharacterLocomotion characterLocomotion)
         {
@@ -114,9 +139,8 @@
             this.isRootMoving = true;
             this.rootMoveImpulse = impulse;
             this.rootMoveStartTime = Time.time;
-            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
-                this.rootMoveStartTick = characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>().currentTick;
                 this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
             }
             this.rootMoveDuration = duration;
@@ -129,6 +153,13 @@
             this.rootMoveDeltaForward = 0f;
             this.rootMoveDeltaSides = 0f;
             this.rootMoveDeltaVertical = 0f;
+
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacter playerCharacter))
+            {
+                playerCharacter.OnRootMotionStart(new RootMotionInformation(rootMoveTickDuration, rootMoveDuration,
+                    rootMoveStartTime, rootMoveCurveForward, rootMoveCurveSides,
+                    rootMoveCurveVertical, rootMoveImpulse, rootMoveGravity));
+            }
         }
 
         public void StopRootMovement()
@@ -145,7 +176,8 @@
                 // TODO: Maybe add some drag?
                 if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
                 {
-                    this.isRootMoving = false;
+                    if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+                        this.isRootMoving = false;
                 }
             }
 
@@ -365,23 +397,11 @@
             }
         }
 
-        int lastTickCalled;
-        public void UpdateRootMovement(Vector3 verticalMovement)
+        protected void UpdateRootMovement(Vector3 verticalMovement)
         {
-            float t;
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
-            {
-                // If we have already called an update for this tick, return without moving the object
-                if (lastTickCalled == networkTransform.currentTick) { return; }
+            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>()) { return; }
 
-                t = (networkTransform.currentTick - this.rootMoveStartTick) / (float)rootMoveTickDuration;
-                lastTickCalled = networkTransform.currentTick;
-            }
-            else
-            {
-                t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
-            }
-
+            float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
             float deltaVertical = this.rootMoveCurveVertical.Evaluate(t) * this.rootMoveImpulse;
@@ -391,9 +411,9 @@
                 deltaVertical - this.rootMoveDeltaVertical,
                 deltaForward - this.rootMoveDeltaForward
             );
-            
-            movement += 1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate * this.rootMoveGravity * verticalMovement;
-            
+
+            movement += Time.deltaTime * this.rootMoveGravity * verticalMovement;
+
             this.characterLocomotion.characterController.Move(
                 this.characterLocomotion.character.transform.TransformDirection(movement)
             );

@@ -9,7 +9,7 @@ namespace GameCreator.Characters
     [RequireComponent(typeof(PlayerCharacter))]
     public class PlayerCharacterNetworkTransform : NetworkBehaviour
     {
-        private struct InputPayload : INetworkSerializable
+        public struct InputPayload : INetworkSerializable
         {
             public int tick;
             public Vector2 inputVector;
@@ -23,7 +23,7 @@ namespace GameCreator.Characters
             }
         }
 
-        private struct StatePayload : INetworkSerializable
+        public struct StatePayload : INetworkSerializable
         {
             public int tick;
             public Vector3 position;
@@ -37,16 +37,11 @@ namespace GameCreator.Characters
             }
         }
 
-        //public Vector3 CurrentPosition { get; private set; }
-        //public Quaternion CurrentRotation { get; private set; }
-        private Vector3 CurrentPosition;
-        private Quaternion CurrentRotation;
-
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
 
-        public int currentTick { get; private set; }
+        private int currentTick;
         private StatePayload[] stateBuffer;
         private InputPayload[] inputBuffer;
         private StatePayload latestServerState;
@@ -138,11 +133,10 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log(positionError);
+                Debug.Log("Position Error: " + positionError);
 
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
-                CurrentPosition = latestServerState.position;
                 playerCharacter.characterLocomotion.characterController.enabled = true;
 
                 // Update buffer at index of latest server state
@@ -221,16 +215,7 @@ namespace GameCreator.Characters
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            KeyValuePair<Vector3, Quaternion> transformData = playerCharacter.ProcessMovement(new Vector3(input.inputVector.x, 0, input.inputVector.y), input.rotation);
-            CurrentPosition = transformData.Key;
-            CurrentRotation = transformData.Value;
-
-            return new StatePayload()
-            {
-                tick = input.tick,
-                position = CurrentPosition,
-                rotation = CurrentRotation
-            };
+            return playerCharacter.ProcessMovement(input);
         }
     }
 }

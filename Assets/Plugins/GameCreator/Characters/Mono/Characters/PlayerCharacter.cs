@@ -56,16 +56,12 @@
 
         private bool forceDisplayTouchstick = false;
 
-        private PlayerCharacterNetworkTransform networkTransform;
-
         // INITIALIZERS: --------------------------------------------------------------------------
 
         protected override void Awake()
         {
             if (!Application.isPlaying) return;
             this.CharacterAwake();
-            networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-
             this.initSaveData = new SaveData()
             {
                 position = transform.position,
@@ -127,11 +123,19 @@
             this.CharacterUpdate();
         }
 
-        public KeyValuePair<Vector3, Quaternion> ProcessMovement(Vector3 inputVector, Quaternion inputRotation)
+        ILocomotionSystem.RootMotionInformation rootMotionInformation;
+        float rootMoveDeltaForward;
+        float rootMoveDeltaSides;
+        float rootMoveDeltaVertical;
+        bool isRootMoving;
+        bool setStartTick;
+        int rootMoveStartTick;
+
+        public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
             LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
-            Vector3 targetDirection = inputRotation * inputVector;
+            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
             this.characterLocomotion.SetDirectionalDirection(targetDirection);
             float speed = this.characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
             Quaternion targetRotation = directionalLocSystem.UpdateRotation(targetDirection);
@@ -144,14 +148,48 @@
 
             if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
-
-            if (directionalLocSystem.isRootMoving)
+            
+            if (setStartTick)
             {
-                directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-                if (IsOwner)
-                    characterLocomotion.characterController.transform.rotation = targetRotation;
-                else
-                    characterLocomotion.characterController.transform.rotation = inputRotation;
+                rootMoveStartTick = inputPayload.tick;
+                setStartTick = false;
+            }
+
+            if (isRootMoving)
+            {
+                //directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                float t = (inputPayload.tick - rootMoveStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
+
+                if (t >= 1)
+                {
+                    isRootMoving = false;
+                    directionalLocSystem.StopRootMovement();
+                }
+
+                float deltaForward = rootMotionInformation.rootMoveCurveForward.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+                float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+                float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+
+                Vector3 movement = new Vector3(
+                    deltaSides - rootMoveDeltaSides,
+                    deltaVertical - rootMoveDeltaVertical,
+                    deltaForward - rootMoveDeltaForward
+                );
+
+                Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
+                movement += 1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate * rootMotionInformation.rootMoveGravity * verticalMovement;
+
+                Debug.Log(t + " " + movement);
+                characterLocomotion.characterController.Move(characterLocomotion.character.transform.TransformDirection(movement));
+
+                rootMoveDeltaForward = deltaForward;
+                rootMoveDeltaSides = deltaSides;
+                rootMoveDeltaVertical = deltaVertical;
+
+                //if (IsOwner)
+                //    characterLocomotion.characterController.transform.rotation = targetRotation;
+                //else
+                //    characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
             }
             else
             {
@@ -159,19 +197,25 @@
                 if (IsOwner)
                     characterLocomotion.characterController.transform.rotation = targetRotation;
                 else
-                    characterLocomotion.characterController.transform.rotation = inputRotation;
+                    characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
             }
 
-            //Debug.Log(networkTransform.CurrentPosition + " " + transform.position + " " + networkTransform.CurrentRotation.eulerAngles);
-            //Debug.Log(targetDirection + " " + targetRotation.eulerAngles);
-            //Debug.Log(networkTransform.currentTick + " " + targetDirection);
+            return new PlayerCharacterNetworkTransform.StatePayload()
+            {
+                tick = inputPayload.tick,
+                position = transform.position,
+                rotation = transform.rotation
+            };
+        }
 
-            //characterLocomotion.characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * inputVector);
-
-            //characterLocomotion.characterController.Move(Time.deltaTime * inputVector);
-            //this.ComputeMovement(IsServer ? transform.rotation * moveInput.Value : inputVector);
-
-            return new KeyValuePair<Vector3, Quaternion>(transform.position, transform.rotation);
+        public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)
+        {
+            this.rootMotionInformation = rootMotionInformation;
+            rootMoveDeltaForward = 0;
+            rootMoveDeltaSides = 0;
+            rootMoveDeltaVertical = 0;
+            isRootMoving = true;
+            setStartTick = true;
         }
 
         public Vector3 GetMoveInputValue() { return moveInput.Value; }
