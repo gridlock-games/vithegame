@@ -155,7 +155,6 @@
             if (setStartTick)
             {
                 rootMoveStartTick = inputPayload.tick;
-                Debug.Log(rootMoveStartTick);
                 setStartTick = false;
             }
 
@@ -197,8 +196,6 @@
                 characterLocomotion.characterController.transform.rotation = targetRotation;
             else
                 characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
-
-            Debug.Log(inputPayload.tick + " " + transform.position);
 
             return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
         }
