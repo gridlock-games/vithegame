@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Unity.Collections;
 
 namespace GameCreator.Characters
 {
@@ -14,6 +15,13 @@ namespace GameCreator.Characters
             public int tick;
             public Vector2 inputVector;
             public Quaternion rotation;
+            
+            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation)
+            {
+                this.tick = tick;
+                this.inputVector = inputVector;
+                this.rotation = rotation;
+            }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
@@ -28,6 +36,13 @@ namespace GameCreator.Characters
             public int tick;
             public Vector3 position;
             public Quaternion rotation;
+
+            public StatePayload(int tick, Vector3 position, Quaternion rotation)
+            {
+                this.tick = tick;
+                this.position = position;
+                this.rotation = rotation;
+            }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
@@ -86,17 +101,12 @@ namespace GameCreator.Characters
                 (lastProcessedState.Equals(default(StatePayload)) ||
                 !latestServerState.Equals(lastProcessedState)))
             {
-                HandleServerReconciliation();
+                //HandleServerReconciliation();
             }
 
             if (IsOwner)
             {
-                InputPayload inputPayload = new InputPayload()
-                {
-                    tick = currentTick,
-                    inputVector = new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)),
-                    rotation = transform.rotation
-                };
+                InputPayload inputPayload = new InputPayload(currentTick, new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation);
                 SendMoveInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
             }

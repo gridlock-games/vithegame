@@ -64,67 +64,12 @@
         private AnimationCurve meleeAnimationClipRootCurve = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
         [ServerRpc]
-        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
+        void DodgeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, Vector3 moveDirection, float angle)
         {
             GameObject target = new GameObject(targetName);
             target.transform.position = targetPosition;
             target.transform.rotation = targetRotation;
-
-            Character characterTarget = this.character.GetCharacter(target);
-            if (characterTarget == null) { Destroy(target); return; }
-            if (characterTarget.disableActions.Value) { Destroy(target); return; }
-
-            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
-            if (melee == null) { Destroy(target); return; }
-            if (melee.GetPoise() <= 10) { Destroy(target); return; }
-
-            CharacterLocomotion locomotion = characterTarget.characterLocomotion;
-            Vector3 moveDirection = Vector3.zero;
-
-            switch (this.direction)
-            {
-                case Direction.CharacterMovement3D:
-                    moveDirection = locomotion.GetMovementDirection();
-                    break;
-
-                case Direction.TowardsTarget:
-                    Transform targetTransform = this.target.GetTransform(target);
-                    if (targetTransform != null)
-                    {
-                        moveDirection = targetTransform.position - characterTarget.transform.position;
-                        moveDirection.Scale(PLANE);
-                    }
-                    break;
-
-                case Direction.TowardsPosition:
-                    targetPosition = this.position.GetPosition(target);
-                    moveDirection = targetPosition - characterTarget.transform.position;
-                    moveDirection.Scale(PLANE);
-                    break;
-
-                case Direction.MovementSidescrollXY:
-                    moveDirection = locomotion.GetMovementDirection();
-                    moveDirection.Scale(new Vector3(1, 1, 0));
-                    break;
-
-                case Direction.MovementSidescrollZY:
-                    moveDirection = locomotion.GetMovementDirection();
-                    moveDirection.Scale(new Vector3(0, 1, 1));
-                    break;
-            }
-
-            Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward),
-                PLANE
-            );
-
-            float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
-
-            // Call back method in CharacterMelee to subtract poise
-            melee.OnDodge();
-
-            DodgeClientRpc(targetPosition, targetRotation, targetName, moveDirection, angle);
-            if (!IsHost) { InstantExecuteLocally(target, moveDirection, angle); }
+            InstantExecuteLocally(target, moveDirection, angle);
             Destroy(target);
         }
 
@@ -140,7 +85,66 @@
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+            if (IsOwner)
+            {
+                Character characterTarget = this.character.GetCharacter(target);
+                if (characterTarget == null) { return false; }
+                if (characterTarget.disableActions.Value) { return false; }
+
+                CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
+                if (melee == null) { return false; }
+                if (melee.GetPoise() <= 10) { return false; }
+
+                CharacterLocomotion locomotion = characterTarget.characterLocomotion;
+                Vector3 moveDirection = Vector3.zero;
+
+                switch (this.direction)
+                {
+                    case Direction.CharacterMovement3D:
+                        moveDirection = locomotion.GetMovementDirection();
+                        break;
+
+                    case Direction.TowardsTarget:
+                        Transform targetTransform = this.target.GetTransform(target);
+                        if (targetTransform != null)
+                        {
+                            moveDirection = targetTransform.position - characterTarget.transform.position;
+                            moveDirection.Scale(PLANE);
+                        }
+                        break;
+
+                    case Direction.TowardsPosition:
+                        target.transform.position = this.position.GetPosition(target);
+                        moveDirection = target.transform.position - characterTarget.transform.position;
+                        moveDirection.Scale(PLANE);
+                        break;
+
+                    case Direction.MovementSidescrollXY:
+                        moveDirection = locomotion.GetMovementDirection();
+                        moveDirection.Scale(new Vector3(1, 1, 0));
+                        break;
+
+                    case Direction.MovementSidescrollZY:
+                        moveDirection = locomotion.GetMovementDirection();
+                        moveDirection.Scale(new Vector3(0, 1, 1));
+                        break;
+                }
+
+                Vector3 charDirection = Vector3.Scale(
+                    characterTarget.transform.TransformDirection(Vector3.forward),
+                    PLANE
+                );
+
+                float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
+
+                // Call back method in CharacterMelee to subtract poise
+                //melee.OnDodge();
+
+                if (!IsHost) { InstantExecuteLocally(target, moveDirection, angle); }
+                DodgeServerRpc(target.transform.position, target.transform.rotation, target.name, moveDirection, angle);
+            }
+
+            //if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
             return false;
         }
 

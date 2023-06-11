@@ -139,10 +139,8 @@
             this.isRootMoving = true;
             this.rootMoveImpulse = impulse;
             this.rootMoveStartTime = Time.time;
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
-            {
-                this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
-            }
+
+            this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
             this.rootMoveDuration = duration;
             this.rootMoveGravity = gravityInfluence;
 

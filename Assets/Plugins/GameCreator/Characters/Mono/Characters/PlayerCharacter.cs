@@ -1,10 +1,11 @@
 ﻿namespace GameCreator.Characters
 {
-    using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
     using Unity.Netcode;
+    using System;
+    using System.IO;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -123,6 +124,7 @@
             this.CharacterUpdate();
         }
 
+        public int lastProcessedTick { get; private set; }
         ILocomotionSystem.RootMotionInformation rootMotionInformation;
         float rootMoveDeltaForward;
         float rootMoveDeltaSides;
@@ -133,6 +135,7 @@
 
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
+            lastProcessedTick = inputPayload.tick;
             LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
@@ -152,12 +155,12 @@
             if (setStartTick)
             {
                 rootMoveStartTick = inputPayload.tick;
+                Debug.Log(rootMoveStartTick);
                 setStartTick = false;
             }
 
-            if (isRootMoving)
+            if (isRootMoving) // If we are playing a melee clip
             {
-                //directionalLocSystem.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
                 float t = (inputPayload.tick - rootMoveStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
 
                 if (t >= 1)
@@ -179,33 +182,25 @@
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
                 movement += 1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate * rootMotionInformation.rootMoveGravity * verticalMovement;
 
-                Debug.Log(t + " " + movement);
                 characterLocomotion.characterController.Move(characterLocomotion.character.transform.TransformDirection(movement));
 
                 rootMoveDeltaForward = deltaForward;
                 rootMoveDeltaSides = deltaSides;
                 rootMoveDeltaVertical = deltaVertical;
-
-                //if (IsOwner)
-                //    characterLocomotion.characterController.transform.rotation = targetRotation;
-                //else
-                //    characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
             }
-            else
+            else // If we are just moving used WASD
             {
                 characterLocomotion.characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection);
-                if (IsOwner)
-                    characterLocomotion.characterController.transform.rotation = targetRotation;
-                else
-                    characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
             }
 
-            return new PlayerCharacterNetworkTransform.StatePayload()
-            {
-                tick = inputPayload.tick,
-                position = transform.position,
-                rotation = transform.rotation
-            };
+            if (IsOwner)
+                characterLocomotion.characterController.transform.rotation = targetRotation;
+            else
+                characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
+
+            Debug.Log(inputPayload.tick + " " + transform.position);
+
+            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
         }
 
         public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)
