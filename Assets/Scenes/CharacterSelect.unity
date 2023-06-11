@@ -237,7 +237,7 @@ MonoBehaviour:
     m_SelectedTrigger: Highlighted
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 214404309}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -2512,29 +2512,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de98d3d77c87ec94f9571a5c2c157c38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterModel:
-  - id: 01
+  charactersList:
+  - id: 0
     characterName: Malakas
-    characterDescription: Malakas
-    characterImage: {fileID: 21300000, guid: f9029ac7ad3a06249ae61c8a44d49919, type: 3}
+    characterDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+      ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+      ex ea commodo consequat.  Duis aute irure dolor in reprehenderit in voluptate
+      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+      laborum. '
+    characterImage: {fileID: 0}
     characterObject: {fileID: 3029624072328525481, guid: d8f810a46376d9b4c90a5ef9278fc389,
       type: 3}
-  - id: 01
-    characterName: Malakas
-    characterDescription: Malakas
-    characterImage: {fileID: 21300000, guid: f9029ac7ad3a06249ae61c8a44d49919, type: 3}
+  - id: 1
+    characterName: Guinevere
+    characterDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+      ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+      ex ea commodo consequat.  Duis aute irure dolor in reprehenderit in voluptate
+      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+      laborum. '
+    characterImage: {fileID: 0}
     characterObject: {fileID: 87900162380643788, guid: 4b6e1387d917b8140b0ca93545df5029,
       type: 3}
-  - id: 01
-    characterName: Malakas
-    characterDescription: Malakas
-    characterImage: {fileID: 21300000, guid: f9029ac7ad3a06249ae61c8a44d49919, type: 3}
+  - id: 2
+    characterName: Lubu
+    characterDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+      ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+      ex ea commodo consequat.  Duis aute irure dolor in reprehenderit in voluptate
+      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+      laborum. '
+    characterImage: {fileID: 0}
     characterObject: {fileID: 5176858122734842529, guid: a98ba54521c17e449a9436fe113b7ea0,
       type: 3}
-  - id: 01
-    characterName: Malakas
-    characterDescription: Malakas
-    characterImage: {fileID: 21300000, guid: f9029ac7ad3a06249ae61c8a44d49919, type: 3}
+  - id: 3
+    characterName: Olaf
+    characterDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+      ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+      ex ea commodo consequat.  Duis aute irure dolor in reprehenderit in voluptate
+      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+      laborum. '
+    characterImage: {fileID: 0}
     characterObject: {fileID: 8533858845993444253, guid: fbbbd46c75f964242a8011a763be158c,
       type: 3}
   placeholderContainer: {fileID: 3461398562259885945, guid: 0ddda986338a17d4f995c5cd3aabf32f,
@@ -2546,8 +2570,8 @@ MonoBehaviour:
   cameraPrefab: {fileID: 4266681709931347342, guid: 1d758e10ea7622d459d53dfec72a8ffc,
     type: 3}
   charDesc_Panel: {fileID: 1280690888}
-  charDesc_Name: {fileID: 0}
-  charDesc_Lore: {fileID: 0}
+  charDesc_Name: {fileID: 1352200404}
+  charDesc_Lore: {fileID: 361319586}
   cameraDistance: 5
 --- !u!4 &1586734003342914210
 Transform:

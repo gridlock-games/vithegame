@@ -10,15 +10,15 @@ using GameCreator.Characters;
 
 public class SceneUserDataManager : MonoBehaviour
 {
-    [SerializeField] private ShopCharacterModel[] characterModel;
+    [SerializeField] private List<ShopCharacterModel> charactersList = new List<ShopCharacterModel>();
     [SerializeField] private GameObject placeholderContainer;
     [SerializeField] private Transform startSpawnLoc;
     [SerializeField] private TextMeshProUGUI nameTMP;
     [SerializeField] public GameObject spotlightPrefab;
     [SerializeField] public GameObject cameraPrefab;
     [SerializeField] private GameObject charDesc_Panel;
-    [SerializeField] private TextMeshProUGUI charDesc_Name;
-    [SerializeField] private TextMeshProUGUI charDesc_Lore;
+    [SerializeField] private Text charDesc_Name;
+    [SerializeField] private Text charDesc_Lore;
 
     private GameObject currentSpotlight;
     private GameObject currentCharDesc;
@@ -98,22 +98,15 @@ public class SceneUserDataManager : MonoBehaviour
     private void SpawnGameObjectsHorizontally()
     {
         List<GameObject> placeholders = new List<GameObject>();
-        for (int i = 0; i < characterModel.Length; i++)
+        for (int i = 0; i < charactersList.Count; i++)
         {
             Vector3 spawnPosition = startSpawnLoc.position + new Vector3(2.0f * i, 0f, 0f);
-
-            string placeholderName = "Container-" + i;
             
-            placeholderContainer.name = placeholderName;
-            // GameObject placeholderObject = Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 0f, 0f));
-
-            GameObject playerObject = Instantiate(characterModel[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
+            GameObject playerObject = Instantiate(charactersList[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
 
             if (NetworkManager.Singleton.IsServer) {
                 playerObject.GetComponent<NetworkObject>().Spawn();
             }
-
-            placeholderObjects.Add(placeholderContainer);
         }
     }
     private void SelectPreviousObject()
@@ -171,6 +164,15 @@ public class SceneUserDataManager : MonoBehaviour
             Destroy(currentSpotlight);
             Destroy(currentCharDesc);
         }
+
+        var charDesc = charactersList.FirstOrDefault(model => model.characterObject.name == selectedObject.name.Replace("(Clone)", ""));
+
+        if (charDesc != null)
+        {
+            Debug.Log(charDesc.characterObject.name);
+            this.charDesc_Lore.text = charDesc.characterDescription;
+            this.charDesc_Name.text = charDesc.characterName;
+        }
         
         selectedObject.transform.rotation = Quaternion.Euler(0f, -215f, 0f);
 
@@ -178,9 +180,7 @@ public class SceneUserDataManager : MonoBehaviour
         currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
 
         charDesc_Panel.SetActive(true);
-
         isPreviewActive = true;
-        
         
         // Move the camera in front of the selected game object
         Vector3 cameraPosition = selectedObject.transform.position + new Vector3(1.0f, 1.0f, -2.0f);
