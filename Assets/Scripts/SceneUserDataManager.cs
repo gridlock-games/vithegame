@@ -10,7 +10,7 @@ using GameCreator.Characters;
 
 public class SceneUserDataManager : MonoBehaviour
 {
-    [SerializeField] private List<ShopCharacterModel> charactersList = new List<ShopCharacterModel>();
+    [SerializeField] private List<CreateCharacterModel> charactersList = new List<CreateCharacterModel>();
     [SerializeField] private GameObject placeholderContainer;
     [SerializeField] private Transform startSpawnLoc;
     [SerializeField] private TextMeshProUGUI nameTMP;
@@ -19,6 +19,8 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private GameObject charDesc_Panel;
     [SerializeField] private Text charDesc_Name;
     [SerializeField] private Text charDesc_Lore;
+    [SerializeField] private GridLayoutGroup gridLayoutGroup;
+    [SerializeField] private Image gridImgPrefab;
 
     private GameObject currentSpotlight;
     private GameObject currentCharDesc;
@@ -44,44 +46,7 @@ public class SceneUserDataManager : MonoBehaviour
 
         this.InitDataReferences();
     }
-    private void Update()
-    {
-        // Check for mouse click
-        if (Input.GetMouseButtonDown(0))
-        {
-            // Cast a ray from the mouse position into the scene
-            Ray ray = mainCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Check if the raycast hit a game object
-                GameObject hitObject = hit.collider.gameObject;
-
-                // Select the clicked game object
-                SelectGameObject(hitObject);
-            }
-        }
-
-        // Check for left arrow key press
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            // Cycle to the previous game object
-            SelectPreviousObject();
-        }
-
-        // Check for right arrow key press
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            // Cycle to the next game object
-            SelectNextObject();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            UnSelect();
-        }
-
-    }
     private void InitDataReferences()
     {
         var _userdata = datamanager;
@@ -95,20 +60,23 @@ public class SceneUserDataManager : MonoBehaviour
             this.SpawnGameObjectsHorizontally();
         }
     }
+
     private void SpawnGameObjectsHorizontally()
     {
         List<GameObject> placeholders = new List<GameObject>();
+        gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
+
         for (int i = 0; i < charactersList.Count; i++)
         {
-            Vector3 spawnPosition = startSpawnLoc.position + new Vector3(2.0f * i, 0f, 0f);
-            
-            GameObject playerObject = Instantiate(charactersList[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-
-            if (NetworkManager.Singleton.IsServer) {
-                playerObject.GetComponent<NetworkObject>().Spawn();
-            }
+            gridImgPrefab.sprite = charactersList[i].characterImage;
+            gridImgPrefab.gameObject.name = charactersList[i].characterName;
+            gridImgPrefab.gameObject.SetActive(true);
+            GameObject newItem = Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
         }
+
+        this.SelectGameObject(null);
     }
+
     private void SelectPreviousObject()
     {
         if (placeholderObjects.Count == 0)
@@ -145,62 +113,34 @@ public class SceneUserDataManager : MonoBehaviour
         SelectGameObject(placeholderObjects[currentIndex]);
     }
 
-    private void SelectGameObject(GameObject selectedObject)
+    public void SelectGameObject(GameObject selectedObject)
     {
-
         if(isPreviewActive) return;
 
+        CreateCharacterModel charDesc = null;
+
+        if(this.selectedObject == null) {
+            charDesc = charactersList[0];
+        } else {
+            Destroy(this.selectedObject, 0f);
+            charDesc = charactersList.FirstOrDefault(model => model.characterName == selectedObject.name.Replace("(Clone)", ""));
+        }
+
+        if(charDesc == null) return;
+        if(charDesc.characterObject == this.selectedObject) return;
+
+        Vector3 spawnPosition = startSpawnLoc.position;
+
+        this.charDesc_Name.text = charDesc.characterName;
+        this.charDesc_Lore.text = charDesc.characterDescription;
+
+
         // Store the selected game object
-        this.selectedObject = selectedObject;
+        this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
 
-        if (selectedObject == null) return;
-        if (selectedObject.tag != "Character") return;
-
-        char_InitRot = selectedObject.transform.rotation;
-
-        // Destroy the previous spotlight if it exists
-        if (currentSpotlight != null)
-        {
-            Destroy(currentSpotlight);
-            Destroy(currentCharDesc);
+        if (NetworkManager.Singleton.IsServer) {
+            this.selectedObject.GetComponent<NetworkObject>().Spawn();
         }
-
-        var charDesc = charactersList.FirstOrDefault(model => model.characterObject.name == selectedObject.name.Replace("(Clone)", ""));
-
-        if (charDesc != null)
-        {
-            Debug.Log(charDesc.characterObject.name);
-            this.charDesc_Lore.text = charDesc.characterDescription;
-            this.charDesc_Name.text = charDesc.characterName;
-        }
-        
-        selectedObject.transform.rotation = Quaternion.Euler(0f, -215f, 0f);
-
-        // Instantiate a new spotlight
-        currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
-
-        charDesc_Panel.SetActive(true);
-        isPreviewActive = true;
-        
-        // Move the camera in front of the selected game object
-        Vector3 cameraPosition = selectedObject.transform.position + new Vector3(1.0f, 1.0f, -2.0f);
-        mainCamera.transform.position = cameraPosition;
-        mainCamera.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-    }
-
-    public void UnSelect() {
-        mainCamera.transform.position = this.cameraDesc_InitPos;
-        mainCamera.transform.rotation = this.charDesc_InitRot;
-
-        selectedObject.transform.rotation = char_InitRot;
-
-        if (currentSpotlight != null)
-        {
-            Destroy(currentSpotlight);
-        }
-
-        charDesc_Panel.SetActive(false);
-        isPreviewActive = false;
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
@@ -279,5 +219,9 @@ public class SceneUserDataManager : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(selectedObject.transform.position, 1f);
         }
+    }
+
+    private void NextScene() {
+        // Selected CharacterObject is this.selectedObject
     }
 }
