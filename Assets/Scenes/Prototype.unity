@@ -144,7 +144,7 @@ PrefabInstance:
     - target: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8533858845993444255, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
@@ -213,12 +213,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3, type: 3}
---- !u!1 &371409404 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
-    type: 3}
-  m_PrefabInstance: {fileID: 245917049}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &493848754
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,7 +746,7 @@ PrefabInstance:
     - target: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8533858845993444255, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
@@ -1807,22 +1801,10 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 245917049}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 371409404}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91c5337897bdb4fdd80ef69fcef1511a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1488470789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 371409404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e1369bd3e64034a8772719f5a99051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1534571468
@@ -1855,7 +1837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ignoreInfo: 0
-  ignoreWarnings: 0
+  ignoreWarnings: 1
   ignoreErrors: 0
 --- !u!4 &1534571470
 Transform:
@@ -2031,7 +2013,7 @@ PrefabInstance:
     - target: {fileID: 8533858845993444253, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8533858845993444255, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
         type: 3}

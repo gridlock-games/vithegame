@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
-using Unity.Collections;
-using Unity.Mathematics;
-using System;
 
 namespace GameCreator.Characters
 {

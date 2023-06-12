@@ -662,15 +662,15 @@ namespace GameCreator.Melee
             );
         }
 
-        public void SetPosture(MeleeClip.Posture posture, float duration)
+        public void SetPosture(Posture posture, float duration)
         {
-            if (!this.IsStaggered && posture == MeleeClip.Posture.Stagger)
+            if (!this.IsStaggered && posture == Posture.Stagger)
             {
                 this.comboSystem.Stop();
                 if (EventStagger != null) EventStagger.Invoke(duration);
             }
 
-            this.isStaggered = posture == MeleeClip.Posture.Stagger;
+            this.isStaggered = posture == Posture.Stagger;
             this.staggerEndtime = GetTime() + duration;
         }
 
@@ -1008,8 +1008,6 @@ namespace GameCreator.Melee
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
-
-
             
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
@@ -1219,7 +1217,7 @@ namespace GameCreator.Melee
             }
 
             if (!target) return;
-
+            
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
 
             if (GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) return;

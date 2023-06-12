@@ -4,7 +4,6 @@
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
     using Unity.Netcode;
-    using System.Collections.Generic;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -128,6 +127,8 @@
             LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            //if (!IsControllable()) { targetDirection = Vector3.zero; }
+
             characterLocomotion.SetDirectionalDirection(targetDirection);
             float speed = characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, characterLocomotion.characterController.isGrounded);
             Quaternion targetRotation = directionalLocSystem.UpdateRotation(targetDirection);
@@ -158,7 +159,6 @@
 
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
                 movement += 1f / NetworkManager.NetworkTickSystem.TickRate * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
-
                 characterLocomotion.characterController.Move(inputPayload.rotation * movement);
 
                 rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
@@ -270,7 +270,7 @@
             }
 
             Vector3 moveDirection = transform.rotation * moveInput.Value;
-            //if (!IsControllable()) { moveDirection = Vector3.zero; }
+            if (!IsControllable()) { moveDirection = Vector3.zero; }
             Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
 
             this.ComputeMovement(targetDirection);
