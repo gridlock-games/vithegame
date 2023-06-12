@@ -43,7 +43,7 @@ namespace LightPat.UI
                     if (ClientManager.Singleton)
                     {
                         string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
-                        nameDisplay.SetText(clientName);
+                        nameDisplay.SetText(netObj.OwnerClientId + " - " + clientName);
                         target.name = clientName;
                     }
                 }

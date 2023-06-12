@@ -128,9 +128,20 @@ namespace GameCreator.Characters
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
                 SendInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
-            }
 
-            ProcessInputQueue();
+                ProcessInputQueue();
+            }
+            else // If we are not the owner of this object
+            {
+                ProcessInputQueue();
+
+                if (!latestServerState.Equals(default(StatePayload)) &&
+                (lastProcessedState.Equals(default(StatePayload)) ||
+                !latestServerState.Equals(lastProcessedState)))
+                {
+                    HandleServerReconciliation();
+                }
+            }
 
             currentTick++;
         }
@@ -159,10 +170,11 @@ namespace GameCreator.Characters
 
             int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
-            Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
             if (positionError > 0.001f)
             {
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
                 playerCharacter.characterLocomotion.characterController.enabled = true;
