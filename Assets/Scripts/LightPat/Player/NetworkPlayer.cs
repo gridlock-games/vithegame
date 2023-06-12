@@ -92,13 +92,11 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
-                    DisableActionsServerRpc(true);
                     Cursor.lockState = CursorLockMode.None;
                     pauseInstance = Instantiate(pauseMenuPrefab);
                 }
                 else
                 {
-                    DisableActionsServerRpc(false);
                     Cursor.lockState = CursorLockMode.Locked;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
@@ -120,8 +118,6 @@ namespace LightPat.Player
                     Destroy(scoreboardInstance);
             }
         }
-
-        [ServerRpc] private void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
 
         // Messages from Character Melee
         void OnDamageDealt(int damage)

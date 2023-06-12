@@ -263,8 +263,6 @@
                     0.0f,
                     Input.GetAxisRaw(AXIS_V)
                 );
-                
-                if (disableActions.Value) { moveInput.Value = Vector3.zero; }
             }
 
             Vector3 moveDirection = transform.rotation * moveInput.Value;

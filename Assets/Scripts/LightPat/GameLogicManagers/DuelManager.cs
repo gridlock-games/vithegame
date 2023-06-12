@@ -112,9 +112,8 @@ namespace LightPat.Core
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    if (playerObject)
-                        playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
-                    else
+                    //playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
+                    if (!playerObject)
                         allPlayersSpawned.Value = false;
                 }
 
@@ -211,7 +210,7 @@ namespace LightPat.Core
                 {
                     if (teamSpawnPoint.team == clientPair.Value.team)
                     {
-                        playerChar.transform.position = teamSpawnPoint.spawnPosition;
+                        playerChar.GetComponent<PlayerCharacterNetworkTransform>().SetPosition(teamSpawnPoint.spawnPosition);
                         playerChar.UpdateRotationClientRpc(Quaternion.Euler(teamSpawnPoint.spawnRotation), new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
                         break;
                     }

@@ -74,6 +74,15 @@ namespace GameCreator.Characters
         private Queue<InputPayload> inputQueue;
 
         private PlayerCharacter playerCharacter;
+        private Vector3 queuedPositionOverwrite;
+        private bool overwritePosition;
+        public void SetPosition(Vector3 newPosition)
+        {
+            if (!IsServer) { Debug.LogError("SetPosition() needs to be called from the server"); return; }
+
+            queuedPositionOverwrite = newPosition;
+            overwritePosition = true;
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -150,11 +159,10 @@ namespace GameCreator.Characters
 
             int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
+            Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
             if (positionError > 0.001f)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
-
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
                 playerCharacter.characterLocomotion.characterController.enabled = true;
@@ -204,7 +212,18 @@ namespace GameCreator.Characters
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            return playerCharacter.ProcessMovement(input);
+            StatePayload statePayload = playerCharacter.ProcessMovement(input);
+
+            if (overwritePosition)
+            {
+                statePayload.position = queuedPositionOverwrite;
+                overwritePosition = false;
+                playerCharacter.characterLocomotion.characterController.enabled = false;
+                transform.position = statePayload.position;
+                playerCharacter.characterLocomotion.characterController.enabled = true;
+            }
+
+            return statePayload;
         }
     }
 }
