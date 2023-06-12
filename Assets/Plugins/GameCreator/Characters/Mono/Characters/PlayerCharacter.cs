@@ -128,8 +128,8 @@
             LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
-            this.characterLocomotion.SetDirectionalDirection(targetDirection);
-            float speed = this.characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
+            characterLocomotion.SetDirectionalDirection(targetDirection);
+            float speed = characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, characterLocomotion.characterController.isGrounded);
             Quaternion targetRotation = directionalLocSystem.UpdateRotation(targetDirection);
 
             directionalLocSystem.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
@@ -156,7 +156,7 @@
                     inputPayload.rootMotionResult.rootMotionForward - rootMoveDeltaForward
                 );
 
-                Vector3 verticalMovement = Vector3.up * this.characterLocomotion.verticalSpeed;
+                Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
                 movement += 1f / NetworkManager.NetworkTickSystem.TickRate * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
 
                 characterLocomotion.characterController.Move(inputPayload.rotation * movement);
