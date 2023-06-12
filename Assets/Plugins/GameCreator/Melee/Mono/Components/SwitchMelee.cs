@@ -31,19 +31,24 @@ namespace GameCreator.Melee
         private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
-        [SerializeField] private VisualEffect _switchWeaponVFX;
+        [SerializeField] private VisualEffect[] _switchWeaponVFX;
         
         private void Awake()
         {
             _characterMelee = GetComponent<CharacterMelee>();
             limbs = GetComponentInChildren<LimbReferences>();
-            _switchWeaponVFX = GetComponentInChildren<VisualEffect>();
+            _switchWeaponVFX = GetComponentsInChildren<VisualEffect>();
         }
 
         private void Start()
         {
-            if (_switchWeaponVFX)
-                _switchWeaponVFX.Stop();
+
+            if (_switchWeaponVFX != null)
+            {
+                StopVFX();
+            }
+            //_switchWeaponVFX.St();
+            
         }
 
         private void LateUpdate()
@@ -63,7 +68,8 @@ namespace GameCreator.Melee
                 {
                     if (weaponData.weaponType == _keyToWeaponType[key])
                     {
-                        _switchWeaponVFX.Play();
+                        PlayVFX();
+                        //_switchWeaponVFX.Play();
                         if (weaponData.meleeWeapon) { weaponIsValid = true; }
                         break;
                     }
@@ -80,13 +86,21 @@ namespace GameCreator.Melee
             }
         }
 
-        // public IEnumerator SpawnParticleCoroutine()
-        // {
-        //     Debug.Log("SpawnParticleCoroutine");
-        //     _switchWeaponVFX.Play();
-        //     yield return new WaitForSeconds(2f);
-        //     _switchWeaponVFX.Stop();
-        // }
+        void StopVFX()
+        {
+            foreach (var vfx in _switchWeaponVFX)
+            {
+                vfx.Stop();
+            }
+        }
+        
+        void PlayVFX()
+        {
+            foreach (var vfx in _switchWeaponVFX)
+            {
+                vfx.Play();
+            }
+        }
 
         // Switch the character's melee weapon to the one specified by _currentWeaponType
         void SwitchWeapon()

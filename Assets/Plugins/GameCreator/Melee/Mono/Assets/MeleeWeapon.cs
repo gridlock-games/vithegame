@@ -48,6 +48,7 @@ namespace GameCreator.Melee
         public CharacterState characterState;
         public AvatarMask characterMask;
         public Sprite weaponImage;
+        
 
         // 3d model:
         public List<WeaponModel> weaponModels = new List<WeaponModel>();
@@ -61,6 +62,13 @@ namespace GameCreator.Melee
         public AudioClip audioDraw;
         public AudioClip audioImpactNormal;
         public AudioClip audioImpactKnockback;
+
+
+        // abilities
+        public Ability abilityA = new Ability();
+        public Ability abilityB = new Ability();
+        public Ability abilityC = new Ability();
+        public Ability abilityRage = new Ability();
 
         // reactions:
         public List<MeleeClip> groundHitReactionsFront = new List<MeleeClip>();
@@ -94,6 +102,7 @@ namespace GameCreator.Melee
 
         public MeleeClip knockbackF;
         public MeleeClip knockupF;
+        public MeleeClip staggerF;
 
         // combo system:
         public List<Combo> combos = new List<Combo>();
@@ -200,11 +209,23 @@ namespace GameCreator.Melee
 
             if (isKnockup)
             {
-                index = UnityEngine.Random.Range(0, this.knockupReaction.Count - 1);
+                index = UnityEngine.Random.Range(0, 2);
                 if (this.knockupReaction.Count != 1 && index == this.prevRandomHit) index++;
                 this.prevRandomHit = index;
 
-                return this.knockupReaction[index];
+                switch(location) {
+                    case HitLocation.RightMiddle:
+                        return this.knockupReaction[4];
+
+                    case HitLocation.LeftMiddle:
+                        return this.knockupReaction[3];
+
+                    case HitLocation.BackMiddle:
+                        return this.knockupReaction[5];
+                        
+                    default:
+                        return this.knockupReaction[index];
+                }
             }
 
             if (isKnockback)

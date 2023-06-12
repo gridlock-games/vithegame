@@ -47,7 +47,7 @@ namespace GameCreator.Melee
 
         protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
-        private int KNOCK_UP_FOLLOWUP_LIMIT = 6;
+        private int KNOCK_UP_FOLLOWUP_LIMIT = 9999;
 
         private const CharacterAnimation.Layer LAYER_DEFEND = CharacterAnimation.Layer.Layer3;
 
@@ -92,6 +92,7 @@ namespace GameCreator.Melee
         public Action<MeleeWeapon> EventDrawWeapon;
         public Action<MeleeWeapon> EventSheatheWeapon;
         public event Action<MeleeClip> EventAttack;
+        // public event Action<MeleeClip> EventOnHitObstacle;
         public event Action<float> EventStagger;
         public event Action EventBreakDefense;
         public event Action<bool> EventBlock;
@@ -171,21 +172,24 @@ namespace GameCreator.Melee
 
                     if (meleeClip)
                     {
-                        this.inputBuffer.ConsumeInput();
-                        bool checkDash = this.Character.characterLocomotion.isDashing;
-
                         if (IsServer)
                         {
-                            if (key == ActionKey.A) // Light Attack
+                            if (meleeClip.isHeavy) // Heavy Attack
+                            {
+                                if (Poise.Value <= 20) { 
+                                    return; 
+                                }
+                                OnHeavyAttack();
+                            }
+                            else // Light Attack
                             {
                                 OnLightAttack();
                             }
-                            else if (key == ActionKey.B) // Heavy Attack
-                            {
-                                if (Poise.Value <= 20) { return; }
-                                OnHeavyAttack();
-                            }
                         }
+
+                        this.inputBuffer.ConsumeInput();
+                        bool checkDash = this.Character.characterLocomotion.isDashing;
+
 
                         if (IsOwner)
                             FocusTarget(meleeClip);
@@ -204,7 +208,11 @@ namespace GameCreator.Melee
         }
 
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
+        public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
+
+        private bool hasInvokeSpawnOnActivate = false;
+        private int counter = 0;
         private void LateUpdate()
         {
             this.IsAttacking = false;
@@ -218,6 +226,7 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase();
                 this.IsAttacking = phase >= 0f;
+                hasInvokeSpawnOnActivate = false;
 
                 // Only want hit registration on server
                 if (!IsServer) { return; }
@@ -227,9 +236,9 @@ namespace GameCreator.Melee
                     foreach (var blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
-
                         GameObject[] hits = blade.CaptureHits();
 
+                        // This is section is for stuff assuming you've hit something
                         for (int i = 0; i < hits.Length; ++i)
                         {
                             int hitInstanceID = hits[i].GetInstanceID();
@@ -241,6 +250,14 @@ namespace GameCreator.Melee
 
                             CharacterMelee targetMelee = hits[i].GetComponent<CharacterMelee>();
                             MeleeClip attack = this.comboSystem.GetCurrentClip();
+
+                            GameObject g = hits[i].gameObject;
+
+                            // This is for checking if we are hitting an environment object
+                            if(g.tag == "Obstacle") {
+                                Vector3 position_attackWp = blade.GetImpactPosition();
+                                Vector3 position_attacker = this.transform.position;
+                            }
 
                             if (targetMelee != null && !targetMelee.IsInvincible)
                             {
@@ -256,7 +273,7 @@ namespace GameCreator.Melee
                                 switch (attack.attackType)
                                 {
                                     case AttackType.Stun:
-                                        targetMelee.Character.Stun();
+                                        targetMelee.Character.Stun(this.Character, targetMelee.Character);
                                         break;
                                     case AttackType.Knockdown:
                                         if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
@@ -265,9 +282,14 @@ namespace GameCreator.Melee
                                     case AttackType.Knockedup:
                                         targetMelee.Character.Knockup(this.Character, targetMelee.Character);
                                         break;
+                                    case AttackType.Stagger:
+                                        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
+                                        break;
                                     case AttackType.None:
-                                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
-                                            targetMelee.Character.CancelAilment();
+                                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                                            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered) {
+                                                targetMelee.Character.CancelAilment();
+                                            }
                                         break;
                                 }
 
@@ -279,7 +301,8 @@ namespace GameCreator.Melee
                                 int previousHP = targetMelee.HP.Value;
                                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown)
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown||
+                                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                                 {
                                     hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
                                     if (hitResult == HitResult.ReceiveDamage)
@@ -986,6 +1009,8 @@ namespace GameCreator.Melee
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
+
+            
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,
@@ -1206,6 +1231,11 @@ namespace GameCreator.Melee
 
             float distance = Vector3.Distance(transform.position, target.position);
             AnimationCurve clipMovementForward = clip.movementForward;
+
+            if(!clip.isLunge && clip.isModifyFocus) {
+                TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
+                SetTargetFocus(targetMelee);
+            }
 
             // If our distance from target is < boxCastHalfExtents.z, then reduce/increase movementForwardCurve
             if (distance <= boxCastHalfExtents.z && clip.isLunge)

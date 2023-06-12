@@ -98,6 +98,8 @@
 
         private SerializedProperty spAttackPhase;
 
+        private SerializedProperty spAttackSpawnVFX;
+
         private int drawDragType;
 
         private bool initStyles = true;
@@ -111,6 +113,8 @@
 
         private IActionsListEditor actionsOnExecute;
         private SerializedProperty spActionsOnExecute;
+        private IActionsListEditor actionOnActivate;
+        private SerializedProperty spActionsOnActivate;
 
         // INITIALIZER: ---------------------------------------------------------------------------
 
@@ -175,6 +179,7 @@
             this.spPosture = this.serializedObject.FindProperty("posture");
 
             this.spAttackPhase = serializedObject.FindProperty("attackPhase");
+            this.spAttackSpawnVFX = serializedObject.FindProperty("attackSpawnVFX");
 
             if (!TEX_PREVIEW_ACCEPT) TEX_PREVIEW_ACCEPT = MakeTexture(Color.green, 0.25f);
             if (!TEX_PREVIEW_REJECT) TEX_PREVIEW_REJECT = MakeTexture(Color.red, 0.25f);
@@ -225,6 +230,29 @@
                 Actions prefabActions = prefabInstance.GetComponent<Actions>();
                 prefabActions.destroyAfterFinishing = true;
                 this.spActionsOnExecute.objectReferenceValue = prefabActions.actionsList;
+
+                this.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                this.serializedObject.Update();
+            }
+
+            this.spActionsOnActivate = this.serializedObject.FindProperty("actionOnActivate");
+            if (this.spActionsOnActivate.objectReferenceValue == null)
+            {
+                string actionsName = Guid.NewGuid().ToString("N");
+
+                GameCreatorUtilities.CreateFolderStructure(PATH_ONHIT);
+                string path = Path.Combine(PATH_ONHIT, string.Format(PREFAB_NAME, actionsName));
+                path = AssetDatabase.GenerateUniqueAssetPath(path);
+
+                GameObject sceneInstance = new GameObject(actionsName);
+                sceneInstance.AddComponent<Actions>();
+
+                GameObject prefabInstance = PrefabUtility.SaveAsPrefabAsset(sceneInstance, path);
+                DestroyImmediate(sceneInstance);
+
+                Actions prefabActions = prefabInstance.GetComponent<Actions>();
+                prefabActions.destroyAfterFinishing = true;
+                this.spActionsOnActivate.objectReferenceValue = prefabActions.actionsList;
 
                 this.serializedObject.ApplyModifiedPropertiesWithoutUndo();
                 this.serializedObject.Update();
@@ -282,6 +310,10 @@
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("On Hit", EditorStyles.boldLabel);
                 this.PaintActionsOnHit();
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("On Activate", EditorStyles.boldLabel);
+                this.PaintActionsOnActivate();
             }
 
             EditorGUILayout.Space();
@@ -327,9 +359,10 @@
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
                     
-
-                    EditorGUILayout.PropertyField(this.spIsDodge);
-
+                    
+                    if(!this.spIsAttack.boolValue) {
+                        EditorGUILayout.PropertyField(this.spIsDodge);
+                    }
                     
                     if(this.spIsDodge.boolValue) {
                         EditorGUILayout.Space();
@@ -443,6 +476,8 @@
                     EditorGUI.BeginDisabledGroup(!this.spIsAttack.boolValue);
                     EditorGUI.indentLevel++;
 
+                    
+                    EditorGUILayout.PropertyField(this.spIsLunge);
                     EditorGUILayout.PropertyField(this.spIsModifyFocus);
                     
                     EditorGUI.BeginDisabledGroup(!this.spIsModifyFocus.boolValue);
@@ -457,16 +492,6 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
-                    EditorGUILayout.PropertyField(this.spIsLunge);
-                    
-                    EditorGUI.BeginDisabledGroup(!this.spIsLunge.boolValue);
-                    
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(this.spMovementForward_OnLunge);
-                    EditorGUILayout.PropertyField(this.spMovementSides_OnLunge);
-                    EditorGUI.indentLevel--;
-                    
-                    EditorGUI.EndDisabledGroup();
 
                     EditorGUILayout.PropertyField(this.spAttackType);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
@@ -899,6 +924,18 @@
             this.actionsOnExecute.OnInspectorGUI();
         }
 
+        private void PaintActionsOnActivate()
+        {
+            if(this.actionOnActivate == null) 
+            {
+                this.actionOnActivate = Editor.CreateEditor(
+                    this.spActionsOnActivate.objectReferenceValue
+                ) as IActionsListEditor;
+            }
+
+            this.actionOnActivate.OnInspectorGUI();
+        }
+
         private void DuplicateMeleeClip()
         {
             string path = AssetDatabase.GetAssetPath(this.target);
@@ -913,33 +950,42 @@
 
             SerializedProperty newActionsOnHit = soNewInstance.FindProperty("actionsOnHit");
             SerializedProperty newActionsOnExec = soNewInstance.FindProperty("actionsOnExecute");
+            SerializedProperty newActionsOnActivate = soNewInstance.FindProperty("actionOnActivate");
 
             IActionsList a1 = newActionsOnHit.objectReferenceValue as IActionsList;
             IActionsList a2 = newActionsOnExec.objectReferenceValue as IActionsList;
+            IActionsList a3 = newActionsOnActivate.objectReferenceValue as IActionsList;
 
             GameObject a1Src = PrefabUtility.InstantiatePrefab(a1.gameObject) as GameObject;
             GameObject a2Src = PrefabUtility.InstantiatePrefab(a2.gameObject) as GameObject;
+            GameObject a3Src = PrefabUtility.InstantiatePrefab(a3.gameObject) as GameObject;
 
             PrefabUtility.UnpackPrefabInstance(a1Src, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
             PrefabUtility.UnpackPrefabInstance(a2Src, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
+            PrefabUtility.UnpackPrefabInstance(a3Src, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
 
             string a1Path = AssetDatabase.GetAssetPath(a1.gameObject);
             string a2Path = AssetDatabase.GetAssetPath(a2.gameObject);
+            string a3Path = AssetDatabase.GetAssetPath(a3.gameObject);
 
             string a1NewPath = AssetDatabase.GenerateUniqueAssetPath(a1Path);
             string a2NewPath = AssetDatabase.GenerateUniqueAssetPath(a2Path);
+            string a3NewPath = AssetDatabase.GenerateUniqueAssetPath(a3Path);
 
             GameObject p1Src = PrefabUtility.SaveAsPrefabAsset(a1Src, a1NewPath);
             GameObject p2Src = PrefabUtility.SaveAsPrefabAsset(a2Src, a2NewPath);
+            GameObject p3Src = PrefabUtility.SaveAsPrefabAsset(a3Src, a3NewPath);
 
             newActionsOnHit.objectReferenceValue = p1Src.GetComponent<IActionsList>();
             newActionsOnExec.objectReferenceValue = p2Src.GetComponent<IActionsList>();
+            newActionsOnActivate.objectReferenceValue = p3Src.GetComponent<IActionsList>();
 
             soNewInstance.ApplyModifiedPropertiesWithoutUndo();
             soNewInstance.Update();
 
             DestroyImmediate(a1Src);
             DestroyImmediate(a2Src);
+            DestroyImmediate(a3Src);
         }
 
         // STYLES: --------------------------------------------------------------------------------
