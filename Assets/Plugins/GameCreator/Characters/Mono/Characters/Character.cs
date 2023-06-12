@@ -112,6 +112,8 @@
         public bool save;
         protected SaveData initSaveData = new SaveData();
 
+        public NetworkVariable<bool> disableActions = new NetworkVariable<bool>();
+
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
         // INITIALIZERS: --------------------------------------------------------------------------
@@ -266,6 +268,7 @@
         public bool IsControllable()
         {
             if (this.characterLocomotion == null) return false;
+            if (disableActions.Value) return false;
             return this.characterLocomotion.isControllable;
         }
 

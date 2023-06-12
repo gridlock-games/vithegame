@@ -112,8 +112,9 @@ namespace LightPat.Core
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    //playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
-                    if (!playerObject)
+                    if (playerObject)
+                        playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
+                    else
                         allPlayersSpawned.Value = false;
                 }
 

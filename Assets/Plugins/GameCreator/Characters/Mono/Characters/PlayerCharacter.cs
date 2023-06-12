@@ -258,11 +258,14 @@
                     moveInput.Value = new Vector3(touchDirection.x, 0.0f, touchDirection.y);
                 }
 
-                moveInput.Value = new Vector3(
-                    Input.GetAxisRaw(AXIS_H),
-                    0.0f,
-                    Input.GetAxisRaw(AXIS_V)
-                );
+                if (disableActions.Value)
+                {
+                    moveInput.Value = Vector3.zero;
+                }
+                else
+                {
+                    moveInput.Value = new Vector3(Input.GetAxisRaw(AXIS_H), 0, Input.GetAxisRaw(AXIS_V));
+                }
             }
 
             Vector3 moveDirection = transform.rotation * moveInput.Value;
