@@ -4,65 +4,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
+using GameCreator.Core;
+using GameCreator.Characters;
 
 public class SceneUserDataManager : MonoBehaviour
 {
-    [SerializeField] private ShopCharacterModel[] characterModel;
+    [SerializeField] private List<CreateCharacterModel> charactersList = new List<CreateCharacterModel>();
     [SerializeField] private GameObject placeholderContainer;
     [SerializeField] private Transform startSpawnLoc;
     [SerializeField] private TextMeshProUGUI nameTMP;
     [SerializeField] public GameObject spotlightPrefab;
     [SerializeField] public GameObject cameraPrefab;
+    [SerializeField] private GameObject charDesc_Panel;
+    [SerializeField] private Text charDesc_Name;
+    [SerializeField] private Text charDesc_Lore;
+    [SerializeField] private GridLayoutGroup gridLayoutGroup;
+    [SerializeField] private Image gridImgPrefab;
 
     private GameObject currentSpotlight;
+    private GameObject currentCharDesc;
     private GameObject mainCamera;
     private GameObject selectedObject;
     private List<GameObject> placeholderObjects = new List<GameObject>();
     private int currentIndex = -1;
+    public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
+    private Boolean isPreviewActive = false;
+
+    private Vector3 cameraDesc_InitPos;
+    private Quaternion charDesc_InitRot; 
+    private Quaternion char_InitRot; 
 
     void Start()
     {
         this.datamanager = DataManager.Instance;
         mainCamera = Instantiate(cameraPrefab);
+
+        this.cameraDesc_InitPos = mainCamera.transform.position;
+        this.charDesc_InitRot = mainCamera.transform.rotation;
+
         this.InitDataReferences();
     }
 
-    private void Update()
-    {
-        // Check for mouse click
-        if (Input.GetMouseButtonDown(0))
-        {
-            // Cast a ray from the mouse position into the scene
-            Ray ray = mainCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Check if the raycast hit a game object
-                GameObject hitObject = hit.collider.gameObject;
-
-                // Select the clicked game object
-                SelectGameObject(hitObject);
-            }
-        }
-
-        // Check for left arrow key press
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            // Cycle to the previous game object
-            SelectPreviousObject();
-        }
-
-        // Check for right arrow key press
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            // Cycle to the next game object
-            SelectNextObject();
-        }
-
-    }
-    public void InitDataReferences()
+    private void InitDataReferences()
     {
         var _userdata = datamanager;
         if (_userdata)
@@ -76,18 +61,20 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
-    public void SpawnGameObjectsHorizontally()
+    private void SpawnGameObjectsHorizontally()
     {
         List<GameObject> placeholders = new List<GameObject>();
-        for (int i = 0; i < characterModel.Length; i++)
-        {
+        gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
 
-            Vector3 spawnPosition = startSpawnLoc.position + new Vector3(2.0f * i, 0f, 0f);
-            Instantiate(characterModel[i].characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-            placeholderContainer.name = placeholderContainer.name + "-" + i;
-            Instantiate(placeholderContainer, spawnPosition + Vector3.up * 1.0f, Quaternion.Euler(0f, 180f, 0f));
-            placeholderObjects.Add(placeholderContainer);
+        for (int i = 0; i < charactersList.Count; i++)
+        {
+            gridImgPrefab.sprite = charactersList[i].characterImage;
+            gridImgPrefab.gameObject.name = charactersList[i].characterName;
+            gridImgPrefab.gameObject.SetActive(true);
+            GameObject newItem = Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
         }
+
+        this.SelectGameObject(null);
     }
 
     private void SelectPreviousObject()
@@ -124,6 +111,36 @@ public class SceneUserDataManager : MonoBehaviour
 
         // Select the game object at the current index
         SelectGameObject(placeholderObjects[currentIndex]);
+    }
+
+    public void SelectGameObject(GameObject selectedObject)
+    {
+        if(isPreviewActive) return;
+
+        CreateCharacterModel charDesc = null;
+
+        if(this.selectedObject == null) {
+            charDesc = charactersList[0];
+        } else {
+            Destroy(this.selectedObject, 0f);
+            charDesc = charactersList.FirstOrDefault(model => model.characterName == selectedObject.name.Replace("(Clone)", ""));
+        }
+
+        if(charDesc == null) return;
+        if(charDesc.characterObject == this.selectedObject) return;
+
+        Vector3 spawnPosition = startSpawnLoc.position;
+
+        this.charDesc_Name.text = charDesc.characterName;
+        this.charDesc_Lore.text = charDesc.characterDescription;
+
+
+        // Store the selected game object
+        this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
+
+        if (NetworkManager.Singleton.IsServer) {
+            this.selectedObject.GetComponent<NetworkObject>().Spawn();
+        }
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
@@ -194,25 +211,6 @@ public class SceneUserDataManager : MonoBehaviour
         datamanager.PostUserdata(_userdata, false);
     }
 
-
-    private void SelectGameObject(GameObject selectedObject)
-    {
-        // Store the selected game object
-        this.selectedObject = selectedObject;
-
-        if (selectedObject == null) return;
-        if (selectedObject.tag != "Placeholder") return;
-
-        // Destroy the previous spotlight if it exists
-        if (currentSpotlight != null)
-        {
-            Destroy(currentSpotlight);
-        }
-
-        // Instantiate a new spotlight
-        currentSpotlight = Instantiate(spotlightPrefab, selectedObject.transform.position + Vector3.up * 2.5f, Quaternion.Euler(90f, 0f, 0f));
-        // currentSpotlight.GetComponent<FollowMouse>().TargetObject = selectedObject;
-    }
     private void OnDrawGizmosSelected()
     {
         if (selectedObject != null)
@@ -221,5 +219,9 @@ public class SceneUserDataManager : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(selectedObject.transform.position, 1f);
         }
+    }
+
+    private void NextScene() {
+        // Selected CharacterObject is this.selectedObject
     }
 }
