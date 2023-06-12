@@ -718,7 +718,7 @@
             resetDefaultStateRunning = false;
         }
 
-        private PreserveRotation Rotation(GameObject anchor, Character targetChar)
+        public PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
             Vector3 anchorPosition = anchor.transform.position;
             Vector3 targetPosition = targetChar.transform.position;
