@@ -124,22 +124,20 @@
 
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
-            LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
-
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
-            //if (!IsControllable()) { targetDirection = Vector3.zero; }
+            if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 
             characterLocomotion.SetDirectionalDirection(targetDirection);
             float speed = characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, characterLocomotion.characterController.isGrounded);
-            Quaternion targetRotation = directionalLocSystem.UpdateRotation(targetDirection);
+            Quaternion targetRotation = characterLocomotion.currentLocomotionSystem.UpdateRotation(targetDirection);
 
-            directionalLocSystem.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
-            directionalLocSystem.UpdateSliding();
+            characterLocomotion.currentLocomotionSystem.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
+            characterLocomotion.currentLocomotionSystem.UpdateSliding();
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, ILocomotionSystem.HORIZONTAL_PLANE), 1.0f);
             targetDirection *= speed;
 
-            if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
+            if (characterLocomotion.currentLocomotionSystem.isSliding) targetDirection = characterLocomotion.currentLocomotionSystem.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
             
             if (inputPayload.rootMotionResult.newMeleeClip)

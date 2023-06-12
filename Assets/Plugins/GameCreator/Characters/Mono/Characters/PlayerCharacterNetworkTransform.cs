@@ -12,13 +12,15 @@ namespace GameCreator.Characters
         public struct InputPayload : INetworkSerializable
         {
             public int tick;
+            public bool isControllable;
             public Vector2 inputVector;
             public Quaternion rotation;
             public PlayerCharacter.RootMotionResult rootMotionResult;
             
-            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation, PlayerCharacter.RootMotionResult rootMotionResult)
+            public InputPayload(int tick, bool isControllable, Vector2 inputVector, Quaternion rotation, PlayerCharacter.RootMotionResult rootMotionResult)
             {
                 this.tick = tick;
+                this.isControllable = isControllable;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
                 this.rootMotionResult = rootMotionResult;
@@ -27,8 +29,14 @@ namespace GameCreator.Characters
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref inputVector);
+                serializer.SerializeValue(ref isControllable);
                 serializer.SerializeValue(ref rotation);
+
+                if (isControllable)
+                {
+                    serializer.SerializeValue(ref inputVector);
+                }
+
                 serializer.SerializeNetworkSerializable(ref rootMotionResult);
             }
         }
@@ -95,10 +103,7 @@ namespace GameCreator.Characters
             currentTick++;
         }
 
-        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload)
-        {
-            latestServerState = statePayload;
-        }
+        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
 
         private void HandleClientTick()
         {
@@ -111,7 +116,7 @@ namespace GameCreator.Characters
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(currentTick, new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
+                InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
                 SendInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
             }
@@ -194,11 +199,7 @@ namespace GameCreator.Characters
             SendInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
         }
 
-        [ClientRpc]
-        private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams)
-        {
-            inputQueue.Enqueue(inputPayload);
-        }
+        [ClientRpc] private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {

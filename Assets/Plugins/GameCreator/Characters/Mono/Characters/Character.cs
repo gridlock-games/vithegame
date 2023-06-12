@@ -145,6 +145,9 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                     Knockup(null, this);
                     break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
+                    Stagger(null, this);
+                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     CancelAilment();
                     break;
@@ -513,13 +516,7 @@
             }
         }
 
-        [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams)
-        {
-            //Vector3 rotationDirection = Vector3.Scale(targetRotation.eulerAngles, PLANE).normalized;
-            //this.characterLocomotion.SetRotation(targetRotation.eulerAngles);
-            transform.rotation = targetRotation;
-            //Debug.Log(targetRotation.eulerAngles + " ");
-        }
+        [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams) { transform.rotation = targetRotation; }
 
         [ClientRpc]
         private void UpdateAilmentRotationClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)

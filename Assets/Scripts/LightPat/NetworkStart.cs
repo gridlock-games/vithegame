@@ -8,7 +8,7 @@ public class NetworkStart : MonoBehaviour
     private void Start()
     {
         if (Application.isEditor)
-            NetworkManager.Singleton.StartServer();
+            NetworkManager.Singleton.StartHost();
         else
             NetworkManager.Singleton.StartClient();
     }
