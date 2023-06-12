@@ -54,50 +54,6 @@
             }
         }
 
-        public struct NetworkedState : INetworkSerializable
-        {
-            public Vector3 forwardSpeed;
-            public float sidesSpeed;
-            public float pivotSpeed;
-            public bool targetLock;
-            public float isGrounded;
-            public float isSliding;
-            public float isDashing;
-            public float verticalSpeed;
-            public Vector3 normal;
-
-            public NetworkedState(State charState)
-            {
-                this.forwardSpeed = charState.forwardSpeed;
-                this.sidesSpeed = charState.sidesSpeed;
-                this.pivotSpeed = charState.pivotSpeed;
-                this.targetLock = charState.targetLock;
-                this.isGrounded = charState.isGrounded;
-                this.isSliding = charState.isSliding;
-                this.isDashing = charState.isDashing;
-                this.verticalSpeed = charState.verticalSpeed;
-                this.normal = charState.normal;
-            }
-
-            public State ConvertToState()
-            {
-                return new State(forwardSpeed, sidesSpeed, pivotSpeed, targetLock, isGrounded, isSliding, isDashing, verticalSpeed, normal);
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref forwardSpeed);
-                serializer.SerializeValue(ref sidesSpeed);
-                serializer.SerializeValue(ref pivotSpeed);
-                serializer.SerializeValue(ref targetLock);
-                serializer.SerializeValue(ref isGrounded);
-                serializer.SerializeValue(ref isSliding);
-                serializer.SerializeValue(ref isDashing);
-                serializer.SerializeValue(ref verticalSpeed);
-                serializer.SerializeValue(ref normal);
-            }
-        }
-
         [Serializable]
         public class SaveData
         {
@@ -271,14 +227,9 @@
             return this.characterLocomotion.isDashing;
         }
 
-        private NetworkVariable<NetworkedState> networkedState = new NetworkVariable<NetworkedState>();
         public State GetCharacterState()
         {
-            if (IsServer)
-            {
-                networkedState.Value = new NetworkedState(characterState);
-            }
-            return networkedState.Value.ConvertToState();
+            return characterState;
         }
 
         public void SetRagdoll(bool active, bool autoStand = false)
