@@ -17,14 +17,14 @@ namespace GameCreator.Characters
             public int tick;
             public Vector2 inputVector;
             public Quaternion rotation;
-            public SampledAnimationCurve rootMotionCurve;
+            public PlayerCharacter.RootMotionResult rootMotionResult;
             
-            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation, AnimationCurve curve)
+            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation, PlayerCharacter.RootMotionResult rootMotionResult)
             {
                 this.tick = tick;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
-                rootMotionCurve = new SampledAnimationCurve(curve, 100);
+                this.rootMotionResult = rootMotionResult;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -32,7 +32,7 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref inputVector);
                 serializer.SerializeValue(ref rotation);
-                serializer.SerializeNetworkSerializable(ref rootMotionCurve);
+                serializer.SerializeNetworkSerializable(ref rootMotionResult);
             }
         }
 
@@ -54,95 +54,6 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
-            }
-        }
-
-        public struct SampledAnimationCurve : INetworkSerializable, IDisposable
-        {
-            public NativeArray<float> sampledAnimationCurve;
-            public bool animationCurveExists;
-
-            /// <param name="samples">Must be 2 or higher</param>
-            public SampledAnimationCurve(AnimationCurve ac, int samples)
-            {
-                sampledAnimationCurve = new NativeArray<float>(samples, Allocator.Persistent);
-
-                animationCurveExists = ac != null;
-                if (!animationCurveExists) { return; }
-
-                animationCurveExists = ac.keys.Length >= 2;
-                if (!animationCurveExists) { return; }
-
-                float timeFrom = ac.keys[0].time;
-                float timeTo = ac.keys[^1].time;
-                float timeStep = (timeTo - timeFrom) / (samples - 1);
-
-                for (int i = 0; i < samples; i++)
-                {
-                    sampledAnimationCurve[i] = ac.Evaluate(timeFrom + (i * timeStep));
-                }
-            }
-
-            public void Dispose()
-            {
-                sampledAnimationCurve.Dispose();
-            }
-
-            /// <param name="time">Must be from 0 to 1</param>
-            public float EvaluateLerp(float time)
-            {
-                int len = sampledAnimationCurve.Length - 1;
-                float clamp01 = time < 0 ? 0 : (time > 1 ? 1 : time);
-                float floatIndex = (clamp01 * len);
-                int floorIndex = (int)math.floor(floatIndex);
-                if (floorIndex == len)
-                {
-                    return sampledAnimationCurve[len];
-                }
-
-                float lowerValue = sampledAnimationCurve[floorIndex];
-                float higherValue = sampledAnimationCurve[floorIndex + 1];
-                return math.lerp(lowerValue, higherValue, math.frac(floatIndex));
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref animationCurveExists);
-
-                if (!animationCurveExists) { return; }
-
-                // Length
-                int length = 0;
-                if (!serializer.IsReader)
-                {
-                    length = sampledAnimationCurve.Length;
-                }
-
-                serializer.SerializeValue(ref length);
-
-                // Array
-                if (serializer.IsReader)
-                {
-                    if (sampledAnimationCurve.IsCreated)
-                    {
-                        // Make sure the existing array is disposed and not leaked
-                        sampledAnimationCurve.Dispose();
-                    }
-                    sampledAnimationCurve = new NativeArray<float>(length, Allocator.Persistent);
-                }
-
-                for (int n = 0; n < length; ++n)
-                {
-                    // NataveArray doesn't have a by-ref index operator
-                    // so we have to read, serialize, write. This works in both
-                    // reading and writing contexts - in reading, `val` gets overwritten
-                    // so the current value doesn't matter; in writing, `val` is unchanged,
-                    // so Array[n] = val is the same as Array[n] = Array[n].
-                    // NativeList also exists which does have a by-ref `ElementAt()` method.
-                    var val = sampledAnimationCurve[n];
-                    serializer.SerializeValue(ref val);
-                    sampledAnimationCurve[n] = val;
-                }
             }
         }
 
@@ -189,16 +100,13 @@ namespace GameCreator.Characters
 
         [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
 
-        public bool sendCurve;
-        public AnimationCurve testCurve;
-        private AnimationCurve nullCurve;
         private void HandleClientTick()
         {
             if (!latestServerState.Equals(default(StatePayload)) &&
                 (lastProcessedState.Equals(default(StatePayload)) ||
                 !latestServerState.Equals(lastProcessedState)))
             {
-                //HandleServerReconciliation();
+                HandleServerReconciliation();
             }
 
             if (IsOwner)
@@ -206,7 +114,7 @@ namespace GameCreator.Characters
                 InputPayload inputPayload = new InputPayload(currentTick,
                     new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)),
                     transform.rotation,
-                    sendCurve ? nullCurve : testCurve);
+                    playerCharacter.RootMotionTickUpdate(currentTick));
                 SendInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
             }
@@ -313,7 +221,6 @@ namespace GameCreator.Characters
         {
             if (!IsHost)
                 inputQueue.Enqueue(inputPayload);
-            Debug.Log(inputPayload.rootMotionCurve.animationCurveExists);
             // Send input to all clients that aren't the owner of this object
             List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
             clientIds.Remove(OwnerClientId);

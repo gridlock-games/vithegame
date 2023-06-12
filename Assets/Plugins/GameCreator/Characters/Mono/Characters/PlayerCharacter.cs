@@ -4,8 +4,7 @@
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
     using Unity.Netcode;
-    using System;
-    using System.IO;
+    using System.Collections.Generic;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -124,18 +123,8 @@
             this.CharacterUpdate();
         }
 
-        public int lastProcessedTick { get; private set; }
-        ILocomotionSystem.RootMotionInformation rootMotionInformation;
-        float rootMoveDeltaForward;
-        float rootMoveDeltaSides;
-        float rootMoveDeltaVertical;
-        bool isRootMoving;
-        bool setStartTick;
-        int rootMoveStartTick;
-
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
-            lastProcessedTick = inputPayload.tick;
             LocomotionSystemDirectional directionalLocSystem = (LocomotionSystemDirectional)characterLocomotion.currentLocomotionSystem;
 
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
@@ -152,40 +141,29 @@
             if (directionalLocSystem.isSliding) targetDirection = directionalLocSystem.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
             
-            if (setStartTick)
+            if (inputPayload.rootMotionResult.newMeleeClip)
             {
-                rootMoveStartTick = inputPayload.tick;
-                setStartTick = false;
+                rootMoveDeltaForward = 0;
+                rootMoveDeltaSides = 0;
+                rootMoveDeltaVertical = 0;
             }
 
-            if (isRootMoving) // If we are playing a melee clip
+            if (inputPayload.rootMotionResult.apply) // If we are playing a melee clip
             {
-                float t = (inputPayload.tick - rootMoveStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
-
-                if (t >= 1)
-                {
-                    isRootMoving = false;
-                    directionalLocSystem.StopRootMovement();
-                }
-
-                float deltaForward = rootMotionInformation.rootMoveCurveForward.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
-                float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
-                float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
-
                 Vector3 movement = new Vector3(
-                    deltaSides - rootMoveDeltaSides,
-                    deltaVertical - rootMoveDeltaVertical,
-                    deltaForward - rootMoveDeltaForward
+                    inputPayload.rootMotionResult.rootMotionSides - rootMoveDeltaSides,
+                    inputPayload.rootMotionResult.rootMotionVertical - rootMoveDeltaVertical,
+                    inputPayload.rootMotionResult.rootMotionForward - rootMoveDeltaForward
                 );
 
-                Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
-                movement += 1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate * rootMotionInformation.rootMoveGravity * verticalMovement;
+                Vector3 verticalMovement = Vector3.up * this.characterLocomotion.verticalSpeed;
+                movement += 1f / NetworkManager.NetworkTickSystem.TickRate * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
 
-                characterLocomotion.characterController.Move(characterLocomotion.character.transform.TransformDirection(movement));
+                characterLocomotion.characterController.Move(inputPayload.rotation * movement);
 
-                rootMoveDeltaForward = deltaForward;
-                rootMoveDeltaSides = deltaSides;
-                rootMoveDeltaVertical = deltaVertical;
+                rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
+                rootMoveDeltaSides = inputPayload.rootMotionResult.rootMotionSides;
+                rootMoveDeltaVertical = inputPayload.rootMotionResult.rootMotionVertical;
             }
             else // If we are just moving used WASD
             {
@@ -200,13 +178,70 @@
             return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
         }
 
+        public struct RootMotionResult : INetworkSerializable
+        {
+            public bool apply;
+            public bool newMeleeClip;
+            public float rootMotionForward;
+            public float rootMotionSides;
+            public float rootMotionVertical;
+            public float rootMoveGravity;
+
+            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity)
+            {
+                this.apply = apply;
+                this.newMeleeClip = newMeleeClip;
+                this.rootMotionForward = rootMotionForward;
+                this.rootMotionSides = rootMotionSides;
+                this.rootMotionVertical = rootMotionVertical;
+                this.rootMoveGravity = rootMoveGravity;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref apply);
+                serializer.SerializeValue(ref newMeleeClip);
+
+                if (apply)
+                {
+                    serializer.SerializeValue(ref rootMotionForward);
+                    serializer.SerializeValue(ref rootMotionSides);
+                    serializer.SerializeValue(ref rootMotionVertical);
+                    serializer.SerializeValue(ref rootMoveGravity);
+                }
+            }
+        }
+
+        private bool setStartTick;
+        private int rootMotionStartTick;
+        private float rootMoveDeltaForward;
+        private float rootMoveDeltaSides;
+        private float rootMoveDeltaVertical;
+        private ILocomotionSystem.RootMotionInformation rootMotionInformation;
+        public RootMotionResult RootMotionTickUpdate(int tick)
+        {
+            bool newMeleeClip = setStartTick;
+            if (setStartTick)
+            {
+                rootMotionStartTick = tick;
+                setStartTick = false;
+            }
+
+            if (rootMotionInformation.rootMoveTickDuration == 0) return default;
+            if (tick > rootMotionStartTick + rootMotionInformation.rootMoveTickDuration) { return default; }
+
+            float t = (tick - rootMotionStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
+
+            float deltaForward = rootMotionInformation.rootMoveCurveForward.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+            float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+            float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+
+            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity);
+        }
+
         public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)
         {
             this.rootMotionInformation = rootMotionInformation;
-            rootMoveDeltaForward = 0;
-            rootMoveDeltaSides = 0;
-            rootMoveDeltaVertical = 0;
-            isRootMoving = true;
             setStartTick = true;
         }
 
