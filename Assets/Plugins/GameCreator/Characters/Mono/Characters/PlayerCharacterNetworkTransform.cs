@@ -98,23 +98,23 @@ namespace GameCreator.Characters
             currentTick++;
         }
 
-        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
+        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload)
+        {
+            latestServerState = statePayload;
+        }
 
         private void HandleClientTick()
         {
-            if (!latestServerState.Equals(default(StatePayload)) &&
-                (lastProcessedState.Equals(default(StatePayload)) ||
-                !latestServerState.Equals(lastProcessedState)))
-            {
-                HandleServerReconciliation();
-            }
-
             if (IsOwner)
             {
-                InputPayload inputPayload = new InputPayload(currentTick,
-                    new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)),
-                    transform.rotation,
-                    playerCharacter.RootMotionTickUpdate(currentTick));
+                if (!latestServerState.Equals(default(StatePayload)) &&
+                (lastProcessedState.Equals(default(StatePayload)) ||
+                !latestServerState.Equals(lastProcessedState)))
+                {
+                    HandleServerReconciliation();
+                }
+
+                InputPayload inputPayload = new InputPayload(currentTick, new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
                 SendInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
             }
@@ -151,7 +151,7 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log("Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = latestServerState.position;
@@ -176,36 +176,6 @@ namespace GameCreator.Characters
                     tickToProcess++;
                 }
             }
-
-            //float angleError = Quaternion.Angle(latestServerState.rotation, stateBuffer[serverStateBufferIndex].rotation);
-
-            //if (angleError > 0.001f)
-            //{
-            //    Debug.Log("Angle Error: " + angleError);
-
-            //    CurrentRotation = latestServerState.rotation;
-            //    transform.position = latestServerState.position;
-            //    transform.rotation = latestServerState.rotation;
-
-            //    // Update buffer at index of latest server state
-            //    stateBuffer[serverStateBufferIndex] = latestServerState;
-
-            //    // Now re-simulate the rest of the ticks up to the current tick on the client
-            //    int tickToProcess = latestServerState.tick + 1;
-
-            //    while (tickToProcess < currentTick)
-            //    {
-            //        int bufferIndex = tickToProcess % BUFFER_SIZE;
-
-            //        // Process new movement with reconciled state
-            //        StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
-
-            //        // Update buffer with recalculated state
-            //        stateBuffer[bufferIndex] = statePayload;
-
-            //        tickToProcess++;
-            //    }
-            //}
         }
 
         private void Start()
@@ -227,7 +197,11 @@ namespace GameCreator.Characters
             SendInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
         }
 
-        [ClientRpc] private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
+        [ClientRpc]
+        private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams)
+        {
+            inputQueue.Enqueue(inputPayload);
+        }
 
         private StatePayload ProcessInput(InputPayload input)
         {
