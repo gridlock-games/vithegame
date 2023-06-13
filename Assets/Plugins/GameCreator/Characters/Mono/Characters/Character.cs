@@ -517,6 +517,8 @@
             }
         }
 
+        [ClientRpc] public void UpdatePositionClientRpc(Vector3 targetPosition, ClientRpcParams clientRpcParams) { transform.position = targetPosition; }
+
         [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams) { transform.rotation = targetRotation; }
 
         [ClientRpc]

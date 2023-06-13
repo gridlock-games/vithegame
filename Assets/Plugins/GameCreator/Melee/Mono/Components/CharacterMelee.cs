@@ -431,6 +431,32 @@ namespace GameCreator.Melee
                 targetMelee.SendMessage("OnDeath", this);
                 SendMessage("OnKill", targetMelee);
             }
+
+            IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
+
+            bool hitSomething = triggers.Length > 0;
+            if (hitSomething)
+            {
+                for (int j = 0; j < triggers.Length; ++j)
+                {
+                    triggers[j].OnReceiveAttack(this, attack, hitResult);
+                }
+            }
+
+            if (hitSomething && attack != null && targetMelee != null)
+            {
+                attack.ExecuteActionsOnHit(bladeImpactPosition, targetMelee.gameObject);
+            }
+
+            if (attack != null && attack.pushForce > float.Epsilon)
+            {
+                Rigidbody[] rigidbodies = targetMelee.GetComponents<Rigidbody>();
+                for (int j = 0; j < rigidbodies.Length; ++j)
+                {
+                    Vector3 direction = rigidbodies[j].transform.position - transform.position;
+                    rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
+                }
+            }
         }
 
         protected void UpdatePoise()

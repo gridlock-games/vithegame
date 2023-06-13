@@ -211,7 +211,11 @@ namespace LightPat.Core
                 {
                     if (teamSpawnPoint.team == clientPair.Value.team)
                     {
-                        playerChar.GetComponent<PlayerCharacterNetworkTransform>().SetPosition(teamSpawnPoint.spawnPosition);
+                        if (playerChar.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+                            networkTransform.SetPosition(teamSpawnPoint.spawnPosition);
+                        else
+                            playerChar.UpdatePositionClientRpc(teamSpawnPoint.spawnPosition, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
+                        
                         playerChar.UpdateRotationClientRpc(Quaternion.Euler(teamSpawnPoint.spawnRotation), new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
                         break;
                     }
