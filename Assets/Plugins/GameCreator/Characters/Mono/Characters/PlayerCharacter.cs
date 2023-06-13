@@ -147,17 +147,18 @@
                 rootMoveDeltaVertical = 0;
             }
 
+            Vector3 movement;
             if (inputPayload.rootMotionResult.apply) // If we are playing a melee clip
             {
-                Vector3 movement = new Vector3(
+                movement = new Vector3(
                     inputPayload.rootMotionResult.rootMotionSides - rootMoveDeltaSides,
                     inputPayload.rootMotionResult.rootMotionVertical - rootMoveDeltaVertical,
                     inputPayload.rootMotionResult.rootMotionForward - rootMoveDeltaForward
                 );
 
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
-                movement += 1f / NetworkManager.NetworkTickSystem.TickRate * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
-                characterLocomotion.characterController.Move(inputPayload.rotation * movement);
+                movement += (inputPayload.rootMotionResult.rootMoveGravity * verticalMovement) * (1f / NetworkManager.NetworkTickSystem.TickRate);
+                movement = inputPayload.rotation * movement;
 
                 rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
                 rootMoveDeltaSides = inputPayload.rootMotionResult.rootMotionSides;
@@ -165,8 +166,10 @@
             }
             else // If we are just moving used WASD
             {
-                characterLocomotion.characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection);
+                movement = 1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection;
             }
+
+            characterLocomotion.characterController.Move(movement);
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
@@ -270,7 +273,8 @@
 
             Vector3 moveDirection = transform.rotation * moveInput.Value;
             if (!IsControllable()) { moveDirection = Vector3.zero; }
-            Vector3 targetDirection = IsServer ? moveInput.Value : moveDirection;
+
+            Vector3 targetDirection = IsOwner ? moveInput.Value : moveDirection;
 
             this.ComputeMovement(targetDirection);
 

@@ -90,6 +90,8 @@ namespace GameCreator.Characters
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             if (IsClient)
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
+
+            Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Character"), true);
         }
 
         public override void OnNetworkDespawn()
