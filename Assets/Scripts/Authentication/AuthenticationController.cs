@@ -2,11 +2,15 @@ using System;
 using Assets.SimpleGoogleSignIn;
 using Proyecto26;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AuthenticationController : MonoBehaviour
 {
     
-    [SerializeField] private GameObject signInPage;
+    [SerializeField] private GameObject btn_SignIn;
+    [SerializeField] private GameObject btn_Signedin;
+    [SerializeField] private GameObject btn_SignOut;
+    [SerializeField] private GameObject btn_StartGame;
     private DataManager datamanager;
     private void Start()
     {
@@ -15,9 +19,14 @@ public class AuthenticationController : MonoBehaviour
         if (PlayerPrefs.HasKey("email"))
         {
             RestClient.Get($"{datamanager.firebaseURL}.json", GetCacheResponse);
+            btn_Signedin.SetActive(true);
+            btn_SignOut.SetActive(true);
+            btn_StartGame.SetActive(true);
             return;
-        }
-        signInPage.SetActive(true);
+        } 
+        
+        
+        btn_SignIn.SetActive(true);
     }
 
     // Callback on getting data and save as user model
@@ -59,6 +68,11 @@ public class AuthenticationController : MonoBehaviour
                     data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
                     datamanager.PostUserdata(data);
                 });
+
+                
+                btn_Signedin.SetActive(true);
+                btn_SignOut.SetActive(true);
+                btn_StartGame.SetActive(true);
                 return;
             }
             //if Google login fail
@@ -66,5 +80,11 @@ public class AuthenticationController : MonoBehaviour
         });
     }
 
+    public void StartGame() {
+         if (PlayerPrefs.HasKey("email"))
+        {
+            SceneManager.LoadScene("CharacterSelect");
+        } 
+    }
 
 }

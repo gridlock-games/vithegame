@@ -39,7 +39,6 @@ public class DataManager : MonoBehaviour
     public void LoginSuccess(UserModel _data)
     {
         GameSession(SessionType.LOGIN);
-        SceneManager.LoadScene("Store");
         Debug.Log("Login Success");
     }
     public void GameSession(SessionType type)
