@@ -11,7 +11,7 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject serverCameraPrefab;
-        public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
+        [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();

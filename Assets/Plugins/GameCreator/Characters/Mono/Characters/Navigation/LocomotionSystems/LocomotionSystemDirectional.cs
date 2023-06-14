@@ -43,15 +43,19 @@
             if (this.isSliding) targetDirection = this.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
-            if (this.isRootMoving)
+            // If there is no player character network transform component on this object
+            if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
             {
-                this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-                this.characterLocomotion.characterController.transform.rotation = targetRotation;
-            }
-            else
-            {
-                this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
-                this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                if (this.isRootMoving)
+                {
+                    this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                }
+                else
+                {
+                    this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
+                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
+                }
             }
 
             if (this.characterLocomotion.navmeshAgent != null &&

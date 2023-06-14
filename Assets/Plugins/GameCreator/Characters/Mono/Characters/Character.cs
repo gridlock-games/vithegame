@@ -54,50 +54,6 @@
             }
         }
 
-        public struct NetworkedState : INetworkSerializable
-        {
-            public Vector3 forwardSpeed;
-            public float sidesSpeed;
-            public float pivotSpeed;
-            public bool targetLock;
-            public float isGrounded;
-            public float isSliding;
-            public float isDashing;
-            public float verticalSpeed;
-            public Vector3 normal;
-
-            public NetworkedState(State charState)
-            {
-                this.forwardSpeed = charState.forwardSpeed;
-                this.sidesSpeed = charState.sidesSpeed;
-                this.pivotSpeed = charState.pivotSpeed;
-                this.targetLock = charState.targetLock;
-                this.isGrounded = charState.isGrounded;
-                this.isSliding = charState.isSliding;
-                this.isDashing = charState.isDashing;
-                this.verticalSpeed = charState.verticalSpeed;
-                this.normal = charState.normal;
-            }
-
-            public State ConvertToState()
-            {
-                return new State(forwardSpeed, sidesSpeed, pivotSpeed, targetLock, isGrounded, isSliding, isDashing, verticalSpeed, normal);
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref forwardSpeed);
-                serializer.SerializeValue(ref sidesSpeed);
-                serializer.SerializeValue(ref pivotSpeed);
-                serializer.SerializeValue(ref targetLock);
-                serializer.SerializeValue(ref isGrounded);
-                serializer.SerializeValue(ref isSliding);
-                serializer.SerializeValue(ref isDashing);
-                serializer.SerializeValue(ref verticalSpeed);
-                serializer.SerializeValue(ref normal);
-            }
-        }
-
         [Serializable]
         public class SaveData
         {
@@ -189,6 +145,9 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                     Knockup(null, this);
                     break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
+                    Stagger(null, this);
+                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     CancelAilment();
                     break;
@@ -271,14 +230,9 @@
             return this.characterLocomotion.isDashing;
         }
 
-        private NetworkVariable<NetworkedState> networkedState = new NetworkVariable<NetworkedState>();
         public State GetCharacterState()
         {
-            if (IsServer)
-            {
-                networkedState.Value = new NetworkedState(characterState);
-            }
-            return networkedState.Value.ConvertToState();
+            return characterState;
         }
 
         public void SetRagdoll(bool active, bool autoStand = false)
@@ -314,6 +268,7 @@
         public bool IsControllable()
         {
             if (this.characterLocomotion == null) return false;
+            if (disableActions.Value) return false;
             return this.characterLocomotion.isControllable;
         }
 
@@ -562,13 +517,9 @@
             }
         }
 
-        [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams)
-        {
-            //Vector3 rotationDirection = Vector3.Scale(targetRotation.eulerAngles, PLANE).normalized;
-            //this.characterLocomotion.SetRotation(targetRotation.eulerAngles);
-            transform.rotation = targetRotation;
-            //Debug.Log(targetRotation.eulerAngles + " ");
-        }
+        [ClientRpc] public void UpdatePositionClientRpc(Vector3 targetPosition, ClientRpcParams clientRpcParams) { transform.position = targetPosition; }
+
+        [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams) { transform.rotation = targetRotation; }
 
         [ClientRpc]
         private void UpdateAilmentRotationClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
@@ -771,11 +722,8 @@
 
         public PreserveRotation Rotation(GameObject anchor, Character targetChar)
         {
-            PlayerCharacterNetworkTransform anchorNetworkTransform = anchor.GetComponent<PlayerCharacterNetworkTransform>();
-            PlayerCharacterNetworkTransform targetNetworkTransform = targetChar.GetComponent<PlayerCharacterNetworkTransform>();
-
-            Vector3 anchorPosition = anchorNetworkTransform ? anchorNetworkTransform.GetPosition() : anchor.transform.position;
-            Vector3 targetPosition = targetNetworkTransform ? targetNetworkTransform.GetPosition() : targetChar.transform.position;
+            Vector3 anchorPosition = anchor.transform.position;
+            Vector3 targetPosition = targetChar.transform.position;
 
             Vector3 rotationDirection = anchorPosition - targetPosition;
 
