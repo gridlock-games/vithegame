@@ -3,14 +3,22 @@ using Assets.SimpleGoogleSignIn;
 using Proyecto26;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
+using TMPro;
+using System.Net;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class AuthenticationController : MonoBehaviour
 {
-    
+
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
     [SerializeField] private GameObject btn_StartGame;
+    [SerializeField] private TMP_InputField clientIPAddressInput;
+    [SerializeField] private TMP_InputField displayNameInput;
+    [SerializeField] private TextMeshProUGUI infoDisplayText;
     private DataManager datamanager;
     private void Start()
     {
@@ -22,11 +30,36 @@ public class AuthenticationController : MonoBehaviour
             btn_Signedin.SetActive(true);
             btn_SignOut.SetActive(true);
             btn_StartGame.SetActive(true);
-            return;
-        } 
-        
-        
-        btn_SignIn.SetActive(true);
+            clientIPAddressInput.gameObject.SetActive(true);
+            displayNameInput.gameObject.SetActive(true);
+        }
+        else
+        {
+            btn_SignIn.SetActive(true);
+        }
+    }
+
+    private bool transitioningToCharacterSelect;
+    private void Update()
+    {
+        // If we are a headless build
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+        {
+            StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
+        }
+        else // If we are not a headless build
+        {
+            if (clientIPAddressInput.text == "" | displayNameInput.text == "")
+            {
+                btn_StartGame.GetComponent<Button>().interactable = false;
+                infoDisplayText.SetText("Enter the player hub's ip address and display name to play");
+            }
+            else
+            {
+                btn_StartGame.GetComponent<Button>().interactable = true;
+                infoDisplayText.SetText("");
+            }
+        }
     }
 
     // Callback on getting data and save as user model
@@ -40,7 +73,6 @@ public class AuthenticationController : MonoBehaviour
         data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
         datamanager.PostUserdata(data);
     }
-
 
     public void SignIn()
     {
@@ -69,10 +101,11 @@ public class AuthenticationController : MonoBehaviour
                     datamanager.PostUserdata(data);
                 });
 
-                
                 btn_Signedin.SetActive(true);
                 btn_SignOut.SetActive(true);
                 btn_StartGame.SetActive(true);
+                clientIPAddressInput.gameObject.SetActive(true);
+                displayNameInput.gameObject.SetActive(true);
                 return;
             }
             //if Google login fail
@@ -80,11 +113,41 @@ public class AuthenticationController : MonoBehaviour
         });
     }
 
-    public void StartGame() {
-         if (PlayerPrefs.HasKey("email"))
+    public void StartGame()
+    {
+        if (PlayerPrefs.HasKey("email"))
         {
-            SceneManager.LoadScene("CharacterSelect");
-        } 
+            Debug.Log("Start Game");
+            //StartClient(clientIPAddressInput.text, displayNameInput.text);
+            //SceneManager.LoadScene("CharacterSelect");
+        }
     }
 
+    private void StartServer(string targetIP)
+    {
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        if (NetworkManager.Singleton.StartServer())
+        {
+            Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+            NetworkManager.Singleton.SceneManager.LoadScene("Hub", LoadSceneMode.Single);
+        }
+    }
+
+    private bool StartClient(string targetIP, string displayName)
+    {
+        if (displayName == "")
+        {
+            Debug.LogError("Please select a player name before starting");
+            return false;
+        }
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
+
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        if (NetworkManager.Singleton.StartClient())
+        {
+            Debug.Log("Started Client, looking for address: " + clientIPAddressInput.text);
+            return true;
+        }
+        return false;
+    }
 }

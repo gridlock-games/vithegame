@@ -6,6 +6,7 @@ using TMPro;
 using LightPat.Core;
 using GameCreator.Characters;
 using GameCreator.Melee;
+using UnityEngine.SceneManagement;
 
 namespace LightPat.Player
 {
@@ -20,6 +21,8 @@ namespace LightPat.Player
 
         public override void OnNetworkSpawn()
         {
+            Debug.Log(SceneManager.GetActiveScene().name);
+
             GetComponent<PlayerCharacter>().enabled = true;
             if (IsLocalPlayer) // This checks if we are this instance's player object
             {

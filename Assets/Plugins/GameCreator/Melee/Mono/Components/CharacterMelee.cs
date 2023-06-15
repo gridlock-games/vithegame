@@ -211,8 +211,6 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
 
-        private bool hasInvokeSpawnOnActivate = false;
-        private int counter = 0;
         private void LateUpdate()
         {
             this.IsAttacking = false;
@@ -226,7 +224,6 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase();
                 this.IsAttacking = phase >= 0f;
-                hasInvokeSpawnOnActivate = false;
 
                 // Only want hit registration on the owner
                 if (!IsOwner) { return; }
