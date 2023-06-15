@@ -153,6 +153,8 @@
 
         private void SetFoot(Foot foot)
         {
+            if(foot == null) return;
+
             float weight = foot.GetWeight(this.animator);
 
             if (foot.hit)
