@@ -61,7 +61,6 @@
         {
             if (!Application.isPlaying) return;
             this.CharacterAwake();
-
             this.initSaveData = new SaveData()
             {
                 position = transform.position,
@@ -123,6 +122,130 @@
             this.CharacterUpdate();
         }
 
+        public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
+        {
+            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
+
+            characterLocomotion.SetDirectionalDirection(targetDirection);
+            float speed = characterLocomotion.currentLocomotionSystem.CalculateSpeed(targetDirection, characterLocomotion.characterController.isGrounded);
+            Quaternion targetRotation = characterLocomotion.currentLocomotionSystem.UpdateRotation(targetDirection);
+
+            characterLocomotion.currentLocomotionSystem.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
+            characterLocomotion.currentLocomotionSystem.UpdateSliding();
+
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, ILocomotionSystem.HORIZONTAL_PLANE), 1.0f);
+            targetDirection *= speed;
+
+            if (characterLocomotion.currentLocomotionSystem.isSliding) targetDirection = characterLocomotion.currentLocomotionSystem.slideDirection;
+            targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
+            
+            if (inputPayload.rootMotionResult.newMeleeClip)
+            {
+                rootMoveDeltaForward = 0;
+                rootMoveDeltaSides = 0;
+                rootMoveDeltaVertical = 0;
+            }
+
+            Vector3 movement;
+            if (inputPayload.rootMotionResult.apply) // If we are playing a melee clip
+            {
+                movement = new Vector3(
+                    inputPayload.rootMotionResult.rootMotionSides - rootMoveDeltaSides,
+                    inputPayload.rootMotionResult.rootMotionVertical - rootMoveDeltaVertical,
+                    inputPayload.rootMotionResult.rootMotionForward - rootMoveDeltaForward
+                );
+
+                Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
+                movement += (inputPayload.rootMotionResult.rootMoveGravity * verticalMovement) * (1f / NetworkManager.NetworkTickSystem.TickRate);
+                movement = inputPayload.rotation * movement;
+
+                rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
+                rootMoveDeltaSides = inputPayload.rootMotionResult.rootMotionSides;
+                rootMoveDeltaVertical = inputPayload.rootMotionResult.rootMotionVertical;
+            }
+            else // If we are just moving used WASD
+            {
+                movement = 1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection;
+            }
+
+            characterLocomotion.characterController.Move(movement);
+
+            if (IsOwner)
+                characterLocomotion.characterController.transform.rotation = targetRotation;
+            else
+                characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
+
+            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+        }
+
+        public struct RootMotionResult : INetworkSerializable
+        {
+            public bool apply;
+            public bool newMeleeClip;
+            public float rootMotionForward;
+            public float rootMotionSides;
+            public float rootMotionVertical;
+            public float rootMoveGravity;
+
+            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity)
+            {
+                this.apply = apply;
+                this.newMeleeClip = newMeleeClip;
+                this.rootMotionForward = rootMotionForward;
+                this.rootMotionSides = rootMotionSides;
+                this.rootMotionVertical = rootMotionVertical;
+                this.rootMoveGravity = rootMoveGravity;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref apply);
+                serializer.SerializeValue(ref newMeleeClip);
+
+                if (apply)
+                {
+                    serializer.SerializeValue(ref rootMotionForward);
+                    serializer.SerializeValue(ref rootMotionSides);
+                    serializer.SerializeValue(ref rootMotionVertical);
+                    serializer.SerializeValue(ref rootMoveGravity);
+                }
+            }
+        }
+
+        private bool setStartTick;
+        private int rootMotionStartTick;
+        private float rootMoveDeltaForward;
+        private float rootMoveDeltaSides;
+        private float rootMoveDeltaVertical;
+        private ILocomotionSystem.RootMotionInformation rootMotionInformation;
+        public RootMotionResult RootMotionTickUpdate(int tick)
+        {
+            bool newMeleeClip = setStartTick;
+            if (setStartTick)
+            {
+                rootMotionStartTick = tick;
+                setStartTick = false;
+            }
+
+            if (rootMotionInformation.rootMoveTickDuration == 0) return default;
+            if (tick > rootMotionStartTick + rootMotionInformation.rootMoveTickDuration) { return default; }
+
+            float t = (tick - rootMotionStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
+
+            float deltaForward = rootMotionInformation.rootMoveCurveForward.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+            float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+            float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
+
+            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity);
+        }
+
+        public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)
+        {
+            this.rootMotionInformation = rootMotionInformation;
+            setStartTick = true;
+        }
+
         public Vector3 GetMoveInputValue() { return moveInput.Value; }
 
         protected NetworkVariable<Vector3> moveInput = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -138,41 +261,21 @@
                     moveInput.Value = new Vector3(touchDirection.x, 0.0f, touchDirection.y);
                 }
 
-                moveInput.Value = new Vector3(
-                    Input.GetAxisRaw(AXIS_H),
-                    0.0f,
-                    Input.GetAxisRaw(AXIS_V)
-                );
-                
-                if (disableActions.Value) { moveInput.Value = Vector3.zero; }
-            }
-
-            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-            Vector3 moveDirection;
-            Vector3 targetDirection;
-            if (IsControllable())
-            {
-                if (!IsServer)
+                if (disableActions.Value)
                 {
-                    Vector3 relativePoint = networkTransform.GetPosition() - transform.position;
-                    if (relativePoint.magnitude < 0.1f)
-                        moveDirection = Vector3.zero;
-                    else
-                        moveDirection = relativePoint.normalized;
+                    moveInput.Value = Vector3.zero;
                 }
                 else
                 {
-                    moveDirection = transform.rotation * moveInput.Value;
+                    moveInput.Value = new Vector3(Input.GetAxisRaw(AXIS_H), 0, Input.GetAxisRaw(AXIS_V));
                 }
+            }
 
-                targetDirection = IsServer ? moveInput.Value : moveDirection;
-            }
-            else // If not controllable
-            {
-                moveDirection = Vector3.zero;
-                targetDirection = Vector3.zero;
-            }
-            
+            Vector3 moveDirection = transform.rotation * moveInput.Value;
+            if (!IsControllable()) { moveDirection = Vector3.zero; }
+
+            Vector3 targetDirection = IsOwner ? moveInput.Value : moveDirection;
+
             this.ComputeMovement(targetDirection);
 
             this.characterLocomotion.SetDirectionalDirection(moveDirection);

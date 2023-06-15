@@ -37,7 +37,7 @@
 
         // CONSTANT PROPERTIES: -------------------------------------------------------------------
 
-		protected static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1,0,1);
+		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
 
         private const string AXIS_MOUSE_X = "Mouse X";
         private const string AXIS_MOUSE_Y = "Mouse Y";
@@ -54,7 +54,7 @@
         public float pivotSpeed;
 
         public bool isSliding;
-        protected Vector3 slideDirection = Vector3.zero;
+        public Vector3 slideDirection { get; protected set; } = Vector3.zero;
 
         public bool isDashing { private set; get; }
         protected Vector3 dashVelocity = Vector3.zero;
@@ -78,6 +78,7 @@
         private float rootMoveImpulse;
         private float rootMoveGravity;
         private float rootMoveDuration;
+        private int rootMoveTickDuration;
 
         private float slidingValue;
         private float slidingSpeed;
@@ -88,6 +89,32 @@
         );
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public struct RootMotionInformation
+        {
+            public int rootMoveTickDuration;
+            public float animationDuration;
+            public float animationStartTime;
+            public AnimationCurve rootMoveCurveForward;
+            public AnimationCurve rootMoveCurveSides;
+            public AnimationCurve rootMoveCurveVertical;
+            public float rootMoveImpulse;
+            public float rootMoveGravity;
+
+            public RootMotionInformation(int rootMoveTickDuration, float animationDuration, float animationStartTime,
+                AnimationCurve rootMoveCurveForward, AnimationCurve rootMoveCurveSides, AnimationCurve rootMoveCurveVertical,
+                float rootMoveImpulse, float rootMoveGravity)
+            {
+                this.rootMoveTickDuration = rootMoveTickDuration;
+                this.animationDuration = animationDuration;
+                this.animationStartTime = animationStartTime;
+                this.rootMoveCurveForward = rootMoveCurveForward;
+                this.rootMoveCurveSides = rootMoveCurveSides;
+                this.rootMoveCurveVertical = rootMoveCurveVertical;
+                this.rootMoveImpulse = rootMoveImpulse;
+                this.rootMoveGravity = rootMoveGravity;
+            }
+        }
 
         public void Setup(CharacterLocomotion characterLocomotion)
         {
@@ -112,6 +139,8 @@
             this.isRootMoving = true;
             this.rootMoveImpulse = impulse;
             this.rootMoveStartTime = Time.time;
+
+            this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
             this.rootMoveDuration = duration;
             this.rootMoveGravity = gravityInfluence;
 
@@ -122,6 +151,13 @@
             this.rootMoveDeltaForward = 0f;
             this.rootMoveDeltaSides = 0f;
             this.rootMoveDeltaVertical = 0f;
+
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacter playerCharacter))
+            {
+                playerCharacter.OnRootMotionStart(new RootMotionInformation(rootMoveTickDuration, rootMoveDuration,
+                    rootMoveStartTime, rootMoveCurveForward, rootMoveCurveSides,
+                    rootMoveCurveVertical, rootMoveImpulse, rootMoveGravity));
+            }
         }
 
         public void StopRootMovement()
@@ -138,7 +174,8 @@
                 // TODO: Maybe add some drag?
                 if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
                 {
-                    this.isRootMoving = false;
+                    if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+                        this.isRootMoving = false;
                 }
             }
 
@@ -162,7 +199,7 @@
 
         // CHARACTER CONTROLLER METHODS: ----------------------------------------------------------
 
-        protected Quaternion UpdateRotation(Vector3 targetDirection)
+        public Quaternion UpdateRotation(Vector3 targetDirection)
         {
             Quaternion targetRotation = this.characterLocomotion.character.transform.rotation;
             this.aimDirection = this.characterLocomotion.character.transform.TransformDirection(Vector3.forward);
@@ -289,7 +326,7 @@
             return targetRotation;
         }
 
-        protected float CalculateSpeed(Vector3 targetDirection, bool isGrounded)
+        public float CalculateSpeed(Vector3 targetDirection, bool isGrounded)
         {
             float speed = (this.characterLocomotion.canRun
                 ? this.characterLocomotion.runSpeed
@@ -311,7 +348,7 @@
             return speed;
         }
 
-        protected virtual void UpdateAnimationConstraints(ref Vector3 targetDirection, ref Quaternion targetRotation)
+        public virtual void UpdateAnimationConstraints(ref Vector3 targetDirection, ref Quaternion targetRotation)
         {
             if (this.characterLocomotion.animatorConstraint == CharacterLocomotion.ANIM_CONSTRAINT.KEEP_MOVEMENT)
             {
@@ -329,7 +366,7 @@
             }
         }
 
-        protected virtual void UpdateSliding()
+        public virtual void UpdateSliding()
         {
             float slopeAngle = Vector3.Angle(Vector3.up, this.characterLocomotion.terrainNormal);
             bool frameSliding = (
@@ -360,6 +397,8 @@
 
         protected void UpdateRootMovement(Vector3 verticalMovement)
         {
+            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>()) { return; }
+
             float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
@@ -371,7 +410,7 @@
                 deltaForward - this.rootMoveDeltaForward
             );
 
-            movement += verticalMovement * this.rootMoveGravity * Time.deltaTime;
+            movement += Time.deltaTime * this.rootMoveGravity * verticalMovement;
 
             this.characterLocomotion.characterController.Move(
                 this.characterLocomotion.character.transform.TransformDirection(movement)
