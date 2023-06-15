@@ -65,10 +65,10 @@ namespace GameCreator.Melee
 
 
         // abilities
-        public Ability abilityA = new Ability();
-        public Ability abilityB = new Ability();
-        public Ability abilityC = new Ability();
-        public Ability abilityRage = new Ability();
+        public Ability abilityA;
+        public Ability abilityB;
+        public Ability abilityC;
+        public Ability abilityRage;
 
         // reactions:
         public List<MeleeClip> groundHitReactionsFront = new List<MeleeClip>();
