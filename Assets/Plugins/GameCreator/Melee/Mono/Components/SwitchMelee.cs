@@ -26,13 +26,19 @@ namespace GameCreator.Melee
             { KeyCode.Alpha5, WeaponType.SWORD }
         };
 
-        public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(); }
+        public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(_currentWeaponType.Value); }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
-        private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(); }
+        private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(current); }
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
         [SerializeField] private VisualEffect[] _switchWeaponVFX;
         
+        public void SwitchWeaponBeforeSpawn()
+        {
+            if (IsSpawned) { Debug.LogError("SwitchWeaponBeforeSpawn() should only be called when the object is not spawned"); return; }
+            SwitchWeapon(_currentWeaponType.Value);
+        }
+
         private void Awake()
         {
             _characterMelee = GetComponent<CharacterMelee>();
@@ -42,13 +48,7 @@ namespace GameCreator.Melee
 
         private void Start()
         {
-
-            if (_switchWeaponVFX != null)
-            {
-                StopVFX();
-            }
-            //_switchWeaponVFX.St();
-            
+            if (_switchWeaponVFX != null) { StopVFX(); }
         }
 
         private void LateUpdate()
@@ -103,7 +103,7 @@ namespace GameCreator.Melee
         }
 
         // Switch the character's melee weapon to the one specified by _currentWeaponType
-        void SwitchWeapon()
+        void SwitchWeapon(WeaponType weaponType)
         {
             if (!limbs) { Debug.LogError("No LimbReferences Component in Children of " + name + ". This object will not be able to switch weapons"); return; }
             //SetupWeaponType();
@@ -113,7 +113,7 @@ namespace GameCreator.Melee
 
             
             // Find the weapon from the WeaponMeleeSO asset based on the current weapon type
-            var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == _currentWeaponType.Value);
+            var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == weaponType);
             if (weapon != null)
             {
                 // Equip the new weapon and update the currentWeapon property of CharacterMelee

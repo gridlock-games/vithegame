@@ -59,6 +59,12 @@ public class AuthenticationController : MonoBehaviour
                 btn_StartGame.GetComponent<Button>().interactable = true;
                 infoDisplayText.SetText("");
             }
+
+            if (transitioningToCharacterSelect)
+            {
+                btn_StartGame.GetComponent<Button>().interactable = false;
+                infoDisplayText.SetText("Loading Character Select Screen, please wait...");
+            }
         }
     }
 
@@ -117,15 +123,16 @@ public class AuthenticationController : MonoBehaviour
     {
         if (PlayerPrefs.HasKey("email"))
         {
-            Debug.Log("Start Game");
-            //StartClient(clientIPAddressInput.text, displayNameInput.text);
-            //SceneManager.LoadScene("CharacterSelect");
+            transitioningToCharacterSelect = true;
+            StoreClient(clientIPAddressInput.text, displayNameInput.text);
+            SceneManager.LoadScene("CharacterSelect");
         }
     }
 
     private void StartServer(string targetIP)
     {
         NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+
         if (NetworkManager.Singleton.StartServer())
         {
             Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
@@ -133,21 +140,14 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    private bool StartClient(string targetIP, string displayName)
+    private void StoreClient(string targetIP, string displayName)
     {
-        if (displayName == "")
-        {
-            Debug.LogError("Please select a player name before starting");
-            return false;
-        }
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
-
         NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
-        if (NetworkManager.Singleton.StartClient())
-        {
-            Debug.Log("Started Client, looking for address: " + clientIPAddressInput.text);
-            return true;
-        }
-        return false;
+        //if (NetworkManager.Singleton.StartClient())
+        //{
+        //    Debug.Log("Started Client, looking for address: " + clientIPAddressInput.text);
+        //    return true;
+        //}
     }
 }

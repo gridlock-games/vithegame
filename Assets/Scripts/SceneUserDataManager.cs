@@ -33,8 +33,13 @@ public class SceneUserDataManager : MonoBehaviour
     private Boolean isPreviewActive = false;
 
     private Vector3 cameraDesc_InitPos;
-    private Quaternion charDesc_InitRot; 
-    private Quaternion char_InitRot; 
+    private Quaternion charDesc_InitRot;
+    private Quaternion char_InitRot;
+
+    public void ConnectToPlayerHub()
+    {
+
+    }
 
     void Start()
     {
@@ -115,32 +120,31 @@ public class SceneUserDataManager : MonoBehaviour
 
     public void SelectGameObject(GameObject selectedObject)
     {
-        if(isPreviewActive) return;
+        if (isPreviewActive) return;
 
         CreateCharacterModel charDesc = null;
 
-        if(this.selectedObject == null) {
+        if (this.selectedObject == null)
+        {
             charDesc = charactersList[0];
-        } else {
+        }
+        else
+        {
             Destroy(this.selectedObject, 0f);
             charDesc = charactersList.FirstOrDefault(model => model.characterName == selectedObject.name.Replace("(Clone)", ""));
         }
 
-        if(charDesc == null) return;
-        if(charDesc.characterObject == this.selectedObject) return;
+        if (charDesc == null) return;
+        if (charDesc.characterObject == this.selectedObject) return;
 
         Vector3 spawnPosition = startSpawnLoc.position;
 
         this.charDesc_Name.text = charDesc.characterName;
         this.charDesc_Lore.text = charDesc.characterDescription;
 
-
         // Store the selected game object
         this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-
-        if (NetworkManager.Singleton.IsServer) {
-            this.selectedObject.GetComponent<NetworkObject>().Spawn();
-        }
+        this.selectedObject.GetComponent<GameCreator.Melee.SwitchMelee>().SwitchWeaponBeforeSpawn();
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
@@ -221,7 +225,8 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
-    private void NextScene() {
+    private void NextScene()
+    {
         // Selected CharacterObject is this.selectedObject
     }
 }
