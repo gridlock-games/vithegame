@@ -144,10 +144,5 @@ public class AuthenticationController : MonoBehaviour
     {
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
         NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
-        //if (NetworkManager.Singleton.StartClient())
-        //{
-        //    Debug.Log("Started Client, looking for address: " + clientIPAddressInput.text);
-        //    return true;
-        //}
     }
 }

@@ -12,7 +12,7 @@ namespace LightPat.Core
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                Debug.Log(SceneManager.GetActiveScene().name);
+                //Debug.Log(SceneManager.GetActiveScene().name);
             }
         }
     }

@@ -34,8 +34,10 @@ public class SceneUserDataManager : MonoBehaviour
 
     public void ConnectToPlayerHub()
     {
-        Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
-        Debug.Log(NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+        if (NetworkManager.Singleton.StartClient())
+        {
+            Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+        }
     }
 
     void Start()
