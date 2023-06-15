@@ -30,25 +30,18 @@ public class SceneUserDataManager : MonoBehaviour
     private int currentIndex = -1;
     public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
-    private Boolean isPreviewActive = false;
-
-    private Vector3 cameraDesc_InitPos;
-    private Quaternion charDesc_InitRot;
-    private Quaternion char_InitRot;
+    private bool isPreviewActive = false;
 
     public void ConnectToPlayerHub()
     {
-
+        Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+        Debug.Log(NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
     }
 
     void Start()
     {
         this.datamanager = DataManager.Instance;
         mainCamera = Instantiate(cameraPrefab);
-
-        this.cameraDesc_InitPos = mainCamera.transform.position;
-        this.charDesc_InitRot = mainCamera.transform.rotation;
-
         this.InitDataReferences();
     }
 
@@ -68,7 +61,6 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void SpawnGameObjectsHorizontally()
     {
-        List<GameObject> placeholders = new List<GameObject>();
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
 
         for (int i = 0; i < charactersList.Count; i++)
@@ -76,7 +68,7 @@ public class SceneUserDataManager : MonoBehaviour
             gridImgPrefab.sprite = charactersList[i].characterImage;
             gridImgPrefab.gameObject.name = charactersList[i].characterName;
             gridImgPrefab.gameObject.SetActive(true);
-            GameObject newItem = Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
+            Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
         }
 
         this.SelectGameObject(null);
