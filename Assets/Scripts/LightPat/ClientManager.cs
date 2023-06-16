@@ -285,6 +285,7 @@ namespace LightPat.Core
 
         private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
         {
+            //if (IsSpawned) { Debug.LogError("ChangeLocalSceneThenStartClient() should only be called when the network manager is turned off"); yield break; }
             Debug.Log("Loading " + sceneName + " scene");
             SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 

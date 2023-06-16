@@ -52,11 +52,11 @@ namespace LightPat.UI
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true);
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Arena_ver2", true);
             }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Deathmatch", true);
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Arena_ver2", true);
             }
         }
 

@@ -29,21 +29,14 @@ namespace LightPat.Core
 
         private IEnumerator ConnectToLobby()
         {
+            Debug.Log("Shutting down NetworkManager");
             NetworkManager.Singleton.Shutdown();
-            Debug.Log("Shutdown started");
-            Debug.Log(NetworkManager.Singleton.ShutdownInProgress);
-            Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
-
             Debug.Log("Shutdown complete");
-            Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
-            Debug.Log(targetIP);
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
-
-            if (NetworkManager.Singleton.StartClient())
-            {
-                Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
-            }
+            Debug.Log("Switching to lobby scene: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            // Change the scene locally, then connect to the target IP
+            ClientManager.Singleton.ChangeLocalSceneThenStartClient("Lobby");
         }
 
         private string targetIP;
