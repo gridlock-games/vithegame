@@ -18,11 +18,10 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
+        [SerializeField] private GameObject[] crosshairs;
 
         public override void OnNetworkSpawn()
         {
-            Debug.Log(SceneManager.GetActiveScene().name);
-
             GetComponent<PlayerCharacter>().enabled = true;
             if (IsLocalPlayer) // This checks if we are this instance's player object
             {
@@ -40,16 +39,20 @@ namespace LightPat.Player
                 // Add the hook player component
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
-                Destroy(worldSpaceLabel);
+                // Deactivate crosshair in the player hub
+                foreach (GameObject crosshair in crosshairs)
+                {
+                    crosshair.SetActive(SceneManager.GetActiveScene().name != "Hub");
+                }
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
             {
                 worldSpaceLabel.SetActive(true);
+                worldSpaceLabel.GetComponent<UI.WorldSpaceLabel>().disableHealthbar = SceneManager.GetActiveScene().name == "Hub";
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 Destroy(playerHUD);
-                // If we are not the local player, display the name tag
             }
         }
 

@@ -11,6 +11,7 @@ namespace GameCreator.Melee
     using GameCreator.Variables;
     using GameCreator.Pool;
     using static GameCreator.Melee.MeleeClip;
+    using UnityEngine.SceneManagement;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -155,6 +156,9 @@ namespace GameCreator.Melee
 
         protected virtual void Update()
         {
+            if (SceneManager.GetActiveScene().name == "Hub")
+                SetInvincibility(1000);
+
             if (IsServer)
             {
                 this.UpdatePoise();

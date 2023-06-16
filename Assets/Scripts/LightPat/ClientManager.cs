@@ -118,7 +118,6 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
-            Debug.Log(SceneManager.GetActiveScene().name);
             if (SceneManager.GetActiveScene().name == "Hub")
             {
                 Vector3 spawnPosition = Vector3.zero;

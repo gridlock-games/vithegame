@@ -32,7 +32,7 @@ namespace GameCreator.Melee
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
 
         [SerializeField] private VisualEffect[] _switchWeaponVFX;
-        
+
         public WeaponType GetCurrentWeaponType()
         {
             return _currentWeaponType.Value;
@@ -98,7 +98,7 @@ namespace GameCreator.Melee
                 vfx.Stop();
             }
         }
-        
+
         void PlayVFX()
         {
             foreach (var vfx in _switchWeaponVFX)
@@ -116,7 +116,6 @@ namespace GameCreator.Melee
             // Unequip the current weapon before switching
             UnequipWeapon();
 
-            
             // Find the weapon from the WeaponMeleeSO asset based on the current weapon type
             var weapon = _weaponMeleeSO.weaponCollections.FirstOrDefault(x => x.weaponType == weaponType);
             if (weapon != null)
@@ -124,7 +123,7 @@ namespace GameCreator.Melee
                 // Equip the new weapon and update the currentWeapon property of CharacterMelee
                 _characterMelee.currentWeapon = weapon.meleeWeapon;
                 _characterMelee.currentShield = weapon.meleeWeapon.defaultShield;
-                
+
                 _characterMelee.DrawWeapon();
 
                 //_characterMelee.currentWeapon?.EquipNewWeapon(_characterMelee.CharacterAnimator);
@@ -142,7 +141,7 @@ namespace GameCreator.Melee
                 Destroy(asd.gameObject);
                 //Debug.Log($"{asd.gameObject.name} weaponClone");
             }
-            
+
             var qwe = limbs.leftHand.GetComponentInChildren<BladeComponent>();
             if (qwe != null)
             {
