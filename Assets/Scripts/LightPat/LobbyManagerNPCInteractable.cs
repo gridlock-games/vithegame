@@ -14,6 +14,7 @@ namespace LightPat.Core
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
 
+        private Button[] buttons;
         private bool localPlayerInRange;
         private Player.NetworkPlayer localPlayer;
 
@@ -48,17 +49,33 @@ namespace LightPat.Core
         private string targetIP;
         public void SetServerIP(string targetIP)
         {
+            int buttonIndex = System.Array.IndexOf(serverIPList, targetIP);
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (i == buttonIndex)
+                {
+                    buttons[i].interactable = false;
+                }
+                else
+                {
+                    buttons[i].interactable = true;
+                }
+            }
+
             this.targetIP = targetIP;
         }
 
         private void Start()
         {
-            foreach (string serverIP in serverIPList)
+            buttons = new Button[serverIPList.Length];
+            for (int i = 0; i < serverIPList.Length; i++)
             {
+                string serverIP = serverIPList[i];
                 GameObject serverButton = Instantiate(serverButtonPrefab, serverButtonParent);
                 serverButton.name = serverIP;
                 serverButton.GetComponentInChildren<TextMeshProUGUI>().SetText(serverIP);
                 serverButton.GetComponent<Button>().onClick.AddListener(() => SetServerIP(serverIP));
+                buttons[i] = serverButton.GetComponent<Button>();
             }
         }
 
