@@ -72,6 +72,9 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
+        
+        public float attackInterval = 0.10f;
+
         private NetworkVariable<float> Defense = new NetworkVariable<float>();
         private float defenseDelayCooldown;
 
@@ -239,127 +242,59 @@ namespace GameCreator.Melee
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         GameObject[] hits = blade.CaptureHits();
 
-                        // This is section is for stuff assuming you've hit something
-                        for (int i = 0; i < hits.Length; ++i)
-                        {
-                            int hitInstanceID = hits[i].GetInstanceID();
-
-                            if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
-                            if (hits[i].transform.IsChildOf(this.transform)) continue;
-
-                            HitResult hitResult = HitResult.ReceiveDamage;
-
-                            CharacterMelee targetMelee = hits[i].GetComponent<CharacterMelee>();
-                            MeleeClip attack = this.comboSystem.GetCurrentClip();
-
-                            GameObject g = hits[i].gameObject;
-
-                            // This is for checking if we are hitting an environment object
-                            if(g.tag == "Obstacle") {
-                                Vector3 position_attackWp = blade.GetImpactPosition();
-                                Vector3 position_attacker = this.transform.position;
-                            }
-
-                            if (targetMelee != null && !targetMelee.IsInvincible)
-                            {
-                                HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition());
-
-                                //if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
-                                //{
-                                //    targetMelee.knockedUpHitCount.Value = 0;
-                                //    if (attack.attackType != AttackType.Knockdown)
-                                //        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                                //    targetMelee.EventKnockedUpHitLimitReached.Invoke();
-                                //}
-
-                                //// Set Ailments here
-                                //switch (attack.attackType)
-                                //{
-                                //    case AttackType.Stun:
-                                //        targetMelee.Character.Stun(this.Character, targetMelee.Character);
-                                //        break;
-                                //    case AttackType.Knockdown:
-                                //        if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
-                                //            targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                                //        break;
-                                //    case AttackType.Knockedup:
-                                //        targetMelee.Character.Knockup(this.Character, targetMelee.Character);
-                                //        break;
-                                //    case AttackType.Stagger:
-                                //        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
-                                //        break;
-                                //    case AttackType.None:
-                                //        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
-                                //            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered) {
-                                //                targetMelee.Character.CancelAilment();
-                                //            }
-                                //        break;
-                                //}
-
-                                //if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
-                                //{
-                                //    targetMelee.knockedUpHitCount.Value++;
-                                //}
-
-                                //int previousHP = targetMelee.HP.Value;
-                                //if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
-                                //    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                                //    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown||
-                                //    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                                //{
-                                //    hitResult = targetMelee.OnReceiveAttack(this, attack, blade);
-                                //    if (hitResult == HitResult.ReceiveDamage)
-                                //        targetMelee.HP.Value -= attack.baseDamage;
-                                //    else if (hitResult == HitResult.PoiseBlock)
-                                //        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
-                                //}
-                                //else
-                                //{
-                                //    targetMelee.HP.Value -= attack.baseDamage;
-                                //}
-
-                                //// Send messages for stats in NetworkPlayer script
-                                //SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
-
-                                //if (targetMelee.HP.Value <= 0 & previousHP > 0)
-                                //{
-                                //    targetMelee.SendMessage("OnDeath", this);
-                                //    SendMessage("OnKill", targetMelee);
-                                //}
-                            }
-
-                            //IgniterMeleeOnReceiveAttack[] triggers = hits[i].GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
-
-                            //bool hitSomething = triggers.Length > 0;
-                            //if (hitSomething)
-                            //{
-                            //    for (int j = 0; j < triggers.Length; ++j)
-                            //    {
-                            //        triggers[j].OnReceiveAttack(this, attack, hitResult);
-                            //    }
-                            //}
-
-                            //if (hitSomething && attack != null && targetMelee != null)
-                            //{
-                            //    Vector3 position = blade.GetImpactPosition();
-                            //    attack.ExecuteActionsOnHit(position, hits[i].gameObject);
-                            //}
-
-                            //if (attack != null && attack.pushForce > float.Epsilon)
-                            //{
-                            //    Rigidbody[] rigidbodies = hits[i].GetComponents<Rigidbody>();
-                            //    for (int j = 0; j < rigidbodies.Length; ++j)
-                            //    {
-                            //        Vector3 direction = rigidbodies[j].transform.position - transform.position;
-                            //        rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
-                            //    }
-                            //}
-
-                            this.targetsEvaluated.Add(hitInstanceID);
-                        }
+                        StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
+        }
+
+        private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade) {
+            int hitInstanceID = 0;
+            int count = 0;
+
+            // Repeat the action on each attacked object for a specific number of times
+            // Perform the action on the attacked object
+                foreach (GameObject hit in hits)
+                {
+                    // Do something with the attacked object
+
+                    hitInstanceID = hit.GetInstanceID();
+
+                    if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
+                    if (hit.transform.IsChildOf(this.transform)) continue;
+
+                    HitResult hitResult = HitResult.ReceiveDamage;
+
+                    CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
+                    MeleeClip attack = this.comboSystem.GetCurrentClip();
+
+                    GameObject g = hit.gameObject;
+
+                    // This is for checking if we are hitting an environment object
+                    if(g.tag == "Obstacle") {
+                        Vector3 position_attackWp = blade.GetImpactPosition();
+                        Vector3 position_attacker = this.transform.position;
+                    }
+
+                    if (targetMelee != null && !targetMelee.IsInvincible)
+                    {
+                        HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition());
+                        count++;
+                        Debug.Log("HIT");
+                        Debug.Log(count);
+                    }
+
+                    this.targetsEvaluated.Add(hitInstanceID);
+                    
+                    // Wait for the specified interval before performing the action again
+                    yield return new WaitForSeconds(0.1f);
+
+                    
+                    
+                    if (count < attack.hitCount) {
+                        this.targetsEvaluated.Remove(hitInstanceID);
+                    }
+                }
         }
 
         [ServerRpc]
