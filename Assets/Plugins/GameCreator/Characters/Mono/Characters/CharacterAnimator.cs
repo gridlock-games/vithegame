@@ -210,8 +210,6 @@
 
             this.animator.transform.localRotation = rotation;
 
-            if (!character.IsSpawned) { return; }
-
             direction = Vector3.Scale(direction, Vector3.one * (1.0f / this.character.characterLocomotion.runSpeed));
 
             float paramMoveForwardSpeed = this.paramValues[HASH_MOVE_FORWARD_SPEED].Get(direction.z, 0.1f);

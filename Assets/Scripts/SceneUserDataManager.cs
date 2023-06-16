@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using GameCreator.Core;
-using GameCreator.Characters;
+using LightPat.Core;
+using GameCreator.Melee;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -21,29 +21,52 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private Text charDesc_Lore;
     [SerializeField] private GridLayoutGroup gridLayoutGroup;
     [SerializeField] private Image gridImgPrefab;
+    [SerializeField] private Text loadingText;
 
-    private GameObject currentSpotlight;
-    private GameObject currentCharDesc;
-    private GameObject mainCamera;
     private GameObject selectedObject;
     private List<GameObject> placeholderObjects = new List<GameObject>();
     private int currentIndex = -1;
     public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
-    private Boolean isPreviewActive = false;
+    private bool isPreviewActive = false;
+    private bool connectingToPlayerHub;
 
-    private Vector3 cameraDesc_InitPos;
-    private Quaternion charDesc_InitRot; 
-    private Quaternion char_InitRot; 
+    public void ConnectToPlayerHub()
+    {
+        if (connectingToPlayerHub) { return; }
+
+        string payloadString = "";
+        string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+
+        // Find player object by weapon type
+        for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
+        {
+            if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
+            {
+                payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
+                break;
+            }
+        }
+
+        if (payloadString == "")
+        {
+            Debug.LogError("Couldn't find a matching player prefab in ClientManager's list. Change the weapon type in switch melee of one of the player prefabs to match your chosen character's weapon type.");
+            return;
+        }
+
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
+        if (NetworkManager.Singleton.StartClient())
+        {
+            Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+            connectingToPlayerHub = true;
+            loadingText.text = "Connecting to player hub...";
+        }
+    }
 
     void Start()
     {
         this.datamanager = DataManager.Instance;
-        mainCamera = Instantiate(cameraPrefab);
-
-        this.cameraDesc_InitPos = mainCamera.transform.position;
-        this.charDesc_InitRot = mainCamera.transform.rotation;
-
+        Instantiate(cameraPrefab);
         this.InitDataReferences();
     }
 
@@ -63,7 +86,6 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void SpawnGameObjectsHorizontally()
     {
-        List<GameObject> placeholders = new List<GameObject>();
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
 
         for (int i = 0; i < charactersList.Count; i++)
@@ -71,7 +93,7 @@ public class SceneUserDataManager : MonoBehaviour
             gridImgPrefab.sprite = charactersList[i].characterImage;
             gridImgPrefab.gameObject.name = charactersList[i].characterName;
             gridImgPrefab.gameObject.SetActive(true);
-            GameObject newItem = Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
+            Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
         }
 
         this.SelectGameObject(null);
@@ -115,32 +137,31 @@ public class SceneUserDataManager : MonoBehaviour
 
     public void SelectGameObject(GameObject selectedObject)
     {
-        if(isPreviewActive) return;
+        if (isPreviewActive) return;
 
         CreateCharacterModel charDesc = null;
 
-        if(this.selectedObject == null) {
+        if (this.selectedObject == null)
+        {
             charDesc = charactersList[0];
-        } else {
+        }
+        else
+        {
             Destroy(this.selectedObject, 0f);
             charDesc = charactersList.FirstOrDefault(model => model.characterName == selectedObject.name.Replace("(Clone)", ""));
         }
 
-        if(charDesc == null) return;
-        if(charDesc.characterObject == this.selectedObject) return;
+        if (charDesc == null) return;
+        if (charDesc.characterObject == this.selectedObject) return;
 
         Vector3 spawnPosition = startSpawnLoc.position;
 
         this.charDesc_Name.text = charDesc.characterName;
         this.charDesc_Lore.text = charDesc.characterDescription;
 
-
         // Store the selected game object
         this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-
-        if (NetworkManager.Singleton.IsServer) {
-            this.selectedObject.GetComponent<NetworkObject>().Spawn();
-        }
+        this.selectedObject.GetComponent<SwitchMelee>().SwitchWeaponBeforeSpawn();
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
@@ -221,7 +242,8 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
-    private void NextScene() {
+    private void NextScene()
+    {
         // Selected CharacterObject is this.selectedObject
     }
 }
