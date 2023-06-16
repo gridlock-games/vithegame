@@ -19,8 +19,11 @@ namespace LightPat.Core
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
+        private static string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
+
+        public static string GetPayLoadParseString() { return payloadParseString; }
 
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
@@ -90,6 +93,10 @@ namespace LightPat.Core
         {
             _singleton = this;
             DontDestroyOnLoad(gameObject);
+        }
+
+        private void Start()
+        {
             foreach (GameObject g in playerPrefabOptions)
             {
                 NetworkManager.Singleton.AddNetworkPrefab(g);
@@ -110,6 +117,29 @@ namespace LightPat.Core
             AddClientRpc(valuePair.Key, valuePair.Value);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
+
+            if (SceneManager.GetActiveScene().name == "Hub")
+            {
+                Vector3 spawnPosition = Vector3.zero;
+                Quaternion spawnRotation = Quaternion.identity;
+
+                if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
+                {
+                    GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
+                    foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
+                    {
+                        if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                        {
+                            spawnPosition = teamSpawnPoint.spawnPosition;
+                            spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                            break;
+                        }
+                    }
+                }
+
+                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+                g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            }
         }
 
         void ClientDisconnectCallback(ulong clientId)
@@ -130,7 +160,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = SceneManager.GetActiveScene().name == "Lobby";
+            response.Approved = true;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -147,7 +177,11 @@ namespace LightPat.Core
             response.Pending = false;
 
             if (response.Approved)
-                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
+            {
+                string payload = System.Text.Encoding.ASCII.GetString(connectionData);
+                string[] payloadOptions = payload.Split(payloadParseString);
+                QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1])));
+            }
         }
 
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
@@ -276,11 +310,11 @@ namespace LightPat.Core
         public int deaths;
         public int damageDealt;
 
-        public ClientData(string clientName)
+        public ClientData(string clientName, int playerPrefabOptionIndex)
         {
             this.clientName = clientName;
             ready = false;
-            playerPrefabOptionIndex = 0;
+            this.playerPrefabOptionIndex = playerPrefabOptionIndex;
             team = Team.Red;
             spawnWeapons = new int[0];
             kills = 0;

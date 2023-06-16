@@ -6,6 +6,7 @@ using TMPro;
 using LightPat.Core;
 using GameCreator.Characters;
 using GameCreator.Melee;
+using UnityEngine.SceneManagement;
 
 namespace LightPat.Player
 {
@@ -17,6 +18,7 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject playerHUD;
+        [SerializeField] private GameObject[] crosshairs;
 
         public override void OnNetworkSpawn()
         {
@@ -37,16 +39,20 @@ namespace LightPat.Player
                 // Add the hook player component
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookPlayer>();
                 playerHUD.SetActive(true);
-                Destroy(worldSpaceLabel);
+                // Deactivate crosshair in the player hub
+                foreach (GameObject crosshair in crosshairs)
+                {
+                    crosshair.SetActive(SceneManager.GetActiveScene().name != "Hub");
+                }
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else // If we are not this instance's player object
             {
                 worldSpaceLabel.SetActive(true);
+                worldSpaceLabel.GetComponent<UI.WorldSpaceLabel>().disableHealthbar = SceneManager.GetActiveScene().name == "Hub";
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 Destroy(playerHUD);
-                // If we are not the local player, display the name tag
             }
         }
 
@@ -110,20 +116,18 @@ namespace LightPat.Player
             // Scoreboard
             if (Input.GetKeyDown(KeyCode.Tab))
             {
-                Debug.Log("Reached down");
                 if (!scoreboardInstance)
                     scoreboardInstance = Instantiate(scoreboardPrefab);
             }
             
             if (Input.GetKeyUp(KeyCode.Tab))
             {
-                Debug.Log("Reached up");
                 if (scoreboardInstance)
                     Destroy(scoreboardInstance);
             }
         }
 
-        [ServerRpc] private void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
+        [ServerRpc] public void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
 
         // Messages from Character Melee
         void OnDamageDealt(int damage)
