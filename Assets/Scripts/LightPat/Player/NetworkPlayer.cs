@@ -7,6 +7,7 @@ using LightPat.Core;
 using GameCreator.Characters;
 using GameCreator.Melee;
 using UnityEngine.SceneManagement;
+using GameCreator.Camera;
 
 namespace LightPat.Player
 {
@@ -20,6 +21,8 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerHUD;
         [SerializeField] private GameObject[] crosshairs;
 
+        public CameraMotorTypeAdventure cameraMotorInstance { get; private set; }
+
         public override void OnNetworkSpawn()
         {
             GetComponent<PlayerCharacter>().enabled = true;
@@ -32,8 +35,9 @@ namespace LightPat.Player
                 playerCamera.SetActive(true);
                 playerCamera.transform.SetParent(null, true);
                 playerCamera.AddComponent<GameCreator.Core.Hooks.HookCamera>();
-                var camControl = playerCamera.AddComponent<GameCreator.Camera.CameraController>();
-                camControl.currentCameraMotor = cameraMotor.GetComponent<GameCreator.Camera.CameraMotor>();
+                var camControl = playerCamera.AddComponent<CameraController>();
+                camControl.currentCameraMotor = cameraMotor.GetComponent<CameraMotor>();
+                cameraMotorInstance = (CameraMotorTypeAdventure)camControl.currentCameraMotor.cameraMotorType;
                 playerCamera.GetComponent<Camera>().enabled = true;
                 playerCamera.GetComponent<AudioListener>().enabled = true;
                 // Add the hook player component
@@ -98,14 +102,19 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
-                    DisableActionsServerRpc(true);
-                    Cursor.lockState = CursorLockMode.None;
-                    pauseInstance = Instantiate(pauseMenuPrefab);
+                    if (cameraMotorInstance.allowOrbitInput)
+                    {
+                        DisableActionsServerRpc(true);
+                        Cursor.lockState = CursorLockMode.None;
+                        cameraMotorInstance.allowOrbitInput = false;
+                        pauseInstance = Instantiate(pauseMenuPrefab);
+                    }
                 }
                 else
                 {
                     DisableActionsServerRpc(false);
                     Cursor.lockState = CursorLockMode.Locked;
+                    cameraMotorInstance.allowOrbitInput = true;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
                 }

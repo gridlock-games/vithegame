@@ -20,10 +20,12 @@ namespace LightPat.Core
                 {
                     lobbyManagerUI.SetActive(false);
                     localPlayer.DisableActionsServerRpc(false);
+                    localPlayer.cameraMotorInstance.allowOrbitInput = true;
                 }
                 else if (localPlayerInRange)
                 {
                     localPlayer.DisableActionsServerRpc(true);
+                    localPlayer.cameraMotorInstance.allowOrbitInput = false;
                     lobbyManagerUI.SetActive(true);
                 }
             }
