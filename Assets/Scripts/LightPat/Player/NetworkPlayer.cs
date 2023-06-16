@@ -116,14 +116,12 @@ namespace LightPat.Player
             // Scoreboard
             if (Input.GetKeyDown(KeyCode.Tab))
             {
-                Debug.Log("Reached down");
                 if (!scoreboardInstance)
                     scoreboardInstance = Instantiate(scoreboardPrefab);
             }
             
             if (Input.GetKeyUp(KeyCode.Tab))
             {
-                Debug.Log("Reached up");
                 if (scoreboardInstance)
                     Destroy(scoreboardInstance);
             }
