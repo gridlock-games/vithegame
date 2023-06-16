@@ -154,7 +154,11 @@ namespace LightPat.Core
             response.Pending = false;
 
             if (response.Approved)
-                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData), 0));
+            {
+                string payload = System.Text.Encoding.ASCII.GetString(connectionData);
+                string[] payloadOptions = payload.Split(payloadParseString);
+                QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1])));
+            }
         }
 
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }

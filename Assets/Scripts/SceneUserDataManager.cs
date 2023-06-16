@@ -21,6 +21,7 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private Text charDesc_Lore;
     [SerializeField] private GridLayoutGroup gridLayoutGroup;
     [SerializeField] private Image gridImgPrefab;
+    [SerializeField] private Text loadingText;
 
     private GameObject currentSpotlight;
     private GameObject currentCharDesc;
@@ -31,12 +32,16 @@ public class SceneUserDataManager : MonoBehaviour
     public float cameraDistance = 5.0f;
     private DataManager datamanager = new DataManager();
     private bool isPreviewActive = false;
+    private bool connectingToPlayerHub;
 
     public void ConnectToPlayerHub()
     {
+        if (connectingToPlayerHub) { return; }
+
         string payloadString = "";
         string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
 
+        // Find player object by weapon type
         for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
         {
             if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
@@ -46,10 +51,18 @@ public class SceneUserDataManager : MonoBehaviour
             }
         }
 
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
+        if (payloadString == "")
+        {
+            Debug.LogError("Couldn't find a matching player prefab in ClientManager's list. Change the weapon type in switch melee of one of the player prefabs to match your chosen character's weapon type.");
+            return;
+        }
+
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
         if (NetworkManager.Singleton.StartClient())
         {
             Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+            connectingToPlayerHub = true;
+            loadingText.text = "Connecting to player hub...";
         }
     }
 
