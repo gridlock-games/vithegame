@@ -112,6 +112,13 @@
         public Vector3 boxCastHalfExtents = new Vector3(2.0f, 1.0f, 2.0f);
 
 
+        // abilities
+
+        public int hitCount = 1;
+        public bool isSequence = false;
+        public List<MeleeClip> sequencedClips = new List<MeleeClip>();
+
+
         // animation:
         public float animSpeed = 1.0f;
         public AnimationCurve attackPhase = new AnimationCurve(
