@@ -33,9 +33,7 @@ namespace LightPat.UI
 
         public void LeaveLobby()
         {
-            Destroy(NetworkManager.Singleton.gameObject);
-            NetworkManager.Singleton.Shutdown();
-            SceneManager.LoadScene("StartMenu");
+            Application.Quit();
         }
 
         public void ToggleReady()
