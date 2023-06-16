@@ -23,7 +23,26 @@ namespace LightPat.Core
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
-            Debug.Log(Time.time + " Clicked " + targetIP);
+            StartCoroutine(ConnectToLobby());
+        }
+
+        private IEnumerator ConnectToLobby()
+        {
+            NetworkManager.Singleton.Shutdown();
+            Debug.Log("Shutdown started");
+            Debug.Log(NetworkManager.Singleton.ShutdownInProgress);
+            Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+
+            Debug.Log("Shutdown complete");
+            Debug.Log(System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            Debug.Log(targetIP);
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+
+            if (NetworkManager.Singleton.StartClient())
+            {
+                Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+            }
         }
 
         private string targetIP;
@@ -52,12 +71,14 @@ namespace LightPat.Core
                     lobbyManagerUI.SetActive(false);
                     localPlayer.DisableActionsServerRpc(false);
                     localPlayer.cameraMotorInstance.allowOrbitInput = true;
+                    Cursor.lockState = CursorLockMode.Locked;
                 }
                 else if (localPlayerInRange)
                 {
                     localPlayer.DisableActionsServerRpc(true);
                     localPlayer.cameraMotorInstance.allowOrbitInput = false;
                     lobbyManagerUI.SetActive(true);
+                    Cursor.lockState = CursorLockMode.None;
                 }
             }
         }
