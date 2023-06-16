@@ -136,13 +136,15 @@ namespace LightPat.UI
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
-            if (NetworkManager.Singleton.IsClient)
+            // Can't check if we are the client here, because the network manager may not be started yet if we are client
+            if (!NetworkManager.Singleton.IsServer)
                 StartCoroutine(WaitForClientConnection());
         }
 
         private IEnumerator WaitForClientConnection()
         {
             yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId));
+            playerModelDropdown.value = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex;
             UpdatePlayerDisplay();
             UpdateGameModeValue();
             primaryWeaponDropdown.value = 0;
