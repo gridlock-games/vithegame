@@ -8,6 +8,7 @@ using TMPro;
 using System.Net;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using LightPat.Core;
 
 public class AuthenticationController : MonoBehaviour
 {
@@ -142,7 +143,7 @@ public class AuthenticationController : MonoBehaviour
 
     private void StoreClient(string targetIP, string displayName)
     {
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
         NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
     }
 }

@@ -19,14 +19,17 @@ namespace LightPat.Core
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
+        private static string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
+
+        public static string GetPayLoadParseString() { return payloadParseString; }
 
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
-        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
+        public void QueueClient(ulong clientId, ClientData clientData) { Debug.Log("Queue client called"); queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
@@ -90,6 +93,10 @@ namespace LightPat.Core
         {
             _singleton = this;
             DontDestroyOnLoad(gameObject);
+        }
+
+        private void Start()
+        {
             foreach (GameObject g in playerPrefabOptions)
             {
                 NetworkManager.Singleton.AddNetworkPrefab(g);
@@ -130,7 +137,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = SceneManager.GetActiveScene().name == "Lobby";
+            response.Approved = true;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -147,7 +154,7 @@ namespace LightPat.Core
             response.Pending = false;
 
             if (response.Approved)
-                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData)));
+                QueueClient(clientId, new ClientData(System.Text.Encoding.ASCII.GetString(connectionData), 0));
         }
 
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
@@ -276,11 +283,11 @@ namespace LightPat.Core
         public int deaths;
         public int damageDealt;
 
-        public ClientData(string clientName)
+        public ClientData(string clientName, int playerPrefabOptionIndex)
         {
             this.clientName = clientName;
             ready = false;
-            playerPrefabOptionIndex = 0;
+            this.playerPrefabOptionIndex = playerPrefabOptionIndex;
             team = Team.Red;
             spawnWeapons = new int[0];
             kills = 0;

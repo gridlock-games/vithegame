@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using GameCreator.Core;
-using GameCreator.Characters;
+using LightPat.Core;
+using GameCreator.Melee;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -34,6 +34,19 @@ public class SceneUserDataManager : MonoBehaviour
 
     public void ConnectToPlayerHub()
     {
+        string payloadString = "";
+        string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+
+        for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
+        {
+            if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
+            {
+                payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
+                break;
+            }
+        }
+
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName);
         if (NetworkManager.Singleton.StartClient())
         {
             Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
@@ -138,7 +151,7 @@ public class SceneUserDataManager : MonoBehaviour
 
         // Store the selected game object
         this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
-        this.selectedObject.GetComponent<GameCreator.Melee.SwitchMelee>().SwitchWeaponBeforeSpawn();
+        this.selectedObject.GetComponent<SwitchMelee>().SwitchWeaponBeforeSpawn();
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")

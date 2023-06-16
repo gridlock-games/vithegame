@@ -33,6 +33,11 @@ namespace GameCreator.Melee
 
         [SerializeField] private VisualEffect[] _switchWeaponVFX;
         
+        public WeaponType GetCurrentWeaponType()
+        {
+            return _currentWeaponType.Value;
+        }
+
         public void SwitchWeaponBeforeSpawn()
         {
             if (IsSpawned) { Debug.LogError("SwitchWeaponBeforeSpawn() should only be called when the object is not spawned"); return; }
