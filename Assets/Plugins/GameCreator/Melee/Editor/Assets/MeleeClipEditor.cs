@@ -1,7 +1,7 @@
 ﻿namespace GameCreator.Melee
 {
-	using UnityEngine;
-	using UnityEditor;
+    using UnityEngine;
+    using UnityEditor;
     using GameCreator.Core;
     using GameCreator.Characters;
     using System;
@@ -9,8 +9,8 @@
 
     [CustomEditor(typeof(MeleeClip))]
     [CanEditMultipleObjects]
-	public class MeleeClipEditor : IMeleeEditor
-	{
+    public class MeleeClipEditor : IMeleeEditor
+    {
         private const float SEC_2_FPS = 30f;
         private const float FRAME_DISTANCE = 0.0335f;
         private const float SPACING = 2f;
@@ -45,6 +45,7 @@
         private Section sectionMotion;
         private Section sectionEffects;
         private Section sectionCombat;
+        private Section sectionAbilities;
 
         private SerializedProperty spAnimationClip;
         private SerializedProperty spAttackDodgeClip;
@@ -100,7 +101,12 @@
 
         private SerializedProperty spAttackSpawnVFX;
 
+        // abilities
+        private SerializedProperty spIsSequence;
+        private SerializedProperty spSequencedClips;
         private SerializedProperty spHitCount;
+
+        // end of abilities
 
         private int drawDragType;
 
@@ -129,6 +135,7 @@
             this.sectionMotion = new Section("Motion", this.LoadIcon("Animation"), this.Repaint);
             this.sectionEffects = new Section("Effects", this.LoadIcon("Effects"), this.Repaint);
             this.sectionCombat = new Section("Combat", this.LoadIcon("Animation"), this.Repaint);
+            this.sectionAbilities = new Section("Abilities", this.LoadIcon("Effects"), this.Repaint);
 
             this.spAnimationClip = this.serializedObject.FindProperty("animationClip");
             this.spAttackDodgeClip = this.serializedObject.FindProperty("attackDodgeClip");
@@ -164,13 +171,15 @@
 
             this.spIsAttack = this.serializedObject.FindProperty("isAttack");
             this.spIsModifyFocus = this.serializedObject.FindProperty("isModifyFocus");
+            this.spIsSequence = this.serializedObject.FindProperty("isSequence");
+            this.spSequencedClips = this.serializedObject.FindProperty("sequencedClips");
             this.spBoxCastHalfExtents = this.serializedObject.FindProperty("boxCastHalfExtents");
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
             this.spAttackType = this.serializedObject.FindProperty("attackType");
-            this.spIsDodge = this.serializedObject.FindProperty("isDodge"); 
+            this.spIsDodge = this.serializedObject.FindProperty("isDodge");
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
 
             this.spPoiseDamage = this.serializedObject.FindProperty("poiseDamage");
@@ -302,6 +311,10 @@
             GUILayout.Space(SPACING);
             this.PaintSectionCombat();
 
+             
+            GUILayout.Space(SPACING);
+            this.PaintSectionAbilities();
+
             this.serializedObject.ApplyModifiedProperties();
             this.serializedObject.Update();
 
@@ -361,13 +374,15 @@
                 if (group.visible)
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
-                    
-                    
-                    if(!this.spIsAttack.boolValue) {
+
+
+                    if (!this.spIsAttack.boolValue)
+                    {
                         EditorGUILayout.PropertyField(this.spIsDodge);
                     }
-                    
-                    if(this.spIsDodge.boolValue) {
+
+                    if (this.spIsDodge.boolValue)
+                    {
                         EditorGUILayout.Space();
                         EditorGUILayout.LabelField("Dodge from Idle", EditorStyles.boldLabel);
                     }
@@ -397,12 +412,13 @@
                     EditorGUILayout.PropertyField(this.spMovementMultiplier);
                     EditorGUILayout.PropertyField(this.spGravityInfluence);
 
-                    if(this.spIsDodge.boolValue) {
+                    if (this.spIsDodge.boolValue)
+                    {
                         EditorGUILayout.Space();
                         EditorGUILayout.Space();
                         EditorGUILayout.LabelField("Dodge from Attack", EditorStyles.boldLabel);
                         EditorGUILayout.Space();
-                        
+
                         EditorGUILayout.PropertyField(this.spAttackDodgeClip);
                         EditorGUILayout.Space();
 
@@ -427,7 +443,7 @@
                         EditorGUILayout.Space();
                         EditorGUILayout.PropertyField(this.spMovementMultiplier_OnAttack);
                         EditorGUILayout.PropertyField(this.spGravityInfluence_OnAttack);
-                        
+
                         EditorGUILayout.Space();
                         EditorGUILayout.Space();
                     }
@@ -466,6 +482,27 @@
             }
         }
 
+        private void PaintSectionAbilities()
+        {
+            this.sectionAbilities.PaintSection();
+            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionAbilities.state.faded))
+            {
+                if (group.visible)
+                {
+                    EditorGUILayout.PropertyField(this.spIsSequence);
+
+                    if (this.spIsSequence.boolValue == false)
+                    {
+                        EditorGUILayout.PropertyField(this.spHitCount);
+                    } else {
+                        
+                        EditorGUILayout.PropertyField(this.spSequencedClips);
+                    }
+                }
+            }
+
+        }
+
         private void PaintSectionCombat()
         {
             this.sectionCombat.PaintSection();
@@ -478,18 +515,15 @@
                     EditorGUILayout.PropertyField(this.spIsAttack);
                     EditorGUI.BeginDisabledGroup(!this.spIsAttack.boolValue);
                     EditorGUI.indentLevel++;
-
-                    
-                    EditorGUILayout.PropertyField(this.spHitCount);
                     EditorGUILayout.PropertyField(this.spIsLunge);
                     EditorGUILayout.PropertyField(this.spIsModifyFocus);
-                    
+
                     EditorGUI.BeginDisabledGroup(!this.spIsModifyFocus.boolValue);
-                    
+
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(this.spBoxCastHalfExtents);
                     EditorGUI.indentLevel--;
-                    
+
                     EditorGUI.EndDisabledGroup();
 
 
@@ -637,9 +671,12 @@
 
                             curve = this.ProcessRootCurve(curve);
 
-                            if(!isAttackDodge) {
+                            if (!isAttackDodge)
+                            {
                                 this.spMovementSides.animationCurveValue = curve;
-                            }else {
+                            }
+                            else
+                            {
                                 this.spMovementSides_OnAttack.animationCurveValue = curve;
                             }
                         }
@@ -653,9 +690,12 @@
 
                             curve = this.ProcessRootCurve(curve);
 
-                            if(!isAttackDodge) {
+                            if (!isAttackDodge)
+                            {
                                 this.spMovementVertical.animationCurveValue = curve;
-                            }else {
+                            }
+                            else
+                            {
                                 this.spMovementVertical_OnAttack.animationCurveValue = curve;
                             }
                         }
@@ -669,9 +709,12 @@
 
                             curve = this.ProcessRootCurve(curve);
 
-                            if(!isAttackDodge) {
+                            if (!isAttackDodge)
+                            {
                                 this.spMovementForward.animationCurveValue = curve;
-                            }else {
+                            }
+                            else
+                            {
                                 this.spMovementForward_OnAttack.animationCurveValue = curve;
                             }
                         }
@@ -682,7 +725,7 @@
 
         private AnimationCurve ProcessRootCurve(AnimationCurve source)
         {
-            
+
             MeleeClip meleeClip = this.target as MeleeClip;
             float value = source.Evaluate(0f);
             float duration = source.keys[source.length - 1].time;
@@ -831,8 +874,8 @@
 
                 switch (diffMin >= diffMax)
                 {
-                    case true  : this.timeline = attackPhaseMin; break;
-                    case false : this.timeline = attackPhaseMax; break;
+                    case true: this.timeline = attackPhaseMin; break;
+                    case false: this.timeline = attackPhaseMax; break;
                 }
 
                 spAttackPhase.animationCurveValue = this.CreateAttackPhase(
@@ -930,7 +973,7 @@
 
         private void PaintActionsOnActivate()
         {
-            if(this.actionOnActivate == null) 
+            if (this.actionOnActivate == null)
             {
                 this.actionOnActivate = Editor.CreateEditor(
                     this.spActionsOnActivate.objectReferenceValue

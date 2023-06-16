@@ -194,6 +194,7 @@ namespace GameCreator.Melee
                             }
                         }
 
+                        
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
 
@@ -206,11 +207,31 @@ namespace GameCreator.Melee
 
                         this.Blades.ForEach(blade => blade.isOrbitLocked = meleeClip.isOrbitLocked);
 
-                        this.currentMeleeClip.Play(this);
+                        if(!this.currentMeleeClip.isSequence) {
+                            this.currentMeleeClip.Play(this);
 
-                        if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
+                            if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
+                        } else if (this.currentMeleeClip.isSequence) {
+                            StartCoroutine(SequenceClipPlayHandler(currentMeleeClip));
+                        }
                     }
                 }
+            }
+        }
+
+        private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent) {
+            List<MeleeClip> sequenceChildren = sequenceClipParent.sequencedClips;
+            
+
+            this.comboSystem.StartAttackTime(false);
+
+            foreach(MeleeClip clip in sequenceChildren) {
+                this.currentMeleeClip = clip;
+                this.comboSystem.StartAttackTime(true);
+                clip.Play(this);
+
+                if (this.EventAttack != null) this.EventAttack.Invoke(clip);
+                yield return new WaitForSeconds(clip.animationClip.length);
             }
         }
 
@@ -229,7 +250,8 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
-                int phase = this.comboSystem.GetCurrentPhase();
+                int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
+
                 this.IsAttacking = phase >= 0f;
 
                 // Only want hit registration on the owner
@@ -266,7 +288,7 @@ namespace GameCreator.Melee
                     HitResult hitResult = HitResult.ReceiveDamage;
 
                     CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
-                    MeleeClip attack = this.comboSystem.GetCurrentClip();
+                    MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
 
                     GameObject g = hit.gameObject;
 
@@ -302,7 +324,7 @@ namespace GameCreator.Melee
         {
             HitResult hitResult = HitResult.ReceiveDamage;
             CharacterMelee targetMelee = NetworkManager.SpawnManager.SpawnedObjects[targetMeleeNetworkObjId].GetComponent<CharacterMelee>();
-            MeleeClip attack = comboSystem.GetCurrentClip();
+            MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
 
             if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
             {
@@ -947,7 +969,7 @@ namespace GameCreator.Melee
         void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition)
         {
             CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CharacterMelee>();
-            MeleeClip attack = attacker.comboSystem.GetCurrentClip();
+            MeleeClip attack = attacker.comboSystem.GetCurrentClip() ? attacker.comboSystem.GetCurrentClip() : attacker.currentMeleeClip;
 
             Character assailant = attacker.Character;
             CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();

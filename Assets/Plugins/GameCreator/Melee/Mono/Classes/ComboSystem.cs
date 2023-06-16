@@ -83,6 +83,13 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void StartAttackTime(bool start) {
+            if(start) {
+                this.startAttackTime = Time.time;
+            } else {
+                this.startAttackTime = -100f;
+            }
+        }
         public int GetCurrentPhase()
         {
             float prevTime = Time.time - this.startAttackTime;
@@ -94,6 +101,21 @@
             if (prevTime < this.currentCombo.meleeClip.Length)
             {
                 currentPhase = this.currentCombo.meleeClip.attackPhase.Evaluate(prevTime);
+            }
+
+            return Mathf.RoundToInt(currentPhase);
+        }
+
+        public int GetCurrentPhase(MeleeClip meleeClip)
+        {
+            float prevTime = Time.time - this.startAttackTime;
+            float currentPhase = -1f;
+            
+            if (meleeClip == null) return Mathf.RoundToInt(currentPhase);
+
+            if (prevTime < meleeClip.Length)
+            {
+                currentPhase = meleeClip.attackPhase.Evaluate(prevTime);
             }
 
             return Mathf.RoundToInt(currentPhase);
