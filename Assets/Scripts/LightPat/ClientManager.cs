@@ -29,7 +29,7 @@ namespace LightPat.Core
 
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
-        public void QueueClient(ulong clientId, ClientData clientData) { Debug.Log("Queue client called"); queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
+        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
@@ -117,6 +117,30 @@ namespace LightPat.Core
             AddClientRpc(valuePair.Key, valuePair.Value);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
+
+            Debug.Log(SceneManager.GetActiveScene().name);
+            if (SceneManager.GetActiveScene().name == "Hub")
+            {
+                Vector3 spawnPosition = Vector3.zero;
+                Quaternion spawnRotation = Quaternion.identity;
+
+                if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
+                {
+                    GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
+                    foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
+                    {
+                        if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
+                        {
+                            spawnPosition = teamSpawnPoint.spawnPosition;
+                            spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                            break;
+                        }
+                    }
+                }
+
+                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+                g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            }
         }
 
         void ClientDisconnectCallback(ulong clientId)

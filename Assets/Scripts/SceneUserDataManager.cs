@@ -23,9 +23,6 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private Image gridImgPrefab;
     [SerializeField] private Text loadingText;
 
-    private GameObject currentSpotlight;
-    private GameObject currentCharDesc;
-    private GameObject mainCamera;
     private GameObject selectedObject;
     private List<GameObject> placeholderObjects = new List<GameObject>();
     private int currentIndex = -1;
@@ -69,7 +66,7 @@ public class SceneUserDataManager : MonoBehaviour
     void Start()
     {
         this.datamanager = DataManager.Instance;
-        mainCamera = Instantiate(cameraPrefab);
+        Instantiate(cameraPrefab);
         this.InitDataReferences();
     }
 
