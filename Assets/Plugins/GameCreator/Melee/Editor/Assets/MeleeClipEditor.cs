@@ -100,6 +100,8 @@
 
         private SerializedProperty spAttackSpawnVFX;
 
+        private SerializedProperty spHitCount;
+
         private int drawDragType;
 
         private bool initStyles = true;
@@ -166,6 +168,7 @@
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
+            this.spHitCount = this.serializedObject.FindProperty("hitCount");
             this.spAttackType = this.serializedObject.FindProperty("attackType");
             this.spIsDodge = this.serializedObject.FindProperty("isDodge"); 
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
@@ -477,6 +480,7 @@
                     EditorGUI.indentLevel++;
 
                     
+                    EditorGUILayout.PropertyField(this.spHitCount);
                     EditorGUILayout.PropertyField(this.spIsLunge);
                     EditorGUILayout.PropertyField(this.spIsModifyFocus);
                     

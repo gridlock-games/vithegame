@@ -111,6 +111,8 @@
         public bool isModifyFocus = false;
         public Vector3 boxCastHalfExtents = new Vector3(2.0f, 1.0f, 2.0f);
 
+        public int hitCount = 1;
+
 
         // animation:
         public float animSpeed = 1.0f;
