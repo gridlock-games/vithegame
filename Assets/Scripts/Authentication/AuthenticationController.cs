@@ -130,8 +130,11 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
+    private bool startServerCalled;
     private void StartServer(string targetIP)
     {
+        if (startServerCalled) { return; }
+        startServerCalled = true;
         NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
 
         if (NetworkManager.Singleton.StartServer())

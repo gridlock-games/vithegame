@@ -280,6 +280,21 @@ namespace LightPat.Core
 
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
+
+        public void ChangeLocalSceneThenStartClient(string sceneName) { StartCoroutine(ChangeLocalSceneThenStartClientCoroutine(sceneName)); }
+
+        private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
+        {
+            Debug.Log("Loading " + sceneName + " scene");
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+
+            if (NetworkManager.Singleton.StartClient())
+            {
+                Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+            }
+        }
     }
 
     public struct ClientData : INetworkSerializable
