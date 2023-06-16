@@ -10,6 +10,7 @@ namespace LightPat.Core
         [SerializeField] private GameObject lobbyManagerUI;
 
         private bool localPlayerInRange;
+        private Player.NetworkPlayer localPlayer;
 
         private void Update()
         {
@@ -18,9 +19,11 @@ namespace LightPat.Core
                 if (lobbyManagerUI.activeInHierarchy)
                 {
                     lobbyManagerUI.SetActive(false);
+                    localPlayer.DisableActionsServerRpc(false);
                 }
                 else if (localPlayerInRange)
                 {
+                    localPlayer.DisableActionsServerRpc(true);
                     lobbyManagerUI.SetActive(true);
                 }
             }
@@ -32,6 +35,7 @@ namespace LightPat.Core
             {
                 if (netObj.IsLocalPlayer)
                 {
+                    localPlayer = netObj.GetComponent<Player.NetworkPlayer>();
                     localPlayerInRange = true;
                 }
             }
@@ -44,6 +48,7 @@ namespace LightPat.Core
                 if (netObj.IsLocalPlayer)
                 {
                     lobbyManagerUI.SetActive(false);
+                    localPlayer = null;
                     localPlayerInRange = false;
                 }
             }

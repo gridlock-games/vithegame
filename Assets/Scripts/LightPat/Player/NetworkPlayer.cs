@@ -127,7 +127,7 @@ namespace LightPat.Player
             }
         }
 
-        [ServerRpc] private void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
+        [ServerRpc] public void DisableActionsServerRpc(bool disableActions) { GetComponent<Character>().disableActions.Value = disableActions; }
 
         // Messages from Character Melee
         void OnDamageDealt(int damage)
