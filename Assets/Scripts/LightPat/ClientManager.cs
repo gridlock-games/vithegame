@@ -49,6 +49,8 @@ namespace LightPat.Core
         {
             lobbyLeaderId.OnValueChanged -= OnLobbyLeaderChanged;
             randomSeed.OnValueChanged -= OnRandomSeedChange;
+
+            clientDataDictionary = new Dictionary<ulong, ClientData>();
         }
 
         private void OnRandomSeedChange(int prev, int current) { Random.InitState(current); }
