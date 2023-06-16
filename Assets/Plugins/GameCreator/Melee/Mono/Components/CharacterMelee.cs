@@ -1223,6 +1223,17 @@ namespace GameCreator.Melee
             return hitLocation;
         }
 
+        private Boolean IsTargetInFront(float attackVectorAngle)
+        {
+            // checked if within 20 deg
+            if (attackVectorAngle <= 10.00f && attackVectorAngle >= -10.00f)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public bool Grab(CharacterMelee targetCharacter)
         {
             CharacterMelee executorCharacter = this;
@@ -1314,7 +1325,7 @@ namespace GameCreator.Melee
             
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
 
-            if (GetHitLocation(attackVectorAngle) != MeleeWeapon.HitLocation.FrontMiddle) return;
+            if (IsTargetInFront(attackVectorAngle) == false) return;
 
             // If we have a target character, then look at them
             Vector3 relativePos = target.position - characterCamera.position;
