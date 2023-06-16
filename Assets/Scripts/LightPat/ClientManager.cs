@@ -120,24 +120,7 @@ namespace LightPat.Core
 
             if (SceneManager.GetActiveScene().name == "Hub")
             {
-                Vector3 spawnPosition = Vector3.zero;
-                Quaternion spawnRotation = Quaternion.identity;
-
-                if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
-                {
-                    GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
-                    foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
-                    {
-                        if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
-                        {
-                            spawnPosition = teamSpawnPoint.spawnPosition;
-                            spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                            break;
-                        }
-                    }
-                }
-
-                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
                 g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
             }
         }
