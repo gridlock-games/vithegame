@@ -49,6 +49,8 @@ namespace LightPat.Core
         {
             lobbyLeaderId.OnValueChanged -= OnLobbyLeaderChanged;
             randomSeed.OnValueChanged -= OnRandomSeedChange;
+
+            clientDataDictionary = new Dictionary<ulong, ClientData>();
         }
 
         private void OnRandomSeedChange(int prev, int current) { Random.InitState(current); }
@@ -120,24 +122,7 @@ namespace LightPat.Core
 
             if (SceneManager.GetActiveScene().name == "Hub")
             {
-                Vector3 spawnPosition = Vector3.zero;
-                Quaternion spawnRotation = Quaternion.identity;
-
-                if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
-                {
-                    GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
-                    foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
-                    {
-                        if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
-                        {
-                            spawnPosition = teamSpawnPoint.spawnPosition;
-                            spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                            break;
-                        }
-                    }
-                }
-
-                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
                 g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
             }
         }
@@ -296,6 +281,22 @@ namespace LightPat.Core
             GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
 
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+        }
+
+        public void ChangeLocalSceneThenStartClient(string sceneName) { StartCoroutine(ChangeLocalSceneThenStartClientCoroutine(sceneName)); }
+
+        private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
+        {
+            //if (IsSpawned) { Debug.LogError("ChangeLocalSceneThenStartClient() should only be called when the network manager is turned off"); yield break; }
+            Debug.Log("Loading " + sceneName + " scene");
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+
+            if (NetworkManager.Singleton.StartClient())
+            {
+                Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
+            }
         }
     }
 
