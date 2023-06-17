@@ -222,7 +222,7 @@ namespace GameCreator.Melee
         private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent) {
             List<MeleeClip> sequenceChildren = sequenceClipParent.sequencedClips;
             
-
+            // Reset attack time first
             this.comboSystem.StartAttackTime(false);
 
             foreach(MeleeClip clip in sequenceChildren) {
@@ -302,8 +302,6 @@ namespace GameCreator.Melee
                     {
                         HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition());
                         count++;
-                        Debug.Log("HIT");
-                        Debug.Log(count);
                     }
 
                     this.targetsEvaluated.Add(hitInstanceID);
@@ -313,7 +311,7 @@ namespace GameCreator.Melee
 
                     
                     
-                    if (count < attack.hitCount) {
+                    if (attack && count < attack.hitCount) {
                         this.targetsEvaluated.Remove(hitInstanceID);
                     }
                 }

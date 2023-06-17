@@ -370,6 +370,11 @@
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(0f, false));
                         break;
+                        
+                    case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
+                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        StartCoroutine(StartSunAfterDuration(0f, false));
+                        break;
 
                     default:
                         this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
@@ -576,6 +581,19 @@
             }
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered, null, waitForClientRotation);
+        }
+
+        /* Pause for a given duration if the target character is coming from another ailment
+        Ailments: Stun*/
+        private IEnumerator StartSunAfterDuration(float duration, bool waitForClientRotation)
+        {
+            float initTime = Time.time;
+            while (initTime + duration >= Time.time)
+            {
+                yield return null;
+            }
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null, waitForClientRotation);
         }
 
         /* This is needed so that the character won't immediatley go through 

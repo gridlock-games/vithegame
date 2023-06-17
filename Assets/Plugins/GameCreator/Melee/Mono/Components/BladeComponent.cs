@@ -162,7 +162,8 @@
 
                 case  1:
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
-                    if(!isActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                    
+                    if(clip != null && this.weaponBone != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone)) {
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }
@@ -317,6 +318,7 @@
 
             this.prevBoxBounds = currentBoxData;
             List<GameObject> candidates = new List<GameObject>();
+            MeleeClip clip = this.Melee.currentMeleeClip;
             
             for (int i = 0; i < boxInterframeCaptures.Length; ++i)
             {
@@ -324,7 +326,7 @@
                 
                 int numCollisions = Physics.OverlapBoxNonAlloc(
                     this.boxInterframeCaptures[i].center,
-                    this.boxSize / 2f,
+                    (this.boxSize * (clip != null ? clip.bladeSizeMultiplier : 1.0f)) / 2f,
                     this.bufferColliders,
                     this.boxInterframeCaptures[i].rotation,
                     this.layerMask,
@@ -363,6 +365,9 @@
             }
             #endif
 
+            
+            MeleeClip clip = this.Melee.currentMeleeClip;
+
             switch (this.captureHits)
             {
                 case CaptureHitModes.Segment:
@@ -398,9 +403,11 @@
                     Vector3 center = transform.TransformPoint(this.boxCenter);
                     Matrix4x4 gizmosMatrix = Gizmos.matrix;
                     Gizmos.matrix = transform.localToWorldMatrix;
+
+                    
                     if (isHitActive)
                     {
-                        Gizmos.DrawCube(this.boxCenter, this.boxSize);
+                        Gizmos.DrawCube(this.boxCenter, this.boxSize * (clip != null ? clip.bladeSizeMultiplier : 1.0f));
 
                         for (int i = 0; i < this.boxInterframeCaptures.Length; ++i)
                         {
@@ -415,13 +422,13 @@
                                 Vector3.one
                             );
                             
-                            Gizmos.DrawWireCube(Vector3.zero, this.boxSize);
+                            Gizmos.DrawWireCube(Vector3.zero, this.boxSize * (clip != null ? clip.bladeSizeMultiplier : 1.0f));
                         }
                     }
                     else
                     {
                         
-                        Gizmos.DrawWireCube(this.boxCenter, this.boxSize);
+                        Gizmos.DrawWireCube(this.boxCenter, this.boxSize * (clip != null ? clip.bladeSizeMultiplier : 1.0f));
                     }
 
                     Gizmos.matrix = gizmosMatrix;

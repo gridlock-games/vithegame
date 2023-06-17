@@ -67,6 +67,9 @@
             if(melee.currentWeapon.abilityB != null) {
                 abilityBImageFill.sprite = melee.currentWeapon.abilityB.skillImageFill;
             }
+            if(melee.currentWeapon.abilityC != null) {
+                abilityCImageFill.sprite = melee.currentWeapon.abilityC.skillImageFill;
+            }
         }
     }
 }

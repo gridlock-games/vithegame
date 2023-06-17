@@ -81,6 +81,7 @@
         private SerializedProperty spIsModifyFocus;
         private SerializedProperty spBoxCastHalfExtents;
         private SerializedProperty spIsHeavy;
+        private SerializedProperty spBladeMultiplier;
         private SerializedProperty spIsOrbitLocked;
         private SerializedProperty spIsLunge;
         private SerializedProperty spAttackType;
@@ -175,6 +176,7 @@
             this.spSequencedClips = this.serializedObject.FindProperty("sequencedClips");
             this.spBoxCastHalfExtents = this.serializedObject.FindProperty("boxCastHalfExtents");
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
+            this.spBladeMultiplier = this.serializedObject.FindProperty("bladeSizeMultiplier"); 
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
@@ -530,6 +532,7 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
+                    EditorGUILayout.PropertyField(this.spBladeMultiplier);
 
                     EditorGUILayout.PropertyField(this.spAttackType);
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
