@@ -372,7 +372,7 @@
             #endif
 
             
-            MeleeClip clip = this.Melee.currentMeleeClip;
+            MeleeClip clip = this.Melee ? this.Melee.currentMeleeClip : new MeleeClip();
 
             switch (this.captureHits)
             {

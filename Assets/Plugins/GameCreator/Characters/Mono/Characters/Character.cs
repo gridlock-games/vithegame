@@ -200,7 +200,7 @@
         }
 
         // UPDATE: --------------------------------------------------------------------------------
-
+        
         private void Update()
         {
             if (!Application.isPlaying) return;
@@ -681,8 +681,8 @@
                     break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
-                    if (melee.currentWeapon.knockbackReaction[0])
-                        melee.currentWeapon.knockbackReaction[0].Play(melee);
+                    if (melee.currentWeapon.knockbackF)
+                        melee.currentWeapon.knockbackF.Play(melee);
                     melee.SetInvincibility(6.50f);
                     break;
                 

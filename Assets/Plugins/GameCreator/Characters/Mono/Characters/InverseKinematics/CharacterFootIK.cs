@@ -108,6 +108,9 @@
             if (this.character == null || this.characterAnimator == null) return;
             if (this.character.IsRagdoll()) return;
 
+            int originalLayer = gameObject.layer;
+            gameObject.layer = LayerMask.NameToLayer("Character");
+
             this.eventBeforeIK.Invoke(layerIndex);
 
             if (!this.characterAnimator.useFootIK) return;
@@ -121,6 +124,7 @@
                 SetFoot(this.rightFoot);
             }
 
+            gameObject.layer = originalLayer;
             this.eventAfterIK.Invoke(layerIndex);
         }
 
