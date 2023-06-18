@@ -157,6 +157,9 @@
 
                 case  0:
                     this.EventAttackStart.Invoke();
+                    if(Melee.count > 0) {
+                     Melee.count = 0;
+                    };
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
                     break;
 
@@ -164,6 +167,8 @@
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
                     
                     if(clip != null && this.weaponBone != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone)) {
+
+                        if(clip.name == "Atk_Skill_Hammer_01_C") Debug.Log("I am running");
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }
@@ -175,6 +180,7 @@
                     if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
+                    Melee.count = 0;
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
                     this.EventAttackRecovery.Invoke();
                     break;

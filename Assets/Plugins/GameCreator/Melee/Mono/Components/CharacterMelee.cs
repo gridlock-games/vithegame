@@ -238,7 +238,8 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
-
+        
+        public int count = 0;
         private void LateUpdate()
         {
             this.IsAttacking = false;
@@ -259,31 +260,30 @@ namespace GameCreator.Melee
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
-                    foreach (var blade in this.Blades)
+                    GameObject[] hits;
+                    foreach (BladeComponent blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
-                        GameObject[] hits = blade.CaptureHits();
-
-                        StartCoroutine(ProcessAttackedObjects(hits, blade));
+                        hits = blade.CaptureHits();
+                        
+                        if(this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
         }
 
         private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade) {
-            int hitInstanceID = 0;
-            int count = 0;
+                int hitInstanceID = 0;
 
-            // Repeat the action on each attacked object for a specific number of times
-            // Perform the action on the attacked object
+                // Repeat the action on each attacked object for a specific number of times
+                // Perform the action on the attacked object
                 foreach (GameObject hit in hits)
                 {
                     // Do something with the attacked object
-
                     hitInstanceID = hit.GetInstanceID();
 
-                    if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
                     if (hit.transform.IsChildOf(this.transform)) continue;
+                    if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                     HitResult hitResult = HitResult.ReceiveDamage;
 
@@ -301,17 +301,15 @@ namespace GameCreator.Melee
                     if (targetMelee != null && !targetMelee.IsInvincible)
                     {
                         HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition());
-                        count++;
+                        this.count++;
                     }
-
+                    
                     this.targetsEvaluated.Add(hitInstanceID);
                     
                     // Wait for the specified interval before performing the action again
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(0.15f);
 
-                    
-                    
-                    if (attack && count < attack.hitCount) {
+                    if (attack && this.count < attack.hitCount) {
                         this.targetsEvaluated.Remove(hitInstanceID);
                     }
                 }
