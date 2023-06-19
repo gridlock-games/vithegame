@@ -33,9 +33,7 @@ namespace LightPat.UI
 
         public void LeaveLobby()
         {
-            Destroy(NetworkManager.Singleton.gameObject);
-            NetworkManager.Singleton.Shutdown();
-            SceneManager.LoadScene("StartMenu");
+            Application.Quit();
         }
 
         public void ToggleReady()
@@ -52,11 +50,11 @@ namespace LightPat.UI
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true);
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Arena_ver2", true);
             }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Deathmatch", true);
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Arena_ver2", true);
             }
         }
 
@@ -136,13 +134,15 @@ namespace LightPat.UI
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
-            if (NetworkManager.Singleton.IsClient)
+            // Can't check if we are the client here, because the network manager may not be started yet if we are client
+            if (!NetworkManager.Singleton.IsServer)
                 StartCoroutine(WaitForClientConnection());
         }
 
         private IEnumerator WaitForClientConnection()
         {
             yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId));
+            playerModelDropdown.value = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex;
             UpdatePlayerDisplay();
             UpdateGameModeValue();
             primaryWeaponDropdown.value = 0;

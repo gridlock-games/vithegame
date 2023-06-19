@@ -55,12 +55,10 @@ public class SceneUserDataManager : MonoBehaviour
         }
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
-        if (NetworkManager.Singleton.StartClient())
-        {
-            Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
-            connectingToPlayerHub = true;
-            loadingText.text = "Connecting to player hub...";
-        }
+
+        connectingToPlayerHub = true;
+        loadingText.text = "Connecting to player hub...";
+        ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
     }
 
     void Start()

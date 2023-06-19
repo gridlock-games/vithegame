@@ -100,6 +100,8 @@
         public float defenseDamage = 1f;
         public int baseDamage = 10;
 
+        public float bladeSizeMultiplier = 1.0f;
+
 
         // properties:
         public Interrupt interruptible = Interrupt.Interruptible;
