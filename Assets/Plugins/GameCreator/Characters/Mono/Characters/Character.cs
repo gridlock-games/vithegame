@@ -606,7 +606,9 @@
             {
                 yield return null;
             }
-            melee.currentWeapon.recoveryStandUp.Play(melee);
+            MeleeClip standRecovery = melee.currentWeapon.recoveryStandUp;
+            standRecovery.Play(melee);
+            
             float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
         }
@@ -640,6 +642,8 @@
             
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
+            
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             
 
             float recoveryAnimDuration = 0f;
@@ -703,6 +707,8 @@
             resetDefaultStateRunning = true;
             float initTime = Time.time;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
+            
+            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
             while (initTime + (duration * 0.80f) >= Time.time)
             {
@@ -726,8 +732,6 @@
             {
                 this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
             }
-
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
             if (IsServer) { melee.knockedUpHitCount.Value = 0; }
 

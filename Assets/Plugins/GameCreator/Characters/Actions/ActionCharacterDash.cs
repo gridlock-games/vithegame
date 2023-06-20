@@ -362,7 +362,7 @@
             return result;
         }
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         public static new string NAME = "Character/Character Dash";
         private const string TITLE_NAME = "Character {0} dash {1}";
 
