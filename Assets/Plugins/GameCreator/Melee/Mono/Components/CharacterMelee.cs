@@ -1132,7 +1132,7 @@ namespace GameCreator.Melee
 
         public float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer, CharacterAnimator animator)
         {
-            float time = TRANSITION;
+            float time = 0f;
             if (state != null)
             {
                 if (state.enterClip != null)
@@ -1140,13 +1140,13 @@ namespace GameCreator.Melee
                     time = state.enterClip.length;
                 }
 
-                time = Mathf.Max(TRANSITION, time) * 0.5f;
+                time = Mathf.Max(0f, time) * 0.5f;
                 this.CharacterAnimator.SetState(state, mask, 1f, time, 1f, layer);
 
-                if (animator != null)
-                {
-                    animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), false);
-                }
+                // if (animator != null)
+                // {
+                //     animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), true);
+                // }
             }
 
             return time;
