@@ -10,6 +10,7 @@
     using GameCreator.Melee;
     using System;
     using Unity.Netcode;
+    using GameCreator.Variables;
 
     [RequireComponent(typeof(CharacterController))]
     [AddComponentMenu("Game Creator/Characters/Character", 100)]
@@ -639,6 +640,13 @@
                 yield return new WaitUntil(() => ailmentRotationRecieved);
                 ailmentRotationRecieved = false;
             }
+
+
+            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
+
+            Boolean isDodging = (bool)variables.Get("isDodging").Get();
+
+            if (isDodging == true) yield break;
             
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();

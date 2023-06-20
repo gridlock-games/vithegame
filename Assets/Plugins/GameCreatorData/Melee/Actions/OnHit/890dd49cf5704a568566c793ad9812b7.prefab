@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 1732818305628545725}
   - component: {fileID: 5401879543554495648}
   - component: {fileID: 7520676218898335184}
-  - component: {fileID: -3407932955711034100}
-  - component: {fileID: 5758682468023067801}
   - component: {fileID: -6560163536167364488}
   m_Layer: 0
   m_Name: 890dd49cf5704a568566c793ad9812b7
@@ -68,98 +66,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6d5a50368374438dbff3af09a8fefb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actions:
-  - {fileID: -3407932955711034100}
-  - {fileID: -6560163536167364488}
-  - {fileID: 5758682468023067801}
+  actions: []
   executingIndex: -1
   isExecuting: 0
---- !u!114 &-3407932955711034100
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086864936054783499}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d234afa27d82846abbf91e13c4f5eedf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isExpanded: 0
-  valueFrom: 2
-  global:
-    allowTypesMask: -1
-    name: 
-  local:
-    allowTypesMask: -1
-    name: 
-    targetType: 2
-    targetObject: {fileID: 0}
-  list:
-    targetType: 3
-    targetObject: {fileID: 0}
-    select: 1
-    index: 0
-  variable:
-    variableType: 1
-    global:
-      allowTypesMask: 8
-      name: 
-    local:
-      allowTypesMask: 8
-      name: isDodging
-      targetType: 1
-      targetObject: {fileID: 0}
-    list:
-      targetType: 3
-      targetObject: {fileID: 0}
-      select: 1
-      index: 0
-  value: 1
---- !u!114 &5758682468023067801
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086864936054783499}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d234afa27d82846abbf91e13c4f5eedf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isExpanded: 0
-  valueFrom: 2
-  global:
-    allowTypesMask: -1
-    name: 
-  local:
-    allowTypesMask: -1
-    name: 
-    targetType: 2
-    targetObject: {fileID: 0}
-  list:
-    targetType: 3
-    targetObject: {fileID: 0}
-    select: 1
-    index: 0
-  variable:
-    variableType: 1
-    global:
-      allowTypesMask: 8
-      name: 
-    local:
-      allowTypesMask: 8
-      name: isDodging
-      targetType: 1
-      targetObject: {fileID: 0}
-    list:
-      targetType: 3
-      targetObject: {fileID: 0}
-      select: 1
-      index: 0
-  value: 0
 --- !u!114 &-6560163536167364488
 MonoBehaviour:
   m_ObjectHideFlags: 3
