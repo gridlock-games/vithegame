@@ -205,7 +205,14 @@ namespace GameCreator.Melee
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
 
-                        this.Blades.ForEach(blade => blade.isOrbitLocked = meleeClip.isOrbitLocked);
+                        this.Blades.ForEach(blade =>
+                        {
+                            blade.isOrbitLocked = meleeClip.isOrbitLocked;
+                            if (meleeClip.affectedBones.Contains(blade.weaponBone))
+                            {
+                                blade.boxSize = blade.boxSize * meleeClip.bladeSizeMultiplier;
+                            }
+                        });
 
                         if(!this.currentMeleeClip.isSequence) {
                             this.currentMeleeClip.Play(this);
