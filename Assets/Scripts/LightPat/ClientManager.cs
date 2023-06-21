@@ -109,6 +109,15 @@ namespace LightPat.Core
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); Random.InitState(randomSeed.Value); };
         }
 
+        private void Update()
+        {
+            foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                if (clientPair.Value.PlayerObject)
+                    clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+            }
+        }
+
         private IEnumerator ClientConnectCallback(ulong clientId)
         {
             yield return null;
@@ -145,7 +154,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = true;
+            response.Approved = false;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -160,6 +169,12 @@ namespace LightPat.Core
             // If additional approval steps are needed, set this to true until the additional steps are complete
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
+
+            // Only allow clients to connect if the server is at the lobby scene or the hub scene
+            if (SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub")
+            {
+                response.Approved = true;
+            }
 
             if (response.Approved)
             {
