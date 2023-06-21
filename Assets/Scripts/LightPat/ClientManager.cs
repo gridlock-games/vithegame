@@ -111,10 +111,13 @@ namespace LightPat.Core
 
         private void Update()
         {
-            foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
+            if (IsServer)
             {
-                if (clientPair.Value.PlayerObject)
-                    clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+                foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
+                {
+                    if (clientPair.Value.PlayerObject)
+                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+                }
             }
         }
 
