@@ -120,11 +120,6 @@ namespace LightPat.Core
 
                 if (!allPlayersSpawned.Value) { return; }
 
-                if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
-                {
-                    OnGameEnd();
-                }
-
                 if (countdownTime.Value > 0)
                 {
                     foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
@@ -140,6 +135,12 @@ namespace LightPat.Core
                 {
                     roundTimeInSeconds.Value -= Time.deltaTime;
                     if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
+
+                    // If a player disconnects during the match, end the game
+                    if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
+                    {
+                        OnGameEnd();
+                    }
                 }
 
                 if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
