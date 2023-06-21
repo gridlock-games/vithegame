@@ -40,12 +40,11 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    public bool isServer;
     private bool transitioningToCharacterSelect;
     private void Update()
     {
         // If we are a headless build
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | isServer)
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
         {
             StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
         }
@@ -131,7 +130,6 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    public bool lobbyBuild;
     private bool startServerCalled;
     private void StartServer(string targetIP)
     {
@@ -142,7 +140,8 @@ public class AuthenticationController : MonoBehaviour
         if (NetworkManager.Singleton.StartServer())
         {
             Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
-            NetworkManager.Singleton.SceneManager.LoadScene(lobbyBuild ? "Lobby" : "Hub", LoadSceneMode.Single);
+            // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
+            NetworkManager.Singleton.SceneManager.LoadScene(SceneUtility.GetBuildIndexByScenePath("Lobby") != -1 ? "Lobby" : "Hub", LoadSceneMode.Single);
         }
     }
 
