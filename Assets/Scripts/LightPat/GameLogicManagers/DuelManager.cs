@@ -120,6 +120,11 @@ namespace LightPat.Core
 
                 if (!allPlayersSpawned.Value) { return; }
 
+                if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
+                {
+                    OnGameEnd();
+                }
+
                 if (countdownTime.Value > 0)
                 {
                     foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
