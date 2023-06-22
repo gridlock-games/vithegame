@@ -90,35 +90,38 @@ public class AuthenticationController : MonoBehaviour
 
     public void SignIn()
     {
-        GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
+        if (datamanager != null)
         {
-            if (success)
+            GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
             {
-                //Check if data already exist in firebase. data equal to null post new data.
-                RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
+                if (success)
                 {
-                    var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
-                    if (data == null)
+                    //Check if data already exist in firebase. data equal to null post new data.
+                    RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
                     {
-                        data = new UserModel
+                        var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
+                        if (data == null)
                         {
-                            account_name = info.name,
-                            email = info.email,
-                            display_picture = info.picture,
-                            date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
-                            last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
-                        };
+                            data = new UserModel
+                            {
+                                account_name = info.name,
+                                email = info.email,
+                                display_picture = info.picture,
+                                date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
+                                last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+                            };
+                            datamanager.PostUserdata(data);
+                            return;
+                        }
+                        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
                         datamanager.PostUserdata(data);
-                        return;
-                    }
-                    data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
-                    datamanager.PostUserdata(data);
-                });
-                UpdateUI();
-            }
-            //if Google login fail
-            Debug.LogError(error);
-        });
+                    });
+                    UpdateUI();
+                }
+                //if Google login fail
+                Debug.LogError(error);
+            });
+        }
     }
 
     public void StartGame()
