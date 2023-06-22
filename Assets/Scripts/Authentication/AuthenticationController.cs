@@ -25,19 +25,24 @@ public class AuthenticationController : MonoBehaviour
     {
         datamanager = DataManager.Instance;
         //check if data already cached if not activate sign in page
+        UpdateUI();
         if (PlayerPrefs.HasKey("email"))
         {
             RestClient.Get($"{datamanager.firebaseURL}.json", GetCacheResponse);
-            btn_Signedin.SetActive(true);
-            btn_SignOut.SetActive(true);
-            btn_StartGame.SetActive(true);
-            clientIPAddressInput.gameObject.SetActive(true);
-            displayNameInput.gameObject.SetActive(true);
         }
-        else
-        {
-            btn_SignIn.SetActive(true);
-        }
+    }
+
+    private void UpdateUI()
+    {
+        bool signedIn = PlayerPrefs.HasKey("email");
+
+        btn_Signedin.SetActive(signedIn);
+        btn_SignOut.SetActive(signedIn);
+        btn_StartGame.SetActive(signedIn);
+        clientIPAddressInput.gameObject.SetActive(signedIn);
+        displayNameInput.gameObject.SetActive(signedIn);
+
+        btn_SignIn.SetActive(!signedIn);
     }
 
     private bool transitioningToCharacterSelect;
@@ -50,6 +55,8 @@ public class AuthenticationController : MonoBehaviour
         }
         else // If we are not a headless build
         {
+            infoDisplayText.enabled = clientIPAddressInput.enabled;
+
             if (clientIPAddressInput.text == "" | displayNameInput.text == "")
             {
                 btn_StartGame.GetComponent<Button>().interactable = false;
@@ -107,13 +114,7 @@ public class AuthenticationController : MonoBehaviour
                     data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
                     datamanager.PostUserdata(data);
                 });
-
-                btn_Signedin.SetActive(true);
-                btn_SignOut.SetActive(true);
-                btn_StartGame.SetActive(true);
-                clientIPAddressInput.gameObject.SetActive(true);
-                displayNameInput.gameObject.SetActive(true);
-                return;
+                UpdateUI();
             }
             //if Google login fail
             Debug.LogError(error);
@@ -122,12 +123,20 @@ public class AuthenticationController : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log(PlayerPrefs.HasKey("email"));
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
             StoreClient(clientIPAddressInput.text, displayNameInput.text);
             SceneManager.LoadScene("CharacterSelect");
         }
+    }
+
+    public void SignOut()
+    {
+        Debug.Log("Deleting all player prefs");
+        PlayerPrefs.DeleteAll();
+        UpdateUI();
     }
 
     private bool startServerCalled;
