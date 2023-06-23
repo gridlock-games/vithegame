@@ -208,10 +208,6 @@ namespace GameCreator.Melee
                         this.Blades.ForEach(blade =>
                         {
                             blade.isOrbitLocked = meleeClip.isOrbitLocked;
-                            if (meleeClip.affectedBones.Contains(blade.weaponBone))
-                            {
-                                blade.boxSize = blade.boxSize * meleeClip.bladeSizeMultiplier;
-                            }
                         });
 
                         if(!this.currentMeleeClip.isSequence) {
