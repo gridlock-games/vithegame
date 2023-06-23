@@ -25,24 +25,10 @@ public class AuthenticationController : MonoBehaviour
     {
         datamanager = DataManager.Instance;
         //check if data already cached if not activate sign in page
-        UpdateUI();
         if (PlayerPrefs.HasKey("email"))
         {
             RestClient.Get($"{datamanager.firebaseURL}.json", GetCacheResponse);
         }
-    }
-
-    private void UpdateUI()
-    {
-        bool signedIn = PlayerPrefs.HasKey("email");
-
-        btn_Signedin.SetActive(signedIn);
-        btn_SignOut.SetActive(signedIn);
-        btn_StartGame.SetActive(signedIn);
-        clientIPAddressInput.gameObject.SetActive(signedIn);
-        displayNameInput.gameObject.SetActive(signedIn);
-
-        btn_SignIn.SetActive(!signedIn);
     }
 
     private bool transitioningToCharacterSelect;
@@ -55,6 +41,16 @@ public class AuthenticationController : MonoBehaviour
         }
         else // If we are not a headless build
         {
+            bool signedIn = PlayerPrefs.HasKey("email");
+
+            btn_Signedin.SetActive(signedIn);
+            btn_SignOut.SetActive(signedIn);
+            btn_StartGame.SetActive(signedIn);
+            clientIPAddressInput.gameObject.SetActive(signedIn);
+            displayNameInput.gameObject.SetActive(signedIn);
+
+            btn_SignIn.SetActive(!signedIn);
+
             infoDisplayText.enabled = clientIPAddressInput.enabled;
 
             if (clientIPAddressInput.text == "" | displayNameInput.text == "")
@@ -116,7 +112,6 @@ public class AuthenticationController : MonoBehaviour
                         data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
                         datamanager.PostUserdata(data);
                     });
-                    UpdateUI();
                 }
                 //if Google login fail
                 Debug.LogError(error);
@@ -139,7 +134,6 @@ public class AuthenticationController : MonoBehaviour
     {
         Debug.Log("Deleting all player prefs");
         PlayerPrefs.DeleteAll();
-        UpdateUI();
     }
 
     private bool startServerCalled;
