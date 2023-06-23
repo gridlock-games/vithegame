@@ -208,10 +208,6 @@ namespace GameCreator.Melee
                         this.Blades.ForEach(blade =>
                         {
                             blade.isOrbitLocked = meleeClip.isOrbitLocked;
-                            if (meleeClip.affectedBones.Contains(blade.weaponBone))
-                            {
-                                blade.boxSize = blade.boxSize * meleeClip.bladeSizeMultiplier;
-                            }
                         });
 
                         if(!this.currentMeleeClip.isSequence) {
@@ -279,55 +275,72 @@ namespace GameCreator.Melee
             }
         }
 
-        private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade) {
-                int hitInstanceID = 0;
+        private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade)
+        {
+            int hitInstanceID = 0;
 
-                // Repeat the action on each attacked object for a specific number of times
-                // Perform the action on the attacked object
-                foreach (GameObject hit in hits)
+            // Repeat the action on each attacked object for a specific number of times
+            // Perform the action on the attacked object
+            foreach (GameObject hit in hits)
+            {
+                // Do something with the attacked object
+                hitInstanceID = hit.GetInstanceID();
+
+                if (hit.transform.IsChildOf(this.transform)) continue;
+                if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
+
+                CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
+                MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
+
+                GameObject g = hit.gameObject;
+
+                // This is for checking if we are hitting an environment object
+                if (g.CompareTag("Obstacle"))
                 {
-                    // Do something with the attacked object
-                    hitInstanceID = hit.GetInstanceID();
-
-                    if (hit.transform.IsChildOf(this.transform)) continue;
-                    if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
-
-                    HitResult hitResult = HitResult.ReceiveDamage;
-
-                    CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
-                    MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
-
-                    GameObject g = hit.gameObject;
-
-                    // This is for checking if we are hitting an environment object
-                    if(g.tag == "Obstacle") {
-                        Vector3 position_attackWp = blade.GetImpactPosition();
-                        Vector3 position_attacker = this.transform.position;
-                    }
-
-                    if (targetMelee != null && !targetMelee.IsInvincible)
-                    {
-                        HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition());
-                        this.count++;
-                    }
-                    
-                    this.targetsEvaluated.Add(hitInstanceID);
-                    
-                    // Wait for the specified interval before performing the action again
-                    yield return new WaitForSeconds(0.15f);
-
-                    if (attack && this.count < attack.hitCount) {
-                        this.targetsEvaluated.Remove(hitInstanceID);
-                    }
+                    Vector3 position_attackWp = blade.GetImpactPosition();
+                    Vector3 position_attacker = this.transform.position;
                 }
+
+                if (targetMelee != null && !targetMelee.IsInvincible)
+                {
+                    //Debug.Log("Hit at " + Time.time + " - " + attack.name);
+                    HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition(), attack.name);
+                    this.count++;
+                }
+
+                this.targetsEvaluated.Add(hitInstanceID);
+                    
+                // Wait for the specified interval before performing the action again
+                yield return new WaitForSeconds(0.15f);
+
+                if (attack && this.count < attack.hitCount) {
+                    this.targetsEvaluated.Remove(hitInstanceID);
+                }
+            }
         }
 
         [ServerRpc]
-        private void HitServerRpc(ulong targetMeleeNetworkObjId, Vector3 bladeImpactPosition)
+        private void HitServerRpc(ulong targetMeleeNetworkObjId, Vector3 bladeImpactPosition, string meleeClipName)
         {
             HitResult hitResult = HitResult.ReceiveDamage;
             CharacterMelee targetMelee = NetworkManager.SpawnManager.SpawnedObjects[targetMeleeNetworkObjId].GetComponent<CharacterMelee>();
-            MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
+            
+            // Look up melee clip by name
+            MeleeClip attack = null;
+            foreach (Combo combo in currentWeapon.combos)
+            {
+                if (combo.meleeClip.name == meleeClipName)
+                {
+                    attack = combo.meleeClip;
+                    break;
+                }
+            }
+
+            if (attack == null)
+            {
+                Debug.LogError("No melee clip named " + meleeClipName + " found in combos for weapon: " + currentWeapon);
+                attack = currentMeleeClip;
+            }
 
             if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
             {

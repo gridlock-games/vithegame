@@ -300,6 +300,9 @@
 
         private GameObject[] CaptureHitsBox(float multiplier)
         {
+
+            Vector3 boxMultiplied = this.boxSize * multiplier;
+
             int predictions = 1;
             BoxData currentBoxData = new BoxData(
                 this.transform.TransformPoint(this.boxCenter), 
@@ -341,7 +344,7 @@
                 
                 int numCollisions = Physics.OverlapBoxNonAlloc(
                     this.boxInterframeCaptures[i].center,
-                    (this.boxSize * multiplier)  / 2f,
+                    boxMultiplied  / 2f,
                     this.bufferColliders,
                     this.boxInterframeCaptures[i].rotation,
                     this.layerMask,
@@ -383,7 +386,8 @@
             
             MeleeClip clip = this.Melee ? this.Melee.currentMeleeClip : new MeleeClip();
             float multiplier = 1.0f;
-            
+            Vector3 boxMultiplied = this.boxSize * multiplier;
+
             if (clip != null && clip.affectedBones.Contains(this.weaponBone))
             {
                 multiplier = clip.bladeSizeMultiplier;
@@ -428,7 +432,7 @@
                     
                     if (isHitActive)
                     {
-                        Gizmos.DrawCube(this.boxCenter, (this.boxSize * multiplier));
+                        Gizmos.DrawCube(this.boxCenter, boxMultiplied);
 
                         for (int i = 0; i < this.boxInterframeCaptures.Length; ++i)
                         {
@@ -443,13 +447,12 @@
                                 Vector3.one
                             );
                             
-                            Gizmos.DrawWireCube(Vector3.zero, (this.boxSize * multiplier));
+                            Gizmos.DrawWireCube(Vector3.zero, boxMultiplied);
                         }
                     }
                     else
                     {
-                        
-                        Gizmos.DrawWireCube(this.boxCenter, this.boxSize );
+                        Gizmos.DrawWireCube(this.boxCenter, boxMultiplied );
                     }
 
                     Gizmos.matrix = gizmosMatrix;

@@ -2242,7 +2242,7 @@ MonoBehaviour:
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
-    PacketDelayMS: 0
+    PacketDelayMS: 100
     PacketJitterMS: 0
     PacketDropRate: 0
 --- !u!114 &1627123835
@@ -2262,7 +2262,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
     NetworkPrefabs:
     - Override: 0

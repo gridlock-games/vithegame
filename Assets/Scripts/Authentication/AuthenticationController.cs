@@ -12,14 +12,15 @@ using LightPat.Core;
 
 public class AuthenticationController : MonoBehaviour
 {
+    public string playerHubIPAddress = "128.199.214.19";
 
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
     [SerializeField] private GameObject btn_StartGame;
-    [SerializeField] private TMP_InputField clientIPAddressInput;
     [SerializeField] private TMP_InputField displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
+
     private DataManager datamanager;
     private void Start()
     {
@@ -28,15 +29,6 @@ public class AuthenticationController : MonoBehaviour
         if (PlayerPrefs.HasKey("email"))
         {
             RestClient.Get($"{datamanager.firebaseURL}.json", GetCacheResponse);
-            btn_Signedin.SetActive(true);
-            btn_SignOut.SetActive(true);
-            btn_StartGame.SetActive(true);
-            clientIPAddressInput.gameObject.SetActive(true);
-            displayNameInput.gameObject.SetActive(true);
-        }
-        else
-        {
-            btn_SignIn.SetActive(true);
         }
     }
 
@@ -50,10 +42,21 @@ public class AuthenticationController : MonoBehaviour
         }
         else // If we are not a headless build
         {
-            if (clientIPAddressInput.text == "" | displayNameInput.text == "")
+            bool signedIn = PlayerPrefs.HasKey("email");
+
+            btn_Signedin.SetActive(signedIn);
+            btn_SignOut.SetActive(signedIn);
+            btn_StartGame.SetActive(signedIn);
+            displayNameInput.gameObject.SetActive(signedIn);
+
+            btn_SignIn.SetActive(!signedIn);
+
+            infoDisplayText.enabled = displayNameInput.enabled;
+
+            if (displayNameInput.text == "")
             {
                 btn_StartGame.GetComponent<Button>().interactable = false;
-                infoDisplayText.SetText("Enter the player hub's ip address and display name to play");
+                infoDisplayText.SetText("Enter a display name to play");
             }
             else
             {
@@ -83,51 +86,56 @@ public class AuthenticationController : MonoBehaviour
 
     public void SignIn()
     {
-        GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
+        if (datamanager != null)
         {
-            if (success)
+            GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
             {
-                //Check if data already exist in firebase. data equal to null post new data.
-                RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
+                if (success)
                 {
-                    var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
-                    if (data == null)
+                    //Check if data already exist in firebase. data equal to null post new data.
+                    RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
                     {
-                        data = new UserModel
+                        var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
+                        if (data == null)
                         {
-                            account_name = info.name,
-                            email = info.email,
-                            display_picture = info.picture,
-                            date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
-                            last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
-                        };
+                            data = new UserModel
+                            {
+                                account_name = info.name,
+                                email = info.email,
+                                display_picture = info.picture,
+                                date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
+                                last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+                            };
+                            datamanager.PostUserdata(data);
+                            return;
+                        }
+                        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
                         datamanager.PostUserdata(data);
-                        return;
-                    }
-                    data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
-                    datamanager.PostUserdata(data);
-                });
-
-                btn_Signedin.SetActive(true);
-                btn_SignOut.SetActive(true);
-                btn_StartGame.SetActive(true);
-                clientIPAddressInput.gameObject.SetActive(true);
-                displayNameInput.gameObject.SetActive(true);
-                return;
-            }
-            //if Google login fail
-            Debug.LogError(error);
-        });
+                    });
+                }
+                //if Google login fail
+                Debug.LogError(error);
+            });
+        }
     }
 
+    private bool startingGame;
     public void StartGame()
     {
+        if (startingGame) { return; }
+        startingGame = true;
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
-            StoreClient(clientIPAddressInput.text, displayNameInput.text);
+            StoreClient(playerHubIPAddress, displayNameInput.text);
             SceneManager.LoadScene("CharacterSelect");
         }
+    }
+
+    public void SignOut()
+    {
+        Debug.Log("Deleting all player prefs");
+        PlayerPrefs.DeleteAll();
     }
 
     private bool startServerCalled;
