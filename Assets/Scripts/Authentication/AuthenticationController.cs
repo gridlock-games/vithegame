@@ -12,14 +12,15 @@ using LightPat.Core;
 
 public class AuthenticationController : MonoBehaviour
 {
+    public string playerHubIPAddress = "128.199.214.19";
 
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
     [SerializeField] private GameObject btn_StartGame;
-    [SerializeField] private TMP_InputField clientIPAddressInput;
     [SerializeField] private TMP_InputField displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
+
     private DataManager datamanager;
     private void Start()
     {
@@ -46,17 +47,16 @@ public class AuthenticationController : MonoBehaviour
             btn_Signedin.SetActive(signedIn);
             btn_SignOut.SetActive(signedIn);
             btn_StartGame.SetActive(signedIn);
-            clientIPAddressInput.gameObject.SetActive(signedIn);
             displayNameInput.gameObject.SetActive(signedIn);
 
             btn_SignIn.SetActive(!signedIn);
 
-            infoDisplayText.enabled = clientIPAddressInput.enabled;
+            infoDisplayText.enabled = displayNameInput.enabled;
 
-            if (clientIPAddressInput.text == "" | displayNameInput.text == "")
+            if (displayNameInput.text == "")
             {
                 btn_StartGame.GetComponent<Button>().interactable = false;
-                infoDisplayText.SetText("Enter the player hub's ip address and display name to play");
+                infoDisplayText.SetText("Enter a display name to play");
             }
             else
             {
@@ -119,13 +119,15 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
+    private bool startingGame;
     public void StartGame()
     {
-        Debug.Log(PlayerPrefs.HasKey("email"));
+        if (startingGame) { return; }
+        startingGame = true;
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
-            StoreClient(clientIPAddressInput.text, displayNameInput.text);
+            StoreClient(playerHubIPAddress, displayNameInput.text);
             SceneManager.LoadScene("CharacterSelect");
         }
     }
