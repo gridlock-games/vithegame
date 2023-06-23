@@ -62,6 +62,7 @@ namespace LightPat.Core
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
+            if (targetIP == null) { Debug.Log("No target IP specified"); return; }
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
@@ -70,8 +71,6 @@ namespace LightPat.Core
 
         private IEnumerator ConnectToLobby()
         {
-            if (targetIP == null) { Debug.Log("No target IP specified"); yield break; }
-
             Debug.Log("Shutting down NetworkManager");
             NetworkManager.Singleton.Shutdown();
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
