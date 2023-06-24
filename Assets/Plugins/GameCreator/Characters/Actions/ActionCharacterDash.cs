@@ -268,7 +268,7 @@
 
             if (clip != null && animator != null)
             {   
-                if(attachments != null && this.dashParticle != null) {
+                if(this.dashParticle.gameObject != null) {
                     Vector3 spawnPosition = characterTarget.transform.position;
 
                     Instantiate(this.dashParticle.GetGameObject(target), spawnPosition, Quaternion.identity);
