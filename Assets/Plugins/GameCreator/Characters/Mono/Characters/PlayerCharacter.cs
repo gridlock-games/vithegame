@@ -169,14 +169,43 @@
                 movement = 1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection;
             }
 
+            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
+            Vector3 oldPosition = transform.position;
+
+            // Set position to current position
+            characterLocomotion.characterController.enabled = false;
+            transform.position = networkTransform.currentPosition;
+            characterLocomotion.characterController.enabled = true;
+
+            // Apply movement to charactercontroller
             characterLocomotion.characterController.Move(movement);
+            Vector3 newPosition = transform.position;
+
+            // Revert movement change
+            characterLocomotion.characterController.enabled = false;
+            transform.position = oldPosition;
+            characterLocomotion.characterController.enabled = true;
+
+            //Debug.DrawRay(networkTransform.currentPosition, movement * movement.magnitude, Color.red, Time.deltaTime);
+            //RaycastHit[] allHits = Physics.RaycastAll(networkTransform.currentPosition, transform.up * -1, movement.y, -1, QueryTriggerInteraction.Ignore);
+            //System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            //foreach (RaycastHit hit in allHits)
+            //{
+            //    if (hit.transform == transform) { continue; }
+            //    //newPosition = hit.point - Mathf.Clamp(movement.y, 0.01f, Mathf.Infinity);
+            //    break;
+            //}
+
+            //movement.y = 0;
+            //Vector3 newPosition = networkTransform.currentPosition + movement;
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
             else
                 characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
 
-            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, newPosition, transform.rotation);
         }
 
         public struct RootMotionResult : INetworkSerializable
