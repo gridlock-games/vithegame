@@ -66,6 +66,7 @@ namespace GameCreator.Characters
         public float playerObjectDirectionalMagnitudeThreshold = 0.1f;
 
         public Vector3 currentPosition { get; private set; }
+        public Quaternion currentRotation { get; private set; }
 
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
@@ -241,17 +242,8 @@ namespace GameCreator.Characters
             }
 
             currentPosition = statePayload.position;
+            currentRotation = statePayload.rotation;
             return statePayload;
-        }
-
-        [SerializeField] private GameObject displayPrefab;
-        private GameObject displayInstance;
-        private void Update()
-        {
-            if (!displayInstance)
-                displayInstance = Instantiate(displayPrefab);
-
-            displayInstance.transform.position = currentPosition;
         }
     }
 }
