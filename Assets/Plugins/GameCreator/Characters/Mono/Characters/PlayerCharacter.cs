@@ -186,20 +186,6 @@
             transform.position = oldPosition;
             characterLocomotion.characterController.enabled = true;
 
-            //Debug.DrawRay(networkTransform.currentPosition, movement * movement.magnitude, Color.red, Time.deltaTime);
-            //RaycastHit[] allHits = Physics.RaycastAll(networkTransform.currentPosition, transform.up * -1, movement.y, -1, QueryTriggerInteraction.Ignore);
-            //System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-            //foreach (RaycastHit hit in allHits)
-            //{
-            //    if (hit.transform == transform) { continue; }
-            //    //newPosition = hit.point - Mathf.Clamp(movement.y, 0.01f, Mathf.Infinity);
-            //    break;
-            //}
-
-            //movement.y = 0;
-            //Vector3 newPosition = networkTransform.currentPosition + movement;
-
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
             else

@@ -62,6 +62,9 @@ namespace GameCreator.Characters
             }
         }
 
+        public float playerObjectTeleportThreshold = 2;
+        public float playerObjectDirectionalMagnitudeThreshold = 0.1f;
+
         public Vector3 currentPosition { get; private set; }
 
         private const string AXIS_H = "Horizontal";
@@ -177,7 +180,7 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 //transform.position = latestServerState.position;
