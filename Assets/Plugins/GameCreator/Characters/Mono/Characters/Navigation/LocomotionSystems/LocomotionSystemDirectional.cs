@@ -34,6 +34,31 @@
             float speed = this.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
             Quaternion targetRotation = this.UpdateRotation(targetDirection);
 
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                if (!networkTransform.IsOwner)
+                    targetRotation = networkTransform.currentRotation;
+                
+                // If distance is greater than teleport threshold, teleport player object to the network position
+                if (Vector3.Distance(networkTransform.currentPosition, characterLocomotion.character.transform.position) > networkTransform.playerObjectTeleportThreshold)
+                {
+                    characterLocomotion.characterController.enabled = false;
+                    characterLocomotion.characterController.transform.position = networkTransform.currentPosition;
+                    characterLocomotion.characterController.enabled = true;
+                }
+                else // Teleport threshold not reached
+                {
+                    // Calculate target direction towards network position
+                    targetDirection = networkTransform.currentPosition - characterLocomotion.character.transform.position;
+                    
+                    // If our magnitude is less than the magnitude threshold, do not move the player
+                    if (targetDirection.magnitude < networkTransform.playerObjectDirectionalMagnitudeThreshold)
+                        targetDirection = Vector3.zero;
+                    else
+                        targetDirection = targetDirection.normalized;
+                }
+            }
+
             this.UpdateAnimationConstraints(ref targetDirection, ref targetRotation);
             this.UpdateSliding();
 
@@ -44,18 +69,15 @@
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
             // If there is no player character network transform component on this object
-            if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+            if (this.isRootMoving)
             {
-                if (this.isRootMoving)
-                {
-                    this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
-                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
-                }
-                else
-                {
-                    this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
-                    this.characterLocomotion.characterController.transform.rotation = targetRotation;
-                }
+                this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);
+                this.characterLocomotion.characterController.transform.rotation = targetRotation;
+            }
+            else
+            {
+                this.characterLocomotion.characterController.Move(targetDirection * Time.deltaTime);
+                this.characterLocomotion.characterController.transform.rotation = targetRotation;
             }
 
             if (this.characterLocomotion.navmeshAgent != null &&

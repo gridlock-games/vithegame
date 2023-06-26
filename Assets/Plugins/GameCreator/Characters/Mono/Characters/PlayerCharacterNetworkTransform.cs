@@ -62,6 +62,12 @@ namespace GameCreator.Characters
             }
         }
 
+        public float playerObjectTeleportThreshold = 2;
+        public float playerObjectDirectionalMagnitudeThreshold = 0.1f;
+
+        public Vector3 currentPosition { get; private set; }
+        public Quaternion currentRotation { get; private set; }
+
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
@@ -91,7 +97,7 @@ namespace GameCreator.Characters
             if (IsClient)
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
 
-            Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Character"), true);
+            //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Character"), !IsServer);
         }
 
         public override void OnNetworkDespawn()
@@ -177,9 +183,8 @@ namespace GameCreator.Characters
             {
                 Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
-                playerCharacter.characterLocomotion.characterController.enabled = false;
-                transform.position = latestServerState.position;
-                playerCharacter.characterLocomotion.characterController.enabled = true;
+                currentPosition = latestServerState.position;
+                currentRotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
@@ -237,6 +242,8 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = true;
             }
 
+            currentPosition = statePayload.position;
+            currentRotation = statePayload.rotation;
             return statePayload;
         }
     }

@@ -169,14 +169,29 @@
                 movement = 1f / NetworkManager.NetworkTickSystem.TickRate * targetDirection;
             }
 
+            PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
+            Vector3 oldPosition = transform.position;
+
+            // Set position to current position
+            characterLocomotion.characterController.enabled = false;
+            transform.position = networkTransform.currentPosition;
+            characterLocomotion.characterController.enabled = true;
+
+            // Apply movement to charactercontroller
             characterLocomotion.characterController.Move(movement);
+            Vector3 newPosition = transform.position;
+
+            // Revert movement change
+            characterLocomotion.characterController.enabled = false;
+            transform.position = oldPosition;
+            characterLocomotion.characterController.enabled = true;
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
             else
                 characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
 
-            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, newPosition, transform.rotation);
         }
 
         public struct RootMotionResult : INetworkSerializable

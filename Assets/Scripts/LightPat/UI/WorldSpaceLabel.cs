@@ -47,6 +47,10 @@ namespace LightPat.UI
                         nameDisplay.SetText(clientName);
                         target.name = clientName;
                     }
+                    else
+                    {
+                        nameDisplay.SetText(netObj.OwnerClientId + " - " + target.name);
+                    }
                 }
             }
 

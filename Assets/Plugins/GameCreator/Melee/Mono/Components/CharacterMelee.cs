@@ -259,7 +259,7 @@ namespace GameCreator.Melee
                 this.IsAttacking = phase >= 0f;
 
                 // Only want hit registration on the owner
-                if (!IsOwner) { return; }
+                if (!IsServer) { return; }
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
@@ -292,10 +292,8 @@ namespace GameCreator.Melee
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
 
-                GameObject g = hit.gameObject;
-
                 // This is for checking if we are hitting an environment object
-                if (g.CompareTag("Obstacle"))
+                if (hit.gameObject.CompareTag("Obstacle"))
                 {
                     Vector3 position_attackWp = blade.GetImpactPosition();
                     Vector3 position_attacker = this.transform.position;
@@ -303,132 +301,109 @@ namespace GameCreator.Melee
 
                 if (targetMelee != null && !targetMelee.IsInvincible)
                 {
-                    //Debug.Log("Hit at " + Time.time + " - " + attack.name);
-                    HitServerRpc(targetMelee.NetworkObjectId, blade.GetImpactPosition(), attack.name);
                     this.count++;
                 }
 
                 this.targetsEvaluated.Add(hitInstanceID);
-                    
+                
                 // Wait for the specified interval before performing the action again
                 yield return new WaitForSeconds(0.15f);
 
-                if (attack && this.count < attack.hitCount) {
+                if (attack && this.count < attack.hitCount)
+                {
                     this.targetsEvaluated.Remove(hitInstanceID);
                 }
-            }
-        }
 
-        [ServerRpc]
-        private void HitServerRpc(ulong targetMeleeNetworkObjId, Vector3 bladeImpactPosition, string meleeClipName)
-        {
-            HitResult hitResult = HitResult.ReceiveDamage;
-            CharacterMelee targetMelee = NetworkManager.SpawnManager.SpawnedObjects[targetMeleeNetworkObjId].GetComponent<CharacterMelee>();
-            
-            // Look up melee clip by name
-            MeleeClip attack = null;
-            foreach (Combo combo in currentWeapon.combos)
-            {
-                if (combo.meleeClip.name == meleeClipName)
+                HitResult hitResult = HitResult.ReceiveDamage;
+
+                if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
                 {
-                    attack = combo.meleeClip;
-                    break;
-                }
-            }
-
-            if (attack == null)
-            {
-                Debug.LogError("No melee clip named " + meleeClipName + " found in combos for weapon: " + currentWeapon);
-                attack = currentMeleeClip;
-            }
-
-            if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
-            {
-                targetMelee.knockedUpHitCount.Value = 0;
-                if (attack.attackType != AttackType.Knockdown)
-                    targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                targetMelee.EventKnockedUpHitLimitReached.Invoke();
-            }
-
-            // Set Ailments here
-            switch (attack.attackType)
-            {
-                case AttackType.Stun:
-                    targetMelee.Character.Stun(this.Character, targetMelee.Character);
-                    break;
-                case AttackType.Knockdown:
-                    if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
+                    targetMelee.knockedUpHitCount.Value = 0;
+                    if (attack.attackType != AttackType.Knockdown)
                         targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
-                    break;
-                case AttackType.Knockedup:
-                    targetMelee.Character.Knockup(this.Character, targetMelee.Character);
-                    break;
-                case AttackType.Stagger:
-                    targetMelee.Character.Stagger(this.Character, targetMelee.Character);
-                    break;
-                case AttackType.None:
-                    if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
-                        targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                    {
-                        targetMelee.Character.CancelAilment();
-                    }
-                    break;
-            }
-
-            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
-            {
-                targetMelee.knockedUpHitCount.Value++;
-            }
-
-            int previousHP = targetMelee.HP.Value;
-            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
-                targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
-                targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-            {
-                hitResult = targetMelee.OnReceiveAttack(this, attack, bladeImpactPosition);
-                if (hitResult == HitResult.ReceiveDamage)
-                    targetMelee.HP.Value -= attack.baseDamage;
-                else if (hitResult == HitResult.PoiseBlock)
-                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
-            }
-            else
-            {
-                targetMelee.HP.Value -= attack.baseDamage;
-            }
-
-            // Send messages for stats in NetworkPlayer script
-            SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
-
-            if (targetMelee.HP.Value <= 0 & previousHP > 0)
-            {
-                targetMelee.SendMessage("OnDeath", this);
-                SendMessage("OnKill", targetMelee);
-            }
-
-            IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
-
-            bool hitSomething = triggers.Length > 0;
-            if (hitSomething)
-            {
-                for (int j = 0; j < triggers.Length; ++j)
-                {
-                    triggers[j].OnReceiveAttack(this, attack, hitResult);
+                    targetMelee.EventKnockedUpHitLimitReached.Invoke();
                 }
-            }
 
-            if (hitSomething && attack != null && targetMelee != null)
-            {
-                attack.ExecuteActionsOnHit(bladeImpactPosition, targetMelee.gameObject);
-            }
-
-            if (attack != null && attack.pushForce > float.Epsilon)
-            {
-                Rigidbody[] rigidbodies = targetMelee.GetComponents<Rigidbody>();
-                for (int j = 0; j < rigidbodies.Length; ++j)
+                // Set Ailments here
+                switch (attack.attackType)
                 {
-                    Vector3 direction = rigidbodies[j].transform.position - transform.position;
-                    rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
+                    case AttackType.Stun:
+                        targetMelee.Character.Stun(this.Character, targetMelee.Character);
+                        break;
+                    case AttackType.Knockdown:
+                        if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
+                            targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                        break;
+                    case AttackType.Knockedup:
+                        targetMelee.Character.Knockup(this.Character, targetMelee.Character);
+                        break;
+                    case AttackType.Stagger:
+                        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
+                        break;
+                    case AttackType.None:
+                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+                        {
+                            targetMelee.Character.CancelAilment();
+                        }
+                        break;
+                }
+
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                {
+                    targetMelee.knockedUpHitCount.Value++;
+                }
+
+                int previousHP = targetMelee.HP.Value;
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+                {
+                    hitResult = targetMelee.OnReceiveAttack(this, attack, blade.GetImpactPosition());
+                    if (hitResult == HitResult.ReceiveDamage)
+                        targetMelee.HP.Value -= attack.baseDamage;
+                    else if (hitResult == HitResult.PoiseBlock)
+                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                }
+                else
+                {
+                    targetMelee.HP.Value -= attack.baseDamage;
+                }
+
+                // Send messages for stats in NetworkPlayer script
+                SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
+
+                if (targetMelee.HP.Value <= 0 & previousHP > 0)
+                {
+                    targetMelee.SendMessage("OnDeath", this);
+                    SendMessage("OnKill", targetMelee);
+                }
+
+                IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
+
+                bool hitSomething = triggers.Length > 0;
+                if (hitSomething)
+                {
+                    for (int j = 0; j < triggers.Length; ++j)
+                    {
+                        triggers[j].OnReceiveAttack(this, attack, hitResult);
+                    }
+                }
+
+                if (hitSomething && attack != null && targetMelee != null)
+                {
+                    attack.ExecuteActionsOnHit(blade.GetImpactPosition(), targetMelee.gameObject);
+                }
+
+                if (attack != null && attack.pushForce > float.Epsilon)
+                {
+                    Rigidbody[] rigidbodies = targetMelee.GetComponents<Rigidbody>();
+                    for (int j = 0; j < rigidbodies.Length; ++j)
+                    {
+                        Vector3 direction = rigidbodies[j].transform.position - transform.position;
+                        rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
+                    }
                 }
             }
         }
