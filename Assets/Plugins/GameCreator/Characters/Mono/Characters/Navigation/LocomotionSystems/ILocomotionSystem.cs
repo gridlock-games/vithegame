@@ -407,8 +407,8 @@
                 deltaVertical - this.rootMoveDeltaVertical,
                 deltaForward - this.rootMoveDeltaForward
             );
-
-            movement += Time.deltaTime * this.rootMoveGravity * verticalMovement;
+            
+            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
 
             this.characterLocomotion.characterController.Move(
                 this.characterLocomotion.character.transform.TransformDirection(movement)

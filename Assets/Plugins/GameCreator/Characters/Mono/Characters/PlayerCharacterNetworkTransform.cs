@@ -63,7 +63,6 @@ namespace GameCreator.Characters
         }
 
         public float playerObjectTeleportThreshold = 2;
-        public float playerObjectDirectionalMagnitudeThreshold = 0.1f;
 
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
@@ -134,6 +133,10 @@ namespace GameCreator.Characters
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
+                if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
+                {
+                    inputPayload.inputVector = Vector2.zero;
+                }
                 SendInputServerRpc(inputPayload);
                 inputQueue.Enqueue(inputPayload);
 
@@ -245,6 +248,17 @@ namespace GameCreator.Characters
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;
+        }
+
+        //private void Update()
+        //{
+        //    Debug.Log(Vector3.Distance(currentPosition, transform.position));
+        //}
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(currentPosition, 1);
         }
     }
 }

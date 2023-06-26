@@ -40,7 +40,7 @@
                     targetRotation = networkTransform.currentRotation;
                 
                 // If distance is greater than teleport threshold, teleport player object to the network position
-                if (Vector3.Distance(networkTransform.currentPosition, characterLocomotion.character.transform.position) > networkTransform.playerObjectTeleportThreshold)
+                if (Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position) > networkTransform.playerObjectTeleportThreshold)
                 {
                     characterLocomotion.characterController.enabled = false;
                     characterLocomotion.characterController.transform.position = networkTransform.currentPosition;
@@ -50,12 +50,18 @@
                 {
                     // Calculate target direction towards network position
                     targetDirection = networkTransform.currentPosition - characterLocomotion.character.transform.position;
-                    
+
                     // If our magnitude is less than the magnitude threshold, do not move the player
-                    if (targetDirection.magnitude < networkTransform.playerObjectDirectionalMagnitudeThreshold)
-                        targetDirection = Vector3.zero;
-                    else
-                        targetDirection = targetDirection.normalized;
+                    //if (targetDirection.magnitude < 0.1f)
+                    //{
+                    //    targetDirection.x = 0;
+                    //    targetDirection.z = 0;
+                    //}
+                    if (targetDirection.magnitude > 0.1f)
+                    {
+                        Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
+                        targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
+                    }
                 }
             }
 
@@ -68,7 +74,6 @@
             if (this.isSliding) targetDirection = this.slideDirection;
             targetDirection += Vector3.up * this.characterLocomotion.verticalSpeed;
 
-            // If there is no player character network transform component on this object
             if (this.isRootMoving)
             {
                 this.UpdateRootMovement(Vector3.up * this.characterLocomotion.verticalSpeed);

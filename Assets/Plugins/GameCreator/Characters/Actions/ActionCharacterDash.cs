@@ -140,7 +140,51 @@
 
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+            //if (IsOwner) { DodgeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+
+            Character characterTarget = this.character.GetCharacter(target);
+            CharacterLocomotion locomotion = characterTarget.characterLocomotion;
+            Vector3 moveDirection = Vector3.zero;
+
+            switch (this.direction)
+            {
+                case Direction.CharacterMovement3D:
+                    moveDirection = locomotion.GetMovementDirection();
+                    break;
+
+                case Direction.TowardsTarget:
+                    Transform targetTransform = this.target.GetTransform(target);
+                    if (targetTransform != null)
+                    {
+                        moveDirection = targetTransform.position - characterTarget.transform.position;
+                        moveDirection.Scale(PLANE);
+                    }
+                    break;
+
+                case Direction.TowardsPosition:
+                    moveDirection = position.GetPosition(target) - characterTarget.transform.position;
+                    moveDirection.Scale(PLANE);
+                    break;
+
+                case Direction.MovementSidescrollXY:
+                    moveDirection = locomotion.GetMovementDirection();
+                    moveDirection.Scale(new Vector3(1, 1, 0));
+                    break;
+
+                case Direction.MovementSidescrollZY:
+                    moveDirection = locomotion.GetMovementDirection();
+                    moveDirection.Scale(new Vector3(0, 1, 1));
+                    break;
+            }
+
+            Vector3 charDirection = Vector3.Scale(
+                characterTarget.transform.TransformDirection(Vector3.forward),
+                PLANE
+            );
+
+            float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
+
+            InstantExecuteLocally(target, moveDirection, angle);
             return false;
         }
 
