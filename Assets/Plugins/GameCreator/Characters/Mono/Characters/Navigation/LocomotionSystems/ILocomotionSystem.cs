@@ -174,8 +174,8 @@
                 // TODO: Maybe add some drag?
                 if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
                 {
-                    if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
-                        this.isRootMoving = false;
+                    //if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+                    this.isRootMoving = false;
                 }
             }
 
@@ -397,8 +397,6 @@
 
         protected void UpdateRootMovement(Vector3 verticalMovement)
         {
-            if (characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>()) { return; }
-
             float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
