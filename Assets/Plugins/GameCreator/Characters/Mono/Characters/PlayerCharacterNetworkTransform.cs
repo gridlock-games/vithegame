@@ -189,7 +189,7 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 currentPosition = latestServerState.position;
                 currentRotation = latestServerState.rotation;
@@ -252,11 +252,6 @@ namespace GameCreator.Characters
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;
-        }
-
-        private void Update()
-        {
-            Debug.Log(Vector3.Distance(transform.position, currentPosition));
         }
 
         private void OnDrawGizmos()
