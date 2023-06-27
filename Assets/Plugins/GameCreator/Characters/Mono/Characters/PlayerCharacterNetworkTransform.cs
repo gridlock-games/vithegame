@@ -133,14 +133,19 @@ namespace GameCreator.Characters
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
+                // If we are in the middle of root motion, do not take an input vector
                 if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
                 {
                     inputPayload.inputVector = Vector2.zero;
                 }
-                SendInputServerRpc(inputPayload);
-                inputQueue.Enqueue(inputPayload);
 
-                ProcessInputQueue();
+                SendInputServerRpc(inputPayload);
+
+                if (!IsHost)
+                {
+                    inputQueue.Enqueue(inputPayload);
+                    ProcessInputQueue();
+                }
             }
             else // If we are not the owner of this object
             {
@@ -221,8 +226,7 @@ namespace GameCreator.Characters
         [ServerRpc]
         private void SendInputServerRpc(InputPayload inputPayload)
         {
-            if (!IsHost)
-                inputQueue.Enqueue(inputPayload);
+            inputQueue.Enqueue(inputPayload);
             // Send input to all clients that aren't the owner of this object
             List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
             clientIds.Remove(OwnerClientId);
@@ -250,15 +254,23 @@ namespace GameCreator.Characters
             return statePayload;
         }
 
-        //private void Update()
-        //{
-        //    Debug.Log(Vector3.Distance(currentPosition, transform.position));
-        //}
+        private void Update()
+        {
+            Debug.Log(Vector3.Distance(transform.position, currentPosition));
+        }
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(currentPosition, 1);
+            if (OwnerClientId == 0)
+                Gizmos.color = Color.red;
+            else if (OwnerClientId == 1)
+                Gizmos.color = Color.blue;
+            else if (OwnerClientId == 2)
+                Gizmos.color = Color.green;
+            else
+                Gizmos.color = Color.black;
+
+            Gizmos.DrawSphere(currentPosition, 0.5f);
         }
     }
 }

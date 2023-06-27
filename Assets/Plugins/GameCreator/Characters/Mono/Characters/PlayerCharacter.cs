@@ -157,7 +157,7 @@
                 );
 
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
-                movement += (inputPayload.rootMotionResult.rootMoveGravity * verticalMovement) * (1f / NetworkManager.NetworkTickSystem.TickRate);
+                movement += (1f / NetworkManager.NetworkTickSystem.TickRate) * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
                 movement = inputPayload.rotation * movement;
 
                 rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
@@ -247,7 +247,7 @@
                 setStartTick = false;
             }
 
-            if (rootMotionInformation.rootMoveTickDuration == 0) return default;
+            if (rootMotionInformation.rootMoveTickDuration == 0) { return default; }
             if (tick > rootMotionStartTick + rootMotionInformation.rootMoveTickDuration) { return default; }
 
             float t = (tick - rootMotionStartTick) / (float)rootMotionInformation.rootMoveTickDuration;

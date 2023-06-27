@@ -174,7 +174,6 @@
                 // TODO: Maybe add some drag?
                 if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
                 {
-                    //if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
                     this.isRootMoving = false;
                 }
             }
@@ -407,16 +406,24 @@
                 deltaVertical - this.rootMoveDeltaVertical,
                 deltaForward - this.rootMoveDeltaForward
             );
-            
+
             movement += Time.deltaTime * rootMoveGravity * verticalMovement;
 
-            this.characterLocomotion.characterController.Move(
-                this.characterLocomotion.character.transform.TransformDirection(movement)
-            );
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                // TODO make this not use the local player's rotation, but rotate to the target direction
+                movement = characterLocomotion.character.transform.rotation * movement;
+            }
+            else
+            {
+                movement = characterLocomotion.character.transform.rotation * movement;
+            }
 
-            this.rootMoveDeltaForward = deltaForward;
-            this.rootMoveDeltaSides = deltaSides;
-            this.rootMoveDeltaVertical = deltaVertical;
+            characterLocomotion.characterController.Move(movement);
+
+            rootMoveDeltaForward = deltaForward;
+            rootMoveDeltaSides = deltaSides;
+            rootMoveDeltaVertical = deltaVertical;
         }
 
         protected DirectionData GetFaceDirection()

@@ -51,12 +51,6 @@
                     // Calculate target direction towards network position
                     targetDirection = networkTransform.currentPosition - characterLocomotion.character.transform.position;
 
-                    // If our magnitude is less than the magnitude threshold, do not move the player
-                    //if (targetDirection.magnitude < 0.1f)
-                    //{
-                    //    targetDirection.x = 0;
-                    //    targetDirection.z = 0;
-                    //}
                     if (targetDirection.magnitude > 0.1f)
                     {
                         Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
