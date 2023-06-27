@@ -413,6 +413,7 @@
             {
                 // TODO make this not use the local player's rotation, but rotate to the target direction
                 movement = characterLocomotion.character.transform.rotation * movement;
+                //movement = Quaternion.LookRotation(networkTransform.currentPosition - networkTransform.transform.position, networkTransform.transform.up) * movement;
             }
             else
             {
