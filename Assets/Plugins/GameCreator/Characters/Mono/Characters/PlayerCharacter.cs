@@ -124,6 +124,9 @@
 
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
+            // If the input payload hasn't been recieved yet (this happens on non-owner clients)
+            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 

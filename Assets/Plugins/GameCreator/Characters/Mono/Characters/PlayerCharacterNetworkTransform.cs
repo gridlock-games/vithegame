@@ -12,6 +12,7 @@ namespace GameCreator.Characters
         public struct InputPayload : INetworkSerializable
         {
             public int tick;
+            public bool initialized;
             public bool isControllable;
             public Vector2 inputVector;
             public Quaternion rotation;
@@ -20,6 +21,7 @@ namespace GameCreator.Characters
             public InputPayload(int tick, bool isControllable, Vector2 inputVector, Quaternion rotation, PlayerCharacter.RootMotionResult rootMotionResult)
             {
                 this.tick = tick;
+                initialized = true;
                 this.isControllable = isControllable;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
@@ -31,6 +33,7 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref isControllable);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref initialized);
 
                 if (isControllable)
                 {
@@ -192,7 +195,7 @@ namespace GameCreator.Characters
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 currentPosition = latestServerState.position;
-                currentRotation = latestServerState.rotation;
+                //currentRotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
