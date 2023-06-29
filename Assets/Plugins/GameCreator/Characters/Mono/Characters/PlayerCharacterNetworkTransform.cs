@@ -98,8 +98,6 @@ namespace GameCreator.Characters
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             if (IsClient)
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
-
-            //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Character"), !IsServer);
         }
 
         public override void OnNetworkDespawn()
@@ -152,14 +150,8 @@ namespace GameCreator.Characters
             }
             else // If we are not the owner of this object
             {
-                ProcessInputQueue();
-
-                if (!latestServerState.Equals(default(StatePayload)) &&
-                (lastProcessedState.Equals(default(StatePayload)) ||
-                !latestServerState.Equals(lastProcessedState)))
-                {
-                    HandleServerReconciliation();
-                }
+                currentPosition = latestServerState.position;
+                currentRotation = latestServerState.rotation;
             }
 
             currentTick++;
@@ -192,7 +184,7 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 currentPosition = latestServerState.position;
                 //currentRotation = latestServerState.rotation;
@@ -226,17 +218,7 @@ namespace GameCreator.Characters
             playerCharacter = GetComponent<PlayerCharacter>();
         }
 
-        [ServerRpc]
-        private void SendInputServerRpc(InputPayload inputPayload)
-        {
-            inputQueue.Enqueue(inputPayload);
-            // Send input to all clients that aren't the owner of this object
-            List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
-            clientIds.Remove(OwnerClientId);
-            SendInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
-        }
-
-        [ClientRpc] private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
+        [ServerRpc] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {
