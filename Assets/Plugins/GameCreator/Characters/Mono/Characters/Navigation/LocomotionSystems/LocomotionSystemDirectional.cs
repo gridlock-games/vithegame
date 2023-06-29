@@ -38,9 +38,10 @@
             {
                 if (!networkTransform.IsOwner)
                 {
-                    targetRotation = networkTransform.currentRotation;
+                    targetRotation = Quaternion.RotateTowards(networkTransform.transform.rotation, networkTransform.currentRotation,
+                        Time.deltaTime * this.characterLocomotion.angularSpeed);
                 }
-                
+
                 // If distance is greater than teleport threshold, teleport player object to the network position
                 if (Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position) > networkTransform.playerObjectTeleportThreshold)
                 {
