@@ -138,6 +138,7 @@
 
             int currPhase = this.Melee.GetCurrentPhase();
             MeleeClip clip = this.Melee.currentMeleeClip;
+            MeleeWeapon weapon = this.Melee.currentWeapon;
 
             if (currPhase == this.prevPhase) return;
 
@@ -167,11 +168,11 @@
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
                     
                     if(clip != null && this.weaponBone != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone)) {
-
-                        if(clip.name == "Atk_Skill_Hammer_01_C") Debug.Log("I am running");
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }
+                    
+                    this.Melee.ExecuteSwingAudio();
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
                     break;

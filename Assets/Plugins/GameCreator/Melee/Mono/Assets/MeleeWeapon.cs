@@ -62,6 +62,7 @@ namespace GameCreator.Melee
         public AudioClip audioDraw;
         public AudioClip audioImpactNormal;
         public AudioClip audioImpactKnockback;
+        public AudioClip audioSwing;
 
 
         // abilities

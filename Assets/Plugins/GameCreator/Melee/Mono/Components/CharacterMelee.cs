@@ -1083,6 +1083,14 @@ namespace GameCreator.Melee
             return Time.time;
         }
 
+        public void ExecuteSwingAudio()
+        {
+            if (this.currentWeapon.audioSwing)
+            {
+                this.PlayAudio(this.currentWeapon.audioSwing); 
+            }
+        }
+
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
             this.PlayAudio(audio);
