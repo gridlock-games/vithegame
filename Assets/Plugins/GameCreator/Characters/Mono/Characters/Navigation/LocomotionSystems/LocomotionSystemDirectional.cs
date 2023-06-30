@@ -34,7 +34,7 @@
             float speed = this.CalculateSpeed(targetDirection, this.characterLocomotion.characterController.isGrounded);
             Quaternion targetRotation = this.UpdateRotation(targetDirection);
 
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform) & characterLocomotion.character.IsSpawned)
             {
                 if (!networkTransform.IsOwner)
                 {

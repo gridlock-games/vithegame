@@ -11,7 +11,10 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject serverCameraPrefab;
+        
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
+        [HideInInspector] public string playerHubIP;
+
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
@@ -107,7 +110,14 @@ namespace LightPat.Core
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); Random.InitState(randomSeed.Value); };
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); Random.InitState(randomSeed.Value); };
+
+            SceneManager.sceneLoaded += OnSceneLoad;
+            SceneManager.sceneUnloaded += OnSceneUnload;
         }
+
+        void OnSceneLoad(Scene scene, LoadSceneMode mode) { Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode); }
+
+        void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
 
         private void Update()
         {
@@ -301,14 +311,16 @@ namespace LightPat.Core
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
 
-        public void ChangeLocalSceneThenStartClient(string sceneName) { StartCoroutine(ChangeLocalSceneThenStartClientCoroutine(sceneName)); }
-
-        private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
+        public AsyncOperation ChangeLocalSceneThenStartClient(string sceneName)
         {
             //if (IsSpawned) { Debug.LogError("ChangeLocalSceneThenStartClient() should only be called when the network manager is turned off"); yield break; }
             Debug.Log("Loading " + sceneName + " scene");
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            StartCoroutine(ChangeLocalSceneThenStartClientCoroutine(sceneName));
+            return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        }
 
+        private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
+        {
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
 
             if (NetworkManager.Singleton.StartClient())

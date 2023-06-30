@@ -407,7 +407,7 @@
                 deltaForward - this.rootMoveDeltaForward
             );
 
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform) & characterLocomotion.character.IsSpawned)
             {
                 // Calculate rotation to look at the current network position
                 Quaternion relativeRotation = Quaternion.identity;
