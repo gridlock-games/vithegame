@@ -171,12 +171,11 @@
         {
             if (this.isRootMoving)
             {
-                // TODO: Maybe add some drag?
-                if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
-                {
-                    //if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
-                    this.isRootMoving = false;
-                }
+                //// TODO: Maybe add some drag?
+                //if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
+                //{
+                //    this.isRootMoving = false;
+                //}
             }
 
             if (this.isDashing)
@@ -408,15 +407,41 @@
                 deltaForward - this.rootMoveDeltaForward
             );
 
-            movement += Time.deltaTime * this.rootMoveGravity * verticalMovement;
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                // Calculate rotation to look at the current network position
+                Quaternion relativeRotation = Quaternion.identity;
+                if ((networkTransform.currentPosition - networkTransform.transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
+                
+                // Calculate rotation to look in the direction of our movement
+                Quaternion movementRotation = Quaternion.identity;
+                if (movement.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up); }
 
-            this.characterLocomotion.characterController.Move(
-                this.characterLocomotion.character.transform.TransformDirection(movement)
-            );
+                // Apply the direction of movement to the direction to move towards the current network position
+                Quaternion finalRotation = relativeRotation * movementRotation;
 
-            this.rootMoveDeltaForward = deltaForward;
-            this.rootMoveDeltaSides = deltaSides;
-            this.rootMoveDeltaVertical = deltaVertical;
+                // Invert movement along the local x axis, idk why I need to do this
+                movement.x *= -1;
+                // Apply rotation to movement vector
+                movement = finalRotation * movement;
+            }
+            else
+            {
+                movement = characterLocomotion.character.transform.rotation * movement;
+            }
+
+            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
+
+            characterLocomotion.characterController.Move(movement);
+
+            rootMoveDeltaForward = deltaForward;
+            rootMoveDeltaSides = deltaSides;
+            rootMoveDeltaVertical = deltaVertical;
+
+            if (t >= 1)
+            {
+                isRootMoving = false;
+            }
         }
 
         protected DirectionData GetFaceDirection()
