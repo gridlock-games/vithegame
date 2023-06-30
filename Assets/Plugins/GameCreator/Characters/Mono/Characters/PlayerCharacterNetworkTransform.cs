@@ -12,6 +12,7 @@ namespace GameCreator.Characters
         public struct InputPayload : INetworkSerializable
         {
             public int tick;
+            public bool initialized;
             public bool isControllable;
             public Vector2 inputVector;
             public Quaternion rotation;
@@ -20,6 +21,7 @@ namespace GameCreator.Characters
             public InputPayload(int tick, bool isControllable, Vector2 inputVector, Quaternion rotation, PlayerCharacter.RootMotionResult rootMotionResult)
             {
                 this.tick = tick;
+                initialized = true;
                 this.isControllable = isControllable;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
@@ -31,6 +33,7 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref isControllable);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref initialized);
 
                 if (isControllable)
                 {
@@ -63,7 +66,6 @@ namespace GameCreator.Characters
         }
 
         public float playerObjectTeleportThreshold = 2;
-        public float playerObjectDirectionalMagnitudeThreshold = 0.1f;
 
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
@@ -96,8 +98,6 @@ namespace GameCreator.Characters
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             if (IsClient)
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
-
-            //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Character"), !IsServer);
         }
 
         public override void OnNetworkDespawn()
@@ -134,21 +134,24 @@ namespace GameCreator.Characters
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
-                SendInputServerRpc(inputPayload);
-                inputQueue.Enqueue(inputPayload);
+                // If we are in the middle of root motion, do not take an input vector
+                if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
+                {
+                    inputPayload.inputVector = Vector2.zero;
+                }
 
-                ProcessInputQueue();
+                SendInputServerRpc(inputPayload);
+
+                if (!IsHost)
+                {
+                    inputQueue.Enqueue(inputPayload);
+                    ProcessInputQueue();
+                }
             }
             else // If we are not the owner of this object
             {
-                ProcessInputQueue();
-
-                if (!latestServerState.Equals(default(StatePayload)) &&
-                (lastProcessedState.Equals(default(StatePayload)) ||
-                !latestServerState.Equals(lastProcessedState)))
-                {
-                    HandleServerReconciliation();
-                }
+                currentPosition = latestServerState.position;
+                currentRotation = latestServerState.rotation;
             }
 
             currentTick++;
@@ -184,7 +187,7 @@ namespace GameCreator.Characters
                 Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 currentPosition = latestServerState.position;
-                currentRotation = latestServerState.rotation;
+                //currentRotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
@@ -215,18 +218,7 @@ namespace GameCreator.Characters
             playerCharacter = GetComponent<PlayerCharacter>();
         }
 
-        [ServerRpc]
-        private void SendInputServerRpc(InputPayload inputPayload)
-        {
-            if (!IsHost)
-                inputQueue.Enqueue(inputPayload);
-            // Send input to all clients that aren't the owner of this object
-            List<ulong> clientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
-            clientIds.Remove(OwnerClientId);
-            SendInputClientRpc(inputPayload, new ClientRpcParams() { Send = { TargetClientIds = clientIds } });
-        }
-
-        [ClientRpc] private void SendInputClientRpc(InputPayload inputPayload, ClientRpcParams clientRpcParams) { inputQueue.Enqueue(inputPayload); }
+        [ServerRpc] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {
@@ -245,6 +237,20 @@ namespace GameCreator.Characters
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (OwnerClientId == 0)
+                Gizmos.color = Color.red;
+            else if (OwnerClientId == 1)
+                Gizmos.color = Color.blue;
+            else if (OwnerClientId == 2)
+                Gizmos.color = Color.green;
+            else
+                Gizmos.color = Color.black;
+
+            Gizmos.DrawSphere(currentPosition, 0.5f);
         }
     }
 }

@@ -124,6 +124,9 @@
 
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
+            // If the input payload hasn't been recieved yet (this happens on non-owner clients)
+            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 
@@ -157,7 +160,7 @@
                 );
 
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
-                movement += (inputPayload.rootMotionResult.rootMoveGravity * verticalMovement) * (1f / NetworkManager.NetworkTickSystem.TickRate);
+                movement += (1f / NetworkManager.NetworkTickSystem.TickRate) * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
                 movement = inputPayload.rotation * movement;
 
                 rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
@@ -170,21 +173,25 @@
             }
 
             PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-            Vector3 oldPosition = transform.position;
+            Vector3 newPosition = networkTransform.currentPosition;
+            if (inputPayload.isControllable)
+            {
+                Vector3 oldPosition = transform.position;
 
-            // Set position to current position
-            characterLocomotion.characterController.enabled = false;
-            transform.position = networkTransform.currentPosition;
-            characterLocomotion.characterController.enabled = true;
+                // Set position to current position
+                characterLocomotion.characterController.enabled = false;
+                transform.position = networkTransform.currentPosition;
+                characterLocomotion.characterController.enabled = true;
 
-            // Apply movement to charactercontroller
-            characterLocomotion.characterController.Move(movement);
-            Vector3 newPosition = transform.position;
+                // Apply movement to charactercontroller
+                characterLocomotion.characterController.Move(movement);
+                newPosition = transform.position;
 
-            // Revert movement change
-            characterLocomotion.characterController.enabled = false;
-            transform.position = oldPosition;
-            characterLocomotion.characterController.enabled = true;
+                // Revert movement change
+                characterLocomotion.characterController.enabled = false;
+                transform.position = oldPosition;
+                characterLocomotion.characterController.enabled = true;
+            }
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
@@ -243,7 +250,7 @@
                 setStartTick = false;
             }
 
-            if (rootMotionInformation.rootMoveTickDuration == 0) return default;
+            if (rootMotionInformation.rootMoveTickDuration == 0) { return default; }
             if (tick > rootMotionStartTick + rootMotionInformation.rootMoveTickDuration) { return default; }
 
             float t = (tick - rootMotionStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
