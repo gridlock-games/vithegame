@@ -171,11 +171,11 @@
         {
             if (this.isRootMoving)
             {
-                // TODO: Maybe add some drag?
-                if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
-                {
-                    this.isRootMoving = false;
-                }
+                //// TODO: Maybe add some drag?
+                //if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
+                //{
+                //    this.isRootMoving = false;
+                //}
             }
 
             if (this.isDashing)
@@ -407,24 +407,38 @@
                 deltaForward - this.rootMoveDeltaForward
             );
 
-            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
-
             if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
                 // TODO make this not use the local player's rotation, but rotate to the target direction
-                movement = characterLocomotion.character.transform.rotation * movement;
-                //movement = Quaternion.LookRotation(networkTransform.currentPosition - networkTransform.transform.position, networkTransform.transform.up) * movement;
+
+                Quaternion relativeRotation = Quaternion.LookRotation(networkTransform.currentPosition - networkTransform.transform.position, networkTransform.transform.up);
+
+                Quaternion movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up);
+
+                Quaternion finalRotation = relativeRotation * movementRotation;
+
+                movement.x *= -1;
+                movement = finalRotation * movement;
+                Debug.Log(movement + " " + finalRotation.eulerAngles);
+                Debug.DrawRay(networkTransform.transform.position,  new Vector3(movement.x, 0, movement.z).normalized * 10, Color.black, Time.deltaTime);
             }
             else
             {
                 movement = characterLocomotion.character.transform.rotation * movement;
             }
 
+            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
+
             characterLocomotion.characterController.Move(movement);
 
             rootMoveDeltaForward = deltaForward;
             rootMoveDeltaSides = deltaSides;
             rootMoveDeltaVertical = deltaVertical;
+
+            if (t >= 1)
+            {
+                isRootMoving = false;
+            }
         }
 
         protected DirectionData GetFaceDirection()
