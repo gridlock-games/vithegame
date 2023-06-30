@@ -409,18 +409,21 @@
 
             if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
-                // TODO make this not use the local player's rotation, but rotate to the target direction
+                // Calculate rotation to look at the current network position
+                Quaternion relativeRotation = Quaternion.identity;
+                if (movement.normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
+                
+                // Calculate rotation to look in the direction of our movement
+                Quaternion movementRotation = Quaternion.identity;
+                if (movement.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up); }
 
-                Quaternion relativeRotation = Quaternion.LookRotation(networkTransform.currentPosition - networkTransform.transform.position, networkTransform.transform.up);
-
-                Quaternion movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up);
-
+                // Apply the direction of movement to the direction to move towards the current network position
                 Quaternion finalRotation = relativeRotation * movementRotation;
 
+                // Invert movement along the local x axis, idk why I need to do this
                 movement.x *= -1;
+                // Apply rotation to movement vector
                 movement = finalRotation * movement;
-                Debug.Log(movement + " " + finalRotation.eulerAngles);
-                Debug.DrawRay(networkTransform.transform.position,  new Vector3(movement.x, 0, movement.z).normalized * 10, Color.black, Time.deltaTime);
             }
             else
             {
