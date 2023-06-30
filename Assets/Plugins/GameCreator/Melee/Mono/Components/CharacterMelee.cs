@@ -72,7 +72,7 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        
+
         public float attackInterval = 0.10f;
 
         private NetworkVariable<float> Defense = new NetworkVariable<float>();
@@ -183,8 +183,9 @@ namespace GameCreator.Melee
                         {
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (Poise.Value <= 20) { 
-                                    return; 
+                                if (Poise.Value <= 20)
+                                {
+                                    return;
                                 }
                                 OnHeavyAttack();
                             }
@@ -194,10 +195,8 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
-
 
                         if (IsOwner)
                             FocusTarget(meleeClip);
@@ -210,11 +209,14 @@ namespace GameCreator.Melee
                             blade.isOrbitLocked = meleeClip.isOrbitLocked;
                         });
 
-                        if(!this.currentMeleeClip.isSequence) {
+                        if (!this.currentMeleeClip.isSequence)
+                        {
                             this.currentMeleeClip.Play(this);
 
                             if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
-                        } else if (this.currentMeleeClip.isSequence) {
+                        }
+                        else if (this.currentMeleeClip.isSequence)
+                        {
                             StartCoroutine(SequenceClipPlayHandler(currentMeleeClip));
                         }
                     }
@@ -222,13 +224,15 @@ namespace GameCreator.Melee
             }
         }
 
-        private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent) {
+        private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent)
+        {
             List<MeleeClip> sequenceChildren = sequenceClipParent.sequencedClips;
-            
+
             // Reset attack time first
             this.comboSystem.StartAttackTime(false);
 
-            foreach(MeleeClip clip in sequenceChildren) {
+            foreach (MeleeClip clip in sequenceChildren)
+            {
                 this.currentMeleeClip = clip;
                 this.comboSystem.StartAttackTime(true);
                 clip.Play(this);
@@ -241,7 +245,7 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
-        
+
         public int count = 0;
         private void LateUpdate()
         {
@@ -268,8 +272,8 @@ namespace GameCreator.Melee
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         hits = blade.CaptureHits();
-                        
-                        if(this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
+
+                        if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
@@ -305,7 +309,7 @@ namespace GameCreator.Melee
                 }
 
                 this.targetsEvaluated.Add(hitInstanceID);
-                
+
                 // Wait for the specified interval before performing the action again
                 yield return new WaitForSeconds(0.15f);
 
@@ -1050,7 +1054,7 @@ namespace GameCreator.Melee
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
-            
+
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,
@@ -1270,7 +1274,7 @@ namespace GameCreator.Melee
             }
 
             if (!target) return;
-            
+
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
 
             if (IsTargetInFront(attackVectorAngle) == false) return;
@@ -1283,7 +1287,8 @@ namespace GameCreator.Melee
             float distance = Vector3.Distance(transform.position, target.position);
             AnimationCurve clipMovementForward = clip.movementForward;
 
-            if(!clip.isLunge && clip.isModifyFocus) {
+            if (!clip.isLunge && clip.isModifyFocus)
+            {
                 TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
                 SetTargetFocus(targetMelee);
             }

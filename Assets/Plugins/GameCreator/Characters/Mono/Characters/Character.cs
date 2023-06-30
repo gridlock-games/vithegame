@@ -149,6 +149,9 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                     Stagger(null, this);
                     break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.Dead:
+                    UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
+                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     CancelAilment();
                     break;

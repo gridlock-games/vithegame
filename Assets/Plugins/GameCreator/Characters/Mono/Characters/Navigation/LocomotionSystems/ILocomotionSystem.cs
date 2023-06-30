@@ -411,7 +411,7 @@
             {
                 // Calculate rotation to look at the current network position
                 Quaternion relativeRotation = Quaternion.identity;
-                if (movement.normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
+                if ((networkTransform.currentPosition - networkTransform.transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
                 
                 // Calculate rotation to look in the direction of our movement
                 Quaternion movementRotation = Quaternion.identity;
