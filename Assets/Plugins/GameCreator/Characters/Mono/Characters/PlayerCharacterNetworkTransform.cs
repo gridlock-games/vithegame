@@ -154,7 +154,8 @@ namespace GameCreator.Characters
                 currentRotation = latestServerState.rotation;
             }
 
-            currentTick++;
+            // If we are the host, this is also called in the HandleServerTick() method
+            if (!IsHost) { currentTick++; }
         }
 
         private int ProcessInputQueue()
@@ -164,7 +165,6 @@ namespace GameCreator.Characters
             while (inputQueue.Count > 0)
             {
                 InputPayload inputPayload = inputQueue.Dequeue();
-
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 inputBuffer[bufferIndex] = inputPayload;
