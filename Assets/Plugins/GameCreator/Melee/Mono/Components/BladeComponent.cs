@@ -152,7 +152,7 @@
             switch (currPhase)
             {
                 case -1:
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackEnd.Invoke();
                     break;
 
@@ -161,7 +161,7 @@
                     if(Melee.count > 0) {
                      Melee.count = 0;
                     };
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     break;
 
                 case  1:
@@ -182,7 +182,7 @@
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.count = 0;
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackRecovery.Invoke();
                     break;
             }
