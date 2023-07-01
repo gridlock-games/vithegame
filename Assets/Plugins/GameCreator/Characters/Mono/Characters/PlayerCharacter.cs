@@ -185,6 +185,7 @@
 
                 // Apply movement to charactercontroller
                 characterLocomotion.characterController.Move(movement);
+
                 newPosition = transform.position;
 
                 // Revert movement change
@@ -209,8 +210,9 @@
             public float rootMotionSides;
             public float rootMotionVertical;
             public float rootMoveGravity;
+            public float progress;
 
-            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity)
+            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity, float progress)
             {
                 this.apply = apply;
                 this.newMeleeClip = newMeleeClip;
@@ -218,6 +220,7 @@
                 this.rootMotionSides = rootMotionSides;
                 this.rootMotionVertical = rootMotionVertical;
                 this.rootMoveGravity = rootMoveGravity;
+                this.progress = progress;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -231,6 +234,7 @@
                     serializer.SerializeValue(ref rootMotionSides);
                     serializer.SerializeValue(ref rootMotionVertical);
                     serializer.SerializeValue(ref rootMoveGravity);
+                    serializer.SerializeValue(ref progress);
                 }
             }
         }
@@ -259,7 +263,7 @@
             float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
             float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
 
-            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity);
+            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity, t);
         }
 
         public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)

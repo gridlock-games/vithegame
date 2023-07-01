@@ -394,25 +394,53 @@
             }
         }
 
+        private float lastT;
+        private float lastRootMoveStartTime;
         protected void UpdateRootMovement(Vector3 verticalMovement)
         {
-            float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+            float t;
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                // Prevent root motion progress from exceeding the network's root motion progress
+                t = networkTransform.localRootMotionProgressLimit;
+
+                // If the current progress is 0 and the last progress was more than 0, root motion needs to be deactivated
+                if (lastT > 0 & t == 0)
+                {
+                    isRootMoving = false;
+                    lastT = t;
+                    lastRootMoveStartTime = rootMoveStartTime;
+                    return;
+                }
+
+                // If there is a new clip assigned, don't execute root motion, this is because we need to wait for the next tick to occur before executing
+                if (rootMoveStartTime != lastRootMoveStartTime)
+                {
+                    lastT = t;
+                    lastRootMoveStartTime = rootMoveStartTime;
+                    return;
+                }
+            }
+            else
+            {
+                t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+            }
+
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
             float deltaVertical = this.rootMoveCurveVertical.Evaluate(t) * this.rootMoveImpulse;
 
-            Vector3 movement = new Vector3(
-                deltaSides - this.rootMoveDeltaSides,
-                deltaVertical - this.rootMoveDeltaVertical,
-                deltaForward - this.rootMoveDeltaForward
-            );
+            Vector3 movement = new Vector3(deltaSides, deltaVertical, deltaForward);
+            movement.x -= rootMoveDeltaSides;
+            movement.y -= rootMoveDeltaVertical;
+            movement.z -= rootMoveDeltaForward;
 
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform) & characterLocomotion.character.IsSpawned)
+            if (networkTransform)
             {
                 // Calculate rotation to look at the current network position
                 Quaternion relativeRotation = Quaternion.identity;
                 if ((networkTransform.currentPosition - networkTransform.transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
-                
+
                 // Calculate rotation to look in the direction of our movement
                 Quaternion movementRotation = Quaternion.identity;
                 if (movement.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up); }
@@ -430,14 +458,16 @@
                 movement = characterLocomotion.character.transform.rotation * movement;
             }
 
-            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
-
-            characterLocomotion.characterController.Move(movement);
-
             rootMoveDeltaForward = deltaForward;
             rootMoveDeltaSides = deltaSides;
             rootMoveDeltaVertical = deltaVertical;
 
+            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
+
+            characterLocomotion.characterController.Move(movement);
+
+            lastT = t;
+            lastRootMoveStartTime = rootMoveStartTime;
             if (t >= 1)
             {
                 isRootMoving = false;

@@ -70,6 +70,8 @@ namespace GameCreator.Characters
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
 
+        public float localRootMotionProgressLimit { get; private set; }
+
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
         private const int BUFFER_SIZE = 1024;
@@ -134,6 +136,7 @@ namespace GameCreator.Characters
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
+                
                 // If we are in the middle of root motion, do not take an input vector
                 if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
                 {
@@ -234,6 +237,7 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = true;
             }
 
+            localRootMotionProgressLimit = input.rootMotionResult.progress;
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;

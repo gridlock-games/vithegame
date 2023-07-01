@@ -294,6 +294,7 @@ namespace GameCreator.Melee
                 if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
+                if (!targetMelee) { continue; }
                 MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
 
                 // This is for checking if we are hitting an environment object
