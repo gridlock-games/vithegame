@@ -125,7 +125,7 @@
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
             // If the input payload hasn't been recieved yet (this happens on non-owner clients)
-            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation, inputPayload.rootMotionResult.progress); }
 
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
@@ -173,32 +173,29 @@
             }
 
             PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-            Vector3 newPosition = networkTransform.currentPosition;
-            if (inputPayload.isControllable)
-            {
-                Vector3 oldPosition = transform.position;
+            Vector3 oldPosition = transform.position;
 
-                // Set position to current position
-                characterLocomotion.characterController.enabled = false;
-                transform.position = networkTransform.currentPosition;
-                characterLocomotion.characterController.enabled = true;
+            // Set position to current position
+            characterLocomotion.characterController.enabled = false;
+            transform.position = networkTransform.currentPosition;
+            characterLocomotion.characterController.enabled = true;
 
-                // Apply movement to charactercontroller
-                characterLocomotion.characterController.Move(movement);
-                newPosition = transform.position;
+            // Apply movement to charactercontroller
+            characterLocomotion.characterController.Move(movement);
 
-                // Revert movement change
-                characterLocomotion.characterController.enabled = false;
-                transform.position = oldPosition;
-                characterLocomotion.characterController.enabled = true;
-            }
+            Vector3 newPosition = transform.position;
+
+            // Revert movement change
+            characterLocomotion.characterController.enabled = false;
+            transform.position = oldPosition;
+            characterLocomotion.characterController.enabled = true;
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
             else
                 characterLocomotion.characterController.transform.rotation = inputPayload.rotation;
 
-            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, newPosition, transform.rotation);
+            return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, newPosition, transform.rotation, inputPayload.rootMotionResult.progress);
         }
 
         public struct RootMotionResult : INetworkSerializable
@@ -209,8 +206,9 @@
             public float rootMotionSides;
             public float rootMotionVertical;
             public float rootMoveGravity;
+            public float progress;
 
-            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity)
+            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity, float progress)
             {
                 this.apply = apply;
                 this.newMeleeClip = newMeleeClip;
@@ -218,6 +216,7 @@
                 this.rootMotionSides = rootMotionSides;
                 this.rootMotionVertical = rootMotionVertical;
                 this.rootMoveGravity = rootMoveGravity;
+                this.progress = progress;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -231,6 +230,7 @@
                     serializer.SerializeValue(ref rootMotionSides);
                     serializer.SerializeValue(ref rootMotionVertical);
                     serializer.SerializeValue(ref rootMoveGravity);
+                    serializer.SerializeValue(ref progress);
                 }
             }
         }
@@ -259,7 +259,7 @@
             float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
             float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
 
-            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity);
+            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity, t);
         }
 
         public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)

@@ -49,12 +49,14 @@ namespace GameCreator.Characters
             public int tick;
             public Vector3 position;
             public Quaternion rotation;
+            public float rootMotionProgress;
 
-            public StatePayload(int tick, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, Vector3 position, Quaternion rotation, float rootMotionProgress)
             {
                 this.tick = tick;
                 this.position = position;
                 this.rotation = rotation;
+                this.rootMotionProgress = rootMotionProgress;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -62,6 +64,7 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref rootMotionProgress);
             }
         }
 
@@ -69,6 +72,8 @@ namespace GameCreator.Characters
 
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
+
+        public float localRootMotionProgressLimit { get; private set; }
 
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
@@ -134,6 +139,7 @@ namespace GameCreator.Characters
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, playerCharacter.IsControllable(), new Vector2(Input.GetAxisRaw(AXIS_H), Input.GetAxisRaw(AXIS_V)), transform.rotation, playerCharacter.RootMotionTickUpdate(currentTick));
+                
                 // If we are in the middle of root motion, do not take an input vector
                 if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
                 {
@@ -150,11 +156,13 @@ namespace GameCreator.Characters
             }
             else // If we are not the owner of this object
             {
+                localRootMotionProgressLimit = latestServerState.rootMotionProgress;
                 currentPosition = latestServerState.position;
                 currentRotation = latestServerState.rotation;
             }
 
-            currentTick++;
+            // If we are the host, this is also called in the HandleServerTick() method
+            if (!IsHost) { currentTick++; }
         }
 
         private int ProcessInputQueue()
@@ -164,7 +172,6 @@ namespace GameCreator.Characters
             while (inputQueue.Count > 0)
             {
                 InputPayload inputPayload = inputQueue.Dequeue();
-
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 inputBuffer[bufferIndex] = inputPayload;
@@ -234,6 +241,7 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = true;
             }
 
+            localRootMotionProgressLimit = statePayload.rootMotionProgress;
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;

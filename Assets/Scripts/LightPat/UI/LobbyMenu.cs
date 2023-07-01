@@ -33,7 +33,19 @@ namespace LightPat.UI
 
         public void LeaveLobby()
         {
-            Application.Quit();
+            StartCoroutine(ConnectToHub());
+        }
+
+        private IEnumerator ConnectToHub()
+        {
+            Debug.Log("Shutting down NetworkManager");
+            NetworkManager.Singleton.Shutdown();
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            Debug.Log("Shutdown complete");
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = ClientManager.Singleton.playerHubIP;
+            Debug.Log("Switching to hub scene: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            // Change the scene locally, then connect to the target IP
+            ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
         }
 
         public void ToggleReady()
