@@ -173,26 +173,22 @@
             }
 
             PlayerCharacterNetworkTransform networkTransform = GetComponent<PlayerCharacterNetworkTransform>();
-            Vector3 newPosition = networkTransform.currentPosition;
-            if (inputPayload.isControllable)
-            {
-                Vector3 oldPosition = transform.position;
+            Vector3 oldPosition = transform.position;
 
-                // Set position to current position
-                characterLocomotion.characterController.enabled = false;
-                transform.position = networkTransform.currentPosition;
-                characterLocomotion.characterController.enabled = true;
+            // Set position to current position
+            characterLocomotion.characterController.enabled = false;
+            transform.position = networkTransform.currentPosition;
+            characterLocomotion.characterController.enabled = true;
 
-                // Apply movement to charactercontroller
-                characterLocomotion.characterController.Move(movement);
+            // Apply movement to charactercontroller
+            characterLocomotion.characterController.Move(movement);
 
-                newPosition = transform.position;
+            Vector3 newPosition = transform.position;
 
-                // Revert movement change
-                characterLocomotion.characterController.enabled = false;
-                transform.position = oldPosition;
-                characterLocomotion.characterController.enabled = true;
-            }
+            // Revert movement change
+            characterLocomotion.characterController.enabled = false;
+            transform.position = oldPosition;
+            characterLocomotion.characterController.enabled = true;
 
             if (IsOwner)
                 characterLocomotion.characterController.transform.rotation = targetRotation;
