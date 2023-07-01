@@ -177,12 +177,15 @@ namespace GameCreator.Melee
                     : 1f;
             }
 
-            this.render.material.color = new Color(
-                this.material.color.r,
-                this.material.color.g,
-                this.material.color.b,
-                1f - Mathf.Clamp01(t)
-            );
+            if (render.material.HasProperty("_Color"))
+            {
+                this.render.material.color = new Color(
+                    this.material.color.r,
+                    this.material.color.g,
+                    this.material.color.b,
+                    1f - Mathf.Clamp01(t)
+                );
+            }
         }
 
         // CATMULL-ROM METHODS: -------------------------------------------------------------------
