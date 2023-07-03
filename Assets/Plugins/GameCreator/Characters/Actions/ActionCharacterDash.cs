@@ -85,7 +85,6 @@
             {
                 case Direction.CharacterMovement3D:
                     moveDirection = locomotion.GetMovementDirection();
-                    Debug.Log(moveDirection);
                     break;
 
                 case Direction.TowardsTarget:
@@ -113,14 +112,16 @@
                     moveDirection.Scale(new Vector3(0, 1, 1));
                     break;
             }
+            
+            Vector3 charDirection = Vector3.Scale(characterTarget.transform.TransformDirection(Vector3.forward), PLANE);
+            
+            if (characterTarget.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                moveDirection = characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
+            }
 
-            Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward),
-                PLANE
-            );
-
+            Debug.Log(moveDirection + " " + charDirection);
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
-            Debug.Log(angle);
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
 
