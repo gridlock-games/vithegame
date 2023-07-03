@@ -49,14 +49,12 @@ namespace GameCreator.Characters
             public int tick;
             public Vector3 position;
             public Quaternion rotation;
-            public float rootMotionProgress;
 
-            public StatePayload(int tick, Vector3 position, Quaternion rotation, float rootMotionProgress)
+            public StatePayload(int tick, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
                 this.position = position;
                 this.rotation = rotation;
-                this.rootMotionProgress = rootMotionProgress;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -64,7 +62,6 @@ namespace GameCreator.Characters
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
-                serializer.SerializeValue(ref rootMotionProgress);
             }
         }
 
@@ -72,8 +69,6 @@ namespace GameCreator.Characters
 
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
-
-        public float localRootMotionProgressLimit { get; private set; }
 
         private const string AXIS_H = "Horizontal";
         private const string AXIS_V = "Vertical";
@@ -156,7 +151,6 @@ namespace GameCreator.Characters
             }
             else // If we are not the owner of this object
             {
-                localRootMotionProgressLimit = latestServerState.rootMotionProgress;
                 currentPosition = latestServerState.position;
                 currentRotation = latestServerState.rotation;
             }
@@ -241,7 +235,6 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = true;
             }
 
-            localRootMotionProgressLimit = statePayload.rootMotionProgress;
             currentPosition = statePayload.position;
             currentRotation = statePayload.rotation;
             return statePayload;
