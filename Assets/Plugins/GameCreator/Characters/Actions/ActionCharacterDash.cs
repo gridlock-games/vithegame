@@ -117,7 +117,7 @@
             
             if (characterTarget.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
-                moveDirection = characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
+                moveDirection = networkTransform.currentRotation * characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
             }
 
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
