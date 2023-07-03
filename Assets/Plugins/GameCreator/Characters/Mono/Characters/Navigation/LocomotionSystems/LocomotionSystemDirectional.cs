@@ -45,21 +45,23 @@
                 // If distance is greater than teleport threshold, teleport player object to the network position
                 if (Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position) > networkTransform.playerObjectTeleportThreshold)
                 {
-                    Debug.Log("Teleporting player " + networkTransform.OwnerClientId);
-                    characterLocomotion.characterController.enabled = false;
-                    characterLocomotion.characterController.transform.position = networkTransform.currentPosition;
-                    characterLocomotion.characterController.enabled = true;
+                    //Debug.Log("Teleporting player " + networkTransform.OwnerClientId);
+                    //characterLocomotion.characterController.enabled = false;
+                    //characterLocomotion.characterController.transform.position = networkTransform.currentPosition;
+                    //characterLocomotion.characterController.enabled = true;
                 }
                 else // Teleport threshold not reached
                 {
-                    // Calculate target direction towards network position
-                    targetDirection = networkTransform.currentPosition - characterLocomotion.character.transform.position;
+                    
+                }
 
-                    if (targetDirection.magnitude > 0.1f)
-                    {
-                        Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
-                        targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
-                    }
+                // Calculate target direction towards network position
+                targetDirection = networkTransform.currentPosition - characterLocomotion.character.transform.position;
+
+                if (targetDirection.magnitude > 0.1f)
+                {
+                    Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
+                    targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
                 }
             }
 

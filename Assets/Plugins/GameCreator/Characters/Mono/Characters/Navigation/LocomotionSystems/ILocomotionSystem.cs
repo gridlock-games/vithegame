@@ -394,37 +394,9 @@
             }
         }
 
-        private float lastT;
-        private float lastRootMoveStartTime;
         protected void UpdateRootMovement(Vector3 verticalMovement)
         {
-            float t;
-            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
-            {
-                // Prevent root motion progress from exceeding the network's root motion progress
-                t = networkTransform.localRootMotionProgressLimit;
-
-                // If the current progress is 0 and the last progress was more than 0, root motion needs to be deactivated
-                if (lastT > 0 & t == 0)
-                {
-                    isRootMoving = false;
-                    lastT = t;
-                    lastRootMoveStartTime = rootMoveStartTime;
-                    return;
-                }
-
-                // If there is a new clip assigned, don't execute root motion, this is because we need to wait for the next tick to occur before executing
-                if (rootMoveStartTime != lastRootMoveStartTime)
-                {
-                    lastT = t;
-                    lastRootMoveStartTime = rootMoveStartTime;
-                    return;
-                }
-            }
-            else
-            {
-                t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
-            }
+            float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
 
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
@@ -435,8 +407,14 @@
             movement.y -= rootMoveDeltaVertical;
             movement.z -= rootMoveDeltaForward;
 
-            if (networkTransform)
+            rootMoveDeltaForward = deltaForward;
+            rootMoveDeltaSides = deltaSides;
+            rootMoveDeltaVertical = deltaVertical;
+
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
+                movement = characterLocomotion.character.transform.rotation * movement;
+
                 // Calculate rotation to look at the current network position
                 Quaternion relativeRotation = Quaternion.identity;
                 if ((networkTransform.currentPosition - networkTransform.transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
@@ -452,22 +430,28 @@
                 movement.x *= -1;
                 // Apply rotation to movement vector
                 movement = finalRotation * movement;
+
+                // Scale movement vector according to distance between network position and local position
+                float localDistance = Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position);
+                movement = movement.normalized * localDistance;
+                
+                // If our movement vector isn't going to reduce the distance between the local position and network position, simply move straight to the network position
+                // This prevents some jitters
+                float afterMoveDistance = Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position + (movement.normalized * localDistance));
+                if (localDistance < afterMoveDistance)
+                {
+                    movement = networkTransform.currentPosition - networkTransform.transform.position;
+                }
             }
             else
             {
                 movement = characterLocomotion.character.transform.rotation * movement;
             }
 
-            rootMoveDeltaForward = deltaForward;
-            rootMoveDeltaSides = deltaSides;
-            rootMoveDeltaVertical = deltaVertical;
-
             movement += Time.deltaTime * rootMoveGravity * verticalMovement;
 
             characterLocomotion.characterController.Move(movement);
 
-            lastT = t;
-            lastRootMoveStartTime = rootMoveStartTime;
             if (t >= 1)
             {
                 isRootMoving = false;

@@ -85,6 +85,7 @@
             {
                 case Direction.CharacterMovement3D:
                     moveDirection = locomotion.GetMovementDirection();
+                    Debug.Log(moveDirection);
                     break;
 
                 case Direction.TowardsTarget:
@@ -119,7 +120,7 @@
             );
 
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
-
+            Debug.Log(angle);
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
 
