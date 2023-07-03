@@ -185,10 +185,10 @@ namespace GameCreator.Characters
 
             if (positionError > 0.001f)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 currentPosition = latestServerState.position;
-                //currentRotation = latestServerState.rotation;
+                currentRotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
