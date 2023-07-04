@@ -267,64 +267,99 @@ namespace GameCreator.Melee
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
-                    GameObject[] hits;
                     foreach (BladeComponent blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
-                        hits = blade.CaptureHits();
+                        GameObject[] hits = blade.CaptureHits();
 
-                        if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
+                        if (count < currentMeleeClip.hitCount)
+                        {
+                            hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
+                            StartCoroutine(ProcessHitQueue());
+                        }
+
+                        //if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
         }
 
-        private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade)
-        {
-            int hitInstanceID = 0;
+        private static Queue<HitQueueElement> hitQueue = new Queue<HitQueueElement>();
 
+        private struct HitQueueElement
+        {
+            public CharacterMelee melee;
+            public BladeComponent blade;
+            public GameObject[] hits;
+
+            public HitQueueElement(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+            {
+                this.melee = melee;
+                this.blade = blade;
+                this.hits = hits;
+            }
+        }
+
+        private IEnumerator ProcessHitQueue()
+        {
+            // Wait for one frame for the hit queue to fill with all hits from the previous frame
+            yield return null;
+
+            // Empty the hit queue and process the hits for each element
+            while (hitQueue.Count > 0)
+            {
+                HitQueueElement queueElement = hitQueue.Dequeue();
+                ProcessAttackedObjects(queueElement.melee, queueElement.blade, queueElement.hits);
+                yield return null;
+            }
+        }
+
+        private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+        {
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
             foreach (GameObject hit in hits)
             {
                 // Do something with the attacked object
-                hitInstanceID = hit.GetInstanceID();
+                int hitInstanceID = hit.GetInstanceID();
 
                 if (hit.transform.IsChildOf(this.transform)) continue;
-                if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
+                if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
-                MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
+
+                Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
+                Debug.Log(melee.CanAttack() + " " + melee.isStaggered);
+                if (!melee.CanAttack()) { Debug.Log(melee.OwnerClientId + " skipping"); return; }
+
+                MeleeClip attack = melee.comboSystem.GetCurrentClip() ? melee.comboSystem.GetCurrentClip() : melee.currentMeleeClip;
 
                 // This is for checking if we are hitting an environment object
-                if (hit.gameObject.CompareTag("Obstacle"))
+                if (hit.CompareTag("Obstacle"))
                 {
                     Vector3 position_attackWp = blade.GetImpactPosition();
-                    Vector3 position_attacker = this.transform.position;
+                    Vector3 position_attacker = melee.transform.position;
                 }
 
                 if (targetMelee != null && !targetMelee.IsInvincible)
                 {
-                    this.count++;
+                    melee.count++;
                 }
 
-                this.targetsEvaluated.Add(hitInstanceID);
-
-                // Wait for the specified interval before performing the action again
-                yield return new WaitForSeconds(0.15f);
+                melee.targetsEvaluated.Add(hitInstanceID);
 
                 if (attack && this.count < attack.hitCount)
                 {
-                    this.targetsEvaluated.Remove(hitInstanceID);
+                    melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
                 HitResult hitResult = HitResult.ReceiveDamage;
 
-                if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
+                if (targetMelee.knockedUpHitCount.Value >= melee.KNOCK_UP_FOLLOWUP_LIMIT)
                 {
                     targetMelee.knockedUpHitCount.Value = 0;
                     if (attack.attackType != AttackType.Knockdown)
-                        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                        targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
                     targetMelee.EventKnockedUpHitLimitReached.Invoke();
                 }
 
@@ -332,17 +367,17 @@ namespace GameCreator.Melee
                 switch (attack.attackType)
                 {
                     case AttackType.Stun:
-                        targetMelee.Character.Stun(this.Character, targetMelee.Character);
+                        targetMelee.Character.Stun(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Knockdown:
-                        if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
-                            targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                        if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
+                            targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Knockedup:
-                        targetMelee.Character.Knockup(this.Character, targetMelee.Character);
+                        targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Stagger:
-                        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
+                        targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.None:
                         if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
@@ -364,7 +399,7 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
-                    hitResult = targetMelee.OnReceiveAttack(this, attack, blade.GetImpactPosition());
+                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
@@ -380,7 +415,7 @@ namespace GameCreator.Melee
 
                 if (targetMelee.HP.Value <= 0 & previousHP > 0)
                 {
-                    targetMelee.SendMessage("OnDeath", this);
+                    targetMelee.SendMessage("OnDeath", melee);
                     SendMessage("OnKill", targetMelee);
                 }
 
@@ -391,7 +426,7 @@ namespace GameCreator.Melee
                 {
                     for (int j = 0; j < triggers.Length; ++j)
                     {
-                        triggers[j].OnReceiveAttack(this, attack, hitResult);
+                        triggers[j].OnReceiveAttack(melee, attack, hitResult);
                     }
                 }
 
