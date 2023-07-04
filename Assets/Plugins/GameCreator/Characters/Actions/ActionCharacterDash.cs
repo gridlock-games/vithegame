@@ -112,14 +112,15 @@
                     moveDirection.Scale(new Vector3(0, 1, 1));
                     break;
             }
-
-            Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward),
-                PLANE
-            );
+            
+            Vector3 charDirection = Vector3.Scale(characterTarget.transform.TransformDirection(Vector3.forward), PLANE);
+            
+            if (characterTarget.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                moveDirection = networkTransform.currentRotation * characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
+            }
 
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
-
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
 

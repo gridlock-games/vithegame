@@ -1215,6 +1215,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: NPC_Training_Dummy
       objectReference: {fileID: 0}
+    - target: {fileID: 5633332360581669749, guid: 1ca5f1e08c615fe42b22fe9339be1166,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5633332360581669751, guid: 1ca5f1e08c615fe42b22fe9339be1166,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1247,7 +1252,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &677222899
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1620,7 +1625,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh189420
+  m_Name: pb_Mesh282926
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1980,7 +1985,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1481053332
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2399,6 +2404,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: NPC_Training_Dummy (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5633332360581669749, guid: 1ca5f1e08c615fe42b22fe9339be1166,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5633332360581669751, guid: 1ca5f1e08c615fe42b22fe9339be1166,
         type: 3}
@@ -4304,6 +4314,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: NPC_Training_Dummy (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5633332360581669749, guid: 1ca5f1e08c615fe42b22fe9339be1166,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5633332360581669751, guid: 1ca5f1e08c615fe42b22fe9339be1166,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -4342,7 +4357,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1746105032
 BoxCollider:
   m_ObjectHideFlags: 0
