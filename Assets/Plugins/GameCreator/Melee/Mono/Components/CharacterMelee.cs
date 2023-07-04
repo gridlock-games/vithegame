@@ -338,6 +338,7 @@ namespace GameCreator.Melee
                 if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
+                if (!targetMelee) { continue; }
                 if (targetMelee.IsInvincible) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
