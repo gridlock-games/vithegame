@@ -45,22 +45,8 @@
 
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-			//if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
-			StartCoroutine(Wait(target));
+            if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
 			return false;
-        }
-
-		private IEnumerator Wait(GameObject target)
-        {
-			if (IsOwner)
-            {
-				MeleeServerRpc(target.transform.position, target.transform.rotation, target.name);
-			}
-			else
-            {
-				yield return null;
-				MeleeServerRpc(target.transform.position, target.transform.rotation, target.name);
-			}
         }
 
 		public bool InstantExecuteLocally(GameObject target)

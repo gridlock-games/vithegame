@@ -275,7 +275,7 @@ namespace GameCreator.Melee
                         if (count < currentMeleeClip.hitCount)
                         {
                             hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
-                            StartCoroutine(ProcessHitQueue());
+                            ProcessHitQueue();
                         }
 
                         //if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
@@ -300,18 +300,34 @@ namespace GameCreator.Melee
             }
         }
 
-        private IEnumerator ProcessHitQueue()
+        private void ProcessHitQueue()
         {
-            // Wait for one frame for the hit queue to fill with all hits from the previous frame
-            yield return null;
+            //// Wait for one frame for the hit queue to fill with all hits from the previous frame
+            //yield return null;
 
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
             {
                 HitQueueElement queueElement = hitQueue.Dequeue();
                 ProcessAttackedObjects(queueElement.melee, queueElement.blade, queueElement.hits);
-                yield return null;
+                //yield return null;
             }
+        }
+
+        private void MarkHit()
+        {
+            StartCoroutine(ResetHitBool());
+        }
+
+        private bool wasHit;
+        private IEnumerator ResetHitBool()
+        {
+            wasHit = true;
+            // Wait until we have stopped attacking
+            // (comboSystem.GetCurrentPhase(currentMeleeClip) >= 0)
+            yield return new WaitUntil(() => !IsAttacking);
+            Debug.Log("Reset " + OwnerClientId);
+            wasHit = false;
         }
 
         private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
@@ -329,8 +345,12 @@ namespace GameCreator.Melee
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
 
                 Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
-                Debug.Log(melee.CanAttack() + " " + melee.isStaggered);
-                if (!melee.CanAttack()) { Debug.Log(melee.OwnerClientId + " skipping"); return; }
+                if (melee.wasHit)
+                {
+                    Debug.Log(melee.OwnerClientId + " skipping");
+                    return;
+                }
+                targetMelee.MarkHit();
 
                 MeleeClip attack = melee.comboSystem.GetCurrentClip() ? melee.comboSystem.GetCurrentClip() : melee.currentMeleeClip;
 
@@ -400,6 +420,7 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
                     hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
+
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
