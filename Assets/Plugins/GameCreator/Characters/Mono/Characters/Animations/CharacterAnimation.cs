@@ -392,7 +392,7 @@
                 this.runtimeController
             );
 
-            this.mixerStatesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            //this.mixerStatesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
             this.mixerStatesInput.ConnectInput(0, this.runtimeControllerPlayable, 0, 1f);
             this.mixerStatesInput.SetInputWeight(0, 1f);
         }
@@ -401,7 +401,7 @@
         {
             this.states = new List<PlayableState>();
 
-            this.mixerStatesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            //this.mixerStatesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
             this.mixerStatesOutput.ConnectInput(0, this.mixerStatesInput, 0, 1f);
             this.mixerStatesOutput.SetInputWeight(0, 1f);
         }
@@ -410,11 +410,11 @@
         {
             this.gestures = new List<PlayableGesture>();
 
-            this.mixerGesturesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            //this.mixerGesturesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
             this.mixerGesturesInput.ConnectInput(0, this.mixerStatesOutput, 0, 1f);
             this.mixerGesturesInput.SetInputWeight(0, 1f);
 
-            this.mixerGesturesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            //this.mixerGesturesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
             this.mixerGesturesOutput.ConnectInput(0, this.mixerGesturesInput, 0, 1f);
             this.mixerGesturesOutput.SetInputWeight(0, 1f);
         }

@@ -43,7 +43,7 @@ namespace GameCreator.Inventory
             }
         }
         
-        public static void Deselect()
+        public static new void Deselect()
         {
             foreach (KeyValuePair<int,SelectedItemUI> entry in SelectedItemUIs)
             {

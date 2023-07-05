@@ -167,7 +167,8 @@
                 case  1:
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
                     
-                    if(clip != null && this.weaponBone != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                    if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone))
+                    {
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }

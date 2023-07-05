@@ -192,8 +192,10 @@
             }
         }
 
-        protected void OnDestroy()
+
+        protected new void OnDestroy()
         {
+            base.OnDestroy();
             this.OnDestroyGID();
             if (!Application.isPlaying) return;
 
@@ -353,7 +355,7 @@
             {
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
-                switch(prevAilment) {
+                switch (prevAilment) {
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         bool waitForClientRotation = false;
@@ -372,7 +374,7 @@
                         }
 
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartKnockdownAfterDuration(0f, false));
+                        StartCoroutine(StartKnockdownAfterDuration(0f, waitForClientRotation));
                         break;
                         
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
