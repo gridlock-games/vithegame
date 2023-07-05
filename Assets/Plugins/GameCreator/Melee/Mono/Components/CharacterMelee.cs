@@ -319,12 +319,10 @@ namespace GameCreator.Melee
         private bool wasHit;
         private IEnumerator ResetHitBool()
         {
-            Debug.Log(OwnerClientId + " Was Hit");
             wasHit = true;
             // Wait until we have stopped attacking to reset hit bool
             yield return new WaitUntil(() => !IsAttacking);
             wasHit = false;
-            Debug.Log("Reseting " + OwnerClientId);
         }
 
         private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
@@ -341,11 +339,10 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
-                Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
-                if (targetMelee.IsInvincible) { Debug.Log(targetMelee.OwnerClientId + " is invinicible"); continue; }
+                if (targetMelee.IsInvincible) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
-                if (melee.wasHit) { Debug.Log(OwnerClientId + " has already been hit"); return; }
+                if (melee.wasHit) { return; }
                 // Mark the target as hit, this prevents hit trading
                 targetMelee.MarkHit();
 
@@ -417,7 +414,7 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
                     hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-
+                    Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
