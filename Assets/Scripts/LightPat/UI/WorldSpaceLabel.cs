@@ -71,18 +71,22 @@ namespace LightPat.UI
 
             transform.position = target.position + positionOffset;
 
-            if (!Camera.main) { return; }
-            Quaternion rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
-            transform.rotation = rotTarget;
+            Quaternion rotTarget = Quaternion.identity;
+            if (Camera.main)
+            {
+                rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
+                transform.rotation = rotTarget;
 
-            if (Vector3.Distance(Camera.main.transform.position, transform.position) > viewDistance)
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * animationSpeed);
-            else
-                transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
-
+                if (Vector3.Distance(Camera.main.transform.position, transform.position) > viewDistance)
+                    transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * animationSpeed);
+                else
+                    transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
+            }
+            
             if (melee)
             {
-                healthSlider.transform.rotation = rotTarget;
+                if (Camera.main)
+                    healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             }
 

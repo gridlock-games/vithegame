@@ -339,6 +339,7 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
+                Debug.Log(melee.OwnerClientId + " attempted to hit " + targetMelee.OwnerClientId);
                 if (targetMelee.IsInvincible) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
@@ -414,7 +415,7 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
                     hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-                    Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
+                    Debug.Log(melee.OwnerClientId + " registered hit " + targetMelee.OwnerClientId);
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
