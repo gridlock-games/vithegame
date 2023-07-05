@@ -35,7 +35,7 @@ namespace LightPat.UI
 
         public void RestartLevel()
         {
-            Application.LoadLevel(Application.loadedLevel);
+            //Application.LoadLevel(Application.loadedLevel);
         }
 
         private void Start()

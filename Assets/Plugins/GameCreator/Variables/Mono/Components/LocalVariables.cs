@@ -57,7 +57,7 @@
             this.RequireInit(force);
 		}
 
-        protected virtual void OnDestroy()
+        protected virtual new void OnDestroy()
 		{
             this.OnDestroyGID();
             if (!Application.isPlaying) return;

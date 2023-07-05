@@ -90,7 +90,7 @@ namespace GameCreator.Inventory
             }
         }
 
-        protected virtual void OnDestroy()
+        protected virtual new void OnDestroy()
         {
             this.OnDestroyGID();
 

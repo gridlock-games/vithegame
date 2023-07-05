@@ -31,7 +31,7 @@ public class SceneUserDataManager : MonoBehaviour
     private bool isPreviewActive = false;
     private bool connectingToPlayerHub;
 
-    private AsyncOperation loadingHubAyncOperation;
+    private AsyncOperation loadingHubAsyncOperation;
     public void ConnectToPlayerHub()
     {
         if (connectingToPlayerHub) { return; }
@@ -58,8 +58,15 @@ public class SceneUserDataManager : MonoBehaviour
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
 
         connectingToPlayerHub = true;
+
+        // Disable character buttons while scene loads
+        foreach (GameObject characterOptionImage in characterOptionImages)
+        {
+            characterOptionImage.GetComponent<Button>().interactable = false;
+        }
+
         loadingText.text = "Connecting to player hub...";
-        loadingHubAyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
     }
 
     void Start()
@@ -71,9 +78,9 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void Update()
     {
-        if (loadingHubAyncOperation != null)
+        if (loadingHubAsyncOperation != null)
         {
-            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAyncOperation.progress * 100) + "%";
+            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAsyncOperation.progress * 100) + "%";
         }
     }
 
@@ -91,6 +98,7 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
+    private List<GameObject> characterOptionImages = new List<GameObject>();
     private void SpawnGameObjectsHorizontally()
     {
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
@@ -100,7 +108,7 @@ public class SceneUserDataManager : MonoBehaviour
             gridImgPrefab.sprite = charactersList[i].characterImage;
             gridImgPrefab.gameObject.name = charactersList[i].characterName;
             gridImgPrefab.gameObject.SetActive(true);
-            Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
+            characterOptionImages.Add(Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform));
         }
 
         this.SelectGameObject(null);

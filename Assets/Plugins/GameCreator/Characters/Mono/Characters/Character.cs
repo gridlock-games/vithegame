@@ -192,8 +192,10 @@
             }
         }
 
-        protected void OnDestroy()
+
+        protected new void OnDestroy()
         {
+            base.OnDestroy();
             this.OnDestroyGID();
             if (!Application.isPlaying) return;
 
@@ -353,7 +355,7 @@
             {
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
-                switch(prevAilment) {
+                switch (prevAilment) {
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         bool waitForClientRotation = false;
@@ -372,7 +374,7 @@
                         }
 
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartKnockdownAfterDuration(0f, false));
+                        StartCoroutine(StartKnockdownAfterDuration(0f, waitForClientRotation));
                         break;
                         
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
@@ -644,19 +646,17 @@
                 ailmentRotationRecieved = false;
             }
 
-
             LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
 
-            Boolean isDodging = (bool)variables.Get("isDodging").Get();
+            bool isDodging = (bool)variables.Get("isDodging").Get();
 
             if (isDodging == true) yield break;
             
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
             
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             
-
             float recoveryAnimDuration = 0f;
 
             switch (ailment)
@@ -707,9 +707,9 @@
                     break;
             }
 
-            this.characterAilment = prevAilment != ailment ? this.characterLocomotion.Ailment(ailment) : prevAilment;
+            characterAilment = prevAilment != ailment ? characterLocomotion.Ailment(ailment) : prevAilment;
             if (IsServer) { characterAilmentNetworked.Value = characterAilment; }
-            this.onAilmentEvent.Invoke(ailment);
+            onAilmentEvent.Invoke(ailment);
         }
 
         public bool resetDefaultStateRunning { get; private set; }

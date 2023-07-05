@@ -158,20 +158,15 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
             
-            MeleeWeapon meleeweapon = new MeleeWeapon();
-
-            if (melee != null)
+            if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
             {
-                if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
-                {
-                    if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
-                    melee.StopAttack();
-                    animator.StopGesture(0f);
-                    melee.currentMeleeClip = null;
-                }
-
-                meleeweapon = melee.currentWeapon;
+                if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
+                melee.StopAttack();
+                animator.StopGesture(0f);
+                melee.currentMeleeClip = null;
             }
+
+            MeleeWeapon meleeweapon = melee.currentWeapon;
 
             AnimationClip clip = null;
 
