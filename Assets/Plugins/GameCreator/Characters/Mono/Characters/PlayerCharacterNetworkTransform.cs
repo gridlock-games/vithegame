@@ -169,7 +169,11 @@ namespace GameCreator.Characters
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 inputBuffer[bufferIndex] = inputPayload;
+                
                 StatePayload statePayload = ProcessInput(inputPayload);
+                currentPosition = statePayload.position;
+                currentRotation = statePayload.rotation;
+
                 stateBuffer[bufferIndex] = statePayload;
             }
 
@@ -196,18 +200,25 @@ namespace GameCreator.Characters
                 // Now re-simulate the rest of the ticks up to the current tick on the client
                 int tickToProcess = latestServerState.tick + 1;
 
+                Vector3 currentPositionCached = latestServerState.position;
+                Quaternion currentRotationCached = latestServerState.rotation;
                 while (tickToProcess < currentTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                     // Process new movement with reconciled state
                     StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
+                    currentPositionCached = statePayload.position;
+                    currentRotationCached = statePayload.rotation;
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
 
                     tickToProcess++;
                 }
+
+                currentPosition = currentPositionCached;
+                currentRotation = currentRotationCached;
             }
         }
 
@@ -235,8 +246,6 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = true;
             }
 
-            currentPosition = statePayload.position;
-            currentRotation = statePayload.rotation;
             return statePayload;
         }
 

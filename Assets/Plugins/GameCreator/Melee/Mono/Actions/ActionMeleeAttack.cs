@@ -14,7 +14,7 @@
 		public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
 		public CharacterMelee.ActionKey key = CharacterMelee.ActionKey.A;
 
-		[ServerRpc]
+		[ServerRpc(RequireOwnership = false)]
 		void MeleeServerRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
 		{
 			GameObject target = new GameObject(targetName);
@@ -45,7 +45,7 @@
 
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-			if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
+            if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
 			return false;
         }
 
