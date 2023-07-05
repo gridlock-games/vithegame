@@ -31,7 +31,7 @@ public class SceneUserDataManager : MonoBehaviour
     private bool isPreviewActive = false;
     private bool connectingToPlayerHub;
 
-    private AsyncOperation loadingHubAyncOperation;
+    private AsyncOperation loadingHubAsyncOperation;
     public void ConnectToPlayerHub()
     {
         if (connectingToPlayerHub) { return; }
@@ -59,7 +59,7 @@ public class SceneUserDataManager : MonoBehaviour
 
         connectingToPlayerHub = true;
         loadingText.text = "Connecting to player hub...";
-        loadingHubAyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
     }
 
     void Start()
@@ -71,9 +71,9 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void Update()
     {
-        if (loadingHubAyncOperation != null)
+        if (loadingHubAsyncOperation != null)
         {
-            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAyncOperation.progress * 100) + "%";
+            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAsyncOperation.progress * 100) + "%";
         }
     }
 
