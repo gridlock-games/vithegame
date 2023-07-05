@@ -78,7 +78,7 @@ namespace LightPat.Player
 
         [SerializeField] private TextMeshProUGUI pingDisplay;
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
-        private float _hudRefreshRate = 1f;
+        private readonly float _hudRefreshRate = 1f;
         private float _timer;
 
         private void Update()

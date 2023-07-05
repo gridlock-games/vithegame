@@ -19,8 +19,6 @@ public class ConditionCharacterAilment : ICondition
         Character character = this.target.GetCharacter(target);
         if (character == null) return false;
 
-        bool hasAilment = false;
-
         return this.characterAilments == character.characterAilment;
     }
 

@@ -319,10 +319,12 @@ namespace GameCreator.Melee
         private bool wasHit;
         private IEnumerator ResetHitBool()
         {
+            Debug.Log(OwnerClientId + " Was Hit");
             wasHit = true;
             // Wait until we have stopped attacking to reset hit bool
             yield return new WaitUntil(() => !IsAttacking);
             wasHit = false;
+            Debug.Log("Reseting " + OwnerClientId);
         }
 
         private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
@@ -339,10 +341,11 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
-                if (targetMelee.IsInvincible) { continue; }
+                Debug.Log(melee.OwnerClientId + " hit " + targetMelee.OwnerClientId);
+                if (targetMelee.IsInvincible) { Debug.Log(targetMelee.OwnerClientId + " is invinicible"); continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
-                if (melee.wasHit) { return; }
+                if (melee.wasHit) { Debug.Log(OwnerClientId + " has already been hit"); return; }
                 // Mark the target as hit, this prevents hit trading
                 targetMelee.MarkHit();
 

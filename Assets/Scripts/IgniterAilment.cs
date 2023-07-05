@@ -13,8 +13,6 @@ public class IgniterAilment : Igniter
     
     public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Invoker);
 
-    private CharacterLocomotion.CHARACTER_AILMENTS characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
-
     void Start()
     {
         Character target = this.character.GetCharacter(gameObject);
