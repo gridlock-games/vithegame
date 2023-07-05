@@ -58,6 +58,13 @@ public class SceneUserDataManager : MonoBehaviour
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
 
         connectingToPlayerHub = true;
+
+        // Disable character buttons while scene loads
+        foreach (GameObject characterOptionImage in characterOptionImages)
+        {
+            characterOptionImage.GetComponent<Button>().interactable = false;
+        }
+
         loadingText.text = "Connecting to player hub...";
         loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
     }
@@ -91,6 +98,7 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
+    private List<GameObject> characterOptionImages = new List<GameObject>();
     private void SpawnGameObjectsHorizontally()
     {
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
@@ -100,7 +108,7 @@ public class SceneUserDataManager : MonoBehaviour
             gridImgPrefab.sprite = charactersList[i].characterImage;
             gridImgPrefab.gameObject.name = charactersList[i].characterName;
             gridImgPrefab.gameObject.SetActive(true);
-            Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
+            characterOptionImages.Add(Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform));
         }
 
         this.SelectGameObject(null);
