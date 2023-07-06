@@ -42,6 +42,7 @@ public class SceneUserDataManager : MonoBehaviour
         // Find player object by weapon type
         for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
         {
+            Debug.Log(ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() + " " + selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType());
             if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
