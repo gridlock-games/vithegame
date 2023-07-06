@@ -466,8 +466,7 @@ namespace GameCreator.Melee
             PropogateMeleeClipChangeClientRpc(meleeClip.name);
         }
 
-        [ClientRpc]
-        void PropogateMeleeClipChangeClientRpc(string clipName)
+        private MeleeClip GetMeleeClipFromWeaponByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
 
@@ -531,13 +530,24 @@ namespace GameCreator.Melee
                 }
             }
 
-            if (selectedClip)
+            if (!selectedClip) { Debug.LogError("Clip Not Found: " + clipName); }
+
+            return selectedClip;
+        }
+
+        [ClientRpc]
+        private void PropogateMeleeClipChangeClientRpc(string clipName)
+        {
+            MeleeClip clip = GetMeleeClipFromWeaponByName(clipName);
+            if (clip)
             {
-                selectedClip.PlayLocally(this);
+                clip.PlayLocally(this);
+                if (clip.isAttack)
+                    currentMeleeClip = clip;
             }
             else
             {
-                Debug.LogError("Selected Clip Not Found: " + clipName);
+                Debug.LogError("Clip Not Found: " + clipName);
             }
         }
 
@@ -718,7 +728,8 @@ namespace GameCreator.Melee
 
         public override void OnNetworkSpawn()
         {
-            HP.Value = maxHealth;
+            if (IsServer)
+                HP.Value = maxHealth;
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
         }

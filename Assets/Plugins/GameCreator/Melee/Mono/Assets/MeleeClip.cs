@@ -154,7 +154,7 @@
             }
             else
             {
-                Debug.LogError("PlayNetworked() is only supposed to be called on the server");
+                //Debug.LogError("PlayNetworked() is only supposed to be called on the server");
                 return;
             }
 
