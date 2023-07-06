@@ -28,25 +28,13 @@
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee == null) { Destroy(target); return; }
 
-			MeleeClientRpc(targetPosition, targetRotation, targetName);
-			if (!IsHost) InstantExecuteLocally(target);
-			Destroy(target);
-		}
-
-		[ClientRpc]
-		void MeleeClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName)
-        {
-			GameObject target = new GameObject(targetName);
-			target.transform.position = targetPosition;
-			target.transform.rotation = targetRotation;
 			InstantExecuteLocally(target);
 			Destroy(target);
 		}
 
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
-            //if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
-            MeleeServerRpc(target.transform.position, target.transform.rotation, target.name);
+            if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
             return false;
         }
 

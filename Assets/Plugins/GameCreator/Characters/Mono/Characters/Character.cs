@@ -613,7 +613,7 @@
                 yield return null;
             }
             MeleeClip standRecovery = melee.currentWeapon.recoveryStandUp;
-            standRecovery.Play(melee);
+            standRecovery.PlayNetworked(melee);
             
             float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
@@ -666,7 +666,7 @@
                     /*Stun has an if handling since it has its own standup sequence*/
                     if (prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                     {
-                        melee.currentWeapon.recoveryStun.Play(melee);
+                        melee.currentWeapon.recoveryStun.PlayNetworked(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
                         CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     }
@@ -679,7 +679,7 @@
                         }
                         else
                         {
-                            melee.currentWeapon.recoveryStandUp.Play(melee);
+                            melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
                             recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
                             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                         }
@@ -692,18 +692,18 @@
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                     if (melee.currentWeapon.knockupF)
-                        melee.currentWeapon.knockupF.Play(melee);
+                        melee.currentWeapon.knockupF.PlayNetworked(melee);
                     break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown:
                     if (melee.currentWeapon.knockbackF)
-                        melee.currentWeapon.knockbackF.Play(melee);
+                        melee.currentWeapon.knockbackF.PlayNetworked(melee);
                     melee.SetInvincibility(6.50f);
                     break;
                 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                     if (melee.currentWeapon.staggerF)
-                        melee.currentWeapon.staggerF.Play(melee);
+                        melee.currentWeapon.staggerF.PlayNetworked(melee);
                     break;
             }
 
@@ -716,15 +716,11 @@
         private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
         {
             resetDefaultStateRunning = true;
-            float initTime = Time.time;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             
             this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
 
-            while (initTime + (duration * 0.80f) >= Time.time)
-            {
-                yield return null;
-            }
+            yield return new WaitForSeconds(duration * 0.80f);
 
             melee.ChangeState(
                 melee.currentWeapon.characterState,
@@ -733,7 +729,7 @@
                 this.GetCharacterAnimator()
             );
 
-            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned && 
+            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned &&
                 prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
             {
                 melee.SetInvincibility(1.0f);

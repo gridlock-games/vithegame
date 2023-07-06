@@ -30,11 +30,15 @@ namespace GameCreator.Melee
             defaultMaterialList = skinnedMeshRenderer.materials;
         }
 
+        private bool rendererRunning;
         private IEnumerator ResetMeshColorAfterDelay(float delay, Material[] materialChanges)
         {
+            yield return new WaitUntil(() => !rendererRunning);
+            rendererRunning = true;
             skinnedMeshRenderer.materials = materialChanges;
             yield return new WaitForSeconds(delay);
             skinnedMeshRenderer.materials = defaultMaterialList;
+            rendererRunning = false;
         }
     }
 }
