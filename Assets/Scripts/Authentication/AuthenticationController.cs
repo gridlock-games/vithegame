@@ -51,9 +51,7 @@ public class AuthenticationController : MonoBehaviour
 
             btn_SignIn.SetActive(!signedIn);
 
-            infoDisplayText.enabled = displayNameInput.enabled;
-
-            if (displayNameInput.text == "")
+            if (displayNameInput.text == "" & signedIn)
             {
                 btn_StartGame.GetComponent<Button>().interactable = false;
                 infoDisplayText.SetText("Enter a display name to play");
