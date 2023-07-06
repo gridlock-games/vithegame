@@ -144,7 +144,26 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Play(CharacterMelee melee)
+        public void PlayNetworked(CharacterMelee melee)
+        {
+            if (!melee.IsSpawned) { Debug.LogError("Spawn the character before trying to play melee clips"); return; }
+
+            if (melee.NetworkManager.IsServer)
+            {
+                melee.PropogateMeleeClipChange(this);
+            }
+            else
+            {
+                Debug.LogError("PlayNetworked() is only supposed to be called on the server");
+                return;
+            }
+
+            // If we are not a client (the host), play the clip
+            if (!melee.NetworkManager.IsClient)
+                PlayLocally(melee);
+        }
+
+        public void PlayLocally(CharacterMelee melee)
         {
             if (this.interruptible == Interrupt.Uninterruptible) melee.SetUninterruptable(this.Length);
             if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(this.Length);

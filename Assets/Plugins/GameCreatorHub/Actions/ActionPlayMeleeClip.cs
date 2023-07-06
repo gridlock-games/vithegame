@@ -21,7 +21,7 @@ public class ActionPlayMeleeClip : IAction
             characterMelee = charTarget.GetComponent<CharacterMelee>();
             if (characterMelee != null)
             {
-                meleeclip.Play(characterMelee);
+                meleeclip.PlayNetworked(characterMelee);
                 return true;
             }
             return false;

@@ -12,6 +12,7 @@ namespace GameCreator.Melee
     using GameCreator.Pool;
     using static GameCreator.Melee.MeleeClip;
     using UnityEngine.SceneManagement;
+    using System.Reflection;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -211,7 +212,7 @@ namespace GameCreator.Melee
 
                         if (!this.currentMeleeClip.isSequence)
                         {
-                            this.currentMeleeClip.Play(this);
+                            this.currentMeleeClip.PlayNetworked(this);
 
                             if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
                         }
@@ -235,7 +236,7 @@ namespace GameCreator.Melee
             {
                 this.currentMeleeClip = clip;
                 this.comboSystem.StartAttackTime(true);
-                clip.Play(this);
+                clip.PlayNetworked(this);
 
                 if (this.EventAttack != null) this.EventAttack.Invoke(clip);
                 yield return new WaitForSeconds(clip.animationClip.length);
@@ -302,15 +303,12 @@ namespace GameCreator.Melee
 
         private void ProcessHitQueue()
         {
-            //// Wait for one frame for the hit queue to fill with all hits from the previous frame
-            //yield return null;
-
+            // Wait for one frame for the hit queue to fill with all hits from the previous frame
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
             {
                 HitQueueElement queueElement = hitQueue.Dequeue();
                 ProcessAttackedObjects(queueElement.melee, queueElement.blade, queueElement.hits);
-                //yield return null;
             }
         }
 
@@ -339,7 +337,6 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
-                Debug.Log(melee.OwnerClientId + " attempted to hit " + targetMelee.OwnerClientId);
                 if (targetMelee.IsInvincible) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
@@ -415,7 +412,6 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
                     hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-                    Debug.Log(melee.OwnerClientId + " registered hit " + targetMelee.OwnerClientId);
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
@@ -460,6 +456,88 @@ namespace GameCreator.Melee
                         rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
                     }
                 }
+            }
+        }
+
+        public void PropogateMeleeClipChange(MeleeClip meleeClip)
+        {
+            if (!IsServer) { Debug.LogError("PropogateMeleeClipChange() should only be called from the server"); return; }
+
+            PropogateMeleeClipChangeClientRpc(meleeClip.name);
+        }
+
+        [ClientRpc]
+        void PropogateMeleeClipChangeClientRpc(string clipName)
+        {
+            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
+
+            MeleeClip selectedClip = null;
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(MeleeClip))
+                {
+                    var meleeClipObject = propertyInfo.GetValue(currentWeapon);
+                    MeleeClip meleeClip = (MeleeClip)meleeClipObject;
+
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<MeleeClip>))
+                {
+                    var meleeClipListObject = propertyInfo.GetValue(currentWeapon);
+                    List<MeleeClip> meleeClipList = (List<MeleeClip>)meleeClipListObject;
+
+                    foreach (MeleeClip meleeClip in meleeClipList)
+                    {
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<Combo>))
+                {
+                    var comboListObject = propertyInfo.GetValue(currentWeapon);
+                    List<Combo> comboList = (List<Combo>)comboListObject;
+
+                    foreach (Combo combo in comboList)
+                    {
+                        MeleeClip meleeClip = combo.meleeClip;
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(Ability))
+                {
+                    var abilityObject = propertyInfo.GetValue(currentWeapon);
+                    Ability ability = (Ability)abilityObject;
+
+                    if (!ability) { continue; }
+
+                    MeleeClip meleeClip = ability.meleeClip;
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                    }
+                }
+
+                if (selectedClip)
+                {
+                    if (selectedClip.name == clipName) { break; }
+                }
+            }
+
+            if (selectedClip)
+            {
+                selectedClip.PlayLocally(this);
+            }
+            else
+            {
+                Debug.LogError("Selected Clip Not Found: " + clipName);
             }
         }
 
@@ -917,12 +995,12 @@ namespace GameCreator.Melee
                                 ? this.currentShield.groundPerfectBlockReaction
                                 : this.currentShield.airbornPerfectBlockReaction;
 
-                            attackerReaction.Play(attacker);
+                            attackerReaction.PlayNetworked(attacker);
                         }
 
                         if (this.currentShield.perfectBlockClip != null)
                         {
-                            this.currentShield.perfectBlockClip.Play(this);
+                            this.currentShield.perfectBlockClip.PlayNetworked(this);
                         }
 
                         this.ExecuteEffects(
@@ -936,7 +1014,7 @@ namespace GameCreator.Melee
                     }
 
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -950,7 +1028,7 @@ namespace GameCreator.Melee
                 else if (Poise.Value >= 30)
                 {
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -1006,7 +1084,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
-                hitReaction.Play(this);
+                hitReaction.PlayNetworked(this);
             }
             return HitResult.ReceiveDamage;
         }
@@ -1051,12 +1129,12 @@ namespace GameCreator.Melee
                                 ? this.currentShield.groundPerfectBlockReaction
                                 : this.currentShield.airbornPerfectBlockReaction;
 
-                            attackerReaction.Play(attacker);
+                            attackerReaction.PlayNetworked(attacker);
                         }
 
                         if (this.currentShield.perfectBlockClip != null)
                         {
-                            this.currentShield.perfectBlockClip.Play(this);
+                            this.currentShield.perfectBlockClip.PlayNetworked(this);
                         }
 
                         this.ExecuteEffects(
@@ -1070,7 +1148,7 @@ namespace GameCreator.Melee
                     }
 
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -1084,7 +1162,7 @@ namespace GameCreator.Melee
                 else if (Poise.Value >= 30)
                 {
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -1127,7 +1205,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
-                hitReaction.Play(this);
+                hitReaction.PlayNetworked(this);
             }
         }
 
@@ -1270,8 +1348,8 @@ namespace GameCreator.Melee
             executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
             targetCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
 
-            executorWeapon.grabAttack.Play(executorCharacter);
-            executorWeapon.grabReaction.Play(targetCharacter);
+            executorWeapon.grabAttack.PlayNetworked(executorCharacter);
+            executorWeapon.grabReaction.PlayNetworked(targetCharacter);
 
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executorCharacter, targetCharacter));
 
