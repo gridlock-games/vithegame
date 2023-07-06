@@ -35,7 +35,6 @@
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
             if (IsOwner) { MeleeServerRpc(target.transform.position, target.transform.rotation, target.name); }
-            //MeleeServerRpc(target.transform.position, target.transform.rotation, target.name);
             return false;
         }
 
