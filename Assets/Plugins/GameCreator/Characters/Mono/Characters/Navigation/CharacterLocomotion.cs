@@ -12,7 +12,8 @@
     [System.Serializable]
     public class CharacterLocomotion
     {
-        public enum CHARACTER_AILMENTS {
+        public enum CHARACTER_AILMENTS
+        {
             None,
             WasGrabbed,
             IsKnockedDown,
@@ -102,7 +103,7 @@
 
         [Tooltip("Check this if you want to use Unity's NavMesh and have a map baked")]
         public bool canUseNavigationMesh = false;
-        
+
         // INNER PROPERTIES: ----------------------------------------------------------------------
 
         private float lastGroundTime = 0f;
@@ -120,7 +121,7 @@
         public ILocomotionSystem currentLocomotionSystem { get; private set; }
 
         public bool useGravity = true;
-        
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         public void Setup(Character character)
@@ -230,7 +231,7 @@
                     animator.animator.transform.position = position;
                 }
             }
-            
+
             switch (this.currentLocomotionType)
             {
                 case CharacterLocomotion.LOCOMOTION_SYSTEM.CharacterController:
@@ -388,8 +389,8 @@
                 this.verticalSpeed = Mathf.Max(this.verticalSpeed, MAX_GROUND_VSPEED);
             }
 
-            this.verticalSpeed = this.gravity <= 0 
-                ? Mathf.Max(this.verticalSpeed, -Mathf.Abs(this.maxFallSpeed)) 
+            this.verticalSpeed = this.gravity <= 0
+                ? Mathf.Max(this.verticalSpeed, -Mathf.Abs(this.maxFallSpeed))
                 : Mathf.Min(this.verticalSpeed, Mathf.Abs(this.maxFallSpeed));
         }
 
@@ -435,22 +436,17 @@
             this.character.characterState.normal = this.terrainNormal;
         }
 
-        public bool UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable) {
-            try {
-                // This is to ensure that the target is not an NPC
-                PlayerCharacter isPlayer = this.character.GetComponent<PlayerCharacter>();
+        public void UpdateDirectionControl(OVERRIDE_FACE_DIRECTION direction, bool isControllable)
+        {
+            if (!character.NetworkManager.IsServer) { Debug.LogError("UpdateDirectionControl() should only be called from the server"); return; }
 
-                this.isControllable = isControllable;
-                this.isBusy = !isControllable;
-                this.overrideFaceDirection = isPlayer ? direction : CharacterLocomotion.OVERRIDE_FACE_DIRECTION.None;
-                return true;
-            } catch {
-
-                return false;
-            }
+            // These network variables use an onvaluechanged callback in the Character script to modify the proper variables in characterlocomotion
+            character.isControllable.Value = isControllable;
+            character.overrideFaceDirection.Value = direction;
         }
 
-        public CHARACTER_AILMENTS Ailment(CHARACTER_AILMENTS ailment) {
+        public CHARACTER_AILMENTS Ailment(CHARACTER_AILMENTS ailment)
+        {
             this.ailment = ailment;
 
             //Debug.Log(this.ailment);
