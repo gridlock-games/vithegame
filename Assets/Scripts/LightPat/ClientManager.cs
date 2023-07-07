@@ -193,7 +193,15 @@ namespace LightPat.Core
             {
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
-                QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1])));
+
+                if (payloadOptions.Length == 2)
+                {
+                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1])));
+                }
+                else
+                {
+                    QueueClient(clientId, new ClientData(payloadOptions[0], 0));
+                }
             }
         }
 
@@ -284,7 +292,7 @@ namespace LightPat.Core
         }
 
         [ServerRpc(RequireOwnership = false)]
-        void SpawnPlayerServerRpc(ulong clientId)
+        private void SpawnPlayerServerRpc(ulong clientId)
         {
             clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
             SynchronizeClientDictionaries();
@@ -305,9 +313,8 @@ namespace LightPat.Core
                     }
                 }
             }
-
+            
             GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
-
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
 

@@ -94,6 +94,9 @@ namespace GameCreator.Characters
 
         public override void OnNetworkSpawn()
         {
+            currentPosition = transform.position;
+            currentRotation = transform.rotation;
+
             if (IsServer)
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             if (IsClient)
