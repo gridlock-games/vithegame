@@ -392,7 +392,9 @@
                 this.runtimeController
             );
 
-            this.mixerStatesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            #pragma warning disable CS0618 // Type or member is obsolete
+            this.mixerStatesInput = AnimationMixerPlayable.Create(graph, 1, true);
+            #pragma warning restore CS0618 // Type or member is obsolete
             this.mixerStatesInput.ConnectInput(0, this.runtimeControllerPlayable, 0, 1f);
             this.mixerStatesInput.SetInputWeight(0, 1f);
         }
@@ -401,7 +403,9 @@
         {
             this.states = new List<PlayableState>();
 
+            #pragma warning disable CS0618 // Type or member is obsolete
             this.mixerStatesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            #pragma warning restore CS0618 // Type or member is obsolete
             this.mixerStatesOutput.ConnectInput(0, this.mixerStatesInput, 0, 1f);
             this.mixerStatesOutput.SetInputWeight(0, 1f);
         }
@@ -410,11 +414,15 @@
         {
             this.gestures = new List<PlayableGesture>();
 
+            #pragma warning disable CS0618 // Type or member is obsolete
             this.mixerGesturesInput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            #pragma warning restore CS0618 // Type or member is obsolete
             this.mixerGesturesInput.ConnectInput(0, this.mixerStatesOutput, 0, 1f);
             this.mixerGesturesInput.SetInputWeight(0, 1f);
 
+            #pragma warning disable CS0618 // Type or member is obsolete
             this.mixerGesturesOutput = AnimationMixerPlayable.Create(this.graph, 1, true);
+            #pragma warning restore CS0618 // Type or member is obsolete
             this.mixerGesturesOutput.ConnectInput(0, this.mixerGesturesInput, 0, 1f);
             this.mixerGesturesOutput.SetInputWeight(0, 1f);
         }

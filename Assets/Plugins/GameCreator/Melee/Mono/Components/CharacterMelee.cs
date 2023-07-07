@@ -12,6 +12,7 @@ namespace GameCreator.Melee
     using GameCreator.Pool;
     using static GameCreator.Melee.MeleeClip;
     using UnityEngine.SceneManagement;
+    using System.Reflection;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -72,7 +73,7 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        
+
         public float attackInterval = 0.10f;
 
         private NetworkVariable<float> Defense = new NetworkVariable<float>();
@@ -183,8 +184,9 @@ namespace GameCreator.Melee
                         {
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (Poise.Value <= 20) { 
-                                    return; 
+                                if (Poise.Value <= 20)
+                                {
+                                    return;
                                 }
                                 OnHeavyAttack();
                             }
@@ -194,10 +196,8 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
-
 
                         if (IsOwner)
                             FocusTarget(meleeClip);
@@ -210,11 +210,14 @@ namespace GameCreator.Melee
                             blade.isOrbitLocked = meleeClip.isOrbitLocked;
                         });
 
-                        if(!this.currentMeleeClip.isSequence) {
-                            this.currentMeleeClip.Play(this);
+                        if (!this.currentMeleeClip.isSequence)
+                        {
+                            this.currentMeleeClip.PlayNetworked(this);
 
                             if (this.EventAttack != null) this.EventAttack.Invoke(meleeClip);
-                        } else if (this.currentMeleeClip.isSequence) {
+                        }
+                        else if (this.currentMeleeClip.isSequence)
+                        {
                             StartCoroutine(SequenceClipPlayHandler(currentMeleeClip));
                         }
                     }
@@ -222,16 +225,18 @@ namespace GameCreator.Melee
             }
         }
 
-        private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent) {
+        private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent)
+        {
             List<MeleeClip> sequenceChildren = sequenceClipParent.sequencedClips;
-            
+
             // Reset attack time first
             this.comboSystem.StartAttackTime(false);
 
-            foreach(MeleeClip clip in sequenceChildren) {
+            foreach (MeleeClip clip in sequenceChildren)
+            {
                 this.currentMeleeClip = clip;
                 this.comboSystem.StartAttackTime(true);
-                clip.Play(this);
+                clip.PlayNetworked(this);
 
                 if (this.EventAttack != null) this.EventAttack.Invoke(clip);
                 yield return new WaitForSeconds(clip.animationClip.length);
@@ -241,7 +246,7 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventKnockedUpHitLimitReached;
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
-        
+
         public int count = 0;
         private void LateUpdate()
         {
@@ -263,64 +268,110 @@ namespace GameCreator.Melee
 
                 if (this.Blades != null && this.Blades.Count > 0 && phase == 1)
                 {
-                    GameObject[] hits;
                     foreach (BladeComponent blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
-                        hits = blade.CaptureHits();
-                        
-                        if(this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
+                        GameObject[] hits = blade.CaptureHits();
+
+                        if (count < currentMeleeClip.hitCount)
+                        {
+                            hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
+                            ProcessHitQueue();
+                        }
+
+                        //if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
         }
 
-        private IEnumerator ProcessAttackedObjects(GameObject[] hits, BladeComponent blade)
-        {
-            int hitInstanceID = 0;
+        private static Queue<HitQueueElement> hitQueue = new Queue<HitQueueElement>();
 
+        private struct HitQueueElement
+        {
+            public CharacterMelee melee;
+            public BladeComponent blade;
+            public GameObject[] hits;
+
+            public HitQueueElement(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+            {
+                this.melee = melee;
+                this.blade = blade;
+                this.hits = hits;
+            }
+        }
+
+        private void ProcessHitQueue()
+        {
+            // Wait for one frame for the hit queue to fill with all hits from the previous frame
+            // Empty the hit queue and process the hits for each element
+            while (hitQueue.Count > 0)
+            {
+                HitQueueElement queueElement = hitQueue.Dequeue();
+                ProcessAttackedObjects(queueElement.melee, queueElement.blade, queueElement.hits);
+            }
+        }
+
+        private void MarkHit() { StartCoroutine(ResetHitBool()); }
+
+        private bool wasHit;
+        private IEnumerator ResetHitBool()
+        {
+            wasHit = true;
+            // Wait until we have stopped attacking to reset hit bool
+            yield return new WaitUntil(() => !IsAttacking);
+            wasHit = false;
+        }
+
+        private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+        {
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
             foreach (GameObject hit in hits)
             {
                 // Do something with the attacked object
-                hitInstanceID = hit.GetInstanceID();
+                int hitInstanceID = hit.GetInstanceID();
 
                 if (hit.transform.IsChildOf(this.transform)) continue;
-                if (this.targetsEvaluated.Contains(hitInstanceID)) continue;
+                if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
-                MeleeClip attack = this.comboSystem.GetCurrentClip() ? this.comboSystem.GetCurrentClip() : this.currentMeleeClip;
+                if (!targetMelee) { continue; }
+                if (targetMelee.IsInvincible) { continue; }
+
+                // If this attacker melee has already been hit on this frame, ignore the all hits
+                if (melee.wasHit) { return; }
+                // Mark the target as hit, this prevents hit trading
+                targetMelee.MarkHit();
+
+                MeleeClip attack = melee.comboSystem.GetCurrentClip() ? melee.comboSystem.GetCurrentClip() : melee.currentMeleeClip;
 
                 // This is for checking if we are hitting an environment object
-                if (hit.gameObject.CompareTag("Obstacle"))
+                if (hit.CompareTag("Obstacle"))
                 {
                     Vector3 position_attackWp = blade.GetImpactPosition();
-                    Vector3 position_attacker = this.transform.position;
+                    Vector3 position_attacker = melee.transform.position;
                 }
 
                 if (targetMelee != null && !targetMelee.IsInvincible)
                 {
-                    this.count++;
+                    melee.count++;
                 }
 
-                this.targetsEvaluated.Add(hitInstanceID);
-                
-                // Wait for the specified interval before performing the action again
-                yield return new WaitForSeconds(0.15f);
+                melee.targetsEvaluated.Add(hitInstanceID);
 
                 if (attack && this.count < attack.hitCount)
                 {
-                    this.targetsEvaluated.Remove(hitInstanceID);
+                    melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
                 HitResult hitResult = HitResult.ReceiveDamage;
 
-                if (targetMelee.knockedUpHitCount.Value >= this.KNOCK_UP_FOLLOWUP_LIMIT)
+                if (targetMelee.knockedUpHitCount.Value >= melee.KNOCK_UP_FOLLOWUP_LIMIT)
                 {
                     targetMelee.knockedUpHitCount.Value = 0;
                     if (attack.attackType != AttackType.Knockdown)
-                        targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                        targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
                     targetMelee.EventKnockedUpHitLimitReached.Invoke();
                 }
 
@@ -328,17 +379,17 @@ namespace GameCreator.Melee
                 switch (attack.attackType)
                 {
                     case AttackType.Stun:
-                        targetMelee.Character.Stun(this.Character, targetMelee.Character);
+                        targetMelee.Character.Stun(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Knockdown:
-                        if (targetMelee.knockedUpHitCount.Value < this.KNOCK_UP_FOLLOWUP_LIMIT)
-                            targetMelee.Character.Knockdown(this.Character, targetMelee.Character);
+                        if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
+                            targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Knockedup:
-                        targetMelee.Character.Knockup(this.Character, targetMelee.Character);
+                        targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.Stagger:
-                        targetMelee.Character.Stagger(this.Character, targetMelee.Character);
+                        targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                         break;
                     case AttackType.None:
                         if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
@@ -360,7 +411,7 @@ namespace GameCreator.Melee
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                 {
-                    hitResult = targetMelee.OnReceiveAttack(this, attack, blade.GetImpactPosition());
+                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
                     if (hitResult == HitResult.ReceiveDamage)
                         targetMelee.HP.Value -= attack.baseDamage;
                     else if (hitResult == HitResult.PoiseBlock)
@@ -376,7 +427,7 @@ namespace GameCreator.Melee
 
                 if (targetMelee.HP.Value <= 0 & previousHP > 0)
                 {
-                    targetMelee.SendMessage("OnDeath", this);
+                    targetMelee.SendMessage("OnDeath", melee);
                     SendMessage("OnKill", targetMelee);
                 }
 
@@ -387,7 +438,7 @@ namespace GameCreator.Melee
                 {
                     for (int j = 0; j < triggers.Length; ++j)
                     {
-                        triggers[j].OnReceiveAttack(this, attack, hitResult);
+                        triggers[j].OnReceiveAttack(melee, attack, hitResult);
                     }
                 }
 
@@ -405,6 +456,91 @@ namespace GameCreator.Melee
                         rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
                     }
                 }
+            }
+        }
+
+        public void PropogateMeleeClipChange(MeleeClip meleeClip)
+        {
+            if (!IsServer) { Debug.LogError("PropogateMeleeClipChange() should only be called from the server"); return; }
+
+            PropogateMeleeClipChangeClientRpc(meleeClip.name);
+        }
+
+        private MeleeClip GetMeleeClipFromWeaponByName(string clipName)
+        {
+            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
+
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(MeleeClip))
+                {
+                    var meleeClipObject = propertyInfo.GetValue(currentWeapon);
+                    MeleeClip meleeClip = (MeleeClip)meleeClipObject;
+
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<MeleeClip>))
+                {
+                    var meleeClipListObject = propertyInfo.GetValue(currentWeapon);
+                    List<MeleeClip> meleeClipList = (List<MeleeClip>)meleeClipListObject;
+
+                    foreach (MeleeClip meleeClip in meleeClipList)
+                    {
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { return meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<Combo>))
+                {
+                    var comboListObject = propertyInfo.GetValue(currentWeapon);
+                    List<Combo> comboList = (List<Combo>)comboListObject;
+
+                    foreach (Combo combo in comboList)
+                    {
+                        MeleeClip meleeClip = combo.meleeClip;
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { return meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(Ability))
+                {
+                    var abilityObject = propertyInfo.GetValue(currentWeapon);
+                    Ability ability = (Ability)abilityObject;
+
+                    if (!ability) { continue; }
+
+                    MeleeClip meleeClip = ability.meleeClip;
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+            }
+
+            Debug.LogError("Melee clip Not Found: " + clipName);
+            return null;
+        }
+
+        [ClientRpc]
+        private void PropogateMeleeClipChangeClientRpc(string clipName)
+        {
+            MeleeClip clip = GetMeleeClipFromWeaponByName(clipName);
+            if (clip)
+            {
+                clip.PlayLocally(this);
+                if (clip.isAttack)
+                    currentMeleeClip = clip;
+            }
+            else
+            {
+                Debug.LogError("Clip Not Found: " + clipName);
             }
         }
 
@@ -585,7 +721,8 @@ namespace GameCreator.Melee
 
         public override void OnNetworkSpawn()
         {
-            HP.Value = maxHealth;
+            if (IsServer)
+                HP.Value = maxHealth;
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
         }
@@ -862,12 +999,12 @@ namespace GameCreator.Melee
                                 ? this.currentShield.groundPerfectBlockReaction
                                 : this.currentShield.airbornPerfectBlockReaction;
 
-                            attackerReaction.Play(attacker);
+                            attackerReaction.PlayNetworked(attacker);
                         }
 
                         if (this.currentShield.perfectBlockClip != null)
                         {
-                            this.currentShield.perfectBlockClip.Play(this);
+                            this.currentShield.perfectBlockClip.PlayNetworked(this);
                         }
 
                         this.ExecuteEffects(
@@ -881,7 +1018,7 @@ namespace GameCreator.Melee
                     }
 
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -895,7 +1032,7 @@ namespace GameCreator.Melee
                 else if (Poise.Value >= 30)
                 {
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -951,7 +1088,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
-                hitReaction.Play(this);
+                hitReaction.PlayNetworked(this);
             }
             return HitResult.ReceiveDamage;
         }
@@ -996,12 +1133,12 @@ namespace GameCreator.Melee
                                 ? this.currentShield.groundPerfectBlockReaction
                                 : this.currentShield.airbornPerfectBlockReaction;
 
-                            attackerReaction.Play(attacker);
+                            attackerReaction.PlayNetworked(attacker);
                         }
 
                         if (this.currentShield.perfectBlockClip != null)
                         {
-                            this.currentShield.perfectBlockClip.Play(this);
+                            this.currentShield.perfectBlockClip.PlayNetworked(this);
                         }
 
                         this.ExecuteEffects(
@@ -1015,7 +1152,7 @@ namespace GameCreator.Melee
                     }
 
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -1029,7 +1166,7 @@ namespace GameCreator.Melee
                 else if (Poise.Value >= 30)
                 {
                     MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.Play(this);
+                    if (blockReaction != null) blockReaction.PlayNetworked(this);
 
                     this.ExecuteEffects(
                         bladeImpactPosition,
@@ -1050,7 +1187,7 @@ namespace GameCreator.Melee
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
-            
+
             MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
                 this.Character.IsGrounded(),
                 hitLocation,
@@ -1072,7 +1209,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             if (!this.IsUninterruptable && attack.attackType == AttackType.None)
             {
-                hitReaction.Play(this);
+                hitReaction.PlayNetworked(this);
             }
         }
 
@@ -1082,6 +1219,62 @@ namespace GameCreator.Melee
         {
             return Time.time;
         }
+
+        public void ExecuteSwingAudio()
+        {
+            if (currentWeapon.audioSwing)
+            {
+                if (IsServer)
+                {
+                    PlayAudio(currentWeapon.audioSwing);
+                    ExecuteSwingAudioClientRpc(currentWeapon.audioSwing.name);
+                }
+                else
+                {
+                    Debug.LogWarning("ExecuteSwingAudio() should only be called on the server");
+                    PlayAudio(currentWeapon.audioSwing);
+                }
+            }
+        }
+
+        [ClientRpc] private void ExecuteSwingAudioClientRpc(string audioClipName) { PlayAudio(GetAudioClipFromWeaponByName(audioClipName)); }
+
+        private AudioClip GetAudioClipFromWeaponByName(string clipName)
+        {
+            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(AudioClip))
+                {
+                    var audioClipObject = propertyInfo.GetValue(currentWeapon);
+                    AudioClip audioClip = (AudioClip)audioClipObject;
+
+                    if (audioClip)
+                    {
+                        if (audioClip.name == clipName) { return audioClip; }
+                    }
+                }
+            }
+
+            propertyList = typeof(MeleeShield).GetFields();
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(AudioClip))
+                {
+                    var audioClipObject = propertyInfo.GetValue(currentShield);
+                    AudioClip audioClip = (AudioClip)audioClipObject;
+
+                    if (audioClip)
+                    {
+                        if (audioClip.name == clipName) { return audioClip; }
+                    }
+                }
+            }
+
+            Debug.LogError("Audio clip Not Found: " + clipName);
+            return null;
+        }
+
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
@@ -1207,8 +1400,8 @@ namespace GameCreator.Melee
             executorCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
             targetCharacter.SetPosture(Posture.Stagger, anim_ExecutedDuration);
 
-            executorWeapon.grabAttack.Play(executorCharacter);
-            executorWeapon.grabReaction.Play(targetCharacter);
+            executorWeapon.grabAttack.PlayNetworked(executorCharacter);
+            executorWeapon.grabReaction.PlayNetworked(targetCharacter);
 
             CoroutinesManager.Instance.StartCoroutine(this.PostGrabRoutine(executorCharacter, targetCharacter));
 
@@ -1270,7 +1463,7 @@ namespace GameCreator.Melee
             }
 
             if (!target) return;
-            
+
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, target.transform.position - transform.position, Vector3.up);
 
             if (IsTargetInFront(attackVectorAngle) == false) return;
@@ -1283,7 +1476,8 @@ namespace GameCreator.Melee
             float distance = Vector3.Distance(transform.position, target.position);
             AnimationCurve clipMovementForward = clip.movementForward;
 
-            if(!clip.isLunge && clip.isModifyFocus) {
+            if (!clip.isLunge && clip.isModifyFocus)
+            {
                 TargetMelee targetMelee = target.root.GetComponent<TargetMelee>();
                 SetTargetFocus(targetMelee);
             }

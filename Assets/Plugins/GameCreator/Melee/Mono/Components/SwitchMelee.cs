@@ -22,14 +22,26 @@ namespace GameCreator.Melee
             { KeyCode.Alpha1, WeaponType.GREATSWORD },
             { KeyCode.Alpha2, WeaponType.HAMMER },
             { KeyCode.Alpha3, WeaponType.DAGGER },
-            { KeyCode.Alpha4, WeaponType.BRAWLER },
-            { KeyCode.Alpha5, WeaponType.SWORD }
+            { KeyCode.Alpha4, WeaponType.BRAWLER }
         };
 
         public override void OnNetworkSpawn() { _currentWeaponType.OnValueChanged += OnCurrentWeaponTypeChange; SwitchWeapon(_currentWeaponType.Value); }
         public override void OnNetworkDespawn() { _currentWeaponType.OnValueChanged -= OnCurrentWeaponTypeChange; }
-        private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current) { SwitchWeapon(current); }
-        [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType) { _currentWeaponType.Value = weaponType; }
+
+        private void OnCurrentWeaponTypeChange(WeaponType prev, WeaponType current)
+        {
+            SwitchWeapon(current);
+            PlayVFX();
+        }
+
+        [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
+        {
+            if (_characterMelee.IsStaggered) return;
+            if (_characterMelee.IsAttacking) return;
+            if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
+
+            _currentWeaponType.Value = weaponType;
+        }
 
         [SerializeField] private VisualEffect[] _switchWeaponVFX;
 
@@ -61,6 +73,7 @@ namespace GameCreator.Melee
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;
+            if (_characterMelee.IsStaggered) return;
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
@@ -73,7 +86,6 @@ namespace GameCreator.Melee
                 {
                     if (weaponData.weaponType == _keyToWeaponType[key])
                     {
-                        PlayVFX();
                         //_switchWeaponVFX.Play();
                         if (weaponData.meleeWeapon) { weaponIsValid = true; }
                         break;

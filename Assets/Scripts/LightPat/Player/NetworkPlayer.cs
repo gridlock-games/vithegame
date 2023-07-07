@@ -78,7 +78,7 @@ namespace LightPat.Player
 
         [SerializeField] private TextMeshProUGUI pingDisplay;
         [SerializeField] private TextMeshProUGUI fpsCounterDisplay;
-        private float _hudRefreshRate = 1f;
+        private readonly float _hudRefreshRate = 1f;
         private float _timer;
 
         private void Update()
@@ -87,13 +87,12 @@ namespace LightPat.Player
 
             if (!IsOwner) { return; }
 
-            pingDisplay.SetText("Ping: " + roundTripTime.Value + " ms");
-
-            // FPS Counter
+            // FPS Counter and Ping Display
             if (Time.unscaledTime > _timer)
             {
                 int fps = (int)(1f / Time.unscaledDeltaTime);
                 fpsCounterDisplay.SetText("FPS: " + fps);
+                pingDisplay.SetText("Ping: " + roundTripTime.Value + " ms");
                 _timer = Time.unscaledTime + _hudRefreshRate;
             }
 

@@ -65,7 +65,7 @@
             SaveLoadManager.Instance.Initialize(this);
         }
 
-        private void OnDestroy()
+        private new void OnDestroy()
         {
             base.OnDestroyGID();
 

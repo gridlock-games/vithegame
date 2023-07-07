@@ -58,6 +58,7 @@
         private SerializedProperty spAudioDraw;
         private SerializedProperty spAudioImpactNormal;
         private SerializedProperty spAudioImpactKnockback;
+        private SerializedProperty spAudioSwing;
 
         private SerializedProperty spPrefabImpactNormal;
         private SerializedProperty spPrefabImpactHit;
@@ -160,6 +161,7 @@
             this.spAbilityRage = this.serializedObject.FindProperty("abilityRage");
         
             this.spAudioSheathe = this.serializedObject.FindProperty("audioSheathe");
+            this.spAudioSwing = this.serializedObject.FindProperty("audioSwing");
             this.spAudioDraw = this.serializedObject.FindProperty("audioDraw");
             this.spAudioImpactNormal = this.serializedObject.FindProperty("audioImpactNormal");
             this.spAudioImpactKnockback = this.serializedObject.FindProperty("audioImpactKnockback");
@@ -430,6 +432,7 @@
                     EditorGUILayout.PropertyField(this.spAudioSheathe);
 
                     EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(this.spAudioSwing);
                     EditorGUILayout.PropertyField(this.spAudioImpactNormal);
                     EditorGUILayout.PropertyField(this.spAudioImpactKnockback);
 

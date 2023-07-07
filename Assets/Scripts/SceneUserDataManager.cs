@@ -31,6 +31,7 @@ public class SceneUserDataManager : MonoBehaviour
     private bool isPreviewActive = false;
     private bool connectingToPlayerHub;
 
+    private AsyncOperation loadingHubAsyncOperation;
     public void ConnectToPlayerHub()
     {
         if (connectingToPlayerHub) { return; }
@@ -41,6 +42,7 @@ public class SceneUserDataManager : MonoBehaviour
         // Find player object by weapon type
         for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
         {
+            Debug.Log(ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() + " " + selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType());
             if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
@@ -57,8 +59,15 @@ public class SceneUserDataManager : MonoBehaviour
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
 
         connectingToPlayerHub = true;
+
+        // Disable character buttons while scene loads
+        foreach (GameObject characterOptionImage in characterOptionImages)
+        {
+            characterOptionImage.GetComponent<Button>().interactable = false;
+        }
+
         loadingText.text = "Connecting to player hub...";
-        ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
     }
 
     void Start()
@@ -66,6 +75,14 @@ public class SceneUserDataManager : MonoBehaviour
         this.datamanager = DataManager.Instance;
         Instantiate(cameraPrefab);
         this.InitDataReferences();
+    }
+
+    private void Update()
+    {
+        if (loadingHubAsyncOperation != null)
+        {
+            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAsyncOperation.progress * 100) + "%";
+        }
     }
 
     private void InitDataReferences()
@@ -82,6 +99,7 @@ public class SceneUserDataManager : MonoBehaviour
         }
     }
 
+    private List<GameObject> characterOptionImages = new List<GameObject>();
     private void SpawnGameObjectsHorizontally()
     {
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
@@ -91,7 +109,7 @@ public class SceneUserDataManager : MonoBehaviour
             gridImgPrefab.sprite = charactersList[i].characterImage;
             gridImgPrefab.gameObject.name = charactersList[i].characterName;
             gridImgPrefab.gameObject.SetActive(true);
-            Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform);
+            characterOptionImages.Add(Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform));
         }
 
         this.SelectGameObject(null);

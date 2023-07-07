@@ -26,7 +26,7 @@ namespace GameCreator.Core
             SaveLoadManager.Instance.Initialize(this);
         }
 
-        protected virtual void OnDestroy()
+        protected virtual new void OnDestroy()
         {
             if (!Application.isPlaying || this.exitingApplication) return;
 

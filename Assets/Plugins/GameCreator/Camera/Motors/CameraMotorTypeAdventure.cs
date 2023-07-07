@@ -334,7 +334,7 @@
                     }
 
                     Vector2 sensitivityValue = this.sensitivity.GetValue(gameObject);
-
+                    
                     rotationX = axisX * sensitivityValue.x * Time.timeScale;
                     rotationY = axisY * sensitivityValue.y * Time.timeScale;
 

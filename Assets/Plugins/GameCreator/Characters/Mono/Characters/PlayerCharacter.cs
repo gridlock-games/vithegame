@@ -124,6 +124,9 @@
 
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
+            // If the input payload hasn't been recieved yet (this happens on non-owner clients)
+            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 
@@ -157,7 +160,7 @@
                 );
 
                 Vector3 verticalMovement = Vector3.up * characterLocomotion.verticalSpeed;
-                movement += (inputPayload.rootMotionResult.rootMoveGravity * verticalMovement) * (1f / NetworkManager.NetworkTickSystem.TickRate);
+                movement += (1f / NetworkManager.NetworkTickSystem.TickRate) * inputPayload.rootMotionResult.rootMoveGravity * verticalMovement;
                 movement = inputPayload.rotation * movement;
 
                 rootMoveDeltaForward = inputPayload.rootMotionResult.rootMotionForward;
@@ -179,6 +182,7 @@
 
             // Apply movement to charactercontroller
             characterLocomotion.characterController.Move(movement);
+
             Vector3 newPosition = transform.position;
 
             // Revert movement change
@@ -202,8 +206,9 @@
             public float rootMotionSides;
             public float rootMotionVertical;
             public float rootMoveGravity;
+            public float progress;
 
-            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity)
+            public RootMotionResult(bool apply, bool newMeleeClip, float rootMotionForward, float rootMotionSides, float rootMotionVertical, float rootMoveGravity, float progress)
             {
                 this.apply = apply;
                 this.newMeleeClip = newMeleeClip;
@@ -211,6 +216,7 @@
                 this.rootMotionSides = rootMotionSides;
                 this.rootMotionVertical = rootMotionVertical;
                 this.rootMoveGravity = rootMoveGravity;
+                this.progress = progress;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -224,6 +230,7 @@
                     serializer.SerializeValue(ref rootMotionSides);
                     serializer.SerializeValue(ref rootMotionVertical);
                     serializer.SerializeValue(ref rootMoveGravity);
+                    serializer.SerializeValue(ref progress);
                 }
             }
         }
@@ -243,7 +250,7 @@
                 setStartTick = false;
             }
 
-            if (rootMotionInformation.rootMoveTickDuration == 0) return default;
+            if (rootMotionInformation.rootMoveTickDuration == 0) { return default; }
             if (tick > rootMotionStartTick + rootMotionInformation.rootMoveTickDuration) { return default; }
 
             float t = (tick - rootMotionStartTick) / (float)rootMotionInformation.rootMoveTickDuration;
@@ -252,7 +259,7 @@
             float deltaSides = rootMotionInformation.rootMoveCurveSides.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
             float deltaVertical = rootMotionInformation.rootMoveCurveVertical.Evaluate(t) * rootMotionInformation.rootMoveImpulse;
 
-            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity);
+            return new RootMotionResult(true, newMeleeClip, deltaForward, deltaSides, deltaVertical, rootMotionInformation.rootMoveGravity, t);
         }
 
         public void OnRootMotionStart(ILocomotionSystem.RootMotionInformation rootMotionInformation)

@@ -138,6 +138,7 @@
 
             int currPhase = this.Melee.GetCurrentPhase();
             MeleeClip clip = this.Melee.currentMeleeClip;
+            MeleeWeapon weapon = this.Melee.currentWeapon;
 
             if (currPhase == this.prevPhase) return;
 
@@ -151,7 +152,7 @@
             switch (currPhase)
             {
                 case -1:
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackEnd.Invoke();
                     break;
 
@@ -160,18 +161,19 @@
                     if(Melee.count > 0) {
                      Melee.count = 0;
                     };
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     break;
 
                 case  1:
                     if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
                     
-                    if(clip != null && this.weaponBone != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone)) {
-
-                        if(clip.name == "Atk_Skill_Hammer_01_C") Debug.Log("I am running");
+                    if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone))
+                    {
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }
+                    
+                    this.Melee.ExecuteSwingAudio();
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
                     break;
@@ -181,7 +183,7 @@
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.count = 0;
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0.2f);
+                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackRecovery.Invoke();
                     break;
             }

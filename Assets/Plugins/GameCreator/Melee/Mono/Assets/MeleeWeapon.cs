@@ -62,6 +62,7 @@ namespace GameCreator.Melee
         public AudioClip audioDraw;
         public AudioClip audioImpactNormal;
         public AudioClip audioImpactKnockback;
+        public AudioClip audioSwing;
 
 
         // abilities
@@ -84,14 +85,14 @@ namespace GameCreator.Melee
         public List<MeleeClip> groundHitReactionsLeftMiddle = new List<MeleeClip>();
         public List<MeleeClip> groundHitReactionsRightMiddle = new List<MeleeClip>();
 
-        public MeleeClip dodgeF = new MeleeClip();
-        public MeleeClip dodgeFL = new MeleeClip();
-        public MeleeClip dodgeFR = new MeleeClip();
-        public MeleeClip dodgeB = new MeleeClip();
-        public MeleeClip dodgeBL = new MeleeClip();
-        public MeleeClip dodgeBR = new MeleeClip();
-        public MeleeClip dodgeL = new MeleeClip();
-        public MeleeClip dodgeR = new MeleeClip();
+        public MeleeClip dodgeF;
+        public MeleeClip dodgeFL;
+        public MeleeClip dodgeFR;
+        public MeleeClip dodgeB;
+        public MeleeClip dodgeBL;
+        public MeleeClip dodgeBR;
+        public MeleeClip dodgeL;
+        public MeleeClip dodgeR;
 
         // grabs
         public MeleeClip grabAttack;

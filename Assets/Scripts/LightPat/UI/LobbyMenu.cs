@@ -28,12 +28,28 @@ namespace LightPat.UI
         public TMP_Dropdown secondaryWeaponDropdown;
         public TMP_Dropdown tertiaryWeaponDropdown;
 
-        GameObject playerModel;
-        Vector3 cameraPositionOffset;
+        private GameObject playerModel;
+        private Vector3 cameraPositionOffset;
 
+        private bool leaveLobbyInProgress;
         public void LeaveLobby()
         {
-            Application.Quit();
+            if (leaveLobbyInProgress) { return; }
+            leaveLobbyInProgress = true;
+            StartCoroutine(ConnectToHub());
+        }
+
+        private AsyncOperation loadingHubAsyncOperation;
+        private IEnumerator ConnectToHub()
+        {
+            Debug.Log("Shutting down NetworkManager");
+            NetworkManager.Singleton.Shutdown();
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            Debug.Log("Shutdown complete");
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = ClientManager.Singleton.playerHubIP;
+            Debug.Log("Switching to hub scene: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            // Change the scene locally, then connect to the target IP
+            loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
         }
 
         public void ToggleReady()
@@ -242,33 +258,41 @@ namespace LightPat.UI
             bool canStartGame = false;
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
             {
-                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
-                if (clientIdArray.Length < 2)
+                if (loadingHubAsyncOperation == null)
                 {
-                    errorDisplay.SetText("Duel requires there to be at least 2 players in the lobby");
-                }
-                else if (clientIdArray.Length > 2)
-                {
-                    errorDisplay.SetText("Duel requires there to be only 2 players in the lobby");
-                }
-                else
-                {
-                    errorDisplay.SetText("");
+                    ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
 
-                    canStartGame = true;
-
-                    if (NetworkManager.Singleton.IsServer)
+                    if (clientIdArray.Length < 2)
                     {
-                        int counter = 0;
-                        foreach (ulong clientId in clientIdArray)
+                        errorDisplay.SetText("Duel requires there to be at least 2 players in the lobby");
+                    }
+                    else if (clientIdArray.Length > 2)
+                    {
+                        errorDisplay.SetText("Duel requires there to be only 2 players in the lobby");
+                    }
+                    else
+                    {
+                        errorDisplay.SetText("");
+
+                        canStartGame = true;
+
+                        if (NetworkManager.Singleton.IsServer)
                         {
-                            if (counter == 0)
-                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
-                            else if (counter == 1)
-                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
-                            counter++;
+                            int counter = 0;
+                            foreach (ulong clientId in clientIdArray)
+                            {
+                                if (counter == 0)
+                                    ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
+                                else if (counter == 1)
+                                    ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
+                                counter++;
+                            }
                         }
                     }
+                }
+                else // If we are loading the hub scene
+                {
+                    errorDisplay.SetText("Connecting to player hub... " + Mathf.RoundToInt(loadingHubAsyncOperation.progress * 100) + "%");
                 }
             }
             startGameButton.interactable = canStartGame;

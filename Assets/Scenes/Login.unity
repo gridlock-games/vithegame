@@ -608,6 +608,7 @@ MonoBehaviour:
     type: 3}
   gameLogicManagerNetObjId:
     m_InternalValue: 0
+  playerHubIP: 
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0
@@ -1853,11 +1854,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c77c2b956b1ee4b9baeb1358cd1675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerHubIPAddress: 128.199.214.19
   btn_SignIn: {fileID: 1505543978}
   btn_Signedin: {fileID: 45389541}
   btn_SignOut: {fileID: 2041294709}
   btn_StartGame: {fileID: 1739017530}
-  clientIPAddressInput: {fileID: 1277978444}
   displayNameInput: {fileID: 788381146}
   infoDisplayText: {fileID: 1786870635}
 --- !u!1 &1504166514

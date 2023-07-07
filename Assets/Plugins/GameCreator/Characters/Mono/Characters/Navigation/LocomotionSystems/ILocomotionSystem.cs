@@ -171,12 +171,11 @@
         {
             if (this.isRootMoving)
             {
-                // TODO: Maybe add some drag?
-                if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
-                {
-                    //if (!characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
-                    this.isRootMoving = false;
-                }
+                //// TODO: Maybe add some drag?
+                //if (Time.time >= this.rootMoveStartTime + this.rootMoveDuration)
+                //{
+                //    this.isRootMoving = false;
+                //}
             }
 
             if (this.isDashing)
@@ -398,25 +397,65 @@
         protected void UpdateRootMovement(Vector3 verticalMovement)
         {
             float t = (Time.time - this.rootMoveStartTime) / this.rootMoveDuration;
+
             float deltaForward = this.rootMoveCurveForward.Evaluate(t) * this.rootMoveImpulse;
             float deltaSides = this.rootMoveCurveSides.Evaluate(t) * this.rootMoveImpulse;
             float deltaVertical = this.rootMoveCurveVertical.Evaluate(t) * this.rootMoveImpulse;
 
-            Vector3 movement = new Vector3(
-                deltaSides - this.rootMoveDeltaSides,
-                deltaVertical - this.rootMoveDeltaVertical,
-                deltaForward - this.rootMoveDeltaForward
-            );
+            Vector3 movement = new Vector3(deltaSides, deltaVertical, deltaForward);
+            movement.x -= rootMoveDeltaSides;
+            movement.y -= rootMoveDeltaVertical;
+            movement.z -= rootMoveDeltaForward;
 
-            movement += Time.deltaTime * this.rootMoveGravity * verticalMovement;
+            rootMoveDeltaForward = deltaForward;
+            rootMoveDeltaSides = deltaSides;
+            rootMoveDeltaVertical = deltaVertical;
 
-            this.characterLocomotion.characterController.Move(
-                this.characterLocomotion.character.transform.TransformDirection(movement)
-            );
+            if (characterLocomotion.character.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                movement = characterLocomotion.character.transform.rotation * movement;
 
-            this.rootMoveDeltaForward = deltaForward;
-            this.rootMoveDeltaSides = deltaSides;
-            this.rootMoveDeltaVertical = deltaVertical;
+                // Calculate rotation to look at the current network position
+                Quaternion relativeRotation = Quaternion.identity;
+                if ((networkTransform.currentPosition - networkTransform.transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((networkTransform.currentPosition - networkTransform.transform.position).normalized, networkTransform.transform.up); }
+
+                // Calculate rotation to look in the direction of our movement
+                Quaternion movementRotation = Quaternion.identity;
+                if (movement.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(movement.normalized, networkTransform.transform.up); }
+
+                // Apply the direction of movement to the direction to move towards the current network position
+                Quaternion finalRotation = relativeRotation * movementRotation;
+
+                // Invert movement along the local x axis, idk why I need to do this
+                movement.x *= -1;
+                // Apply rotation to movement vector
+                movement = finalRotation * movement;
+
+                // Scale movement vector according to distance between network position and local position
+                float localDistance = Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position);
+                movement = movement.normalized * localDistance;
+                
+                // If our movement vector isn't going to reduce the distance between the local position and network position, simply move straight to the network position
+                // This prevents some jitters
+                float afterMoveDistance = Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position + (movement.normalized * localDistance));
+                if (localDistance < afterMoveDistance)
+                {
+                    movement = networkTransform.currentPosition - networkTransform.transform.position;
+                }
+            }
+            else
+            {
+                movement = characterLocomotion.character.transform.rotation * movement;
+            }
+
+            movement += Time.deltaTime * rootMoveGravity * verticalMovement;
+
+            characterLocomotion.characterController.Move(movement);
+
+            if (t >= 1)
+            {
+                isRootMoving = false;
+            }
         }
 
         protected DirectionData GetFaceDirection()

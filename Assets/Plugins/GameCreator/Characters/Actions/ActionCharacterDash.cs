@@ -112,14 +112,15 @@
                     moveDirection.Scale(new Vector3(0, 1, 1));
                     break;
             }
-
-            Vector3 charDirection = Vector3.Scale(
-                characterTarget.transform.TransformDirection(Vector3.forward),
-                PLANE
-            );
+            
+            Vector3 charDirection = Vector3.Scale(characterTarget.transform.TransformDirection(Vector3.forward), PLANE);
+            
+            if (characterTarget.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                moveDirection = networkTransform.currentRotation * characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
+            }
 
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
-
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
 
@@ -157,20 +158,15 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
             
-            MeleeWeapon meleeweapon = new MeleeWeapon();
-
-            if (melee != null)
+            if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
             {
-                if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
-                {
-                    if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
-                    melee.StopAttack();
-                    animator.StopGesture(0f);
-                    melee.currentMeleeClip = null;
-                }
-
-                meleeweapon = melee.currentWeapon;
+                if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
+                melee.StopAttack();
+                animator.StopGesture(0f);
+                melee.currentMeleeClip = null;
             }
+
+            MeleeWeapon meleeweapon = melee.currentWeapon;
 
             AnimationClip clip = null;
 
