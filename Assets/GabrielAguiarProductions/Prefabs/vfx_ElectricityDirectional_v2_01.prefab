@@ -9995,7 +9995,7 @@ VisualEffect:
       - m_Value: 35
         m_Name: Speed
         m_Overridden: 1
-      - m_Value: 0.4
+      - m_Value: 0.3
         m_Name: Lifetime
         m_Overridden: 1
       - m_Value: 0.15
@@ -10003,6 +10003,9 @@ VisualEffect:
         m_Overridden: 1
       - m_Value: 0.1
         m_Name: Cone_topRadius
+        m_Overridden: 1
+      - m_Value: 30
+        m_Name: Rate
         m_Overridden: 1
     m_Vector2f:
       m_Array: []
@@ -10026,7 +10029,7 @@ VisualEffect:
       - m_Value: {x: 1, y: 1, z: 1}
         m_Name: Target_scale
         m_Overridden: 1
-      - m_Value: {x: 90, y: 0, z: 0}
+      - m_Value: {x: 180, y: 0, z: 0}
         m_Name: Cone_transform_angles
         m_Overridden: 1
     m_Vector4f:
