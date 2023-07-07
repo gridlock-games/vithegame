@@ -470,7 +470,6 @@ namespace GameCreator.Melee
         {
             IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
 
-            MeleeClip selectedClip = null;
             foreach (FieldInfo propertyInfo in propertyList)
             {
                 if (propertyInfo.FieldType == typeof(MeleeClip))
@@ -480,7 +479,7 @@ namespace GameCreator.Melee
 
                     if (meleeClip)
                     {
-                        if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                        if (meleeClip.name == clipName) { return meleeClip; }
                     }
                 }
                 else if (propertyInfo.FieldType == typeof(List<MeleeClip>))
@@ -492,7 +491,7 @@ namespace GameCreator.Melee
                     {
                         if (meleeClip)
                         {
-                            if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                            if (meleeClip.name == clipName) { return meleeClip; }
                         }
                     }
                 }
@@ -506,7 +505,7 @@ namespace GameCreator.Melee
                         MeleeClip meleeClip = combo.meleeClip;
                         if (meleeClip)
                         {
-                            if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                            if (meleeClip.name == clipName) { return meleeClip; }
                         }
                     }
                 }
@@ -520,19 +519,13 @@ namespace GameCreator.Melee
                     MeleeClip meleeClip = ability.meleeClip;
                     if (meleeClip)
                     {
-                        if (meleeClip.name == clipName) { selectedClip = meleeClip; }
+                        if (meleeClip.name == clipName) { return meleeClip; }
                     }
-                }
-
-                if (selectedClip)
-                {
-                    if (selectedClip.name == clipName) { break; }
                 }
             }
 
-            if (!selectedClip) { Debug.LogError("Clip Not Found: " + clipName); }
-
-            return selectedClip;
+            Debug.LogError("Melee clip Not Found: " + clipName);
+            return null;
         }
 
         [ClientRpc]
@@ -1229,11 +1222,59 @@ namespace GameCreator.Melee
 
         public void ExecuteSwingAudio()
         {
-            if (this.currentWeapon.audioSwing)
+            if (currentWeapon.audioSwing)
             {
-                this.PlayAudio(this.currentWeapon.audioSwing); 
+                if (IsServer)
+                {
+                    PlayAudio(currentWeapon.audioSwing);
+                    ExecuteSwingAudioClientRpc(currentWeapon.audioSwing.name);
+                }
+                else
+                {
+                    Debug.LogWarning("ExecuteSwingAudio() should only be called on the server");
+                    PlayAudio(currentWeapon.audioSwing);
+                }
             }
         }
+
+        [ClientRpc] private void ExecuteSwingAudioClientRpc(string audioClipName) { PlayAudio(GetAudioClipFromWeaponByName(audioClipName)); }
+
+        private AudioClip GetAudioClipFromWeaponByName(string clipName)
+        {
+            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(AudioClip))
+                {
+                    var audioClipObject = propertyInfo.GetValue(currentWeapon);
+                    AudioClip audioClip = (AudioClip)audioClipObject;
+
+                    if (audioClip)
+                    {
+                        if (audioClip.name == clipName) { return audioClip; }
+                    }
+                }
+            }
+
+            propertyList = typeof(MeleeShield).GetFields();
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(AudioClip))
+                {
+                    var audioClipObject = propertyInfo.GetValue(currentShield);
+                    AudioClip audioClip = (AudioClip)audioClipObject;
+
+                    if (audioClip)
+                    {
+                        if (audioClip.name == clipName) { return audioClip; }
+                    }
+                }
+            }
+
+            Debug.LogError("Audio clip Not Found: " + clipName);
+            return null;
+        }
+
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {
