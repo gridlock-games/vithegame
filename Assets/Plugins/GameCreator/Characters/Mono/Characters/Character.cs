@@ -134,7 +134,7 @@
             {
                 yield return new WaitUntil(() => characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None);
             }
-            
+
             switch (current)
             {
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
@@ -158,8 +158,37 @@
             }
         }
 
-        public override void OnNetworkSpawn() { characterAilmentNetworked.OnValueChanged += OnAilmentChange; }
-        public override void OnNetworkDespawn() { characterAilmentNetworked.OnValueChanged -= OnAilmentChange; }
+        public NetworkVariable<bool> isControllable;
+
+        private void OnIsControllableChange(bool prev, bool current)
+        {
+            characterLocomotion.isControllable = current;
+            characterLocomotion.isBusy = !current;
+        }
+
+        public NetworkVariable<CharacterLocomotion.OVERRIDE_FACE_DIRECTION> overrideFaceDirection;
+
+        private void OnOverrideFaceDirectionChange(CharacterLocomotion.OVERRIDE_FACE_DIRECTION prev, CharacterLocomotion.OVERRIDE_FACE_DIRECTION current)
+        {
+            characterLocomotion.overrideFaceDirection = GetComponent<PlayerCharacter>() ? current : CharacterLocomotion.OVERRIDE_FACE_DIRECTION.None;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            characterAilmentNetworked.OnValueChanged += OnAilmentChange;
+            isControllable.OnValueChanged += OnIsControllableChange;
+            overrideFaceDirection.OnValueChanged += OnOverrideFaceDirectionChange;
+
+            if (IsServer)
+                isControllable.Value = true;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            characterAilmentNetworked.OnValueChanged -= OnAilmentChange;
+            isControllable.OnValueChanged -= OnIsControllableChange;
+            overrideFaceDirection.OnValueChanged -= OnOverrideFaceDirectionChange;
+        }
 
         protected override void Awake()
         {
@@ -206,7 +235,7 @@
         }
 
         // UPDATE: --------------------------------------------------------------------------------
-        
+
         private void Update()
         {
             if (!Application.isPlaying) return;
@@ -275,7 +304,11 @@
         {
             if (this.characterLocomotion == null) return false;
             if (disableActions.Value) return false;
-            return this.characterLocomotion.isControllable;
+
+            if (IsSpawned)
+                return isControllable.Value;
+            else
+                return characterLocomotion.isControllable;
         }
 
         public bool IsRagdoll()
@@ -345,17 +378,18 @@
         public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable)
         {
             if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
-            this.characterLocomotion.UpdateDirectionControl(direction, isControllable);
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(direction, isControllable); }
             return true;
         }
-        
+
         public bool Stun(Character attacker, Character target)
         {
             if (allowedStunEntries.Contains(this.characterAilment))
             {
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
-                switch (prevAilment) {
+                switch (prevAilment)
+                {
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         bool waitForClientRotation = false;
@@ -376,14 +410,14 @@
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(0f, waitForClientRotation));
                         break;
-                        
+
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartSunAfterDuration(0f, false));
                         break;
 
                     default:
-                        this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                        if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
                         break;
                 }
@@ -428,7 +462,7 @@
                 }
                 else
                 {
-                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, waitForClientRotation);
                 }
 
@@ -463,19 +497,20 @@
 
                 // This is to make sure the target's ailment is reset before applying the Stager ailment
 
-                switch(prevAilment) {
+                switch (prevAilment)
+                {
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStunned:
-                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockupAfterDuration(.05f, waitForClientRotation));
                         break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
-                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(.05f, waitForClientRotation));
                         break;
                     default:
-                        this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-                        this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered, null, waitForClientRotation);
+                        if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
+                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered, null, waitForClientRotation);
                         break;
                 }
 
@@ -516,7 +551,7 @@
                 }
                 else
                 {
-                    this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
                     this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, waitForClientRotation);
                 }
 
@@ -535,7 +570,7 @@
         [ClientRpc]
         private void UpdateAilmentRotationClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
         {
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            //this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
             Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
             PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
             target.transform.rotation = rotationConfig.quaternion;
@@ -559,7 +594,7 @@
             {
                 yield return null;
             }
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown, null, waitForClientRotation);
         }
 
@@ -572,7 +607,7 @@
             {
                 yield return null;
             }
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp, null, waitForClientRotation);
         }
 
@@ -585,7 +620,7 @@
             {
                 yield return null;
             }
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered, null, waitForClientRotation);
         }
 
@@ -598,7 +633,7 @@
             {
                 yield return null;
             }
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null, waitForClientRotation);
         }
 
@@ -614,7 +649,7 @@
             }
             MeleeClip standRecovery = melee.currentWeapon.recoveryStandUp;
             standRecovery.PlayNetworked(melee);
-            
+
             float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
             CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
         }
@@ -651,12 +686,12 @@
             bool isDodging = (bool)variables.Get("isDodging").Get();
 
             if (isDodging == true) yield break;
-            
+
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
-            
-            characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            
+
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
+
             float recoveryAnimDuration = 0f;
 
             switch (ailment)
@@ -700,7 +735,7 @@
                         melee.currentWeapon.knockbackF.PlayNetworked(melee);
                     melee.SetInvincibility(6.50f);
                     break;
-                
+
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                     if (melee.currentWeapon.staggerF)
                         melee.currentWeapon.staggerF.PlayNetworked(melee);
@@ -717,8 +752,8 @@
         {
             resetDefaultStateRunning = true;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
-            
-            this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true); }
 
             yield return new WaitForSeconds(duration * 0.80f);
 
