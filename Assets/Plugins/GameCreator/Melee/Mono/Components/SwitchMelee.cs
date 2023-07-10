@@ -21,7 +21,7 @@ namespace GameCreator.Melee
         {
             { KeyCode.Alpha1, WeaponType.GREATSWORD },
             { KeyCode.Alpha2, WeaponType.HAMMER },
-            { KeyCode.Alpha3, WeaponType.DAGGER },
+            { KeyCode.Alpha3, WeaponType.LANCE },
             { KeyCode.Alpha4, WeaponType.BRAWLER }
         };
 
