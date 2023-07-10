@@ -267,7 +267,7 @@
         public void SetIsControllable(bool isControllable)
         {
             if (isControllable == this.isControllable) return;
-            this.isControllable = isControllable;
+            character.isControllable.Value = isControllable;
 
             if (!isControllable) this.SetDirectionalDirection(Vector3.zero);
             if (this.character.onIsControllable != null)
