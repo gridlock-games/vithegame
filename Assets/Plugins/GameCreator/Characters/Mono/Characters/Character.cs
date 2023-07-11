@@ -162,7 +162,6 @@
 
         private void OnIsControllableChange(bool prev, bool current)
         {
-            Debug.Log(OwnerClientId + " " + current);
             characterLocomotion.isControllable = current;
             characterLocomotion.isBusy = !current;
         }

@@ -809,8 +809,6 @@ namespace GameCreator.Melee
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
         {
-            Debug.Log(OwnerClientId + " Blocking: " + current);
-
             if (current) // Start blocking
             {
                 if (this.currentShield.defendState != null)
