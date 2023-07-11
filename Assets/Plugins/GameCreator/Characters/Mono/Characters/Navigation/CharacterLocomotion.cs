@@ -266,7 +266,8 @@
 
         public void SetIsControllable(bool isControllable)
         {
-            if (isControllable == this.isControllable) return;
+            if (!character.NetworkManager.IsServer) { Debug.LogError("SetIsControllable() should only be called from the server"); return; }
+            if (isControllable == this.isControllable) { return; }
             character.isControllable.Value = isControllable;
 
             if (!isControllable) this.SetDirectionalDirection(Vector3.zero);
