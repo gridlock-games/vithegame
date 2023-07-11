@@ -466,7 +466,7 @@ namespace GameCreator.Melee
             PropogateMeleeClipChangeClientRpc(meleeClip.name);
         }
 
-        private MeleeClip GetMeleeClipFromWeaponByName(string clipName)
+        private MeleeClip GetMeleeClipFromWeaponOrShieldByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
 
@@ -524,6 +524,62 @@ namespace GameCreator.Melee
                 }
             }
 
+            propertyList = typeof(MeleeShield).GetFields();
+
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(MeleeClip))
+                {
+                    var meleeClipObject = propertyInfo.GetValue(currentShield);
+                    MeleeClip meleeClip = (MeleeClip)meleeClipObject;
+
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<MeleeClip>))
+                {
+                    var meleeClipListObject = propertyInfo.GetValue(currentShield);
+                    List<MeleeClip> meleeClipList = (List<MeleeClip>)meleeClipListObject;
+
+                    foreach (MeleeClip meleeClip in meleeClipList)
+                    {
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { return meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<Combo>))
+                {
+                    var comboListObject = propertyInfo.GetValue(currentShield);
+                    List<Combo> comboList = (List<Combo>)comboListObject;
+
+                    foreach (Combo combo in comboList)
+                    {
+                        MeleeClip meleeClip = combo.meleeClip;
+                        if (meleeClip)
+                        {
+                            if (meleeClip.name == clipName) { return meleeClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(Ability))
+                {
+                    var abilityObject = propertyInfo.GetValue(currentShield);
+                    Ability ability = (Ability)abilityObject;
+
+                    if (!ability) { continue; }
+
+                    MeleeClip meleeClip = ability.meleeClip;
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+            }
+
             Debug.LogError("Melee clip Not Found: " + clipName);
             return null;
         }
@@ -531,7 +587,7 @@ namespace GameCreator.Melee
         [ClientRpc]
         private void PropogateMeleeClipChangeClientRpc(string clipName)
         {
-            MeleeClip clip = GetMeleeClipFromWeaponByName(clipName);
+            MeleeClip clip = GetMeleeClipFromWeaponOrShieldByName(clipName);
             if (clip)
             {
                 clip.PlayLocally(this);
