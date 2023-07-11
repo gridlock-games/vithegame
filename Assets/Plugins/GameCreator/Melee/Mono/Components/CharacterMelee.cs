@@ -809,6 +809,8 @@ namespace GameCreator.Melee
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
         {
+            Debug.Log(OwnerClientId + " Blocking: " + current);
+
             if (current) // Start blocking
             {
                 if (this.currentShield.defendState != null)
@@ -850,6 +852,7 @@ namespace GameCreator.Melee
             if (this.currentShield == null) return;
 
             isBlockingNetworked.Value = true;
+            Character.characterLocomotion.SetIsControllable(false);
         }
 
         [ServerRpc]
@@ -858,6 +861,7 @@ namespace GameCreator.Melee
             if (!this.IsBlocking) return;
 
             isBlockingNetworked.Value = false;
+            Character.characterLocomotion.SetIsControllable(true);
         }
 
         public virtual void Execute(ActionKey actionKey)

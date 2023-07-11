@@ -36,6 +36,7 @@ namespace GameCreator.Melee
 
         [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
         {
+            if (_characterMelee.IsBlocking) return;
             if (_characterMelee.IsStaggered) return;
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
@@ -73,6 +74,7 @@ namespace GameCreator.Melee
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;
+            if (_characterMelee.IsBlocking) return;
             if (_characterMelee.IsStaggered) return;
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
