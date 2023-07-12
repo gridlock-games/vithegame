@@ -248,9 +248,15 @@ namespace GameCreator.Melee
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
 
         public int count = 0;
+
+        private NetworkVariable<bool> isAttackingNetworked = new NetworkVariable<bool>();
+
+        private void OnIsAttackingChange(bool prev, bool current) { IsAttacking = current; }
+
         private void LateUpdate()
         {
-            this.IsAttacking = false;
+            if (IsServer)
+                isAttackingNetworked.Value = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -261,7 +267,8 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
-                this.IsAttacking = phase >= 0f;
+                if (IsServer)
+                    isAttackingNetworked.Value = phase >= 0f;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -278,8 +285,6 @@ namespace GameCreator.Melee
                             hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
                             ProcessHitQueue();
                         }
-
-                        //if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
@@ -781,12 +786,14 @@ namespace GameCreator.Melee
                 HP.Value = maxHealth;
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
+            isAttackingNetworked.OnValueChanged += OnIsAttackingChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
             HP.OnValueChanged -= OnHPChanged;
+            isAttackingNetworked.OnValueChanged -= OnIsAttackingChange;
         }
 
         private void OnHPChanged(int prev, int current)
