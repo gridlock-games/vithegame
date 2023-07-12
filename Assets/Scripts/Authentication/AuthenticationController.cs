@@ -12,7 +12,7 @@ using LightPat.Core;
 
 public class AuthenticationController : MonoBehaviour
 {
-    public string playerHubIPAddress = "128.199.214.19";
+    public string playerHubIPAddress = "104.248.158.20";
 
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
