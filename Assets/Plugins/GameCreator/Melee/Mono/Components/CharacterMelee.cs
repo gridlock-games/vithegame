@@ -247,7 +247,13 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
 
-        public int count = 0;
+        public int hitCount { get; private set; }
+        private float lastHitCountChangeTime;
+
+        public void ResetHitCount()
+        {
+            hitCount = 0;
+        }
 
         private NetworkVariable<bool> isAttackingNetworked = new NetworkVariable<bool>();
 
@@ -280,7 +286,7 @@ namespace GameCreator.Melee
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         GameObject[] hits = blade.CaptureHits();
 
-                        if (count < currentMeleeClip.hitCount)
+                        if (hitCount < currentMeleeClip.hitCount)
                         {
                             hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
                             ProcessHitQueue();
@@ -337,7 +343,7 @@ namespace GameCreator.Melee
                 // Do something with the attacked object
                 int hitInstanceID = hit.GetInstanceID();
 
-                if (hit.transform.IsChildOf(this.transform)) continue;
+                if (hit.transform.IsChildOf(transform)) continue;
                 if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
@@ -358,14 +364,16 @@ namespace GameCreator.Melee
                     Vector3 position_attacker = melee.transform.position;
                 }
 
-                if (targetMelee != null && !targetMelee.IsInvincible)
-                {
-                    melee.count++;
-                }
+                // Increment hit count for attacks that can potentially hit a target many times
+                // Want to wait to register a hit until a certain amount of time has passed
+                if (Time.time - melee.lastHitCountChangeTime < 0.1f) { continue; }
+
+                melee.hitCount++;
+                melee.lastHitCountChangeTime = Time.time;
 
                 melee.targetsEvaluated.Add(hitInstanceID);
 
-                if (attack && this.count < attack.hitCount)
+                if (attack && this.hitCount < attack.hitCount)
                 {
                     melee.targetsEvaluated.Remove(hitInstanceID);
                 }
