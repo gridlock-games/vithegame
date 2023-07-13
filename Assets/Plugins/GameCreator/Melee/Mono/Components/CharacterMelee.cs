@@ -1129,6 +1129,11 @@ namespace GameCreator.Melee
                     if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
                 }
             }
+            else
+            {
+                if (IsOwner) this.StopBlockingServerRpc();
+                if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+            }
             #endregion
 
 
