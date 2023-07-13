@@ -164,7 +164,6 @@
         {
             characterLocomotion.isControllable = current;
             characterLocomotion.isBusy = !current;
-            //Debug.Log("Is Controllable: " + current);
         }
 
         public NetworkVariable<CharacterLocomotion.OVERRIDE_FACE_DIRECTION> overrideFaceDirection;

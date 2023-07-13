@@ -829,7 +829,6 @@ namespace GameCreator.Melee
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
         {
-            Debug.Log(OwnerClientId + " Is Blocking: " + current + " " + Poise.Value + " " + Defense.Value);
             if (current) // Start blocking
             {
                 if (currentShield.defendState != null)
@@ -1143,7 +1142,7 @@ namespace GameCreator.Melee
                     isBlockingNetworked.Value = false;
                 }
             }
-            else
+            else // If we are not blocking, or if attack is not blockable, or we are hit by an attack outside of the defense angle
             {
                 isBlockingNetworked.Value = false;
             }
