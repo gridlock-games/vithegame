@@ -412,31 +412,34 @@ namespace GameCreator.Melee
                     targetMelee.EventKnockedUpHitLimitReached.Invoke();
                 }
 
-                // Set Ailments here
-                switch (attack.attackType)
+                if (hitResult == HitResult.ReceiveDamage)
                 {
-                    case AttackType.Stun:
-                        targetMelee.Character.Stun(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Knockdown:
-                        if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
-                            targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Knockedup:
-                        targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Stagger:
-                        targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.None:
-                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
-                            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                        {
-                            targetMelee.Character.CancelAilment();
-                        }
-                        break;
+                    // Set Ailments here
+                    switch (attack.attackType)
+                    {
+                        case AttackType.Stun:
+                            targetMelee.Character.Stun(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Knockdown:
+                            if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
+                                targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Knockedup:
+                            targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Stagger:
+                            targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.None:
+                            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                                targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+                            {
+                                targetMelee.Character.CancelAilment();
+                            }
+                            break;
+                    }
                 }
-
+                
                 // Send messages for stats in NetworkPlayer script
                 SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
 

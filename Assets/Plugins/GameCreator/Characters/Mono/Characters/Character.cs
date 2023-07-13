@@ -164,6 +164,7 @@
         {
             characterLocomotion.isControllable = current;
             characterLocomotion.isBusy = !current;
+            //Debug.Log("Is Controllable: " + current);
         }
 
         public NetworkVariable<CharacterLocomotion.OVERRIDE_FACE_DIRECTION> overrideFaceDirection;
@@ -180,7 +181,10 @@
             overrideFaceDirection.OnValueChanged += OnOverrideFaceDirectionChange;
 
             if (IsServer)
+            {
                 isControllable.Value = true;
+                overrideFaceDirection.Value = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
+            }
         }
 
         public override void OnNetworkDespawn()
