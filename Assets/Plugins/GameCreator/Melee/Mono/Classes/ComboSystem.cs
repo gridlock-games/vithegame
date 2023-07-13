@@ -2,13 +2,13 @@
 {
     using System;
     using System.Collections;
-	using System.Collections.Generic;
+    using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
 
     public class ComboSystem
-	{
+    {
         public enum Condition
         {
             None,
@@ -83,13 +83,18 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void StartAttackTime(bool start) {
-            if(start) {
+        public void StartAttackTime(bool start)
+        {
+            if (start)
+            {
                 this.startAttackTime = Time.time;
-            } else {
+            }
+            else
+            {
                 this.startAttackTime = -100f;
             }
         }
+
         public int GetCurrentPhase()
         {
             float prevTime = Time.time - this.startAttackTime;
@@ -110,7 +115,7 @@
         {
             float prevTime = Time.time - this.startAttackTime;
             float currentPhase = -1f;
-            
+
             if (meleeClip == null) return Mathf.RoundToInt(currentPhase);
 
             if (prevTime < meleeClip.Length)
@@ -216,7 +221,7 @@
                 inputH = Input.GetAxisRaw(AXIS_H);
                 inputV = Input.GetAxisRaw(AXIS_V);
             }
-            
+
             Vector3 input = new Vector3(inputH, 0.0f, inputV);
             //Vector3 direction = HookCamera.Instance.transform.TransformDirection(input);
             Vector3 direction = melee.transform.TransformDirection(input);
@@ -279,14 +284,14 @@
                             return candidates[i];
                         }
                         break;
-                    
+
                     case Condition.InputLeft:
                         if (inputAngle < -60f && inputAngle > -120f)
-                        { 
+                        {
                             return candidates[i];
                         }
                         break;
-                    
+
                     case Condition.InputRight:
                         if (inputAngle > 60f && inputAngle < 120f)
                         {
@@ -310,7 +315,7 @@
 
                     case Condition.IsDashing:
                         float isDashing = this.melee.Character.characterState.isDashing;
-                        if(isDashing == 1.0f) return candidates[i];
+                        if (isDashing == 1.0f) return candidates[i];
 
                         break;
                 }
@@ -318,5 +323,5 @@
 
             return null;
         }
-	}
+    }
 }

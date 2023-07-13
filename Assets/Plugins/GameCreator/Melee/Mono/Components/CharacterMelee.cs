@@ -247,10 +247,22 @@ namespace GameCreator.Melee
         public UnityEngine.Events.UnityEvent EventOnHitObstacle;
         public NetworkVariable<int> knockedUpHitCount = new NetworkVariable<int>();
 
-        public int count = 0;
+        public int hitCount { get; private set; }
+        private float lastHitCountChangeTime;
+
+        public void ResetHitCount()
+        {
+            hitCount = 0;
+        }
+
+        private NetworkVariable<bool> isAttackingNetworked = new NetworkVariable<bool>();
+
+        private void OnIsAttackingChange(bool prev, bool current) { IsAttacking = current; }
+
         private void LateUpdate()
         {
-            this.IsAttacking = false;
+            if (IsServer)
+                isAttackingNetworked.Value = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -261,7 +273,8 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
-                this.IsAttacking = phase >= 0f;
+                if (IsServer)
+                    isAttackingNetworked.Value = phase >= 0f;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -273,13 +286,11 @@ namespace GameCreator.Melee
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         GameObject[] hits = blade.CaptureHits();
 
-                        if (count < currentMeleeClip.hitCount)
+                        if (hitCount < currentMeleeClip.hitCount)
                         {
                             hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
                             ProcessHitQueue();
                         }
-
-                        //if (this.count < this.currentMeleeClip.hitCount) StartCoroutine(ProcessAttackedObjects(hits, blade));
                     }
                 }
             }
@@ -332,7 +343,7 @@ namespace GameCreator.Melee
                 // Do something with the attacked object
                 int hitInstanceID = hit.GetInstanceID();
 
-                if (hit.transform.IsChildOf(this.transform)) continue;
+                if (hit.transform.IsChildOf(transform)) continue;
                 if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
@@ -353,14 +364,16 @@ namespace GameCreator.Melee
                     Vector3 position_attacker = melee.transform.position;
                 }
 
-                if (targetMelee != null && !targetMelee.IsInvincible)
-                {
-                    melee.count++;
-                }
+                // Increment hit count for attacks that can potentially hit a target many times
+                // Want to wait to register a hit until a certain amount of time has passed
+                if (Time.time - melee.lastHitCountChangeTime < 0.1f) { continue; }
+
+                melee.hitCount++;
+                melee.lastHitCountChangeTime = Time.time;
 
                 melee.targetsEvaluated.Add(hitInstanceID);
 
-                if (attack && this.count < attack.hitCount)
+                if (attack && this.hitCount < attack.hitCount)
                 {
                     melee.targetsEvaluated.Remove(hitInstanceID);
                 }
@@ -781,12 +794,14 @@ namespace GameCreator.Melee
                 HP.Value = maxHealth;
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
+            isAttackingNetworked.OnValueChanged += OnIsAttackingChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
             HP.OnValueChanged -= OnHPChanged;
+            isAttackingNetworked.OnValueChanged -= OnIsAttackingChange;
         }
 
         private void OnHPChanged(int prev, int current)

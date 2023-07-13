@@ -9,7 +9,7 @@ namespace GameCreator.Melee
     {
         [SerializeField] private Material[] hitMaterials;
         [SerializeField] private Material[] healMaterials;
-        [SerializeField] private float meshColorResetDelay = 0.75f;
+        [SerializeField] private float meshColorResetDelay = 0.25f;
 
         private SkinnedMeshRenderer skinnedMeshRenderer;
         private Material[] defaultMaterialList;

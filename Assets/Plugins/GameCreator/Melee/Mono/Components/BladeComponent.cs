@@ -2,15 +2,15 @@
 {
     using System;
     using System.Collections;
-	using System.Collections.Generic;
+    using System.Collections.Generic;
     using GameCreator.Camera;
-	using UnityEngine;
+    using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.UI;
     using Unity.Netcode;
 
     public class BladeComponent : MonoBehaviour
-	{
+    {
         public enum CaptureHitModes
         {
             Segment,
@@ -78,9 +78,9 @@
 
         private readonly Collider[] bufferColliders = new Collider[20];
         private readonly RaycastHit[] bufferRaycastHits = new RaycastHit[20];
-        
+
         private BoxData[] boxInterframeCaptures = new BoxData[20];
-        
+
         public MeleeWeapon.WeaponBone weaponBone = MeleeWeapon.WeaponBone.RightHand;
 
         // trail
@@ -92,9 +92,9 @@
 
         public bool isOrbitLocked = false;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private float capturingHitsTime;
-        #endif
+#endif
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
@@ -134,7 +134,7 @@
         private void Update()
         {
             if (!this.Melee) return;
-            
+
 
             int currPhase = this.Melee.GetCurrentPhase();
             MeleeClip clip = this.Melee.currentMeleeClip;
@@ -148,7 +148,7 @@
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
-            
+
             switch (currPhase)
             {
                 case -1:
@@ -156,33 +156,34 @@
                     this.EventAttackEnd.Invoke();
                     break;
 
-                case  0:
+                case 0:
                     this.EventAttackStart.Invoke();
-                    if(Melee.count > 0) {
-                     Melee.count = 0;
+                    if (Melee.hitCount > 0)
+                    {
+                        Melee.ResetHitCount();
                     };
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     break;
 
-                case  1:
-                    if(adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
-                    
+                case 1:
+                    if (adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
+
                     if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone))
                     {
                         clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
                         isActivated = true;
                     }
-                    
+
                     this.Melee.ExecuteSwingAudio();
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
                     break;
 
-                case  2:
-                    if(adventureMotor != null) adventureMotor.allowOrbitInput = true;
+                case 2:
+                    if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
-                    Melee.count = 0;
+                    Melee.ResetHitCount();
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackRecovery.Invoke();
                     break;
@@ -207,16 +208,16 @@
 
         public GameObject[] CaptureHits()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             this.capturingHitsTime = Time.time;
-            #endif
+#endif
 
             GameObject[] candidates = EMPTY_GO_LIST;
-            
-            
+
+
             MeleeClip clip = this.Melee.currentMeleeClip;
             float multiplier = 1.0f;
-            
+
             if (clip != null && clip.affectedBones.Contains(this.weaponBone))
             {
                 multiplier = clip.bladeSizeMultiplier;
@@ -282,7 +283,7 @@
 
         private GameObject[] CaptureHitsSphere(float multiplier)
         {
-            
+
             int numCollisions = Physics.OverlapSphereNonAlloc(
                 transform.TransformPoint(this.offset),
                 (this.radius * multiplier),
@@ -307,20 +308,20 @@
 
             int predictions = 1;
             BoxData currentBoxData = new BoxData(
-                this.transform.TransformPoint(this.boxCenter), 
+                this.transform.TransformPoint(this.boxCenter),
                 this.transform.rotation,
                 true
             );
 
-            this.boxInterframeCaptures[0] = currentBoxData; 
+            this.boxInterframeCaptures[0] = currentBoxData;
             bool hasPreviousCapture = Time.frameCount <= this.prevCaptureFrame + 1;
-            
+
             if (hasPreviousCapture)
             {
                 predictions = this.boxInterframePredictions;
                 for (int i = 0; i < predictions; ++i)
                 {
-                    float t = ((float) (i + 1f)) / ((float) predictions);
+                    float t = ((float)(i + 1f)) / ((float)predictions);
                     this.boxInterframeCaptures[i] = new BoxData(
                         Vector3.Lerp(currentBoxData.center, this.prevBoxBounds.center, t),
                         Quaternion.Lerp(currentBoxData.rotation, this.prevBoxBounds.rotation, t),
@@ -339,14 +340,14 @@
 
             this.prevBoxBounds = currentBoxData;
             List<GameObject> candidates = new List<GameObject>();
-            
+
             for (int i = 0; i < boxInterframeCaptures.Length; ++i)
             {
                 if (!this.boxInterframeCaptures[i].active) continue;
-                
+
                 int numCollisions = Physics.OverlapBoxNonAlloc(
                     this.boxInterframeCaptures[i].center,
-                    boxMultiplied  / 2f,
+                    boxMultiplied / 2f,
                     this.bufferColliders,
                     this.boxInterframeCaptures[i].rotation,
                     this.layerMask,
@@ -362,7 +363,7 @@
 
             return candidates.ToArray();
         }
-        
+
         public Vector3 GetImpactPosition()
         {
             Vector3 posA = transform.TransformPoint(this.pointA);
@@ -377,15 +378,15 @@
             Gizmos.color = GIZMOS_DEFAULT_COLOR;
             bool isHitActive = false;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (Application.isPlaying && Time.time - this.capturingHitsTime < 0.1f)
             {
                 Gizmos.color = GIZMOS_ACTIVE_COLOR;
                 isHitActive = true;
             }
-            #endif
+#endif
 
-            
+
             MeleeClip clip = this.Melee ? this.Melee.currentMeleeClip : new MeleeClip();
             float multiplier = 1.0f;
             Vector3 boxMultiplied = this.boxSize * multiplier;
@@ -431,7 +432,7 @@
                     Matrix4x4 gizmosMatrix = Gizmos.matrix;
                     Gizmos.matrix = transform.localToWorldMatrix;
 
-                    
+
                     if (isHitActive)
                     {
                         Gizmos.DrawCube(this.boxCenter, boxMultiplied);
@@ -442,19 +443,19 @@
                             if (!this.boxInterframeCaptures[i].active) continue;
                             if (this.boxInterframeCaptures[i].rotation == default) continue;
                             if (this.boxInterframeCaptures[i].center == default) continue;
-                            
+
                             Gizmos.matrix = Matrix4x4.TRS(
                                 this.boxInterframeCaptures[i].center,
                                 this.boxInterframeCaptures[i].rotation,
                                 Vector3.one
                             );
-                            
+
                             Gizmos.DrawWireCube(Vector3.zero, boxMultiplied);
                         }
                     }
                     else
                     {
-                        Gizmos.DrawWireCube(this.boxCenter, boxMultiplied );
+                        Gizmos.DrawWireCube(this.boxCenter, boxMultiplied);
                     }
 
                     Gizmos.matrix = gizmosMatrix;

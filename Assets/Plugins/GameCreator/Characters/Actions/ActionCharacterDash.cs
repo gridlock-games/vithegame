@@ -1,9 +1,9 @@
 ﻿namespace GameCreator.Characters
 {
-	using System.Collections;
-	using System.Collections.Generic;
-	using UnityEngine;
-	using UnityEngine.Events;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.Events;
     using GameCreator.Core;
     using GameCreator.Characters;
     using GameCreator.Variables;
@@ -11,13 +11,13 @@
     using GameCreator.Camera;
     using Unity.Netcode;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     using UnityEditor;
-    #endif
+#endif
 
     [AddComponentMenu("")]
-	public class ActionCharacterDash : IAction
-	{
+    public class ActionCharacterDash : IAction
+    {
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
         public enum Direction
@@ -112,9 +112,9 @@
                     moveDirection.Scale(new Vector3(0, 1, 1));
                     break;
             }
-            
+
             Vector3 charDirection = Vector3.Scale(characterTarget.transform.TransformDirection(Vector3.forward), PLANE);
-            
+
             if (characterTarget.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
             {
                 moveDirection = networkTransform.currentRotation * characterTarget.GetComponent<PlayerCharacter>().GetMoveInputValue();
@@ -157,7 +157,7 @@
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
-            
+
             if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
             {
                 if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
@@ -180,8 +180,8 @@
             if (angle <= 15f && angle >= -15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeF;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeF.animSpeed;
                 transitionIn = meleeweapon.dodgeF.transitionIn;
                 transitionOut = meleeweapon.dodgeF.transitionOut;
@@ -189,8 +189,8 @@
             else if (angle < 80f && angle > 15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeFL;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeFL.animSpeed;
                 transitionIn = meleeweapon.dodgeFL.transitionIn;
                 transitionOut = meleeweapon.dodgeFL.transitionOut;
@@ -198,8 +198,8 @@
             else if (angle > -80f && angle < -15f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeFR;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeFR.animSpeed;
                 transitionIn = meleeweapon.dodgeFR.transitionIn;
                 transitionOut = meleeweapon.dodgeFR.transitionOut;
@@ -207,8 +207,8 @@
             else if (angle > 80f && angle < 100f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeL;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeL.animSpeed;
                 transitionIn = meleeweapon.dodgeL.transitionIn;
                 transitionOut = meleeweapon.dodgeL.transitionOut;
@@ -216,8 +216,8 @@
             else if (angle < -80f && angle > -100f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeR;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeR.animSpeed;
                 transitionIn = meleeweapon.dodgeR.transitionIn;
                 transitionOut = meleeweapon.dodgeR.transitionOut;
@@ -225,8 +225,8 @@
             else if (angle < -100f && angle > -170f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeBR;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeBR.animSpeed;
                 transitionIn = meleeweapon.dodgeBR.transitionIn;
                 transitionOut = meleeweapon.dodgeBR.transitionOut;
@@ -234,8 +234,8 @@
             else if (angle > 100f && angle < 170f)
             {
                 dodgeMeleeClip = meleeweapon.dodgeBL;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeBL.animSpeed;
                 transitionIn = meleeweapon.dodgeBL.transitionIn;
                 transitionOut = meleeweapon.dodgeBL.transitionOut;
@@ -243,15 +243,15 @@
             else
             {
                 dodgeMeleeClip = meleeweapon.dodgeB;
-                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
-                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip :  dodgeMeleeClip.attackDodgeClip;
+                clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
+                this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeB.animSpeed;
                 transitionIn = meleeweapon.dodgeF.transitionIn;
                 transitionOut = meleeweapon.dodgeF.transitionOut;
             }
             #endregion
 
-            float duration = ((clip.length) / (speed)) * 0.95f;
+            float duration = clip.length / speed * 0.95f;
 
             bool isDashing = characterTarget.Dash(
                 moveDirection.normalized,
@@ -263,20 +263,21 @@
             CharacterAttachments attachments = animator.GetCharacterAttachments();
 
             if (clip != null && animator != null)
-            {   
-                if(this.dashParticle.gameObject != null) {
+            {
+                if (this.dashParticle.gameObject != null)
+                {
                     Vector3 spawnPosition = characterTarget.transform.position;
 
                     Instantiate(this.dashParticle.GetGameObject(target), spawnPosition, Quaternion.identity);
-                } 
+                }
 
                 characterTarget.characterLocomotion.RootMovement(
                     !melee.IsAttacking ? dodgeMeleeClip.movementMultiplier : dodgeMeleeClip.movementMultiplier_OnAttack,
                     duration,
                     1.0f,
                     !melee.IsAttacking ? dodgeMeleeClip.movementForward : dodgeMeleeClip.movementForward_OnAttack,
-                    !melee.IsAttacking ? dodgeMeleeClip.movementSides  : dodgeMeleeClip.movementSides_OnAttack,
-                    !melee.IsAttacking ? dodgeMeleeClip.movementVertical  : dodgeMeleeClip.movementVertical_OnAttack
+                    !melee.IsAttacking ? dodgeMeleeClip.movementSides : dodgeMeleeClip.movementSides_OnAttack,
+                    !melee.IsAttacking ? dodgeMeleeClip.movementVertical : dodgeMeleeClip.movementVertical_OnAttack
                 );
 
                 animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
@@ -287,7 +288,7 @@
 
         // EXTRACT: ------------------------------------------------------------------------------
 
-        # if UNITY_EDITOR
+#if UNITY_EDITOR
         private void ExtractRootMotion()
         {
             AnimationClip animationClip = this.meleeAnimationClip as AnimationClip;
@@ -335,7 +336,7 @@
                 }
             }
         }
-        #endif
+#endif
 
         private AnimationCurve ProcessRootCurve(AnimationCurve source)
         {
@@ -358,7 +359,7 @@
             return result;
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public static new string NAME = "Character/Character Dash";
         private const string TITLE_NAME = "Character {0} dash {1}";
 
@@ -460,6 +461,6 @@
 
             serializedObject.ApplyModifiedProperties();
         }
-        #endif
+#endif
     }
 }
