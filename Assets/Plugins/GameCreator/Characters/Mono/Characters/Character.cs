@@ -380,6 +380,8 @@
 
         public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable)
         {
+            if (dead) { return false; }
+
             if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
             if (IsServer) { characterLocomotion.UpdateDirectionControl(direction, isControllable); }
             return true;
@@ -387,6 +389,8 @@
 
         public bool Stun(Character attacker, Character target)
         {
+            if (dead) { return false; }
+
             if (allowedStunEntries.Contains(this.characterAilment))
             {
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
@@ -435,6 +439,8 @@
 
         public bool Knockup(Character attacker, Character target)
         {
+            if (dead) { return false; }
+
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
@@ -479,6 +485,8 @@
 
         public bool Stagger(Character attacker, Character target)
         {
+            if (dead) { return false; }
+
             if (allowedStaggerEntries.Contains(this.characterAilment))
             {
                 bool waitForClientRotation = false;
@@ -525,8 +533,21 @@
             }
         }
 
+        private bool dead;
+        public bool Die(Character killer)
+        {
+            dead = true;
+            UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
+
+            if (resetDefaultStateCoroutine != null) { StopCoroutine(resetDefaultStateCoroutine); }
+
+            return true;
+        }
+
         public bool Knockdown(Character attacker, Character target)
         {
+            if (dead) { return false; }
+
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
@@ -654,11 +675,13 @@
             standRecovery.PlayNetworked(melee);
 
             float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-            CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+            resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
         }
 
         public bool CancelAilment()
         {
+            if (dead) { return false; }
+
             if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
                 this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
@@ -670,7 +693,6 @@
             }
         }
 
-        // Triggered by an IgniterEvent
         public void UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS ailment, CharacterState assignState, bool waitForRotationRecieved = false)
         {
             StartCoroutine(UpdateAilmentCoroutine(ailment, waitForRotationRecieved));
@@ -706,7 +728,7 @@
                     {
                         melee.currentWeapon.recoveryStun.PlayNetworked(melee);
                         recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
-                        CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                        resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     }
                     else
                     {
@@ -719,13 +741,13 @@
                         {
                             melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
                             recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-                            CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                            resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                         }
                     }
                     break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
-                    CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                    resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     break;
 
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
@@ -751,6 +773,7 @@
         }
 
         public bool resetDefaultStateRunning { get; private set; }
+        private Coroutine resetDefaultStateCoroutine;
         private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
         {
             resetDefaultStateRunning = true;

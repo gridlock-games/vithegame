@@ -349,6 +349,7 @@ namespace GameCreator.Melee
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
                 if (targetMelee.IsInvincible) { continue; }
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
@@ -400,6 +401,18 @@ namespace GameCreator.Melee
                     targetMelee.HP.Value -= attack.baseDamage;
                 }
 
+                // Send messages for stats in NetworkPlayer script
+                SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
+
+                if (targetMelee.HP.Value <= 0 & previousHP > 0)
+                {
+                    targetMelee.SendMessage("OnDeath", melee);
+                    SendMessage("OnKill", targetMelee);
+
+                    // Death ailment
+                    targetMelee.Character.Die(melee.Character);
+                }
+
                 // Add 1 to knocked up hit count if we are already knocked up
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { targetMelee.knockedUpHitCount.Value++; }
 
@@ -440,15 +453,6 @@ namespace GameCreator.Melee
                     }
                 }
                 
-                // Send messages for stats in NetworkPlayer script
-                SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
-
-                if (targetMelee.HP.Value <= 0 & previousHP > 0)
-                {
-                    targetMelee.SendMessage("OnDeath", melee);
-                    SendMessage("OnKill", targetMelee);
-                }
-
                 IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
 
                 bool hitSomething = triggers.Length > 0;
