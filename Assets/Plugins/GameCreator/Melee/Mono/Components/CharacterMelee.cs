@@ -366,7 +366,10 @@ namespace GameCreator.Melee
 
                 // Increment hit count for attacks that can potentially hit a target many times
                 // Want to wait to register a hit until a certain amount of time has passed
-                if (Time.time - melee.lastHitCountChangeTime < 0.1f) { continue; }
+                if (attack.hitCount > 1)
+                {
+                    if (Time.time - melee.lastHitCountChangeTime < 0.05f) { continue; }
+                }
 
                 melee.hitCount++;
                 melee.lastHitCountChangeTime = Time.time;
@@ -378,8 +381,29 @@ namespace GameCreator.Melee
                     melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
+                // Calculate hit result/HP damage
                 HitResult hitResult = HitResult.ReceiveDamage;
+                int previousHP = targetMelee.HP.Value;
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
+                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+                {
+                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
+                    if (hitResult == HitResult.ReceiveDamage)
+                        targetMelee.HP.Value -= attack.baseDamage;
+                    else if (hitResult == HitResult.PoiseBlock)
+                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                }
+                else
+                {
+                    targetMelee.HP.Value -= attack.baseDamage;
+                }
 
+                // Add 1 to knocked up hit count if we are already knocked up
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { targetMelee.knockedUpHitCount.Value++; }
+
+                // If we reach the knock up hit limit, perform a knockdown
                 if (targetMelee.knockedUpHitCount.Value >= melee.KNOCK_UP_FOLLOWUP_LIMIT)
                 {
                     targetMelee.knockedUpHitCount.Value = 0;
@@ -411,28 +435,6 @@ namespace GameCreator.Melee
                             targetMelee.Character.CancelAilment();
                         }
                         break;
-                }
-
-                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
-                {
-                    targetMelee.knockedUpHitCount.Value++;
-                }
-
-                int previousHP = targetMelee.HP.Value;
-                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                {
-                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-                    if (hitResult == HitResult.ReceiveDamage)
-                        targetMelee.HP.Value -= attack.baseDamage;
-                    else if (hitResult == HitResult.PoiseBlock)
-                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
-                }
-                else
-                {
-                    targetMelee.HP.Value -= attack.baseDamage;
                 }
 
                 // Send messages for stats in NetworkPlayer script
@@ -824,32 +826,45 @@ namespace GameCreator.Melee
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
         {
+            Debug.Log(OwnerClientId + " Is Blocking: " + current + " " + Poise.Value + " " + Defense.Value);
             if (current) // Start blocking
             {
-                if (this.currentShield.defendState != null)
+                if (currentShield.defendState != null)
                 {
-                    this.CharacterAnimator.SetState(
-                        this.currentShield.defendState,
-                        this.currentShield.defendMask,
+                    CharacterAnimator.SetState(
+                        currentShield.defendState,
+                        currentShield.defendMask,
                         1f, 0.15f, 1f,
                         LAYER_DEFEND
                     );
                 }
 
-                if (!this.IsBlocking && this.EventBlock != null)
+                if (!IsBlocking && EventBlock != null)
                 {
-                    this.EventBlock.Invoke(true);
+                    EventBlock.Invoke(true);
                 }
 
-                this.startBlockingTime = GetTime();
-                this.IsBlocking = true;
+                startBlockingTime = GetTime();
+                IsBlocking = true;
             }
             else // Stop blocking
             {
-                if (this.EventBlock != null) this.EventBlock.Invoke(false);
-                this.CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
-                this.IsBlocking = false;
+                if (Poise.Value == 0 & Defense.Value == 0)
+                {
+                    if (EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
+                    IsBlocking = false;
+                }
+                else
+                {
+                    if (EventBlock != null) EventBlock.Invoke(false);
+                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
+                    IsBlocking = false;
+                }
             }
+
+            if (IsServer)
+                Character.characterLocomotion.SetIsControllable(!current);
         }
 
         [ServerRpc]
@@ -865,7 +880,6 @@ namespace GameCreator.Melee
             if (this.currentShield == null) return;
 
             isBlockingNetworked.Value = true;
-            Character.characterLocomotion.SetIsControllable(false);
         }
 
         [ServerRpc]
@@ -874,7 +888,6 @@ namespace GameCreator.Melee
             if (!this.IsBlocking) return;
 
             isBlockingNetworked.Value = false;
-            Character.characterLocomotion.SetIsControllable(true);
         }
 
         public virtual void Execute(ActionKey actionKey)
@@ -1124,18 +1137,14 @@ namespace GameCreator.Melee
                 {
                     this.Defense.Value = 0f;
                     this.Poise.Value = 0f;
-                    if (IsOwner) this.StopBlockingServerRpc();
-
-                    if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                    isBlockingNetworked.Value = false;
                 }
             }
             else
             {
-                if (IsOwner) this.StopBlockingServerRpc();
-                if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                isBlockingNetworked.Value = false;
             }
             #endregion
-
 
             this.AddPoise(-attack.poiseDamage);
 
