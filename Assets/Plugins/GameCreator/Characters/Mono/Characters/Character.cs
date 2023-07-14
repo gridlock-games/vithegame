@@ -544,6 +544,16 @@
             return true;
         }
 
+        public bool CancelDeath()
+        {
+            if (!dead) { return false; }
+
+            dead = false;
+            UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+
+            return true;
+        }
+
         public bool Knockdown(Character attacker, Character target)
         {
             if (dead) { return false; }

@@ -99,6 +99,7 @@ namespace LightPat.Core
         Coroutine changeLocomotionControlCoroutine;
         private IEnumerator ChangeLocomotionControlOnAilmentReset(Character playerChar, CharacterLocomotion.OVERRIDE_FACE_DIRECTION newFaceDirection, bool isControllable)
         {
+            playerChar.CancelDeath();
             yield return new WaitUntil(() => playerChar.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None & playerChar.resetDefaultStateRunning == false);
             yield return null;
             playerChar.characterLocomotion.UpdateDirectionControl(newFaceDirection, isControllable);
