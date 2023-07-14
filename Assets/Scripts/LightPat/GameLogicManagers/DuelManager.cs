@@ -72,31 +72,26 @@ namespace LightPat.Core
 
         private void OnCountdownTimerChange(float prev, float current)
         {
-            if (!IsClient) { return; }
+            if (!IsServer) { return; }
 
             if (prev > 0 & current <= 0)
             {
-                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
-                if (localPlayer)
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    if (changeLocomotionControlCoroutine != null)
-                        StopCoroutine(changeLocomotionControlCoroutine);
-                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true));
+                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                    StartCoroutine(ChangeLocomotionControlOnAilmentReset(playerObject.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true));
                 }
             }
             else if (prev <= 0 & current > 0)
             {
-                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
-                if (localPlayer)
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    if (changeLocomotionControlCoroutine != null)
-                        StopCoroutine(changeLocomotionControlCoroutine);
-                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false));
+                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                    StartCoroutine(ChangeLocomotionControlOnAilmentReset(playerObject.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false));
                 }
             }
         }
 
-        Coroutine changeLocomotionControlCoroutine;
         private IEnumerator ChangeLocomotionControlOnAilmentReset(Character playerChar, CharacterLocomotion.OVERRIDE_FACE_DIRECTION newFaceDirection, bool isControllable)
         {
             yield return new WaitUntil(() => playerChar.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None & playerChar.resetDefaultStateRunning == false);
