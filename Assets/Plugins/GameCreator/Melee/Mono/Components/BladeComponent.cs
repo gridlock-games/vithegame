@@ -130,6 +130,7 @@
         // UPDATE METHOD: -------------------------------------------------------------------------
 
         private bool isActivated = false;
+        private bool isVFXActivated = false;
 
         private void Update()
         {
@@ -163,6 +164,10 @@
                         Melee.ResetHitCount();
                     };
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
+                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated) {
+                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        isVFXActivated = true;
+                    } 
                     break;
 
                 case 1:
@@ -174,6 +179,11 @@
                         isActivated = true;
                     }
 
+                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated) {
+                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        isVFXActivated = true;
+                    } 
+
                     this.Melee.ExecuteSwingAudio();
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
                     this.EventAttackActivation.Invoke();
@@ -181,11 +191,16 @@
 
                 case 2:
                     if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
+                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated) {
+                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        isVFXActivated = true;
+                    } 
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.ResetHitCount();
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
                     this.EventAttackRecovery.Invoke();
+                    this.isVFXActivated = false;
                     break;
             }
 
