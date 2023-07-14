@@ -460,7 +460,6 @@
 
             // These network variables use an onvaluechanged callback in the Character script to modify the proper variables in characterlocomotion
             character.isControllable.Value = isControllable;
-            Debug.Log(character.overrideFaceDirection.Value + " " + direction);
             character.overrideFaceDirection.Value = direction;
         }
 
