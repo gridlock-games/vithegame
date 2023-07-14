@@ -120,6 +120,21 @@
         public bool isSequence = false;
         public List<MeleeClip> sequencedClips = new List<MeleeClip>();
 
+        
+        public enum AttachVFXPhase {
+            OnExecute,
+            OnActivate,
+            OnHit,
+            OnRecovery
+        }
+
+        
+        // VFX:
+        public TargetGameObject abilityVFX = new TargetGameObject();
+        public Vector3 vfxPositionOffset = new Vector3(0,0,0);
+        public Vector3 vfxRotationOffset = new Vector3(0,0,0);
+        public AttachVFXPhase attachVFXOnPhase = AttachVFXPhase.OnExecute;
+
 
         // animation:
         public float animSpeed = 1.0f;
@@ -144,6 +159,15 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void PlayVFXAttachment(GameObject character) {
+            if(this.abilityVFX.gameObject == null) return;
+            if(character == null) return;
+
+            Vector3 characterPosition = character.transform.position;
+                Instantiate(this.abilityVFX.GetGameObject(character.gameObject), 
+                    characterPosition + character.transform.rotation * this.vfxPositionOffset, 
+                    character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
+        }
         public void PlayNetworked(CharacterMelee melee)
         {
             if (!melee.IsSpawned) { Debug.LogError("Spawn the character before trying to play melee clips"); return; }
