@@ -539,7 +539,21 @@
             dead = true;
             UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
 
-            if (resetDefaultStateCoroutine != null) { StopCoroutine(resetDefaultStateCoroutine); }
+            if (resetDefaultStateCoroutine != null)
+            {
+                StopCoroutine(resetDefaultStateCoroutine);
+                resetDefaultStateRunning = false;
+            }
+
+            return true;
+        }
+
+        public bool CancelDeath()
+        {
+            if (!dead) { return false; }
+
+            dead = false;
+            UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
 
             return true;
         }
