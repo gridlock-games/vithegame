@@ -235,7 +235,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ailment: 2
-  triggered: 0
 --- !u!1 &493848754
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,7 +1128,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ailment: 3
-  triggered: 0
 --- !u!65 &832507295
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1704,12 +1702,7 @@ MonoBehaviour:
     NetworkTransport: {fileID: 1627123834}
     PlayerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
       type: 3}
-    NetworkPrefabs:
-    - Override: 0
-      Prefab: {fileID: 0}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
+    NetworkPrefabs: []
     TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -1718,7 +1711,7 @@ MonoBehaviour:
     TimeResyncInterval: 30
     EnsureNetworkVariableLengthSafety: 0
     EnableSceneManagement: 1
-    ForceSamePrefabs: 1
+    ForceSamePrefabs: 0
     RecycleNetworkIds: 1
     NetworkIdRecycleDelay: 120
     RpcHashSize: 0
@@ -3013,7 +3006,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ailment: 4
-  triggered: 0
 --- !u!65 &2056950550
 BoxCollider:
   m_ObjectHideFlags: 0

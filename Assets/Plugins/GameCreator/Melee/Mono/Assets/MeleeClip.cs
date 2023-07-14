@@ -5,6 +5,8 @@
     using GameCreator.Core;
     using UnityEngine;
     using GameCreator.Camera;
+    using Unity.Netcode;
+    using UnityEngine.VFX;
 
     [CreateAssetMenu(
         fileName = "Melee Clip",
@@ -30,7 +32,8 @@
             Stagger,
         }
 
-        public enum AttackType {
+        public enum AttackType
+        {
             None,
             Stun,
             Knockdown,
@@ -121,19 +124,20 @@
         public bool isSequence = false;
         public List<MeleeClip> sequencedClips = new List<MeleeClip>();
 
-        
-        public enum AttachVFXPhase {
+
+        public enum AttachVFXPhase
+        {
             OnExecute,
             OnActivate,
             OnHit,
             OnRecovery
         }
 
-        
+
         // VFX:
         public TargetGameObject abilityVFX = new TargetGameObject();
-        public Vector3 vfxPositionOffset = new Vector3(0,0,0);
-        public Vector3 vfxRotationOffset = new Vector3(0,0,0);
+        public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
+        public Vector3 vfxRotationOffset = new Vector3(0, 0, 0);
         public AttachVFXPhase attachVFXOnPhase = AttachVFXPhase.OnExecute;
 
 
@@ -160,15 +164,43 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void PlayVFXAttachment(GameObject character) {
-            if(this.abilityVFX.gameObject == null) return;
-            if(character == null) return;
+        public void PlayVFXAttachment(GameObject character)
+        {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("PlayVFXAttachment() should only be called from the server"); return; }
+            if (this.abilityVFX.gameObject == null) return;
+            if (character == null) return;
 
-            Vector3 characterPosition = character.transform.position;
-                Instantiate(this.abilityVFX.GetGameObject(character.gameObject), 
-                    characterPosition + character.transform.rotation * this.vfxPositionOffset, 
-                    character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
+            GameObject abilityVFXPrefab = abilityVFX.GetGameObject(character);
+
+            GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                character.transform.position + character.transform.rotation * this.vfxPositionOffset,
+                character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
+
+            if (abilityVFXInstance.TryGetComponent(out NetworkObject netObj))
+            {
+                netObj.Spawn(true);
+                netObj.StartCoroutine(DestroyAfterParticleSystemFinishes(netObj));
+            }
+            else
+            {
+                Debug.LogError(abilityVFXPrefab.name + "- Ability VFX doesn't have a network object attached to it, it won't be synced in multiplayer");
+            }
         }
+
+        private IEnumerator DestroyAfterParticleSystemFinishes(NetworkObject netObj)
+        {
+            ParticleSystem particleSystem = netObj.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
+
+            AudioSource audioSource = netObj.GetComponentInChildren<AudioSource>();
+            if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
+
+            VisualEffect visualEffect = netObj.GetComponentInChildren<VisualEffect>();
+            if (visualEffect) { yield return new WaitUntil(() => visualEffect.HasAnySystemAwake()); }
+
+            netObj.Despawn(true);
+        }
+
         public void PlayNetworked(CharacterMelee melee)
         {
             if (!melee.IsSpawned) { Debug.LogError("Spawn the character before trying to play melee clips"); return; }
@@ -215,7 +247,8 @@
 
             float duration = Mathf.Max(0, this.animationClip.length - this.transitionOut);
 
-            if(isAttack) { 
+            if (isAttack)
+            {
 
                 AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
                 AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
@@ -227,7 +260,9 @@
                     newMovementSidesCurve,
                     this.movementVertical
                 );
-            } else {
+            }
+            else
+            {
                 melee.Character.RootMovement(
                     this.movementMultiplier,
                     duration / this.animSpeed,
@@ -340,7 +375,7 @@
 
                     yield return null;
                 }
-                
+
                 adventureMotor.orbitSpeed = 15.00f;
             }
 
