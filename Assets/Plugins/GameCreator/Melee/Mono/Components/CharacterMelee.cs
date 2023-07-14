@@ -349,6 +349,7 @@ namespace GameCreator.Melee
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
                 if (targetMelee.IsInvincible) { continue; }
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
@@ -366,7 +367,10 @@ namespace GameCreator.Melee
 
                 // Increment hit count for attacks that can potentially hit a target many times
                 // Want to wait to register a hit until a certain amount of time has passed
-                if (Time.time - melee.lastHitCountChangeTime < 0.1f) { continue; }
+                if (attack.hitCount > 1)
+                {
+                    if (Time.time - melee.lastHitCountChangeTime < 0.05f) { continue; }
+                }
 
                 melee.hitCount++;
                 melee.lastHitCountChangeTime = Time.time;
@@ -378,46 +382,8 @@ namespace GameCreator.Melee
                     melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
+                // Calculate hit result/HP damage
                 HitResult hitResult = HitResult.ReceiveDamage;
-
-                if (targetMelee.knockedUpHitCount.Value >= melee.KNOCK_UP_FOLLOWUP_LIMIT)
-                {
-                    targetMelee.knockedUpHitCount.Value = 0;
-                    if (attack.attackType != AttackType.Knockdown)
-                        targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
-                    targetMelee.EventKnockedUpHitLimitReached.Invoke();
-                }
-
-                // Set Ailments here
-                switch (attack.attackType)
-                {
-                    case AttackType.Stun:
-                        targetMelee.Character.Stun(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Knockdown:
-                        if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
-                            targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Knockedup:
-                        targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.Stagger:
-                        targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
-                        break;
-                    case AttackType.None:
-                        if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
-                            targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                        {
-                            targetMelee.Character.CancelAilment();
-                        }
-                        break;
-                }
-
-                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
-                {
-                    targetMelee.knockedUpHitCount.Value++;
-                }
-
                 int previousHP = targetMelee.HP.Value;
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                     targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
@@ -442,8 +408,51 @@ namespace GameCreator.Melee
                 {
                     targetMelee.SendMessage("OnDeath", melee);
                     SendMessage("OnKill", targetMelee);
+
+                    // Death ailment
+                    targetMelee.Character.Die(melee.Character);
                 }
 
+                // Add 1 to knocked up hit count if we are already knocked up
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { targetMelee.knockedUpHitCount.Value++; }
+
+                // If we reach the knock up hit limit, perform a knockdown
+                if (targetMelee.knockedUpHitCount.Value >= melee.KNOCK_UP_FOLLOWUP_LIMIT)
+                {
+                    targetMelee.knockedUpHitCount.Value = 0;
+                    if (attack.attackType != AttackType.Knockdown)
+                        targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
+                    targetMelee.EventKnockedUpHitLimitReached.Invoke();
+                }
+
+                if (hitResult == HitResult.ReceiveDamage)
+                {
+                    // Set Ailments here
+                    switch (attack.attackType)
+                    {
+                        case AttackType.Stun:
+                            targetMelee.Character.Stun(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Knockdown:
+                            if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
+                                targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Knockedup:
+                            targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Stagger:
+                            targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.None:
+                            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
+                                targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+                            {
+                                targetMelee.Character.CancelAilment();
+                            }
+                            break;
+                    }
+                }
+                
                 IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
 
                 bool hitSomething = triggers.Length > 0;
@@ -826,30 +835,42 @@ namespace GameCreator.Melee
         {
             if (current) // Start blocking
             {
-                if (this.currentShield.defendState != null)
+                if (currentShield.defendState != null)
                 {
-                    this.CharacterAnimator.SetState(
-                        this.currentShield.defendState,
-                        this.currentShield.defendMask,
+                    CharacterAnimator.SetState(
+                        currentShield.defendState,
+                        currentShield.defendMask,
                         1f, 0.15f, 1f,
                         LAYER_DEFEND
                     );
                 }
 
-                if (!this.IsBlocking && this.EventBlock != null)
+                if (!IsBlocking && EventBlock != null)
                 {
-                    this.EventBlock.Invoke(true);
+                    EventBlock.Invoke(true);
                 }
 
-                this.startBlockingTime = GetTime();
-                this.IsBlocking = true;
+                startBlockingTime = GetTime();
+                IsBlocking = true;
             }
             else // Stop blocking
             {
-                if (this.EventBlock != null) this.EventBlock.Invoke(false);
-                this.CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
-                this.IsBlocking = false;
+                if (Poise.Value == 0 & Defense.Value == 0)
+                {
+                    if (EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
+                    IsBlocking = false;
+                }
+                else
+                {
+                    if (EventBlock != null) EventBlock.Invoke(false);
+                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
+                    IsBlocking = false;
+                }
             }
+
+            if (IsServer)
+                Character.characterLocomotion.SetIsControllable(!current);
         }
 
         [ServerRpc]
@@ -865,7 +886,6 @@ namespace GameCreator.Melee
             if (this.currentShield == null) return;
 
             isBlockingNetworked.Value = true;
-            Character.characterLocomotion.SetIsControllable(false);
         }
 
         [ServerRpc]
@@ -874,7 +894,6 @@ namespace GameCreator.Melee
             if (!this.IsBlocking) return;
 
             isBlockingNetworked.Value = false;
-            Character.characterLocomotion.SetIsControllable(true);
         }
 
         public virtual void Execute(ActionKey actionKey)
@@ -1124,18 +1143,14 @@ namespace GameCreator.Melee
                 {
                     this.Defense.Value = 0f;
                     this.Poise.Value = 0f;
-                    if (IsOwner) this.StopBlockingServerRpc();
-
-                    if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                    isBlockingNetworked.Value = false;
                 }
             }
-            else
+            else // If we are not blocking, or if attack is not blockable, or we are hit by an attack outside of the defense angle
             {
-                if (IsOwner) this.StopBlockingServerRpc();
-                if (this.EventBreakDefense != null) this.EventBreakDefense.Invoke();
+                isBlockingNetworked.Value = false;
             }
             #endregion
-
 
             this.AddPoise(-attack.poiseDamage);
 

@@ -299,7 +299,7 @@ namespace LightPat.Core
             if (IsServer)
             {
                 countdownTimeMessage.Value = "Returning to lobby...";
-                countdownTime.Value = 10;
+                countdownTime.Value = 5;
                 StartCoroutine(ReturnToLobby());
             }
         }
