@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3475868787669841813}
   - component: {fileID: 7219950117402475839}
-  - component: {fileID: 1779413169932977498}
   m_Layer: 0
   m_Name: PS_Piercing_Earth_modify
   m_TagString: Untagged
@@ -130,22 +129,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1779413169932977498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4763027113158606504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &4837356997345925141
 GameObject:
   m_ObjectHideFlags: 0

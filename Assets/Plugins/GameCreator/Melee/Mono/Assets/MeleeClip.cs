@@ -175,7 +175,7 @@
                 character.transform.position + character.transform.rotation * this.vfxPositionOffset,
                 character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
 
-            CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXPrefab));
+            CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
         }
 
         private IEnumerator DestroyAfterEffectsFinish(GameObject obj)
