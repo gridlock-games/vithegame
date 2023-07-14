@@ -443,6 +443,11 @@ namespace GameCreator.Melee
                         case AttackType.Stagger:
                             targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             break;
+                        case AttackType.Followup:
+                            if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                                targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
+                            }
+                            break;
                         case AttackType.None:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
@@ -1179,7 +1184,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            if (!this.IsUninterruptable && attack.attackType == AttackType.None)
+            if ((!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
             {
                 hitReaction.PlayNetworked(this);
             }
@@ -1300,7 +1305,7 @@ namespace GameCreator.Melee
 
             attack.ExecuteHitPause();
             // Play Reaction Clip only if the attackType is not an Ailment
-            if (!this.IsUninterruptable && attack.attackType == AttackType.None)
+            if ((!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
             {
                 hitReaction.PlayNetworked(this);
             }
