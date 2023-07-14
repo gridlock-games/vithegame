@@ -166,7 +166,6 @@
 
         public void PlayVFXAttachment(GameObject character)
         {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("PlayVFXAttachment() should only be called from the server"); return; }
             if (this.abilityVFX.gameObject == null) return;
             if (character == null) return;
 
@@ -176,29 +175,21 @@
                 character.transform.position + character.transform.rotation * this.vfxPositionOffset,
                 character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
 
-            if (abilityVFXInstance.TryGetComponent(out NetworkObject netObj))
-            {
-                netObj.Spawn(true);
-                netObj.StartCoroutine(DestroyAfterParticleSystemFinishes(netObj));
-            }
-            else
-            {
-                Debug.LogError(abilityVFXPrefab.name + "- Ability VFX doesn't have a network object attached to it, it won't be synced in multiplayer");
-            }
+            CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXPrefab));
         }
 
-        private IEnumerator DestroyAfterParticleSystemFinishes(NetworkObject netObj)
+        private IEnumerator DestroyAfterEffectsFinish(GameObject obj)
         {
-            ParticleSystem particleSystem = netObj.GetComponentInChildren<ParticleSystem>();
+            ParticleSystem particleSystem = obj.GetComponentInChildren<ParticleSystem>();
             if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
 
-            AudioSource audioSource = netObj.GetComponentInChildren<AudioSource>();
+            AudioSource audioSource = obj.GetComponentInChildren<AudioSource>();
             if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
 
-            VisualEffect visualEffect = netObj.GetComponentInChildren<VisualEffect>();
+            VisualEffect visualEffect = obj.GetComponentInChildren<VisualEffect>();
             if (visualEffect) { yield return new WaitUntil(() => visualEffect.HasAnySystemAwake()); }
 
-            netObj.Despawn(true);
+            Destroy(obj);
         }
 
         public void PlayNetworked(CharacterMelee melee)
