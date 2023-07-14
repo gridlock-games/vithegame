@@ -410,7 +410,7 @@ namespace GameCreator.Melee
                     SendMessage("OnKill", targetMelee);
 
                     // Death ailment
-                    //targetMelee.Character.Die(melee.Character);
+                    targetMelee.Character.Die(melee.Character);
                 }
 
                 // Add 1 to knocked up hit count if we are already knocked up
