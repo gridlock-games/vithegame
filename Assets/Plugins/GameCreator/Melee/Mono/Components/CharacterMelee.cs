@@ -410,7 +410,7 @@ namespace GameCreator.Melee
                     SendMessage("OnKill", targetMelee);
 
                     // Death ailment
-                    targetMelee.Character.Die(melee.Character);
+                    //targetMelee.Character.Die(melee.Character);
                 }
 
                 // Add 1 to knocked up hit count if we are already knocked up
@@ -827,6 +827,15 @@ namespace GameCreator.Melee
                 foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
                 {
                     hitRenderer.RenderHeal();
+                }
+            }
+
+            // Cancel death ailment if we get our health back
+            if (IsServer)
+            {
+                if (prev <= 0 & current > 0)
+                {
+                    Character.CancelDeath();
                 }
             }
         }

@@ -79,7 +79,8 @@ namespace LightPat.Core
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    StartCoroutine(ChangeLocomotionControlOnAilmentReset(playerObject.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true));
+                    Character playerChar = playerObject.GetComponent<Character>();
+                    playerChar.characterLocomotion.SetAllowDirectionalControlChanges(true, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
                 }
             }
             else if (prev <= 0 & current > 0)
@@ -87,16 +88,10 @@ namespace LightPat.Core
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    StartCoroutine(ChangeLocomotionControlOnAilmentReset(playerObject.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false));
+                    Character playerChar = playerObject.GetComponent<Character>();
+                    playerChar.characterLocomotion.SetAllowDirectionalControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                 }
             }
-        }
-
-        private IEnumerator ChangeLocomotionControlOnAilmentReset(Character playerChar, CharacterLocomotion.OVERRIDE_FACE_DIRECTION newFaceDirection, bool isControllable)
-        {
-            yield return new WaitUntil(() => playerChar.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None & playerChar.resetDefaultStateRunning == false);
-            yield return null;
-            playerChar.characterLocomotion.UpdateDirectionControl(newFaceDirection, isControllable);
         }
 
         private void Update()

@@ -437,9 +437,26 @@
             this.character.characterState.normal = this.terrainNormal;
         }
 
+        private bool allowDirectionalControlChanges;
+        public void SetAllowDirectionalControlChanges(bool allowDirectionalControlChanges, OVERRIDE_FACE_DIRECTION direction, bool isControllable)
+        {
+            if (!character.NetworkManager.IsServer) { Debug.LogError("SetAllowDirectionalControlChanges() should only be called from the server"); return; }
+
+            // First call is if allow directional control changes is already true
+            if (this.allowDirectionalControlChanges)
+                UpdateDirectionControl(direction, isControllable);
+            
+            this.allowDirectionalControlChanges = allowDirectionalControlChanges;
+
+            // Second call is if allow directional control changes was set to true in the above statement
+            if (this.allowDirectionalControlChanges)
+                UpdateDirectionControl(direction, isControllable);
+        }
+
         public void UpdateDirectionControl(OVERRIDE_FACE_DIRECTION direction, bool isControllable)
         {
             if (!character.NetworkManager.IsServer) { Debug.LogError("UpdateDirectionControl() should only be called from the server"); return; }
+            if (!allowDirectionalControlChanges) { return; }
 
             // These network variables use an onvaluechanged callback in the Character script to modify the proper variables in characterlocomotion
             character.isControllable.Value = isControllable;
