@@ -181,8 +181,8 @@
 
             if (IsServer)
             {
-                isControllable.Value = true;
-                overrideFaceDirection.Value = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
+                //characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.None, true);
             }
         }
 
@@ -536,6 +536,7 @@
         private bool dead;
         public bool Die(Character killer)
         {
+            if (dead) { return false; }
             dead = true;
             UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
 

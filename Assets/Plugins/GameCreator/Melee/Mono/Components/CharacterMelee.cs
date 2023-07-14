@@ -834,6 +834,15 @@ namespace GameCreator.Melee
                     hitRenderer.RenderHeal();
                 }
             }
+
+            // Cancel death ailment if we get our health back
+            if (IsServer)
+            {
+                if (prev <= 0 & current > 0)
+                {
+                    Character.CancelDeath();
+                }
+            }
         }
 
         void OnIsBlockingNetworkedChange(bool prev, bool current)
