@@ -377,23 +377,12 @@ namespace GameCreator.Melee
                 }
 
                 // Calculate hit result/HP damage
-                HitResult hitResult = HitResult.ReceiveDamage;
                 int previousHP = targetMelee.HP.Value;
-                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                {
-                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-                    if (hitResult == HitResult.ReceiveDamage)
-                        targetMelee.HP.Value -= attack.baseDamage;
-                    else if (hitResult == HitResult.PoiseBlock)
-                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
-                }
-                else
-                {
+                HitResult hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
+                if (hitResult == HitResult.ReceiveDamage)
                     targetMelee.HP.Value -= attack.baseDamage;
-                }
+                else if (hitResult == HitResult.PoiseBlock)
+                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
 
                 // Send messages for stats in NetworkPlayer script
                 SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
