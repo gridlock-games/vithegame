@@ -164,10 +164,11 @@
                         Melee.ResetHitCount();
                     };
                     if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
-                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    {
                         clip.PlayVFXAttachment(this.Melee.gameObject);
                         isVFXActivated = true;
-                    } 
+                    }
                     break;
 
                 case 1:
@@ -179,10 +180,11 @@
                         isActivated = true;
                     }
 
-                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    {
                         clip.PlayVFXAttachment(this.Melee.gameObject);
                         isVFXActivated = true;
-                    } 
+                    }
 
                     this.Melee.ExecuteSwingAudio();
                     if (this.weaponTrail != null) this.weaponTrail.Activate();
@@ -191,10 +193,11 @@
 
                 case 2:
                     if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
-                    if(clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone)) {
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    {
                         clip.PlayVFXAttachment(this.Melee.gameObject);
                         isVFXActivated = true;
-                    } 
+                    }
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.ResetHitCount();

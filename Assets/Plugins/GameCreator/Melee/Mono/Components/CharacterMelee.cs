@@ -255,14 +255,9 @@ namespace GameCreator.Melee
             hitCount = 0;
         }
 
-        private NetworkVariable<bool> isAttackingNetworked = new NetworkVariable<bool>();
-
-        private void OnIsAttackingChange(bool prev, bool current) { IsAttacking = current; }
-
         private void LateUpdate()
         {
-            if (IsServer)
-                isAttackingNetworked.Value = false;
+            IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -273,8 +268,7 @@ namespace GameCreator.Melee
             {
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
-                if (IsServer)
-                    isAttackingNetworked.Value = phase >= 0f;
+                IsAttacking = phase >= 0f;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -619,7 +613,10 @@ namespace GameCreator.Melee
             {
                 clip.PlayLocally(this);
                 if (clip.isAttack)
+                {
                     currentMeleeClip = clip;
+                    comboSystem.SetStateFromClip(clip);
+                }
             }
             else
             {
@@ -808,14 +805,12 @@ namespace GameCreator.Melee
                 HP.Value = maxHealth;
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
-            isAttackingNetworked.OnValueChanged += OnIsAttackingChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
             HP.OnValueChanged -= OnHPChanged;
-            isAttackingNetworked.OnValueChanged -= OnIsAttackingChange;
         }
 
         private void OnHPChanged(int prev, int current)
@@ -1329,59 +1324,8 @@ namespace GameCreator.Melee
 
         public void ExecuteSwingAudio()
         {
-            if (currentWeapon.audioSwing)
-            {
-                if (IsServer)
-                {
-                    PlayAudio(currentWeapon.audioSwing);
-                    ExecuteSwingAudioClientRpc(currentWeapon.audioSwing.name);
-                }
-                else
-                {
-                    Debug.LogWarning("ExecuteSwingAudio() should only be called on the server");
-                    PlayAudio(currentWeapon.audioSwing);
-                }
-            }
+            if (currentWeapon.audioSwing) { PlayAudio(currentWeapon.audioSwing); }
         }
-
-        [ClientRpc] private void ExecuteSwingAudioClientRpc(string audioClipName) { PlayAudio(GetAudioClipFromWeaponByName(audioClipName)); }
-
-        private AudioClip GetAudioClipFromWeaponByName(string clipName)
-        {
-            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
-            foreach (FieldInfo propertyInfo in propertyList)
-            {
-                if (propertyInfo.FieldType == typeof(AudioClip))
-                {
-                    var audioClipObject = propertyInfo.GetValue(currentWeapon);
-                    AudioClip audioClip = (AudioClip)audioClipObject;
-
-                    if (audioClip)
-                    {
-                        if (audioClip.name == clipName) { return audioClip; }
-                    }
-                }
-            }
-
-            propertyList = typeof(MeleeShield).GetFields();
-            foreach (FieldInfo propertyInfo in propertyList)
-            {
-                if (propertyInfo.FieldType == typeof(AudioClip))
-                {
-                    var audioClipObject = propertyInfo.GetValue(currentShield);
-                    AudioClip audioClip = (AudioClip)audioClipObject;
-
-                    if (audioClip)
-                    {
-                        if (audioClip.name == clipName) { return audioClip; }
-                    }
-                }
-            }
-
-            Debug.LogError("Audio clip Not Found: " + clipName);
-            return null;
-        }
-
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
         {

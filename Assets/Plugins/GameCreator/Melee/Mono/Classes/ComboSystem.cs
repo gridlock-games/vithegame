@@ -147,16 +147,56 @@
             if (!next.HasChild(actionkey)) return null;
             next = next.GetChild(actionkey);
 
-            this.startAttackTime = Time.time;
-            this.current = next;
+            startAttackTime = Time.time;
+            current = next;
 
-            this.currentCombo = this.SelectMeleeClip(); ;
+            currentCombo = SelectMeleeClip();
 
-            this.isBlock = false;
-            this.isPerfectBlock = false;
+            isBlock = false;
+            isPerfectBlock = false;
 
             if (this.currentCombo == null) return null;
             return this.currentCombo.meleeClip;
+        }
+
+        public void SetStateFromClip(MeleeClip meleeClip)
+        {
+            if (!meleeClip.isAttack) { Debug.LogError("This melee clip should be an attack"); return; }
+
+            var enumerator = root.GetEnumerator();
+
+            TreeCombo<CharacterMelee.ActionKey, Combo> targetCombo = FindTreeComboFromMeleeClip(root, meleeClip);
+
+            if (targetCombo == null) { Debug.LogError("Couldn't find tree combo object in list of combos - " + meleeClip); return; }
+
+            startAttackTime = Time.time;
+            current = targetCombo;
+
+            currentCombo = SelectMeleeClip();
+
+            isBlock = false;
+            isPerfectBlock = false;
+        }
+
+        private TreeCombo<CharacterMelee.ActionKey, Combo> FindTreeComboFromMeleeClip(TreeCombo<CharacterMelee.ActionKey, Combo> node, MeleeClip targetMeleeClip)
+        {
+            var enumerator = node.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                foreach (Combo combo in enumerator.Current.GetData())
+                {
+                    if (combo.isEnabled)
+                    {
+                        if (combo.meleeClip == targetMeleeClip) { return enumerator.Current; }
+                    }
+                }
+
+                var treeCombo = FindTreeComboFromMeleeClip(enumerator.Current, targetMeleeClip);
+                if (treeCombo != null) { return treeCombo; }
+            }
+
+            return null;
         }
 
         public void Stop()

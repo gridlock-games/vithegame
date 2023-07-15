@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.VFX;
+using System.Reflection;
 
 namespace GameCreator.Melee
 {
@@ -34,7 +35,8 @@ namespace GameCreator.Melee
             PlayVFX();
         }
 
-        [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
+        [ServerRpc]
+        private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
         {
             if (_characterMelee.IsBlocking) return;
             if (_characterMelee.IsStaggered) return;
