@@ -164,16 +164,21 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void PlayVFXAttachment(GameObject character)
+        public void PlayVFXAttachment(CharacterMelee character)
         {
             if (this.abilityVFX.gameObject == null) return;
             if (character == null) return;
 
-            GameObject abilityVFXPrefab = abilityVFX.GetGameObject(character);
+            GameObject abilityVFXPrefab = abilityVFX.GetGameObject(character.gameObject);
 
             GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
                 character.transform.position + character.transform.rotation * this.vfxPositionOffset,
                 character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
+
+            if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
+            {
+                dmg.Initialize(character);
+            }
 
             CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
         }

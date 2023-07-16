@@ -282,7 +282,7 @@ namespace GameCreator.Melee
 
                         if (hitCount < currentMeleeClip.hitCount)
                         {
-                            hitQueue.Enqueue(new HitQueueElement(this, blade, hits));
+                            hitQueue.Enqueue(new HitQueueElement(this, blade.GetImpactPosition(), hits));
                             ProcessHitQueue();
                         }
                     }
@@ -294,16 +294,21 @@ namespace GameCreator.Melee
 
         private struct HitQueueElement
         {
-            public CharacterMelee melee;
-            public BladeComponent blade;
+            public CharacterMelee attackerMelee;
+            public Vector3 impactPosition;
             public GameObject[] hits;
 
-            public HitQueueElement(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+            public HitQueueElement(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits)
             {
-                this.melee = melee;
-                this.blade = blade;
+                this.attackerMelee = melee;
+                this.impactPosition = impactPosition;
                 this.hits = hits;
             }
+        }
+
+        public void AddHitsToQueue(Vector3 impactPosition, GameObject[] hits)
+        {
+            hitQueue.Enqueue(new HitQueueElement(this, impactPosition, hits));
         }
 
         private void ProcessHitQueue()
@@ -313,7 +318,7 @@ namespace GameCreator.Melee
             while (hitQueue.Count > 0)
             {
                 HitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.melee, queueElement.blade, queueElement.hits);
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits);
             }
         }
 
@@ -328,7 +333,7 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, BladeComponent blade, GameObject[] hits)
+        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits)
         {
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
@@ -355,7 +360,7 @@ namespace GameCreator.Melee
                 // This is for checking if we are hitting an environment object
                 if (hit.CompareTag("Obstacle"))
                 {
-                    Vector3 position_attackWp = blade.GetImpactPosition();
+                    Vector3 position_attackWp = impactPosition;
                     Vector3 position_attacker = melee.transform.position;
                 }
 
@@ -377,23 +382,12 @@ namespace GameCreator.Melee
                 }
 
                 // Calculate hit result/HP damage
-                HitResult hitResult = HitResult.ReceiveDamage;
                 int previousHP = targetMelee.HP.Value;
-                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown ||
-                    targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-                {
-                    hitResult = targetMelee.OnReceiveAttack(melee, attack, blade.GetImpactPosition());
-                    if (hitResult == HitResult.ReceiveDamage)
-                        targetMelee.HP.Value -= attack.baseDamage;
-                    else if (hitResult == HitResult.PoiseBlock)
-                        targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
-                }
-                else
-                {
+                HitResult hitResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
+                if (hitResult == HitResult.ReceiveDamage)
                     targetMelee.HP.Value -= attack.baseDamage;
-                }
+                else if (hitResult == HitResult.PoiseBlock)
+                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
 
                 // Send messages for stats in NetworkPlayer script
                 SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
@@ -465,7 +459,7 @@ namespace GameCreator.Melee
 
                 if (hitSomething && attack != null && targetMelee != null)
                 {
-                    attack.ExecuteActionsOnHit(blade.GetImpactPosition(), targetMelee.gameObject);
+                    attack.ExecuteActionsOnHit(impactPosition, targetMelee.gameObject);
                 }
 
                 if (attack != null && attack.pushForce > float.Epsilon)

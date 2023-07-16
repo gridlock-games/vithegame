@@ -137,11 +137,10 @@
             if (!this.Melee) return;
 
 
-            int currPhase = this.Melee.GetCurrentPhase();
-            MeleeClip clip = this.Melee.currentMeleeClip;
-            MeleeWeapon weapon = this.Melee.currentWeapon;
+            int currPhase = Melee.GetCurrentPhase();
+            MeleeClip clip = Melee.currentMeleeClip;
 
-            if (currPhase == this.prevPhase) return;
+            if (currPhase == prevPhase) return;
 
             CameraMotorTypeAdventure adventureMotor = null;
             if (parentNetObj.IsOwner)
@@ -150,64 +149,67 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
 
+            // If we have no current melee clip don't do anything
+            if (!clip) { return; }
+
             switch (currPhase)
             {
                 case -1:
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
-                    this.EventAttackEnd.Invoke();
+                    if (weaponTrail != null) weaponTrail.Deactivate(0f);
+                    EventAttackEnd.Invoke();
                     break;
 
                 case 0:
-                    this.EventAttackStart.Invoke();
+                    EventAttackStart.Invoke();
                     if (Melee.hitCount > 0)
                     {
                         Melee.ResetHitCount();
                     };
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    if (weaponTrail != null) this.weaponTrail.Deactivate(0f);
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
                     {
-                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;
                     }
                     break;
 
                 case 1:
-                    if (adventureMotor != null && this.isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
+                    if (adventureMotor != null && isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
 
-                    if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(this.weaponBone))
+                    if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(weaponBone))
                     {
-                        clip.ExecuteActionsOnActivate(this.Melee.transform.position, this.Melee.gameObject);
+                        clip.ExecuteActionsOnActivate(Melee.transform.position, Melee.gameObject);
                         isActivated = true;
                     }
 
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
                     {
-                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;
                     }
 
-                    this.Melee.ExecuteSwingAudio();
-                    if (this.weaponTrail != null) this.weaponTrail.Activate();
-                    this.EventAttackActivation.Invoke();
+                    Melee.ExecuteSwingAudio();
+                    if (weaponTrail != null) weaponTrail.Activate();
+                    EventAttackActivation.Invoke();
                     break;
 
                 case 2:
                     if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(this.weaponBone))
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
                     {
-                        clip.PlayVFXAttachment(this.Melee.gameObject);
+                        clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;
                     }
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.ResetHitCount();
-                    if (this.weaponTrail != null) this.weaponTrail.Deactivate(0f);
-                    this.EventAttackRecovery.Invoke();
-                    this.isVFXActivated = false;
+                    if (weaponTrail != null) weaponTrail.Deactivate(0f);
+                    EventAttackRecovery.Invoke();
+                    isVFXActivated = false;
                     break;
             }
 
-            this.prevPhase = currPhase;
+            prevPhase = currPhase;
         }
 
         private void LateUpdate()
