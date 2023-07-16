@@ -150,7 +150,7 @@
             }
 
             // If we have no current melee clip don't do anything
-            //if (!clip) { return; }
+            if (!clip) { return; }
 
             switch (currPhase)
             {
