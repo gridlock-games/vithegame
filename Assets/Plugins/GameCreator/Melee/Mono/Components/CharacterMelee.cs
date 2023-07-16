@@ -257,6 +257,11 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
+            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+            {
+                hitRenderer.RenderInvinicible(IsInvincible);
+            }
+
             IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)

@@ -11,16 +11,32 @@ namespace GameCreator.Melee
         [SerializeField] private Material[] healMaterials;
         [SerializeField] private float meshColorResetDelay = 0.25f;
 
+        [SerializeField] private Material[] invincibleMaterials;
+
         private SkinnedMeshRenderer skinnedMeshRenderer;
         private Material[] defaultMaterialList;
 
+        public void RenderInvinicible(bool isInvinicible)
+        {
+            if (isInvinicible)
+            {
+                skinnedMeshRenderer.materials = invincibleMaterials;
+            }
+            else
+            {
+                skinnedMeshRenderer.materials = defaultMaterialList;
+            }
+        }
+
         public void RenderHit()
         {
+            return;
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, hitMaterials));
         }
 
         public void RenderHeal()
         {
+            return;
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, healMaterials));
         }
 
