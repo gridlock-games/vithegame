@@ -124,17 +124,6 @@
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
 
-            DodgeClientRpc(targetPosition, targetRotation, targetName, moveDirection, angle);
-            if (!IsHost) { InstantExecuteLocally(target, moveDirection, angle); }
-            Destroy(target);
-        }
-
-        [ClientRpc]
-        void DodgeClientRpc(Vector3 targetPosition, Quaternion targetRotation, string targetName, Vector3 moveDirection, float angle)
-        {
-            GameObject target = new GameObject(targetName);
-            target.transform.position = targetPosition;
-            target.transform.rotation = targetRotation;
             InstantExecuteLocally(target, moveDirection, angle);
             Destroy(target);
         }
@@ -167,11 +156,8 @@
             }
 
             MeleeWeapon meleeweapon = melee.currentWeapon;
-
-            AnimationClip clip = null;
-
-            float speed = 1.0f;
-
+            AnimationClip clip;
+            float speed;
             MeleeClip dodgeMeleeClip;
 
             float transitionIn;
@@ -260,8 +246,6 @@
                 1.0f
             );
 
-            CharacterAttachments attachments = animator.GetCharacterAttachments();
-
             if (clip != null && animator != null)
             {
                 if (this.dashParticle.gameObject != null)
@@ -271,16 +255,7 @@
                     Instantiate(this.dashParticle.GetGameObject(target), spawnPosition, Quaternion.identity);
                 }
 
-                characterTarget.characterLocomotion.RootMovement(
-                    !melee.IsAttacking ? dodgeMeleeClip.movementMultiplier : dodgeMeleeClip.movementMultiplier_OnAttack,
-                    duration,
-                    1.0f,
-                    !melee.IsAttacking ? dodgeMeleeClip.movementForward : dodgeMeleeClip.movementForward_OnAttack,
-                    !melee.IsAttacking ? dodgeMeleeClip.movementSides : dodgeMeleeClip.movementSides_OnAttack,
-                    !melee.IsAttacking ? dodgeMeleeClip.movementVertical : dodgeMeleeClip.movementVertical_OnAttack
-                );
-
-                animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
+                dodgeMeleeClip.PlayNetworked(melee, speed, transitionIn, transitionOut);
             }
 
             return true;

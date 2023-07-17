@@ -257,6 +257,14 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
+            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
+            {
+                if (!hitRenderer.rendererRunning)
+                {
+                    hitRenderer.RenderInvinicible(IsInvincible);
+                }
+            }
+
             IsAttacking = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
@@ -383,7 +391,9 @@ namespace GameCreator.Melee
 
                 // Calculate hit result/HP damage
                 int previousHP = targetMelee.HP.Value;
-                HitResult hitResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
+                KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
+                HitResult hitResult = OnRecieveAttackResult.Key;
+                MeleeClip hitReaction = OnRecieveAttackResult.Value;
                 if (hitResult == HitResult.ReceiveDamage)
                     targetMelee.HP.Value -= attack.baseDamage;
                 else if (hitResult == HitResult.PoiseBlock)
@@ -399,6 +409,10 @@ namespace GameCreator.Melee
 
                     // Death ailment
                     targetMelee.Character.Die(melee.Character);
+                }
+                else // If we are not dead
+                {
+                    if (hitReaction != null) { hitReaction.PlayNetworked(targetMelee); }
                 }
 
                 // Add 1 to knocked up hit count if we are already knocked up
@@ -1050,9 +1064,9 @@ namespace GameCreator.Melee
             AddPoise(-10);
         }
 
-        public HitResult OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, Vector3 bladeImpactPosition)
+        private KeyValuePair<HitResult, MeleeClip> OnReceiveAttack(CharacterMelee attacker, MeleeClip attack, Vector3 bladeImpactPosition)
         {
-            if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return HitResult.Ignore; }
+            if (!IsServer) { Debug.LogError("OnReceiveAttack() should only be called on the server."); return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, null); }
 
             Character assailant = attacker.Character;
             CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
@@ -1061,10 +1075,12 @@ namespace GameCreator.Melee
 
             OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
 
-            if (this.currentWeapon == null) return HitResult.ReceiveDamage;
-            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return HitResult.ReceiveDamage;
-            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return HitResult.ReceiveDamage;
-            if (this.IsInvincible) return HitResult.Ignore;
+            MeleeClip hitReaction = null;
+
+            if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
+            if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
@@ -1097,55 +1113,50 @@ namespace GameCreator.Melee
                             attackerReaction.PlayNetworked(attacker);
                         }
 
-                        if (this.currentShield.perfectBlockClip != null)
-                        {
-                            this.currentShield.perfectBlockClip.PlayNetworked(this);
-                        }
+                        if (currentShield.perfectBlockClip != null) { hitReaction = currentShield.perfectBlockClip; }
 
-                        this.ExecuteEffects(
-                            this.Blade.GetImpactPosition(),
-                            this.currentShield.audioPerfectBlock,
-                            this.currentShield.prefabImpactPerfectBlock
+                        ExecuteEffects(
+                            Blade.GetImpactPosition(),
+                            currentShield.audioPerfectBlock,
+                            currentShield.prefabImpactPerfectBlock
                         );
 
-                        this.comboSystem.OnPerfectBlock();
-                        return HitResult.PerfectBlock;
+                        comboSystem.OnPerfectBlock();
+                        return new KeyValuePair<HitResult, MeleeClip>(HitResult.PerfectBlock, hitReaction);
                     }
 
-                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.PlayNetworked(this);
+                    hitReaction = currentShield.GetBlockReaction();
 
-                    this.ExecuteEffects(
+                    ExecuteEffects(
                         bladeImpactPosition,
-                        this.currentShield.audioBlock,
-                        this.currentShield.prefabImpactBlock
+                        currentShield.audioBlock,
+                        currentShield.prefabImpactBlock
                     );
 
-                    this.comboSystem.OnBlock();
-                    return HitResult.AttackBlock;
+                    comboSystem.OnBlock();
+                    return new KeyValuePair<HitResult, MeleeClip>(HitResult.AttackBlock, hitReaction);
                 }
                 else if (Poise.Value >= 30)
                 {
-                    MeleeClip blockReaction = this.currentShield.GetBlockReaction();
-                    if (blockReaction != null) blockReaction.PlayNetworked(this);
+                    hitReaction = currentShield.GetBlockReaction();
 
-                    this.ExecuteEffects(
+                    ExecuteEffects(
                         bladeImpactPosition,
-                        this.currentShield.audioBlock,
-                        this.currentShield.prefabImpactBlock
+                        currentShield.audioBlock,
+                        currentShield.prefabImpactBlock
                     );
 
-                    this.comboSystem.OnBlock();
+                    comboSystem.OnBlock();
 
-                    this.Defense.Value = 0f;
+                    Defense.Value = 0f;
 
                     AddPoise(-30);
-                    return HitResult.PoiseBlock;
+                    return new KeyValuePair<HitResult, MeleeClip>(HitResult.PoiseBlock, hitReaction);
                 }
                 else
                 {
-                    this.Defense.Value = 0f;
-                    this.Poise.Value = 0f;
+                    Defense.Value = 0f;
+                    Poise.Value = 0f;
                     isBlockingNetworked.Value = false;
                 }
             }
@@ -1159,17 +1170,17 @@ namespace GameCreator.Melee
 
 
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
-            bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
-            bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
+            bool isKnockup = attack.attackType == AttackType.Knockedup | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
-            MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
-                this.Character.IsGrounded(),
+            hitReaction = currentWeapon.GetHitReaction(
+                Character.IsGrounded(),
                 hitLocation,
                 isKnockback,
                 isKnockup
             );
 
-            this.ExecuteEffects(
+            ExecuteEffects(
                 bladeImpactPosition,
                 isKnockback
                     ? attacker.currentWeapon.audioImpactKnockback
@@ -1182,11 +1193,9 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            if ((!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
-            {
-                hitReaction.PlayNetworked(this);
-            }
-            return HitResult.ReceiveDamage;
+            bool shouldPlayHitReaction = (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
+            if (!shouldPlayHitReaction) { hitReaction = null; }
+            return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
 
         [ClientRpc]
