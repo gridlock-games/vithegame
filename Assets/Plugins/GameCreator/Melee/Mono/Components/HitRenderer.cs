@@ -30,7 +30,6 @@ namespace GameCreator.Melee
 
         public void RenderHit()
         {
-            Debug.Log("Render Hit");
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, hitMaterials));
         }
 
@@ -45,7 +44,7 @@ namespace GameCreator.Melee
             defaultMaterialList = skinnedMeshRenderer.materials;
         }
 
-        private bool rendererRunning;
+        public bool rendererRunning { get; private set; }
         private IEnumerator ResetMeshColorAfterDelay(float delay, Material[] materialChanges)
         {
             yield return new WaitUntil(() => !rendererRunning);

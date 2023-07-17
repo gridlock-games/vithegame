@@ -259,7 +259,10 @@ namespace GameCreator.Melee
         {
             foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
             {
-                hitRenderer.RenderInvinicible(IsInvincible);
+                if (!hitRenderer.rendererRunning)
+                {
+                    hitRenderer.RenderInvinicible(IsInvincible);
+                }
             }
 
             IsAttacking = false;
