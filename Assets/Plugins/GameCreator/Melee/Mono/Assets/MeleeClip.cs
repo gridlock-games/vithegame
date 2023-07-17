@@ -197,7 +197,7 @@
             Destroy(obj);
         }
 
-        public void PlayNetworked(CharacterMelee melee)
+        public void PlayNetworked(CharacterMelee melee, float? animSpeed = null, float? transitionIn = null, float? transitionOut = null)
         {
             if (!melee.IsSpawned) { Debug.LogError("Spawn the character before trying to play melee clips"); return; }
 
@@ -216,7 +216,7 @@
                 PlayLocally(melee);
         }
 
-        public void PlayLocally(CharacterMelee melee)
+        public void PlayLocally(CharacterMelee melee, float? animSpeed = null, float? transitionIn = null, float? transitionOut = null)
         {
             if (this.interruptible == Interrupt.Uninterruptible) melee.SetUninterruptable(this.Length);
             if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(this.Length);
@@ -241,20 +241,47 @@
             melee.SetPosture(this.posture, this.Length);
             melee.PlayAudio(this.soundEffect);
 
-            float duration = Mathf.Max(0, this.animationClip.length - this.transitionOut);
+            float selectedAnimSpeed = animSpeed == null ? this.animSpeed : (float)animSpeed;
+            float selectedTransitionIn = transitionIn == null ? this.transitionIn : (float)transitionIn;
+            float selectedTransitionOut = transitionOut == null ? this.transitionOut : (float)transitionOut;
+
+            float duration = Mathf.Max(0, this.animationClip.length - selectedTransitionOut);
 
             if (isAttack)
             {
-
                 AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
                 AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
                 melee.Character.RootMovement(
                     this.movementMultiplier,
-                    duration / this.animSpeed,
+                    duration / selectedAnimSpeed,
                     this.gravityInfluence,
                     newMovementForwardCurve,
                     newMovementSidesCurve,
                     this.movementVertical
+                );
+
+                melee.Character.GetCharacterAnimator().StopGesture(0.1f);
+                melee.Character.GetCharacterAnimator().CrossFadeGesture(
+                    this.animationClip, selectedAnimSpeed, this.avatarMask,
+                    selectedTransitionIn, selectedTransitionOut
+                );
+            }
+            else if (isDodge)
+            {
+                melee.Character.RootMovement(
+                    !melee.IsAttacking ? movementMultiplier : movementMultiplier_OnAttack,
+                    duration,
+                    1.0f,
+                    !melee.IsAttacking ? movementForward : movementForward_OnAttack,
+                    !melee.IsAttacking ? movementSides : movementSides_OnAttack,
+                    !melee.IsAttacking ? movementVertical : movementVertical_OnAttack
+                );
+
+                melee.Character.GetCharacterAnimator().StopGesture(0.1f);
+                melee.Character.GetCharacterAnimator().CrossFadeGesture(
+                    !melee.IsAttacking ? animationClip : attackDodgeClip,
+                    selectedAnimSpeed, this.avatarMask,
+                    selectedTransitionIn, selectedTransitionOut
                 );
             }
             else
@@ -267,17 +294,16 @@
                     this.movementSides,
                     this.movementVertical
                 );
-            }
 
-            melee.Character.GetCharacterAnimator().StopGesture(0.1f);
-            melee.Character.GetCharacterAnimator().CrossFadeGesture(
-                this.animationClip, this.animSpeed, this.avatarMask,
-                this.transitionIn, this.transitionOut
-            );
+                melee.Character.GetCharacterAnimator().StopGesture(0.1f);
+                melee.Character.GetCharacterAnimator().CrossFadeGesture(
+                    this.animationClip, selectedAnimSpeed, this.avatarMask,
+                    selectedTransitionIn, selectedTransitionOut
+                );
+            }
 
             this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
         }
-
 
         public void Stop(CharacterMelee melee)
         {

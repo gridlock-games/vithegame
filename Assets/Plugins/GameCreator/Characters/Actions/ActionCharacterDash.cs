@@ -255,18 +255,7 @@
                     Instantiate(this.dashParticle.GetGameObject(target), spawnPosition, Quaternion.identity);
                 }
 
-                dodgeMeleeClip.PlayNetworked(melee);
-
-                //characterTarget.characterLocomotion.RootMovement(
-                //    !melee.IsAttacking ? dodgeMeleeClip.movementMultiplier : dodgeMeleeClip.movementMultiplier_OnAttack,
-                //    duration,
-                //    1.0f,
-                //    !melee.IsAttacking ? dodgeMeleeClip.movementForward : dodgeMeleeClip.movementForward_OnAttack,
-                //    !melee.IsAttacking ? dodgeMeleeClip.movementSides : dodgeMeleeClip.movementSides_OnAttack,
-                //    !melee.IsAttacking ? dodgeMeleeClip.movementVertical : dodgeMeleeClip.movementVertical_OnAttack
-                //);
-
-                //animator.CrossFadeGesture(clip, speed, null, transitionIn, transitionOut);
+                dodgeMeleeClip.PlayNetworked(melee, speed, transitionIn, transitionOut);
             }
 
             return true;

@@ -30,13 +30,12 @@ namespace GameCreator.Melee
 
         public void RenderHit()
         {
-            return;
+            Debug.Log("Render Hit");
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, hitMaterials));
         }
 
         public void RenderHeal()
         {
-            return;
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, healMaterials));
         }
 
