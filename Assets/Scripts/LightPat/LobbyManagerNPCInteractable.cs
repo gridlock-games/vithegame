@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.IO;
 using Unity.Collections;
+using System.Net;
 
 namespace LightPat.Core
 {
@@ -131,58 +132,118 @@ namespace LightPat.Core
 
             if (IsServer)
             {
-                string filename = "IP Config.txt";
-                string path = Path.Join(Application.dataPath, filename);
-                // This text is added only once to the file
-                if (!File.Exists(path))
+                //string filename = "IP Config.txt";
+                //string path = Path.Join(Application.dataPath, filename);
+                //// This text is added only once to the file
+                //if (!File.Exists(path))
+                //{
+                //    // Create a file to write to.
+                //    using (StreamWriter sw = File.CreateText(path))
+                //    {
+                //        sw.WriteLine("# Please write a name for a server followed by an IP on each line of this text document like so: (Desktop | 192.168.50.150)");
+                //        sw.WriteLine("# Lines that start with hashtag (#) will be ignored");
+                //        sw.WriteLine("# DO NOT LEAVE WHITESPACE");
+                //    }
+                //}
+
+                //using (StreamReader sr = File.OpenText(path))
+                //{
+                //    string s = "";
+                //    List<FixedString32Bytes> IPListCache = new List<FixedString32Bytes>();
+                //    while ((s = sr.ReadLine()) != null)
+                //    {
+                //        if (s[0] == '#') continue;
+                //        IPListCache.Add(s);
+                //    }
+
+                //    // Sync IP List if the file has changed
+                //    if (IPListCache.Count != IPList.Count)
+                //    {
+                //        IPList.Clear();
+                //        foreach (FixedString32Bytes fixedString in IPListCache)
+                //        {
+                //            IPList.Add(fixedString);
+                //        }
+                //    }
+                //    else // If the lengths are not the same, look for a mismatched value
+                //    {
+                //        bool mismatchedValue = false;
+                //        for (int i = 0; i < IPListCache.Count; i++)
+                //        {
+                //            if (IPList[i] != IPListCache[i]) { mismatchedValue = true; break; }
+                //        }
+
+                //        if (mismatchedValue)
+                //        {
+                //            IPList.Clear();
+                //            foreach (FixedString32Bytes fixedString in IPListCache)
+                //            {
+                //                IPList.Add(fixedString);
+                //            }
+                //        }
+                //    }
+                //}
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://us-central1-vithegame.cloudfunctions.net/api/servers/duels");
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+                List<Server> serverList = new List<Server>();
+
+                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                 {
-                    // Create a file to write to.
-                    using (StreamWriter sw = File.CreateText(path))
+                    string json = sr.ReadToEnd();
+                    foreach (string jsonSplit in json.Split("},"))
                     {
-                        sw.WriteLine("# Please write a name for a server followed by an IP on each line of this text document like so: (Desktop | 192.168.50.150)");
-                        sw.WriteLine("# Lines that start with hashtag (#) will be ignored");
-                        sw.WriteLine("# DO NOT LEAVE WHITESPACE");
+                        string finalJsonElement;
+                        if (jsonSplit[0] == '[')
+                        {
+                            finalJsonElement = jsonSplit.Remove(0, 1) + "}";
+                        }
+                        else if (jsonSplit[^1] == ']')
+                        {
+                            finalJsonElement = jsonSplit.Remove(jsonSplit.Length - 1, 1);
+                        }
+                        else
+                        {
+                            finalJsonElement = jsonSplit + "}";
+                        }
+
+                        serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
                     }
                 }
 
-                using (StreamReader sr = File.OpenText(path))
+                foreach (Server server in serverList)
                 {
-                    string s = "";
-                    List<FixedString32Bytes> IPListCache = new List<FixedString32Bytes>();
-                    while ((s = sr.ReadLine()) != null)
+                    if (!serversProcessed.Contains(server))
                     {
-                        if (s[0] == '#') continue;
-                        IPListCache.Add(s);
-                    }
-
-                    // Sync IP List if the file has changed
-                    if (IPListCache.Count != IPList.Count)
-                    {
-                        IPList.Clear();
-                        foreach (FixedString32Bytes fixedString in IPListCache)
-                        {
-                            IPList.Add(fixedString);
-                        }
-                    }
-                    else // If the lengths are not the same, look for a mismatched value
-                    {
-                        bool mismatchedValue = false;
-                        for (int i = 0; i < IPListCache.Count; i++)
-                        {
-                            if (IPList[i] != IPListCache[i]) { mismatchedValue = true; break; }
-                        }
-
-                        if (mismatchedValue)
-                        {
-                            IPList.Clear();
-                            foreach (FixedString32Bytes fixedString in IPListCache)
-                            {
-                                IPList.Add(fixedString);
-                            }
-                        }
+                        serversProcessed.Add(server);
+                        StartCoroutine(WaitForPingToComplete(server));
                     }
                 }
             }
+        }
+
+        List<Server> serversProcessed = new List<Server>();
+
+        private IEnumerator WaitForPingToComplete(Server server)
+        {
+            Ping ping = new Ping(server.ip);
+            yield return new WaitUntil(() => ping.isDone);
+
+            string serverString = server.label + "|" + server.ip;
+            if (!IPList.Contains(serverString))
+                IPList.Add(serverString);
+        }
+
+        private struct Server
+        {
+            public string _id;
+            public int type;
+            public int population;
+            public int progress;
+            public string ip;
+            public string label;
+            public string __v;
         }
 
         private void OnTriggerEnter(Collider other)
