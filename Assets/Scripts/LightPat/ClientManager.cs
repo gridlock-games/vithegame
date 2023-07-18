@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.Rendering;
 
 namespace LightPat.Core
 {
@@ -119,8 +120,22 @@ namespace LightPat.Core
 
         void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
 
+        private readonly float _hudRefreshRate = 1f;
+        private float _timer;
+
         private void Update()
         {
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+            {
+                // FPS Counter and Ping Display
+                if (Time.unscaledTime > _timer)
+                {
+                    int fps = (int)(1f / Time.unscaledDeltaTime);
+                    Debug.Log(fps + " FPS");
+                    _timer = Time.unscaledTime + _hudRefreshRate;
+                }
+            }
+
             if (IsServer)
             {
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
