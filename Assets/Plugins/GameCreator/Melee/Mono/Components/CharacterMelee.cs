@@ -448,6 +448,8 @@ namespace GameCreator.Melee
                         case AttackType.Followup:
                             if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
                                 targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
+                            } else {
+                                targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             }
                             break;
                         case AttackType.None:
