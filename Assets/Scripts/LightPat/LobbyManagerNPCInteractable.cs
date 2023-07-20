@@ -226,7 +226,7 @@ namespace LightPat.Core
             refreshServerListRunning = false;
         }
 
-        List<Server> serversProcessed = new List<Server>();
+        private List<Server> serversProcessed = new List<Server>();
 
         private IEnumerator WaitForPingToComplete(Server server)
         {

@@ -167,41 +167,63 @@ namespace LightPat.Core
                 g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
             }
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://us-central1-vithegame.cloudfunctions.net/api/servers/duels");
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StartCoroutine(UpdateServerPopulation());
+        }
+
+        private IEnumerator UpdateServerPopulation()
+        {
+            // Get list of servers in the API
+            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+
+            UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
+
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(getRequest.error);
+            }
 
             List<Server> serverList = new List<Server>();
 
-            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+            string json = getRequest.downloadHandler.text;
+
+            foreach (string jsonSplit in json.Split("},"))
             {
-                string json = sr.ReadToEnd();
-                Debug.Log(json);
-                foreach (string jsonSplit in json.Split("},"))
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
                 {
-                    string finalJsonElement = jsonSplit;
-                    if (finalJsonElement[0] == '[')
-                    {
-                        finalJsonElement = finalJsonElement.Remove(0, 1);
-                    }
-
-                    if (finalJsonElement[^1] == ']')
-                    {
-                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                    }
-
-                    if (finalJsonElement[^1] != '}')
-                    {
-                        finalJsonElement += "}";
-                    }
-
-                    serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
                 }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
             }
 
             // PUT request to update duel server API
+            bool thisServerIsInAPI = false;
             foreach (Server server in serverList)
             {
-                StartCoroutine(PutRequest(new ServerPutPayload(server._id, server.population, server.progress)));
+                if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
+                {
+                    thisServerIsInAPI = true;
+                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, server.progress)));
+                    break;
+                }
+            }
+
+            if (!thisServerIsInAPI)
+            {
+                Debug.LogError("You have not put this server in the API yet!");
             }
         }
 
@@ -238,10 +260,6 @@ namespace LightPat.Core
             {
                 Debug.Log(putRequest.error);
             }
-            else
-            {
-                Debug.Log("Upload complete!");
-            }
         }
 
         private struct ServerPutPayload
@@ -265,6 +283,8 @@ namespace LightPat.Core
             clientDataDictionary.Remove(clientId);
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
+
+            StartCoroutine(UpdateServerPopulation());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
