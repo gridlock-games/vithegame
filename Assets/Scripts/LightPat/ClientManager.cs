@@ -18,6 +18,7 @@ namespace LightPat.Core
         public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
+        [HideInInspector] public const string serverEndPointURL = "";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
@@ -173,9 +174,7 @@ namespace LightPat.Core
         private IEnumerator UpdateServerPopulation()
         {
             // Get list of servers in the API
-            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
@@ -248,9 +247,7 @@ namespace LightPat.Core
 
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
-
-            UnityWebRequest putRequest = UnityWebRequest.Put(endpointURL, jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(serverEndPointURL, jsonData);
 
             putRequest.SetRequestHeader("Content-Type", "application/json");
 

@@ -140,9 +140,7 @@ namespace LightPat.Core
             refreshServerListRunning = true;
 
             // Get list of servers in the API
-            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
