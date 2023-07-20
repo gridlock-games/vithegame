@@ -180,7 +180,7 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(getRequest.error);
+                Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
             }
 
             List<Server> serverList = new List<Server>();
@@ -255,7 +255,7 @@ namespace LightPat.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(putRequest.error);
+                Debug.Log("Put request error in ClientManager.PutRequest " + putRequest.error);
             }
         }
 

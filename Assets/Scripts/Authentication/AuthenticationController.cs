@@ -159,7 +159,7 @@ public class AuthenticationController : MonoBehaviour
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log(getRequest.error);
+            Debug.Log("Get Request Error in AuthneticationController.StoreClient() " + getRequest.error);
         }
 
         string json = getRequest.downloadHandler.text;

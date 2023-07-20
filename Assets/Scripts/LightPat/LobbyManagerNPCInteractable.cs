@@ -146,7 +146,7 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(getRequest.error);
+                Debug.Log("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
             }
 
             List<ClientManager.Server> serverList = new List<ClientManager.Server>();
