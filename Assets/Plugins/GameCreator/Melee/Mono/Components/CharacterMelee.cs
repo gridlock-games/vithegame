@@ -13,6 +13,7 @@ namespace GameCreator.Melee
     using static GameCreator.Melee.MeleeClip;
     using UnityEngine.SceneManagement;
     using System.Reflection;
+    using GameCreator.Variables;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -932,6 +933,7 @@ namespace GameCreator.Melee
                 {
                     this.inputBuffer.ConsumeInput();
                 }
+
                 this.comboSystem.Stop();
                 this.currentMeleeClip.Stop(this);
             }
@@ -940,7 +942,10 @@ namespace GameCreator.Melee
         public int GetCurrentPhase()
         {
             if (this.comboSystem == null) return -1;
-            return this.comboSystem.GetCurrentPhase();
+
+            int phase = this.currentMeleeClip != null ? this.comboSystem.GetCurrentPhase(this.currentMeleeClip) : -1;
+            
+            return phase;
         }
 
         public void PlayAudio(AudioClip audioClip)
@@ -1083,6 +1088,11 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
+
+            if(melee.IsAttacking) {
+                melee.StopAttack();
+                CharacterAnimator.StopGesture(0f);
+            }
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 

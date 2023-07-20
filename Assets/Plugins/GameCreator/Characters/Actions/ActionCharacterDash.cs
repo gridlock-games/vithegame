@@ -147,12 +147,18 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
 
-            if (melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true)
+            if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true ) || characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Reset)
             {
+                if(characterTarget.characterAilment  == CharacterLocomotion.CHARACTER_AILMENTS.Reset) {
+                    characterTarget.CancelAilment();
+                }
+
                 if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                 melee.StopAttack();
                 animator.StopGesture(0f);
                 melee.currentMeleeClip = null;
+
+
             }
 
             MeleeWeapon meleeweapon = melee.currentWeapon;

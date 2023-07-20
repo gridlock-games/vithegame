@@ -95,22 +95,6 @@
             }
         }
 
-        public int GetCurrentPhase()
-        {
-            float prevTime = Time.time - this.startAttackTime;
-            float currentPhase = -1f;
-
-            if (this.currentCombo == null) return Mathf.RoundToInt(currentPhase);
-            if (this.currentCombo.meleeClip == null) return Mathf.RoundToInt(currentPhase);
-
-            if (prevTime < this.currentCombo.meleeClip.Length)
-            {
-                currentPhase = this.currentCombo.meleeClip.attackPhase.Evaluate(prevTime);
-            }
-
-            return Mathf.RoundToInt(currentPhase);
-        }
-
         public int GetCurrentPhase(MeleeClip meleeClip)
         {
             float prevTime = Time.time - this.startAttackTime;
@@ -134,7 +118,7 @@
 
         public MeleeClip Select(CharacterMelee.ActionKey actionkey)
         {
-            int currentPhase = this.GetCurrentPhase();
+            int currentPhase = this.GetCurrentPhase(this.GetCurrentClip());
 
             if (currentPhase == -1 && this.melee.Character.characterLocomotion.isBusy) return null;
 
@@ -202,7 +186,6 @@
         public void Stop()
         {
             this.startAttackTime = -100f;
-
             this.current = this.root;
             this.currentCombo = null;
         }
