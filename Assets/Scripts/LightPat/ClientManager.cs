@@ -5,6 +5,10 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Rendering;
+using UnityEngine.Networking;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.IO;
 
 namespace LightPat.Core
 {
@@ -14,7 +18,7 @@ namespace LightPat.Core
         public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
-        [HideInInspector] public string playerHubIP;
+        [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
@@ -46,6 +50,7 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
+                StartCoroutine(UpdateServerPopulation());
             }
         }
 
@@ -141,7 +146,7 @@ namespace LightPat.Core
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
-                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
                 }
             }
         }
@@ -162,6 +167,110 @@ namespace LightPat.Core
                 GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
                 g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
             }
+
+            StartCoroutine(UpdateServerPopulation());
+        }
+
+        private IEnumerator UpdateServerPopulation()
+        {
+            // Get list of servers in the API
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
+
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+            }
+
+            List<Server> serverList = new List<Server>();
+
+            string json = getRequest.downloadHandler.text;
+
+            foreach (string jsonSplit in json.Split("},"))
+            {
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+            }
+
+            // PUT request to update duel server API
+            bool thisServerIsInAPI = false;
+            foreach (Server server in serverList)
+            {
+                if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
+                {
+                    thisServerIsInAPI = true;
+                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, server.progress)));
+                    break;
+                }
+            }
+
+            if (!thisServerIsInAPI)
+            {
+                Debug.LogError("You have not put this server in the API yet!");
+            }
+        }
+
+        public struct Server
+        {
+            public string _id;
+            public int type;
+            public int population;
+            public int progress;
+            public string ip;
+            public string label;
+            public string __v;
+        }
+
+        private IEnumerator PutRequest(ServerPutPayload payload)
+        {
+            string json = JsonUtility.ToJson(payload);
+            var regex = new Regex(Regex.Escape("_id"));
+            json = regex.Replace(json, "serverId", 1);
+
+            Debug.Log(json);
+
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(serverEndPointURL, jsonData);
+
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Put request error in ClientManager.PutRequest " + putRequest.error);
+            }
+        }
+
+        private struct ServerPutPayload
+        {
+            public string _id;
+            public int population;
+            public int progress;
+
+            public ServerPutPayload(string _id, int population, int progress)
+            {
+                this._id = _id;
+                this.population = population;
+                this.progress = progress;
+            }
         }
 
         void ClientDisconnectCallback(ulong clientId)
@@ -171,6 +280,8 @@ namespace LightPat.Core
             clientDataDictionary.Remove(clientId);
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
+
+            StartCoroutine(UpdateServerPopulation());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

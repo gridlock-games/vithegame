@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.Networking;
 
 namespace LightPat.UI
 {
@@ -42,11 +43,61 @@ namespace LightPat.UI
         private AsyncOperation loadingHubAsyncOperation;
         private IEnumerator ConnectToHub()
         {
+            // Get list of servers in the API
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Get Request Error in LobbyMenu.ConnectToHub() " + getRequest.error);
+            }
+
+            string json = getRequest.downloadHandler.text;
+            ClientManager.Server playerHubServer = new();
+
+            bool playerHubServerFound = false;
+            foreach (string jsonSplit in json.Split("},"))
+            {
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+                if (server.type == 1)
+                {
+                    playerHubServer = server;
+                    playerHubServerFound = true;
+                    break;
+                }
+            }
+
+            if (!playerHubServerFound)
+            {
+                Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
+                yield break;
+            }
+
             Debug.Log("Shutting down NetworkManager");
             NetworkManager.Singleton.Shutdown();
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             Debug.Log("Shutdown complete");
-            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = ClientManager.Singleton.playerHubIP;
+
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
+
             Debug.Log("Switching to hub scene: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP
             loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
