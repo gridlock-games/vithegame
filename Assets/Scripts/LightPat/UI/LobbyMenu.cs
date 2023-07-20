@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.Networking;
 
 namespace LightPat.UI
 {
@@ -46,7 +47,51 @@ namespace LightPat.UI
             NetworkManager.Singleton.Shutdown();
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             Debug.Log("Shutdown complete");
-            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = ClientManager.Singleton.playerHubIP;
+
+            // Get list of servers in the API
+            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+
+            UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
+
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(getRequest.error);
+            }
+
+            string json = getRequest.downloadHandler.text;
+            ClientManager.Server playerHubServer = new();
+
+            foreach (string jsonSplit in json.Split("},"))
+            {
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+                if (server.type == 1)
+                {
+                    playerHubServer = server;
+                    break;
+                }
+            }
+
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
+
             Debug.Log("Switching to hub scene: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP
             loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");

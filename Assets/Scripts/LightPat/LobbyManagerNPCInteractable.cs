@@ -81,7 +81,6 @@ namespace LightPat.Core
             Debug.Log("Shutdown complete");
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
-            ClientManager.Singleton.playerHubIP = networkTransport.ConnectionData.Address;
             networkTransport.ConnectionData.Address = targetIP;
             Debug.Log("Switching to lobby scene: " + networkTransport.ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP

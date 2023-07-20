@@ -18,7 +18,6 @@ namespace LightPat.Core
         public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
-        [HideInInspector] public string playerHubIP;
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
