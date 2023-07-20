@@ -4,12 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using UnityEngine.UI;
-using System.IO;
 using Unity.Collections;
-using System.Net;
-using static LightPat.Core.ClientManager;
 using UnityEngine.Networking;
-using System.Text.RegularExpressions;
 
 namespace LightPat.Core
 {
@@ -155,7 +151,7 @@ namespace LightPat.Core
                 Debug.Log(getRequest.error);
             }
 
-            List<Server> serverList = new List<Server>();
+            List<ClientManager.Server> serverList = new List<ClientManager.Server>();
 
             string json = getRequest.downloadHandler.text;
 
@@ -177,11 +173,11 @@ namespace LightPat.Core
                     finalJsonElement += "}";
                 }
 
-                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                serverList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
             }
 
             // Process servers here
-            foreach (Server server in serverList)
+            foreach (ClientManager.Server server in serverList)
             {
                 if (server.type != 0) { continue; }
 
@@ -199,7 +195,7 @@ namespace LightPat.Core
             {
                 bool serverStringInAPI = false;
 
-                foreach (Server server in serverList)
+                foreach (ClientManager.Server server in serverList)
                 {
                     string APIServerString = server.label + "|" + server.ip;
 
@@ -225,9 +221,9 @@ namespace LightPat.Core
             refreshServerListRunning = false;
         }
 
-        private List<Server> serversProcessed = new List<Server>();
+        private List<ClientManager.Server> serversProcessed = new List<ClientManager.Server>();
 
-        private IEnumerator WaitForPingToComplete(Server server)
+        private IEnumerator WaitForPingToComplete(ClientManager.Server server)
         {
             Ping ping = new Ping(server.ip);
             yield return new WaitUntil(() => ping.isDone);

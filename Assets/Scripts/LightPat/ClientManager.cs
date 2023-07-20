@@ -145,7 +145,7 @@ namespace LightPat.Core
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
-                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.NetworkTransport>().GetCurrentRtt(clientPair.Key);
+                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
                 }
             }
         }
