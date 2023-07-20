@@ -9,11 +9,11 @@ using System.Net;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using LightPat.Core;
+using UnityEngine.Networking;
+using System.Collections;
 
 public class AuthenticationController : MonoBehaviour
 {
-    public string playerHubIPAddress = "104.248.158.20";
-
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
@@ -125,8 +125,7 @@ public class AuthenticationController : MonoBehaviour
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
-            StoreClient(playerHubIPAddress, displayNameInput.text);
-            SceneManager.LoadScene("CharacterSelect");
+            StartCoroutine(StoreClient(displayNameInput.text));
         }
     }
 
@@ -151,9 +150,61 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    private void StoreClient(string targetIP, string displayName)
+    private IEnumerator StoreClient(string displayName)
     {
+        // Get list of servers in the API
+        string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+
+        UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
+
+        yield return getRequest.SendWebRequest();
+
+        if (getRequest.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(getRequest.error);
+        }
+
+        string json = getRequest.downloadHandler.text;
+        ClientManager.Server playerHubServer = new();
+
+        bool playerHubServerFound = false;
+        foreach (string jsonSplit in json.Split("},"))
+        {
+            string finalJsonElement = jsonSplit;
+            if (finalJsonElement[0] == '[')
+            {
+                finalJsonElement = finalJsonElement.Remove(0, 1);
+            }
+
+            if (finalJsonElement[^1] == ']')
+            {
+                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+            }
+
+            if (finalJsonElement[^1] != '}')
+            {
+                finalJsonElement += "}";
+            }
+
+            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+            if (server.type == 1)
+            {
+                playerHubServer = server;
+                playerHubServerFound = true;
+                break;
+            }
+        }
+
+        if (!playerHubServerFound)
+        {
+            Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
+            yield break;
+        }
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
+
+        SceneManager.LoadScene("CharacterSelect");
     }
 }

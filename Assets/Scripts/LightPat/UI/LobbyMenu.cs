@@ -43,10 +43,6 @@ namespace LightPat.UI
         private AsyncOperation loadingHubAsyncOperation;
         private IEnumerator ConnectToHub()
         {
-            Debug.Log("Shutting down NetworkManager");
-            NetworkManager.Singleton.Shutdown();
-            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
-            Debug.Log("Shutdown complete");
 
             // Get list of servers in the API
             string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
@@ -63,6 +59,7 @@ namespace LightPat.UI
             string json = getRequest.downloadHandler.text;
             ClientManager.Server playerHubServer = new();
 
+            bool playerHubServerFound = false;
             foreach (string jsonSplit in json.Split("},"))
             {
                 string finalJsonElement = jsonSplit;
@@ -86,9 +83,21 @@ namespace LightPat.UI
                 if (server.type == 1)
                 {
                     playerHubServer = server;
+                    playerHubServerFound = true;
                     break;
                 }
             }
+
+            if (!playerHubServerFound)
+            {
+                Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
+                yield break;
+            }
+
+            Debug.Log("Shutting down NetworkManager");
+            NetworkManager.Singleton.Shutdown();
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            Debug.Log("Shutdown complete");
 
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
 
