@@ -43,7 +43,6 @@ namespace LightPat.UI
         private AsyncOperation loadingHubAsyncOperation;
         private IEnumerator ConnectToHub()
         {
-
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
 
