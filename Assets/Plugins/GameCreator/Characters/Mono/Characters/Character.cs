@@ -265,7 +265,10 @@
 
         public bool isCharacterDashing()
         {
-            return this.characterLocomotion.isDashing;
+            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
+            bool isDodging = (bool)variables.Get("isDodging").Get();
+            
+            return isDodging;
         }
 
         public State GetCharacterState()
@@ -515,6 +518,9 @@
                         StartCoroutine(StartKnockupAfterDuration(.05f, waitForClientRotation));
                         break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
+                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        StartCoroutine(StartSunAfterDuration(.05f, waitForClientRotation));
+                        break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(.05f, waitForClientRotation));
@@ -721,14 +727,10 @@
                 ailmentRotationRecieved = false;
             }
 
-            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
-
-            bool isDodging = (bool)variables.Get("isDodging").Get();
-
-            if (isDodging == true) yield break;
-
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
+
+            bool isDodging = this.isCharacterDashing();
 
             if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
 
@@ -754,9 +756,9 @@
                         }
                         else
                         {
-                            melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
-                            recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-                            resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                            if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
+                            recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                            if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                         }
                     }
                     break;
@@ -791,6 +793,7 @@
         private Coroutine resetDefaultStateCoroutine;
         private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
         {
+
             resetDefaultStateRunning = true;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
@@ -808,7 +811,9 @@
             if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned &&
                 prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
             {
-                melee.SetInvincibility(1.0f);
+                if(this.isCharacterDashing()  == false) {
+                    melee.SetInvincibility(1.0f);
+                }
             }
 
             if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)

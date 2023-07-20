@@ -8,6 +8,7 @@
     using UnityEngine.Events;
     using UnityEngine.UI;
     using Unity.Netcode;
+    using GameCreator.Variables;
 
     public class BladeComponent : MonoBehaviour
     {
@@ -136,8 +137,22 @@
         {
             if (!this.Melee) return;
 
+            LocalVariables variables = Melee.Character.gameObject.GetComponent<LocalVariables>();
+            bool isDodging = (bool)variables.Get("isDodging").Get();
+            
 
             int currPhase = Melee.GetCurrentPhase();
+            
+            if(isDodging) {
+                Melee.isLunging = false;
+                Melee.ReleaseTargetFocus();
+                Melee.ResetHitCount();
+                if (weaponTrail != null) {
+                    weaponTrail.Deactivate(0f);
+                }
+                isVFXActivated = false;
+            }
+            
             MeleeClip clip = Melee.currentMeleeClip;
 
             if (currPhase == prevPhase) return;
