@@ -50,6 +50,7 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
+                StartCoroutine(UpdateServerPopulation());
             }
         }
 
