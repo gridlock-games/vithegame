@@ -7,6 +7,9 @@ using UnityEngine.UI;
 using System.IO;
 using Unity.Collections;
 using System.Net;
+using static LightPat.Core.ClientManager;
+using UnityEngine.Networking;
+using System.Text.RegularExpressions;
 
 namespace LightPat.Core
 {
@@ -132,95 +135,95 @@ namespace LightPat.Core
 
             if (IsServer)
             {
-                //string filename = "IP Config.txt";
-                //string path = Path.Join(Application.dataPath, filename);
-                //// This text is added only once to the file
-                //if (!File.Exists(path))
-                //{
-                //    // Create a file to write to.
-                //    using (StreamWriter sw = File.CreateText(path))
-                //    {
-                //        sw.WriteLine("# Please write a name for a server followed by an IP on each line of this text document like so: (Desktop | 192.168.50.150)");
-                //        sw.WriteLine("# Lines that start with hashtag (#) will be ignored");
-                //        sw.WriteLine("# DO NOT LEAVE WHITESPACE");
-                //    }
-                //}
+                if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
+            }
+        }
 
-                //using (StreamReader sr = File.OpenText(path))
-                //{
-                //    string s = "";
-                //    List<FixedString32Bytes> IPListCache = new List<FixedString32Bytes>();
-                //    while ((s = sr.ReadLine()) != null)
-                //    {
-                //        if (s[0] == '#') continue;
-                //        IPListCache.Add(s);
-                //    }
+        private bool refreshServerListRunning;
+        private IEnumerator RefreshServerList()
+        {
+            refreshServerListRunning = true;
 
-                //    // Sync IP List if the file has changed
-                //    if (IPListCache.Count != IPList.Count)
-                //    {
-                //        IPList.Clear();
-                //        foreach (FixedString32Bytes fixedString in IPListCache)
-                //        {
-                //            IPList.Add(fixedString);
-                //        }
-                //    }
-                //    else // If the lengths are not the same, look for a mismatched value
-                //    {
-                //        bool mismatchedValue = false;
-                //        for (int i = 0; i < IPListCache.Count; i++)
-                //        {
-                //            if (IPList[i] != IPListCache[i]) { mismatchedValue = true; break; }
-                //        }
+            // Get list of servers in the API
+            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
-                //        if (mismatchedValue)
-                //        {
-                //            IPList.Clear();
-                //            foreach (FixedString32Bytes fixedString in IPListCache)
-                //            {
-                //                IPList.Add(fixedString);
-                //            }
-                //        }
-                //    }
-                //}
+            UnityWebRequest getRequest = UnityWebRequest.Get(endpointURL);
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://us-central1-vithegame.cloudfunctions.net/api/servers/duels");
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            yield return getRequest.SendWebRequest();
 
-                List<Server> serverList = new List<Server>();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(getRequest.error);
+            }
 
-                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+            List<Server> serverList = new List<Server>();
+
+            string json = getRequest.downloadHandler.text;
+
+            foreach (string jsonSplit in json.Split("},"))
+            {
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
                 {
-                    string json = sr.ReadToEnd();
-                    foreach (string jsonSplit in json.Split("},"))
-                    {
-                        string finalJsonElement;
-                        if (jsonSplit[0] == '[')
-                        {
-                            finalJsonElement = jsonSplit.Remove(0, 1) + "}";
-                        }
-                        else if (jsonSplit[^1] == ']')
-                        {
-                            finalJsonElement = jsonSplit.Remove(jsonSplit.Length - 1, 1);
-                        }
-                        else
-                        {
-                            finalJsonElement = jsonSplit + "}";
-                        }
-
-                        serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
-                    }
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
                 }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+            }
+
+            // Process servers here
+            foreach (Server server in serverList)
+            {
+                if (server.type != 0) { continue; }
+
+                string serverString = server.label + "|" + server.ip;
+                if (!serversProcessed.Contains(server) & !IPList.Contains(serverString))
+                {
+                    serversProcessed.Add(server);
+                    StartCoroutine(WaitForPingToComplete(server));
+                }
+            }
+
+            // If we have the server in the IPList but not in the API
+            List<FixedString32Bytes> stringsToRemove = new List<FixedString32Bytes>();
+            foreach (FixedString32Bytes serverString in IPList)
+            {
+                bool serverStringInAPI = false;
 
                 foreach (Server server in serverList)
                 {
-                    if (!serversProcessed.Contains(server))
+                    string APIServerString = server.label + "|" + server.ip;
+
+                    if (APIServerString == serverString)
                     {
-                        serversProcessed.Add(server);
-                        StartCoroutine(WaitForPingToComplete(server));
+                        serverStringInAPI = true;
+                        break;
                     }
                 }
+
+                if (!serverStringInAPI)
+                {
+                    stringsToRemove.Add(serverString);
+                }
             }
+
+            // Remove strings that are not in the API but are in the IPList
+            foreach (FixedString32Bytes serverString in stringsToRemove)
+            {
+                IPList.Remove(serverString);
+            }
+
+            refreshServerListRunning = false;
         }
 
         List<Server> serversProcessed = new List<Server>();
@@ -232,18 +235,10 @@ namespace LightPat.Core
 
             string serverString = server.label + "|" + server.ip;
             if (!IPList.Contains(serverString))
+            {
                 IPList.Add(serverString);
-        }
-
-        private struct Server
-        {
-            public string _id;
-            public int type;
-            public int population;
-            public int progress;
-            public string ip;
-            public string label;
-            public string __v;
+                serversProcessed.Remove(server);
+            }
         }
 
         private void OnTriggerEnter(Collider other)

@@ -5,6 +5,10 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Rendering;
+using UnityEngine.Networking;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.IO;
 
 namespace LightPat.Core
 {
@@ -141,7 +145,7 @@ namespace LightPat.Core
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
-                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<NetworkTransport>().GetCurrentRtt(clientPair.Key);
+                        clientPair.Value.PlayerObject.GetComponent<Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.NetworkTransport>().GetCurrentRtt(clientPair.Key);
                 }
             }
         }
@@ -161,6 +165,96 @@ namespace LightPat.Core
             {
                 GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
                 g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            }
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://us-central1-vithegame.cloudfunctions.net/api/servers/duels");
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            List<Server> serverList = new List<Server>();
+
+            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+            {
+                string json = sr.ReadToEnd();
+                Debug.Log(json);
+                foreach (string jsonSplit in json.Split("},"))
+                {
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
+
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
+
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
+
+                    serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                }
+            }
+
+            // PUT request to update duel server API
+            foreach (Server server in serverList)
+            {
+                StartCoroutine(PutRequest(new ServerPutPayload(server._id, server.population, server.progress)));
+            }
+        }
+
+        public struct Server
+        {
+            public string _id;
+            public int type;
+            public int population;
+            public int progress;
+            public string ip;
+            public string label;
+            public string __v;
+        }
+
+        private IEnumerator PutRequest(ServerPutPayload payload)
+        {
+            string json = JsonUtility.ToJson(payload);
+            var regex = new Regex(Regex.Escape("_id"));
+            json = regex.Replace(json, "serverId", 1);
+
+            Debug.Log(json);
+
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            string endpointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(endpointURL, jsonData);
+
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(putRequest.error);
+            }
+            else
+            {
+                Debug.Log("Upload complete!");
+            }
+        }
+
+        private struct ServerPutPayload
+        {
+            public string _id;
+            public int population;
+            public int progress;
+
+            public ServerPutPayload(string _id, int population, int progress)
+            {
+                this._id = _id;
+                this.population = population;
+                this.progress = progress;
             }
         }
 
