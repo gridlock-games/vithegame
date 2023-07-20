@@ -81,6 +81,8 @@ namespace GameCreator.Melee
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
+            if( !Application.isEditor ) return;
+
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
             {
