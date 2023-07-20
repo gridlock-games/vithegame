@@ -518,6 +518,9 @@
                         StartCoroutine(StartKnockupAfterDuration(.05f, waitForClientRotation));
                         break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
+                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                        StartCoroutine(StartSunAfterDuration(.05f, waitForClientRotation));
+                        break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(.05f, waitForClientRotation));
