@@ -6,9 +6,7 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Rendering;
 using UnityEngine.Networking;
-using System.Text.RegularExpressions;
 using System.Net;
-using System.IO;
 
 namespace LightPat.Core
 {
@@ -240,10 +238,6 @@ namespace LightPat.Core
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-            var regex = new Regex(Regex.Escape("_id"));
-            json = regex.Replace(json, "serverId", 1);
-
-            Debug.Log(json);
 
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -261,13 +255,13 @@ namespace LightPat.Core
 
         private struct ServerPutPayload
         {
-            public string _id;
+            public string serverId;
             public int population;
             public int progress;
 
-            public ServerPutPayload(string _id, int population, int progress)
+            public ServerPutPayload(string serverId, int population, int progress)
             {
-                this._id = _id;
+                this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
             }
