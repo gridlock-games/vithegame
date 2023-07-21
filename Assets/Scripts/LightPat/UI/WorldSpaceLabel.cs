@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using GameCreator.Melee;
@@ -11,11 +9,12 @@ namespace LightPat.UI
 {
     public class WorldSpaceLabel : MonoBehaviour
     {
-        public TextMeshPro nameDisplay;
+        public TextMeshProUGUI nameDisplay;
 
         public float rotationSpeed = 0.6f;
         public float animationSpeed = 0.1f;
         public float viewDistance = 5f;
+        public float scale = 1;
         public bool disableHealthbar;
 
         public Slider healthSlider;
@@ -51,6 +50,10 @@ namespace LightPat.UI
                     {
                         nameDisplay.SetText(netObj.OwnerClientId + " - " + target.name);
                     }
+                }
+                else
+                {
+                    nameDisplay.SetText(netObj.OwnerClientId + " - " + target.name);
                 }
             }
 
