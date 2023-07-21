@@ -7,7 +7,6 @@ using System.Linq;
 using UnityEngine.Rendering;
 using UnityEngine.Networking;
 using System.Net;
-using Unity.Collections;
 
 namespace LightPat.Core
 {
@@ -20,10 +19,7 @@ namespace LightPat.Core
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
-        private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
-
-        private NetworkVariable<FixedString32Bytes> activeServerSceneName = new NetworkVariable<FixedString32Bytes>();
-
+        public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
@@ -32,10 +28,6 @@ namespace LightPat.Core
         private static readonly string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
-
-        public GameMode GetCurrentGameModeValue() { return gameMode.Value; }
-
-        public FixedString32Bytes GetActiveServerSceneNameValue() { return activeServerSceneName.Value; }
 
         public static string GetPayLoadParseString() { return payloadParseString; }
 
@@ -127,12 +119,7 @@ namespace LightPat.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
-        void OnSceneLoad(Scene scene, LoadSceneMode mode)
-        {
-            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
-
-            if (mode == LoadSceneMode.Single) { activeServerSceneName.Value = scene.name; }
-        }
+        void OnSceneLoad(Scene scene, LoadSceneMode mode) { Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode); }
 
         void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
 

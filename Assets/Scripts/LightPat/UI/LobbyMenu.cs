@@ -226,11 +226,11 @@ namespace LightPat.UI
                 gameModeDropdown.interactable = false;
 
             // Set game mode dropdown
-            if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.GetCurrentGameModeValue().ToString())
+            if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.gameMode.Value.ToString())
             {
                 for (int i = 0; i < gameModeDropdown.options.Count; i++)
                 {
-                    if (ClientManager.Singleton.GetCurrentGameModeValue().ToString() == gameModeDropdown.options[i].text)
+                    if (ClientManager.Singleton.gameMode.Value.ToString() == gameModeDropdown.options[i].text)
                     {
                         gameModeDropdown.SetValueWithoutNotify(i);
                         break;
