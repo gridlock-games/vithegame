@@ -38,7 +38,7 @@ namespace GameCreator.Melee
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, healMaterials));
         }
 
-        void Start()
+        private void Awake()
         {
             skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
             defaultMaterialList = skinnedMeshRenderer.materials;

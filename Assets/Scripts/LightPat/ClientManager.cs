@@ -25,7 +25,7 @@ namespace LightPat.Core
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
-        private static string payloadParseString = "|";
+        private static readonly string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
 
