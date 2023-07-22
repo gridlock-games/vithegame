@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using UnityEngine.Rendering;
 using UnityEngine.Networking;
 using System.Net;
 
@@ -41,6 +40,8 @@ namespace LightPat.Core
 
         public override void OnNetworkSpawn()
         {
+            NetworkManager.SceneManager.OnSceneEvent += OnNetworkSceneEvent;
+
             lobbyLeaderId.OnValueChanged += OnLobbyLeaderChanged;
             randomSeed.OnValueChanged += OnRandomSeedChange;
             
@@ -119,26 +120,35 @@ namespace LightPat.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
-        void OnSceneLoad(Scene scene, LoadSceneMode mode) { Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode); }
+        private Queue<string> additiveSceneQueue = new Queue<string>();
+
+        void OnNetworkSceneEvent(SceneEvent sceneEvent)
+        {
+            Debug.Log(sceneEvent.SceneEventType);
+
+            if (IsServer)
+            {
+                if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
+                {
+                    if (additiveSceneQueue.Count > 0)
+                    {
+                        string additiveSceneName = additiveSceneQueue.Dequeue();
+                        Debug.Log("Additively loading scene: " + additiveSceneName);
+                        NetworkManager.SceneManager.LoadScene(additiveSceneName, LoadSceneMode.Additive);
+                    }
+                }
+            }
+        }
+
+        void OnSceneLoad(Scene scene, LoadSceneMode mode)
+        {
+            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+        }
 
         void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
 
-        private readonly float _hudRefreshRate = 1f;
-        private float _timer;
-
         private void Update()
         {
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            {
-                // FPS Counter and Ping Display
-                if (Time.unscaledTime > _timer)
-                {
-                    int fps = (int)(1f / Time.unscaledDeltaTime);
-                    Debug.Log(fps + " FPS");
-                    _timer = Time.unscaledTime + _hudRefreshRate;
-                }
-            }
-
             if (IsServer)
             {
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -399,9 +409,13 @@ namespace LightPat.Core
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers)
+        public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene = null)
         {
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
+
+            if (additiveScene != null)
+                additiveSceneQueue.Enqueue(additiveScene);
+
             NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 
             if (spawnPlayers)

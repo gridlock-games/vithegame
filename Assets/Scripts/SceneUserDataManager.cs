@@ -42,7 +42,6 @@ public class SceneUserDataManager : MonoBehaviour
         // Find player object by weapon type
         for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
         {
-            Debug.Log(ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() + " " + selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType());
             if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
@@ -67,7 +66,8 @@ public class SceneUserDataManager : MonoBehaviour
         }
 
         loadingText.text = "Connecting to player hub...";
-        loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        //loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        NetworkManager.Singleton.StartClient();
     }
 
     void Start()
