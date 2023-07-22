@@ -1505,9 +1505,12 @@ namespace GameCreator.Melee
 
             // Visualize boxcast
             Vector3 origin = transform.position;
-            Quaternion orientation = characterCamera.rotation;
-            Vector3 direction = characterCamera.forward;
-            Debug.DrawRay(transform.position, direction * boxCastDistance, Color.green);
+            Quaternion orientation = characterCamera != null ? characterCamera.rotation : new Quaternion(0,0,0,0);
+            Vector3 direction = characterCamera != null ? characterCamera.forward : new Vector3(0,0,0);
+
+            if(orientation != null && direction != null) { 
+                Debug.DrawRay(transform.position, direction * boxCastDistance, Color.green);
+            }
 
             // Get all hits in boxcast
             RaycastHit[] allHits = Physics.BoxCastAll(origin, this.boxCastHalfExtents, direction * boxCastDistance, orientation, boxCastDistance);
