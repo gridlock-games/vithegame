@@ -85,22 +85,23 @@ namespace LightPat.Core
             }
         }
 
-        private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName)
+        private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName, string additiveSceneName = null)
         {
+            // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            // Wait for an additive scene to load
+            if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
             SpawnPlayerServerRpc(NetworkManager.LocalClientId);
         }
 
         private IEnumerator WaitForServerSceneChange(string sceneName, string additiveSceneName = null)
         {
             if (IsClient) { yield break; }
+
+            // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-            if (additiveSceneName != null)
-            {
-                Debug.Log("Waiting for the following scene to load: " + additiveSceneName);
-                yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded);
-                Debug.Log(additiveSceneName + " has been loaded");
-            }
+            // Wait for an additive scene to load
+            if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
 
             gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
             GameObject cameraObject = Instantiate(serverCameraPrefab);
@@ -345,7 +346,7 @@ namespace LightPat.Core
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
         [ClientRpc] void AddClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } Debug.Log(clientData.clientName + " has connected. ID: " + clientId); clientDataDictionary.Add(clientId, clientData); }
         [ClientRpc] void RemoveClientRpc(ulong clientId) { clientDataDictionary.Remove(clientId); }
-        [ClientRpc] void SpawnAllPlayersOnSceneChangeClientRpc(string sceneName) { StartCoroutine(SpawnLocalPlayerOnSceneChange(sceneName)); }
+        [ClientRpc] void SpawnAllPlayersOnSceneChangeClientRpc(string sceneName, string additiveSceneName = null) { StartCoroutine(SpawnLocalPlayerOnSceneChange(sceneName, additiveSceneName)); }
 
         [ServerRpc(RequireOwnership = false)]
         public void ToggleReadyServerRpc(ulong clientId)
@@ -428,7 +429,7 @@ namespace LightPat.Core
             if (spawnPlayers)
             {
                 StartCoroutine(WaitForServerSceneChange(sceneName, additiveScene));
-                SpawnAllPlayersOnSceneChangeClientRpc(sceneName);
+                SpawnAllPlayersOnSceneChangeClientRpc(sceneName, additiveScene);
             }
         }
 
