@@ -117,7 +117,7 @@ namespace LightPat.UI
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true, "Arena_ver2");
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true, "Arena_ver2_pruned");
             }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
             {
