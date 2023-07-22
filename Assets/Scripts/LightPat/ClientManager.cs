@@ -132,7 +132,7 @@ namespace LightPat.Core
 
         void OnNetworkSceneEvent(SceneEvent sceneEvent)
         {
-            Debug.Log(sceneEvent.SceneEventType);
+            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType);
 
             if (IsServer)
             {
