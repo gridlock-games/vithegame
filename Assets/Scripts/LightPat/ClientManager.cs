@@ -91,10 +91,17 @@ namespace LightPat.Core
             SpawnPlayerServerRpc(NetworkManager.LocalClientId);
         }
 
-        private IEnumerator WaitForServerSceneChange(string sceneName)
+        private IEnumerator WaitForServerSceneChange(string sceneName, string additiveSceneName = null)
         {
             if (IsClient) { yield break; }
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            if (additiveSceneName != null)
+            {
+                Debug.Log("Waiting for the following scene to load: " + additiveSceneName);
+                yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded);
+                Debug.Log(additiveSceneName + " has been loaded");
+            }
+
             gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
             GameObject cameraObject = Instantiate(serverCameraPrefab);
         }
@@ -420,7 +427,7 @@ namespace LightPat.Core
 
             if (spawnPlayers)
             {
-                StartCoroutine(WaitForServerSceneChange(sceneName));
+                StartCoroutine(WaitForServerSceneChange(sceneName, additiveScene));
                 SpawnAllPlayersOnSceneChangeClientRpc(sceneName);
             }
         }
