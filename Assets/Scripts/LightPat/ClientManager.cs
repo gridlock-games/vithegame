@@ -230,7 +230,7 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet!");
+                Debug.LogError("You have not put this server in the API yet! Cannot update server population");
             }
         }
 
