@@ -10,7 +10,8 @@ using Unity.Netcode;
 public class Ability : MonoBehaviour
 {
 
-    public enum AbilityType {
+    public enum AbilityType
+    {
         Active,
         Passive,
         TeamBuff,
@@ -29,11 +30,13 @@ public class Ability : MonoBehaviour
 
     public virtual bool isOnCoolDown { get; set; }
 
-    public void ExecuteSkill(CharacterMelee melee) {
-        if(!NetworkManager.Singleton.IsServer) return;
+    public void ExecuteSkill(CharacterMelee melee)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
 
-        if(this.abilityType != AbilityType.Passive) { 
-            if(meleeClip == null) return;
+        if (this.abilityType != AbilityType.Passive)
+        {
+            if (meleeClip == null) return;
             // Invoke in CharacterMelee
             melee.ExecuteAbility(meleeClip, CharacterMelee.ActionKey.A);
         }
