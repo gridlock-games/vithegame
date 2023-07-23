@@ -133,6 +133,9 @@ namespace GameCreator.Melee
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        private bool isPlayingAbility = false;
+        private MeleeClip abilityClip;
+
         // ACCESSORS: -----------------------------------------------------------------------------
 
         public Character Character { get; protected set; }
@@ -173,26 +176,33 @@ namespace GameCreator.Melee
             {
                 this.comboSystem.Update();
 
+                if (!this.CanAttack()) return;
+
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
                     ActionKey key = this.inputBuffer.GetInput();
-                    MeleeClip meleeClip = this.comboSystem.Select(key);
+                    MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
+
+                    if(isPlayingAbility) {
+                        this.comboSystem.StartAttackTime(true);
+                    }
 
                     if (meleeClip)
                     {
                         if (IsServer)
                         {
-                            if (meleeClip.isHeavy) // Heavy Attack
-                            {
-                                if (Poise.Value <= 20)
+                            if(!isPlayingAbility) {
+                                if (meleeClip.isHeavy) // Heavy Attack
                                 {
-                                    return;
+                                    if (Poise.Value <= 20)
+                                    {
+                                        return;
+                                    }
+                                    OnHeavyAttack();
+                                } else // Light Attack
+                                {
+                                    OnLightAttack();
                                 }
-                                OnHeavyAttack();
-                            }
-                            else // Light Attack
-                            {
-                                OnLightAttack();
                             }
                         }
 
@@ -274,9 +284,15 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
+                
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
+
+                if(phase == 2 && isPlayingAbility) {
+                    isPlayingAbility = false;
+                    this.comboSystem.StartAttackTime(false);
+                }
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -501,6 +517,21 @@ namespace GameCreator.Melee
         {
             IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
 
+            Abilities abilitiesFromParent = GetComponentInParent<Abilities>();
+
+            if(abilitiesFromParent) {
+                List<Ability> abilities = abilitiesFromParent.abilities;
+
+                foreach (Ability ablty in abilities) {
+                    MeleeClip meleeClip = ablty.meleeClip;
+
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+            }
+
             foreach (FieldInfo propertyInfo in propertyList)
             {
                 if (propertyInfo.FieldType == typeof(MeleeClip))
@@ -610,6 +641,8 @@ namespace GameCreator.Melee
                     }
                 }
             }
+
+            
 
             Debug.LogError("Melee clip Not Found: " + clipName);
             return null;
@@ -924,6 +957,17 @@ namespace GameCreator.Melee
             this.inputBuffer.AddInput(actionKey);
         }
 
+        public virtual void ExecuteAbility(MeleeClip meleeClip, ActionKey actionKey)
+        {
+            if (!this.currentWeapon) return;
+            if (!this.CanAttack()) return;
+
+            if (IsOwner) this.StopBlockingServerRpc();
+            this.isPlayingAbility = true;
+            this.abilityClip = meleeClip;
+            this.inputBuffer.AddInput(actionKey);
+        }
+
         public void StopAttack()
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
@@ -943,7 +987,7 @@ namespace GameCreator.Melee
             if (this.comboSystem == null) return -1;
 
             int phase = this.currentMeleeClip != null ? this.comboSystem.GetCurrentPhase(this.currentMeleeClip) : -1;
-            
+
             return phase;
         }
 

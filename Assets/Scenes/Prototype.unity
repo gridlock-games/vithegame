@@ -1320,6 +1320,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hammer_Training_Dummy (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3427816913848544856, guid: f71b0ff4e1373ca4693713393c768bf9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3427816913848544858, guid: f71b0ff4e1373ca4693713393c768bf9,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1704,6 +1709,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Greatsword_Training_Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 288998041406652132, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -2178,7 +2188,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
       type: 3}
     NetworkPrefabs: []
     TickRate: 120
@@ -2234,6 +2244,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brawler_Training_Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 1375938828783933841, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1375938828783933843, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
         type: 3}
