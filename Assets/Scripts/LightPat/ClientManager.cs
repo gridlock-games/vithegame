@@ -193,12 +193,21 @@ namespace LightPat.Core
             // Async operation is null
             if (currentSceneLoadingOperation == null)
             {
-                if (sceneLoadingScreenInstance) { Destroy(sceneLoadingScreenInstance); }
+                if (sceneLoadingScreenInstance)
+                {
+                    Debug.Log("Destroying scene loading screen instance");
+                    Destroy(sceneLoadingScreenInstance);
+                }
             }
             else // Async operation is not null
             {
                 SceneLoadingProgress = currentSceneLoadingOperation.progress;
-                if (!sceneLoadingScreenInstance) { sceneLoadingScreenInstance = Instantiate(sceneLoadingScreenPrefab); }
+                if (!sceneLoadingScreenInstance)
+                {
+                    Debug.Log("Instantiating scene loading screen instance");
+                    sceneLoadingScreenInstance = Instantiate(sceneLoadingScreenPrefab);
+                    DontDestroyOnLoad(sceneLoadingScreenInstance);
+                }
             }
 
             if (IsServer)
