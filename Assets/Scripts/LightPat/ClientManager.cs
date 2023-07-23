@@ -12,7 +12,6 @@ namespace LightPat.Core
     public class ClientManager : NetworkBehaviour
     {
         public GameObject[] playerPrefabOptions;
-        public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
@@ -100,11 +99,10 @@ namespace LightPat.Core
 
             // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
+
             // Wait for an additive scene to load
             if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
-
-            gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
-            GameObject cameraObject = Instantiate(serverCameraPrefab);
         }
 
         private void Awake()
@@ -177,12 +175,6 @@ namespace LightPat.Core
             AddClientRpc(valuePair.Key, valuePair.Value);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
-
-            if (SceneManager.GetActiveScene().name == "Hub")
-            {
-                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
-                g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
-            }
 
             StartCoroutine(UpdateServerPopulation());
         }
@@ -416,10 +408,28 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene = null)
+        public void ChangeScene(string sceneName, bool spawnPlayers, string additiveScene = null)
+        {
+            if (IsServer)
+            {
+                ApplyNetworkSceneChange(NetworkManager.LocalClientId, sceneName, spawnPlayers, additiveScene);
+            }
+            else
+            {
+                ChangeSceneServerRpc(NetworkManager.LocalClientId, sceneName, spawnPlayers, additiveScene);
+            }
+        }
+
+        [ServerRpc]
+        private void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene)
+        {
+            ApplyNetworkSceneChange(clientId, sceneName, spawnPlayers, additiveScene);
+        }
+
+        private void ApplyNetworkSceneChange(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene)
         {
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
+            if (!IsServer) { Debug.LogError("You should only change the scene on the server!"); return; }
 
             if (additiveScene != null)
                 additiveSceneQueue.Enqueue(additiveScene);
@@ -458,24 +468,6 @@ namespace LightPat.Core
             
             GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
-        }
-
-        public AsyncOperation ChangeLocalSceneThenStartClient(string sceneName)
-        {
-            //if (IsSpawned) { Debug.LogError("ChangeLocalSceneThenStartClient() should only be called when the network manager is turned off"); yield break; }
-            Debug.Log("Loading " + sceneName + " scene");
-            StartCoroutine(ChangeLocalSceneThenStartClientCoroutine(sceneName));
-            return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-        }
-
-        private IEnumerator ChangeLocalSceneThenStartClientCoroutine(string sceneName)
-        {
-            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-
-            if (NetworkManager.Singleton.StartClient())
-            {
-                Debug.Log("Started Client, looking for address: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address);
-            }
         }
     }
 

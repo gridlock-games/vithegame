@@ -38,7 +38,7 @@ public class AuthenticationController : MonoBehaviour
     private void Update()
     {
         // If we are a headless build
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | Application.isEditor)
         {
             StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
         }
@@ -147,8 +147,16 @@ public class AuthenticationController : MonoBehaviour
         if (NetworkManager.Singleton.StartServer())
         {
             Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+
             // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
-            NetworkManager.Singleton.SceneManager.LoadScene(SceneUtility.GetBuildIndexByScenePath("Lobby") != -1 ? "Lobby" : "Hub", LoadSceneMode.Single);
+            if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
+            {
+                ClientManager.Singleton.ChangeScene("Lobby", false);
+            }
+            else
+            {
+                ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
+            }
         }
     }
 
