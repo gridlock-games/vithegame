@@ -99,7 +99,16 @@ namespace LightPat.Core
 
             // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
-            gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
+
+            GameLogicManager glm = FindObjectOfType<GameLogicManager>();
+            if (glm)
+            {
+                gameLogicManagerNetObjId.Value = glm.NetworkObjectId;
+            }
+            else
+            {
+                gameLogicManagerNetObjId.Value = 0;
+            }
 
             // Wait for an additive scene to load
             if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
