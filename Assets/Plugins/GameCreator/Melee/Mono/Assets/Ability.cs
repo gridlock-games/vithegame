@@ -20,11 +20,14 @@ public class Ability : MonoBehaviour
     }
 
     public Sprite skillImageFill;
+    public WeaponType weaponBind = WeaponType.BRAWLER;
     public MeleeClip meleeClip;
     public AbilityType abilityType = AbilityType.Active;
     public float coolDown = 0.00f;
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
+
+    private bool isCoolingDown = false;
 
     public void ExecuteSkill(CharacterMelee melee) {
         if(!NetworkManager.Singleton.IsServer) return;
@@ -35,4 +38,19 @@ public class Ability : MonoBehaviour
             melee.ExecuteAbility(meleeClip, CharacterMelee.ActionKey.A);
         }
     }
+
+
+    public bool IsCoolDown() {
+        return this.isCoolingDown;
+    }
+
+    public void StartCoolDown() {
+        this.isCoolingDown = true;
+    }
+
+    public void EndCoolDown() {
+        this.isCoolingDown = false;
+    }
+
+
 }

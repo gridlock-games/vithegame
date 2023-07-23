@@ -15,6 +15,7 @@
 
         public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
         private CharacterMelee melee;
+        private Abilities abilities;
 
         public Slider healthSlider;
         public Slider defenseSlider;
@@ -32,6 +33,7 @@
         private void Start()
         {
             melee = GetComponentInParent<CharacterMelee>();
+            abilities = GetComponentInParent<Abilities>();
         }
 
         private void Update()
@@ -61,15 +63,31 @@
             if (!melee.currentWeapon) { return; }
             if (!melee.currentWeapon.weaponImage) { return; }
             weaponImageFill.sprite = melee.currentWeapon.weaponImage;
-            if(melee.currentWeapon.abilityA != null) {
-                abilityAImageFill.sprite = melee.currentWeapon.abilityA.skillImageFill;
+
+            foreach(Ability ability in abilities.abilities) {
+                switch(ability.skillKey) {
+                    case KeyCode.Q:
+                        abilityAImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        break;
+                    case KeyCode.E:
+                        abilityBImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        break;
+                    case KeyCode.R:
+                        abilityCImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        break;
+                }
             }
-            if(melee.currentWeapon.abilityB != null) {
-                abilityBImageFill.sprite = melee.currentWeapon.abilityB.skillImageFill;
-            }
-            if(melee.currentWeapon.abilityC != null) {
-                abilityCImageFill.sprite = melee.currentWeapon.abilityC.skillImageFill;
-            }
+
+
+            // if(melee.currentWeapon.abilityA != null) {
+            //     abilityAImageFill.sprite = melee.currentWeapon.abilityA.skillImageFill;
+            // }
+            // if(melee.currentWeapon.abilityB != null) {
+            //     abilityBImageFill.sprite = melee.currentWeapon.abilityB.skillImageFill;
+            // }
+            // if(melee.currentWeapon.abilityC != null) {
+            //     abilityCImageFill.sprite = melee.currentWeapon.abilityC.skillImageFill;
+            // }
         }
     }
 }

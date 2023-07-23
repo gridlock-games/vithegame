@@ -8,14 +8,6 @@ using GameCreator.Core;
 using Unity.Netcode;
 public class Abilities : MonoBehaviour
 {
-    public enum AbilityType {
-        Active,
-        Passive,
-        TeamBuff,
-        TeamDebuff,
-        SelfBuff,
-        Debuff,
-    }
 
     public List<Ability> abilities = new List<Ability>();
 
@@ -45,6 +37,7 @@ public class Abilities : MonoBehaviour
         if (melee.IsBlocking) return;
         if (melee.IsStaggered) return;
         if (!NetworkManager.Singleton.IsServer) return;
+        if (abilities.Count <= 0) return;
 
         foreach (KeyCode key in _hotKeys) {
             if (Input.GetKey(key)) {
@@ -52,13 +45,30 @@ public class Abilities : MonoBehaviour
 
                 float PoiseValue = melee.GetPoise();
 
+                if(ability.IsCoolDown() == true) return;
+
                 if(ability && PoiseValue >= ability.staminaCost) {
                     melee.AddPoise(-1 * ability.staminaCost);
                     ability.ExecuteSkill(melee);
+                    ability.StartCoolDown();
                 } else {
                     return;
                 }
             }
+        }
+    }
+
+    private void DisableSkillSlot(Ability ability) {
+        switch(ability.skillKey) {
+        case KeyCode.Q:
+            meleeUI.abilityAImageFill.sprite = null;
+            break;
+        case KeyCode.E:
+            meleeUI.abilityBImageFill.sprite = null;
+            break;
+        case KeyCode.R:
+            meleeUI.abilityCImageFill.sprite = null;
+            break;
         }
     }
 }
