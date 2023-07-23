@@ -604,10 +604,10 @@ MonoBehaviour:
   - {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f, type: 3}
   - {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2, type: 3}
   - {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae, type: 3}
-  serverCameraPrefab: {fileID: 2298131365329834814, guid: 5ef6a7dcb7705a5439eb702be894f48e,
-    type: 3}
   gameLogicManagerNetObjId:
     m_InternalValue: 0
+  sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
+    type: 3}
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0
@@ -1854,6 +1854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetIPAddressOverride: 127.0.0.1
+  isServer: 1
   btn_SignIn: {fileID: 1505543978}
   btn_Signedin: {fileID: 45389541}
   btn_SignOut: {fileID: 2041294709}

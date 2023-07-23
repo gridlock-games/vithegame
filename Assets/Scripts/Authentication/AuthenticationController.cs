@@ -38,7 +38,9 @@ public class AuthenticationController : MonoBehaviour
     private void Update()
     {
         // If we are a headless build
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | Application.isEditor)
+        bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
+        bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
             StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
         }

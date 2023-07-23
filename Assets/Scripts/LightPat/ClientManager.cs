@@ -135,20 +135,28 @@ namespace LightPat.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
+        public GameObject sceneLoadingScreenPrefab;
+        
+        public float SceneLoadingProgress { get; private set; }
+
         private Queue<string> additiveSceneQueue = new Queue<string>();
+        private GameObject sceneLoadingScreenInstance;
 
         void OnNetworkSceneEvent(SceneEvent sceneEvent)
         {
-            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType);
+            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
+
+            currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
             if (IsServer)
             {
+                // If we have finished loading a scene
                 if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
                 {
+                    // Load all additive scenes in queue
                     if (additiveSceneQueue.Count > 0)
                     {
                         string additiveSceneName = additiveSceneQueue.Dequeue();
-                        Debug.Log("Additively loading scene: " + additiveSceneName);
                         NetworkManager.SceneManager.LoadScene(additiveSceneName, LoadSceneMode.Additive);
                     }
                 }
@@ -157,13 +165,42 @@ namespace LightPat.Core
 
         void OnSceneLoad(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+            //Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
         }
 
-        void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
+        void OnSceneUnload(Scene scene)
+        {
+            //Debug.Log("Unloaded scene: " + scene.name);
+        }
+
+        private AsyncOperation currentSceneLoadingOperation;
 
         private void Update()
         {
+            // Loading Screen
+            if (IsClient)
+            {
+                if (!sceneLoadingScreenInstance)
+                {
+                    sceneLoadingScreenInstance = Instantiate(sceneLoadingScreenPrefab);
+                }
+                else
+                {
+                    Destroy(sceneLoadingScreenInstance);
+                }
+            }
+
+            // Async operation is null
+            if (currentSceneLoadingOperation == null)
+            {
+                if (sceneLoadingScreenInstance) { Destroy(sceneLoadingScreenInstance); }
+            }
+            else // Async operation is not null
+            {
+                SceneLoadingProgress = currentSceneLoadingOperation.progress;
+                if (!sceneLoadingScreenInstance) { sceneLoadingScreenInstance = Instantiate(sceneLoadingScreenPrefab); }
+            }
+
             if (IsServer)
             {
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -184,6 +221,12 @@ namespace LightPat.Core
             AddClientRpc(valuePair.Key, valuePair.Value);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
+
+            if (SceneManager.GetActiveScene().name == "Hub")
+            {
+                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
+                g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            }
 
             StartCoroutine(UpdateServerPopulation());
         }
@@ -429,7 +472,7 @@ namespace LightPat.Core
             }
         }
 
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         private void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene)
         {
             ApplyNetworkSceneChange(clientId, sceneName, spawnPlayers, additiveScene);
