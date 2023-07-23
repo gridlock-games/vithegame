@@ -38,7 +38,7 @@ public class AuthenticationController : MonoBehaviour
     private void Update()
     {
         // If we are a headless build
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | Application.isEditor)
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
         {
             StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
         }
