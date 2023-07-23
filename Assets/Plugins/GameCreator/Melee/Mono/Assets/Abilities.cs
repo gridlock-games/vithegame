@@ -8,7 +8,6 @@ using GameCreator.Core;
 using Unity.Netcode;
 public class Abilities : MonoBehaviour
 {
-
     public List<Ability> abilities = new List<Ability>();
 
     private readonly List<KeyCode> _hotKeys = new List<KeyCode>()
@@ -27,6 +26,11 @@ public class Abilities : MonoBehaviour
     {
         melee = GetComponentInParent<CharacterMelee>();
         meleeUI = melee.GetComponentInChildren<CharacterMeleeUI>();
+
+        foreach (Ability ability in abilities)
+        {
+            ability.ResetAbility();
+        }
     }
 
     // Update is called once per frame
@@ -52,8 +56,7 @@ public class Abilities : MonoBehaviour
                 if (ability && PoiseValue >= ability.staminaCost)
                 {
                     melee.AddPoise(-1 * ability.staminaCost);
-                    ability.ExecuteSkill(melee);
-                    ability.isOnCoolDown = true;
+                    ability.ExecuteAbility(melee);
                 }
                 else
                 {

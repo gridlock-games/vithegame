@@ -120,7 +120,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1996702960792658932}
   - component: {fileID: 9125837852881772666}
-  - component: {fileID: 9047703967680563329}
   m_Layer: 0
   m_Name: PS_Piercing_Generic
   m_TagString: Untagged
@@ -240,16 +239,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &9047703967680563329
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7606818437225425609}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a162edb52cf436d4d94365aaf7c15022, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  destroyDelay: 1.4

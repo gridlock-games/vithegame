@@ -9,7 +9,6 @@ using Unity.Netcode;
 
 public class Ability : MonoBehaviour
 {
-
     public enum AbilityType
     {
         Active,
@@ -28,9 +27,14 @@ public class Ability : MonoBehaviour
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
 
-    public virtual bool isOnCoolDown { get; set; }
+    public bool isOnCoolDown { get; private set; }
 
-    public void ExecuteSkill(CharacterMelee melee)
+    public void ResetAbility()
+    {
+        isOnCoolDown = false;
+    }
+
+    public void ExecuteAbility(CharacterMelee melee)
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
@@ -38,9 +42,16 @@ public class Ability : MonoBehaviour
         {
             if (meleeClip == null) return;
             // Invoke in CharacterMelee
+            isOnCoolDown = true;
             melee.ExecuteAbility(meleeClip, CharacterMelee.ActionKey.A);
+            melee.StartCoroutine(WaitForAbilityCooldown());
         }
     }
 
+    private IEnumerator WaitForAbilityCooldown()
+    {
+        yield return new WaitForSeconds(coolDown);
 
+        isOnCoolDown = false;
+    }
 }

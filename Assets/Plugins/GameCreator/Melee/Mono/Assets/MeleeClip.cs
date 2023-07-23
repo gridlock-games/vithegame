@@ -192,7 +192,7 @@
             if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
 
             VisualEffect visualEffect = obj.GetComponentInChildren<VisualEffect>();
-            if (visualEffect) { yield return new WaitUntil(() => visualEffect.HasAnySystemAwake()); }
+            if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
 
             Destroy(obj);
         }
