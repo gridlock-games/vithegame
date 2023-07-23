@@ -183,7 +183,8 @@ namespace GameCreator.Melee
                     ActionKey key = this.inputBuffer.GetInput();
                     MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
 
-                    if(isPlayingAbility) {
+                    if (isPlayingAbility)
+                    {
                         this.comboSystem.StartAttackTime(true);
                     }
 
@@ -191,7 +192,8 @@ namespace GameCreator.Melee
                     {
                         if (IsServer)
                         {
-                            if(!isPlayingAbility) {
+                            if (!isPlayingAbility)
+                            {
                                 if (meleeClip.isHeavy) // Heavy Attack
                                 {
                                     if (Poise.Value <= 20)
@@ -199,7 +201,8 @@ namespace GameCreator.Melee
                                         return;
                                     }
                                     OnHeavyAttack();
-                                } else // Light Attack
+                                }
+                                else // Light Attack
                                 {
                                     OnLightAttack();
                                 }
@@ -284,12 +287,13 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
-                
+
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
 
-                if(phase == 2 && isPlayingAbility) {
+                if (phase == 2 && isPlayingAbility)
+                {
                     isPlayingAbility = false;
                     this.comboSystem.StartAttackTime(false);
                 }
@@ -462,9 +466,12 @@ namespace GameCreator.Melee
                             targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             break;
                         case AttackType.Followup:
-                            if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                            {
                                 targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
-                            } else {
+                            }
+                            else
+                            {
                                 targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             }
                             break;
@@ -477,7 +484,7 @@ namespace GameCreator.Melee
                             break;
                     }
                 }
-                
+
                 IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
 
                 bool hitSomething = triggers.Length > 0;
@@ -519,10 +526,12 @@ namespace GameCreator.Melee
 
             Abilities abilitiesFromParent = GetComponentInParent<Abilities>();
 
-            if(abilitiesFromParent) {
+            if (abilitiesFromParent)
+            {
                 List<Ability> abilities = abilitiesFromParent.abilities;
 
-                foreach (Ability ablty in abilities) {
+                foreach (Ability ablty in abilities)
+                {
                     MeleeClip meleeClip = ablty.meleeClip;
 
                     if (meleeClip)
@@ -641,8 +650,6 @@ namespace GameCreator.Melee
                     }
                 }
             }
-
-            
 
             Debug.LogError("Melee clip Not Found: " + clipName);
             return null;
@@ -1132,7 +1139,8 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
-            if(melee.IsAttacking) {
+            if (melee.IsAttacking)
+            {
                 melee.StopAttack();
                 CharacterAnimator.StopGesture(0f);
             }
@@ -1548,10 +1556,11 @@ namespace GameCreator.Melee
 
             // Visualize boxcast
             Vector3 origin = transform.position;
-            Quaternion orientation = characterCamera != null ? characterCamera.rotation : new Quaternion(0,0,0,0);
-            Vector3 direction = characterCamera != null ? characterCamera.forward : new Vector3(0,0,0);
+            Quaternion orientation = characterCamera != null ? characterCamera.rotation : new Quaternion(0, 0, 0, 0);
+            Vector3 direction = characterCamera != null ? characterCamera.forward : new Vector3(0, 0, 0);
 
-            if(orientation != null && direction != null) { 
+            if (orientation != null && direction != null)
+            {
                 Debug.DrawRay(transform.position, direction * boxCastDistance, Color.green);
             }
 

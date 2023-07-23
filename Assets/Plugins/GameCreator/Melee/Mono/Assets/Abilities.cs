@@ -19,7 +19,7 @@ public class Abilities : MonoBehaviour
         KeyCode.F,
     };
 
-    private CharacterMelee melee; 
+    private CharacterMelee melee;
     private CharacterMeleeUI meleeUI;
 
     // Start is called before the first frame update
@@ -32,43 +32,50 @@ public class Abilities : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(melee == null) return;
+        if (melee == null) return;
         if (!Input.anyKeyDown) return;
         if (melee.IsBlocking) return;
         if (melee.IsStaggered) return;
         if (!NetworkManager.Singleton.IsServer) return;
         if (abilities.Count <= 0) return;
 
-        foreach (KeyCode key in _hotKeys) {
-            if (Input.GetKey(key)) {
+        foreach (KeyCode key in _hotKeys)
+        {
+            if (Input.GetKey(key))
+            {
                 var ability = this.abilities.Find(ablty => ablty.skillKey == key);
 
                 float PoiseValue = melee.GetPoise();
 
-                if(ability.isOnCoolDown == true) return;
+                if (ability.isOnCoolDown == true) return;
 
-                if(ability && PoiseValue >= ability.staminaCost) {
+                if (ability && PoiseValue >= ability.staminaCost)
+                {
                     melee.AddPoise(-1 * ability.staminaCost);
                     ability.ExecuteSkill(melee);
                     ability.isOnCoolDown = true;
-                } else {
+                }
+                else
+                {
                     return;
                 }
             }
         }
     }
 
-    private void DisableSkillSlot(Ability ability) {
-        switch(ability.skillKey) {
-        case KeyCode.Q:
-            meleeUI.abilityAImageFill.sprite = null;
-            break;
-        case KeyCode.E:
-            meleeUI.abilityBImageFill.sprite = null;
-            break;
-        case KeyCode.R:
-            meleeUI.abilityCImageFill.sprite = null;
-            break;
+    private void DisableSkillSlot(Ability ability)
+    {
+        switch (ability.skillKey)
+        {
+            case KeyCode.Q:
+                meleeUI.abilityAImageFill.sprite = null;
+                break;
+            case KeyCode.E:
+                meleeUI.abilityBImageFill.sprite = null;
+                break;
+            case KeyCode.R:
+                meleeUI.abilityCImageFill.sprite = null;
+                break;
         }
     }
 }
