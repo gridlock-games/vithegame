@@ -1,12 +1,9 @@
 using UnityEngine;
-using System;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using GameCreator.Melee;
-using GameCreator.Core;
 using Unity.Netcode;
-public class Abilities : MonoBehaviour
+
+public class Abilities : NetworkBehaviour
 {
     public List<Ability> abilities = new List<Ability>();
 
@@ -36,33 +33,32 @@ public class Abilities : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner) return;
         if (melee == null) return;
         if (!Input.anyKeyDown) return;
         if (melee.IsBlocking) return;
         if (melee.IsStaggered) return;
-        if (!NetworkManager.Singleton.IsServer) return;
         if (abilities.Count <= 0) return;
 
         foreach (KeyCode key in _hotKeys)
         {
-            if (Input.GetKey(key))
-            {
-                var ability = this.abilities.Find(ablty => ablty.skillKey == key);
+            if (Input.GetKeyDown(key)) { ActivateAbilityServerRpc(key); }
+        }
+    }
 
-                float PoiseValue = melee.GetPoise();
+    [ServerRpc]
+    private void ActivateAbilityServerRpc(KeyCode key)
+    {
+        var ability = this.abilities.Find(ablty => ablty.skillKey == key);
 
-                if (ability.isOnCoolDown == true) return;
+        float PoiseValue = melee.GetPoise();
 
-                if (ability && PoiseValue >= ability.staminaCost)
-                {
-                    melee.AddPoise(-1 * ability.staminaCost);
-                    ability.ExecuteAbility(melee);
-                }
-                else
-                {
-                    return;
-                }
-            }
+        if (ability.isOnCoolDown == true) return;
+
+        if (ability && PoiseValue >= ability.staminaCost)
+        {
+            melee.AddPoise(-1 * ability.staminaCost);
+            ability.ExecuteAbility(melee);
         }
     }
 
