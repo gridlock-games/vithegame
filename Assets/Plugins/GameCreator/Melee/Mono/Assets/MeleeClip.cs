@@ -219,7 +219,7 @@
         public void PlayLocally(CharacterMelee melee, float? animSpeed = null, float? transitionIn = null, float? transitionOut = null)
         {
             if (this.interruptible == Interrupt.Uninterruptible) melee.SetUninterruptable(this.Length);
-            if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(this.Length);
+            if (this.vulnerability == Vulnerable.Invincible) melee.SetInvincibility(isDodge ? this.Length * 0.35f : this.Length);
 
             if (this.isAttack)
             {

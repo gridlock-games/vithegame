@@ -808,13 +808,13 @@
                 this.GetCharacterAnimator()
             );
 
-            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned &&
-                prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-            {
-                if(this.isCharacterDashing()  == false) {
-                    melee.SetInvincibility(1.0f);
-                }
-            }
+            // if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned &&
+            //     prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
+            // {
+            //     if(this.isCharacterDashing()  == false) {
+            //         melee.SetInvincibility(0.10f);
+            //     }
+            // }
 
             if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
