@@ -55,6 +55,7 @@ namespace LightPat.Player
                 Cursor.lockState = CursorLockMode.Locked;
 
                 spawnedOnOwnerInstance.Value = true;
+                Destroy(worldSpaceLabel);
             }
             else // If we are not this instance's player object
             {

@@ -4,11 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using UnityEngine.Rendering;
 using UnityEngine.Networking;
-using System.Text.RegularExpressions;
 using System.Net;
-using System.IO;
 
 namespace LightPat.Core
 {
@@ -27,7 +24,7 @@ namespace LightPat.Core
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
-        private static string payloadParseString = "|";
+        private static readonly string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
 
@@ -43,6 +40,8 @@ namespace LightPat.Core
 
         public override void OnNetworkSpawn()
         {
+            NetworkManager.SceneManager.OnSceneEvent += OnNetworkSceneEvent;
+
             lobbyLeaderId.OnValueChanged += OnLobbyLeaderChanged;
             randomSeed.OnValueChanged += OnRandomSeedChange;
             
@@ -86,16 +85,24 @@ namespace LightPat.Core
             }
         }
 
-        private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName)
+        private IEnumerator SpawnLocalPlayerOnSceneChange(string sceneName, string additiveSceneName = null)
         {
+            // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            // Wait for an additive scene to load
+            if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
             SpawnPlayerServerRpc(NetworkManager.LocalClientId);
         }
 
-        private IEnumerator WaitForServerSceneChange(string sceneName)
+        private IEnumerator WaitForServerSceneChange(string sceneName, string additiveSceneName = null)
         {
             if (IsClient) { yield break; }
+
+            // Wait for the active scene to load
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == sceneName);
+            // Wait for an additive scene to load
+            if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
+
             gameLogicManagerNetObjId.Value = FindObjectOfType<GameLogicManager>().NetworkObjectId;
             GameObject cameraObject = Instantiate(serverCameraPrefab);
         }
@@ -121,26 +128,35 @@ namespace LightPat.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
-        void OnSceneLoad(Scene scene, LoadSceneMode mode) { Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode); }
+        private Queue<string> additiveSceneQueue = new Queue<string>();
+
+        void OnNetworkSceneEvent(SceneEvent sceneEvent)
+        {
+            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType);
+
+            if (IsServer)
+            {
+                if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
+                {
+                    if (additiveSceneQueue.Count > 0)
+                    {
+                        string additiveSceneName = additiveSceneQueue.Dequeue();
+                        Debug.Log("Additively loading scene: " + additiveSceneName);
+                        NetworkManager.SceneManager.LoadScene(additiveSceneName, LoadSceneMode.Additive);
+                    }
+                }
+            }
+        }
+
+        void OnSceneLoad(Scene scene, LoadSceneMode mode)
+        {
+            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+        }
 
         void OnSceneUnload(Scene scene) { Debug.Log("Unloaded scene: " + scene.name); }
 
-        private readonly float _hudRefreshRate = 1f;
-        private float _timer;
-
         private void Update()
         {
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            {
-                // FPS Counter and Ping Display
-                if (Time.unscaledTime > _timer)
-                {
-                    int fps = (int)(1f / Time.unscaledDeltaTime);
-                    Debug.Log(fps + " FPS");
-                    _timer = Time.unscaledTime + _hudRefreshRate;
-                }
-            }
-
             if (IsServer)
             {
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -222,7 +238,7 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet!");
+                Debug.LogError("You have not put this server in the API yet! Cannot update server population");
             }
         }
 
@@ -240,10 +256,6 @@ namespace LightPat.Core
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-            var regex = new Regex(Regex.Escape("_id"));
-            json = regex.Replace(json, "serverId", 1);
-
-            Debug.Log(json);
 
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -261,13 +273,13 @@ namespace LightPat.Core
 
         private struct ServerPutPayload
         {
-            public string _id;
+            public string serverId;
             public int population;
             public int progress;
 
-            public ServerPutPayload(string _id, int population, int progress)
+            public ServerPutPayload(string serverId, int population, int progress)
             {
-                this._id = _id;
+                this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
             }
@@ -334,7 +346,7 @@ namespace LightPat.Core
         [ClientRpc] void SynchronizeClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } clientDataDictionary[clientId] = clientData; }
         [ClientRpc] void AddClientRpc(ulong clientId, ClientData clientData) { if (IsHost) { return; } Debug.Log(clientData.clientName + " has connected. ID: " + clientId); clientDataDictionary.Add(clientId, clientData); }
         [ClientRpc] void RemoveClientRpc(ulong clientId) { clientDataDictionary.Remove(clientId); }
-        [ClientRpc] void SpawnAllPlayersOnSceneChangeClientRpc(string sceneName) { StartCoroutine(SpawnLocalPlayerOnSceneChange(sceneName)); }
+        [ClientRpc] void SpawnAllPlayersOnSceneChangeClientRpc(string sceneName, string additiveSceneName = null) { StartCoroutine(SpawnLocalPlayerOnSceneChange(sceneName, additiveSceneName)); }
 
         [ServerRpc(RequireOwnership = false)]
         public void ToggleReadyServerRpc(ulong clientId)
@@ -405,15 +417,19 @@ namespace LightPat.Core
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers)
+        public void ChangeSceneServerRpc(ulong clientId, string sceneName, bool spawnPlayers, string additiveScene = null)
         {
             if (clientId != lobbyLeaderId.Value) { Debug.LogError("You can only change the scene if you are the lobby leader!"); return; }
+
+            if (additiveScene != null)
+                additiveSceneQueue.Enqueue(additiveScene);
+
             NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 
             if (spawnPlayers)
             {
-                StartCoroutine(WaitForServerSceneChange(sceneName));
-                SpawnAllPlayersOnSceneChangeClientRpc(sceneName);
+                StartCoroutine(WaitForServerSceneChange(sceneName, additiveScene));
+                SpawnAllPlayersOnSceneChangeClientRpc(sceneName, additiveScene);
             }
         }
 

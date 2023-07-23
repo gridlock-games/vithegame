@@ -13,7 +13,6 @@ namespace GameCreator.Melee
     using static GameCreator.Melee.MeleeClip;
     using UnityEngine.SceneManagement;
     using System.Reflection;
-    using GameCreator.Variables;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]

@@ -14,6 +14,8 @@ using System.Collections;
 
 public class AuthenticationController : MonoBehaviour
 {
+    public string targetIPAddressOverride = "";
+
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
@@ -201,7 +203,7 @@ public class AuthenticationController : MonoBehaviour
         }
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIPAddressOverride != "" ? targetIPAddressOverride : playerHubServer.ip;
 
         SceneManager.LoadScene("CharacterSelect");
     }

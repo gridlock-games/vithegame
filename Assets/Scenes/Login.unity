@@ -608,7 +608,6 @@ MonoBehaviour:
     type: 3}
   gameLogicManagerNetObjId:
     m_InternalValue: 0
-  playerHubIP: 
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0
@@ -1854,7 +1853,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c77c2b956b1ee4b9baeb1358cd1675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHubIPAddress: 178.128.113.37
+  targetIPAddressOverride: 127.0.0.1
   btn_SignIn: {fileID: 1505543978}
   btn_Signedin: {fileID: 45389541}
   btn_SignOut: {fileID: 2041294709}
@@ -2043,37 +2042,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1505543978}
   m_CullTransparentMesh: 1
---- !u!1 &1651199463
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1651199464}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1651199464
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1651199463}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 17.722284, y: -0.48961353, z: -9.571903}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1675691152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2466,7 +2434,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1775991328
 GameObject:
@@ -2532,13 +2500,7 @@ MonoBehaviour:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1775991329}
     PlayerPrefab: {fileID: 0}
-    NetworkPrefabs:
-    - Override: 0
-      Prefab: {fileID: 8751820525613608092, guid: a390b9ebb329b3a4f8feb29cdc3c3bb3,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
+    NetworkPrefabs: []
     TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1

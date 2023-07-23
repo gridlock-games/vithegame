@@ -117,7 +117,7 @@ namespace LightPat.UI
             Debug.Log("Loading game");
             if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
             {
-                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true);
+                ClientManager.Singleton.ChangeSceneServerRpc(NetworkManager.Singleton.LocalClientId, "Duel", true, "OutdoorCastleArena");
             }
             else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
             {
@@ -143,8 +143,7 @@ namespace LightPat.UI
 
         public void UpdateGameModeValue()
         {
-            GameMode chosenGameMode;
-            System.Enum.TryParse(gameModeDropdown.options[gameModeDropdown.value].text, out chosenGameMode);
+            System.Enum.TryParse(gameModeDropdown.options[gameModeDropdown.value].text, out GameMode chosenGameMode);
             ClientManager.Singleton.UpdateGameModeServerRpc(chosenGameMode);
         }
 
