@@ -27,7 +27,7 @@ public class Ability : MonoBehaviour
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
 
-    private bool isCoolingDown = false;
+    public virtual bool isOnCoolDown { get; set; }
 
     public void ExecuteSkill(CharacterMelee melee) {
         if(!NetworkManager.Singleton.IsServer) return;
@@ -37,19 +37,6 @@ public class Ability : MonoBehaviour
             // Invoke in CharacterMelee
             melee.ExecuteAbility(meleeClip, CharacterMelee.ActionKey.A);
         }
-    }
-
-
-    public bool IsCoolDown() {
-        return this.isCoolingDown;
-    }
-
-    public void StartCoolDown() {
-        this.isCoolingDown = true;
-    }
-
-    public void EndCoolDown() {
-        this.isCoolingDown = false;
     }
 
 

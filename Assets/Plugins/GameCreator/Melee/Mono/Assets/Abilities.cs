@@ -45,12 +45,12 @@ public class Abilities : MonoBehaviour
 
                 float PoiseValue = melee.GetPoise();
 
-                if(ability.IsCoolDown() == true) return;
+                if(ability.isOnCoolDown == true) return;
 
                 if(ability && PoiseValue >= ability.staminaCost) {
                     melee.AddPoise(-1 * ability.staminaCost);
                     ability.ExecuteSkill(melee);
-                    ability.StartCoolDown();
+                    ability.isOnCoolDown = true;
                 } else {
                     return;
                 }

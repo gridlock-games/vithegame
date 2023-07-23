@@ -67,13 +67,13 @@
             foreach(Ability ability in abilities.abilities) {
                 switch(ability.skillKey) {
                     case KeyCode.Q:
-                        abilityAImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        abilityAImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
                         break;
                     case KeyCode.E:
-                        abilityBImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        abilityBImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
                         break;
                     case KeyCode.R:
-                        abilityCImageFill.sprite = ability.IsCoolDown() == false ? ability.skillImageFill : null;
+                        abilityCImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
                         break;
                 }
             }
