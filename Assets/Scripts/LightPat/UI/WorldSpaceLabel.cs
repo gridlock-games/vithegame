@@ -66,6 +66,20 @@ namespace LightPat.UI
                 return;
             }
 
+            // Set world space label text to client name
+            if (target.TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsPlayerObject)
+                {
+                    if (ClientManager.Singleton)
+                    {
+                        string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
+                        nameDisplay.SetText(clientName);
+                        target.name = clientName;
+                    }
+                }
+            }
+
             gameObject.SetActive(target.gameObject.activeInHierarchy);
 
             transform.position = target.position + positionOffset;
