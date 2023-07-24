@@ -174,12 +174,12 @@ namespace LightPat.Core
 
         void OnSceneLoad(Scene scene, LoadSceneMode mode)
         {
-            //Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
         }
 
         void OnSceneUnload(Scene scene)
         {
-            //Debug.Log("Unloaded scene: " + scene.name);
+            Debug.Log("Unloaded scene: " + scene.name);
         }
 
         private AsyncOperation currentSceneLoadingOperation;
