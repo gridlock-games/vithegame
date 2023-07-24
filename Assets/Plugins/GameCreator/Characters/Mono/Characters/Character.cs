@@ -389,7 +389,7 @@
 
         public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable)
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
             if (IsServer) { characterLocomotion.UpdateDirectionControl(direction, isControllable); }
@@ -398,7 +398,7 @@
 
         public bool Stun(Character attacker, Character target)
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (allowedStunEntries.Contains(this.characterAilment))
             {
@@ -448,7 +448,7 @@
 
         public bool Knockup(Character attacker, Character target)
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
                 this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
@@ -494,7 +494,7 @@
 
         public bool Stagger(Character attacker, Character target)
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (allowedStaggerEntries.Contains(this.characterAilment))
             {
@@ -545,17 +545,16 @@
             }
         }
 
-        private bool dead;
+        private NetworkVariable<bool> dead = new NetworkVariable<bool>();
         public bool Die(Character killer)
         {
-            if (dead) { return false; }
-            dead = true;
+            if (dead.Value) { return false; }
+            dead.Value = true;
             UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
 
             if (resetDefaultStateCoroutine != null)
             {
                 StopCoroutine(resetDefaultStateCoroutine);
-                resetDefaultStateRunning = false;
             }
 
             return true;
@@ -563,9 +562,9 @@
 
         public bool CancelDeath()
         {
-            if (!dead) { return false; }
+            if (!dead.Value) { return false; }
 
-            dead = false;
+            dead.Value = false;
             UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
 
             return true;
@@ -573,7 +572,7 @@
 
         public bool Knockdown(Character attacker, Character target)
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None ||
             this.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
@@ -707,7 +706,7 @@
 
         public bool CancelAilment()
         {
-            if (dead) { return false; }
+            if (dead.Value) { return false; }
 
             if (this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -731,6 +730,12 @@
             {
                 yield return new WaitUntil(() => ailmentRotationRecieved);
                 ailmentRotationRecieved = false;
+            }
+
+            if (dead.Value & ailment != CharacterLocomotion.CHARACTER_AILMENTS.Dead)
+            {
+                ailmentRotationRecieved = false;
+                yield break;
             }
 
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
@@ -795,12 +800,9 @@
             onAilmentEvent.Invoke(ailment);
         }
 
-        public bool resetDefaultStateRunning { get; private set; }
         private Coroutine resetDefaultStateCoroutine;
         private IEnumerator ResetDefaultState(float duration, CharacterMelee melee)
         {
-
-            resetDefaultStateRunning = true;
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
             if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true); }
@@ -830,10 +832,6 @@
             if (IsServer) { melee.knockedUpHitCount.Value = 0; }
 
             this.onAilmentEvent.Invoke(this.characterAilment);
-
-            yield return 0;
-
-            resetDefaultStateRunning = false;
         }
 
         public PreserveRotation Rotation(GameObject anchor, Character targetChar)

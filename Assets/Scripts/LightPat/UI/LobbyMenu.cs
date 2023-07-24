@@ -5,7 +5,6 @@ using LightPat.Core;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
 

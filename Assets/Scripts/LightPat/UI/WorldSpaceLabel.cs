@@ -15,7 +15,6 @@ namespace LightPat.UI
         public float animationSpeed = 0.1f;
         public float viewDistance = 5f;
         public float scale = 1;
-        public bool disableHealthbar;
 
         public Slider healthSlider;
 
@@ -89,8 +88,6 @@ namespace LightPat.UI
                     healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             }
-
-            healthSlider.gameObject.SetActive(!disableHealthbar);
         }
     }
 }
