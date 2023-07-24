@@ -84,6 +84,7 @@
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
             if (melee == null) { Destroy(target); return; }
             if (melee.IsStaggered) { Destroy(target); return; }
+            if (melee.GetHP() <= 0) { Destroy(target); return; }
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;

@@ -1146,12 +1146,14 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
-
             // Prioritize damage taken over attack and non-invincible dodge frames
             if (melee.IsAttacking || melee.Character.isCharacterDashing())
             {
                 melee.StopAttack();
-                CharacterAnimator.StopGesture(0f);
+                CharacterAnimator.StopGesture(0.10f);
+
+                if(melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
+                this.isStaggered = true;
             }
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
