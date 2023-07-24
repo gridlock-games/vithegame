@@ -47,7 +47,7 @@ namespace GameCreator.Melee
         private const float TRANSITION = 0.15f;
         protected const float INPUT_BUFFER_TIME = 0.35f;
 
-        protected const float STUN_TIMEOUT_DURATION = 5.0f;
+        protected const float STUN_TIMEOUT_DURATION = 3.0f;
 
         private int KNOCK_UP_FOLLOWUP_LIMIT = 5;
 
@@ -133,6 +133,9 @@ namespace GameCreator.Melee
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
 
+        private bool isPlayingAbility = false;
+        private MeleeClip abilityClip;
+
         // ACCESSORS: -----------------------------------------------------------------------------
 
         public Character Character { get; protected set; }
@@ -173,10 +176,20 @@ namespace GameCreator.Melee
             {
                 this.comboSystem.Update();
 
+                if (!this.CanAttack()) return;
+
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
                     ActionKey key = this.inputBuffer.GetInput();
                     MeleeClip meleeClip = this.comboSystem.Select(key);
+
+                    
+                    // Disabling Ability invoke in CharacterMelee
+                    // MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
+                    // if (isPlayingAbility)
+                    // {
+                    //     this.comboSystem.StartAttackTime(true);
+                    // }
 
                     if (meleeClip)
                     {
@@ -274,9 +287,17 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
+
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
+
+                // Disabling invoke in CharacterMelee
+                // if (phase == 2 && isPlayingAbility)
+                // {
+                //     isPlayingAbility = false;
+                //     this.comboSystem.StartAttackTime(false);
+                // }
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -446,9 +467,12 @@ namespace GameCreator.Melee
                             targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             break;
                         case AttackType.Followup:
-                            if(targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) {
+                            if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
+                            {
                                 targetMelee.Character.Knockup(melee.Character, targetMelee.Character);
-                            } else {
+                            }
+                            else
+                            {
                                 targetMelee.Character.Stagger(melee.Character, targetMelee.Character);
                             }
                             break;
@@ -461,7 +485,7 @@ namespace GameCreator.Melee
                             break;
                     }
                 }
-                
+
                 IgniterMeleeOnReceiveAttack[] triggers = targetMelee.GetComponentsInChildren<IgniterMeleeOnReceiveAttack>();
 
                 bool hitSomething = triggers.Length > 0;
@@ -500,6 +524,23 @@ namespace GameCreator.Melee
         private MeleeClip GetMeleeClipFromWeaponOrShieldByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
+
+            Abilities abilitiesFromParent = GetComponentInParent<Abilities>();
+
+            if (abilitiesFromParent)
+            {
+                List<Ability> abilities = abilitiesFromParent.abilities;
+
+                foreach (Ability ablty in abilities)
+                {
+                    MeleeClip meleeClip = ablty.meleeClip;
+
+                    if (meleeClip)
+                    {
+                        if (meleeClip.name == clipName) { return meleeClip; }
+                    }
+                }
+            }
 
             foreach (FieldInfo propertyInfo in propertyList)
             {
@@ -924,6 +965,17 @@ namespace GameCreator.Melee
             this.inputBuffer.AddInput(actionKey);
         }
 
+        public virtual void ExecuteAbility(MeleeClip meleeClip, ActionKey actionKey)
+        {
+            if (!this.currentWeapon) return;
+            if (!this.CanAttack()) return;
+
+            if (IsOwner) this.StopBlockingServerRpc();
+            this.isPlayingAbility = true;
+            this.abilityClip = meleeClip;
+            this.inputBuffer.AddInput(actionKey);
+        }
+
         public void StopAttack()
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
@@ -935,6 +987,12 @@ namespace GameCreator.Melee
 
                 this.comboSystem.Stop();
                 this.currentMeleeClip.Stop(this);
+
+                if(this.Blades.Count > 0) {
+                    foreach(var blade in this.Blades) {
+                        blade.EventAttackRecovery.Invoke();
+                    }
+                }
             }
         }
 
@@ -943,7 +1001,7 @@ namespace GameCreator.Melee
             if (this.comboSystem == null) return -1;
 
             int phase = this.currentMeleeClip != null ? this.comboSystem.GetCurrentPhase(this.currentMeleeClip) : -1;
-            
+
             return phase;
         }
 
@@ -1084,13 +1142,19 @@ namespace GameCreator.Melee
             MeleeClip hitReaction = null;
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
+            // if (this.GetHP() <= 0) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
-            if(melee.IsAttacking) {
+            // Prioritize damage taken over attack and non-invincible dodge frames
+            if (melee.IsAttacking || melee.Character.isCharacterDashing())
+            {
                 melee.StopAttack();
-                CharacterAnimator.StopGesture(0f);
+                CharacterAnimator.StopGesture(0.10f);
+
+                if(melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
+                this.isStaggered = true;
             }
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
@@ -1363,6 +1427,7 @@ namespace GameCreator.Melee
             if (this.IsSheathing) return false;
             if (this.IsDrawing) return false;
             if (this.IsStaggered) return false;
+            
             return true;
         }
 
@@ -1504,10 +1569,11 @@ namespace GameCreator.Melee
 
             // Visualize boxcast
             Vector3 origin = transform.position;
-            Quaternion orientation = characterCamera != null ? characterCamera.rotation : new Quaternion(0,0,0,0);
-            Vector3 direction = characterCamera != null ? characterCamera.forward : new Vector3(0,0,0);
+            Quaternion orientation = characterCamera != null ? characterCamera.rotation : new Quaternion(0, 0, 0, 0);
+            Vector3 direction = characterCamera != null ? characterCamera.forward : new Vector3(0, 0, 0);
 
-            if(orientation != null && direction != null) { 
+            if (orientation != null && direction != null)
+            {
                 Debug.DrawRay(transform.position, direction * boxCastDistance, Color.green);
             }
 

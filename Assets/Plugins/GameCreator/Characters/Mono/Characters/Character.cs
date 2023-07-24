@@ -271,6 +271,12 @@
             return isDodging;
         }
 
+        public void setCharacterDashing(bool value)
+        {
+            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
+            variables.Get("isDodging").Update(value);
+        }
+
         public State GetCharacterState()
         {
             return characterState;

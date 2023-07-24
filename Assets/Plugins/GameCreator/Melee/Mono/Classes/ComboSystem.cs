@@ -151,7 +151,7 @@
 
             TreeCombo<CharacterMelee.ActionKey, Combo> targetCombo = FindTreeComboFromMeleeClip(root, meleeClip);
 
-            if (targetCombo == null) { Debug.LogError("Couldn't find tree combo object in list of combos - " + meleeClip); return; }
+            if (targetCombo == null) { Debug.LogWarning("Couldn't find tree combo object in list of combos - " + meleeClip); return; }
 
             startAttackTime = Time.time;
             current = targetCombo;

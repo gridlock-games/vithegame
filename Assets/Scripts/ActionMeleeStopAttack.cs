@@ -15,11 +15,13 @@
 		public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
 			Character _character = this.character.GetCharacter(target);
+            CharacterAnimator animator = _character.GetCharacterAnimator();
 			if (character == null) return true;
 
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
             if (melee != null) melee.StopAttack();
-            melee.Character.GetCharacterAnimator().StopGesture(0.1f);
+            animator.StopGesture(0f);
+			melee.currentMeleeClip = null;
 
             return true;
         }
