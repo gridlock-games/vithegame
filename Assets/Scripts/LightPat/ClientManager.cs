@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
 using System.Net;
-using GameCreator.Characters;
+using UnityEngine.Rendering;
 
 namespace LightPat.Core
 {
     public class ClientManager : NetworkBehaviour
     {
         public GameObject[] playerPrefabOptions;
+        public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
-        public bool allScenesLoaded { get; private set; }
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
 
@@ -115,6 +115,12 @@ namespace LightPat.Core
 
             // Wait for an additive scene to load
             if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
+
+            // If we are not the editor and not a headless build
+            if (!Application.isEditor & SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+            {
+                Instantiate(serverCameraPrefab);
+            }
         }
 
         private void Awake()
@@ -220,11 +226,7 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
-            if (SceneManager.GetActiveScene().name == "Hub")
-            {
-                GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], Vector3.zero, Quaternion.identity);
-                g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
-            }
+            if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
 
             StartCoroutine(UpdateServerPopulation());
         }
@@ -496,6 +498,13 @@ namespace LightPat.Core
         [ServerRpc(RequireOwnership = false)]
         private void SpawnPlayerServerRpc(ulong clientId)
         {
+            SpawnPlayer(clientId);
+        }
+
+        private void SpawnPlayer(ulong clientId)
+        {
+            if (!IsServer) { Debug.LogError("SpawnPlayer() should only be called from the server!"); return; }
+
             clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
             SynchronizeClientDictionaries();
 
@@ -505,17 +514,38 @@ namespace LightPat.Core
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
                 GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
+                bool spawnPointFound = false;
                 foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
                 {
                     if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
                     {
+                        spawnPointFound = true;
                         spawnPosition = teamSpawnPoint.spawnPosition;
                         spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
                         break;
                     }
                 }
+
+                if (!spawnPointFound)
+                {
+                    Debug.LogWarning("No spawn point found for client: " + clientId + ". It will use the first spawn point in the list");
+
+                    if (glm.spawnPoints.Length > 1)
+                    {
+                        spawnPosition = glm.spawnPoints[0].spawnPosition;
+                        spawnRotation = Quaternion.Euler(glm.spawnPoints[0].spawnRotation);
+                    }
+                    else
+                    {
+                        Debug.LogError("Game Logic Manager's spawn point array length is less than 1");
+                    }
+                }
             }
-            
+            else
+            {
+                Debug.LogWarning("No game logic manager found in scene. This means that players will not have a set spawn point");
+            }
+
             GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
