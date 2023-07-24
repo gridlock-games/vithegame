@@ -54,34 +54,17 @@ public class Abilities : NetworkBehaviour
     {
         var ability = this.abilities.Find(ablty => ablty.skillKey == key);
 
-
-
-        float PoiseValue = melee.GetPoise();
-
-        if(melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) {
-            Debug.Log("Cannot activate ability during Dash: " + ability.skillKey);
-            return;
-        }
-
-        if (melee.IsAttacking && !ability.canAnimCancel) {
-            Debug.Log("Animation cancel not available for: " + ability.skillKey);
-            return;
-        }
-
-        if (ability.isOnCoolDown == true) {
-            Debug.Log("Ability is still in cooldown: " + ability.skillKey);
-            return;
-        }
-
-        if (ability && PoiseValue < ability.staminaCost) {
-            Debug.Log("Not enough poise for: " + ability.skillKey);
-            return;
-        }
+        // Don't activate while dashing
+        if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
+        // Don't activate if ability can't cancel attack animation
+        if (melee.IsAttacking && !ability.canAnimCancel) { return; }
+        // Don't activate if ability is on cooldown
+        if (ability.isOnCoolDown == true) { return; }
+        // Don't activate if poise is not high enough
+        if (ability && melee.GetPoise() < ability.staminaCost) { return; }
 
         if (ability != null && melee != null)
         {
-            Debug.Log("Executing ability: " + ability.skillKey);
-            Debug.Log("IsAttacking: " + melee.IsAttacking);
             melee.AddPoise(-1 * ability.staminaCost);
             ability.ExecuteAbility(melee, key);
         }

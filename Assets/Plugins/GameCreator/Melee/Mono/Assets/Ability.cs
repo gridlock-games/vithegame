@@ -32,13 +32,10 @@ public class Ability : MonoBehaviour
 
     public bool isOnCoolDown { get; private set; }
 
-    CharacterAnimator animator;
-
     public void ResetAbility()
     {
         isOnCoolDown = false;
     }
-
 
     // We're only using this for UI cooldowns for now
     // TO DO: Move ability invoke to this
@@ -46,17 +43,14 @@ public class Ability : MonoBehaviour
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
-        this.animator = melee.Character.GetCharacterAnimator();
-
-        if (this.abilityType != AbilityType.Passive)
+        if (abilityType != AbilityType.Passive)
         {
             if (meleeClip == null) return;
             isOnCoolDown = true;
 
-            this.InvokeSkill(melee, key);
-            
+            InvokeSkill(melee, key);
+
             // Disabling Ability invoke in CharacterMelee
-            // melee.ExecuteAbility(meleeClip, CharacterMelee.ActionKey.A);
             melee.StartCoroutine(WaitForAbilityCooldown());
         }
     }
@@ -81,12 +75,13 @@ public class Ability : MonoBehaviour
                 break;
         }
 
-        if(hasValidkey == false) return;
+        if (hasValidkey == false) return;
 
-        if(melee.IsAttacking && canAnimCancel) {
+        if (melee.IsAttacking && canAnimCancel)
+        {
             melee.StopAttack();
             melee.currentMeleeClip = null;
-            animator.StopGesture(0.15f);
+            melee.Character.GetCharacterAnimator().StopGesture(0.15f);
         }
 
         melee.Execute(actionKey);
