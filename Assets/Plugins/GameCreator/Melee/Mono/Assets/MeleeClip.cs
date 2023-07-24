@@ -177,7 +177,7 @@
 
             if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
             {
-                dmg.Initialize(character);
+                dmg.Initialize(character, this);
             }
 
             CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));

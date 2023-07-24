@@ -296,7 +296,7 @@ namespace GameCreator.Melee
 
                         if (hitCount < currentMeleeClip.hitCount)
                         {
-                            hitQueue.Enqueue(new HitQueueElement(this, blade.GetImpactPosition(), hits));
+                            hitQueue.Enqueue(new HitQueueElement(this, blade.GetImpactPosition(), hits, comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip));
                             ProcessHitQueue();
                         }
                     }
@@ -311,18 +311,20 @@ namespace GameCreator.Melee
             public CharacterMelee attackerMelee;
             public Vector3 impactPosition;
             public GameObject[] hits;
+            public MeleeClip attack;
 
-            public HitQueueElement(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits)
+            public HitQueueElement(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
             {
                 this.attackerMelee = melee;
                 this.impactPosition = impactPosition;
                 this.hits = hits;
+                this.attack = attack;
             }
         }
 
-        public void AddHitsToQueue(Vector3 impactPosition, GameObject[] hits)
+        public void AddHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
-            hitQueue.Enqueue(new HitQueueElement(this, impactPosition, hits));
+            hitQueue.Enqueue(new HitQueueElement(this, impactPosition, hits, attack));
         }
 
         private void ProcessHitQueue()
@@ -332,7 +334,7 @@ namespace GameCreator.Melee
             while (hitQueue.Count > 0)
             {
                 HitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits);
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
             }
         }
 
@@ -347,7 +349,7 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits)
+        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
@@ -368,8 +370,6 @@ namespace GameCreator.Melee
                 if (melee.wasHit) { return; }
                 // Mark the target as hit, this prevents hit trading
                 targetMelee.MarkHit();
-
-                MeleeClip attack = melee.comboSystem.GetCurrentClip() ? melee.comboSystem.GetCurrentClip() : melee.currentMeleeClip;
 
                 // This is for checking if we are hitting an environment object
                 if (hit.CompareTag("Obstacle"))
