@@ -126,15 +126,14 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
+        private AbilityManager abilityManager;
+
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
             new Keyframe(0f, 0f),
             new Keyframe(1f, 0f)
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
-
-        private bool isPlayingAbility = false;
-        private MeleeClip abilityClip;
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -151,6 +150,7 @@ namespace GameCreator.Melee
             this.Character = GetComponent<Character>();
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
+            abilityManager = GetComponentInParent<AbilityManager>();
         }
 
         // FOCUS TARGET: --------------------------------------------------------------------------
@@ -182,14 +182,6 @@ namespace GameCreator.Melee
                 {
                     ActionKey key = this.inputBuffer.GetInput();
                     MeleeClip meleeClip = this.comboSystem.Select(key);
-
-                    
-                    // Disabling Ability invoke in CharacterMelee
-                    // MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
-                    // if (isPlayingAbility)
-                    // {
-                    //     this.comboSystem.StartAttackTime(true);
-                    // }
 
                     if (meleeClip)
                     {
@@ -291,13 +283,6 @@ namespace GameCreator.Melee
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
-
-                // Disabling invoke in CharacterMelee
-                // if (phase == 2 && isPlayingAbility)
-                // {
-                //     isPlayingAbility = false;
-                //     this.comboSystem.StartAttackTime(false);
-                // }
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -421,12 +406,12 @@ namespace GameCreator.Melee
                     targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
 
                 // Send messages for stats in NetworkPlayer script
-                SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value);
+                if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
 
                 if (targetMelee.HP.Value <= 0 & previousHP > 0)
                 {
-                    targetMelee.SendMessage("OnDeath", melee);
-                    SendMessage("OnKill", targetMelee);
+                    if (targetMelee.NetworkObject.IsPlayerObject) { targetMelee.SendMessage("OnDeath", melee); }
+                    if (NetworkObject.IsPlayerObject) { SendMessage("OnKill", targetMelee); }
 
                     // Death ailment
                     targetMelee.Character.Die(melee.Character);
@@ -523,15 +508,9 @@ namespace GameCreator.Melee
 
         private MeleeClip GetMeleeClipFromWeaponOrShieldByName(string clipName)
         {
-            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
-
-            Abilities abilitiesFromParent = GetComponentInParent<Abilities>();
-
-            if (abilitiesFromParent)
+            if (abilityManager)
             {
-                List<Ability> abilities = abilitiesFromParent.abilities;
-
-                foreach (Ability ablty in abilities)
+                foreach (Ability ablty in abilityManager.abilities)
                 {
                     MeleeClip meleeClip = ablty.meleeClip;
 
@@ -542,6 +521,7 @@ namespace GameCreator.Melee
                 }
             }
 
+            IEnumerable<FieldInfo> propertyList = typeof(MeleeWeapon).GetFields();
             foreach (FieldInfo propertyInfo in propertyList)
             {
                 if (propertyInfo.FieldType == typeof(MeleeClip))
@@ -962,17 +942,6 @@ namespace GameCreator.Melee
             if (!this.CanAttack()) return;
 
             if (IsOwner) this.StopBlockingServerRpc();
-            this.inputBuffer.AddInput(actionKey);
-        }
-
-        public virtual void ExecuteAbility(MeleeClip meleeClip, ActionKey actionKey)
-        {
-            if (!this.currentWeapon) return;
-            if (!this.CanAttack()) return;
-
-            if (IsOwner) this.StopBlockingServerRpc();
-            this.isPlayingAbility = true;
-            this.abilityClip = meleeClip;
             this.inputBuffer.AddInput(actionKey);
         }
 

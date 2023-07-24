@@ -30,11 +30,11 @@ public class Ability : MonoBehaviour
     public KeyCode skillKey = KeyCode.Space;
     public bool canAnimCancel = false;
 
-    public bool isOnCoolDown { get; private set; }
+    public bool isOnCoolDownLocally { get; private set; }
 
     public void ResetAbility()
     {
-        isOnCoolDown = false;
+        isOnCoolDownLocally = false;
     }
 
     // We're only using this for UI cooldowns for now
@@ -46,7 +46,7 @@ public class Ability : MonoBehaviour
         if (abilityType != AbilityType.Passive)
         {
             if (meleeClip == null) return;
-            isOnCoolDown = true;
+            isOnCoolDownLocally = true;
 
             InvokeSkill(melee, key);
 
@@ -91,6 +91,6 @@ public class Ability : MonoBehaviour
     {
         yield return new WaitForSeconds(coolDown);
 
-        isOnCoolDown = false;
+        isOnCoolDownLocally = false;
     }
 }
