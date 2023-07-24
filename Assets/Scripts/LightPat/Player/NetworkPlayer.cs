@@ -60,7 +60,6 @@ namespace LightPat.Player
             else // If we are not this instance's player object
             {
                 worldSpaceLabel.SetActive(true);
-                worldSpaceLabel.GetComponent<UI.WorldSpaceLabel>().disableHealthbar = SceneManager.GetActiveScene().name == "Hub";
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 Destroy(playerHUD);

@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.VFX;
-using System.Reflection;
+using UnityEngine.SceneManagement;
 
 namespace GameCreator.Melee
 {
@@ -81,7 +81,7 @@ namespace GameCreator.Melee
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
-            if( !Application.isEditor ) return;
+            if (SceneManager.GetActiveScene().name != "Prototype") return;
 
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))

@@ -15,7 +15,7 @@
 
         public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
         private CharacterMelee melee;
-        private Abilities abilities;
+        private AbilityManager abilityManager;
 
         public Slider healthSlider;
         public Slider defenseSlider;
@@ -33,7 +33,7 @@
         private void Start()
         {
             melee = GetComponentInParent<CharacterMelee>();
-            abilities = GetComponentInParent<Abilities>();
+            abilityManager = GetComponentInParent<AbilityManager>();
         }
 
         private void Update()
@@ -65,18 +65,18 @@
             if (!melee.currentWeapon.weaponImage) { return; }
             weaponImageFill.sprite = melee.currentWeapon.weaponImage;
 
-            foreach (Ability ability in abilities.abilities)
+            foreach (Ability ability in abilityManager.abilities)
             {
                 switch (ability.skillKey)
                 {
                     case KeyCode.Q:
-                        abilityAImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
+                        abilityAImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         break;
                     case KeyCode.E:
-                        abilityBImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
+                        abilityBImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         break;
                     case KeyCode.R:
-                        abilityCImageFill.sprite = ability.isOnCoolDown == false ? ability.skillImageFill : null;
+                        abilityCImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         break;
                 }
             }

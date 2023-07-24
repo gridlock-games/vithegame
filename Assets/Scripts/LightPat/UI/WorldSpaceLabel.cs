@@ -15,7 +15,6 @@ namespace LightPat.UI
         public float animationSpeed = 0.1f;
         public float viewDistance = 5f;
         public float scale = 1;
-        public bool disableHealthbar;
 
         public Slider healthSlider;
 
@@ -67,6 +66,20 @@ namespace LightPat.UI
                 return;
             }
 
+            // Set world space label text to client name
+            if (target.TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsPlayerObject)
+                {
+                    if (ClientManager.Singleton)
+                    {
+                        string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
+                        nameDisplay.SetText(clientName);
+                        target.name = clientName;
+                    }
+                }
+            }
+
             gameObject.SetActive(target.gameObject.activeInHierarchy);
 
             transform.position = target.position + positionOffset;
@@ -89,8 +102,6 @@ namespace LightPat.UI
                     healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             }
-
-            healthSlider.gameObject.SetActive(!disableHealthbar);
         }
     }
 }

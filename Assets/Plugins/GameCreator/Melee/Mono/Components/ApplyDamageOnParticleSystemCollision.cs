@@ -12,16 +12,17 @@ namespace GameCreator.Melee
         public Vector3 particleSize = new Vector3(0.1f, 0.1f, 0.1f);
 
         private CharacterMelee attacker;
+        private MeleeClip attack;
 
-        public void Initialize(CharacterMelee attacker)
+        public void Initialize(CharacterMelee attacker, MeleeClip attack)
         {
             if (this.attacker) { Debug.LogError("Initialize() already called, why are you calling it again idiot?"); return; }
             this.attacker = attacker;
+            this.attack = attack;
         }
 
-        ParticleSystem ps;
-        Vector3 startPosition;
-
+        private ParticleSystem ps;
+        private Vector3 startPosition;
 
         private void Start()
         {
@@ -69,7 +70,7 @@ namespace GameCreator.Melee
                     CharacterMelee targetMelee = potentialHits[j].GetComponentInParent<CharacterMelee>();
                     if (targetMelee)
                     {
-                        attacker.AddHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject });
+                        attacker.AddHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject }, attack);
                     }
                 }
             }
