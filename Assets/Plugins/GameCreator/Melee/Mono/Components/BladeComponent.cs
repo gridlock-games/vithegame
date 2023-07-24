@@ -181,7 +181,7 @@
                         Melee.ResetHitCount();
                     };
                     if (weaponTrail != null) this.weaponTrail.Deactivate(0f);
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnExecute && clip.affectedBones.Contains(weaponBone))
                     {
                         clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;
@@ -197,7 +197,7 @@
                         isActivated = true;
                     }
 
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnActivate && clip.affectedBones.Contains(weaponBone))
                     {
                         clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;
@@ -210,7 +210,7 @@
 
                 case 2:
                     if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
-                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.isAttack && !isVFXActivated && clip.affectedBones.Contains(weaponBone))
+                    if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.affectedBones.Contains(weaponBone))
                     {
                         clip.PlayVFXAttachment(Melee);
                         isVFXActivated = true;

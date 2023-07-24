@@ -71,8 +71,15 @@
             target.transform.rotation = targetRotation;
 
             Character characterTarget = this.character.GetCharacter(target);
+            bool isDashing = characterTarget.isCharacterDashing();
+
             if (characterTarget == null) { Destroy(target); return; }
+            if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered || 
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown || 
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered || 
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { Destroy(target); return; }
             if (characterTarget.disableActions.Value) { Destroy(target); return; }
+            if (isDashing) { Destroy(target); return; }
 
             CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
             if (melee == null) { Destroy(target); return; }
@@ -123,6 +130,7 @@
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
+            characterTarget.setCharacterDashing(true);
 
             InstantExecuteLocally(target, moveDirection, angle);
             Destroy(target);
@@ -157,7 +165,6 @@
                 melee.StopAttack();
                 animator.StopGesture(0f);
                 melee.currentMeleeClip = null;
-
 
             }
 

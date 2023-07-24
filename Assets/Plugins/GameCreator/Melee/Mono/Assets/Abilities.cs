@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using GameCreator.Characters;
 using GameCreator.Melee;
 using Unity.Netcode;
 
@@ -34,11 +35,13 @@ public class Abilities : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-        if (melee == null) return;
+        if (abilities.Count <= 0) return;
         if (!Input.anyKeyDown) return;
+        if (melee == null) return;
         if (melee.IsBlocking) return;
         if (melee.IsStaggered) return;
-        if (abilities.Count <= 0) return;
+        if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
+
 
         foreach (KeyCode key in _hotKeys)
         {
@@ -51,30 +54,36 @@ public class Abilities : NetworkBehaviour
     {
         var ability = this.abilities.Find(ablty => ablty.skillKey == key);
 
+
+
         float PoiseValue = melee.GetPoise();
 
-        if (ability.isOnCoolDown == true) return;
-
-        if (ability && PoiseValue >= ability.staminaCost)
-        {
-            melee.AddPoise(-1 * ability.staminaCost);
-            ability.ExecuteAbility(melee);
+        if(melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) {
+            Debug.Log("Cannot activate ability during Dash: " + ability.skillKey);
+            return;
         }
-    }
 
-    private void DisableSkillSlot(Ability ability)
-    {
-        switch (ability.skillKey)
+        if (melee.IsAttacking && !ability.canAnimCancel) {
+            Debug.Log("Animation cancel not available for: " + ability.skillKey);
+            return;
+        }
+
+        if (ability.isOnCoolDown == true) {
+            Debug.Log("Ability is still in cooldown: " + ability.skillKey);
+            return;
+        }
+
+        if (ability && PoiseValue < ability.staminaCost) {
+            Debug.Log("Not enough poise for: " + ability.skillKey);
+            return;
+        }
+
+        if (ability != null && melee != null)
         {
-            case KeyCode.Q:
-                meleeUI.abilityAImageFill.sprite = null;
-                break;
-            case KeyCode.E:
-                meleeUI.abilityBImageFill.sprite = null;
-                break;
-            case KeyCode.R:
-                meleeUI.abilityCImageFill.sprite = null;
-                break;
+            Debug.Log("Executing ability: " + ability.skillKey);
+            Debug.Log("IsAttacking: " + melee.IsAttacking);
+            melee.AddPoise(-1 * ability.staminaCost);
+            ability.ExecuteAbility(melee, key);
         }
     }
 }

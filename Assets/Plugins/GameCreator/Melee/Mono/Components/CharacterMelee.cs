@@ -47,7 +47,7 @@ namespace GameCreator.Melee
         private const float TRANSITION = 0.15f;
         protected const float INPUT_BUFFER_TIME = 0.35f;
 
-        protected const float STUN_TIMEOUT_DURATION = 5.0f;
+        protected const float STUN_TIMEOUT_DURATION = 3.0f;
 
         private int KNOCK_UP_FOLLOWUP_LIMIT = 5;
 
@@ -181,31 +181,31 @@ namespace GameCreator.Melee
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
                     ActionKey key = this.inputBuffer.GetInput();
-                    MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
+                    MeleeClip meleeClip = this.comboSystem.Select(key);
 
-                    if (isPlayingAbility)
-                    {
-                        this.comboSystem.StartAttackTime(true);
-                    }
+                    
+                    // Disabling Ability invoke in CharacterMelee
+                    // MeleeClip meleeClip = !isPlayingAbility ? this.comboSystem.Select(key) : this.abilityClip;
+                    // if (isPlayingAbility)
+                    // {
+                    //     this.comboSystem.StartAttackTime(true);
+                    // }
 
                     if (meleeClip)
                     {
                         if (IsServer)
                         {
-                            if (!isPlayingAbility)
+                            if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (meleeClip.isHeavy) // Heavy Attack
+                                if (Poise.Value <= 20)
                                 {
-                                    if (Poise.Value <= 20)
-                                    {
-                                        return;
-                                    }
-                                    OnHeavyAttack();
+                                    return;
                                 }
-                                else // Light Attack
-                                {
-                                    OnLightAttack();
-                                }
+                                OnHeavyAttack();
+                            }
+                            else // Light Attack
+                            {
+                                OnLightAttack();
                             }
                         }
 
@@ -292,11 +292,12 @@ namespace GameCreator.Melee
 
                 IsAttacking = phase >= 0f;
 
-                if (phase == 2 && isPlayingAbility)
-                {
-                    isPlayingAbility = false;
-                    this.comboSystem.StartAttackTime(false);
-                }
+                // Disabling invoke in CharacterMelee
+                // if (phase == 2 && isPlayingAbility)
+                // {
+                //     isPlayingAbility = false;
+                //     this.comboSystem.StartAttackTime(false);
+                // }
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -986,6 +987,12 @@ namespace GameCreator.Melee
 
                 this.comboSystem.Stop();
                 this.currentMeleeClip.Stop(this);
+
+                if(this.Blades.Count > 0) {
+                    foreach(var blade in this.Blades) {
+                        blade.EventAttackRecovery.Invoke();
+                    }
+                }
             }
         }
 
@@ -1139,7 +1146,9 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
-            if (melee.IsAttacking)
+
+            // Prioritize damage taken over attack and non-invincible dodge frames
+            if (melee.IsAttacking || melee.Character.isCharacterDashing())
             {
                 melee.StopAttack();
                 CharacterAnimator.StopGesture(0f);
@@ -1415,6 +1424,7 @@ namespace GameCreator.Melee
             if (this.IsSheathing) return false;
             if (this.IsDrawing) return false;
             if (this.IsStaggered) return false;
+            
             return true;
         }
 

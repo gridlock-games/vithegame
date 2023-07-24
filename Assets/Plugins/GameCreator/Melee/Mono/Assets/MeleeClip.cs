@@ -283,6 +283,8 @@
                     selectedAnimSpeed, this.avatarMask,
                     selectedTransitionIn, selectedTransitionOut
                 );
+
+                melee.StartCoroutine(DashValueRoutine(melee, false, animationClip.length ));
             }
             else
             {
@@ -402,6 +404,13 @@
             }
 
             yield return 0;
+        }
+
+        private IEnumerator DashValueRoutine(CharacterMelee melee, bool value, float duration)
+        {
+            yield return new WaitForSeconds(duration * 0.90f);
+            
+           melee.Character.setCharacterDashing(false);
         }
 
         private IEnumerator ExecuteHitPause(float duration)
