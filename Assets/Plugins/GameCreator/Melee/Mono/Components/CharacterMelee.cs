@@ -47,7 +47,7 @@ namespace GameCreator.Melee
         private const float TRANSITION = 0.15f;
         protected const float INPUT_BUFFER_TIME = 0.35f;
 
-        protected const float STUN_TIMEOUT_DURATION = 3.0f;
+        protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
         private int KNOCK_UP_FOLLOWUP_LIMIT = 5;
 
