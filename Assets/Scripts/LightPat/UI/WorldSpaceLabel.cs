@@ -22,7 +22,6 @@ namespace LightPat.UI
         CharacterMelee melee;
         Transform target;
         Vector3 positionOffset;
-        Vector3 originalScale;
 
         private void OnEnable()
         {
@@ -58,8 +57,6 @@ namespace LightPat.UI
             }
 
             name = "World Space Label for " + target.name;
-
-            originalScale = transform.localScale;
         }
 
         private void LateUpdate()
@@ -83,7 +80,7 @@ namespace LightPat.UI
                 if (Vector3.Distance(Camera.main.transform.position, transform.position) > viewDistance)
                     transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * animationSpeed);
                 else
-                    transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
+                    transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * animationSpeed);
             }
             
             if (melee)

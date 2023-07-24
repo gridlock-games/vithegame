@@ -608,6 +608,8 @@ MonoBehaviour:
     type: 3}
   gameLogicManagerNetObjId:
     m_InternalValue: 0
+  sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
+    type: 3}
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0
@@ -2513,7 +2515,7 @@ MonoBehaviour:
     RecycleNetworkIds: 1
     NetworkIdRecycleDelay: 120
     RpcHashSize: 0
-    LoadSceneTimeOut: 120
+    LoadSceneTimeOut: 500
     SpawnTimeout: 1
     EnableNetworkLogs: 1
 --- !u!4 &1775991331
