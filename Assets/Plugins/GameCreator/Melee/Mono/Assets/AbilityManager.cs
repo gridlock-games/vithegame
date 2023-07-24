@@ -54,16 +54,6 @@ public class AbilityManager : NetworkBehaviour
             }
         }
 
-        if (OwnerClientId == 1)
-        {
-            string debug = "";
-            for (int i = 0; i < abilities.Count; i++)
-            {
-                debug += abilities[i].name + " " + abilitiesOnCooldown[i] + " - ";
-            }
-            Debug.Log(debug);
-        }
-        
         if (!IsOwner) return;
         if (abilities.Count <= 0) return;
         if (!Input.anyKeyDown) return;
