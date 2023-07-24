@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
 using System.Net;
+using GameCreator.Characters;
 
 namespace LightPat.Core
 {
@@ -16,8 +17,10 @@ namespace LightPat.Core
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
+        public bool allScenesLoaded { get; private set; }
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
+
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
