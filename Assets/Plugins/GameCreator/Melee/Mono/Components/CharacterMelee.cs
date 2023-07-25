@@ -189,8 +189,9 @@ namespace GameCreator.Melee
                         {
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (Poise.Value <= 20)
+                                if (Poise.Value <= 15)
                                 {
+                                    this.StopAttack();
                                     return;
                                 }
                                 OnHeavyAttack();
@@ -1087,7 +1088,7 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("OnHeavyAttack() should only be called on the server."); return; }
 
-            AddPoise(-20);
+            AddPoise(-15);
         }
 
         public void OnDodge()
