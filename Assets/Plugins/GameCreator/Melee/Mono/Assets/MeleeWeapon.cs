@@ -113,7 +113,6 @@ namespace GameCreator.Melee
         public GameObject prefabImpactHit;
         public GameObject prefabImpactKnockback;
 
-
         // recovery:
         public MeleeClip recoveryStandUp; // Facing Up
         public MeleeClip recoveryStandDown; // facing Down
@@ -124,7 +123,6 @@ namespace GameCreator.Melee
         private int prevRandomHit = -1;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
         public List<GameObject> EquipNewWeapon(CharacterAnimator character)
         {
             if (weaponModels.Count == 0) return null;

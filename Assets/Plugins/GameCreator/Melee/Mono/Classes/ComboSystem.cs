@@ -2,13 +2,13 @@
 {
     using System;
     using System.Collections;
-	using System.Collections.Generic;
+    using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
 
     public class ComboSystem
-	{
+    {
         public enum Condition
         {
             None,
@@ -83,34 +83,23 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void StartAttackTime(bool start) {
-            if(start) {
+        public void StartAttackTime(bool start)
+        {
+            if (start)
+            {
                 this.startAttackTime = Time.time;
-            } else {
+            }
+            else
+            {
                 this.startAttackTime = -100f;
             }
-        }
-        public int GetCurrentPhase()
-        {
-            float prevTime = Time.time - this.startAttackTime;
-            float currentPhase = -1f;
-
-            if (this.currentCombo == null) return Mathf.RoundToInt(currentPhase);
-            if (this.currentCombo.meleeClip == null) return Mathf.RoundToInt(currentPhase);
-
-            if (prevTime < this.currentCombo.meleeClip.Length)
-            {
-                currentPhase = this.currentCombo.meleeClip.attackPhase.Evaluate(prevTime);
-            }
-
-            return Mathf.RoundToInt(currentPhase);
         }
 
         public int GetCurrentPhase(MeleeClip meleeClip)
         {
             float prevTime = Time.time - this.startAttackTime;
             float currentPhase = -1f;
-            
+
             if (meleeClip == null) return Mathf.RoundToInt(currentPhase);
 
             if (prevTime < meleeClip.Length)
@@ -129,7 +118,7 @@
 
         public MeleeClip Select(CharacterMelee.ActionKey actionkey)
         {
-            int currentPhase = this.GetCurrentPhase();
+            int currentPhase = this.GetCurrentPhase(this.GetCurrentClip());
 
             if (currentPhase == -1 && this.melee.Character.characterLocomotion.isBusy) return null;
 
@@ -142,22 +131,61 @@
             if (!next.HasChild(actionkey)) return null;
             next = next.GetChild(actionkey);
 
-            this.startAttackTime = Time.time;
-            this.current = next;
+            startAttackTime = Time.time;
+            current = next;
 
-            this.currentCombo = this.SelectMeleeClip(); ;
+            currentCombo = SelectMeleeClip();
 
-            this.isBlock = false;
-            this.isPerfectBlock = false;
+            isBlock = false;
+            isPerfectBlock = false;
 
             if (this.currentCombo == null) return null;
             return this.currentCombo.meleeClip;
         }
 
+        public void SetStateFromClip(MeleeClip meleeClip)
+        {
+            if (!meleeClip.isAttack) { Debug.LogError("This melee clip should be an attack"); return; }
+
+            var enumerator = root.GetEnumerator();
+
+            TreeCombo<CharacterMelee.ActionKey, Combo> targetCombo = FindTreeComboFromMeleeClip(root, meleeClip);
+
+            if (targetCombo == null) { Debug.LogWarning("Couldn't find tree combo object in list of combos - " + meleeClip); return; }
+
+            startAttackTime = Time.time;
+            current = targetCombo;
+
+            currentCombo = SelectMeleeClip();
+
+            isBlock = false;
+            isPerfectBlock = false;
+        }
+
+        private TreeCombo<CharacterMelee.ActionKey, Combo> FindTreeComboFromMeleeClip(TreeCombo<CharacterMelee.ActionKey, Combo> node, MeleeClip targetMeleeClip)
+        {
+            var enumerator = node.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                foreach (Combo combo in enumerator.Current.GetData())
+                {
+                    if (combo.isEnabled)
+                    {
+                        if (combo.meleeClip == targetMeleeClip) { return enumerator.Current; }
+                    }
+                }
+
+                var treeCombo = FindTreeComboFromMeleeClip(enumerator.Current, targetMeleeClip);
+                if (treeCombo != null) { return treeCombo; }
+            }
+
+            return null;
+        }
+
         public void Stop()
         {
             this.startAttackTime = -100f;
-
             this.current = this.root;
             this.currentCombo = null;
         }
@@ -216,7 +244,7 @@
                 inputH = Input.GetAxisRaw(AXIS_H);
                 inputV = Input.GetAxisRaw(AXIS_V);
             }
-            
+
             Vector3 input = new Vector3(inputH, 0.0f, inputV);
             //Vector3 direction = HookCamera.Instance.transform.TransformDirection(input);
             Vector3 direction = melee.transform.TransformDirection(input);
@@ -279,14 +307,14 @@
                             return candidates[i];
                         }
                         break;
-                    
+
                     case Condition.InputLeft:
                         if (inputAngle < -60f && inputAngle > -120f)
-                        { 
+                        {
                             return candidates[i];
                         }
                         break;
-                    
+
                     case Condition.InputRight:
                         if (inputAngle > 60f && inputAngle < 120f)
                         {
@@ -310,7 +338,7 @@
 
                     case Condition.IsDashing:
                         float isDashing = this.melee.Character.characterState.isDashing;
-                        if(isDashing == 1.0f) return candidates[i];
+                        if (isDashing == 1.0f) return candidates[i];
 
                         break;
                 }
@@ -318,5 +346,5 @@
 
             return null;
         }
-	}
+    }
 }

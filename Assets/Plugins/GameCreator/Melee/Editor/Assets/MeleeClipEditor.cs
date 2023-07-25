@@ -15,6 +15,13 @@
         private const float FRAME_DISTANCE = 0.0335f;
         private const float SPACING = 2f;
 
+        public enum AttachVFXPhase {
+            OnExecute,
+            OnActivate,
+            OnHit,
+            OnRecovery
+        }
+
         private static CharacterAnimator REF_OBJECT;
         private static Editor REF_OBJECT_EDITOR;
         private static readonly GUIContent GC_PREVIEW = new GUIContent("Preview Character");
@@ -36,6 +43,13 @@
         private const string PATH_ONHIT = "Assets/Plugins/GameCreatorData/Melee/Actions/OnHit";
 
         // PROPERTIES: ----------------------------------------------------------------------------
+
+        // VFX: ----------------------------------------------------------------------------
+        private SerializedProperty spAttackVFX;
+        private SerializedProperty spVFXAttachmentPhase;
+        private SerializedProperty spVFXPositionOffset;
+        private SerializedProperty spVFXRotationOffset;
+
 
         private MeleeClip instance;
 
@@ -144,6 +158,13 @@
             this.spTransitionIn = this.serializedObject.FindProperty("transitionIn");
             this.spTransitionOut = this.serializedObject.FindProperty("transitionOut");
             this.spAnimationSpeed = this.serializedObject.FindProperty("animSpeed");
+
+            // VFX
+            this.spAttackVFX = this.serializedObject.FindProperty("abilityVFX");
+            this.spVFXAttachmentPhase = this.serializedObject.FindProperty("attachVFXOnPhase");
+            this.spVFXPositionOffset = this.serializedObject.FindProperty("vfxPositionOffset");
+            this.spVFXRotationOffset = this.serializedObject.FindProperty("vfxRotationOffset");
+
 
             // Original
             this.spMovementForward = this.serializedObject.FindProperty("movementForward");
@@ -478,6 +499,16 @@
 
                     EditorGUI.indentLevel--;
                     EditorGUI.EndDisabledGroup();
+
+                    
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.PropertyField(this.spAttackVFX);
+                    EditorGUILayout.PropertyField(this.spVFXAttachmentPhase);
+                    EditorGUILayout.PropertyField(this.spVFXPositionOffset);
+                    EditorGUILayout.PropertyField(this.spVFXRotationOffset);
 
                     EditorGUILayout.EndVertical();
                 }

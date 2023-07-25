@@ -263,7 +263,7 @@ namespace GameCreator.Characters
             else
                 Gizmos.color = Color.black;
 
-            Gizmos.DrawSphere(currentPosition, 0.5f);
+            Gizmos.DrawSphere(currentPosition, 0.25f);
         }
     }
 }

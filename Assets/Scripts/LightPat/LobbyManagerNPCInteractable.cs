@@ -4,8 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using UnityEngine.UI;
-using System.IO;
 using Unity.Collections;
+using UnityEngine.Networking;
 
 namespace LightPat.Core
 {
@@ -77,11 +77,10 @@ namespace LightPat.Core
             Debug.Log("Shutdown complete");
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
-            ClientManager.Singleton.playerHubIP = networkTransport.ConnectionData.Address;
             networkTransport.ConnectionData.Address = targetIP;
-            Debug.Log("Switching to lobby scene: " + networkTransport.ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            Debug.Log("Starting client: " + networkTransport.ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP
-            ClientManager.Singleton.ChangeLocalSceneThenStartClient("Lobby");
+            NetworkManager.Singleton.StartClient();
         }
 
         private string targetIP;
@@ -131,57 +130,107 @@ namespace LightPat.Core
 
             if (IsServer)
             {
-                string filename = "IP Config.txt";
-                string path = Path.Join(Application.dataPath, filename);
-                // This text is added only once to the file
-                if (!File.Exists(path))
+                if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
+            }
+        }
+
+        private bool refreshServerListRunning;
+        private IEnumerator RefreshServerList()
+        {
+            refreshServerListRunning = true;
+
+            // Get list of servers in the API
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+            }
+
+            List<ClientManager.Server> serverList = new List<ClientManager.Server>();
+
+            string json = getRequest.downloadHandler.text;
+
+            foreach (string jsonSplit in json.Split("},"))
+            {
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
                 {
-                    // Create a file to write to.
-                    using (StreamWriter sw = File.CreateText(path))
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                serverList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
+            }
+
+            // Process servers here
+            foreach (ClientManager.Server server in serverList)
+            {
+                if (server.type != 0) { continue; }
+
+                string serverString = server.label + "|" + server.ip;
+                if (!serversProcessed.Contains(server) & !IPList.Contains(serverString))
+                {
+                    serversProcessed.Add(server);
+                    StartCoroutine(WaitForPingToComplete(server));
+                }
+            }
+
+            // If we have the server in the IPList but not in the API
+            List<FixedString32Bytes> stringsToRemove = new List<FixedString32Bytes>();
+            foreach (FixedString32Bytes serverString in IPList)
+            {
+                bool serverStringInAPI = false;
+
+                foreach (ClientManager.Server server in serverList)
+                {
+                    string APIServerString = server.label + "|" + server.ip;
+
+                    if (APIServerString == serverString)
                     {
-                        sw.WriteLine("# Please write a name for a server followed by an IP on each line of this text document like so: (Desktop | 192.168.50.150)");
-                        sw.WriteLine("# Lines that start with hashtag (#) will be ignored");
-                        sw.WriteLine("# DO NOT LEAVE WHITESPACE");
+                        serverStringInAPI = true;
+                        break;
                     }
                 }
 
-                using (StreamReader sr = File.OpenText(path))
+                if (!serverStringInAPI)
                 {
-                    string s = "";
-                    List<FixedString32Bytes> IPListCache = new List<FixedString32Bytes>();
-                    while ((s = sr.ReadLine()) != null)
-                    {
-                        if (s[0] == '#') continue;
-                        IPListCache.Add(s);
-                    }
-
-                    // Sync IP List if the file has changed
-                    if (IPListCache.Count != IPList.Count)
-                    {
-                        IPList.Clear();
-                        foreach (FixedString32Bytes fixedString in IPListCache)
-                        {
-                            IPList.Add(fixedString);
-                        }
-                    }
-                    else // If the lengths are not the same, look for a mismatched value
-                    {
-                        bool mismatchedValue = false;
-                        for (int i = 0; i < IPListCache.Count; i++)
-                        {
-                            if (IPList[i] != IPListCache[i]) { mismatchedValue = true; break; }
-                        }
-
-                        if (mismatchedValue)
-                        {
-                            IPList.Clear();
-                            foreach (FixedString32Bytes fixedString in IPListCache)
-                            {
-                                IPList.Add(fixedString);
-                            }
-                        }
-                    }
+                    stringsToRemove.Add(serverString);
                 }
+            }
+
+            // Remove strings that are not in the API but are in the IPList
+            foreach (FixedString32Bytes serverString in stringsToRemove)
+            {
+                IPList.Remove(serverString);
+            }
+
+            refreshServerListRunning = false;
+        }
+
+        private List<ClientManager.Server> serversProcessed = new List<ClientManager.Server>();
+
+        private IEnumerator WaitForPingToComplete(ClientManager.Server server)
+        {
+            Ping ping = new Ping(server.ip);
+            yield return new WaitUntil(() => ping.isDone);
+
+            string serverString = server.label + "|" + server.ip;
+            if (!IPList.Contains(serverString))
+            {
+                IPList.Add(serverString);
+                serversProcessed.Remove(server);
             }
         }
 

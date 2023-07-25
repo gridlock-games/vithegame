@@ -128,6 +128,9 @@
             
             this.sectionRecoveryStates = new Section("Ailment Recovery Animations", this.LoadIcon("Effects"), this.Repaint);
 
+            
+            // Grabs
+
             this.spGrabAttack = this.serializedObject.FindProperty("grabAttack");
             this.spGrabReaction = this.serializedObject.FindProperty("grabReaction");
             this.spGrabPlaceholderPosition = this.serializedObject.FindProperty("grabPlaceholderPosition");
