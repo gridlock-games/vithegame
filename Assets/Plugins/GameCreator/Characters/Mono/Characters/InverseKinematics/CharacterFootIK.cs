@@ -8,7 +8,7 @@
         private const float FOOT_OFFSET_Y = 0.1f;
         private const float SMOOTH_POSITION = 0.1f;
         private const float SMOOTH_ROTATION = 0.1f;
-        private const float SMOOTH_WEIGHT   = 0.2f;
+        private const float SMOOTH_WEIGHT = 0.2f;
         private const float BODY_MAX_INCLINE = 10f;
 
         private static readonly int IK_L_FOOT = Animator.StringToHash("IK_leftFoot");
@@ -55,7 +55,7 @@
         public CharacterAnimator.EventIK eventAfterIK = new CharacterAnimator.EventIK();
 
         private RaycastHit[] hitBuffer = new RaycastHit[1];
-        
+
         public bool Active { get; set; }
         private float activeValue = 0f;
         private float activeValueVelocity = 0f;
@@ -77,7 +77,7 @@
             this.rightFoot = new Foot(rFoot, AvatarIKGoal.RightFoot, IK_R_FOOT);
 
             this.defaultOffset = transform.localPosition.y;
-            
+
             this.Active = true;
             this.activeValue = 1f;
         }
@@ -85,8 +85,8 @@
         private void Update()
         {
             this.activeValue = Mathf.SmoothDamp(
-                this.activeValue, 
-                this.Active ? 1f : 0f, 
+                this.activeValue,
+                this.Active ? 1f : 0f,
                 ref this.activeValueVelocity, 0.05f
             );
         }
@@ -130,9 +130,9 @@
 
         private void UpdateFoot(Foot foot)
         {
-            float rayMagnitude = this.controller.height/2.0f;
+            float rayMagnitude = this.controller.height / 2.0f;
             Vector3 rayPosition = foot.foot.position;
-            rayPosition.y += rayMagnitude/2.0f;
+            rayPosition.y += rayMagnitude / 2.0f;
 
             int layerMask = this.characterAnimator.footLayerMask;
             QueryTriggerInteraction queryTrigger = QueryTriggerInteraction.Ignore;
@@ -157,7 +157,7 @@
 
         private void SetFoot(Foot foot)
         {
-            if(foot == null) return;
+            if (foot == null) return;
 
             float weight = foot.GetWeight(this.animator);
 
@@ -173,8 +173,8 @@
                 float baseHeight = this.transform.position.y - FOOT_OFFSET_Y;
                 float animHeight = (foot.foot.position.y - baseHeight) / (rotation * Vector3.up).y;
                 Vector3 position = new Vector3(
-                    foot.foot.position.x, 
-                    Mathf.Max(foot.height, baseHeight) + animHeight, 
+                    foot.foot.position.x,
+                    Mathf.Max(foot.height, baseHeight) + animHeight,
                     foot.foot.position.z
                 );
 

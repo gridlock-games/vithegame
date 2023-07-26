@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using GameCreator.Melee;
@@ -11,19 +9,18 @@ namespace LightPat.UI
 {
     public class WorldSpaceLabel : MonoBehaviour
     {
-        public TextMeshPro nameDisplay;
+        public TextMeshProUGUI nameDisplay;
 
         public float rotationSpeed = 0.6f;
         public float animationSpeed = 0.1f;
         public float viewDistance = 5f;
-        public bool disableHealthbar;
+        public float scale = 1;
 
         public Slider healthSlider;
 
         CharacterMelee melee;
         Transform target;
         Vector3 positionOffset;
-        Vector3 originalScale;
 
         private void OnEnable()
         {
@@ -52,11 +49,13 @@ namespace LightPat.UI
                         nameDisplay.SetText(netObj.OwnerClientId + " - " + target.name);
                     }
                 }
+                else
+                {
+                    nameDisplay.SetText(netObj.OwnerClientId + " - " + target.name);
+                }
             }
 
             name = "World Space Label for " + target.name;
-
-            originalScale = transform.localScale;
         }
 
         private void LateUpdate()
@@ -65,6 +64,20 @@ namespace LightPat.UI
             {
                 Destroy(gameObject);
                 return;
+            }
+
+            // Set world space label text to client name
+            if (target.TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsPlayerObject)
+                {
+                    if (ClientManager.Singleton)
+                    {
+                        string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
+                        nameDisplay.SetText(clientName);
+                        target.name = clientName;
+                    }
+                }
             }
 
             gameObject.SetActive(target.gameObject.activeInHierarchy);
@@ -80,7 +93,7 @@ namespace LightPat.UI
                 if (Vector3.Distance(Camera.main.transform.position, transform.position) > viewDistance)
                     transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * animationSpeed);
                 else
-                    transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
+                    transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * animationSpeed);
             }
             
             if (melee)
@@ -89,8 +102,6 @@ namespace LightPat.UI
                     healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             }
-
-            healthSlider.gameObject.SetActive(!disableHealthbar);
         }
     }
 }

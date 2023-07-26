@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.VFX;
+using UnityEngine.SceneManagement;
 
 namespace GameCreator.Melee
 {
@@ -34,8 +35,10 @@ namespace GameCreator.Melee
             PlayVFX();
         }
 
-        [ServerRpc] private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
+        [ServerRpc]
+        private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
         {
+            if (_characterMelee.IsBlocking) return;
             if (_characterMelee.IsStaggered) return;
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
@@ -73,9 +76,12 @@ namespace GameCreator.Melee
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;
+            if (_characterMelee.IsBlocking) return;
             if (_characterMelee.IsStaggered) return;
             if (_characterMelee.IsAttacking) return;
             if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
+
+            if (SceneManager.GetActiveScene().name != "Prototype") return;
 
             // Loop through each key in the dictionary and check if it's been pressed down
             foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))

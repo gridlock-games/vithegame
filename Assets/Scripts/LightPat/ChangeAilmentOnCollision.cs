@@ -10,8 +10,6 @@ namespace LightPat.Core
     {
         public CharacterLocomotion.CHARACTER_AILMENTS ailment;
 
-        [HideInInspector] public bool triggered;
-
         private CharacterController charController;
         private Character character;
 
@@ -25,10 +23,8 @@ namespace LightPat.Core
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                if (hit.gameObject.TryGetComponent(out ChangeAilmentOnCollision changeAilment))
+                if (hit.gameObject.TryGetComponent(out ChangeAilmentOnCollision changeAilment) & !hit.gameObject.GetComponent<CharacterController>())
                 {
-                    if (changeAilment.triggered) { return; }
-                    changeAilment.triggered = true;
                     Debug.Log(changeAilment.ailment);
                     character.UpdateAilment(changeAilment.ailment, null);
                 }

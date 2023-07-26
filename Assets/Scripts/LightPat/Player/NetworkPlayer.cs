@@ -23,6 +23,10 @@ namespace LightPat.Player
 
         public CameraMotorTypeAdventure cameraMotorInstance { get; private set; }
 
+        private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
+
         public override void OnNetworkSpawn()
         {
             GetComponent<PlayerCharacter>().enabled = true;
@@ -49,11 +53,13 @@ namespace LightPat.Player
                     crosshair.SetActive(SceneManager.GetActiveScene().name != "Hub");
                 }
                 Cursor.lockState = CursorLockMode.Locked;
+
+                spawnedOnOwnerInstance.Value = true;
+                Destroy(worldSpaceLabel);
             }
             else // If we are not this instance's player object
             {
                 worldSpaceLabel.SetActive(true);
-                worldSpaceLabel.GetComponent<UI.WorldSpaceLabel>().disableHealthbar = SceneManager.GetActiveScene().name == "Hub";
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 Destroy(playerHUD);

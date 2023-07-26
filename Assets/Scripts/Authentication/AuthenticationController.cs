@@ -9,10 +9,12 @@ using System.Net;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using LightPat.Core;
+using UnityEngine.Networking;
+using System.Collections;
 
 public class AuthenticationController : MonoBehaviour
 {
-    public string playerHubIPAddress = "128.199.214.19";
+    public string targetIPAddressOverride = "";
 
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
@@ -36,7 +38,9 @@ public class AuthenticationController : MonoBehaviour
     private void Update()
     {
         // If we are a headless build
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+        bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
+        bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
             StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
         }
@@ -125,8 +129,7 @@ public class AuthenticationController : MonoBehaviour
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
-            StoreClient(playerHubIPAddress, displayNameInput.text);
-            SceneManager.LoadScene("CharacterSelect");
+            StartCoroutine(StoreClient(displayNameInput.text));
         }
     }
 
@@ -146,14 +149,72 @@ public class AuthenticationController : MonoBehaviour
         if (NetworkManager.Singleton.StartServer())
         {
             Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+
             // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
-            NetworkManager.Singleton.SceneManager.LoadScene(SceneUtility.GetBuildIndexByScenePath("Lobby") != -1 ? "Lobby" : "Hub", LoadSceneMode.Single);
+            if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
+            {
+                ClientManager.Singleton.ChangeScene("Lobby", false);
+            }
+            else
+            {
+                ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
+            }
         }
     }
 
-    private void StoreClient(string targetIP, string displayName)
+    private IEnumerator StoreClient(string displayName)
     {
+        // Get list of servers in the API
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+
+        yield return getRequest.SendWebRequest();
+
+        if (getRequest.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Get Request Error in AuthneticationController.StoreClient() " + getRequest.error);
+        }
+
+        string json = getRequest.downloadHandler.text;
+        ClientManager.Server playerHubServer = new();
+
+        bool playerHubServerFound = false;
+        foreach (string jsonSplit in json.Split("},"))
+        {
+            string finalJsonElement = jsonSplit;
+            if (finalJsonElement[0] == '[')
+            {
+                finalJsonElement = finalJsonElement.Remove(0, 1);
+            }
+
+            if (finalJsonElement[^1] == ']')
+            {
+                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+            }
+
+            if (finalJsonElement[^1] != '}')
+            {
+                finalJsonElement += "}";
+            }
+
+            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+            if (server.type == 1)
+            {
+                playerHubServer = server;
+                playerHubServerFound = true;
+                break;
+            }
+        }
+
+        if (!playerHubServerFound)
+        {
+            Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
+            yield break;
+        }
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIPAddressOverride != "" ? targetIPAddressOverride : playerHubServer.ip;
+
+        SceneManager.LoadScene("CharacterSelect");
     }
 }

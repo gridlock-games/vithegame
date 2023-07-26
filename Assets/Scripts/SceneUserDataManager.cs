@@ -31,7 +31,6 @@ public class SceneUserDataManager : MonoBehaviour
     private bool isPreviewActive = false;
     private bool connectingToPlayerHub;
 
-    private AsyncOperation loadingHubAsyncOperation;
     public void ConnectToPlayerHub()
     {
         if (connectingToPlayerHub) { return; }
@@ -42,7 +41,6 @@ public class SceneUserDataManager : MonoBehaviour
         // Find player object by weapon type
         for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
         {
-            Debug.Log(ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() + " " + selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType());
             if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
@@ -67,7 +65,7 @@ public class SceneUserDataManager : MonoBehaviour
         }
 
         loadingText.text = "Connecting to player hub...";
-        loadingHubAsyncOperation = ClientManager.Singleton.ChangeLocalSceneThenStartClient("Hub");
+        NetworkManager.Singleton.StartClient();
     }
 
     void Start()
@@ -75,14 +73,6 @@ public class SceneUserDataManager : MonoBehaviour
         this.datamanager = DataManager.Instance;
         Instantiate(cameraPrefab);
         this.InitDataReferences();
-    }
-
-    private void Update()
-    {
-        if (loadingHubAsyncOperation != null)
-        {
-            loadingText.text = "Connecting to player hub... " + Mathf.RoundToInt(loadingHubAsyncOperation.progress * 100) + "%";
-        }
     }
 
     private void InitDataReferences()

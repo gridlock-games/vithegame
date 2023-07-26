@@ -72,81 +72,90 @@ namespace LightPat.Core
 
         private void OnCountdownTimerChange(float prev, float current)
         {
-            if (!IsClient) { return; }
+            if (!IsServer) { return; }
 
             if (prev > 0 & current <= 0)
             {
-                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
-                if (localPlayer)
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    if (changeLocomotionControlCoroutine != null)
-                        StopCoroutine(changeLocomotionControlCoroutine);
-                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true));
+                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                    Character playerChar = playerObject.GetComponent<Character>();
+                    playerChar.characterLocomotion.SetAllowDirectionControlChanges(true, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
                 }
             }
             else if (prev <= 0 & current > 0)
             {
-                NetworkObject localPlayer = NetworkManager.LocalClient.PlayerObject;
-                if (localPlayer)
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    if (changeLocomotionControlCoroutine != null)
-                        StopCoroutine(changeLocomotionControlCoroutine);
-                    changeLocomotionControlCoroutine = StartCoroutine(ChangeLocomotionControlOnAilmentReset(localPlayer.GetComponent<Character>(), CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false));
+                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                    Character playerChar = playerObject.GetComponent<Character>();
+                    playerChar.characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                 }
             }
-        }
-
-        Coroutine changeLocomotionControlCoroutine;
-        private IEnumerator ChangeLocomotionControlOnAilmentReset(Character playerChar, CharacterLocomotion.OVERRIDE_FACE_DIRECTION newFaceDirection, bool isControllable)
-        {
-            yield return new WaitUntil(() => playerChar.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None & playerChar.resetDefaultStateRunning == false);
-            yield return null;
-            playerChar.characterLocomotion.UpdateDirectionControl(newFaceDirection, isControllable);
         }
 
         private void Update()
         {
             if (IsServer)
             {
-                allPlayersSpawned.Value = true;
+                bool allPlayersSpawnedOnOwnerInstances = true;
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                     if (playerObject)
+                    {
                         playerObject.GetComponent<Character>().disableActions.Value = !timerDisplay.enabled;
+                        if (allPlayersSpawnedOnOwnerInstances)
+                            allPlayersSpawnedOnOwnerInstances = playerObject.GetComponent<Player.NetworkPlayer>().IsSpawnedOnOwnerInstance() & playerObject.IsSpawned;
+                    }
                     else
-                        allPlayersSpawned.Value = false;
+                    {
+                        allPlayersSpawnedOnOwnerInstances = false;
+                    }
                 }
 
-                if (!allPlayersSpawned.Value) { return; }
-
-                if (countdownTime.Value > 0)
+                if (!allPlayersSpawned.Value & allPlayersSpawnedOnOwnerInstances)
                 {
                     foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                     {
                         NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                        playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().SetInvincibility(countdownTime.Value);
+                        playerObject.GetComponent<Character>().characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                     }
-
-                    countdownTime.Value -= Time.deltaTime;
-                    if (countdownTime.Value < 0) { countdownTime.Value = 0; }
                 }
-                else
+
+                allPlayersSpawned.Value = allPlayersSpawnedOnOwnerInstances;
+
+                // Only change timer values if all players are spawned
+                if (allPlayersSpawned.Value)
                 {
-                    roundTimeInSeconds.Value -= Time.deltaTime;
-                    if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
-
-                    // If a player disconnects during the match, end the game
-                    if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
+                    if (countdownTime.Value > 0)
                     {
-                        OnGameEnd();
-                    }
-                }
+                        foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                        {
+                            NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                            playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().SetInvincibility(countdownTime.Value);
+                        }
 
-                if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
+                        countdownTime.Value -= Time.deltaTime;
+                        if (countdownTime.Value < 0) { countdownTime.Value = 0; }
+                    }
+                    else
+                    {
+                        roundTimeInSeconds.Value -= Time.deltaTime;
+                        if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
+
+                        // If a player disconnects during the match, end the game
+                        if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
+                        {
+                            OnGameEnd();
+                        }
+                    }
+
+                    if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
+                }
             }
 
-            if (countdownTime.Value > 0)
+            if (countdownTime.Value > 0 | !allPlayersSpawned.Value)
             {
                 countdownText.enabled = true;
                 timerDisplay.enabled = false;
@@ -157,7 +166,7 @@ namespace LightPat.Core
                 timerDisplay.enabled = true;
             }
 
-            countdownText.SetText(countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0"));
+            countdownText.SetText(allPlayersSpawned.Value ? countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0") : countdownTimeMessage.Value.ToString());
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
@@ -299,7 +308,7 @@ namespace LightPat.Core
             if (IsServer)
             {
                 countdownTimeMessage.Value = "Returning to lobby...";
-                countdownTime.Value = 10;
+                countdownTime.Value = 5;
                 StartCoroutine(ReturnToLobby());
             }
         }
