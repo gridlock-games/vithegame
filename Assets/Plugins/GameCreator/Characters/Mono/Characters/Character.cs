@@ -688,7 +688,7 @@
         }
 
         /* This is needed so that the character won't immediatley go through 
-        the stand up sequence when the stun duration is over*/
+        the stand up sequence when the knockup duration is over*/
         private IEnumerator RecoverFromKnockupAfterDuration(float duration, CharacterMelee melee)
         {
             float initTime = Time.time;
@@ -755,7 +755,7 @@
                     if (prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned)
                     {
                         melee.currentWeapon.recoveryStun.PlayNetworked(melee);
-                        recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.25f;
+                        recoveryAnimDuration = melee.currentWeapon.recoveryStun.animationClip.length * 1.10f;
                         resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                     }
                     else
@@ -763,12 +763,16 @@
                         /*Knockup has an if handling to prevent character from immediately standing up*/
                         if (prevAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp)
                         {
-                            StartCoroutine(RecoverFromKnockupAfterDuration(1.5f, melee));
+                            StartCoroutine(RecoverFromKnockupAfterDuration(1.10f, melee));
                         }
                         else
                         {
+                            // if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
+                            // recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                            // if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+
                             if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
-                            recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                            recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.10f;
                             if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
                         }
                     }

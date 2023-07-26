@@ -47,7 +47,7 @@ namespace GameCreator.Melee
         private const float TRANSITION = 0.15f;
         protected const float INPUT_BUFFER_TIME = 0.35f;
 
-        protected const float STUN_TIMEOUT_DURATION = 3.0f;
+        protected const float STUN_TIMEOUT_DURATION = 5.0f;
 
         private int KNOCK_UP_FOLLOWUP_LIMIT = 5;
 
@@ -189,8 +189,9 @@ namespace GameCreator.Melee
                         {
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (Poise.Value <= 20)
+                                if (Poise.Value <= 15)
                                 {
+                                    this.StopAttack();
                                     return;
                                 }
                                 OnHeavyAttack();
@@ -1087,7 +1088,7 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("OnHeavyAttack() should only be called on the server."); return; }
 
-            AddPoise(-20);
+            AddPoise(-15);
         }
 
         public void OnDodge()

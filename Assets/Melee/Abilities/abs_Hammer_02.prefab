@@ -46,8 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillImageFill: {fileID: 21300000, guid: 311f42101bcd67e4d81d0cf3a36bcc47, type: 3}
   weaponBind: 2
-  meleeClip: {fileID: 11400000, guid: 579b2e6f43bdbf54788eefd65f8c1202, type: 2}
+  meleeClip: {fileID: 11400000, guid: 304cd98e24f32d2478b95c333bfa60ac, type: 2}
   abilityType: 0
-  coolDown: 0
-  staminaCost: 0
-  skillKey: 32
+  coolDown: 5
+  staminaCost: 15
+  skillKey: 101
+  canAnimCancel: 1
