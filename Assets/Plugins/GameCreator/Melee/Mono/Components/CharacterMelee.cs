@@ -383,7 +383,7 @@ namespace GameCreator.Melee
                 // Want to wait to register a hit until a certain amount of time has passed
                 if (attack.hitCount > 1)
                 {
-                    if (Time.time - melee.lastHitCountChangeTime < 0.05f) { continue; }
+                    if (Time.time - melee.lastHitCountChangeTime < attack.multiHitRegDelay) { continue; }
                 }
 
                 melee.hitCount++;

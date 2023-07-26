@@ -120,6 +120,7 @@
         private SerializedProperty spIsSequence;
         private SerializedProperty spSequencedClips;
         private SerializedProperty spHitCount;
+        private SerializedProperty spHitCountDelay;
 
         // end of abilities
 
@@ -201,6 +202,7 @@
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
+            this.spHitCountDelay = this.serializedObject.FindProperty("multiHitRegDelay");
             this.spAttackType = this.serializedObject.FindProperty("attackType");
             this.spIsDodge = this.serializedObject.FindProperty("isDodge");
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
@@ -527,6 +529,7 @@
                     if (this.spIsSequence.boolValue == false)
                     {
                         EditorGUILayout.PropertyField(this.spHitCount);
+                        EditorGUILayout.PropertyField(this.spHitCountDelay);
                     } else {
                         
                         EditorGUILayout.PropertyField(this.spSequencedClips);
