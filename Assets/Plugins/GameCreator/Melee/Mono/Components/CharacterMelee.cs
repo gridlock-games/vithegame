@@ -177,6 +177,7 @@ namespace GameCreator.Melee
                 this.comboSystem.Update();
 
                 if (!this.CanAttack()) return;
+                if(this.Character.isCharacterDashing()) return;
 
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
@@ -205,8 +206,9 @@ namespace GameCreator.Melee
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
 
-                        if (IsOwner)
+                        if (IsOwner) {
                             FocusTarget(meleeClip);
+                        }
 
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
