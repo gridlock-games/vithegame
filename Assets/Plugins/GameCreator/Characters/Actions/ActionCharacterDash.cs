@@ -86,6 +86,7 @@
             if (melee.IsStaggered) { Destroy(target); return; }
             if (melee.GetHP() <= 0) { Destroy(target); return; }
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
+            if (melee.GetCurrentPhase() >= 1 ) { Destroy(target); return; }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
