@@ -65,7 +65,7 @@
             if (!melee.currentWeapon.weaponImage) { return; }
             weaponImageFill.sprite = melee.currentWeapon.weaponImage;
 
-            foreach (Ability ability in abilityManager.abilities)
+            foreach (Ability ability in abilityManager.GetAbilityInstanceList())
             {
                 switch (ability.skillKey)
                 {

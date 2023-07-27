@@ -513,7 +513,7 @@ namespace GameCreator.Melee
         {
             if (abilityManager)
             {
-                foreach (Ability ablty in abilityManager.abilities)
+                foreach (Ability ablty in abilityManager.GetAbilityInstanceList())
                 {
                     MeleeClip meleeClip = ablty.meleeClip;
 
