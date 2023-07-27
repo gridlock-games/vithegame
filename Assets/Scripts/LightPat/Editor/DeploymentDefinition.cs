@@ -69,7 +69,7 @@ namespace LightPat.Editor
                     options = build.options,
                     target = build.target,
                     subtarget = (int)build.subtarget,
-                    targetGroup = build.targetGroup
+                    targetGroup = BuildTargetGroup.Standalone
                 };
 
                 var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
@@ -100,7 +100,6 @@ namespace LightPat.Editor
         public BuildOptions options;
         public BuildTarget target;
         public StandaloneBuildSubtarget subtarget;
-        public BuildTargetGroup targetGroup;
     }
 }
 #endif
