@@ -190,7 +190,7 @@ namespace GameCreator.Melee
                         {
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
-                                if (Poise.Value <= 15)
+                                if (Poise.Value <= 20)
                                 {
                                     this.StopAttack();
                                     return;
