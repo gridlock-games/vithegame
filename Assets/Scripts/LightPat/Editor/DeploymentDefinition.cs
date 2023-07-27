@@ -8,7 +8,7 @@ namespace LightPat.Editor
     [CreateAssetMenu(fileName = "new-deployment-definition", menuName = "Deployment Definition")]
     public class DeploymentDefinition : ScriptableObject
     {
-        [Header("Please put linux builds above window builds, otherwise an error will be thrown during the build process")]
+        [Header("If your build list has linux builds in it, please set your editor to the linux settings and move them to the top of the list, otherwise an error will be thrown during the build process.")]
         public Build[] buildList;
 
         [ContextMenu("Create builds")]
