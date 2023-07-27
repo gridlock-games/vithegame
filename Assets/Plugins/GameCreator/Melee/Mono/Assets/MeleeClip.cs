@@ -121,6 +121,7 @@
         // abilities
 
         public int hitCount = 1;
+        public float multiHitRegDelay = 1.0f;
         public bool isSequence = false;
         public List<MeleeClip> sequencedClips = new List<MeleeClip>();
 
