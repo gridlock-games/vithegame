@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 public class AbilityManager : NetworkBehaviour
 {
-    public List<Ability> abilities = new List<Ability>();
+    [SerializeField] private List<Ability> abilityPrefabs = new List<Ability>();
 
     private readonly List<KeyCode> _hotKeys = new List<KeyCode>()
     {
@@ -17,11 +17,18 @@ public class AbilityManager : NetworkBehaviour
     };
 
     private CharacterMelee melee;
+    private List<Ability> abilityInstances = new List<Ability>();
+
     private NetworkList<bool> abilitiesOnCooldown;
+
+    public List<Ability> GetAbilityInstanceList()
+    {
+        return abilityInstances;
+    }
 
     public bool IsAbilityOnCooldown(Ability ability)
     {
-        return abilitiesOnCooldown[abilities.IndexOf(ability)];
+        return abilitiesOnCooldown[abilityInstances.IndexOf(ability)];
     }
 
     private void Awake()
@@ -30,9 +37,17 @@ public class AbilityManager : NetworkBehaviour
 
         melee = GetComponentInParent<CharacterMelee>();
 
-        foreach (Ability ability in abilities)
+        List<GameObject> abilityObjects = new List<GameObject>();
+        foreach (Ability ability in abilityPrefabs)
         {
+            abilityObjects.Add(Instantiate(ability.gameObject, transform));
+        }
+
+        foreach (GameObject abilityInstance in abilityObjects)
+        {
+            Ability ability = abilityInstance.GetComponent<Ability>();
             ability.ResetAbility();
+            abilityInstances.Add(ability);
         }
     }
 
@@ -41,21 +56,21 @@ public class AbilityManager : NetworkBehaviour
         if (IsServer)
         {
             // Update cooldown status over the network
-            for (int i = 0; i < abilities.Count; i++)
+            for (int i = 0; i < abilityInstances.Count; i++)
             {
                 if (abilitiesOnCooldown.Count < i + 1)
                 {
-                    abilitiesOnCooldown.Add(abilities[i].isOnCoolDownLocally);
+                    abilitiesOnCooldown.Add(abilityInstances[i].isOnCoolDownLocally);
                 }
                 else
                 {
-                    abilitiesOnCooldown[i] = abilities[i].isOnCoolDownLocally;
+                    abilitiesOnCooldown[i] = abilityInstances[i].isOnCoolDownLocally;
                 }
             }
         }
 
         if (!IsOwner) return;
-        if (abilities.Count <= 0) return;
+        if (abilityInstances.Count <= 0) return;
         if (!Input.anyKeyDown) return;
         if (melee == null) return;
         if (melee.IsBlocking) return;
@@ -71,7 +86,7 @@ public class AbilityManager : NetworkBehaviour
     [ServerRpc]
     private void ActivateAbilityServerRpc(KeyCode key)
     {
-        Ability ability = abilities.Find(ablty => ablty.skillKey == key);
+        Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
 
         // Don't activate while dashing
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
