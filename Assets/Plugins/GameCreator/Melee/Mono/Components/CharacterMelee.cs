@@ -55,6 +55,8 @@ namespace GameCreator.Melee
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
+
+        public bool isCastingAbility {get; private set;}
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MeleeWeapon currentWeapon;
@@ -946,6 +948,22 @@ namespace GameCreator.Melee
 
             if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
+        }
+
+        public virtual void ExecuteAbility(ActionKey actionKey)
+        {
+            if (!this.currentWeapon) return;
+            if (!this.CanAttack()) return;
+
+            this.isCastingAbility = true;
+            if (IsOwner) this.StopBlockingServerRpc();
+            this.inputBuffer.AddInput(actionKey);
+        }
+
+        public void SetIsCastingAbilityStatus() {
+            if(this.isCastingAbility) {
+                this.isCastingAbility = false;
+            }
         }
 
         public void StopAttack()

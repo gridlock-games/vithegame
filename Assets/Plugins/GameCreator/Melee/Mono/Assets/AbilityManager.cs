@@ -19,6 +19,8 @@ public class AbilityManager : NetworkBehaviour
     private CharacterMelee melee;
     private List<Ability> abilityInstances = new List<Ability>();
 
+    private Ability activatedAbility;
+
     private NetworkList<bool> abilitiesOnCooldown;
 
     public List<Ability> GetAbilityInstanceList()
@@ -94,8 +96,10 @@ public class AbilityManager : NetworkBehaviour
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
         // Don't activate if ability can't cancel attack animation
         if (ability && melee.IsAttacking && !ability.canAnimCancel) { return; }
-        // Don't activate if Current Phase >= 1
-        if (ability && melee.GetCurrentPhase() >= 1 && ability.canAnimCancel) { return; }
+        // Don't activate if an ability is already casting
+        if (ability && ability.canAnimCancel) { if( melee.isCastingAbility ) { return; } }
+        // Don't activate if an existing ability is active and requires player to commit
+        if (ability && melee.isCastingAbility  && activatedAbility.hasAnimCommit) { return; }
         // Don't activate if ability is on cooldown
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
@@ -104,8 +108,9 @@ public class AbilityManager : NetworkBehaviour
 
         if (ability != null && melee != null)
         {
-            melee.AddPoise(-1 * ability.staminaCost);
-            ability.ExecuteAbility(melee, key);
+            activatedAbility = ability;
+            melee.AddPoise(-1 * activatedAbility.staminaCost);
+            activatedAbility.ExecuteAbility(melee, key);
         }
     }
 }
