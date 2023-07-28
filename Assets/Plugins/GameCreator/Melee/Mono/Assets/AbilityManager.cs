@@ -79,7 +79,9 @@ public class AbilityManager : NetworkBehaviour
 
         foreach (KeyCode key in _hotKeys)
         {
-            if (Input.GetKeyDown(key)) { ActivateAbilityServerRpc(key); }
+            if (Input.GetKeyDown(key)) { 
+                ActivateAbilityServerRpc(key);
+            }
         }
     }
 
@@ -91,11 +93,14 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate while dashing
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
         // Don't activate if ability can't cancel attack animation
-        if (melee.IsAttacking && !ability.canAnimCancel) { return; }
+        if (ability && melee.IsAttacking && !ability.canAnimCancel) { return; }
+        // Don't activate if Current Phase >= 1
+        if (ability && melee.GetCurrentPhase() >= 1 && ability.canAnimCancel) { return; }
         // Don't activate if ability is on cooldown
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
         if (ability && melee.GetPoise() < ability.staminaCost) { return; }
+        
 
         if (ability != null && melee != null)
         {
