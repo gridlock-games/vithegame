@@ -19,6 +19,8 @@ public class AbilityManager : NetworkBehaviour
     private CharacterMelee melee;
     private List<Ability> abilityInstances = new List<Ability>();
 
+    private Ability activatedAbility;
+
     private NetworkList<bool> abilitiesOnCooldown;
 
     public List<Ability> GetAbilityInstanceList()
@@ -79,7 +81,9 @@ public class AbilityManager : NetworkBehaviour
 
         foreach (KeyCode key in _hotKeys)
         {
-            if (Input.GetKeyDown(key)) { ActivateAbilityServerRpc(key); }
+            if (Input.GetKeyDown(key)) { 
+                ActivateAbilityServerRpc(key);
+            }
         }
     }
 
@@ -91,16 +95,22 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate while dashing
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
         // Don't activate if ability can't cancel attack animation
-        if (melee.IsAttacking && !ability.canAnimCancel) { return; }
+        if (ability && melee.IsAttacking && !ability.canAnimCancel) { return; }
+        // Don't activate if an ability is already casting
+        if (ability && ability.canAnimCancel) { if( melee.isCastingAbility ) { return; } }
+        // Don't activate if an existing ability is active and requires player to commit
+        if (ability && melee.isCastingAbility  && activatedAbility.hasAnimCommit) { return; }
         // Don't activate if ability is on cooldown
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
         if (ability && melee.GetPoise() < ability.staminaCost) { return; }
+        
 
         if (ability != null && melee != null)
         {
-            melee.AddPoise(-1 * ability.staminaCost);
-            ability.ExecuteAbility(melee, key);
+            activatedAbility = ability;
+            melee.AddPoise(-1 * activatedAbility.staminaCost);
+            activatedAbility.ExecuteAbility(melee, key);
         }
     }
 }

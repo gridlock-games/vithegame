@@ -209,6 +209,7 @@
                     break;
 
                 case 2:
+                    Melee.RevertAbilityCastingStatus();
                     if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.affectedBones.Contains(weaponBone))
                     {

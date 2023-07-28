@@ -29,6 +29,7 @@ public class Ability : MonoBehaviour
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
     public bool canAnimCancel = false;
+    public bool hasAnimCommit = false;
 
     public bool isOnCoolDownLocally { get; private set; }
 
@@ -84,7 +85,7 @@ public class Ability : MonoBehaviour
             melee.Character.GetCharacterAnimator().StopGesture(0.15f);
         }
 
-        melee.Execute(actionKey);
+        melee.ExecuteAbility(actionKey);
     }
 
     private IEnumerator WaitForAbilityCooldown()
