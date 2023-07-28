@@ -133,6 +133,7 @@
             float angle = Vector3.SignedAngle(moveDirection, charDirection, Vector3.up);
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
+            melee.RevertAbilityCastingStatus();
             characterTarget.setCharacterDashing(true);
 
             InstantExecuteLocally(target, moveDirection, angle);

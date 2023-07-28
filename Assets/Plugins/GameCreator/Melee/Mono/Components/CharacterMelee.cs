@@ -960,9 +960,9 @@ namespace GameCreator.Melee
             this.inputBuffer.AddInput(actionKey);
         }
 
-        public void SetIsCastingAbilityStatus() {
-            if(this.isCastingAbility) {
-                this.isCastingAbility = false;
+        public void RevertAbilityCastingStatus() {
+            if(isCastingAbility) {
+                isCastingAbility = false;
             }
         }
 
@@ -970,6 +970,7 @@ namespace GameCreator.Melee
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
             {
+                this.isCastingAbility = false;
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();
@@ -1140,6 +1141,7 @@ namespace GameCreator.Melee
             // Prioritize damage taken over attack and non-invincible dodge frames
             if (melee.IsAttacking || melee.Character.isCharacterDashing())
             {
+                melee.RevertAbilityCastingStatus();
                 melee.StopAttack();
                 CharacterAnimator.StopGesture(0.10f);
 
