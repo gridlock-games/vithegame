@@ -17,6 +17,10 @@
         private CharacterMelee melee;
         private AbilityManager abilityManager;
 
+        private Color lowPoiseColor = new Color(3,0,147);
+
+        private Color normalPoiseColor = new Color(200,200,200);
+
         public Slider healthSlider;
         public Slider defenseSlider;
         public Slider poiseSlider;
@@ -71,12 +75,15 @@
                 {
                     case KeyCode.Q:
                         abilityAImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
+                        abilityAImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.E:
                         abilityBImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
+                        abilityBImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.R:
                         abilityCImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
+                        abilityCImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
                         break;
                 }
             }
