@@ -741,6 +741,7 @@
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
+            melee.SetUninterruptable(0f);
             melee.RevertAbilityCastingStatus();
             bool isDodging = this.isCharacterDashing();
 

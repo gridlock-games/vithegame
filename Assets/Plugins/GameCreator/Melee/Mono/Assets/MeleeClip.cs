@@ -323,7 +323,7 @@
         public void ExecuteHitPause()
         {
             if (!this.hitPause) return;
-
+            
             TimeManager.Instance.SetTimeScale(this.hitPauseAmount, HITPAUSE_TIME_LAYER);
             CoroutinesManager.Instance.StartCoroutine(this.ExecuteHitPause(
                 this.hitPauseDuration

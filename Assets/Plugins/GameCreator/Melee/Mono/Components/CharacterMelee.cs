@@ -1001,6 +1001,7 @@ namespace GameCreator.Melee
             if (IsOwner && adventureMotor != null)
             {
                 if (phase == 1 && this.currentMeleeClip.isOrbitLocked) { adventureMotor.allowOrbitInput = false; }
+                if (isUninterruptable && phase == 2 ) { SetUninterruptable(0f); } 
                 if (phase == 2 || phase <= 0 ) { adventureMotor.allowOrbitInput = true; }
             }
 
@@ -1150,10 +1151,12 @@ namespace GameCreator.Melee
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
 
             // Prioritize damage taken over attack and non-invincible dodge frames
-            if (melee.IsAttacking || melee.Character.isCharacterDashing())
+            if ((melee.IsAttacking || melee.Character.isCharacterDashing()) && !isUninterruptable)
             {
                 melee.RevertAbilityCastingStatus();
+                melee.SetUninterruptable(0f); 
                 melee.StopAttack();
+                melee.adventureMotor.allowOrbitInput = true;
                 CharacterAnimator.StopGesture(0.10f);
 
                 if(melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
@@ -1271,7 +1274,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
+            bool shouldPlayHitReaction = (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup) || (this.IsUninterruptable && attack.attackType == AttackType.None && GetCurrentPhase() == 2) ;
             if (!shouldPlayHitReaction) { hitReaction = null; }
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
@@ -1390,7 +1393,7 @@ namespace GameCreator.Melee
 
             attack.ExecuteHitPause();
             // Play Reaction Clip only if the attackType is not an Ailment
-            if ((!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
+            if ((this.IsUninterruptable && attack.attackType == AttackType.None && GetCurrentPhase() == 2) || (!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
             {
                 hitReaction.PlayNetworked(this);
             }
