@@ -741,6 +741,7 @@
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
+            melee.RevertAbilityCastingStatus();
             bool isDodging = this.isCharacterDashing();
 
             if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
