@@ -13,6 +13,7 @@ namespace GameCreator.Melee
     using static GameCreator.Melee.MeleeClip;
     using UnityEngine.SceneManagement;
     using System.Reflection;
+    using GameCreator.Camera;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -57,6 +58,8 @@ namespace GameCreator.Melee
 
 
         public bool isCastingAbility {get; private set;}
+        
+        private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MeleeWeapon currentWeapon;
@@ -163,6 +166,13 @@ namespace GameCreator.Melee
 
         // UPDATE: --------------------------------------------------------------------------------
 
+
+        protected virtual void Start() {
+            if (IsOwner) {
+                CameraMotor motor = CameraMotor.MAIN_MOTOR;
+                adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+            }
+        }
         protected virtual void Update()
         {
             if (SceneManager.GetActiveScene().name == "Hub")
@@ -214,11 +224,6 @@ namespace GameCreator.Melee
 
                         this.currentMeleeClip = meleeClip;
                         this.targetsEvaluated = new HashSet<int>();
-
-                        this.Blades.ForEach(blade =>
-                        {
-                            blade.isOrbitLocked = meleeClip.isOrbitLocked;
-                        });
 
                         if (!this.currentMeleeClip.isSequence)
                         {
@@ -992,6 +997,12 @@ namespace GameCreator.Melee
             if (this.comboSystem == null) return -1;
 
             int phase = this.currentMeleeClip != null ? this.comboSystem.GetCurrentPhase(this.currentMeleeClip) : -1;
+
+            if (IsOwner && adventureMotor != null)
+            {
+                if (phase == 1 && this.currentMeleeClip.isOrbitLocked) { adventureMotor.allowOrbitInput = false; }
+                if (phase == 2 || phase <= 0 ) { adventureMotor.allowOrbitInput = true; }
+            }
 
             return phase;
         }
