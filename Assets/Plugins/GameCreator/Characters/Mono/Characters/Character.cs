@@ -524,9 +524,6 @@
                         StartCoroutine(StartKnockupAfterDuration(.05f, waitForClientRotation));
                         break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
-                        UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartSunAfterDuration(.05f, waitForClientRotation));
-                        break;
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp:
                         UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                         StartCoroutine(StartKnockdownAfterDuration(.05f, waitForClientRotation));
@@ -741,6 +738,7 @@
             CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
+            melee.SetUninterruptable(0f);
             melee.RevertAbilityCastingStatus();
             bool isDodging = this.isCharacterDashing();
 

@@ -91,8 +91,6 @@
         public int trailGranularity = 60;
         public float trailDuration = 0.5f;
 
-        public bool isOrbitLocked = false;
-
 #if UNITY_EDITOR
         private float capturingHitsTime;
 #endif
@@ -120,12 +118,6 @@
                     this.trailDuration
                 );
             }
-        }
-
-        private NetworkObject parentNetObj;
-        private void OnTransformParentChanged()
-        {
-            parentNetObj = GetComponentInParent<NetworkObject>();
         }
 
         // UPDATE METHOD: -------------------------------------------------------------------------
@@ -157,13 +149,6 @@
 
             if (currPhase == prevPhase) return;
 
-            CameraMotorTypeAdventure adventureMotor = null;
-            if (parentNetObj.IsOwner)
-            {
-                CameraMotor motor = CameraMotor.MAIN_MOTOR;
-                adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
-            }
-
             // If we have no current melee clip don't do anything
             if (!clip) { return; }
 
@@ -189,7 +174,6 @@
                     break;
 
                 case 1:
-                    if (adventureMotor != null && isOrbitLocked == true) adventureMotor.allowOrbitInput = false;
 
                     if (clip != null && clip.affectedBones != null && !isActivated && clip.affectedBones.Contains(weaponBone))
                     {
@@ -210,7 +194,6 @@
 
                 case 2:
                     Melee.RevertAbilityCastingStatus();
-                    if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                     if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.affectedBones.Contains(weaponBone))
                     {
                         clip.PlayVFXAttachment(Melee);
