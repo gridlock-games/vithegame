@@ -21,6 +21,13 @@ public class Ability : MonoBehaviour
         DashAttack
     }
 
+    public enum AnimCancellingType {
+        None,
+        Cancel_NormalAtk,
+        Cancel_AbilityAtk,
+        Cancel_Dodge
+    }
+
     public Sprite skillImageFill;
     public WeaponType weaponBind = WeaponType.BRAWLER;
     public MeleeClip meleeClip;
@@ -28,8 +35,9 @@ public class Ability : MonoBehaviour
     public float coolDown = 0.00f;
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
-    public bool canAnimCancel = false;
-    public bool hasAnimCommit = false;
+
+    public AnimCancellingType canCncelAnimationType = AnimCancellingType.Cancel_NormalAtk;
+    public bool canCancelAnimation = false;
 
     public bool isOnCoolDownLocally { get; private set; }
 
@@ -78,7 +86,7 @@ public class Ability : MonoBehaviour
 
         if (hasValidkey == false) return;
 
-        if (melee.IsAttacking && canAnimCancel)
+        if (melee.IsAttacking)
         {
             melee.StopAttack();
             melee.currentMeleeClip = null;
