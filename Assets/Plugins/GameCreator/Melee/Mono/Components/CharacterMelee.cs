@@ -1149,6 +1149,10 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
+            if (melee.isCastingAbility && isUninterruptable) { 
+                return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); 
+            }
+
 
             // Prioritize damage taken over attack and non-invincible dodge frames
             if ((melee.IsAttacking || melee.Character.isCharacterDashing()) && !isUninterruptable)
@@ -1274,7 +1278,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup) || (this.IsUninterruptable && attack.attackType == AttackType.None && GetCurrentPhase() == 2) ;
+            bool shouldPlayHitReaction = (IsUninterruptable && !isCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction) { hitReaction = null; }
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
@@ -1393,7 +1397,7 @@ namespace GameCreator.Melee
 
             attack.ExecuteHitPause();
             // Play Reaction Clip only if the attackType is not an Ailment
-            if ((this.IsUninterruptable && attack.attackType == AttackType.None && GetCurrentPhase() == 2) || (!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
+            if ( (IsUninterruptable && !isCastingAbility)  || (!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
             {
                 hitReaction.PlayNetworked(this);
             }
