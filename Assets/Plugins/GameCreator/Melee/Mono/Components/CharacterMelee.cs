@@ -420,8 +420,11 @@ namespace GameCreator.Melee
                 // Calculate hit result/HP damage
                 int previousHP = targetMelee.HP.Value;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
+                
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
+
+                Debug.Log("hitReaction: " + hitReaction);
                 if (hitResult == HitResult.ReceiveDamage)
                     targetMelee.HP.Value -= attack.baseDamage;
                 else if (hitResult == HitResult.PoiseBlock)
@@ -1156,22 +1159,34 @@ namespace GameCreator.Melee
 
             MeleeClip hitReaction = null;
 
+            
+            // Please comment out instead of deleting this block
+            #region Debug Results
+            Debug.Log ("=============");
+            Debug.Log ("name: " + melee.name);
+            Debug.Log ("IsUninterruptable: " + melee.IsUninterruptable);
+            Debug.Log ("IsInvincible: " + melee.IsInvincible);
+            Debug.Log ("IsAttacking: " + melee.IsAttacking);
+            Debug.Log ("IsDashing: " + melee.Character.isCharacterDashing());
+            #endregion
+
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             // if (this.GetHP() <= 0) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
+            // Uninterruptable Abilities will not be cancelled
             if (melee.isCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
+            // Uninterruptable Heavy Attacks will not be cancelled
             if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
 
             // Prioritize damage taken over attack and non-invincible dodge frames
-            if ((melee.IsAttacking || melee.Character.isCharacterDashing()) && !IsUninterruptable)
+            if (melee.IsAttacking || melee.Character.isCharacterDashing())
             {
-
                 melee.RevertAbilityCastingStatus();
                 melee.SetUninterruptable(0f); 
                 melee.StopAttack();
-                melee.adventureMotor.allowOrbitInput = true;
+                if(melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
                 CharacterAnimator.StopGesture(0.10f);
 
                 if(melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
@@ -1291,6 +1306,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             bool shouldPlayHitReaction = (IsUninterruptable && !isCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction) { hitReaction = null; }
+            
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
 
