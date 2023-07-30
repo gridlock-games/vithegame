@@ -289,18 +289,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38bf0f8c8fb12482d9662e19de74cbbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &380972146 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6867211995634720326, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
-    type: 3}
-  m_PrefabInstance: {fileID: 1307178522}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 380972135}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38bf0f8c8fb12482d9662e19de74cbbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &380972147 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4859219750685990074, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
@@ -325,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a93f1f947e69482dac99c3488751423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
+  isExpanded: 1
   character:
     target: 2
     character: {fileID: 1012365789}
@@ -347,7 +335,7 @@ MonoBehaviour:
         m_Calls: []
   target: 0
   value:
-    target: 0
+    target: 3
     gameObject: {fileID: 0}
     global:
       allowTypesMask: 512
@@ -1589,7 +1577,7 @@ PrefabInstance:
     - target: {fileID: 288998040404840008, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: actions.Array.size
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 288998040404840008, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1620,17 +1608,17 @@ PrefabInstance:
         type: 3}
       propertyPath: actions.Array.data[6]
       value: 
-      objectReference: {fileID: 380972146}
+      objectReference: {fileID: 380972149}
     - target: {fileID: 288998040404840008, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: actions.Array.data[7]
       value: 
-      objectReference: {fileID: 380972149}
+      objectReference: {fileID: 380972142}
     - target: {fileID: 288998040404840008, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: actions.Array.data[8]
       value: 
-      objectReference: {fileID: 380972142}
+      objectReference: {fileID: 0}
     - target: {fileID: 288998041406652121, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1708,8 +1696,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4859219750685990074, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
+      propertyPath: key
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4859219750685990074, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
       propertyPath: isExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6758201128675552347, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1718,8 +1711,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7043209583932600394, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
+      propertyPath: key
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043209583932600394, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
       propertyPath: isExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8019317750045649150, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1741,7 +1739,8 @@ PrefabInstance:
       propertyPath: isExpanded
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6867211995634720326, guid: 08be6bc05a8bb504b80d4c74cae1c5f1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 08be6bc05a8bb504b80d4c74cae1c5f1, type: 3}
 --- !u!1 &1316772814
 GameObject:
@@ -2119,7 +2118,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f,
       type: 3}
     NetworkPrefabs: []
     TickRate: 120

@@ -9,6 +9,7 @@ namespace GameCreator.Melee
     {
         [SerializeField] private Material[] hitMaterials;
         [SerializeField] private Material[] healMaterials;
+        [SerializeField] private Material[] invulnerableMaterials;
         [SerializeField] private float meshColorResetDelay = 0.25f;
 
         [SerializeField] private Material[] invincibleMaterials;
@@ -36,6 +37,11 @@ namespace GameCreator.Melee
         public void RenderHeal()
         {
             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, healMaterials));
+        }
+
+        public void RenderInvulnerable()
+        {
+             StartCoroutine(ResetMeshColorAfterDelay(meshColorResetDelay, invulnerableMaterials));
         }
 
         private void Awake()
