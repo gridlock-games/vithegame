@@ -1162,12 +1162,12 @@ namespace GameCreator.Melee
             
             // Please comment out instead of deleting this block
             #region Debug Results
-            Debug.Log ("=============");
-            Debug.Log ("name: " + melee.name);
-            Debug.Log ("IsUninterruptable: " + melee.IsUninterruptable);
-            Debug.Log ("IsInvincible: " + melee.IsInvincible);
-            Debug.Log ("IsAttacking: " + melee.IsAttacking);
-            Debug.Log ("IsDashing: " + melee.Character.isCharacterDashing());
+            print ("=============");
+            print ("name: " + melee.name);
+            print ("IsUninterruptable: " + melee.IsUninterruptable);
+            print ("IsInvincible: " + melee.IsInvincible);
+            print ("IsAttacking: " + melee.IsAttacking);
+            print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
