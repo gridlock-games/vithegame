@@ -132,6 +132,7 @@ namespace GameCreator.Melee
         private float anim_ExecutedDuration = 0.0f;
 
         private AbilityManager abilityManager;
+        private GlowRenderer glowRenderer;
 
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
@@ -156,6 +157,7 @@ namespace GameCreator.Melee
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
         // FOCUS TARGET: --------------------------------------------------------------------------
@@ -279,7 +281,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            GetComponentInChildren<GlowRenderer>().RenderInvincible(IsInvincible);
+            glowRenderer.RenderInvincible(IsInvincible);
 
             IsAttacking = false;
 
@@ -861,11 +863,11 @@ namespace GameCreator.Melee
         {
             if (current < prev)
             {
-                GetComponentInChildren<GlowRenderer>().RenderHit();
+                glowRenderer.RenderHit();
             }
             else if (current > prev)
             {
-                GetComponentInChildren<GlowRenderer>().RenderHeal();
+                glowRenderer.RenderHeal();
             }
 
             // Cancel death ailment if we get our health back
