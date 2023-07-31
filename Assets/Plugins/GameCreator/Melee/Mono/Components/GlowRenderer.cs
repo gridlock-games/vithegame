@@ -50,7 +50,6 @@ namespace GameCreator.Melee
             foreach (Material glowMaterialInstance in glowMaterialInstances)
             {
                 glowMaterialInstance.color = new Color(red, 0, 0, 0);
-                Debug.Log(glowMaterialInstance);
             }
         }
     }

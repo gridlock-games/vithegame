@@ -111,7 +111,6 @@ namespace LightPat.Player
                     {
                         DisableActionsServerRpc(true);
                         Cursor.lockState = CursorLockMode.None;
-                        cameraMotorInstance.allowOrbitInput = false;
                         pauseInstance = Instantiate(pauseMenuPrefab);
                     }
                 }
@@ -119,11 +118,12 @@ namespace LightPat.Player
                 {
                     DisableActionsServerRpc(false);
                     Cursor.lockState = CursorLockMode.Locked;
-                    cameraMotorInstance.allowOrbitInput = true;
                     pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                     Destroy(pauseInstance);
                 }
             }
+
+            cameraMotorInstance.allowOrbitInput = !pauseInstance;
 
             if (!ClientManager.Singleton) { return; }
 
