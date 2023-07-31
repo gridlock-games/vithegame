@@ -219,14 +219,6 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                        {
-                            if (!hitRenderer.rendererRunning && currentMeleeClip != null)
-                            {
-                                if((isCastingAbility || meleeClip.isHeavy)  && meleeClip.interruptible == Interrupt.Uninterruptible) { hitRenderer.RenderInvulnerable(); }
-                            }
-                        }
-
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
 
@@ -284,13 +276,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-            {
-                if (!hitRenderer.rendererRunning)
-                {
-                    hitRenderer.RenderInvinicible(IsInvincible);
-                }
-            }
+            GetComponentInChildren<GlowRenderer>().RenderInvincible(IsInvincible);
 
             IsAttacking = false;
 
@@ -424,7 +410,6 @@ namespace GameCreator.Melee
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
-                Debug.Log("hitReaction: " + hitReaction);
                 if (hitResult == HitResult.ReceiveDamage)
                     targetMelee.HP.Value -= attack.baseDamage;
                 else if (hitResult == HitResult.PoiseBlock)
@@ -873,17 +858,11 @@ namespace GameCreator.Melee
         {
             if (current < prev)
             {
-                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                {
-                    hitRenderer.RenderHit();
-                }
+                GetComponentInChildren<GlowRenderer>().RenderHit();
             }
             else if (current > prev)
             {
-                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                {
-                    hitRenderer.RenderHeal();
-                }
+                GetComponentInChildren<GlowRenderer>().RenderHeal();
             }
 
             // Cancel death ailment if we get our health back
@@ -1162,12 +1141,12 @@ namespace GameCreator.Melee
             
             // Please comment out instead of deleting this block
             #region Debug Results
-            print ("=============");
-            print ("name: " + melee.name);
-            print ("IsUninterruptable: " + melee.IsUninterruptable);
-            print ("IsInvincible: " + melee.IsInvincible);
-            print ("IsAttacking: " + melee.IsAttacking);
-            print ("IsDashing: " + melee.Character.isCharacterDashing());
+            //print ("=============");
+            //print ("name: " + melee.name);
+            //print ("IsUninterruptable: " + melee.IsUninterruptable);
+            //print ("IsInvincible: " + melee.IsInvincible);
+            //print ("IsAttacking: " + melee.IsAttacking);
+            //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
