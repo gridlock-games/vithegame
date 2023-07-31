@@ -53,6 +53,7 @@
         public InitDirection initialDirection = InitDirection.TargetDirection;
 
         public bool allowOrbitInput = true;
+        public bool allowOrbitInputOverride = true;
         public OrbitInput orbitInput = OrbitInput.MouseMove;
         public float orbitSpeed = 25.0f;
         private float orbitInputTime = -1000f;
@@ -153,7 +154,7 @@
             float rotationX = 0.0f;
             float rotationY = 0.0f;
 
-            if (this.allowOrbitInput) this.RotationInput(ref rotationX, ref rotationY);
+            if (this.allowOrbitInput & allowOrbitInputOverride) this.RotationInput(ref rotationX, ref rotationY);
 
             this.targetRotationX += rotationX;
             this.targetRotationY += rotationY;

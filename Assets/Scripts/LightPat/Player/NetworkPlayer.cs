@@ -123,7 +123,7 @@ namespace LightPat.Player
                 }
             }
 
-            cameraMotorInstance.allowOrbitInput = !pauseInstance;
+            cameraMotorInstance.allowOrbitInputOverride = !pauseInstance;
 
             if (!ClientManager.Singleton) { return; }
 
