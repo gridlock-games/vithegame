@@ -29,10 +29,16 @@ namespace GameCreator.Melee
             this.isInvincible = isInvincible;
         }
 
-        public void RenderUninterruptable(bool isUninterruptable)
+        private float lastBlockTime = -5;
+        public void RenderBlock()
         {
-
+            lastBlockTime = Time.time;
         }
+
+        //public void RenderUninterruptable(bool isUninterruptable)
+        //{
+
+        //}
 
         private List<Material> glowMaterialInstances = new List<Material>();
         private bool allowRender;
@@ -59,11 +65,6 @@ namespace GameCreator.Melee
         private void Update()
         {
             if (!allowRender) { return; }
-
-            if (GetComponentInParent<Unity.Netcode.NetworkObject>().IsLocalPlayer)
-            {
-                Debug.Log(isInvincible);
-            }
 
             // Invincible
             if (isInvincible)
@@ -105,6 +106,23 @@ namespace GameCreator.Melee
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
                     glowMaterialInstance.color = new Color(0, 1, 0);
+                }
+                return;
+            }
+            else
+            {
+                foreach (Material glowMaterialInstance in glowMaterialInstances)
+                {
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                }
+            }
+
+            // Block
+            if (Time.time - lastBlockTime < 0.25f)
+            {
+                foreach (Material glowMaterialInstance in glowMaterialInstances)
+                {
+                    glowMaterialInstance.color = new Color(0, 0, 1);
                 }
                 return;
             }

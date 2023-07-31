@@ -416,10 +416,17 @@ namespace GameCreator.Melee
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
                 if (hitResult == HitResult.ReceiveDamage)
+                {
                     targetMelee.HP.Value -= attack.baseDamage;
-                else if (hitResult == HitResult.PoiseBlock)
-                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.RenderHit();
 
+                }
+                else if (hitResult == HitResult.PoiseBlock)
+                {
+                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.RenderBlock();
+                }
+                
                 // Send messages for stats in NetworkPlayer script
                 if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
 
@@ -513,6 +520,28 @@ namespace GameCreator.Melee
                 }
             }
         }
+
+        private void RenderHit()
+        {
+            if (!IsServer) { Debug.LogError("RenderHit() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderHit();
+            RenderHitClientRpc();
+        }
+
+        [ClientRpc] private void RenderHitClientRpc() { glowRenderer.RenderHit(); }
+
+        private void RenderBlock()
+        {
+            if (!IsServer) { Debug.LogError("RenderBlock() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderBlock();
+            RenderBlockClientRpc();
+        }
+
+        [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
 
         public void PropogateMeleeClipChange(MeleeClip meleeClip)
         {
@@ -863,7 +892,7 @@ namespace GameCreator.Melee
         {
             if (current < prev)
             {
-                glowRenderer.RenderHit();
+                // Render hit is handled in LateUpdate() on server now
             }
             else if (current > prev)
             {
