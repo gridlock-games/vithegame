@@ -57,8 +57,8 @@ namespace GameCreator.Melee
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
 
-        public bool isCastingAbility {get; private set;}
-        
+        public bool isCastingAbility { get; private set; }
+
         private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -132,6 +132,7 @@ namespace GameCreator.Melee
         private float anim_ExecutedDuration = 0.0f;
 
         private AbilityManager abilityManager;
+        private GlowRenderer glowRenderer;
 
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
@@ -156,6 +157,7 @@ namespace GameCreator.Melee
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
         // FOCUS TARGET: --------------------------------------------------------------------------
@@ -166,13 +168,15 @@ namespace GameCreator.Melee
 
         // UPDATE: --------------------------------------------------------------------------------
 
-
-        protected virtual void Start() {
-            if (IsOwner) {
+        protected virtual void Start()
+        {
+            if (IsOwner)
+            {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
         }
+
         protected virtual void Update()
         {
             if (SceneManager.GetActiveScene().name == "Hub")
@@ -189,7 +193,7 @@ namespace GameCreator.Melee
                 this.comboSystem.Update();
 
                 if (!this.CanAttack()) return;
-                if(this.Character.isCharacterDashing()) return;
+                if (this.Character.isCharacterDashing()) return;
 
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
@@ -219,18 +223,11 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                        {
-                            if (!hitRenderer.rendererRunning && currentMeleeClip != null)
-                            {
-                                if((isCastingAbility || meleeClip.isHeavy)  && meleeClip.interruptible == Interrupt.Uninterruptible) { hitRenderer.RenderInvulnerable(); }
-                            }
-                        }
-
                         this.inputBuffer.ConsumeInput();
                         bool checkDash = this.Character.characterLocomotion.isDashing;
 
-                        if (IsOwner) {
+                        if (IsOwner)
+                        {
                             FocusTarget(meleeClip);
                         }
 
@@ -284,13 +281,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-            {
-                if (!hitRenderer.rendererRunning)
-                {
-                    hitRenderer.RenderInvinicible(IsInvincible);
-                }
-            }
+            glowRenderer.RenderInvincible(IsInvincible);
 
             IsAttacking = false;
 
@@ -420,16 +411,22 @@ namespace GameCreator.Melee
                 // Calculate hit result/HP damage
                 int previousHP = targetMelee.HP.Value;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
-                
+
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
-                Debug.Log("hitReaction: " + hitReaction);
                 if (hitResult == HitResult.ReceiveDamage)
+                {
                     targetMelee.HP.Value -= attack.baseDamage;
-                else if (hitResult == HitResult.PoiseBlock)
-                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.RenderHit();
 
+                }
+                else if (hitResult == HitResult.PoiseBlock)
+                {
+                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.RenderBlock();
+                }
+                
                 // Send messages for stats in NetworkPlayer script
                 if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
 
@@ -523,6 +520,28 @@ namespace GameCreator.Melee
                 }
             }
         }
+
+        private void RenderHit()
+        {
+            if (!IsServer) { Debug.LogError("RenderHit() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderHit();
+            RenderHitClientRpc();
+        }
+
+        [ClientRpc] private void RenderHitClientRpc() { glowRenderer.RenderHit(); }
+
+        private void RenderBlock()
+        {
+            if (!IsServer) { Debug.LogError("RenderBlock() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderBlock();
+            RenderBlockClientRpc();
+        }
+
+        [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
 
         public void PropogateMeleeClipChange(MeleeClip meleeClip)
         {
@@ -873,17 +892,11 @@ namespace GameCreator.Melee
         {
             if (current < prev)
             {
-                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                {
-                    hitRenderer.RenderHit();
-                }
+                // Render hit is handled in LateUpdate() on server now
             }
             else if (current > prev)
             {
-                foreach (HitRenderer hitRenderer in GetComponentsInChildren<HitRenderer>())
-                {
-                    hitRenderer.RenderHeal();
-                }
+                glowRenderer.RenderHeal();
             }
 
             // Cancel death ailment if we get our health back
@@ -980,8 +993,10 @@ namespace GameCreator.Melee
             this.inputBuffer.AddInput(actionKey);
         }
 
-        public void RevertAbilityCastingStatus() {
-            if(isCastingAbility) {
+        public void RevertAbilityCastingStatus()
+        {
+            if (isCastingAbility)
+            {
                 isCastingAbility = false;
             }
         }
@@ -999,8 +1014,10 @@ namespace GameCreator.Melee
                 this.comboSystem.Stop();
                 this.currentMeleeClip.Stop(this);
 
-                if(this.Blades.Count > 0) {
-                    foreach(var blade in this.Blades) {
+                if (this.Blades.Count > 0)
+                {
+                    foreach (var blade in this.Blades)
+                    {
                         blade.EventAttackRecovery.Invoke();
                     }
                 }
@@ -1016,8 +1033,8 @@ namespace GameCreator.Melee
             if (IsOwner && adventureMotor != null)
             {
                 if (phase == 1 && this.currentMeleeClip.isOrbitLocked) { adventureMotor.allowOrbitInput = false; }
-                if (IsUninterruptable && phase == 2 ) { SetUninterruptable(0f); } 
-                if (phase == 2 || phase <= 0 ) { adventureMotor.allowOrbitInput = true; }
+                if (IsUninterruptable && phase == 2) { SetUninterruptable(0f); }
+                if (phase == 2 || phase <= 0) { adventureMotor.allowOrbitInput = true; }
             }
 
             return phase;
@@ -1159,15 +1176,15 @@ namespace GameCreator.Melee
 
             MeleeClip hitReaction = null;
 
-            
+
             // Please comment out instead of deleting this block
             #region Debug Results
-            print ("=============");
-            print ("name: " + melee.name);
-            print ("IsUninterruptable: " + melee.IsUninterruptable);
-            print ("IsInvincible: " + melee.IsInvincible);
-            print ("IsAttacking: " + melee.IsAttacking);
-            print ("IsDashing: " + melee.Character.isCharacterDashing());
+            //print ("=============");
+            //print ("name: " + melee.name);
+            //print ("IsUninterruptable: " + melee.IsUninterruptable);
+            //print ("IsInvincible: " + melee.IsInvincible);
+            //print ("IsAttacking: " + melee.IsAttacking);
+            //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
@@ -1184,12 +1201,12 @@ namespace GameCreator.Melee
             if (melee.IsAttacking || melee.Character.isCharacterDashing())
             {
                 melee.RevertAbilityCastingStatus();
-                melee.SetUninterruptable(0f); 
+                melee.SetUninterruptable(0f);
                 melee.StopAttack();
-                if(melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
+                if (melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
                 CharacterAnimator.StopGesture(0.10f);
 
-                if(melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
+                if (melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
                 this.isStaggered = true;
             }
 
@@ -1306,7 +1323,7 @@ namespace GameCreator.Melee
             // Play Reaction Clip only if the attackType is not an Ailment
             bool shouldPlayHitReaction = (IsUninterruptable && !isCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction) { hitReaction = null; }
-            
+
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
 
@@ -1435,7 +1452,7 @@ namespace GameCreator.Melee
             if (this.IsSheathing) return false;
             if (this.IsDrawing) return false;
             if (this.IsStaggered) return false;
-            
+
             return true;
         }
 
