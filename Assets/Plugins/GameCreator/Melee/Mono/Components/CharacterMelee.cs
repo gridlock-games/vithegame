@@ -282,6 +282,7 @@ namespace GameCreator.Melee
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
+            glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
 
@@ -542,6 +543,18 @@ namespace GameCreator.Melee
         }
 
         [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
+
+        private void RenderUnInterruptable()
+        {
+            if (!IsServer) { Debug.LogError("RenderUninterruptable() should only be called from the server"); return; }
+
+            if (!IsClient) { 
+                glowRenderer.RenderUninterruptable();
+            }
+            RenderUninterruptableClientRpc();
+        }
+
+        [ClientRpc] private void RenderUninterruptableClientRpc() { glowRenderer.RenderUninterruptable(); }
 
         public void PropogateMeleeClipChange(MeleeClip meleeClip)
         {
