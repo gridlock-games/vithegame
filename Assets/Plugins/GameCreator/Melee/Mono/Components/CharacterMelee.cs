@@ -458,6 +458,8 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
+                    // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
+                    targetMelee.Character.didDodgeCancelAilment = false;
                     // Set Ailments here
                     switch (attack.attackType)
                     {
@@ -1189,20 +1191,25 @@ namespace GameCreator.Melee
             BladeComponent meleeWeapon = melee.Blades[0];
             Character player = this.Character.GetComponent<PlayerCharacter>();
 
-            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
-
-            MeleeClip hitReaction = null;
-
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            //print ("=============");
-            //print ("name: " + melee.name);
-            //print ("IsUninterruptable: " + melee.IsUninterruptable);
+            // print ("=============");
+            // print ("name: " + melee.name);
+            // print ("IsUninterruptable: " + melee.IsUninterruptable);
             //print ("IsInvincible: " + melee.IsInvincible);
-            //print ("IsAttacking: " + melee.IsAttacking);
+            // print ("IsAttacking: " + melee.IsAttacking);
+            // print ("IsCastingAbility: " + melee.isCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
+
+            
+            // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
+            assailant.didDodgeCancelAilment = false;
+
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+
+            MeleeClip hitReaction = null;
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             // if (this.GetHP() <= 0) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
