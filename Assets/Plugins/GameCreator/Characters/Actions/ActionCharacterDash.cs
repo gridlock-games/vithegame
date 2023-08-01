@@ -88,6 +88,13 @@
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
             // if (melee.GetCurrentPhase() >= 1 ) { Destroy(target); return; }
 
+            // TO DO: Do not activate ability if it matches the current melee Phase
+            // if (melee.isCastingAbility) {
+            //     Ability activatedAbility = melee.GetActivatedAbility(melee);
+
+            //     if((int)activatedAbility.dodgeLockOnhase == melee.GetCurrentPhase()) { return; }
+            // }
+
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
 

@@ -29,10 +29,17 @@ public class Ability : MonoBehaviour
         Cancel_Dodge
     }
 
+    public enum DodgeLockOnPhase {
+        None,
+        Activate,
+        Recovery
+    }
+
     public Sprite skillImageFill;
     public WeaponType weaponBind = WeaponType.BRAWLER;
     public MeleeClip meleeClip;
     public AbilityType abilityType = AbilityType.Active;
+    public DodgeLockOnPhase dodgeLockOnhase = DodgeLockOnPhase.None;
     public float coolDown = 0.00f;
     public float staminaCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;

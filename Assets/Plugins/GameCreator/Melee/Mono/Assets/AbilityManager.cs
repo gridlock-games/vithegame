@@ -114,4 +114,8 @@ public class AbilityManager : NetworkBehaviour
             activatedAbility.ExecuteAbility(melee, key);
         }
     }
+
+    public Ability GetActivatedAbility() {
+            return activatedAbility;
+    }
 }

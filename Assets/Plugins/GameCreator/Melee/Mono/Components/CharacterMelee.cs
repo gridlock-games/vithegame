@@ -859,6 +859,10 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
+        public Ability GetActivatedAbility(CharacterMelee melee) {
+            return melee.abilityManager.GetActivatedAbility();
+        }
+
         public int maxHealth = 100;
         private NetworkVariable<int> HP = new NetworkVariable<int>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
