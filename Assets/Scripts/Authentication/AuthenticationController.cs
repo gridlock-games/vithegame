@@ -48,28 +48,33 @@ public class AuthenticationController : MonoBehaviour
         {
             bool signedIn = PlayerPrefs.HasKey("email");
 
-            btn_Signedin.SetActive(signedIn);
-            btn_SignOut.SetActive(signedIn);
-            btn_StartGame.SetActive(signedIn);
-            displayNameInput.gameObject.SetActive(signedIn);
+            if( btn_SignIn ) {
+                btn_SignIn.SetActive(!signedIn);
+                btn_StartGame.SetActive(signedIn);
 
-            btn_SignIn.SetActive(!signedIn);
-
-            if (displayNameInput.text == "" & signedIn)
-            {
-                btn_StartGame.GetComponent<Button>().interactable = false;
-                infoDisplayText.SetText("Enter a display name to play");
-            }
-            else
-            {
-                btn_StartGame.GetComponent<Button>().interactable = true;
-                infoDisplayText.SetText("");
             }
 
-            if (transitioningToCharacterSelect)
-            {
-                btn_StartGame.GetComponent<Button>().interactable = false;
-                infoDisplayText.SetText("Loading Character Select Screen, please wait...");
+            if ( btn_Signedin && btn_SignOut && btn_StartGame && displayNameInput) {
+                btn_Signedin.SetActive(signedIn);
+                btn_SignOut.SetActive(signedIn);
+                displayNameInput.gameObject.SetActive(signedIn);
+
+                if (displayNameInput.text == "" & signedIn)
+                {
+                    btn_StartGame.GetComponent<Button>().interactable = false;
+                    infoDisplayText.SetText("Enter a display name to play");
+                }
+                else
+                {
+                    btn_StartGame.GetComponent<Button>().interactable = true;
+                    infoDisplayText.SetText("");
+                }
+
+                if (transitioningToCharacterSelect)
+                {
+                    btn_StartGame.GetComponent<Button>().interactable = false;
+                    infoDisplayText.SetText("Loading Character Select Screen, please wait...");
+                }
             }
         }
     }
@@ -121,6 +126,39 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
+    public void SignInv2() {
+        if (datamanager != null)
+        {
+            GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
+            {
+                if (success)
+                {
+                    //Check if data already exist in firebase. data equal to null post new data.
+                    RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
+                    {
+                        var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
+                        if (data == null)
+                        {
+                            data = new UserModel
+                            {
+                                account_name = info.name,
+                                email = info.email,
+                                display_picture = info.picture,
+                                date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
+                                last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+                            };
+                            datamanager.PostUserdata(data);
+                            return;
+                        }
+                        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+                        datamanager.PostUserdata(data);
+                    });
+                }
+                //if Google login fail
+                Debug.LogError(error);
+            });
+        }
+    }
     private bool startingGame;
     public void StartGame()
     {
@@ -130,6 +168,21 @@ public class AuthenticationController : MonoBehaviour
         {
             transitioningToCharacterSelect = true;
             StartCoroutine(StoreClient(displayNameInput.text));
+        }
+    }
+
+    public void StartGameV2()
+    {
+        var _userdata = datamanager;
+        if (!_userdata) { return; }
+        if (startingGame) { return; }
+
+        startingGame = true;
+        
+        if (PlayerPrefs.HasKey("email"))
+        {
+            transitioningToCharacterSelect = true;
+            StartCoroutine(StoreClient(datamanager.Data.account_name));
         }
     }
 

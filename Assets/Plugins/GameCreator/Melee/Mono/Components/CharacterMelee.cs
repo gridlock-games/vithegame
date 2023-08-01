@@ -282,6 +282,7 @@ namespace GameCreator.Melee
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
+            glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
 
@@ -457,6 +458,8 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
+                    // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
+                    targetMelee.Character.didDodgeCancelAilment = false;
                     // Set Ailments here
                     switch (attack.attackType)
                     {
@@ -542,6 +545,18 @@ namespace GameCreator.Melee
         }
 
         [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
+
+        private void RenderUnInterruptable()
+        {
+            if (!IsServer) { Debug.LogError("RenderUninterruptable() should only be called from the server"); return; }
+
+            if (!IsClient) { 
+                glowRenderer.RenderUninterruptable();
+            }
+            RenderUninterruptableClientRpc();
+        }
+
+        [ClientRpc] private void RenderUninterruptableClientRpc() { glowRenderer.RenderUninterruptable(); }
 
         public void PropogateMeleeClipChange(MeleeClip meleeClip)
         {
@@ -844,6 +859,10 @@ namespace GameCreator.Melee
 
             this.modelShield = shield.EquipShield(this.CharacterAnimator);
             this.currentShield = shield;
+        }
+
+        public Ability GetActivatedAbility(CharacterMelee melee) {
+            return melee.abilityManager.GetActivatedAbility();
         }
 
         public int maxHealth = 100;
@@ -1172,20 +1191,25 @@ namespace GameCreator.Melee
             BladeComponent meleeWeapon = melee.Blades[0];
             Character player = this.Character.GetComponent<PlayerCharacter>();
 
-            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
-
-            MeleeClip hitReaction = null;
-
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            //print ("=============");
-            //print ("name: " + melee.name);
-            //print ("IsUninterruptable: " + melee.IsUninterruptable);
+            // print ("=============");
+            // print ("name: " + melee.name);
+            // print ("IsUninterruptable: " + melee.IsUninterruptable);
             //print ("IsInvincible: " + melee.IsInvincible);
-            //print ("IsAttacking: " + melee.IsAttacking);
+            // print ("IsAttacking: " + melee.IsAttacking);
+            // print ("IsCastingAbility: " + melee.isCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
+
+            
+            // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
+            assailant.didDodgeCancelAilment = false;
+
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+
+            MeleeClip hitReaction = null;
 
             if (this.currentWeapon == null) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             // if (this.GetHP() <= 0) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);

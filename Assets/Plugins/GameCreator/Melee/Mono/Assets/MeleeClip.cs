@@ -411,7 +411,7 @@
         {
             yield return new WaitForSeconds(duration * 0.90f);
             
-           melee.Character.setCharacterDashing(false);
+           melee.Character.SetCharacterDashing(false);
         }
 
         private IEnumerator ExecuteHitPause(float duration)

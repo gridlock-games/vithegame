@@ -117,6 +117,8 @@
 
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
+        public bool didDodgeCancelAilment = false;
+
         // INITIALIZERS: --------------------------------------------------------------------------
 
         private void OnAilmentChange(CharacterLocomotion.CHARACTER_AILMENTS prev, CharacterLocomotion.CHARACTER_AILMENTS current)
@@ -271,7 +273,7 @@
             return isDodging;
         }
 
-        public void setCharacterDashing(bool value)
+        public void SetCharacterDashing(bool value)
         {
             LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
             variables.Get("isDodging").Update(value);
@@ -694,11 +696,14 @@
             {
                 yield return null;
             }
-            MeleeClip standRecovery = melee.currentWeapon.recoveryStandUp;
-            standRecovery.PlayNetworked(melee);
 
-            float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-            resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+            if (!didDodgeCancelAilment) { 
+                MeleeClip standRecovery = melee.currentWeapon.recoveryStandUp;
+                standRecovery.PlayNetworked(melee);
+
+                float recoveryAnimDuration = melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
+                resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+            } else if(didDodgeCancelAilment) { didDodgeCancelAilment = false; }
         }
 
         public bool CancelAilment()
@@ -773,6 +778,7 @@
                             if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
                             recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.10f;
                             if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
+                            if(didDodgeCancelAilment) { didDodgeCancelAilment = false; }
                         }
                     }
                     break;

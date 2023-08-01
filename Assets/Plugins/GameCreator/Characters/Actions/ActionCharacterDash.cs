@@ -74,9 +74,8 @@
             bool isDashing = characterTarget.isCharacterDashing();
 
             if (characterTarget == null) { Destroy(target); return; }
-            if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered || 
-                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown || 
-                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered || 
+            if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered ||
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned || 
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { Destroy(target); return; }
             if (characterTarget.disableActions.Value) { Destroy(target); return; }
             if (isDashing) { Destroy(target); return; }
@@ -87,6 +86,13 @@
             if (melee.GetHP() <= 0) { Destroy(target); return; }
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
             // if (melee.GetCurrentPhase() >= 1 ) { Destroy(target); return; }
+
+            // TO DO: Do not activate ability if it matches the current melee Phase
+            // if (melee.isCastingAbility) {
+            //     Ability activatedAbility = melee.GetActivatedAbility(melee);
+
+            //     if((int)activatedAbility.dodgeLockOnhase == melee.GetCurrentPhase()) { return; }
+            // }
 
             CharacterLocomotion locomotion = characterTarget.characterLocomotion;
             Vector3 moveDirection = Vector3.zero;
@@ -134,7 +140,7 @@
             // Call back method in CharacterMelee to subtract poise
             melee.OnDodge();
             melee.RevertAbilityCastingStatus();
-            characterTarget.setCharacterDashing(true);
+            characterTarget.SetCharacterDashing(true);
 
             InstantExecuteLocally(target, moveDirection, angle);
             Destroy(target);
@@ -159,17 +165,18 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
 
-            if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true ) || characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Reset)
-            {
-                if(characterTarget.characterAilment  == CharacterLocomotion.CHARACTER_AILMENTS.Reset) {
-                    characterTarget.CancelAilment();
-                }
+            if(characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Reset || 
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
+                characterTarget.didDodgeCancelAilment = true;
+                characterTarget.CancelAilment();
+            }
 
+            if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true ))
+            {
                 if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                 melee.StopAttack();
                 animator.StopGesture(0f);
                 melee.currentMeleeClip = null;
-
             }
 
             MeleeWeapon meleeweapon = melee.currentWeapon;
