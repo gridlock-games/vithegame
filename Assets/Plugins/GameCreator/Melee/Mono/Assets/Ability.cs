@@ -25,6 +25,7 @@ public class Ability : MonoBehaviour
         None,
         Cancel_NormalAtk,
         Cancel_AbilityAtk,
+        Cancel_HeavyAtk,
         Cancel_Dodge
     }
 

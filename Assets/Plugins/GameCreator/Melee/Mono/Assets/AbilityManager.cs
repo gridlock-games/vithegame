@@ -100,6 +100,8 @@ public class AbilityManager : NetworkBehaviour
         if (ability && melee.GetPoise() < ability.staminaCost) { return; }
         // Don't activate if Melee is attacking and cancelType is none
         if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None ) { return; }
+        // Don't activate if Melee is currently playing a Heavy Attack
+        if (ability && melee.IsAttacking && melee.currentMeleeClip.isHeavy && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_HeavyAtk) { return; }
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
         if (ability && melee.isCastingAbility && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
 
