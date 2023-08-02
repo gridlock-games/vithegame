@@ -375,15 +375,21 @@ namespace GameCreator.Melee
                 if (hit.transform.IsChildOf(transform)) continue;
                 if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
 
+                // Do not register hits if Attacker's HP is 0
+                // Problem here is that NPCs will not be able to hit players
+                if (melee.GetHP() <= 0 ) { 
+                    continue; 
+                }
+
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
                 if (targetMelee.IsInvincible) { continue; }
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
-                if (melee.wasHit) { return; }
+                // if (melee.wasHit) { return; }
                 // Mark the target as hit, this prevents hit trading
-                targetMelee.MarkHit();
+                // targetMelee.MarkHit();
 
                 // This is for checking if we are hitting an environment object
                 if (hit.CompareTag("Obstacle"))
@@ -1191,19 +1197,17 @@ namespace GameCreator.Melee
             BladeComponent meleeWeapon = melee.Blades[0];
             Character player = this.Character.GetComponent<PlayerCharacter>();
 
-
             // Please comment out instead of deleting this block
             #region Debug Results
             // print ("=============");
             // print ("name: " + melee.name);
             // print ("IsUninterruptable: " + melee.IsUninterruptable);
-            //print ("IsInvincible: " + melee.IsInvincible);
+            // print ("IsInvincible: " + melee.IsInvincible);
             // print ("IsAttacking: " + melee.IsAttacking);
             // print ("IsCastingAbility: " + melee.isCastingAbility);
-            //print ("IsDashing: " + melee.Character.isCharacterDashing());
+            // print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
-            
             // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
             assailant.didDodgeCancelAilment = false;
 
@@ -1230,7 +1234,8 @@ namespace GameCreator.Melee
                 if (melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
                 CharacterAnimator.StopGesture(0.10f);
 
-                if (melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
+                // Stagger target if they got hit during a dodge
+                // if (melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
                 this.isStaggered = true;
             }
 
@@ -1319,7 +1324,6 @@ namespace GameCreator.Melee
             #endregion
 
             this.AddPoise(-attack.poiseDamage);
-
 
             MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;

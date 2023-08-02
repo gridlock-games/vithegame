@@ -172,9 +172,21 @@ namespace LightPat.Core
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 if (clientPair.Value.team == Team.Red)
-                    redScoreText.SetText(clientPair.Value.clientName + ": " + redScore.Value.ToString());
+                    redScoreText.SetText(EllipsizeString(clientPair.Value.clientName, 5)  + ": " + redScore.Value.ToString());
                 else if (clientPair.Value.team == Team.Blue)
-                    blueScoreText.SetText(clientPair.Value.clientName + ": " + blueScore.Value.ToString());
+                    blueScoreText.SetText(EllipsizeString(clientPair.Value.clientName, 5) + ": " + blueScore.Value.ToString());
+            }
+        }
+
+        private string EllipsizeString(string input, int maxLength)
+        {
+            if (input.Length <= maxLength)
+            {
+                return input;
+            }
+            else
+            {
+                return input.Substring(0, maxLength - 1) + "...";
             }
         }
 
@@ -237,7 +249,7 @@ namespace LightPat.Core
                 }
             }
 
-            countdownTimeMessage.Value = "Get ready for the next round!";
+            countdownTimeMessage.Value = "Ready!";
             countdownTime.Value = 3;
             roundTimeInSeconds.Value = roundTimeAmount;
             roundEndCountdownRunning = false;
