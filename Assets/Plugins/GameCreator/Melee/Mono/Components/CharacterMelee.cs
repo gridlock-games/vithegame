@@ -382,6 +382,9 @@ namespace GameCreator.Melee
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
+                // If the attacker is dead, don't register their hits
+                if (melee.GetHP() <= 0) { Debug.Log(melee.Character.characterAilment); return; }
+
                 // Mark the target as hit, this prevents hit trading
                 // If the target is interruptable, don't mark the hit
                 if (!targetMelee.IsUninterruptable)
