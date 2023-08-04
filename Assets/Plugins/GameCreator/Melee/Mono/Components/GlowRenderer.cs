@@ -64,9 +64,22 @@ namespace GameCreator.Melee
                 {
                     materialList.Add(m);
                 }
-                materialList.Add(glowMaterial);
+
+                int materialCount = materialList.Count;
+                for (int i = 0; i < materialCount; i++)
+                {
+                    materialList.Add(glowMaterial);
+                }
+
                 renderer.materials = materialList.ToArray();
-                glowMaterialInstances.Add(renderer.materials[^1]);
+
+                foreach (Material m in renderer.materials)
+                {
+                    if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
+                    {
+                        glowMaterialInstances.Add(m);
+                    }
+                }
             }
         }
 
