@@ -383,10 +383,12 @@ namespace GameCreator.Melee
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
                 // If the attacker is dead, don't register their hits
-                if (melee.GetHP() <= 0) { Debug.Log(melee.Character.characterAilment); return; }
+                // Adding scene check because NPCs wont be able to hit player due to the HP check
+                if (melee.GetHP() <= 0 && SceneManager.GetActiveScene().name != "Prototype") { Debug.Log(melee.Character.characterAilment); continue; }
 
                 // Mark the target as hit, this prevents hit trading
                 // If the target is interruptable, don't mark the hit
+                // TO DO: This might be a problem when we have team fights
                 if (!targetMelee.IsUninterruptable)
                     targetMelee.MarkHit();
 
@@ -1241,12 +1243,11 @@ namespace GameCreator.Melee
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+
             #region Attack and Defense handlers
 
-            float attackAngle = Vector3.Angle(
-                 attacker.transform.TransformDirection(Vector3.forward),
-                 this.transform.TransformDirection(Vector3.forward)
-             );
+            float attackAngle = attackVectorAngle;
 
             float defenseAngle = this.currentShield != null
                 ? this.currentShield.defenseAngle.GetValue(gameObject)
@@ -1254,7 +1255,7 @@ namespace GameCreator.Melee
 
             if (this.currentShield != null &&
                 attack.isBlockable && this.IsBlocking &&
-                180f - attackAngle < defenseAngle / 2f)
+                hitLocation == MeleeWeapon.HitLocation.FrontMiddle)
             {
                 this.AddDefense(-attack.defenseDamage);
                 if (this.Defense.Value > 0)
@@ -1326,7 +1327,7 @@ namespace GameCreator.Melee
             this.AddPoise(-attack.poiseDamage);
 
 
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+            
             bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
@@ -1370,7 +1371,9 @@ namespace GameCreator.Melee
             if (this.currentWeapon == null) return;
             // if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && isUninterruptable) { return; } 
 
-            // float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
+            float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
+
+            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
 
             #region Attack and Defense VFX
 
@@ -1385,7 +1388,7 @@ namespace GameCreator.Melee
 
             if (this.currentShield != null &&
                 attack.isBlockable && this.IsBlocking &&
-                180f - attackAngle < defenseAngle / 2f)
+                hitLocation == MeleeWeapon.HitLocation.FrontMiddle)
             {
                 if (this.Defense.Value > 0)
                 {

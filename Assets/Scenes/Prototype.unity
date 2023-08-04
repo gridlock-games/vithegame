@@ -330,6 +330,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isExpanded: 1
+--- !u!114 &380972156
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380972135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093bbc6a7c1334b37ac569a948728c55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 0
+  waitTime: 1
 --- !u!1 &493848754
 GameObject:
   m_ObjectHideFlags: 0
@@ -1571,7 +1585,7 @@ PrefabInstance:
         type: 3}
       propertyPath: actions.Array.data[6]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 380972156}
     - target: {fileID: 288998040404840008, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: actions.Array.data[7]
@@ -1590,7 +1604,7 @@ PrefabInstance:
     - target: {fileID: 288998041406652122, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: _currentWeaponType.m_InternalValue
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1680,12 +1694,12 @@ PrefabInstance:
     - target: {fileID: 7043209583932600394, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: key
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7043209583932600394, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: isExpanded
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8019317750045649150, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1705,7 +1719,7 @@ PrefabInstance:
     - target: {fileID: 8642510755689186710, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: isExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6867211995634720326, guid: 08be6bc05a8bb504b80d4c74cae1c5f1, type: 3}
