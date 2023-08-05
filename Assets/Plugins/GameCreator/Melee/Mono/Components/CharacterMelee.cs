@@ -58,7 +58,7 @@ namespace GameCreator.Melee
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
 
-        public bool isCastingAbility { get; private set; }
+        public bool IsCastingAbility { get; private set; }
 
         private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -191,6 +191,16 @@ namespace GameCreator.Melee
                 this.UpdateDefense();
             }
 
+            // Adding check block to make sure melee animations are cancelled as soon ailment == dead
+            if(this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) {
+                this.StopAttack();
+                this.CharacterAnimator.StopGesture(0f);
+                this.currentMeleeClip = null;
+
+                return;
+            }
+
+
             if (this.comboSystem != null)
             {
                 this.comboSystem.Update();
@@ -309,6 +319,9 @@ namespace GameCreator.Melee
                     foreach (BladeComponent blade in this.Blades)
                     {
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
+                        if (this.IsStaggered) return;
+
+                        // This is what activates the blades
                         GameObject[] hits = blade.CaptureHits();
 
                         if (hitCount < currentMeleeClip.hitCount)
@@ -399,8 +412,7 @@ namespace GameCreator.Melee
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
                 // If the attacker is dead, don't register their hits
-                // Adding scene check because NPCs wont be able to hit player due to the HP check
-                if (melee.GetHP() <= 0 && SceneManager.GetActiveScene().name != "Prototype") { Debug.Log(melee.Character.characterAilment); continue; }
+                if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { Debug.Log(melee.Character.characterAilment); continue; }
 
                 // Mark the target as hit, this prevents hit trading
                 // If the target is interruptable, don't mark the hit
@@ -1030,16 +1042,16 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.isCastingAbility = true;
+            this.IsCastingAbility = true;
             if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
         public void RevertAbilityCastingStatus()
         {
-            if (isCastingAbility)
+            if (IsCastingAbility)
             {
-                isCastingAbility = false;
+                IsCastingAbility = false;
             }
         }
 
@@ -1047,7 +1059,7 @@ namespace GameCreator.Melee
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
             {
-                this.isCastingAbility = false;
+                this.IsCastingAbility = false;
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();
@@ -1069,6 +1081,9 @@ namespace GameCreator.Melee
         public int GetCurrentPhase()
         {
             if (this.comboSystem == null) return -1;
+            if (this.IsStaggered) {
+                return -1;
+            }
 
             int phase = this.currentMeleeClip != null ? this.comboSystem.GetCurrentPhase(this.currentMeleeClip) : -1;
 
@@ -1217,12 +1232,13 @@ namespace GameCreator.Melee
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            // print ("=============");
-            // print ("name: " + melee.name);
-            // print ("IsUninterruptable: " + melee.IsUninterruptable);
-            //print ("IsInvincible: " + melee.IsInvincible);
-            // print ("IsAttacking: " + melee.IsAttacking);
-            // print ("IsCastingAbility: " + melee.isCastingAbility);
+            print ("=============");
+            print ("name: " + melee.name);
+            print ("characterAilment: " + melee.Character.characterAilment);
+            print ("IsUninterruptable: " + melee.IsUninterruptable);
+            print ("IsInvincible: " + melee.IsInvincible);
+            print ("IsAttacking: " + melee.IsAttacking);
+            print ("IsCastingAbility: " + melee.IsCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
@@ -1231,6 +1247,8 @@ namespace GameCreator.Melee
             assailant.didDodgeCancelAilment = false;
 
             OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+            
+            this.ReleaseTargetFocus();
 
             MeleeClip hitReaction = null;
 
@@ -1240,22 +1258,20 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             // Uninterruptable Abilities will not be cancelled
-            if (melee.isCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
+            if (melee.IsCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
             // Uninterruptable Heavy Attacks will not be cancelled
             if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
 
             // Prioritize damage taken over attack and non-invincible dodge frames
-            if (melee.IsAttacking || melee.Character.isCharacterDashing())
-            {
-                melee.RevertAbilityCastingStatus();
-                melee.SetUninterruptable(0f);
-                melee.StopAttack();
-                if (melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
-                CharacterAnimator.StopGesture(0.10f);
+            melee.RevertAbilityCastingStatus();
+            melee.SetUninterruptable(0f);
+            melee.StopAttack();
+            if (melee.adventureMotor != null) { melee.adventureMotor.allowOrbitInput = true; }
+            CharacterAnimator.StopGesture(0.10f);
 
-                if (melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
-                this.isStaggered = true;
-            }
+            // Remove this functionality for now as it has unpredictable results
+            // if (melee.Character.isCharacterDashing()) { melee.Character.Stagger(attacker.Character, melee.Character); }
+            this.isStaggered = true;
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
@@ -1367,7 +1383,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (IsUninterruptable && !isCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
+            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction) { hitReaction = null; }
 
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
@@ -1460,7 +1476,7 @@ namespace GameCreator.Melee
 
             // attack.ExecuteHitPause();
             // // Play Reaction Clip only if the attackType is not an Ailment
-            // if ((IsUninterruptable && !isCastingAbility)  || (!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
+            // if ((IsUninterruptable && !IsCastingAbility)  || (!this.IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup))
             // {
             //     hitReaction.PlayNetworked(this);
             // }

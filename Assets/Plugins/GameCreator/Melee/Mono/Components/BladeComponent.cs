@@ -156,6 +156,10 @@
             {
                 case -1:
                     if (weaponTrail != null) weaponTrail.Deactivate(0f);
+                    Melee.isLunging = false;
+                    Melee.ReleaseTargetFocus();
+                    Melee.ResetHitCount();
+                    isVFXActivated = false;
                     EventAttackEnd.Invoke();
                     break;
 
@@ -202,9 +206,9 @@
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.ResetHitCount();
+                    isVFXActivated = false;
                     if (weaponTrail != null) weaponTrail.Deactivate(0f);
                     EventAttackRecovery.Invoke();
-                    isVFXActivated = false;
                     break;
             }
 
