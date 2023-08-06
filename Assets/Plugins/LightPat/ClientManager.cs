@@ -118,7 +118,7 @@ namespace LightPat.Core
             if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
 
             // If we are not the editor and not a headless build
-            if (!Application.isEditor & SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+            if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
             {
                 Instantiate(serverCameraPrefab);
             }
@@ -424,6 +424,7 @@ namespace LightPat.Core
 
         private void ChangeTeam(ulong clientId, Team newTeam)
         {
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             if (clientDataDictionary[clientId].team == newTeam) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeTeam(newTeam);
             SynchronizeClientDictionaries();
@@ -550,7 +551,16 @@ namespace LightPat.Core
                 Debug.LogWarning("No game logic manager found in scene. This means that players will not have a set spawn point");
             }
 
-            GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+            GameObject g;
+            if (clientDataDictionary[clientId].team == Team.Spectator)
+            {
+                g = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+            }
+            else // If the team is not spectator
+            {
+                g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+            }
+
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }

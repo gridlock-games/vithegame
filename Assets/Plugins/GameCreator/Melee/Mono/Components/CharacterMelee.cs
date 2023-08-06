@@ -380,8 +380,19 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
-                // If the attacker's team is the same as the victim's team, do not register this hit
-                if (ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team == ClientManager.Singleton.GetClient(melee.OwnerClientId).team) { continue; }
+
+                if (ClientManager.Singleton)
+                {
+                    Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
+                    Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+
+                    if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                    {
+                        // If the attacker's team is the same as the victim's team, do not register this hit
+                        if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                    }
+                }
+
                 if (targetMelee.IsInvincible) { continue; }
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
