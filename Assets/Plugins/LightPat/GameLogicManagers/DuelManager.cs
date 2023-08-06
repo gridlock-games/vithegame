@@ -259,6 +259,8 @@ namespace LightPat.Core
 
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
+                if (clientPair.Value.team == Team.Spectator) { continue; }
+
                 Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<Character>();
                 playerChar.CancelAilment();
 

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.17676294, g: 0.22126085, b: 0.30355734, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1231,12 +1231,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints:
-  - team: 1
-    spawnPosition: {x: 0, y: 6, z: -2}
-    spawnRotation: {x: 0, y: 0, z: 0}
   - team: 2
     spawnPosition: {x: 0, y: 6, z: 14}
     spawnRotation: {x: 0, y: 180, z: 0}
+  - team: 3
+    spawnPosition: {x: 0, y: 6, z: -2}
+    spawnRotation: {x: 0, y: 0, z: 0}
+  - team: 4
+    spawnPosition: {x: 6, y: 6, z: 6}
+    spawnRotation: {x: 0, y: 270, z: 0}
   scoreToWin: 3
   roundTimeAmount: 120
   redScoreText: {fileID: 1900272426}
