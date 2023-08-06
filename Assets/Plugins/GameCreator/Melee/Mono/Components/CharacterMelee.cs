@@ -1113,6 +1113,22 @@ namespace GameCreator.Melee
             );
         }
 
+        public void PlayAudioNoPitchModifier(AudioClip audioClip)
+        {
+            if (audioClip == null) return;
+
+            Vector3 position = transform.position;
+            if (this.Blade != null) position = this.Blade.transform.position;
+
+            float pitch = 1.0f;
+            AudioMixerGroup soundMixer = DatabaseGeneral.Load().soundAudioMixer;
+
+            AudioManager.Instance.PlaySound3D(
+                audioClip, 0f, position, 1f, pitch,
+                1.0f, soundMixer
+            );
+        }
+
         public void SetPosture(Posture posture, float duration)
         {
             if (!this.IsStaggered && posture == Posture.Stagger)
@@ -1492,6 +1508,10 @@ namespace GameCreator.Melee
         public void ExecuteSwingAudio()
         {
             if (currentWeapon.audioSwing) { PlayAudio(currentWeapon.audioSwing); }
+        }
+
+        public void ExecuteVoiceOver(AudioClip audio) {
+            if(audio) { PlayAudioNoPitchModifier(audio); }
         }
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
