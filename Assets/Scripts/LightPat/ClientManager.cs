@@ -13,6 +13,7 @@ namespace LightPat.Core
     public class ClientManager : NetworkBehaviour
     {
         public GameObject[] playerPrefabOptions;
+        public GameObject spectatorPrefab;
         public GameObject serverCameraPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
@@ -51,7 +52,7 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                StartCoroutine(UpdateServerPopulation());
+                StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -162,6 +163,8 @@ namespace LightPat.Core
                 // If we have finished loading a scene
                 if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
                 {
+                    StartCoroutine(UpdateServerStatus());
+
                     // Load all additive scenes in queue
                     if (additiveSceneQueue.Count > 0)
                     {
@@ -228,10 +231,10 @@ namespace LightPat.Core
 
             if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
 
-            StartCoroutine(UpdateServerPopulation());
+            StartCoroutine(UpdateServerStatus());
         }
 
-        private IEnumerator UpdateServerPopulation()
+        private IEnumerator UpdateServerStatus()
         {
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
@@ -275,14 +278,15 @@ namespace LightPat.Core
                 if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
                 {
                     thisServerIsInAPI = true;
-                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, server.progress)));
+                    string[] gameplayScenes = new string[] { "Hub", "Duel" };
+                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
                     break;
                 }
             }
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet! Cannot update server population");
+                Debug.LogError("You have not put this server in the API yet! Cannot update server status");
             }
         }
 
@@ -337,7 +341,7 @@ namespace LightPat.Core
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
 
-            StartCoroutine(UpdateServerPopulation());
+            StartCoroutine(UpdateServerStatus());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
