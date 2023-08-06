@@ -288,10 +288,7 @@ namespace LightPat.UI
                 int competitorCount = 0;
                 foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
                 {
-                    if (clientData.team == Team.Competitor)
-                    {
-                        competitorCount++;
-                    }
+                    if (clientData.team == Team.Competitor) { competitorCount++; }
                 }
 
                 if (competitorCount < 2)

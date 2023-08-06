@@ -330,9 +330,9 @@ namespace GameCreator.Melee
             public GameObject[] hits;
             public MeleeClip attack;
 
-            public HitQueueElement(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+            public HitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
             {
-                this.attackerMelee = melee;
+                this.attackerMelee = attackerMelee;
                 this.impactPosition = impactPosition;
                 this.hits = hits;
                 this.attack = attack;

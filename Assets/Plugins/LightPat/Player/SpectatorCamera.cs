@@ -5,11 +5,27 @@ using Unity.Netcode;
 
 namespace LightPat.Player
 {
-    public class ServerCamera : MonoBehaviour
+    public class SpectatorCamera : NetworkBehaviour
     {
         public float moveSpeed = 1;
         public float sensitivity = 0.1f;
         int fps;
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsOwner)
+            {
+                gameObject.AddComponent<GameCreator.Core.Hooks.HookCamera>();
+                gameObject.AddComponent<AudioListener>();
+                GetComponent<Camera>().enabled = true;
+            }
+            else
+            {
+                Destroy(GetComponent<Camera>());
+            }
+
+            Debug.Log("Spectator camera spawned " + IsLocalPlayer);
+        }
 
         private void Start()
         {
