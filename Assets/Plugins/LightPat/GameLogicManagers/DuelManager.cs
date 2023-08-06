@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Collections;
 using GameCreator.Characters;
+using System.Linq;
 
 namespace LightPat.Core
 {
@@ -105,25 +106,21 @@ namespace LightPat.Core
             if (IsServer)
             {
                 bool allPlayersSpawnedOnOwnerInstances = true;
-                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
+                foreach (ulong clientId in clientIdArray)
                 {
-                    int competitorCount = 0;
+                    // Assign teams when players spawn in
                     if (ClientManager.Singleton.GetClient(clientId).team == Team.Competitor)
                     {
-                        if (competitorCount == 0)
+                        Team targetTeam = Team.Red;
+                        foreach (ulong nestedClientId in clientIdArray)
                         {
-                            ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
+                            if (ClientManager.Singleton.GetClient(nestedClientId).team == Team.Red)
+                            {
+                                targetTeam = Team.Blue;
+                            }
                         }
-                        else if (competitorCount == 1)
-                        {
-                            ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
-                        }
-                        else
-                        {
-                            Debug.LogError("There shouldn't be more than 2 competitors in a duel!");
-                        }
-                        
-                        competitorCount++;
+                        ClientManager.Singleton.ChangeTeamOnServer(clientId, targetTeam);
                     }
 
                     if (ClientManager.Singleton.GetClient(clientId).team == Team.Spectator) { continue; }
@@ -181,7 +178,7 @@ namespace LightPat.Core
                         int competitorCount = 0;
                         foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
                         {
-                            if (clientData.team == Team.Competitor) { competitorCount++; }
+                            if (clientData.team != Team.Spectator) { competitorCount++; }
                         }
 
                         if (competitorCount != 2) { OnGameEnd(); }

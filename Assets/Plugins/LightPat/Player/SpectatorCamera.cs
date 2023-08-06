@@ -18,18 +18,12 @@ namespace LightPat.Player
                 gameObject.AddComponent<GameCreator.Core.Hooks.HookCamera>();
                 gameObject.AddComponent<AudioListener>();
                 GetComponent<Camera>().enabled = true;
+                Cursor.lockState = CursorLockMode.Locked;
             }
             else
             {
                 Destroy(GetComponent<Camera>());
             }
-
-            Debug.Log("Spectator camera spawned " + IsLocalPlayer);
-        }
-
-        private void Start()
-        {
-            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update()
@@ -57,6 +51,14 @@ namespace LightPat.Player
             guiStyle.fontSize = 48;
             guiStyle.normal.textColor = Color.yellow;
             GUI.Label(new Rect(Screen.currentResolution.width - 100, 50, 100, 50), fps.ToString(), guiStyle);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsOwner)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
     }
 }

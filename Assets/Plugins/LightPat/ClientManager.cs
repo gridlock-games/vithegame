@@ -230,6 +230,7 @@ namespace LightPat.Core
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
             if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
+            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
 
             StartCoroutine(UpdateServerStatus());
         }
@@ -515,6 +516,7 @@ namespace LightPat.Core
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
+                Debug.Log(clientDataDictionary[clientId].team);
                 GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
                 bool spawnPointFound = false;
                 foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)

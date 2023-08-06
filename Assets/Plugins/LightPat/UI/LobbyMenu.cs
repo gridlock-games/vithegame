@@ -310,7 +310,7 @@ namespace LightPat.UI
 
             }
 
-            startGameButton.interactable = canStartGame;
+            //startGameButton.interactable = canStartGame;
 
             changeTeamDropdown.interactable = enableTeams;
 
