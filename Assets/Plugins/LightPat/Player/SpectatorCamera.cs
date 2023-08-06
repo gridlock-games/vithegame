@@ -22,7 +22,7 @@ namespace LightPat.Player
             }
             else
             {
-                Destroy(GetComponent<Camera>());
+                GetComponent<Camera>().enabled = false;
             }
         }
 
