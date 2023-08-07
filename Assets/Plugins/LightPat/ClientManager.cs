@@ -13,7 +13,7 @@ namespace LightPat.Core
     public class ClientManager : NetworkBehaviour
     {
         public GameObject[] playerPrefabOptions;
-        public GameObject serverCameraPrefab;
+        public GameObject spectatorPrefab;
         
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
@@ -51,7 +51,7 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                StartCoroutine(UpdateServerPopulation());
+                StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -117,9 +117,9 @@ namespace LightPat.Core
             if (additiveSceneName != null) { yield return new WaitUntil(() => SceneManager.GetSceneByName(additiveSceneName).isLoaded); }
 
             // If we are not the editor and not a headless build
-            if (!Application.isEditor & SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+            if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
             {
-                Instantiate(serverCameraPrefab);
+                //Instantiate(spectatorPrefab);
             }
         }
 
@@ -135,6 +135,7 @@ namespace LightPat.Core
             {
                 NetworkManager.Singleton.AddNetworkPrefab(g);
             }
+            NetworkManager.Singleton.AddNetworkPrefab(spectatorPrefab);
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); Random.InitState(randomSeed.Value); };
@@ -162,6 +163,8 @@ namespace LightPat.Core
                 // If we have finished loading a scene
                 if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
                 {
+                    StartCoroutine(UpdateServerStatus());
+
                     // Load all additive scenes in queue
                     if (additiveSceneQueue.Count > 0)
                     {
@@ -227,11 +230,12 @@ namespace LightPat.Core
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
             if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
+            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
 
-            StartCoroutine(UpdateServerPopulation());
+            StartCoroutine(UpdateServerStatus());
         }
 
-        private IEnumerator UpdateServerPopulation()
+        private IEnumerator UpdateServerStatus()
         {
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
@@ -275,14 +279,15 @@ namespace LightPat.Core
                 if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
                 {
                     thisServerIsInAPI = true;
-                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, server.progress)));
+                    string[] gameplayScenes = new string[] { "Hub", "Duel" };
+                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
                     break;
                 }
             }
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet! Cannot update server population");
+                Debug.LogError("You have not put this server in the API yet! Cannot update server status");
             }
         }
 
@@ -337,7 +342,7 @@ namespace LightPat.Core
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
 
-            StartCoroutine(UpdateServerPopulation());
+            StartCoroutine(UpdateServerStatus());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -349,7 +354,7 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = false;
+            response.Approved = true;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -366,23 +371,20 @@ namespace LightPat.Core
             response.Pending = false;
 
             // Only allow clients to connect if the server is at the lobby scene or the hub scene
-            if (SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub")
-            {
-                response.Approved = true;
-            }
 
             if (response.Approved)
             {
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
 
+                Team clientTeam = SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub" ? Team.Red : Team.Spectator;
                 if (payloadOptions.Length == 2)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1])));
+                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), clientTeam));
                 }
                 else
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], 0));
+                    QueueClient(clientId, new ClientData(payloadOptions[0], 0, clientTeam));
                 }
             }
         }
@@ -420,6 +422,7 @@ namespace LightPat.Core
 
         private void ChangeTeam(ulong clientId, Team newTeam)
         {
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
             if (clientDataDictionary[clientId].team == newTeam) { return; }
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeTeam(newTeam);
             SynchronizeClientDictionaries();
@@ -513,6 +516,7 @@ namespace LightPat.Core
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
+                Debug.Log(clientDataDictionary[clientId].team);
                 GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
                 bool spawnPointFound = false;
                 foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
@@ -546,7 +550,15 @@ namespace LightPat.Core
                 Debug.LogWarning("No game logic manager found in scene. This means that players will not have a set spawn point");
             }
 
-            GameObject g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+            GameObject g;
+            if (clientDataDictionary[clientId].team == Team.Spectator)
+            {
+                g = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+            }
+            else // If the team is not spectator
+            {
+                g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+            }
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }
@@ -562,12 +574,12 @@ namespace LightPat.Core
         public int deaths;
         public int damageDealt;
 
-        public ClientData(string clientName, int playerPrefabOptionIndex)
+        public ClientData(string clientName, int playerPrefabOptionIndex, Team team)
         {
             this.clientName = clientName;
             ready = false;
             this.playerPrefabOptionIndex = playerPrefabOptionIndex;
-            team = Team.Red;
+            this.team = team;
             spawnWeapons = new int[0];
             kills = 0;
             deaths = 0;

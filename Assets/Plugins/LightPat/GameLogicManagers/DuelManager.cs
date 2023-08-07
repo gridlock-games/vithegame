@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Collections;
 using GameCreator.Characters;
+using System.Linq;
 
 namespace LightPat.Core
 {
@@ -78,18 +79,24 @@ namespace LightPat.Core
             {
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    Character playerChar = playerObject.GetComponent<Character>();
-                    playerChar.characterLocomotion.SetAllowDirectionControlChanges(true, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                    if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
+                    {
+                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                        Character playerChar = playerObject.GetComponent<Character>();
+                        playerChar.characterLocomotion.SetAllowDirectionControlChanges(true, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                    }
                 }
             }
             else if (prev <= 0 & current > 0)
             {
                 foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                    Character playerChar = playerObject.GetComponent<Character>();
-                    playerChar.characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
+                    {
+                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                        Character playerChar = playerObject.GetComponent<Character>();
+                        playerChar.characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                    }
                 }
             }
         }
@@ -99,8 +106,25 @@ namespace LightPat.Core
             if (IsServer)
             {
                 bool allPlayersSpawnedOnOwnerInstances = true;
-                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
+                foreach (ulong clientId in clientIdArray)
                 {
+                    // Assign teams when players spawn in
+                    if (ClientManager.Singleton.GetClient(clientId).team == Team.Competitor)
+                    {
+                        Team targetTeam = Team.Red;
+                        foreach (ulong nestedClientId in clientIdArray)
+                        {
+                            if (ClientManager.Singleton.GetClient(nestedClientId).team == Team.Red)
+                            {
+                                targetTeam = Team.Blue;
+                            }
+                        }
+                        ClientManager.Singleton.ChangeTeamOnServer(clientId, targetTeam);
+                    }
+
+                    if (ClientManager.Singleton.GetClient(clientId).team == Team.Spectator) { continue; }
+
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                     if (playerObject)
                     {
@@ -118,8 +142,11 @@ namespace LightPat.Core
                 {
                     foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                     {
-                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                        playerObject.GetComponent<Character>().characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                        if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
+                        {
+                            NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                            playerObject.GetComponent<Character>().characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                        }
                     }
                 }
 
@@ -132,8 +159,11 @@ namespace LightPat.Core
                     {
                         foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                         {
-                            NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-                            playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().SetInvincibility(countdownTime.Value);
+                            if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
+                            {
+                                NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                                playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().SetInvincibility(countdownTime.Value);
+                            }
                         }
 
                         countdownTime.Value -= Time.deltaTime;
@@ -144,11 +174,14 @@ namespace LightPat.Core
                         roundTimeInSeconds.Value -= Time.deltaTime;
                         if (roundTimeInSeconds.Value < 0) { roundTimeInSeconds.Value = 0; }
 
-                        // If a player disconnects during the match, end the game
-                        if (ClientManager.Singleton.GetClientDataDictionary().Count < 2)
+                        // If a competitor disconnects during the match, end the game
+                        int competitorCount = 0;
+                        foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
                         {
-                            OnGameEnd();
+                            if (clientData.team != Team.Spectator) { competitorCount++; }
                         }
+
+                        if (competitorCount != 2) { OnGameEnd(); }
                     }
 
                     if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
@@ -226,6 +259,8 @@ namespace LightPat.Core
 
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
+                if (clientPair.Value.team == Team.Spectator) { continue; }
+
                 Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<Character>();
                 playerChar.CancelAilment();
 

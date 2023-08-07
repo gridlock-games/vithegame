@@ -43,8 +43,10 @@ namespace LightPat.Core
     public enum Team
     {
         Environment,
+        Competitor,
         Red,
-        Blue
+        Blue,
+        Spectator
     }
 
     public enum GameMode

@@ -14,6 +14,7 @@ namespace GameCreator.Melee
     using UnityEngine.SceneManagement;
     using System.Reflection;
     using GameCreator.Camera;
+    using LightPat.Core;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -133,6 +134,7 @@ namespace GameCreator.Melee
 
         private AbilityManager abilityManager;
         private GlowRenderer glowRenderer;
+        private LightPat.Player.NetworkPlayer networkPlayer;
 
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
@@ -158,6 +160,7 @@ namespace GameCreator.Melee
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
             glowRenderer = GetComponentInChildren<GlowRenderer>();
+            networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
         // FOCUS TARGET: --------------------------------------------------------------------------
@@ -327,9 +330,9 @@ namespace GameCreator.Melee
             public GameObject[] hits;
             public MeleeClip attack;
 
-            public HitQueueElement(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+            public HitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
             {
-                this.attackerMelee = melee;
+                this.attackerMelee = attackerMelee;
                 this.impactPosition = impactPosition;
                 this.hits = hits;
                 this.attack = attack;
@@ -377,6 +380,19 @@ namespace GameCreator.Melee
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
+
+                if (ClientManager.Singleton)
+                {
+                    Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
+                    Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+
+                    if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                    {
+                        // If the attacker's team is the same as the victim's team, do not register this hit
+                        if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                    }
+                }
+
                 if (targetMelee.IsInvincible) { continue; }
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 

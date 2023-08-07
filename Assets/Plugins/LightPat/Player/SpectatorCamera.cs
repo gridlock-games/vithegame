@@ -5,15 +5,25 @@ using Unity.Netcode;
 
 namespace LightPat.Player
 {
-    public class ServerCamera : MonoBehaviour
+    public class SpectatorCamera : NetworkBehaviour
     {
         public float moveSpeed = 1;
         public float sensitivity = 0.1f;
         int fps;
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            if (IsOwner)
+            {
+                gameObject.AddComponent<GameCreator.Core.Hooks.HookCamera>();
+                gameObject.AddComponent<AudioListener>();
+                GetComponent<Camera>().enabled = true;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                GetComponent<Camera>().enabled = false;
+            }
         }
 
         private void Update()
@@ -41,6 +51,14 @@ namespace LightPat.Player
             guiStyle.fontSize = 48;
             guiStyle.normal.textColor = Color.yellow;
             GUI.Label(new Rect(Screen.currentResolution.width - 100, 50, 100, 50), fps.ToString(), guiStyle);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsOwner)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
     }
 }

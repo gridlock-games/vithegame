@@ -17,7 +17,7 @@ namespace LightPat.UI
         public Vector3 iconSpacing;
         public GameObject startButton;
         public GameObject readyButton;
-        public Button changeTeamButton;
+        public TMP_Dropdown changeTeamDropdown;
         public Button startGameButton;
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
@@ -147,23 +147,18 @@ namespace LightPat.UI
 
         public void ChangeTeam()
         {
-            bool nextTeam = false;
-            bool reached = false;
-            ulong localClientId = NetworkManager.Singleton.LocalClientId;
-            foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
-            {
-                if (nextTeam)
-                {
-                    reached = true;
-                    ClientManager.Singleton.ChangeTeamServerRpc(localClientId, team);
-                    break;
-                }
-                if (team == ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team)
-                    nextTeam = true;
-            }
+            Team team = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
+            ClientManager.Singleton.ChangeTeamServerRpc(NetworkManager.Singleton.LocalClientId, team);
+        }
 
-            if (!reached)
-                ClientManager.Singleton.ChangeTeamServerRpc(localClientId, Team.Red);
+        private void ResetTeams()
+        {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
+            foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+            {
+                ClientManager.Singleton.ChangeTeamOnServer(clientId, System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text));
+            }
         }
 
         private void Start()
@@ -203,15 +198,18 @@ namespace LightPat.UI
                 StartCoroutine(WaitForClientConnection());
         }
 
+        private bool clientIsConnected = false;
         private IEnumerator WaitForClientConnection()
         {
             yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId));
             playerModelDropdown.value = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex;
             UpdatePlayerDisplay();
             UpdateGameModeValue();
+            ChangeTeam();
             primaryWeaponDropdown.value = 0;
             secondaryWeaponDropdown.value = 1;
             tertiaryWeaponDropdown.value = 2;
+            clientIsConnected = true;
         }
 
         private void Update()
@@ -236,8 +234,85 @@ namespace LightPat.UI
             }
 
             // If our game mode is not set to duel, enable teams
-            bool enableTeams = (GameMode)System.Enum.Parse(typeof(GameMode), gameModeDropdown.options[gameModeDropdown.value].text) != GameMode.Duel;
-            changeTeamButton.interactable = enableTeams;
+            //bool enableTeams = (GameMode)System.Enum.Parse(typeof(GameMode), gameModeDropdown.options[gameModeDropdown.value].text) != GameMode.Duel;
+            GameMode currentGameMode = System.Enum.Parse<GameMode>(gameModeDropdown.options[gameModeDropdown.value].text);
+
+            List<TMP_Dropdown.OptionData> teamOptions = new List<TMP_Dropdown.OptionData>();
+            if (currentGameMode == GameMode.Duel)
+            {
+                foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
+                {
+                    if (team == Team.Spectator | team == Team.Competitor)
+                    {
+                        teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                    }
+                }
+            }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
+                {
+                    if (team == Team.Spectator | team == Team.Red | team == Team.Blue)
+                    {
+                        teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                    }
+                }
+            }
+
+            // Update team options
+            if (changeTeamDropdown.options.Count != teamOptions.Count)
+            {
+                changeTeamDropdown.ClearOptions();
+                changeTeamDropdown.AddOptions(teamOptions);
+                ChangeTeam();
+            }
+            else // If list lengths are the same
+            {
+                for (int i = 0; i < changeTeamDropdown.options.Count; i++)
+                {
+                    if (changeTeamDropdown.options[i].text != teamOptions[i].text | changeTeamDropdown.options[i].image != teamOptions[i].image)
+                    {
+                        changeTeamDropdown.ClearOptions();
+                        changeTeamDropdown.AddOptions(teamOptions);
+                        ChangeTeam();
+                        break;
+                    }
+                }
+            }
+
+            bool enableTeams = true;
+
+            bool canStartGame = false;
+            if (currentGameMode == GameMode.Duel)
+            {
+                int competitorCount = 0;
+                foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
+                {
+                    if (clientData.team == Team.Competitor) { competitorCount++; }
+                }
+
+                if (competitorCount < 2)
+                {
+                    errorDisplay.SetText("Duel requires there to be at least 2 competitors");
+                }
+                else if (competitorCount > 2)
+                {
+                    errorDisplay.SetText("There are too many competitors. Please change your team to spectator if you are not dueling");
+                }
+                else
+                {
+                    errorDisplay.SetText("");
+                    canStartGame = true;
+                }
+            }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+
+            }
+
+            startGameButton.interactable = canStartGame;
+
+            changeTeamDropdown.interactable = enableTeams;
 
             // Put main camera in right spot to view player model
             if (playerModel)
@@ -265,8 +340,10 @@ namespace LightPat.UI
 
                 // Set the color of the team button
                 Color teamColor = Color.black;
-                if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Red) { teamColor = Color.red; }
-                else if (ClientManager.Singleton.GetClient(valuePair.Key).team == Team.Blue) { teamColor = Color.blue; }
+                Team clientTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
+                if (clientTeam == Team.Red) { teamColor = Color.red; }
+                else if (clientTeam == Team.Blue) { teamColor = Color.blue; }
+                else if (clientTeam == Team.Spectator) { teamColor = Color.clear; }
                 nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
                 nameIcon.GetComponentInChildren<Button>(true).gameObject.SetActive(enableTeams);
 
@@ -302,41 +379,6 @@ namespace LightPat.UI
                     playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
                 }
             }
-
-            bool canStartGame = false;
-            if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
-            {
-                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
-
-                if (clientIdArray.Length < 2)
-                {
-                    errorDisplay.SetText("Duel requires there to be at least 2 players in the lobby");
-                }
-                else if (clientIdArray.Length > 2)
-                {
-                    errorDisplay.SetText("Duel requires there to be only 2 players in the lobby");
-                }
-                else
-                {
-                    errorDisplay.SetText("");
-
-                    canStartGame = true;
-
-                    if (NetworkManager.Singleton.IsServer)
-                    {
-                        int counter = 0;
-                        foreach (ulong clientId in clientIdArray)
-                        {
-                            if (counter == 0)
-                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Red);
-                            else if (counter == 1)
-                                ClientManager.Singleton.ChangeTeamOnServer(clientId, Team.Blue);
-                            counter++;
-                        }
-                    }
-                }
-            }
-            startGameButton.interactable = canStartGame;
 
             if (everyoneIsReady)
             {

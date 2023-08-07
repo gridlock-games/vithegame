@@ -73,9 +73,20 @@ namespace LightPat.UI
                 {
                     if (ClientManager.Singleton)
                     {
+                        Color nameColor;
+                        try
+                        {
+                            nameColor = (Color)typeof(Color).GetProperty(ClientManager.Singleton.GetClient(netObj.OwnerClientId).team.ToString().ToLowerInvariant()).GetValue(null, null);
+                        }
+                        catch
+                        {
+                            nameColor = Color.black;
+                        }
+
                         string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
                         nameDisplay.SetText(clientName);
                         target.name = clientName;
+                        nameDisplay.color = nameColor;
                     }
                 }
             }
