@@ -124,6 +124,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: d4c12229a450e6f4db91ca9b65164dc8, type: 2}
+--- !u!1 &80548445 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+    type: 3}
+  m_PrefabInstance: {fileID: 1307178522}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &320548893
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a93f1f947e69482dac99c3488751423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isExpanded: 0
+  isExpanded: 1
   character:
     target: 2
     character: {fileID: 1012365789}
@@ -1538,7 +1544,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1307178522}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 80548445}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91c5337897bdb4fdd80ef69fcef1511a, type: 3}
@@ -1604,7 +1610,7 @@ PrefabInstance:
     - target: {fileID: 288998041406652122, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: _currentWeaponType.m_InternalValue
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1634,7 +1640,7 @@ PrefabInstance:
     - target: {fileID: 288998041406652132, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14.35
+      value: 15.048
       objectReference: {fileID: 0}
     - target: {fileID: 288998041406652132, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -1699,7 +1705,7 @@ PrefabInstance:
     - target: {fileID: 7043209583932600394, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: isExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8019317750045649150, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -2105,7 +2111,12 @@ MonoBehaviour:
     NetworkTransport: {fileID: 1627123834}
     PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
-    NetworkPrefabs: []
+    NetworkPrefabs:
+    - Override: 0
+      Prefab: {fileID: 80548445}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -2163,7 +2174,7 @@ PrefabInstance:
     - target: {fileID: 1375938828783933841, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1375938828783933843, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
         type: 3}

@@ -42,6 +42,8 @@
 
         private static readonly GameObject[] EMPTY_GO_LIST = new GameObject[0];
 
+        private VoiceActorManager voiceActorManager;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterMelee Melee { get; private set; }
@@ -100,10 +102,12 @@
         public void Setup(CharacterMelee melee)
         {
             this.Melee = melee;
+            this.voiceActorManager = GetComponentInParent<VoiceActorManager>();
         }
 
         private void Awake()
         {
+
             if (this.enableWeaponTrail)
             {
                 this.weaponTrail = new WeaponTrail()
@@ -156,6 +160,10 @@
             {
                 case -1:
                     if (weaponTrail != null) weaponTrail.Deactivate(0f);
+                    Melee.isLunging = false;
+                    Melee.ReleaseTargetFocus();
+                    Melee.ResetHitCount();
+                    isVFXActivated = false;
                     EventAttackEnd.Invoke();
                     break;
 
@@ -187,7 +195,10 @@
                         isVFXActivated = true;
                     }
 
-                    Melee.ExecuteSwingAudio();
+                    if(clip.affectedBones.Contains(weaponBone)) {
+                        Melee.ExecuteVoiceOver(voiceActorManager.GetAttackVO());
+                        Melee.ExecuteSwingAudio();
+                    }
                     if (weaponTrail != null) weaponTrail.Activate();
                     EventAttackActivation.Invoke();
                     break;
@@ -202,9 +213,9 @@
                     Melee.isLunging = false;
                     Melee.ReleaseTargetFocus();
                     Melee.ResetHitCount();
+                    isVFXActivated = false;
                     if (weaponTrail != null) weaponTrail.Deactivate(0f);
                     EventAttackRecovery.Invoke();
-                    isVFXActivated = false;
                     break;
             }
 

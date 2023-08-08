@@ -431,7 +431,7 @@
 
                     case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
-                        StartCoroutine(StartSunAfterDuration(0f, false));
+                        StartCoroutine(StartSunAfterDuration(0.15f, false));
                         break;
 
                     default:
@@ -818,29 +818,25 @@
 
             yield return new WaitForSeconds(duration * 0.80f);
 
-            melee.ChangeState(
-                melee.currentWeapon.characterState,
-                melee.currentWeapon.characterMask,
-                MeleeWeapon.LAYER_STANCE,
-                this.GetCharacterAnimator()
-            );
+            // Reset State only if HP > 0
+            if(characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.Dead) {
+                
+                melee.ChangeState(
+                    melee.currentWeapon.characterState,
+                    melee.currentWeapon.characterMask,
+                    MeleeWeapon.LAYER_STANCE,
+                    this.GetCharacterAnimator()
+                );
 
-            // if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStunned &&
-            //     prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
-            // {
-            //     if(this.isCharacterDashing()  == false) {
-            //         melee.SetInvincibility(0.10f);
-            //     }
-            // }
+                if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                {
+                    this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
+                }
 
-            if (prevAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
-            {
-                this.characterAilment = CharacterLocomotion.CHARACTER_AILMENTS.None;
+                if (IsServer) { melee.knockedUpHitCount.Value = 0; }
+
+                this.onAilmentEvent.Invoke(this.characterAilment);
             }
-
-            if (IsServer) { melee.knockedUpHitCount.Value = 0; }
-
-            this.onAilmentEvent.Invoke(this.characterAilment);
         }
 
         public PreserveRotation Rotation(GameObject anchor, Character targetChar)

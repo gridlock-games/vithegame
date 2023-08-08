@@ -85,10 +85,11 @@
             if (melee.IsStaggered) { Destroy(target); return; }
             if (melee.GetHP() <= 0) { Destroy(target); return; }
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
+            
             // if (melee.GetCurrentPhase() >= 1 ) { Destroy(target); return; }
 
             // TO DO: Do not activate ability if it matches the current melee Phase
-            // if (melee.isCastingAbility) {
+            // if (melee.IsCastingAbility) {
             //     Ability activatedAbility = melee.GetActivatedAbility(melee);
 
             //     if((int)activatedAbility.dodgeLockOnhase == melee.GetCurrentPhase()) { return; }
