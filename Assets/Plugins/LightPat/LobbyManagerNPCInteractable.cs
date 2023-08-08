@@ -15,24 +15,62 @@ namespace LightPat.Core
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
 
-        private NetworkList<FixedString32Bytes> IPList;
+        private NetworkList<Server> serverList;
 
         private Button[] buttons;
         private bool localPlayerInRange;
         private Player.NetworkPlayer localPlayer;
 
+        private struct Server : INetworkSerializable, System.IEquatable<Server>
+        {
+            public FixedString32Bytes _id;
+            public int type;
+            public int population;
+            public int progress;
+            public FixedString32Bytes ip;
+            public FixedString32Bytes label;
+            public FixedString32Bytes __v;
+
+            public Server(string _id, int type, int population, int progress, string ip, string label, string __v)
+            {
+                this._id = _id;
+                this.type = type;
+                this.population = population;
+                this.progress = progress;
+                this.ip = ip;
+                this.label = label;
+                this.__v = __v;
+            }
+
+            public bool Equals(Server other)
+            {
+                return _id == other._id;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref _id);
+                serializer.SerializeValue(ref type);
+                serializer.SerializeValue(ref population);
+                serializer.SerializeValue(ref progress);
+                serializer.SerializeValue(ref ip);
+                serializer.SerializeValue(ref label);
+                serializer.SerializeValue(ref __v);
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
-            IPList.OnListChanged += OnIPListChange;
+            serverList.OnListChanged += OnServerListChange;
             SyncUIWithList();
         }
 
         public override void OnNetworkDespawn()
         {
-            IPList.OnListChanged -= OnIPListChange;
+            serverList.OnListChanged -= OnServerListChange;
         }
 
-        private void OnIPListChange(NetworkListEvent<FixedString32Bytes> changeEvent) { SyncUIWithList(); }
+        private void OnServerListChange(NetworkListEvent<Server> changeEvent) { SyncUIWithList(); }
 
         private void SyncUIWithList()
         {
@@ -41,15 +79,19 @@ namespace LightPat.Core
                 Destroy(child.gameObject);
             }
 
-            buttons = new Button[IPList.Count];
-            for (int i = 0; i < IPList.Count; i++)
+            buttons = new Button[serverList.Count];
+            for (int i = 0; i < serverList.Count; i++)
             {
-                string serverIP = IPList[i].ToString();
-                GameObject serverButton = Instantiate(serverButtonPrefab, serverButtonParent);
-                serverButton.name = serverIP;
-                serverButton.GetComponentInChildren<TextMeshProUGUI>().SetText(serverIP);
-                serverButton.GetComponent<Button>().onClick.AddListener(() => SetServerIP(serverIP));
-                buttons[i] = serverButton.GetComponent<Button>();
+                Server server = serverList[i];
+                GameObject serverElement = Instantiate(serverButtonPrefab, serverButtonParent);
+                serverElement.name = server.label.ToString();
+
+                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText(server.label + " | " + server.ip.ToString());
+                serverElement.transform.Find("Population").GetComponent<TextMeshProUGUI>().SetText("Player count: " + server.population.ToString());
+                serverElement.transform.Find("Status").GetComponent<TextMeshProUGUI>().SetText("Status: " + (server.progress == 0 ? "Waiting for players" : "In Progress"));
+
+                serverElement.transform.Find("Button").GetComponent<Button>().onClick.AddListener(() => SetServerIP(server));
+                buttons[i] = serverElement.transform.Find("Button").GetComponent<Button>();
             }
 
             targetIP = null;
@@ -84,9 +126,9 @@ namespace LightPat.Core
         }
 
         private string targetIP;
-        private void SetServerIP(string targetIP)
+        private void SetServerIP(Server server)
         {
-            int buttonIndex = IPList.IndexOf(targetIP);
+            int buttonIndex = serverList.IndexOf(server);
             for (int i = 0; i < buttons.Length; i++)
             {
                 if (i == buttonIndex)
@@ -99,12 +141,12 @@ namespace LightPat.Core
                 }
             }
 
-            this.targetIP = targetIP.Split('|')[1].Trim();
+            targetIP = server.ip.ToString();
         }
 
         private void Awake()
         {
-            IPList = new NetworkList<FixedString32Bytes>();
+            serverList = new NetworkList<Server>();
         }
 
         private void Update()
@@ -179,8 +221,7 @@ namespace LightPat.Core
             {
                 if (server.type != 0) { continue; }
 
-                string serverString = server.label + "|" + server.ip;
-                if (!serversProcessed.Contains(server) & !IPList.Contains(serverString))
+                if (!serversProcessed.Contains(server) & !this.serverList.Contains(new Server(server._id, server.type, server.population, server.progress, server.ip, server.label, server.__v)))
                 {
                     serversProcessed.Add(server);
                     StartCoroutine(WaitForPingToComplete(server));
@@ -188,16 +229,14 @@ namespace LightPat.Core
             }
 
             // If we have the server in the IPList but not in the API
-            List<FixedString32Bytes> stringsToRemove = new List<FixedString32Bytes>();
-            foreach (FixedString32Bytes serverString in IPList)
+            List<Server> stringsToRemove = new List<Server>();
+            foreach (Server serverString in this.serverList)
             {
                 bool serverStringInAPI = false;
 
                 foreach (ClientManager.Server server in serverList)
                 {
-                    string APIServerString = server.label + "|" + server.ip;
-
-                    if (APIServerString == serverString)
+                    if (server._id == serverString._id)
                     {
                         serverStringInAPI = true;
                         break;
@@ -211,9 +250,9 @@ namespace LightPat.Core
             }
 
             // Remove strings that are not in the API but are in the IPList
-            foreach (FixedString32Bytes serverString in stringsToRemove)
+            foreach (Server serverString in stringsToRemove)
             {
-                IPList.Remove(serverString);
+                this.serverList.Remove(serverString);
             }
 
             refreshServerListRunning = false;
@@ -226,10 +265,10 @@ namespace LightPat.Core
             Ping ping = new Ping(server.ip);
             yield return new WaitUntil(() => ping.isDone);
 
-            string serverString = server.label + "|" + server.ip;
-            if (!IPList.Contains(serverString))
+            Server localServer = new Server(server._id, server.type, server.population, server.progress, server.ip, server.label, server.__v);
+            if (!serverList.Contains(localServer))
             {
-                IPList.Add(serverString);
+                serverList.Add(localServer);
                 serversProcessed.Remove(server);
             }
         }
