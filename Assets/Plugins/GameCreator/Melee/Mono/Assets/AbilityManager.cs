@@ -81,7 +81,8 @@ public class AbilityManager : NetworkBehaviour
 
         foreach (KeyCode key in _hotKeys)
         {
-            if (Input.GetKeyDown(key)) { 
+            if (Input.GetKeyDown(key))
+            {
                 ActivateAbilityServerRpc(key);
             }
         }
@@ -91,6 +92,7 @@ public class AbilityManager : NetworkBehaviour
     private void ActivateAbilityServerRpc(KeyCode key)
     {
         Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
+        if (!ability) { return; }
 
         // Don't activate while dashing
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
@@ -99,7 +101,7 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if poise is not high enough
         if (ability && melee.GetPoise() < ability.staminaCost) { return; }
         // Don't activate if Melee is attacking and cancelType is none
-        if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None ) { return; }
+        if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None) { return; }
         // Don't activate if Melee is currently playing a Heavy Attack
         if (ability && melee.IsAttacking && melee.currentMeleeClip.isHeavy && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_HeavyAtk) { return; }
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
@@ -115,7 +117,8 @@ public class AbilityManager : NetworkBehaviour
         }
     }
 
-    public Ability GetActivatedAbility() {
-            return activatedAbility;
+    public Ability GetActivatedAbility()
+    {
+        return activatedAbility;
     }
 }

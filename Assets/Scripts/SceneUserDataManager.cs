@@ -7,6 +7,8 @@ using TMPro;
 using Unity.Netcode;
 using LightPat.Core;
 using GameCreator.Melee;
+using UnityEngine.Networking;
+using System.Collections;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -19,9 +21,11 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] private GameObject charDesc_Panel;
     [SerializeField] private Text charDesc_Name;
     [SerializeField] private Text charDesc_Lore;
+    [SerializeField] private Button charDesc_Select;
     [SerializeField] private GridLayoutGroup gridLayoutGroup;
     [SerializeField] private Image gridImgPrefab;
     [SerializeField] private Text loadingText;
+    [SerializeField] private TMP_Dropdown serverSelector;
 
     private GameObject selectedObject;
     private List<GameObject> placeholderObjects = new List<GameObject>();
@@ -68,11 +72,86 @@ public class SceneUserDataManager : MonoBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
+    public void UpdateTargetIP()
+    {
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
+    }
+
+    private List<ClientManager.Server> playerHubServerList = new List<ClientManager.Server>();
+    private IEnumerator RefreshServerList()
+    {
+        serverSelector.ClearOptions();
+        // Get list of servers in the API
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+
+        yield return getRequest.SendWebRequest();
+
+        if (getRequest.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Get Request Error in SceneUserDataManager.ConnectToPlayerHubCoroutine() " + getRequest.error);
+        }
+
+        string json = getRequest.downloadHandler.text;
+        ClientManager.Server playerHubServer = new();
+
+        bool playerHubServerFound = false;
+        foreach (string jsonSplit in json.Split("},"))
+        {
+            string finalJsonElement = jsonSplit;
+            if (finalJsonElement[0] == '[')
+            {
+                finalJsonElement = finalJsonElement.Remove(0, 1);
+            }
+
+            if (finalJsonElement[^1] == ']')
+            {
+                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+            }
+
+            if (finalJsonElement[^1] != '}')
+            {
+                finalJsonElement += "}";
+            }
+
+            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+            if (server.type == 1)
+            {
+                playerHubServer = server;
+                playerHubServerFound = true;
+                playerHubServerList.Add(server);
+            }
+        }
+
+        if (!playerHubServerFound)
+        {
+            Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
+            yield break;
+        }
+
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+
+        foreach (ClientManager.Server server in playerHubServerList)
+        {
+            options.Add(new TMP_Dropdown.OptionData(server.label + " | " + server.ip));
+        }
+
+        serverSelector.AddOptions(options);
+
+        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServerList[0].ip;
+    }
+
     void Start()
     {
         this.datamanager = DataManager.Instance;
         Instantiate(cameraPrefab);
         this.InitDataReferences();
+        StartCoroutine(RefreshServerList());
+    }
+
+    private void Update()
+    {
+        charDesc_Select.gameObject.SetActive(playerHubServerList.Count > 0);
     }
 
     private void InitDataReferences()

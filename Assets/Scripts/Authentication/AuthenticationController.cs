@@ -9,13 +9,9 @@ using System.Net;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using LightPat.Core;
-using UnityEngine.Networking;
-using System.Collections;
 
 public class AuthenticationController : MonoBehaviour
 {
-    public string targetIPAddressOverride = "";
-
     [SerializeField] private GameObject btn_SignIn;
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
@@ -183,22 +179,7 @@ public class AuthenticationController : MonoBehaviour
         if (PlayerPrefs.HasKey("email"))
         {
             transitioningToCharacterSelect = true;
-            StartCoroutine(StoreClient(displayNameInput.text));
-        }
-    }
-
-    public void StartGameV2()
-    {
-        var _userdata = datamanager;
-        if (!_userdata) { return; }
-        if (startingGame) { return; }
-
-        startingGame = true;
-        
-        if (PlayerPrefs.HasKey("email"))
-        {
-            transitioningToCharacterSelect = true;
-            StartCoroutine(StoreClient(datamanager.Data.account_name));
+            StoreClient(displayNameInput.text);
         }
     }
 
@@ -231,58 +212,9 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    private IEnumerator StoreClient(string displayName)
+    private void StoreClient(string displayName)
     {
-        // Get list of servers in the API
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
-
-        yield return getRequest.SendWebRequest();
-
-        if (getRequest.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Get Request Error in AuthneticationController.StoreClient() " + getRequest.error);
-        }
-
-        string json = getRequest.downloadHandler.text;
-        ClientManager.Server playerHubServer = new();
-
-        bool playerHubServerFound = false;
-        foreach (string jsonSplit in json.Split("},"))
-        {
-            string finalJsonElement = jsonSplit;
-            if (finalJsonElement[0] == '[')
-            {
-                finalJsonElement = finalJsonElement.Remove(0, 1);
-            }
-
-            if (finalJsonElement[^1] == ']')
-            {
-                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-            }
-
-            if (finalJsonElement[^1] != '}')
-            {
-                finalJsonElement += "}";
-            }
-
-            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
-
-            if (server.type == 1)
-            {
-                playerHubServer = server;
-                playerHubServerFound = true;
-                break;
-            }
-        }
-
-        if (!playerHubServerFound)
-        {
-            Debug.LogError("Player Hub Server not found in API. Is there a server with the type set to 1?");
-            yield break;
-        }
-
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIPAddressOverride != "" ? targetIPAddressOverride : playerHubServer.ip;
 
         SceneManager.LoadScene("CharacterSelect");
     }
