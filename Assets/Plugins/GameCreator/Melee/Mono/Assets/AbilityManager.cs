@@ -92,6 +92,7 @@ public class AbilityManager : NetworkBehaviour
     private void ActivateAbilityServerRpc(KeyCode key)
     {
         Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
+        if (!ability) { return; }
 
         // Don't activate while dashing
         if (melee.Character.isCharacterDashing() && ability.abilityType != Ability.AbilityType.DashAttack) return;
