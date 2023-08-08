@@ -115,14 +115,14 @@ namespace LightPat.Core
                 {
                     lobbyManagerUI.SetActive(false);
                     localPlayer.DisableActionsServerRpc(false);
-                    localPlayer.cameraMotorInstance.allowOrbitInput = true;
+                    localPlayer.externalUIOpen = false;
                     Cursor.lockState = CursorLockMode.Locked;
                     SyncUIWithList();
                 }
                 else if (localPlayerInRange)
                 {
                     localPlayer.DisableActionsServerRpc(true);
-                    localPlayer.cameraMotorInstance.allowOrbitInput = false;
+                    localPlayer.externalUIOpen = true;
                     lobbyManagerUI.SetActive(true);
                     Cursor.lockState = CursorLockMode.None;
                 }

@@ -21,7 +21,9 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerHUD;
         [SerializeField] private GameObject[] crosshairs;
 
-        public CameraMotorTypeAdventure cameraMotorInstance { get; private set; }
+        public bool externalUIOpen;
+
+        private CameraMotorTypeAdventure cameraMotorInstance;
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -107,7 +109,7 @@ namespace LightPat.Player
             {
                 if (!pauseInstance)
                 {
-                    if (cameraMotorInstance.allowOrbitInput)
+                    if (!externalUIOpen & cameraMotorInstance.allowOrbitInput)
                     {
                         DisableActionsServerRpc(true);
                         Cursor.lockState = CursorLockMode.None;
@@ -123,7 +125,7 @@ namespace LightPat.Player
                 }
             }
 
-            cameraMotorInstance.allowOrbitInputOverride = !pauseInstance;
+            cameraMotorInstance.allowOrbitInputOverride = !pauseInstance & !externalUIOpen;
 
             if (!ClientManager.Singleton) { return; }
 
