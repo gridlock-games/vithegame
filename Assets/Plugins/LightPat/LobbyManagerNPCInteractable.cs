@@ -44,7 +44,12 @@ namespace LightPat.Core
 
             public bool Equals(Server other)
             {
-                return _id == other._id;
+                return _id == other._id & type == other.type & population == other.population & progress == other.progress & ip == other.ip & label == other.label & __v == other.__v;
+            }
+
+            public bool Equals(ClientManager.Server other)
+            {
+                return _id == other._id & type == other.type & population == other.population & progress == other.progress & ip == other.ip & label == other.label & __v == other.__v;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -180,6 +185,7 @@ namespace LightPat.Core
         private IEnumerator RefreshServerList()
         {
             refreshServerListRunning = true;
+            Debug.Log("Refreshing Server list " + Time.time);
 
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
@@ -191,7 +197,7 @@ namespace LightPat.Core
                 Debug.Log("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
             }
 
-            List<ClientManager.Server> serverList = new List<ClientManager.Server>();
+            List<ClientManager.Server> APIServerList = new List<ClientManager.Server>();
 
             string json = getRequest.downloadHandler.text;
 
@@ -213,64 +219,49 @@ namespace LightPat.Core
                     finalJsonElement += "}";
                 }
 
-                serverList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
+                APIServerList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
             }
 
             // Process servers here
-            foreach (ClientManager.Server server in serverList)
+            foreach (ClientManager.Server APIServer in APIServerList)
             {
-                if (server.type != 0) { continue; }
+                if (APIServer.type != 0) { continue; }
 
-                if (!serversProcessed.Contains(server) & !this.serverList.Contains(new Server(server._id, server.type, server.population, server.progress, server.ip, server.label, server.__v)))
+                Server server = new Server(APIServer._id, APIServer.type, APIServer.population, APIServer.progress, APIServer.ip, APIServer.label, APIServer.__v);
+                if (!serverList.Contains(server))
                 {
-                    serversProcessed.Add(server);
-                    StartCoroutine(WaitForPingToComplete(server));
+                    serverList.Add(server);
                 }
             }
 
-            // If we have the server in the IPList but not in the API
-            List<Server> stringsToRemove = new List<Server>();
-            foreach (Server serverString in this.serverList)
+            // If we have the server in the network list but not in the API
+            List<Server> serversToRemove = new List<Server>();
+            foreach (Server loadedServer in this.serverList)
             {
-                bool serverStringInAPI = false;
+                bool serverInAPI = false;
 
-                foreach (ClientManager.Server server in serverList)
+                foreach (ClientManager.Server APIServer in APIServerList)
                 {
-                    if (server._id == serverString._id)
+                    if (loadedServer.Equals(APIServer))
                     {
-                        serverStringInAPI = true;
+                        serverInAPI = true;
                         break;
                     }
                 }
 
-                if (!serverStringInAPI)
+                if (!serverInAPI)
                 {
-                    stringsToRemove.Add(serverString);
+                    serversToRemove.Add(loadedServer);
                 }
             }
 
-            // Remove strings that are not in the API but are in the IPList
-            foreach (Server serverString in stringsToRemove)
+            // Remove servers that are not in the API but are in the ServerList
+            foreach (Server serverString in serversToRemove)
             {
-                this.serverList.Remove(serverString);
+                serverList.Remove(serverString);
             }
 
             refreshServerListRunning = false;
-        }
-
-        private List<ClientManager.Server> serversProcessed = new List<ClientManager.Server>();
-
-        private IEnumerator WaitForPingToComplete(ClientManager.Server server)
-        {
-            Ping ping = new Ping(server.ip);
-            yield return new WaitUntil(() => ping.isDone);
-
-            Server localServer = new Server(server._id, server.type, server.population, server.progress, server.ip, server.label, server.__v);
-            if (!serverList.Contains(localServer))
-            {
-                serverList.Add(localServer);
-                serversProcessed.Remove(server);
-            }
         }
 
         private void OnTriggerEnter(Collider other)
