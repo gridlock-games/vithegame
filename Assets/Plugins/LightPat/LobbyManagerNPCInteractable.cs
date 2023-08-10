@@ -15,7 +15,7 @@ namespace LightPat.Core
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
 
-        private NetworkList<Server> serverList;
+        private List<Server> serverList = new List<Server>();
 
         private Button[] buttons;
         private bool localPlayerInRange;
@@ -63,19 +63,6 @@ namespace LightPat.Core
                 serializer.SerializeValue(ref __v);
             }
         }
-
-        public override void OnNetworkSpawn()
-        {
-            serverList.OnListChanged += OnServerListChange;
-            SyncUIWithList();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            serverList.OnListChanged -= OnServerListChange;
-        }
-
-        private void OnServerListChange(NetworkListEvent<Server> changeEvent) { SyncUIWithList(); }
 
         private void SyncUIWithList()
         {
@@ -149,11 +136,6 @@ namespace LightPat.Core
             targetIP = server.ip.ToString();
         }
 
-        private void Awake()
-        {
-            serverList = new NetworkList<Server>();
-        }
-
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.F))
@@ -164,7 +146,6 @@ namespace LightPat.Core
                     localPlayer.DisableActionsServerRpc(false);
                     localPlayer.externalUIOpen = false;
                     Cursor.lockState = CursorLockMode.Locked;
-                    SyncUIWithList();
                 }
                 else if (localPlayerInRange)
                 {
@@ -175,17 +156,13 @@ namespace LightPat.Core
                 }
             }
 
-            if (IsServer)
-            {
-                if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
-            }
+            if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
         }
 
         private bool refreshServerListRunning;
         private IEnumerator RefreshServerList()
         {
             refreshServerListRunning = true;
-            Debug.Log("Refreshing Server list " + Time.time);
 
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
@@ -230,7 +207,9 @@ namespace LightPat.Core
                 Server server = new Server(APIServer._id, APIServer.type, APIServer.population, APIServer.progress, APIServer.ip, APIServer.label, APIServer.__v);
                 if (!serverList.Contains(server))
                 {
+                    Debug.Log("Adding " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress);
                     serverList.Add(server);
+                    SyncUIWithList();
                 }
             }
 
@@ -256,9 +235,11 @@ namespace LightPat.Core
             }
 
             // Remove servers that are not in the API but are in the ServerList
-            foreach (Server serverString in serversToRemove)
+            foreach (Server server in serversToRemove)
             {
-                serverList.Remove(serverString);
+                Debug.Log("Removing " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress);
+                serverList.Remove(server);
+                SyncUIWithList();
             }
 
             refreshServerListRunning = false;
