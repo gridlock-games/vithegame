@@ -23,7 +23,7 @@ public class ShooterGum : MonoBehaviour
 
     void Shoot()
   {
-    GameObject bulletInst = (GameObject) Instantiate(bulletPrefab, bulletPos.position, Quaternion.identity);
+    GameObject bulletInst = (GameObject) Instantiate(bulletPrefab, bulletPos.position, this.transform.rotation);
     bulletInst.GetComponent<Rigidbody>().velocity = bulletPos.transform.forward * speed;
   }
 }
