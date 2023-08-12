@@ -52,6 +52,7 @@ namespace LightPat.Core
     public enum GameMode
     {
         Duel,
+        TeamElimination,
         TeamDeathmatch
     }
 }

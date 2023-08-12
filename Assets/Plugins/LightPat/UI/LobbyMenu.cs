@@ -112,14 +112,19 @@ namespace LightPat.UI
         {
             if (loadingGame) { return; }
             loadingGame = true;
-            Debug.Log("Loading game");
-            if (gameModeDropdown.options[gameModeDropdown.value].text == "Duel")
+            GameMode currentGameMode = System.Enum.Parse<GameMode>(gameModeDropdown.options[gameModeDropdown.value].text);
+            Debug.Log("Loading game: " + currentGameMode);
+            if (currentGameMode == GameMode.Duel)
             {
                 ClientManager.Singleton.ChangeScene("Duel", true, "OutdoorCastleArena");
             }
-            else if (gameModeDropdown.options[gameModeDropdown.value].text == "Deathmatch")
+            else if (currentGameMode == GameMode.TeamElimination)
             {
-                ClientManager.Singleton.ChangeScene("Duel", true);
+                ClientManager.Singleton.ChangeScene("TeamElimination", true);
+            }
+            else
+            {
+                Debug.LogError("Game mode: " + currentGameMode + " not implemented yet!");
             }
         }
 
@@ -141,6 +146,7 @@ namespace LightPat.UI
 
         public void UpdateGameModeValue()
         {
+            if (loadingGame) { return; }
             System.Enum.TryParse(gameModeDropdown.options[gameModeDropdown.value].text, out GameMode chosenGameMode);
             ClientManager.Singleton.UpdateGameModeServerRpc(chosenGameMode);
         }
@@ -248,7 +254,7 @@ namespace LightPat.UI
                     }
                 }
             }
-            else if (currentGameMode == GameMode.TeamDeathmatch)
+            else if (currentGameMode == GameMode.TeamElimination)
             {
                 foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
                 {
@@ -257,6 +263,10 @@ namespace LightPat.UI
                         teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
                     }
                 }
+            }
+            else
+            {
+                Debug.LogError("Game mode: " + currentGameMode + " has not been implemented yet");
             }
 
             // Update team options
@@ -305,9 +315,14 @@ namespace LightPat.UI
                     canStartGame = true;
                 }
             }
-            else if (currentGameMode == GameMode.TeamDeathmatch)
+            else if (currentGameMode == GameMode.TeamElimination)
             {
-
+                // TODO Make sure number of players on each team are even
+                canStartGame = true;
+            }
+            else
+            {
+                Debug.LogError("Game mode " + currentGameMode + " has not been implemented yet");
             }
 
             startGameButton.interactable = canStartGame;

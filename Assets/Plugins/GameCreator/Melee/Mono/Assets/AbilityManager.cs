@@ -30,7 +30,10 @@ public class AbilityManager : NetworkBehaviour
 
     public bool IsAbilityOnCooldown(Ability ability)
     {
-        return abilitiesOnCooldown[abilityInstances.IndexOf(ability)];
+        int abilityIndex = abilityInstances.IndexOf(ability);
+        if (abilityIndex == -1) { return true; }
+
+        return abilitiesOnCooldown[abilityIndex];
     }
 
     private void Awake()
