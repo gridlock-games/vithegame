@@ -232,7 +232,6 @@ namespace LightPat.Core
             }
         }
 
-
         private bool roundEndCountdownRunning;
         private IEnumerator WaitForRoundEndCountdown()
         {
@@ -251,19 +250,13 @@ namespace LightPat.Core
                 charMelee.ResetDefense();
                 charMelee.ResetPoise();
 
-                foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
-                {
-                    if (teamSpawnPoint.team == clientPair.Value.team)
-                    {
-                        if (playerChar.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
-                            networkTransform.SetPosition(teamSpawnPoint.spawnPosition);
-                        else
-                            playerChar.UpdatePositionClientRpc(teamSpawnPoint.spawnPosition, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
+                KeyValuePair<Vector3, Quaternion> spawnOrientation = GetSpawnOrientation(clientPair.Value.team);
+                if (playerChar.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+                    networkTransform.SetPosition(spawnOrientation.Key);
+                else
+                    playerChar.UpdatePositionClientRpc(spawnOrientation.Key, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
 
-                        playerChar.UpdateRotationClientRpc(Quaternion.Euler(teamSpawnPoint.spawnRotation), new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
-                        break;
-                    }
-                }
+                playerChar.UpdateRotationClientRpc(spawnOrientation.Value, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerChar.OwnerClientId } } });
             }
 
             countdownTimeMessage.Value = "Ready!";
@@ -286,11 +279,11 @@ namespace LightPat.Core
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
                 if (teamHPs.ContainsKey(clientPair.Value.team))
                 {
-                    teamHPs.Add(clientPair.Value.team, playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP());
+                    teamHPs[clientPair.Value.team] += playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
                 }
                 else
                 {
-                    teamHPs[clientPair.Value.team] += playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
+                    teamHPs.Add(clientPair.Value.team, playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP());
                 }
             }
 

@@ -1243,13 +1243,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoints:
   - team: 2
-    spawnPosition: {x: 0, y: 0, z: -10}
+    spawnPositions:
+    - {x: 0, y: 0, z: -10}
+    - {x: 3, y: 0, z: -10}
+    - {x: -3, y: 0, z: -10}
+    - {x: -6, y: 0, z: -10}
+    - {x: 6, y: 0, z: -10}
+    - {x: -9, y: 0, z: -10}
+    - {x: 9, y: 0, z: -10}
+    - {x: -12, y: 0, z: -10}
+    - {x: 12, y: 0, z: -10}
+    - {x: 15, y: 0, z: -10}
+    - {x: -15, y: 0, z: -10}
     spawnRotation: {x: 0, y: 0, z: 0}
   - team: 3
-    spawnPosition: {x: 0, y: 0, z: 10}
+    spawnPositions:
+    - {x: 0, y: 0, z: 10}
+    - {x: 3, y: 0, z: 10}
+    - {x: -3, y: 0, z: 10}
+    - {x: -6, y: 0, z: 10}
+    - {x: 6, y: 0, z: 10}
+    - {x: -9, y: 0, z: 10}
+    - {x: 9, y: 0, z: 10}
+    - {x: -12, y: 0, z: 10}
+    - {x: 12, y: 0, z: 10}
+    - {x: 15, y: 0, z: 10}
+    - {x: -15, y: 0, z: 10}
     spawnRotation: {x: 0, y: 180, z: 0}
   scoreToWin: 3
-  roundTimeAmount: 180
+  roundTimeAmount: 20
   redScoreText: {fileID: 1333035076}
   blueScoreText: {fileID: 132746788}
   countdownText: {fileID: 319515592}

@@ -1232,13 +1232,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoints:
   - team: 2
-    spawnPosition: {x: 0, y: 6, z: 14}
+    spawnPositions:
+    - {x: 0, y: 3, z: 15}
     spawnRotation: {x: 0, y: 180, z: 0}
   - team: 3
-    spawnPosition: {x: 0, y: 6, z: -2}
+    spawnPositions:
+    - {x: 0, y: 3, z: -3}
     spawnRotation: {x: 0, y: 0, z: 0}
   - team: 4
-    spawnPosition: {x: 6, y: 6, z: 6}
+    spawnPositions:
+    - {x: 8, y: 3, z: 6}
     spawnRotation: {x: 0, y: 270, z: 0}
   scoreToWin: 3
   roundTimeAmount: 120
