@@ -279,7 +279,7 @@ namespace LightPat.Core
                 if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
                 {
                     thisServerIsInAPI = true;
-                    string[] gameplayScenes = new string[] { "Hub", "Duel" };
+                    string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
                     StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
                     break;
                 }

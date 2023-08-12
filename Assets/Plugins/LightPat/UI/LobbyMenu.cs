@@ -244,6 +244,7 @@ namespace LightPat.UI
             GameMode currentGameMode = System.Enum.Parse<GameMode>(gameModeDropdown.options[gameModeDropdown.value].text);
 
             List<TMP_Dropdown.OptionData> teamOptions = new List<TMP_Dropdown.OptionData>();
+            List<Team> teamOptionsAsEnum = new List<Team>();
             if (currentGameMode == GameMode.Duel)
             {
                 foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
@@ -251,6 +252,7 @@ namespace LightPat.UI
                     if (team == Team.Spectator | team == Team.Competitor)
                     {
                         teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                        teamOptionsAsEnum.Add(team);
                     }
                 }
             }
@@ -261,6 +263,7 @@ namespace LightPat.UI
                     if (team == Team.Spectator | team == Team.Red | team == Team.Blue)
                     {
                         teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                        teamOptionsAsEnum.Add(team);
                     }
                 }
             }
@@ -274,7 +277,8 @@ namespace LightPat.UI
             {
                 changeTeamDropdown.ClearOptions();
                 changeTeamDropdown.AddOptions(teamOptions);
-                ChangeTeam();
+                if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                    ChangeTeam();
             }
             else // If list lengths are the same
             {
@@ -284,7 +288,8 @@ namespace LightPat.UI
                     {
                         changeTeamDropdown.ClearOptions();
                         changeTeamDropdown.AddOptions(teamOptions);
-                        ChangeTeam();
+                        if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                            ChangeTeam();
                         break;
                     }
                 }
@@ -318,7 +323,29 @@ namespace LightPat.UI
             else if (currentGameMode == GameMode.TeamElimination)
             {
                 // TODO Make sure number of players on each team are even
-                canStartGame = true;
+                int redCount = 0;
+                int blueCount = 0;
+                foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
+                {
+                    if (clientData.team == Team.Red)
+                        redCount++;
+                    else if (clientData.team == Team.Blue)
+                        blueCount++;
+                }
+
+                if (redCount + blueCount == 2)
+                {
+                    errorDisplay.SetText("There are only two competitors in this lobby, please use the Duel game mode for a 1v1");
+                }
+                else if (redCount != blueCount)
+                {
+                    errorDisplay.SetText("Please make sure the number of players on each team are even");
+                }
+                else
+                {
+                    errorDisplay.SetText("");
+                    canStartGame = true;
+                }
             }
             else
             {

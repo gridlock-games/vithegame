@@ -121,6 +121,7 @@ namespace LightPat.Core
             }
         }
 
+        private int originalCompetitorCount;
         private void Update()
         {
             if (IsServer)
@@ -149,6 +150,12 @@ namespace LightPat.Core
                     {
                         if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
                         {
+                            originalCompetitorCount = 0;
+                            foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
+                            {
+                                if (clientData.team == Team.Red | clientData.team == Team.Blue) { originalCompetitorCount++; }
+                            }
+
                             NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                             playerObject.GetComponent<Character>().characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                         }
@@ -183,10 +190,11 @@ namespace LightPat.Core
                         int competitorCount = 0;
                         foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
                         {
-                            if (clientData.team != Team.Spectator) { competitorCount++; }
+                            if (clientData.team == Team.Red | clientData.team == Team.Blue) { competitorCount++; }
                         }
 
-                        //if (competitorCount != 2) { OnGameEnd(); }
+                        Debug.Log(originalCompetitorCount + " " + competitorCount);
+                        if (originalCompetitorCount != competitorCount) { OnGameEnd(); }
                     }
 
                     if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
@@ -288,7 +296,7 @@ namespace LightPat.Core
                 }
             }
 
-            winningTeam = teamHPs.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
+            winningTeam = teamHPs.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 
             if (winningTeam == Team.Red)
                 redScore.Value += 1;
