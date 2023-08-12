@@ -277,8 +277,11 @@ namespace LightPat.UI
             {
                 changeTeamDropdown.ClearOptions();
                 changeTeamDropdown.AddOptions(teamOptions);
-                if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
-                    ChangeTeam();
+                if (NetworkManager.Singleton.IsClient)
+                {
+                    if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                        ChangeTeam();
+                }
             }
             else // If list lengths are the same
             {
@@ -288,8 +291,11 @@ namespace LightPat.UI
                     {
                         changeTeamDropdown.ClearOptions();
                         changeTeamDropdown.AddOptions(teamOptions);
-                        if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
-                            ChangeTeam();
+                        if (NetworkManager.Singleton.IsClient)
+                        {
+                            if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                                ChangeTeam();
+                        }
                         break;
                     }
                 }

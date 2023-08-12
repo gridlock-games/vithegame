@@ -193,7 +193,6 @@ namespace LightPat.Core
                             if (clientData.team == Team.Red | clientData.team == Team.Blue) { competitorCount++; }
                         }
 
-                        Debug.Log(originalCompetitorCount + " " + competitorCount);
                         if (originalCompetitorCount != competitorCount) { OnGameEnd(); }
                     }
 
