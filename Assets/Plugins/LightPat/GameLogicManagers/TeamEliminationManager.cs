@@ -238,6 +238,7 @@ namespace LightPat.Core
             roundEndCountdownRunning = true;
             yield return new WaitUntil(() => countdownTime.Value <= 0);
 
+            ResetSpawnCounts();
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 if (clientPair.Value.team == Team.Spectator) { continue; }

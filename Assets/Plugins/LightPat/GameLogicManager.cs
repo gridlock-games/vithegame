@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using System.Linq;
 
 namespace LightPat.Core
 {
@@ -57,6 +58,15 @@ namespace LightPat.Core
 
             spawnCountDict[team] += 1;
             return new KeyValuePair<Vector3, Quaternion>(spawnPosition, spawnRotation);
+        }
+
+        protected void ResetSpawnCounts()
+        {
+            Team[] teamKeys = spawnCountDict.Keys.ToArray();
+            foreach (Team team in teamKeys)
+            {
+                spawnCountDict[team] = 0;
+            }
         }
 
         private void OnDrawGizmos()
