@@ -120,7 +120,7 @@ namespace LightPat.UI
             }
             else if (currentGameMode == GameMode.TeamElimination)
             {
-                ClientManager.Singleton.ChangeScene("TeamElimination", true);
+                ClientManager.Singleton.ChangeScene("TeamElimination", true, "OutdoorCastleArena");
             }
             else
             {
