@@ -31,7 +31,7 @@ public class AbilityManager : NetworkBehaviour
     public bool IsAbilityOnCooldown(Ability ability)
     {
         int abilityIndex = abilityInstances.IndexOf(ability);
-        if (abilityIndex == -1) { return true; }
+        if (abilityIndex == -1 | abilitiesOnCooldown.Count == 0) { return true; }
 
         return abilitiesOnCooldown[abilityIndex];
     }

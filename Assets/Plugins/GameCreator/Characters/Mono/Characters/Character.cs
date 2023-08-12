@@ -545,6 +545,12 @@
         }
 
         private NetworkVariable<bool> dead = new NetworkVariable<bool>();
+
+        public bool IsDead()
+        {
+            return dead.Value;
+        }
+
         public bool Die(Character killer)
         {
             if (dead.Value) { return false; }
