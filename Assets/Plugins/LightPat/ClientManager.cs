@@ -279,7 +279,7 @@ namespace LightPat.Core
                 if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
                 {
                     thisServerIsInAPI = true;
-                    string[] gameplayScenes = new string[] { "Hub", "Duel" };
+                    string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
                     StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
                     break;
                 }
@@ -516,38 +516,14 @@ namespace LightPat.Core
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
             {
-                Debug.Log(clientDataDictionary[clientId].team);
                 GameLogicManager glm = NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>();
-                bool spawnPointFound = false;
-                foreach (TeamSpawnPoint teamSpawnPoint in glm.spawnPoints)
-                {
-                    if (teamSpawnPoint.team == clientDataDictionary[clientId].team)
-                    {
-                        spawnPointFound = true;
-                        spawnPosition = teamSpawnPoint.spawnPosition;
-                        spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
-                        break;
-                    }
-                }
-
-                if (!spawnPointFound)
-                {
-                    Debug.LogWarning("No spawn point found for client: " + clientId + ". It will use the first spawn point in the list");
-
-                    if (glm.spawnPoints.Length > 1)
-                    {
-                        spawnPosition = glm.spawnPoints[0].spawnPosition;
-                        spawnRotation = Quaternion.Euler(glm.spawnPoints[0].spawnRotation);
-                    }
-                    else
-                    {
-                        Debug.LogError("Game Logic Manager's spawn point array length is less than 1");
-                    }
-                }
+                KeyValuePair<Vector3, Quaternion> spawnOrientation = glm.GetSpawnOrientation(clientDataDictionary[clientId].team);
+                spawnPosition = spawnOrientation.Key;
+                spawnRotation = spawnOrientation.Value;
             }
             else
             {
-                Debug.LogWarning("No game logic manager found in scene. This means that players will not have a set spawn point");
+                Debug.LogError("No game logic manager found in scene. This means that players will not have a set spawn point");
             }
 
             GameObject g;

@@ -412,7 +412,7 @@ namespace GameCreator.Melee
                 // If this attacker melee has already been hit on this frame, ignore the all hits
                 if (melee.wasHit) { return; }
                 // If the attacker is dead, don't register their hits
-                if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { Debug.Log(melee.Character.characterAilment); continue; }
+                if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // Mark the target as hit, this prevents hit trading
                 // If the target is interruptable, don't mark the hit
@@ -468,11 +468,12 @@ namespace GameCreator.Melee
 
                 if (targetMelee.HP.Value <= 0 & previousHP > 0)
                 {
+                    // Death ailment
+                    // MAKE SURE YOU CALL THIS BEFORE SENDING THE "OnDeath" MESSAGE IN ORDER TO MAKE SURE THAT THE GAME LOGIC MANAGER REGISTERS THE RESULT PROPERLY
+                    targetMelee.Character.Die(melee.Character);
+
                     if (targetMelee.NetworkObject.IsPlayerObject) { targetMelee.SendMessage("OnDeath", melee); }
                     if (NetworkObject.IsPlayerObject) { SendMessage("OnKill", targetMelee); }
-
-                    // Death ailment
-                    targetMelee.Character.Die(melee.Character);
                 }
                 else // If we are not dead
                 {

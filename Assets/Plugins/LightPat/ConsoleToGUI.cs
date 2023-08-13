@@ -39,10 +39,7 @@ namespace LightPat.Core
             output = logString;
             stack = stackTrace;
 
-            if (type == LogType.Error)
-                myLog = output + "\n" + stack + "\n" + myLog;
-            else
-                myLog = output + "\n" + myLog;
+            myLog = output + "\n" + stack + "\n" + myLog;
 
             if (myLog.Length > 1000)
             {

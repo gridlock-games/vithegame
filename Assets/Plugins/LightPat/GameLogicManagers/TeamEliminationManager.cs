@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using Unity.Netcode;
 using Unity.Collections;
+using TMPro;
 using GameCreator.Characters;
 using System.Linq;
 
 namespace LightPat.Core
 {
-    public class DuelManager : GameLogicManager
+    public class TeamEliminationManager : GameLogicManager
     {
         public int scoreToWin = 3;
         public float roundTimeAmount = 180;
@@ -22,23 +22,43 @@ namespace LightPat.Core
 
         private NetworkVariable<float> countdownTime = new NetworkVariable<float>(3);
         private NetworkVariable<float> roundTimeInSeconds = new NetworkVariable<float>(1);
-        
+
         private NetworkVariable<int> redScore = new NetworkVariable<int>();
         private NetworkVariable<int> blueScore = new NetworkVariable<int>();
 
         private NetworkVariable<bool> allPlayersSpawned = new NetworkVariable<bool>();
 
-        private NetworkVariable<FixedString32Bytes> countdownTimeMessage = new NetworkVariable<FixedString32Bytes>("Starting the duel!");
+        private NetworkVariable<FixedString32Bytes> countdownTimeMessage = new NetworkVariable<FixedString32Bytes>("Starting the match!");
 
-        public override void OnPlayerKill(ulong killerClientId)
+        public override void OnPlayerDeath(ulong deathClientId)
         {
             if (IsServer)
             {
-                Team killerTeam = ClientManager.Singleton.GetClient(killerClientId).team;
-                if (killerTeam == Team.Red)
-                    redScore.Value += 1;
-                else if (killerTeam == Team.Blue)
-                    blueScore.Value += 1;
+                Team victimTeam = ClientManager.Singleton.GetClient(deathClientId).team;
+
+                // Check if all players on that team are dead, then add a point accordingly
+                bool allPlayersOnVictimTeamAreDead = true;
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
+                {
+                    if (ClientManager.Singleton.GetClient(clientId).team == victimTeam)
+                    {
+                        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+                        // If this player is not dead, we know that someone on the team is still alive
+                        if (!playerObject.GetComponent<Character>().IsDead())
+                        {
+                            allPlayersOnVictimTeamAreDead = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (allPlayersOnVictimTeamAreDead)
+                {
+                    if (victimTeam == Team.Red)
+                        blueScore.Value += 1;
+                    else if (victimTeam == Team.Blue)
+                        redScore.Value += 1;
+                }
             }
         }
 
@@ -101,28 +121,14 @@ namespace LightPat.Core
             }
         }
 
+        private int originalCompetitorCount;
         private void Update()
         {
             if (IsServer)
             {
                 bool allPlayersSpawnedOnOwnerInstances = true;
-                ulong[] clientIdArray = ClientManager.Singleton.GetClientDataDictionary().Keys.ToArray();
-                foreach (ulong clientId in clientIdArray)
+                foreach (ulong clientId in ClientManager.Singleton.GetClientDataDictionary().Keys)
                 {
-                    // Assign teams when players spawn in
-                    if (ClientManager.Singleton.GetClient(clientId).team == Team.Competitor)
-                    {
-                        Team targetTeam = Team.Red;
-                        foreach (ulong nestedClientId in clientIdArray)
-                        {
-                            if (ClientManager.Singleton.GetClient(nestedClientId).team == Team.Red)
-                            {
-                                targetTeam = Team.Blue;
-                            }
-                        }
-                        ClientManager.Singleton.ChangeTeamOnServer(clientId, targetTeam);
-                    }
-
                     if (ClientManager.Singleton.GetClient(clientId).team == Team.Spectator) { continue; }
 
                     NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
@@ -144,6 +150,12 @@ namespace LightPat.Core
                     {
                         if (ClientManager.Singleton.GetClient(clientId).team != Team.Spectator)
                         {
+                            originalCompetitorCount = 0;
+                            foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
+                            {
+                                if (clientData.team == Team.Red | clientData.team == Team.Blue) { originalCompetitorCount++; }
+                            }
+
                             NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
                             playerObject.GetComponent<Character>().characterLocomotion.SetAllowDirectionControlChanges(false, CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                         }
@@ -178,10 +190,10 @@ namespace LightPat.Core
                         int competitorCount = 0;
                         foreach (ClientData clientData in ClientManager.Singleton.GetClientDataDictionary().Values)
                         {
-                            if (clientData.team != Team.Spectator) { competitorCount++; }
+                            if (clientData.team == Team.Red | clientData.team == Team.Blue) { competitorCount++; }
                         }
 
-                        if (competitorCount != 2) { OnGameEnd(); }
+                        if (originalCompetitorCount != competitorCount) { OnGameEnd(); }
                     }
 
                     if (roundTimeInSeconds.Value <= 0) { OnTimerEnd(); }
@@ -202,25 +214,8 @@ namespace LightPat.Core
             countdownText.SetText(allPlayersSpawned.Value ? countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0") : countdownTimeMessage.Value.ToString());
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
-            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
-            {
-                if (clientPair.Value.team == Team.Red)
-                    redScoreText.SetText(EllipsizeString(clientPair.Value.clientName, 5)  + ": " + redScore.Value.ToString());
-                else if (clientPair.Value.team == Team.Blue)
-                    blueScoreText.SetText(EllipsizeString(clientPair.Value.clientName, 5) + ": " + blueScore.Value.ToString());
-            }
-        }
-
-        private string EllipsizeString(string input, int maxLength)
-        {
-            if (input.Length <= maxLength)
-            {
-                return input;
-            }
-            else
-            {
-                return input.Substring(0, maxLength - 1) + "...";
-            }
+            redScoreText.SetText("Red Team: " + redScore.Value.ToString());
+            blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
         }
 
         private void OnRoundEnd(Team winningTeam, bool gameOver)
@@ -234,14 +229,7 @@ namespace LightPat.Core
             }
             else
             {
-                foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
-                {
-                    if (clientPair.Value.team == winningTeam)
-                    {
-                        countdownTimeMessage.Value = clientPair.Value.clientName + " won the round!";
-                        break;
-                    }
-                }
+                countdownTimeMessage.Value = winningTeam + " team won the round!";
             }
 
             if (!gameOver)
@@ -257,6 +245,7 @@ namespace LightPat.Core
             roundEndCountdownRunning = true;
             yield return new WaitUntil(() => countdownTime.Value <= 0);
 
+            ResetSpawnCounts();
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 if (clientPair.Value.team == Team.Spectator) { continue; }
@@ -291,21 +280,22 @@ namespace LightPat.Core
             timerEnded = true;
 
             Team winningTeam = Team.Environment;
-            int lastHP = -1;
+
+            Dictionary<Team, int> teamHPs = new Dictionary<Team, int>();
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-                int currentHP = playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
-                if (currentHP > lastHP)
+                if (teamHPs.ContainsKey(clientPair.Value.team))
                 {
-                    winningTeam = clientPair.Value.team;
+                    teamHPs[clientPair.Value.team] += playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
                 }
-                else if (currentHP == lastHP)
+                else
                 {
-                    winningTeam = Team.Environment;
+                    teamHPs.Add(clientPair.Value.team, playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP());
                 }
-                lastHP = currentHP;
             }
+
+            winningTeam = teamHPs.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 
             if (winningTeam == Team.Red)
                 redScore.Value += 1;
@@ -326,25 +316,10 @@ namespace LightPat.Core
         private void OnGameEnd()
         {
             // Display game end message
-            foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
-            {
-                if (redScore.Value >= scoreToWin)
-                {
-                    if (clientPair.Value.team == Team.Red)
-                    {
-                        gameEndDisplay.SetText(clientPair.Value.clientName + " wins!");
-                        break;
-                    }
-                }
-                else if (blueScore.Value >= scoreToWin)
-                {
-                    if (clientPair.Value.team == Team.Blue)
-                    {
-                        gameEndDisplay.SetText(clientPair.Value.clientName + " wins!");
-                        break;
-                    }
-                }
-            }
+            if (redScore.Value >= scoreToWin)
+                gameEndDisplay.SetText(Team.Red + " team wins!");
+            else if (blueScore.Value >= scoreToWin)
+                gameEndDisplay.SetText(Team.Blue + " team wins!");
 
             if (IsServer)
             {
