@@ -347,6 +347,10 @@ namespace LightPat.UI
                 {
                     errorDisplay.SetText("Please make sure the number of players on each team are even");
                 }
+                else if (redCount + blueCount < 2)
+                {
+                    errorDisplay.SetText("There are not enough competitors in this lobby, please use the Duel game mode for a 1v1");
+                }
                 else
                 {
                     errorDisplay.SetText("");
