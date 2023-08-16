@@ -280,7 +280,7 @@ namespace LightPat.Core
                 {
                     thisServerIsInAPI = true;
                     string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
-                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
+                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port)));
                     break;
                 }
             }
@@ -300,11 +300,13 @@ namespace LightPat.Core
             public string ip;
             public string label;
             public string __v;
+            public string port;
         }
 
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
+            Debug.Log(json);
 
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -325,12 +327,14 @@ namespace LightPat.Core
             public string serverId;
             public int population;
             public int progress;
+            public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress)
+            public ServerPutPayload(string serverId, int population, int progress, string port)
             {
                 this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
+                this.port = port;
             }
         }
 

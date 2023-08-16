@@ -194,7 +194,9 @@ public class AuthenticationController : MonoBehaviour
     {
         if (startServerCalled) { return; }
         startServerCalled = true;
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        networkTransport.ConnectionData.Address = targetIP;
+        networkTransport.ConnectionData.Port = 7777;
 
         if (NetworkManager.Singleton.StartServer())
         {

@@ -30,8 +30,9 @@ namespace LightPat.Core
             public FixedString32Bytes ip;
             public FixedString32Bytes label;
             public FixedString32Bytes __v;
+            public FixedString32Bytes port;
 
-            public Server(string _id, int type, int population, int progress, string ip, string label, string __v)
+            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port)
             {
                 this._id = _id;
                 this.type = type;
@@ -40,6 +41,7 @@ namespace LightPat.Core
                 this.ip = ip;
                 this.label = label;
                 this.__v = __v;
+                this.port = port;
             }
 
             public bool Equals(Server other)
@@ -61,6 +63,7 @@ namespace LightPat.Core
                 serializer.SerializeValue(ref ip);
                 serializer.SerializeValue(ref label);
                 serializer.SerializeValue(ref __v);
+                serializer.SerializeValue(ref port);
             }
         }
 
@@ -87,6 +90,7 @@ namespace LightPat.Core
             }
 
             targetIP = null;
+            targetPort = null;
             for (int i = 0; i < buttons.Length; i++)
             {
                 buttons[i].interactable = true;
@@ -97,6 +101,7 @@ namespace LightPat.Core
         public void JoinLobbyOnClick()
         {
             if (targetIP == null) { Debug.Log("No target IP specified"); return; }
+            if (targetPort == null) { Debug.Log("No target port specified"); return; }
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
@@ -110,14 +115,15 @@ namespace LightPat.Core
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             Debug.Log("Shutdown complete");
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-
             networkTransport.ConnectionData.Address = targetIP;
+            networkTransport.ConnectionData.Port = (ushort)int.Parse(targetPort);
             Debug.Log("Starting client: " + networkTransport.ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP
             NetworkManager.Singleton.StartClient();
         }
 
         private string targetIP;
+        private string targetPort;
         private void SetServerIP(Server server)
         {
             int buttonIndex = serverList.IndexOf(server);
@@ -134,6 +140,7 @@ namespace LightPat.Core
             }
 
             targetIP = server.ip.ToString();
+            targetPort = server.port.ToString();
         }
 
         private void Update()
@@ -204,10 +211,10 @@ namespace LightPat.Core
             {
                 if (APIServer.type != 0) { continue; }
 
-                Server server = new Server(APIServer._id, APIServer.type, APIServer.population, APIServer.progress, APIServer.ip, APIServer.label, APIServer.__v);
+                Server server = new Server(APIServer._id, APIServer.type, APIServer.population, APIServer.progress, APIServer.ip, APIServer.label, APIServer.__v, APIServer.port);
                 if (!serverList.Contains(server))
                 {
-                    Debug.Log("Adding " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress);
+                    Debug.Log("Adding " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress + " Port: " + server.port);
                     serverList.Add(server);
                     SyncUIWithList();
                 }
@@ -237,7 +244,7 @@ namespace LightPat.Core
             // Remove servers that are not in the API but are in the ServerList
             foreach (Server server in serversToRemove)
             {
-                Debug.Log("Removing " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress);
+                Debug.Log("Removing " + server.label + " " + server.ip + " Population: " + server.population + " Progress: " + server.progress + " Port: " + server.port);
                 serverList.Remove(server);
                 SyncUIWithList();
             }

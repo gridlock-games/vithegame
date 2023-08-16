@@ -74,7 +74,9 @@ public class SceneUserDataManager : MonoBehaviour
 
     public void UpdateTargetIP()
     {
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        networkTransport.ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
+        networkTransport.ConnectionData.Address = playerHubServerList[serverSelector.value].port;
     }
 
     private List<ClientManager.Server> playerHubServerList = new List<ClientManager.Server>();
