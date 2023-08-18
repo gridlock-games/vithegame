@@ -21,7 +21,7 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerHUD;
         [SerializeField] private GameObject[] crosshairs;
 
-        public bool externalUIOpen;
+        [HideInInspector] public bool externalUIOpen;
 
         private CameraMotorTypeAdventure cameraMotorInstance;
 

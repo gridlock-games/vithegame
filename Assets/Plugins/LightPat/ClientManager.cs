@@ -360,7 +360,6 @@ namespace LightPat.Core
             {
                 Debug.Log("Post request error in ClientManager.PostRequest " + postRequest.error);
             }
-            Debug.Log("Post request result " + postRequest.result);
         }
 
         private struct ServerPostPayload
