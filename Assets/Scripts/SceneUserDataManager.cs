@@ -135,7 +135,7 @@ public class SceneUserDataManager : MonoBehaviour
 
         foreach (ClientManager.Server server in playerHubServerList)
         {
-            options.Add(new TMP_Dropdown.OptionData(server.label + " | " + server.ip));
+            options.Add(new TMP_Dropdown.OptionData(server.label + " | " + server.ip + " | " + server.port));
         }
 
         serverSelector.AddOptions(options);

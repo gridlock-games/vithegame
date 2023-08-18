@@ -196,11 +196,10 @@ public class AuthenticationController : MonoBehaviour
         startServerCalled = true;
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = targetIP;
-        networkTransport.ConnectionData.Port = 7777;
 
         if (NetworkManager.Singleton.StartServer())
         {
-            Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+            Debug.Log("Started Server at " + targetIP + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 
             // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
             if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)

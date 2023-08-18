@@ -14,7 +14,7 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject spectatorPrefab;
-        
+
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
@@ -46,12 +46,12 @@ namespace LightPat.Core
 
             lobbyLeaderId.OnValueChanged += OnLobbyLeaderChanged;
             randomSeed.OnValueChanged += OnRandomSeedChange;
-            
+
             if (IsServer)
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                StartCoroutine(UpdateServerStatus());
+                //StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -146,7 +146,7 @@ namespace LightPat.Core
         }
 
         public GameObject sceneLoadingScreenPrefab;
-        
+
         public float SceneLoadingProgress { get; private set; }
 
         private Queue<string> additiveSceneQueue = new Queue<string>();
@@ -154,7 +154,7 @@ namespace LightPat.Core
 
         void OnNetworkSceneEvent(SceneEvent sceneEvent)
         {
-            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
+            //Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
 
             currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
@@ -177,12 +177,12 @@ namespace LightPat.Core
 
         void OnSceneLoad(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+            //Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
         }
 
         void OnSceneUnload(Scene scene)
         {
-            Debug.Log("Unloaded scene: " + scene.name);
+            //Debug.Log("Unloaded scene: " + scene.name);
         }
 
         private AsyncOperation currentSceneLoadingOperation;
@@ -272,14 +272,15 @@ namespace LightPat.Core
                 serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
             }
 
+            string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
             // PUT request to update duel server API
             bool thisServerIsInAPI = false;
+            var networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             foreach (Server server in serverList)
             {
-                if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
+                if (server.ip == networkTransport.ConnectionData.Address & ushort.Parse(server.port) == networkTransport.ConnectionData.Port)
                 {
                     thisServerIsInAPI = true;
-                    string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
                     StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port)));
                     break;
                 }
@@ -287,7 +288,13 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet! Cannot update server status");
+                ServerPostPayload payload = new ServerPostPayload(0,
+                                                                  clientDataDictionary.Count,
+                                                                  gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                  networkTransport.ConnectionData.Address,
+                                                                  "Label",
+                                                                  networkTransport.ConnectionData.Port.ToString());
+                StartCoroutine(PostRequest(payload));
             }
         }
 
@@ -306,7 +313,6 @@ namespace LightPat.Core
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-            Debug.Log(json);
 
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -334,6 +340,45 @@ namespace LightPat.Core
                 this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
+                this.port = port;
+            }
+        }
+
+        private IEnumerator PostRequest(ServerPostPayload payload)
+        {
+            string json = JsonUtility.ToJson(payload);
+            json = '[' + json + ']';
+
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, json);
+            Debug.Log(json);
+
+            //postRequest.SetRequestHeader("Content-Type", "application/json");
+
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Post request error in ClientManager.PostRequest " + postRequest.error);
+            }
+            Debug.Log("Post request result " + postRequest.result);
+        }
+
+        private struct ServerPostPayload
+        {
+            public int type;
+            public int population;
+            public int progress;
+            public string ip;
+            public string label;
+            public string port;
+
+            public ServerPostPayload(int type, int population, int progress, string ip, string label, string port)
+            {
+                this.type = type;
+                this.population = population;
+                this.progress = progress;
+                this.ip = ip;
+                this.label = label;
                 this.port = port;
             }
         }

@@ -141,6 +141,7 @@ namespace LightPat.Core
 
             targetIP = server.ip.ToString();
             targetPort = server.port.ToString();
+            Debug.Log(targetIP + " " + targetPort);
         }
 
         private void Update()
