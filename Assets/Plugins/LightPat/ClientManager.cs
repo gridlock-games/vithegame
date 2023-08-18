@@ -347,12 +347,8 @@ namespace LightPat.Core
         private IEnumerator PostRequest(ServerPostPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-            json = '[' + json + ']';
 
             UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, json);
-            Debug.Log(json);
-
-            //postRequest.SetRequestHeader("Content-Type", "application/json");
 
             yield return postRequest.SendWebRequest();
 
