@@ -17,8 +17,10 @@ namespace LightPat.UI
         public float scale = 1;
 
         public Slider healthSlider;
+        public Image healthImage;
 
         CharacterMelee melee;
+        Player.TeamIndicator teamIndicator;
         Transform target;
         Vector3 positionOffset;
 
@@ -32,6 +34,7 @@ namespace LightPat.UI
             transform.SetParent(null, true);
 
             melee = target.GetComponent<CharacterMelee>();
+            teamIndicator = target.GetComponent<Player.TeamIndicator>();
             healthSlider.gameObject.SetActive(melee != null);
 
             if (target.TryGetComponent(out NetworkObject netObj))
@@ -66,6 +69,8 @@ namespace LightPat.UI
                 return;
             }
 
+            if (teamIndicator) { nameDisplay.color = teamIndicator.teamColor; }
+
             // Set world space label text to client name
             if (target.TryGetComponent(out NetworkObject netObj))
             {
@@ -73,20 +78,9 @@ namespace LightPat.UI
                 {
                     if (ClientManager.Singleton)
                     {
-                        Color nameColor;
-                        try
-                        {
-                            nameColor = (Color)typeof(Color).GetProperty(ClientManager.Singleton.GetClient(netObj.OwnerClientId).team.ToString().ToLowerInvariant()).GetValue(null, null);
-                        }
-                        catch
-                        {
-                            nameColor = Color.black;
-                        }
-
                         string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
                         nameDisplay.SetText(clientName);
                         target.name = clientName;
-                        nameDisplay.color = nameColor;
                     }
                 }
             }
@@ -112,6 +106,7 @@ namespace LightPat.UI
                 if (Camera.main)
                     healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
+                healthImage.color = teamIndicator ? teamIndicator.teamColor : Color.red;
             }
         }
     }

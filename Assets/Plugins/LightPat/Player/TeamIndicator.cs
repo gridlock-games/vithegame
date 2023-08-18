@@ -9,11 +9,11 @@ namespace LightPat.Player
 {
     public class TeamIndicator : NetworkBehaviour
     {
-        public GameObject indicatorPrefab;
-        public Vector3 indicatorLocalPosition;
-        public float glowAmount = 1;
+        public Color teamColor { get; private set; } = Color.black;
 
-        public Color teamColor { get; private set; } = Color.red;
+        [SerializeField] private GameObject indicatorPrefab;
+        [SerializeField] private Vector3 indicatorLocalPosition;
+        [SerializeField] private float glowAmount = 1;
 
         private GameObject indicatorInstance;
 
@@ -128,6 +128,10 @@ namespace LightPat.Player
                         }
                     }
                 }
+            }
+            else // If no client manager
+            {
+                teamColor = Color.red;
             }
         }
     }
