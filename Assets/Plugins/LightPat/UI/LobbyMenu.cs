@@ -122,6 +122,10 @@ namespace LightPat.UI
             {
                 ClientManager.Singleton.ChangeScene("TeamElimination", true, "OutdoorCastleArena");
             }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true);
+            }
             else
             {
                 Debug.LogError("Game mode: " + currentGameMode + " not implemented yet!");
@@ -267,6 +271,14 @@ namespace LightPat.UI
                     }
                 }
             }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
+                {
+                    teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                    teamOptionsAsEnum.Add(team);
+                }
+            }
             else
             {
                 Debug.LogError("Game mode: " + currentGameMode + " has not been implemented yet");
@@ -356,6 +368,11 @@ namespace LightPat.UI
                     errorDisplay.SetText("");
                     canStartGame = true;
                 }
+            }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                errorDisplay.SetText("");
+                canStartGame = true;
             }
             else
             {
