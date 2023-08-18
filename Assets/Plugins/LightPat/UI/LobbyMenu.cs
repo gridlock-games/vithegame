@@ -287,11 +287,16 @@ namespace LightPat.UI
             // Update team options
             if (changeTeamDropdown.options.Count != teamOptions.Count)
             {
+                Team prevTeam = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
+
                 changeTeamDropdown.ClearOptions();
                 changeTeamDropdown.AddOptions(teamOptions);
+
                 if (NetworkManager.Singleton.IsClient)
                 {
-                    if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                    if (teamOptionsAsEnum.Contains(prevTeam))
+                        changeTeamDropdown.value = teamOptionsAsEnum.IndexOf(prevTeam);
+                    else
                         ChangeTeam();
                 }
             }
@@ -301,11 +306,16 @@ namespace LightPat.UI
                 {
                     if (changeTeamDropdown.options[i].text != teamOptions[i].text | changeTeamDropdown.options[i].image != teamOptions[i].image)
                     {
+                        Team prevTeam = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
+
                         changeTeamDropdown.ClearOptions();
                         changeTeamDropdown.AddOptions(teamOptions);
+                        
                         if (NetworkManager.Singleton.IsClient)
                         {
-                            if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                            if (teamOptionsAsEnum.Contains(prevTeam))
+                                changeTeamDropdown.value = teamOptionsAsEnum.IndexOf(prevTeam);
+                            else
                                 ChangeTeam();
                         }
                         break;
