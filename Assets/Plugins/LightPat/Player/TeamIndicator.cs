@@ -10,6 +10,7 @@ namespace LightPat.Player
     public class TeamIndicator : NetworkBehaviour
     {
         public Color teamColor { get; private set; } = Color.black;
+        public bool teamsAreActive { get; private set; }
 
         [SerializeField] private GameObject indicatorPrefab;
         [SerializeField] private Vector3 indicatorLocalPosition;
@@ -33,6 +34,7 @@ namespace LightPat.Player
                         indicatorInstance = Instantiate(indicatorPrefab, transform);
                         indicatorInstance.transform.localPosition = indicatorLocalPosition;
                     }
+                    teamsAreActive = true;
                 }
                 else
                 {
@@ -40,6 +42,7 @@ namespace LightPat.Player
                     {
                         Destroy(indicatorInstance);
                     }
+                    teamsAreActive = false;
                 }
 
                 Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
@@ -131,6 +134,7 @@ namespace LightPat.Player
             }
             else // If no client manager
             {
+                teamsAreActive = false;
                 teamColor = Color.red;
             }
         }

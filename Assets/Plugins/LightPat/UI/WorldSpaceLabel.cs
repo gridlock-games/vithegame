@@ -69,7 +69,13 @@ namespace LightPat.UI
                 return;
             }
 
-            if (teamIndicator) { nameDisplay.color = teamIndicator.teamColor; }
+            if (teamIndicator)
+            {
+                if (teamIndicator.teamsAreActive)
+                    nameDisplay.color = teamIndicator.teamColor;
+                else
+                    nameDisplay.color = Color.black;
+            }
 
             // Set world space label text to client name
             if (target.TryGetComponent(out NetworkObject netObj))
@@ -106,7 +112,7 @@ namespace LightPat.UI
                 if (Camera.main)
                     healthSlider.transform.rotation = rotTarget;
                 healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
-                healthImage.color = teamIndicator ? teamIndicator.teamColor : Color.red;
+                healthImage.color = teamIndicator ? teamIndicator.teamsAreActive ? teamIndicator.teamColor : Color.red : Color.red;
             }
         }
     }
