@@ -288,11 +288,11 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                ServerPostPayload payload = new ServerPostPayload(0,
+                ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
                                                                   clientDataDictionary.Count,
                                                                   gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
                                                                   networkTransport.ConnectionData.Address,
-                                                                  "Label",
+                                                                  SceneManager.GetActiveScene().name,
                                                                   networkTransport.ConnectionData.Port.ToString());
                 StartCoroutine(PostRequest(payload));
             }
@@ -346,9 +346,17 @@ namespace LightPat.Core
 
         private IEnumerator PostRequest(ServerPostPayload payload)
         {
-            string json = JsonUtility.ToJson(payload);
+            WWWForm form = new WWWForm();
+            form.AddField("type", payload.type);
+            form.AddField("population", payload.population);
+            form.AddField("progress", payload.progress);
+            form.AddField("ip", payload.ip);
+            form.AddField("label", payload.label);
+            form.AddField("port", payload.port);
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, json);
+            //string json = JsonUtility.ToJson(payload);
+
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, form);
 
             yield return postRequest.SendWebRequest();
 
