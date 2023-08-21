@@ -239,22 +239,32 @@ public class AuthenticationController : MonoBehaviour
             }
         }
 
-        foreach (int port in portList)
-        {
-            Debug.Log(port);
-        }
-
         // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
+        int hubPort = 7777;
         if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
         {
-            networkTransport.ConnectionData.Port = 7000;
+            int lobbyPort = hubPort - 1;
+            portList.Sort();
+            portList.Reverse();
+            foreach (int port in portList)
+            {
+                lobbyPort = port - 1;
+            }
+
+            if (lobbyPort < 1)
+            {
+                Debug.LogError("Lobby port is " + lobbyPort + ". It's too small. Please make sure that the lobby port is greater than 1. There's probably too many lobbies created.");
+                yield break;
+            }
+
+            networkTransport.ConnectionData.Port = (ushort)lobbyPort;
             NetworkManager.Singleton.StartServer();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
             ClientManager.Singleton.ChangeScene("Lobby", false);
         }
         else
         {
-            networkTransport.ConnectionData.Port = 7777;
+            networkTransport.ConnectionData.Port = (ushort)hubPort;
             NetworkManager.Singleton.StartServer();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
             ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
