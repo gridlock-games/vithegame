@@ -12,6 +12,7 @@ using LightPat.Core;
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System.IO;
 
 public class AuthenticationController : MonoBehaviour
 {
@@ -43,6 +44,14 @@ public class AuthenticationController : MonoBehaviour
     private bool transitioningToCharacterSelect;
     private void Update()
     {
+        //Application.dataPath
+        string path = @"C:/Users/patse/OneDrive/Desktop/Build/template-tps_Data";
+        path = path.Substring(0, path.LastIndexOf('/'));
+        path = path.Substring(0, path.LastIndexOf('/'));
+        path = Path.Join(path, Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("duel")));
+        path = Path.Join(path, "template-tps.exe");
+        Debug.Log(path);
+
         // If we are a headless build
         bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
         bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;

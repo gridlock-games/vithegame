@@ -104,7 +104,69 @@ namespace LightPat.Core
             if (createLobbyCalled) { return; }
             createLobbyCalled = true;
 
+            CreateLobbyServerRpc(NetworkManager.LocalClientId);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CreateLobbyServerRpc(ulong clientId)
+        {
+            clientsCreatingLobbiesQueue.Enqueue(clientId);
+        }
+
+        private Queue<ulong> clientsCreatingLobbiesQueue = new Queue<ulong>();
+
+        private bool waitingForLobbyToHitApi;
+        private IEnumerator WaitForLobbyToHitAPI(ulong clientId)
+        {
+            waitingForLobbyToHitApi = true;
+
+            int hubPort = 7777;
+            List<int> portList = new List<int>();
+            foreach (Server server in serverList)
+            {
+                portList.Add(int.Parse(server.port.ToString()));
+            }
+
+            int lobbyPort = hubPort - 1;
+            portList.Sort();
+            portList.Reverse();
+            foreach (int port in portList)
+            {
+                lobbyPort = port - 1;
+            }
+
             System.Diagnostics.Process.Start(@"C:\Users\patse\OneDrive\Desktop\Server Build 2\template-tps.exe");
+
+            while (true)
+            {
+                yield return null;
+
+                bool serverFound = false;
+                foreach (Server server in serverList)
+                {
+                    if (int.Parse(server.port.ToString()) == lobbyPort)
+                    {
+                        serverFound = true;
+                        break;
+                    }
+                }
+
+                if (serverFound)
+                    break;
+            }
+
+            CreateLobbyClientRpc(NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address,
+                               lobbyPort.ToString(),
+                               new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } } });
+
+            waitingForLobbyToHitApi = false;
+        }
+
+        [ClientRpc]
+        private void CreateLobbyClientRpc(string targetIP, string targetPort, ClientRpcParams clientRpcParams)
+        {
+            this.targetIP = targetIP;
+            this.targetPort = targetPort;
         }
 
         private bool joinLobbyCalled;
@@ -112,7 +174,6 @@ namespace LightPat.Core
         {
             if (targetIP == null) { Debug.Log("No target IP specified"); return; }
             if (targetPort == null) { Debug.Log("No target port specified"); return; }
-            if (createLobbyCalled) { return; }
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
@@ -128,8 +189,7 @@ namespace LightPat.Core
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = targetIP;
             networkTransport.ConnectionData.Port = (ushort)int.Parse(targetPort);
-            Debug.Log("Starting client: " + networkTransport.ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
-            // Change the scene locally, then connect to the target IP
+            Debug.Log("Starting client: " + networkTransport.ConnectionData.Address + " | " + networkTransport.ConnectionData.Port + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             NetworkManager.Singleton.StartClient();
         }
 
@@ -176,6 +236,11 @@ namespace LightPat.Core
             }
 
             if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
+
+            if (clientsCreatingLobbiesQueue.Count > 0 & !waitingForLobbyToHitApi)
+            {
+                StartCoroutine(WaitForLobbyToHitAPI(clientsCreatingLobbiesQueue.Dequeue()));
+            }
         }
 
         private bool refreshServerListRunning;
@@ -195,6 +260,7 @@ namespace LightPat.Core
 
             List<ClientManager.Server> APIServerList = new List<ClientManager.Server>();
 
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             string json = getRequest.downloadHandler.text;
 
             if (json != "[]")
@@ -217,7 +283,10 @@ namespace LightPat.Core
                         finalJsonElement += "}";
                     }
 
-                    APIServerList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
+                    ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+                    if (server.ip == networkTransport.ConnectionData.Address)
+                        APIServerList.Add(server);
                 }
             }
 
