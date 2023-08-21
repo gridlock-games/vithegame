@@ -36,6 +36,18 @@ namespace LightPat.Core
 
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
+        public void ResetAllClientData()
+        {
+            if (!IsServer) { Debug.LogError("ResetAllClientData() should only be called on the server"); return; }
+
+            foreach (ulong clientId in clientDataDictionary.Keys)
+            {
+                clientDataDictionary[clientId] = new ClientData(clientDataDictionary[clientId].clientName,
+                                                                clientDataDictionary[clientId].playerPrefabOptionIndex,
+                                                                clientDataDictionary[clientId].team);
+            }
+        }
+
         public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
@@ -154,7 +166,7 @@ namespace LightPat.Core
 
         void OnNetworkSceneEvent(SceneEvent sceneEvent)
         {
-            //Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
+            Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
 
             currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
