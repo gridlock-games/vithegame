@@ -249,6 +249,8 @@ public class AuthenticationController : MonoBehaviour
             foreach (int port in portList)
             {
                 lobbyPort = port - 1;
+                if (!portList.Contains(lobbyPort))
+                    break;
             }
 
             if (lobbyPort < 1)

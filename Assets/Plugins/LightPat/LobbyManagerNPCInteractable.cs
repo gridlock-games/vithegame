@@ -151,6 +151,8 @@ namespace LightPat.Core
 
         private void Update()
         {
+            Debug.Log(waitingForApiChange.Value);
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 if (lobbyManagerUI.activeInHierarchy)
@@ -180,7 +182,7 @@ namespace LightPat.Core
                         emptyServerList.Add(server);
                 }
 
-                if (!waitingForApiChange)
+                if (!waitingForApiChange.Value)
                 {
                     if (emptyServerList.Count < emptyLobbyServersRequired | serverList.Count < minimumLobbyServersRequired)
                     {
@@ -195,10 +197,10 @@ namespace LightPat.Core
             }
         }
 
-        private bool waitingForApiChange;
+        private NetworkVariable<bool> waitingForApiChange = new NetworkVariable<bool>();
         private IEnumerator CreateNewLobby()
         {
-            waitingForApiChange = true;
+            waitingForApiChange.Value = true;
 
             int hubPort = 7777;
             List<int> portList = new List<int>();
@@ -213,6 +215,8 @@ namespace LightPat.Core
             foreach (int port in portList)
             {
                 lobbyPort = port - 1;
+                if (!portList.Contains(lobbyPort))
+                    break;
             }
 
             Debug.Log(Application.platform);
@@ -227,7 +231,7 @@ namespace LightPat.Core
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer ? "template-tps.exe" : "template-tps.x86_64");
+                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "template-tps.exe" : "template-tps.x86_64");
             }
 
             System.Diagnostics.Process.Start(path);
@@ -250,12 +254,12 @@ namespace LightPat.Core
                     break;
             }
 
-            waitingForApiChange = false;
+            waitingForApiChange.Value = false;
         }
 
         private IEnumerator DeleteLobby(ServerDeletePayload lobbyServer)
         {
-            waitingForApiChange = true;
+            waitingForApiChange.Value = true;
 
             string json = JsonUtility.ToJson(lobbyServer);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -277,7 +281,7 @@ namespace LightPat.Core
                 }
             }
 
-            waitingForApiChange = false;
+            waitingForApiChange.Value = false;
         }
 
         private struct ServerDeletePayload
