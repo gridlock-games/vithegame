@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using Unity.Collections;
 using UnityEngine.Networking;
+using System.IO;
 
 namespace LightPat.Core
 {
@@ -135,7 +136,13 @@ namespace LightPat.Core
                 lobbyPort = port - 1;
             }
 
-            System.Diagnostics.Process.Start(@"C:\Users\patse\OneDrive\Desktop\Server Build 2\template-tps.exe");
+            string path = Application.dataPath;
+            path = path.Substring(0, path.LastIndexOf('/'));
+            path = path.Substring(0, path.LastIndexOf('/'));
+            path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
+            path = Path.Join(path, "template-tps.exe");
+
+            System.Diagnostics.Process.Start(path);
 
             while (true)
             {
