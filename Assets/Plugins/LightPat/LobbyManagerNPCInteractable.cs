@@ -140,7 +140,7 @@ namespace LightPat.Core
             path = path.Substring(0, path.LastIndexOf('/'));
             path = path.Substring(0, path.LastIndexOf('/'));
             path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-            path = Path.Join(path, "template-tps.exe");
+            path = Path.Join(path, "template-tps.x86_64");
 
             System.Diagnostics.Process.Start(path);
 
