@@ -186,25 +186,28 @@ namespace LightPat.Core
 
             string json = getRequest.downloadHandler.text;
 
-            foreach (string jsonSplit in json.Split("},"))
+            if (json != "[]")
             {
-                string finalJsonElement = jsonSplit;
-                if (finalJsonElement[0] == '[')
+                foreach (string jsonSplit in json.Split("},"))
                 {
-                    finalJsonElement = finalJsonElement.Remove(0, 1);
-                }
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
 
-                if (finalJsonElement[^1] == ']')
-                {
-                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                }
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
 
-                if (finalJsonElement[^1] != '}')
-                {
-                    finalJsonElement += "}";
-                }
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
 
-                APIServerList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
+                    APIServerList.Add(JsonUtility.FromJson<ClientManager.Server>(finalJsonElement));
+                }
             }
 
             // Process servers here

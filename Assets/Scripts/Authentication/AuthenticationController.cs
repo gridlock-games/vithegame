@@ -212,28 +212,31 @@ public class AuthenticationController : MonoBehaviour
         string json = getRequest.downloadHandler.text;
         List<int> portList = new List<int>();
 
-        foreach (string jsonSplit in json.Split("},"))
+        if (json != "[]")
         {
-            string finalJsonElement = jsonSplit;
-            if (finalJsonElement[0] == '[')
+            foreach (string jsonSplit in json.Split("},"))
             {
-                finalJsonElement = finalJsonElement.Remove(0, 1);
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+                if (server.ip == networkTransport.ConnectionData.Address)
+                    portList.Add(int.Parse(server.port));
             }
-
-            if (finalJsonElement[^1] == ']')
-            {
-                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-            }
-
-            if (finalJsonElement[^1] != '}')
-            {
-                finalJsonElement += "}";
-            }
-
-            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
-
-            if (server.ip == networkTransport.ConnectionData.Address)
-                portList.Add(int.Parse(server.port));
         }
 
         foreach (int port in portList)
@@ -241,25 +244,20 @@ public class AuthenticationController : MonoBehaviour
             Debug.Log(port);
         }
 
-        if (NetworkManager.Singleton.StartServer())
+        // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
+        if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
         {
-            // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
-            if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
-            {
-                networkTransport.ConnectionData.Port = 7000;
-
-                Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
-
-                ClientManager.Singleton.ChangeScene("Lobby", false);
-            }
-            else
-            {
-                networkTransport.ConnectionData.Port = 7777;
-                
-                Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
-
-                ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
-            }
+            networkTransport.ConnectionData.Port = 7000;
+            NetworkManager.Singleton.StartServer();
+            Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+            ClientManager.Singleton.ChangeScene("Lobby", false);
+        }
+        else
+        {
+            networkTransport.ConnectionData.Port = 7777;
+            NetworkManager.Singleton.StartServer();
+            Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+            ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
         }
     }
 

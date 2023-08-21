@@ -55,31 +55,35 @@ namespace LightPat.UI
             ClientManager.Server playerHubServer = new();
 
             bool playerHubServerFound = false;
-            foreach (string jsonSplit in json.Split("},"))
+
+            if (json != "[]")
             {
-                string finalJsonElement = jsonSplit;
-                if (finalJsonElement[0] == '[')
+                foreach (string jsonSplit in json.Split("},"))
                 {
-                    finalJsonElement = finalJsonElement.Remove(0, 1);
-                }
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
 
-                if (finalJsonElement[^1] == ']')
-                {
-                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                }
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
 
-                if (finalJsonElement[^1] != '}')
-                {
-                    finalJsonElement += "}";
-                }
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
 
-                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+                    ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
 
-                if (server.type == 1)
-                {
-                    playerHubServer = server;
-                    playerHubServerFound = true;
-                    break;
+                    if (server.type == 1)
+                    {
+                        playerHubServer = server;
+                        playerHubServerFound = true;
+                        break;
+                    }
                 }
             }
 

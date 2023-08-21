@@ -235,8 +235,11 @@ namespace LightPat.Core
             StartCoroutine(UpdateServerStatus());
         }
 
+        private bool updateServerStatusRunning;
         private IEnumerator UpdateServerStatus()
         {
+            if (updateServerStatusRunning) { yield break; }
+            updateServerStatusRunning = true;
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
 
@@ -251,25 +254,28 @@ namespace LightPat.Core
 
             string json = getRequest.downloadHandler.text;
 
-            foreach (string jsonSplit in json.Split("},"))
+            if (json != "[]")
             {
-                string finalJsonElement = jsonSplit;
-                if (finalJsonElement[0] == '[')
+                foreach (string jsonSplit in json.Split("},"))
                 {
-                    finalJsonElement = finalJsonElement.Remove(0, 1);
-                }
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
 
-                if (finalJsonElement[^1] == ']')
-                {
-                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                }
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
 
-                if (finalJsonElement[^1] != '}')
-                {
-                    finalJsonElement += "}";
-                }
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
 
-                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                }
             }
 
             string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
@@ -281,7 +287,7 @@ namespace LightPat.Core
                 if (server.ip == networkTransport.ConnectionData.Address & ushort.Parse(server.port) == networkTransport.ConnectionData.Port)
                 {
                     thisServerIsInAPI = true;
-                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port)));
+                    yield return PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port));
                     break;
                 }
             }
@@ -294,8 +300,9 @@ namespace LightPat.Core
                                                                   networkTransport.ConnectionData.Address,
                                                                   SceneManager.GetActiveScene().name,
                                                                   networkTransport.ConnectionData.Port.ToString());
-                StartCoroutine(PostRequest(payload));
+                yield return PostRequest(payload);
             }
+            updateServerStatusRunning = false;
         }
 
         public struct Server
