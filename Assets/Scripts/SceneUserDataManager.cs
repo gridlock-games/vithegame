@@ -70,11 +70,16 @@ public class SceneUserDataManager : MonoBehaviour
 
         loadingText.text = "Connecting to player hub...";
         NetworkManager.Singleton.StartClient();
+
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        Debug.Log("Started Client at " + networkTransport.ConnectionData.Address + ". Port: " + networkTransport.ConnectionData.Port);
     }
 
     public void UpdateTargetIP()
     {
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        networkTransport.ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
+        networkTransport.ConnectionData.Port = ushort.Parse(playerHubServerList[serverSelector.value].port);
     }
 
     private List<ClientManager.Server> playerHubServerList = new List<ClientManager.Server>();
@@ -92,34 +97,36 @@ public class SceneUserDataManager : MonoBehaviour
         }
 
         string json = getRequest.downloadHandler.text;
-        ClientManager.Server playerHubServer = new();
 
         bool playerHubServerFound = false;
-        foreach (string jsonSplit in json.Split("},"))
+
+        if (json != "[]")
         {
-            string finalJsonElement = jsonSplit;
-            if (finalJsonElement[0] == '[')
+            foreach (string jsonSplit in json.Split("},"))
             {
-                finalJsonElement = finalJsonElement.Remove(0, 1);
-            }
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
 
-            if (finalJsonElement[^1] == ']')
-            {
-                finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-            }
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
 
-            if (finalJsonElement[^1] != '}')
-            {
-                finalJsonElement += "}";
-            }
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
 
-            ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
 
-            if (server.type == 1)
-            {
-                playerHubServer = server;
-                playerHubServerFound = true;
-                playerHubServerList.Add(server);
+                if (server.type == 1)
+                {
+                    playerHubServerFound = true;
+                    playerHubServerList.Add(server);
+                }
             }
         }
 
@@ -133,12 +140,14 @@ public class SceneUserDataManager : MonoBehaviour
 
         foreach (ClientManager.Server server in playerHubServerList)
         {
-            options.Add(new TMP_Dropdown.OptionData(server.label + " | " + server.ip));
+            options.Add(new TMP_Dropdown.OptionData(server.label + " | " + server.ip + " | " + server.port));
         }
 
         serverSelector.AddOptions(options);
 
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServerList[0].ip;
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        networkTransport.ConnectionData.Address = playerHubServerList[0].ip;
+        networkTransport.ConnectionData.Port = ushort.Parse(playerHubServerList[0].port);
     }
 
     void Start()

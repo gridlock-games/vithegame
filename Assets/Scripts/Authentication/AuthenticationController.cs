@@ -9,6 +9,9 @@ using System.Net;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using LightPat.Core;
+using System.Collections;
+using UnityEngine.Networking;
+using System.Collections.Generic;
 
 public class AuthenticationController : MonoBehaviour
 {
@@ -45,7 +48,7 @@ public class AuthenticationController : MonoBehaviour
         bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
-            StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString());
+            StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
         }
         else // If we are not a headless build
         {
@@ -190,25 +193,81 @@ public class AuthenticationController : MonoBehaviour
     }
 
     private bool startServerCalled;
-    private void StartServer(string targetIP)
+    private IEnumerator StartServer(string targetIP)
     {
-        if (startServerCalled) { return; }
+        if (startServerCalled) { yield break; }
         startServerCalled = true;
-        NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = targetIP;
+        var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        networkTransport.ConnectionData.Address = targetIP;
 
-        if (NetworkManager.Singleton.StartServer())
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+
+        yield return getRequest.SendWebRequest();
+
+        if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Started Server at " + targetIP + ". Make sure you opened port 7777 for UDP traffic!");
+            Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+        }
 
-            // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
-            if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
+        string json = getRequest.downloadHandler.text;
+        List<int> portList = new List<int>();
+
+        if (json != "[]")
+        {
+            foreach (string jsonSplit in json.Split("},"))
             {
-                ClientManager.Singleton.ChangeScene("Lobby", false);
+                string finalJsonElement = jsonSplit;
+                if (finalJsonElement[0] == '[')
+                {
+                    finalJsonElement = finalJsonElement.Remove(0, 1);
+                }
+
+                if (finalJsonElement[^1] == ']')
+                {
+                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                }
+
+                if (finalJsonElement[^1] != '}')
+                {
+                    finalJsonElement += "}";
+                }
+
+                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+
+                if (server.ip == networkTransport.ConnectionData.Address)
+                    portList.Add(int.Parse(server.port));
             }
-            else
+        }
+
+        // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
+        int hubPort = 7777;
+        if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)
+        {
+            int lobbyPort = hubPort - 1;
+            portList.Sort();
+            portList.Reverse();
+            foreach (int port in portList)
             {
-                ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
+                lobbyPort = port - 1;
             }
+
+            if (lobbyPort < 1)
+            {
+                Debug.LogError("Lobby port is " + lobbyPort + ". It's too small. Please make sure that the lobby port is greater than 1. There's probably too many lobbies created.");
+                yield break;
+            }
+
+            networkTransport.ConnectionData.Port = (ushort)lobbyPort;
+            NetworkManager.Singleton.StartServer();
+            Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+            ClientManager.Singleton.ChangeScene("Lobby", false);
+        }
+        else
+        {
+            networkTransport.ConnectionData.Port = (ushort)hubPort;
+            NetworkManager.Singleton.StartServer();
+            Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+            ClientManager.Singleton.ChangeScene("Hub", true, "OutdoorCastleArena");
         }
     }
 

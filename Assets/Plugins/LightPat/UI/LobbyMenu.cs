@@ -55,31 +55,35 @@ namespace LightPat.UI
             ClientManager.Server playerHubServer = new();
 
             bool playerHubServerFound = false;
-            foreach (string jsonSplit in json.Split("},"))
+
+            if (json != "[]")
             {
-                string finalJsonElement = jsonSplit;
-                if (finalJsonElement[0] == '[')
+                foreach (string jsonSplit in json.Split("},"))
                 {
-                    finalJsonElement = finalJsonElement.Remove(0, 1);
-                }
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
 
-                if (finalJsonElement[^1] == ']')
-                {
-                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                }
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
 
-                if (finalJsonElement[^1] != '}')
-                {
-                    finalJsonElement += "}";
-                }
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
 
-                ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
+                    ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
 
-                if (server.type == 1)
-                {
-                    playerHubServer = server;
-                    playerHubServerFound = true;
-                    break;
+                    if (server.type == 1)
+                    {
+                        playerHubServer = server;
+                        playerHubServerFound = true;
+                        break;
+                    }
                 }
             }
 
@@ -121,6 +125,10 @@ namespace LightPat.UI
             else if (currentGameMode == GameMode.TeamElimination)
             {
                 ClientManager.Singleton.ChangeScene("TeamElimination", true, "OutdoorCastleArena");
+            }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true);
             }
             else
             {
@@ -267,6 +275,14 @@ namespace LightPat.UI
                     }
                 }
             }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                foreach (Team team in System.Enum.GetValues(typeof(Team)).Cast<Team>())
+                {
+                    teamOptions.Add(new TMP_Dropdown.OptionData(team.ToString()));
+                    teamOptionsAsEnum.Add(team);
+                }
+            }
             else
             {
                 Debug.LogError("Game mode: " + currentGameMode + " has not been implemented yet");
@@ -275,11 +291,16 @@ namespace LightPat.UI
             // Update team options
             if (changeTeamDropdown.options.Count != teamOptions.Count)
             {
+                Team prevTeam = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
+
                 changeTeamDropdown.ClearOptions();
                 changeTeamDropdown.AddOptions(teamOptions);
+
                 if (NetworkManager.Singleton.IsClient)
                 {
-                    if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                    if (teamOptionsAsEnum.Contains(prevTeam))
+                        changeTeamDropdown.value = teamOptionsAsEnum.IndexOf(prevTeam);
+                    else
                         ChangeTeam();
                 }
             }
@@ -289,11 +310,16 @@ namespace LightPat.UI
                 {
                     if (changeTeamDropdown.options[i].text != teamOptions[i].text | changeTeamDropdown.options[i].image != teamOptions[i].image)
                     {
+                        Team prevTeam = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
+
                         changeTeamDropdown.ClearOptions();
                         changeTeamDropdown.AddOptions(teamOptions);
+                        
                         if (NetworkManager.Singleton.IsClient)
                         {
-                            if (!teamOptionsAsEnum.Contains(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team))
+                            if (teamOptionsAsEnum.Contains(prevTeam))
+                                changeTeamDropdown.value = teamOptionsAsEnum.IndexOf(prevTeam);
+                            else
                                 ChangeTeam();
                         }
                         break;
@@ -356,6 +382,11 @@ namespace LightPat.UI
                     errorDisplay.SetText("");
                     canStartGame = true;
                 }
+            }
+            else if (currentGameMode == GameMode.TeamDeathmatch)
+            {
+                errorDisplay.SetText("");
+                canStartGame = true;
             }
             else
             {

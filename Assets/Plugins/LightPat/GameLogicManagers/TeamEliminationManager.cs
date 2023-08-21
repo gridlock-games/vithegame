@@ -214,8 +214,31 @@ namespace LightPat.Core
             countdownText.SetText(allPlayersSpawned.Value ? countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0") : countdownTimeMessage.Value.ToString());
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
-            redScoreText.SetText("Red Team: " + redScore.Value.ToString());
-            blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
+            if (IsClient)
+            {
+                Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
+
+                if (localClientTeam == Team.Red)
+                {
+                    redScoreText.SetText("Your Team: " + redScore.Value.ToString());
+                    blueScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
+                }
+                else if (localClientTeam == Team.Blue)
+                {
+                    redScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
+                    blueScoreText.SetText("Your Team: " + redScore.Value.ToString());
+                }
+                else if (localClientTeam == Team.Spectator)
+                {
+                    redScoreText.SetText("Red Team: " + redScore.Value.ToString());
+                    blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
+                }
+            }
+            else
+            {
+                redScoreText.SetText("Red Team: " + redScore.Value.ToString());
+                blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
+            }
         }
 
         private void OnRoundEnd(Team winningTeam, bool gameOver)
@@ -332,6 +355,7 @@ namespace LightPat.Core
         private IEnumerator ReturnToLobby()
         {
             yield return new WaitUntil(() => countdownTime.Value <= 0);
+            ClientManager.Singleton.ResetAllClientData();
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }

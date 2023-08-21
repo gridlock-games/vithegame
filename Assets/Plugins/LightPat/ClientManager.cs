@@ -14,7 +14,7 @@ namespace LightPat.Core
     {
         public GameObject[] playerPrefabOptions;
         public GameObject spectatorPrefab;
-        
+
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
@@ -36,6 +36,18 @@ namespace LightPat.Core
 
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
+        public void ResetAllClientData()
+        {
+            if (!IsServer) { Debug.LogError("ResetAllClientData() should only be called on the server"); return; }
+
+            foreach (ulong clientId in clientDataDictionary.Keys)
+            {
+                clientDataDictionary[clientId] = new ClientData(clientDataDictionary[clientId].clientName,
+                                                                clientDataDictionary[clientId].playerPrefabOptionIndex,
+                                                                clientDataDictionary[clientId].team);
+            }
+        }
+
         public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
@@ -46,12 +58,12 @@ namespace LightPat.Core
 
             lobbyLeaderId.OnValueChanged += OnLobbyLeaderChanged;
             randomSeed.OnValueChanged += OnRandomSeedChange;
-            
+
             if (IsServer)
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                StartCoroutine(UpdateServerStatus());
+                //StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -146,7 +158,7 @@ namespace LightPat.Core
         }
 
         public GameObject sceneLoadingScreenPrefab;
-        
+
         public float SceneLoadingProgress { get; private set; }
 
         private Queue<string> additiveSceneQueue = new Queue<string>();
@@ -177,12 +189,12 @@ namespace LightPat.Core
 
         void OnSceneLoad(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
+            //Debug.Log("Loaded scene: " + scene.name + " - Mode: " + mode);
         }
 
         void OnSceneUnload(Scene scene)
         {
-            Debug.Log("Unloaded scene: " + scene.name);
+            //Debug.Log("Unloaded scene: " + scene.name);
         }
 
         private AsyncOperation currentSceneLoadingOperation;
@@ -235,8 +247,11 @@ namespace LightPat.Core
             StartCoroutine(UpdateServerStatus());
         }
 
+        private bool updateServerStatusRunning;
         private IEnumerator UpdateServerStatus()
         {
+            if (updateServerStatusRunning) { yield break; }
+            updateServerStatusRunning = true;
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
 
@@ -251,44 +266,55 @@ namespace LightPat.Core
 
             string json = getRequest.downloadHandler.text;
 
-            foreach (string jsonSplit in json.Split("},"))
+            if (json != "[]")
             {
-                string finalJsonElement = jsonSplit;
-                if (finalJsonElement[0] == '[')
+                foreach (string jsonSplit in json.Split("},"))
                 {
-                    finalJsonElement = finalJsonElement.Remove(0, 1);
-                }
+                    string finalJsonElement = jsonSplit;
+                    if (finalJsonElement[0] == '[')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(0, 1);
+                    }
 
-                if (finalJsonElement[^1] == ']')
-                {
-                    finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                }
+                    if (finalJsonElement[^1] == ']')
+                    {
+                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                    }
 
-                if (finalJsonElement[^1] != '}')
-                {
-                    finalJsonElement += "}";
-                }
+                    if (finalJsonElement[^1] != '}')
+                    {
+                        finalJsonElement += "}";
+                    }
 
-                serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    serverList.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                }
             }
 
+            string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
             // PUT request to update duel server API
             bool thisServerIsInAPI = false;
+            var networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             foreach (Server server in serverList)
             {
-                if (server.ip == IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString())
+                if (server.ip == networkTransport.ConnectionData.Address & ushort.Parse(server.port) == networkTransport.ConnectionData.Port)
                 {
                     thisServerIsInAPI = true;
-                    string[] gameplayScenes = new string[] { "Hub", "Duel", "TeamElimination" };
-                    StartCoroutine(PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0)));
+                    yield return PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port));
                     break;
                 }
             }
 
             if (!thisServerIsInAPI)
             {
-                Debug.LogError("You have not put this server in the API yet! Cannot update server status");
+                ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
+                                                                  clientDataDictionary.Count,
+                                                                  gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                  networkTransport.ConnectionData.Address,
+                                                                  SceneManager.GetActiveScene().name,
+                                                                  networkTransport.ConnectionData.Port.ToString());
+                yield return PostRequest(payload);
             }
+            updateServerStatusRunning = false;
         }
 
         public struct Server
@@ -300,6 +326,7 @@ namespace LightPat.Core
             public string ip;
             public string label;
             public string __v;
+            public string port;
         }
 
         private IEnumerator PutRequest(ServerPutPayload payload)
@@ -325,12 +352,56 @@ namespace LightPat.Core
             public string serverId;
             public int population;
             public int progress;
+            public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress)
+            public ServerPutPayload(string serverId, int population, int progress, string port)
             {
                 this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
+                this.port = port;
+            }
+        }
+
+        private IEnumerator PostRequest(ServerPostPayload payload)
+        {
+            WWWForm form = new WWWForm();
+            form.AddField("type", payload.type);
+            form.AddField("population", payload.population);
+            form.AddField("progress", payload.progress);
+            form.AddField("ip", payload.ip);
+            form.AddField("label", payload.label);
+            form.AddField("port", payload.port);
+
+            //string json = JsonUtility.ToJson(payload);
+
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, form);
+
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Post request error in ClientManager.PostRequest " + postRequest.error);
+            }
+        }
+
+        private struct ServerPostPayload
+        {
+            public int type;
+            public int population;
+            public int progress;
+            public string ip;
+            public string label;
+            public string port;
+
+            public ServerPostPayload(int type, int population, int progress, string ip, string label, string port)
+            {
+                this.type = type;
+                this.population = population;
+                this.progress = progress;
+                this.ip = ip;
+                this.label = label;
+                this.port = port;
             }
         }
 

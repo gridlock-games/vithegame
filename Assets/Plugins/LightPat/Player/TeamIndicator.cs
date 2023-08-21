@@ -9,9 +9,12 @@ namespace LightPat.Player
 {
     public class TeamIndicator : NetworkBehaviour
     {
-        public GameObject indicatorPrefab;
-        public Vector3 indicatorLocalPosition;
-        public float glowAmount = 1;
+        public Color teamColor { get; private set; } = Color.black;
+        public bool teamsAreActive { get; private set; }
+
+        [SerializeField] private GameObject indicatorPrefab;
+        [SerializeField] private Vector3 indicatorLocalPosition;
+        [SerializeField] private float glowAmount = 1;
 
         private GameObject indicatorInstance;
 
@@ -19,19 +22,19 @@ namespace LightPat.Player
         {
             if (ClientManager.Singleton)
             {
-                ulong targetClientId = IsSpawned ? OwnerClientId : NetworkManager.Singleton.LocalClientId;
+                // If the local client isn't in the client manager, don't do anything
+                if (!ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.LocalClientId)) return;
 
-                if (!ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetClientId)) { return; }
-
+                // If we are in a team game mode, create an indicator instance, otherwise destroy it
                 GameMode[] teamGameModes = new GameMode[] { GameMode.TeamElimination, GameMode.TeamDeathmatch };
-                Team team = ClientManager.Singleton.GetClient(targetClientId).team;
-                if (teamGameModes.Contains(ClientManager.Singleton.gameMode.Value) & (team == Team.Red | team == Team.Blue))
+                if (teamGameModes.Contains(ClientManager.Singleton.gameMode.Value))
                 {
                     if (!indicatorInstance)
                     {
                         indicatorInstance = Instantiate(indicatorPrefab, transform);
                         indicatorInstance.transform.localPosition = indicatorLocalPosition;
                     }
+                    teamsAreActive = true;
                 }
                 else
                 {
@@ -39,34 +42,100 @@ namespace LightPat.Player
                     {
                         Destroy(indicatorInstance);
                     }
+                    teamsAreActive = false;
                 }
-                
-                foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
+
+                Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
+                if (IsSpawned) // If we are spawned, meaning we are in gameplay
                 {
-                    foreach (Material mat in renderer.materials)
+                    if (!ClientManager.Singleton.GetClientDataDictionary().ContainsKey(OwnerClientId)) return;
+
+                    Team ownerClientTeam = ClientManager.Singleton.GetClient(OwnerClientId).team;
+
+                    foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
                     {
-                        if (mat.HasProperty("_Glow"))
+                        foreach (Material mat in renderer.materials)
                         {
-                            if (team == Team.Red)
+                            if (mat.HasProperty("_Glow"))
                             {
-                                mat.SetColor("_Color", Color.red);
-                                mat.SetFloat("_Glow", glowAmount);
-                            }
-                            else if (team == Team.Blue)
-                            {
-                                mat.SetColor("_Color", Color.blue);
-                                mat.SetFloat("_Glow", glowAmount);
-                            }
-                            else
-                            {
-                                if (indicatorInstance)
+                                // If we are spectating, just make the colors be team based
+                                if (localClientTeam == Team.Spectator)
                                 {
-                                    Destroy(indicatorInstance);
+                                    if (ownerClientTeam == Team.Red)
+                                    {
+                                        mat.SetColor("_Color", Color.red);
+                                        mat.SetFloat("_Glow", glowAmount);
+                                        teamColor = Color.red;
+                                    }
+                                    else if (ownerClientTeam == Team.Blue)
+                                    {
+                                        mat.SetColor("_Color", Color.blue);
+                                        mat.SetFloat("_Glow", glowAmount);
+                                        teamColor = Color.blue;
+                                    }
+                                    else
+                                    {
+                                        if (indicatorInstance)
+                                        {
+                                            Destroy(indicatorInstance);
+                                        }
+                                    }
+                                }
+                                else // If we are a player, make the colors be relative
+                                {
+                                    if (ownerClientTeam == localClientTeam)
+                                    {
+                                        mat.SetColor("_Color", IsLocalPlayer ? Color.white : Color.cyan);
+                                        mat.SetFloat("_Glow", glowAmount);
+                                        teamColor = IsLocalPlayer ? Color.white : Color.cyan;
+                                    }
+                                    else
+                                    {
+                                        mat.SetColor("_Color", Color.red);
+                                        mat.SetFloat("_Glow", glowAmount);
+                                        teamColor = Color.red;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                else // If we are not spawned, meaning we are at the lobby
+                {
+                    foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
+                    {
+                        foreach (Material mat in renderer.materials)
+                        {
+                            if (mat.HasProperty("_Glow"))
+                            {
+                                if (localClientTeam == Team.Red)
+                                {
+                                    mat.SetColor("_Color", Color.red);
+                                    mat.SetFloat("_Glow", glowAmount);
+                                    teamColor = Color.red;
+                                }
+                                else if (localClientTeam == Team.Blue)
+                                {
+                                    mat.SetColor("_Color", Color.blue);
+                                    mat.SetFloat("_Glow", glowAmount);
+                                    teamColor = Color.blue;
+                                }
+                                else
+                                {
+                                    if (indicatorInstance)
+                                    {
+                                        Destroy(indicatorInstance);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else // If no client manager
+            {
+                teamsAreActive = false;
+                teamColor = Color.red;
             }
         }
     }

@@ -18,7 +18,7 @@ namespace LightPat.Core
         private void Start()
         {
             sceneIndex = SceneUtility.GetBuildIndexByScenePath(sceneName);
-            if (sceneIndex == -1) { Debug.LogError("Scene not in build settings"); return; }
+            if (sceneIndex == -1) { Debug.LogError(sceneName + " ! Scene not in build settings"); return; }
 
             scene = SceneManager.GetSceneByBuildIndex(sceneIndex);
             character = GetComponent<Character>();
@@ -27,7 +27,7 @@ namespace LightPat.Core
 
         private void Update()
         {
-            if (sceneIndex == -1) { Debug.LogError("Scene not in build settings"); return; }
+            if (sceneIndex == -1) { return; }
 
             if (scene.isLoaded)
             {
