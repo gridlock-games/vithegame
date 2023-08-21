@@ -62,7 +62,6 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                //StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -174,8 +173,6 @@ namespace LightPat.Core
                 // If we have finished loading a scene
                 if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
                 {
-                    StartCoroutine(UpdateServerStatus());
-
                     // Load all additive scenes in queue
                     if (additiveSceneQueue.Count > 0)
                     {
@@ -221,6 +218,8 @@ namespace LightPat.Core
 
             if (IsServer)
             {
+                if (!updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
+
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
@@ -242,14 +241,11 @@ namespace LightPat.Core
 
             if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
-
-            StartCoroutine(UpdateServerStatus());
         }
 
         private bool updateServerStatusRunning;
         private IEnumerator UpdateServerStatus()
         {
-            if (updateServerStatusRunning) { yield break; }
             updateServerStatusRunning = true;
             // Get list of servers in the API
             UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
@@ -305,13 +301,20 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
-                                                                  clientDataDictionary.Count,
-                                                                  gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
-                                                                  networkTransport.ConnectionData.Address,
-                                                                  SceneManager.GetActiveScene().name,
-                                                                  networkTransport.ConnectionData.Port.ToString());
-                yield return PostRequest(payload);
+                if ((postRequestCalled | putRequestCalled) & clientDataDictionary.Count == 0)
+                {
+                    Application.Quit();
+                }
+                else
+                {
+                    ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
+                                                                      clientDataDictionary.Count,
+                                                                      gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                      networkTransport.ConnectionData.Address,
+                                                                      SceneManager.GetActiveScene().name,
+                                                                      networkTransport.ConnectionData.Port.ToString());
+                    yield return PostRequest(payload);
+                }
             }
             updateServerStatusRunning = false;
         }
@@ -328,6 +331,7 @@ namespace LightPat.Core
             public string port;
         }
 
+        private bool putRequestCalled;
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
@@ -343,6 +347,7 @@ namespace LightPat.Core
             {
                 Debug.LogError("Put request error in ClientManager.PutRequest " + putRequest.error);
             }
+            putRequestCalled = true;
         }
 
         private struct ServerPutPayload
@@ -361,6 +366,7 @@ namespace LightPat.Core
             }
         }
 
+        private bool postRequestCalled;
         private IEnumerator PostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
@@ -379,6 +385,7 @@ namespace LightPat.Core
             {
                 Debug.LogError("Post request error in ClientManager.PostRequest " + postRequest.error);
             }
+            postRequestCalled = true;
         }
 
         private struct ServerPostPayload
@@ -408,8 +415,6 @@ namespace LightPat.Core
             clientDataDictionary.Remove(clientId);
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
-
-            StartCoroutine(UpdateServerStatus());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

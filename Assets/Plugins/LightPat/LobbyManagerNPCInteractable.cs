@@ -16,6 +16,11 @@ namespace LightPat.Core
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
 
+        // The minimum number of lobby instances we want to run at one time
+        private const int minimumLobbyServersRequired = 1;
+        // The minimum number of EMPTY lobby instances we want to run at one time
+        private const int emptyLobbyServersRequired = 1;
+
         private List<Server> serverList = new List<Server>();
 
         private Button[] buttons;
@@ -177,13 +182,11 @@ namespace LightPat.Core
 
                 if (!waitingForApiChange)
                 {
-                    int emptyServersRequired = 1;
-                    int minServersRequired = 1;
-                    if (emptyServerList.Count < emptyServersRequired | serverList.Count < minServersRequired)
+                    if (emptyServerList.Count < emptyLobbyServersRequired | serverList.Count < minimumLobbyServersRequired)
                     {
                         StartCoroutine(CreateNewLobby());
                     }
-                    else if (emptyServerList.Count > emptyServersRequired & serverList.Count > minServersRequired)
+                    else if (emptyServerList.Count > emptyLobbyServersRequired & serverList.Count > minimumLobbyServersRequired)
                     {
                         if (emptyServerList.Count > 0)
                             StartCoroutine(DeleteLobby(new ServerDeletePayload(emptyServerList[0]._id.ToString())));
