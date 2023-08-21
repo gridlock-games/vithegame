@@ -48,7 +48,7 @@ namespace LightPat.UI
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in LobbyMenu.ConnectToHub() " + getRequest.error);
+                Debug.LogError("Get Request Error in LobbyMenu.ConnectToHub() " + getRequest.error);
             }
 
             string json = getRequest.downloadHandler.text;

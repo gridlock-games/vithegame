@@ -255,10 +255,24 @@ namespace LightPat.Core
             waitingForApiChange = true;
 
             string json = JsonUtility.ToJson(lobbyServer);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
+            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(ClientManager.serverEndPointURL))
+            {
+                deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
 
+                deleteRequest.SetRequestHeader("Content-Type", "application/json");
+                deleteRequest.SetRequestHeader("Content-Length", jsonData.Length.ToString());
 
-            yield return null;
+                deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+
+                yield return deleteRequest.SendWebRequest();
+
+                if (deleteRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
+                }
+            }
 
             waitingForApiChange = false;
         }
@@ -286,7 +300,7 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+                Debug.LogError("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
             }
 
             List<ClientManager.Server> APIServerList = new List<ClientManager.Server>();

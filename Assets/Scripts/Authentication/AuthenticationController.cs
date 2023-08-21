@@ -206,7 +206,7 @@ public class AuthenticationController : MonoBehaviour
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+            Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
         }
 
         string json = getRequest.downloadHandler.text;

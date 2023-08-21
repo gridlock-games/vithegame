@@ -93,7 +93,7 @@ public class SceneUserDataManager : MonoBehaviour
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Get Request Error in SceneUserDataManager.ConnectToPlayerHubCoroutine() " + getRequest.error);
+            Debug.LogError("Get Request Error in SceneUserDataManager.ConnectToPlayerHubCoroutine() " + getRequest.error);
         }
 
         string json = getRequest.downloadHandler.text;

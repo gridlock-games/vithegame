@@ -258,7 +258,7 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+                Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
             }
 
             List<Server> serverList = new List<Server>();
@@ -331,7 +331,6 @@ namespace LightPat.Core
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest putRequest = UnityWebRequest.Put(serverEndPointURL, jsonData);
@@ -342,7 +341,7 @@ namespace LightPat.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Put request error in ClientManager.PutRequest " + putRequest.error);
+                Debug.LogError("Put request error in ClientManager.PutRequest " + putRequest.error);
             }
         }
 
@@ -372,15 +371,13 @@ namespace LightPat.Core
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
 
-            //string json = JsonUtility.ToJson(payload);
-
             UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, form);
 
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Post request error in ClientManager.PostRequest " + postRequest.error);
+                Debug.LogError("Post request error in ClientManager.PostRequest " + postRequest.error);
             }
         }
 
