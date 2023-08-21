@@ -65,7 +65,7 @@ namespace GameCreator.Melee
                     materialList.Add(m);
                 }
 
-                int materialCount = materialList.Count;
+                int materialCount = 1;
                 for (int i = 0; i < materialCount; i++)
                 {
                     materialList.Add(glowMaterial);
