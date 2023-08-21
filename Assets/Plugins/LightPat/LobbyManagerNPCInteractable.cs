@@ -98,84 +98,6 @@ namespace LightPat.Core
             }
         }
 
-        private bool createLobbyCalled;
-        public void CreateLobbyOnClick()
-        {
-            if (joinLobbyCalled) { return; }
-            if (createLobbyCalled) { return; }
-            createLobbyCalled = true;
-
-            CreateLobbyServerRpc(NetworkManager.LocalClientId);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void CreateLobbyServerRpc(ulong clientId)
-        {
-            clientsCreatingLobbiesQueue.Enqueue(clientId);
-        }
-
-        private Queue<ulong> clientsCreatingLobbiesQueue = new Queue<ulong>();
-
-        private bool waitingForLobbyToHitApi;
-        private IEnumerator WaitForLobbyToHitAPI(ulong clientId)
-        {
-            waitingForLobbyToHitApi = true;
-
-            int hubPort = 7777;
-            List<int> portList = new List<int>();
-            foreach (Server server in serverList)
-            {
-                portList.Add(int.Parse(server.port.ToString()));
-            }
-
-            int lobbyPort = hubPort - 1;
-            portList.Sort();
-            portList.Reverse();
-            foreach (int port in portList)
-            {
-                lobbyPort = port - 1;
-            }
-
-            string path = Application.dataPath;
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-            path = Path.Join(path, "template-tps.x86_64");
-
-            System.Diagnostics.Process.Start(path);
-
-            while (true)
-            {
-                yield return null;
-
-                bool serverFound = false;
-                foreach (Server server in serverList)
-                {
-                    if (int.Parse(server.port.ToString()) == lobbyPort)
-                    {
-                        serverFound = true;
-                        break;
-                    }
-                }
-
-                if (serverFound)
-                    break;
-            }
-
-            CreateLobbyClientRpc(NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address,
-                               lobbyPort.ToString(),
-                               new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } } });
-
-            waitingForLobbyToHitApi = false;
-        }
-
-        [ClientRpc]
-        private void CreateLobbyClientRpc(string targetIP, string targetPort, ClientRpcParams clientRpcParams)
-        {
-            this.targetIP = targetIP;
-            this.targetPort = targetPort;
-        }
-
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
@@ -244,13 +166,115 @@ namespace LightPat.Core
 
             if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
 
-            if (clientsCreatingLobbiesQueue.Count > 0 & !waitingForLobbyToHitApi)
+            if (IsServer & serverListRefreshedOnce)
             {
-                StartCoroutine(WaitForLobbyToHitAPI(clientsCreatingLobbiesQueue.Dequeue()));
+                List<Server> emptyServerList = new List<Server>();
+                foreach (Server server in serverList)
+                {
+                    if (server.population == 0)
+                        emptyServerList.Add(server);
+                }
+
+                if (!waitingForApiChange)
+                {
+                    int emptyServersRequired = 1;
+                    int minServersRequired = 1;
+                    if (emptyServerList.Count < emptyServersRequired | serverList.Count < minServersRequired)
+                    {
+                        StartCoroutine(CreateNewLobby());
+                    }
+                    else if (emptyServerList.Count > emptyServersRequired & serverList.Count > minServersRequired)
+                    {
+                        if (emptyServerList.Count > 0)
+                            StartCoroutine(DeleteLobby(new ServerDeletePayload(emptyServerList[0]._id.ToString())));
+                    }
+                }
+            }
+        }
+
+        private bool waitingForApiChange;
+        private IEnumerator CreateNewLobby()
+        {
+            waitingForApiChange = true;
+
+            int hubPort = 7777;
+            List<int> portList = new List<int>();
+            foreach (Server server in serverList)
+            {
+                portList.Add(int.Parse(server.port.ToString()));
+            }
+
+            int lobbyPort = hubPort - 1;
+            portList.Sort();
+            portList.Reverse();
+            foreach (int port in portList)
+            {
+                lobbyPort = port - 1;
+            }
+
+            Debug.Log(Application.platform);
+            string path = "";
+            if (Application.isEditor)
+            {
+                path = @"C:\Users\patse\OneDrive\Desktop\Server Build Lobby\template-tps.exe";
+            }
+            else
+            {
+                path = Application.dataPath;
+                path = path.Substring(0, path.LastIndexOf('/'));
+                path = path.Substring(0, path.LastIndexOf('/'));
+                path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
+                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer ? "template-tps.exe" : "template-tps.x86_64");
+            }
+
+            System.Diagnostics.Process.Start(path);
+
+            while (true)
+            {
+                yield return null;
+
+                bool serverFound = false;
+                foreach (Server server in serverList)
+                {
+                    if (int.Parse(server.port.ToString()) == lobbyPort)
+                    {
+                        serverFound = true;
+                        break;
+                    }
+                }
+
+                if (serverFound)
+                    break;
+            }
+
+            waitingForApiChange = false;
+        }
+
+        private IEnumerator DeleteLobby(ServerDeletePayload lobbyServer)
+        {
+            waitingForApiChange = true;
+
+            string json = JsonUtility.ToJson(lobbyServer);
+
+
+
+            yield return null;
+
+            waitingForApiChange = false;
+        }
+
+        private struct ServerDeletePayload
+        {
+            public string serverId;
+
+            public ServerDeletePayload(string serverId)
+            {
+                this.serverId = serverId;
             }
         }
 
         private bool refreshServerListRunning;
+        private bool serverListRefreshedOnce;
         private IEnumerator RefreshServerList()
         {
             refreshServerListRunning = true;
@@ -340,6 +364,7 @@ namespace LightPat.Core
                 SyncUIWithList();
             }
 
+            serverListRefreshedOnce = true;
             refreshServerListRunning = false;
         }
 

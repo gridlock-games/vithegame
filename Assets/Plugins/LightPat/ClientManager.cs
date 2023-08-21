@@ -5,7 +5,6 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
-using System.Net;
 using UnityEngine.Rendering;
 
 namespace LightPat.Core
