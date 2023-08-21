@@ -81,7 +81,7 @@ namespace LightPat.Core
                 GameObject serverElement = Instantiate(serverButtonPrefab, serverButtonParent);
                 serverElement.name = server.label.ToString();
 
-                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText(server.label + " | " + server.ip.ToString());
+                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText(server.label + " | " + server.ip.ToString() + " | " + server.port.ToString());
                 serverElement.transform.Find("Population").GetComponent<TextMeshProUGUI>().SetText("Player count: " + server.population.ToString());
                 serverElement.transform.Find("Status").GetComponent<TextMeshProUGUI>().SetText("Status: " + (server.progress == 0 ? "Waiting for players" : "In Progress"));
 
@@ -97,11 +97,22 @@ namespace LightPat.Core
             }
         }
 
+        private bool createLobbyCalled;
+        public void CreateLobbyOnClick()
+        {
+            if (joinLobbyCalled) { return; }
+            if (createLobbyCalled) { return; }
+            createLobbyCalled = true;
+
+            System.Diagnostics.Process.Start(@"C:\Users\patse\OneDrive\Desktop\Server Build 2\template-tps.exe");
+        }
+
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
             if (targetIP == null) { Debug.Log("No target IP specified"); return; }
             if (targetPort == null) { Debug.Log("No target port specified"); return; }
+            if (createLobbyCalled) { return; }
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
