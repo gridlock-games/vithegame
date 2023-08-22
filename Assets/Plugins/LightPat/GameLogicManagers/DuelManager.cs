@@ -357,7 +357,6 @@ namespace LightPat.Core
         private IEnumerator ReturnToLobby()
         {
             yield return new WaitUntil(() => countdownTime.Value <= 0);
-            ClientManager.Singleton.ResetAllClientData();
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }
