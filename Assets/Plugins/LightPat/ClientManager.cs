@@ -255,6 +255,8 @@ namespace LightPat.Core
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+                updateServerStatusRunning = false;
+                yield break;
             }
 
             List<Server> serverList = new List<Server>();

@@ -200,7 +200,10 @@ namespace LightPat.Core
                     else if (emptyServerList.Count > emptyLobbyServersRequired & serverList.Count > minimumLobbyServersRequired)
                     {
                         if (emptyServerList.Count > 0)
+                        {
+                            Debug.Log("Deleting server " + emptyServerList[0].port);
                             StartCoroutine(DeleteLobby(new ServerDeletePayload(emptyServerList[0]._id.ToString())));
+                        }
                     }
                 }
             }
@@ -211,28 +214,30 @@ namespace LightPat.Core
         {
             waitingForApiChange.Value = true;
 
-            int hubPort = 7777;
-            List<int> portList = new List<int>();
-            foreach (Server server in serverList)
-            {
-                portList.Add(int.Parse(server.port.ToString()));
-            }
+            int originalServerCount = serverList.Count;
 
-            int lobbyPort = hubPort - 1;
-            portList.Sort();
-            portList.Reverse();
-            foreach (int port in portList)
-            {
-                lobbyPort = port - 1;
-                if (!portList.Contains(lobbyPort))
-                    break;
-            }
+            //int hubPort = 7777;
+            //List<int> portList = new List<int>();
+            //foreach (Server server in serverList)
+            //{
+            //    portList.Add(int.Parse(server.port.ToString()));
+            //}
+
+            //int lobbyPort = hubPort - 1;
+            //portList.Sort();
+            //portList.Reverse();
+            //foreach (int port in portList)
+            //{
+            //    lobbyPort = port - 1;
+            //    if (!portList.Contains(lobbyPort))
+            //        break;
+            //}
 
             Debug.Log(Application.platform);
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Server Build Lobby\template-tps.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Lobby Server Build\template-tps.exe";
             }
             else
             {
@@ -244,23 +249,29 @@ namespace LightPat.Core
             }
 
             System.Diagnostics.Process.Start(path);
-
+            Debug.Log("Waiting for server count change: " + originalServerCount);
             while (true)
             {
                 yield return null;
 
-                bool serverFound = false;
-                foreach (Server server in serverList)
+                if (serverList.Count != originalServerCount)
                 {
-                    if (int.Parse(server.port.ToString()) == lobbyPort)
-                    {
-                        serverFound = true;
-                        break;
-                    }
+                    Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + serverList.Count);
+                    break;
                 }
 
-                if (serverFound)
-                    break;
+                //bool serverFound = false;
+                //foreach (Server server in serverList)
+                //{
+                //    if (int.Parse(server.port.ToString()) == lobbyPort)
+                //    {
+                //        serverFound = true;
+                //        break;
+                //    }
+                //}
+
+                //if (serverFound)
+                //    break;
             }
 
             waitingForApiChange.Value = false;
@@ -289,7 +300,6 @@ namespace LightPat.Core
                     Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
                 }
             }
-
             waitingForApiChange.Value = false;
         }
 
@@ -317,6 +327,8 @@ namespace LightPat.Core
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+                refreshServerListRunning = false;
+                yield break;
             }
 
             List<ClientManager.Server> APIServerList = new List<ClientManager.Server>();
