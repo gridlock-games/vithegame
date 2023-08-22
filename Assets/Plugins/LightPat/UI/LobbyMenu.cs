@@ -387,8 +387,8 @@ namespace LightPat.UI
             }
             else if (currentGameMode == GameMode.TeamDeathmatch)
             {
-                errorDisplay.SetText("");
-                canStartGame = true;
+                errorDisplay.SetText("Team Deathmatch hasn't been implemented yet! Please pick a different game mode");
+                canStartGame = false;
             }
             else
             {
