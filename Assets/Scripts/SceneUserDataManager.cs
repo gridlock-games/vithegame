@@ -43,11 +43,13 @@ public class SceneUserDataManager : MonoBehaviour
         string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
 
         // Find player object by weapon type
-        for (int i = 0; i < ClientManager.Singleton.playerPrefabOptions.Length; i++)
+        var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
+        for (int i = 0; i < playerModelOptions.Length; i++)
         {
-            if (ClientManager.Singleton.playerPrefabOptions[i].GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
+            if (playerModelOptions[i].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
+                Debug.Log(payloadString);
                 break;
             }
         }

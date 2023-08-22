@@ -128,6 +128,7 @@ namespace GameCreator.Melee
         // Switch the character's melee weapon to the one specified by _currentWeaponType
         void SwitchWeapon(WeaponType weaponType)
         {
+            if (!limbs) { limbs = GetComponentInChildren<LimbReferences>(); }
             if (!limbs) { Debug.LogError("No LimbReferences Component in Children of " + name + ". This object will not be able to switch weapons"); return; }
             //SetupWeaponType();
 
@@ -153,6 +154,9 @@ namespace GameCreator.Melee
         //TO BE REFACTORED ON SHIELD
         void UnequipWeapon()
         {
+            if (!limbs) { limbs = GetComponentInChildren<LimbReferences>(); }
+            if (!limbs) { Debug.LogError("No LimbReferences Component in Children of " + name + ". This object will not be able to switch weapons"); return; }
+
             var asd = limbs.rightHand.GetComponentInChildren<BladeComponent>();
             if (asd != null)
             {

@@ -68,10 +68,7 @@ namespace LightPat.Player
                 Destroy(playerHUD);
             }
 
-            if (ClientManager.Singleton)
-            {
-
-            }
+            Debug.Log(modelInstance);
         }
 
         public override void OnNetworkDespawn()

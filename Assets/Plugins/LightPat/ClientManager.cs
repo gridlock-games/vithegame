@@ -14,15 +14,14 @@ namespace LightPat.Core
         [SerializeField] private PlayerModelOption[] playerModelOptions;
 
         [System.Serializable]
-        private class PlayerModelOption
+        public class PlayerModelOption
         {
             public string name;
             public GameObject playerPrefab;
             public GameObject[] skinOptions;
         }
 
-        public GameObject[] playerPrefabOptions;
-        public GameObject spectatorPrefab;
+        [SerializeField] private GameObject spectatorPrefab;
 
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
@@ -44,6 +43,8 @@ namespace LightPat.Core
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
+
+        public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
 
         public void ResetAllClientData()
         {
@@ -151,9 +152,9 @@ namespace LightPat.Core
 
         private void Start()
         {
-            foreach (GameObject g in playerPrefabOptions)
+            foreach (PlayerModelOption option in playerModelOptions)
             {
-                NetworkManager.Singleton.AddNetworkPrefab(g);
+                NetworkManager.Singleton.AddNetworkPrefab(option.playerPrefab);
             }
             NetworkManager.Singleton.AddNetworkPrefab(spectatorPrefab);
 
@@ -165,7 +166,7 @@ namespace LightPat.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
-        public GameObject sceneLoadingScreenPrefab;
+        [SerializeField] private GameObject sceneLoadingScreenPrefab;
 
         public float SceneLoadingProgress { get; private set; }
 
@@ -617,7 +618,7 @@ namespace LightPat.Core
             }
             else // If the team is not spectator
             {
-                g = Instantiate(playerPrefabOptions[clientDataDictionary[clientId].playerPrefabOptionIndex], spawnPosition, spawnRotation);
+                g = Instantiate(playerModelOptions[clientDataDictionary[clientId].playerPrefabOptionIndex].playerPrefab, spawnPosition, spawnRotation);
             }
             g.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
