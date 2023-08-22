@@ -10,11 +10,18 @@ using System.IO;
 
 namespace LightPat.Core
 {
-    public class LobbyManagerNPCInteractable : NetworkBehaviour
+    public class LobbyManagerNPC : NetworkBehaviour
     {
         [SerializeField] private GameObject serverButtonPrefab;
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
+        [SerializeField] private Text progressText;
+        [SerializeField] private Button joinLobbyButton;
+
+        // The minimum number of lobby instances we want to run at one time
+        private const int minimumLobbyServersRequired = 1;
+        // The minimum number of EMPTY lobby instances we want to run at one time
+        private const int emptyLobbyServersRequired = 1;
 
         private List<Server> serverList = new List<Server>();
 
@@ -75,14 +82,22 @@ namespace LightPat.Core
                 Destroy(child.gameObject);
             }
 
-            buttons = new Button[serverList.Count];
-            for (int i = 0; i < serverList.Count; i++)
+            List<Server> notEmptyServerList = new List<Server>();
+            foreach (Server server in serverList)
             {
-                Server server = serverList[i];
+                if (server.population > 0)
+                    notEmptyServerList.Add(server);
+            }
+
+            buttons = new Button[notEmptyServerList.Count];
+            for (int i = 0; i < notEmptyServerList.Count; i++)
+            {
+                Server server = notEmptyServerList[i];
+                // Display servers that have at least 1 player in them
                 GameObject serverElement = Instantiate(serverButtonPrefab, serverButtonParent);
                 serverElement.name = server.label.ToString();
 
-                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText(server.label + " | " + server.ip.ToString() + " | " + server.port.ToString());
+                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText("Select Game");
                 serverElement.transform.Find("Population").GetComponent<TextMeshProUGUI>().SetText("Player count: " + server.population.ToString());
                 serverElement.transform.Find("Status").GetComponent<TextMeshProUGUI>().SetText("Status: " + (server.progress == 0 ? "Waiting for players" : "In Progress"));
 
@@ -98,96 +113,33 @@ namespace LightPat.Core
             }
         }
 
-        private bool createLobbyCalled;
         public void CreateLobbyOnClick()
         {
-            if (joinLobbyCalled) { return; }
-            if (createLobbyCalled) { return; }
-            createLobbyCalled = true;
-
-            CreateLobbyServerRpc(NetworkManager.LocalClientId);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void CreateLobbyServerRpc(ulong clientId)
-        {
-            clientsCreatingLobbiesQueue.Enqueue(clientId);
-        }
-
-        private Queue<ulong> clientsCreatingLobbiesQueue = new Queue<ulong>();
-
-        private bool waitingForLobbyToHitApi;
-        private IEnumerator WaitForLobbyToHitAPI(ulong clientId)
-        {
-            waitingForLobbyToHitApi = true;
-
-            int hubPort = 7777;
-            List<int> portList = new List<int>();
             foreach (Server server in serverList)
             {
-                portList.Add(int.Parse(server.port.ToString()));
-            }
-
-            int lobbyPort = hubPort - 1;
-            portList.Sort();
-            portList.Reverse();
-            foreach (int port in portList)
-            {
-                lobbyPort = port - 1;
-            }
-
-            string path = Application.dataPath;
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-            path = Path.Join(path, "template-tps.x86_64");
-
-            System.Diagnostics.Process.Start(path);
-
-            while (true)
-            {
-                yield return null;
-
-                bool serverFound = false;
-                foreach (Server server in serverList)
+                if (server.population == 0 & server.progress == 0)
                 {
-                    if (int.Parse(server.port.ToString()) == lobbyPort)
-                    {
-                        serverFound = true;
-                        break;
-                    }
+                    StartCoroutine(ConnectToLobby(server.ip.ToString(), server.port.ToString()));
+                    return;
                 }
-
-                if (serverFound)
-                    break;
             }
 
-            CreateLobbyClientRpc(NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address,
-                               lobbyPort.ToString(),
-                               new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } } });
-
-            waitingForLobbyToHitApi = false;
-        }
-
-        [ClientRpc]
-        private void CreateLobbyClientRpc(string targetIP, string targetPort, ClientRpcParams clientRpcParams)
-        {
-            this.targetIP = targetIP;
-            this.targetPort = targetPort;
+            Debug.LogError("There isn't a server with 0 players in it, wait a bit then try again");
         }
 
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
+            if (waitingForApiChange.Value) { Debug.Log("Waiting for API change, can't join a lobby yet"); return; }
             if (targetIP == null) { Debug.Log("No target IP specified"); return; }
             if (targetPort == null) { Debug.Log("No target port specified"); return; }
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
-            StartCoroutine(ConnectToLobby());
+            StartCoroutine(ConnectToLobby(targetIP, targetPort));
         }
 
-        private IEnumerator ConnectToLobby()
+        private IEnumerator ConnectToLobby(string targetIP, string targetPort)
         {
             Debug.Log("Shutting down NetworkManager");
             NetworkManager.Singleton.Shutdown();
@@ -224,6 +176,17 @@ namespace LightPat.Core
 
         private void Update()
         {
+            joinLobbyButton.interactable = !waitingForApiChange.Value & serverList.Count > 0;
+
+            if (waitingForApiChange.Value)
+            {
+                progressText.text = "Refreshing Servers...";
+            }
+            else
+            {
+                progressText.text = "";
+            }
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 if (lobbyManagerUI.activeInHierarchy)
@@ -244,25 +207,123 @@ namespace LightPat.Core
 
             if (!refreshServerListRunning) { StartCoroutine(RefreshServerList()); }
 
-            if (clientsCreatingLobbiesQueue.Count > 0 & !waitingForLobbyToHitApi)
+            if (IsServer & serverListRefreshedOnce)
             {
-                StartCoroutine(WaitForLobbyToHitAPI(clientsCreatingLobbiesQueue.Dequeue()));
+                List<Server> emptyServerList = new List<Server>();
+                foreach (Server server in serverList)
+                {
+                    if (server.population == 0)
+                        emptyServerList.Add(server);
+                }
+
+                if (!waitingForApiChange.Value)
+                {
+                    if (emptyServerList.Count < emptyLobbyServersRequired | serverList.Count < minimumLobbyServersRequired)
+                    {
+                        StartCoroutine(CreateNewLobby());
+                    }
+                    else if (emptyServerList.Count > emptyLobbyServersRequired & serverList.Count > minimumLobbyServersRequired)
+                    {
+                        if (emptyServerList.Count > 0)
+                        {
+                            Debug.Log("Deleting server " + emptyServerList[0].port);
+                            StartCoroutine(DeleteLobby(new ServerDeletePayload(emptyServerList[0]._id.ToString())));
+                        }
+                    }
+                }
+            }
+        }
+
+        private NetworkVariable<bool> waitingForApiChange = new NetworkVariable<bool>();
+        private IEnumerator CreateNewLobby()
+        {
+            waitingForApiChange.Value = true;
+
+            int originalServerCount = serverList.Count;
+
+            Debug.Log(Application.platform);
+            string path = "";
+            if (Application.isEditor)
+            {
+                path = @"C:\Users\patse\OneDrive\Desktop\Lobby Server Build\template-tps.exe";
+            }
+            else
+            {
+                path = Application.dataPath;
+                path = path.Substring(0, path.LastIndexOf('/'));
+                path = path.Substring(0, path.LastIndexOf('/'));
+                path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
+                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "template-tps.exe" : "template-tps.x86_64");
+            }
+
+            System.Diagnostics.Process.Start(path);
+            Debug.Log("Waiting for server count change: " + originalServerCount);
+            while (true)
+            {
+                yield return null;
+
+                if (serverList.Count != originalServerCount)
+                {
+                    Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + serverList.Count);
+                    break;
+                }
+            }
+
+            waitingForApiChange.Value = false;
+        }
+
+        private IEnumerator DeleteLobby(ServerDeletePayload lobbyServer)
+        {
+            waitingForApiChange.Value = true;
+
+            string json = JsonUtility.ToJson(lobbyServer);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(ClientManager.serverAPIEndPointURL))
+            {
+                deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+
+                deleteRequest.SetRequestHeader("Content-Type", "application/json");
+                deleteRequest.SetRequestHeader("Content-Length", jsonData.Length.ToString());
+
+                deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+
+                yield return deleteRequest.SendWebRequest();
+
+                if (deleteRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
+                }
+            }
+            waitingForApiChange.Value = false;
+        }
+
+        private struct ServerDeletePayload
+        {
+            public string serverId;
+
+            public ServerDeletePayload(string serverId)
+            {
+                this.serverId = serverId;
             }
         }
 
         private bool refreshServerListRunning;
+        private bool serverListRefreshedOnce;
         private IEnumerator RefreshServerList()
         {
             refreshServerListRunning = true;
 
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+                Debug.LogError("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+                refreshServerListRunning = false;
+                yield break;
             }
 
             List<ClientManager.Server> APIServerList = new List<ClientManager.Server>();
@@ -340,6 +401,7 @@ namespace LightPat.Core
                 SyncUIWithList();
             }
 
+            serverListRefreshedOnce = true;
             refreshServerListRunning = false;
         }
 

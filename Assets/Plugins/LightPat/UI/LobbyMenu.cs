@@ -42,13 +42,13 @@ namespace LightPat.UI
         private IEnumerator ConnectToHub()
         {
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in LobbyMenu.ConnectToHub() " + getRequest.error);
+                Debug.LogError("Get Request Error in LobbyMenu.ConnectToHub() " + getRequest.error);
             }
 
             string json = getRequest.downloadHandler.text;
@@ -98,7 +98,9 @@ namespace LightPat.UI
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             Debug.Log("Shutdown complete");
 
-            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = playerHubServer.ip;
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = playerHubServer.ip;
+            networkTransport.ConnectionData.Port = ushort.Parse(playerHubServer.port);
 
             Debug.Log("Starting client: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP

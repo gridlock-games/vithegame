@@ -200,13 +200,13 @@ public class AuthenticationController : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = targetIP;
 
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+            Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
         }
 
         string json = getRequest.downloadHandler.text;
@@ -249,6 +249,8 @@ public class AuthenticationController : MonoBehaviour
             foreach (int port in portList)
             {
                 lobbyPort = port - 1;
+                if (!portList.Contains(lobbyPort))
+                    break;
             }
 
             if (lobbyPort < 1)

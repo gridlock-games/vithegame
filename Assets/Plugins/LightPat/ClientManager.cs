@@ -5,7 +5,6 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
-using System.Net;
 using UnityEngine.Rendering;
 
 namespace LightPat.Core
@@ -16,7 +15,7 @@ namespace LightPat.Core
         public GameObject spectatorPrefab;
 
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
-        [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
@@ -63,7 +62,6 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
-                //StartCoroutine(UpdateServerStatus());
             }
         }
 
@@ -175,8 +173,6 @@ namespace LightPat.Core
                 // If we have finished loading a scene
                 if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
                 {
-                    StartCoroutine(UpdateServerStatus());
-
                     // Load all additive scenes in queue
                     if (additiveSceneQueue.Count > 0)
                     {
@@ -222,6 +218,8 @@ namespace LightPat.Core
 
             if (IsServer)
             {
+                if (!updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
+
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
@@ -243,23 +241,22 @@ namespace LightPat.Core
 
             if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
-
-            StartCoroutine(UpdateServerStatus());
         }
 
         private bool updateServerStatusRunning;
         private IEnumerator UpdateServerStatus()
         {
-            if (updateServerStatusRunning) { yield break; }
             updateServerStatusRunning = true;
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverAPIEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+                Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+                updateServerStatusRunning = false;
+                yield break;
             }
 
             List<Server> serverList = new List<Server>();
@@ -306,13 +303,20 @@ namespace LightPat.Core
 
             if (!thisServerIsInAPI)
             {
-                ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
-                                                                  clientDataDictionary.Count,
-                                                                  gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
-                                                                  networkTransport.ConnectionData.Address,
-                                                                  SceneManager.GetActiveScene().name,
-                                                                  networkTransport.ConnectionData.Port.ToString());
-                yield return PostRequest(payload);
+                if ((postRequestCalled | putRequestCalled) & clientDataDictionary.Count == 0)
+                {
+                    Application.Quit();
+                }
+                else
+                {
+                    ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
+                                                                      clientDataDictionary.Count,
+                                                                      gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                      networkTransport.ConnectionData.Address,
+                                                                      SceneManager.GetActiveScene().name,
+                                                                      networkTransport.ConnectionData.Port.ToString());
+                    yield return PostRequest(payload);
+                }
             }
             updateServerStatusRunning = false;
         }
@@ -329,13 +333,13 @@ namespace LightPat.Core
             public string port;
         }
 
+        private bool putRequestCalled;
         private IEnumerator PutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
-
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(serverEndPointURL, jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(serverAPIEndPointURL, jsonData);
 
             putRequest.SetRequestHeader("Content-Type", "application/json");
 
@@ -343,8 +347,9 @@ namespace LightPat.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Put request error in ClientManager.PutRequest " + putRequest.error);
+                Debug.LogError("Put request error in ClientManager.PutRequest " + putRequest.error);
             }
+            putRequestCalled = true;
         }
 
         private struct ServerPutPayload
@@ -363,6 +368,7 @@ namespace LightPat.Core
             }
         }
 
+        private bool postRequestCalled;
         private IEnumerator PostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
@@ -373,16 +379,15 @@ namespace LightPat.Core
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
 
-            //string json = JsonUtility.ToJson(payload);
-
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, form);
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverAPIEndPointURL, form);
 
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("Post request error in ClientManager.PostRequest " + postRequest.error);
+                Debug.LogError("Post request error in ClientManager.PostRequest " + postRequest.error);
             }
+            postRequestCalled = true;
         }
 
         private struct ServerPostPayload
@@ -412,8 +417,6 @@ namespace LightPat.Core
             clientDataDictionary.Remove(clientId);
             if (clientId == lobbyLeaderId.Value) { RefreshLobbyLeader(); }
             RemoveClientRpc(clientId);
-
-            StartCoroutine(UpdateServerStatus());
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

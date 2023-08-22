@@ -87,13 +87,13 @@ public class SceneUserDataManager : MonoBehaviour
     {
         serverSelector.ClearOptions();
         // Get list of servers in the API
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Get Request Error in SceneUserDataManager.ConnectToPlayerHubCoroutine() " + getRequest.error);
+            Debug.LogError("Get Request Error in SceneUserDataManager.ConnectToPlayerHubCoroutine() " + getRequest.error);
         }
 
         string json = getRequest.downloadHandler.text;
