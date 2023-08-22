@@ -200,7 +200,7 @@ public class AuthenticationController : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = targetIP;
 
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
         yield return getRequest.SendWebRequest();
 

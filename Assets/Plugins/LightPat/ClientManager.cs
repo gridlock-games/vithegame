@@ -15,7 +15,7 @@ namespace LightPat.Core
         public GameObject spectatorPrefab;
 
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
-        [HideInInspector] public const string serverEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
@@ -248,7 +248,7 @@ namespace LightPat.Core
         {
             updateServerStatusRunning = true;
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverAPIEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
@@ -339,7 +339,7 @@ namespace LightPat.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(serverEndPointURL, jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(serverAPIEndPointURL, jsonData);
 
             putRequest.SetRequestHeader("Content-Type", "application/json");
 
@@ -379,7 +379,7 @@ namespace LightPat.Core
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverEndPointURL, form);
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverAPIEndPointURL, form);
 
             yield return postRequest.SendWebRequest();
 

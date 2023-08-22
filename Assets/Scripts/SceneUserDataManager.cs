@@ -87,7 +87,7 @@ public class SceneUserDataManager : MonoBehaviour
     {
         serverSelector.ClearOptions();
         // Get list of servers in the API
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
         yield return getRequest.SendWebRequest();
 

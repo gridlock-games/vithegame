@@ -10,7 +10,7 @@ using System.IO;
 
 namespace LightPat.Core
 {
-    public class LobbyManagerNPCInteractable : NetworkBehaviour
+    public class LobbyManagerNPC : NetworkBehaviour
     {
         [SerializeField] private GameObject serverButtonPrefab;
         [SerializeField] private Transform serverButtonParent;
@@ -216,23 +216,6 @@ namespace LightPat.Core
 
             int originalServerCount = serverList.Count;
 
-            //int hubPort = 7777;
-            //List<int> portList = new List<int>();
-            //foreach (Server server in serverList)
-            //{
-            //    portList.Add(int.Parse(server.port.ToString()));
-            //}
-
-            //int lobbyPort = hubPort - 1;
-            //portList.Sort();
-            //portList.Reverse();
-            //foreach (int port in portList)
-            //{
-            //    lobbyPort = port - 1;
-            //    if (!portList.Contains(lobbyPort))
-            //        break;
-            //}
-
             Debug.Log(Application.platform);
             string path = "";
             if (Application.isEditor)
@@ -259,19 +242,6 @@ namespace LightPat.Core
                     Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + serverList.Count);
                     break;
                 }
-
-                //bool serverFound = false;
-                //foreach (Server server in serverList)
-                //{
-                //    if (int.Parse(server.port.ToString()) == lobbyPort)
-                //    {
-                //        serverFound = true;
-                //        break;
-                //    }
-                //}
-
-                //if (serverFound)
-                //    break;
             }
 
             waitingForApiChange.Value = false;
@@ -284,7 +254,7 @@ namespace LightPat.Core
             string json = JsonUtility.ToJson(lobbyServer);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(ClientManager.serverEndPointURL))
+            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(ClientManager.serverAPIEndPointURL))
             {
                 deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
 
@@ -320,7 +290,7 @@ namespace LightPat.Core
             refreshServerListRunning = true;
 
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
 
             yield return getRequest.SendWebRequest();
 
