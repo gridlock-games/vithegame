@@ -11,6 +11,16 @@ namespace LightPat.Core
 {
     public class ClientManager : NetworkBehaviour
     {
+        [SerializeField] private PlayerModelOption[] playerModelOptions;
+
+        [System.Serializable]
+        private class PlayerModelOption
+        {
+            public string name;
+            public GameObject playerPrefab;
+            public GameObject[] skinOptions;
+        }
+
         public GameObject[] playerPrefabOptions;
         public GameObject spectatorPrefab;
 
