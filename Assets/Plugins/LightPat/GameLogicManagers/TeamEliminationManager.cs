@@ -220,13 +220,13 @@ namespace LightPat.Core
 
                 if (localClientTeam == Team.Red)
                 {
-                    redScoreText.SetText("Your Team: " + redScore.Value.ToString());
-                    blueScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
+                    redScoreText.SetText("Red Team: " + redScore.Value.ToString());
+                    blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
                 }
                 else if (localClientTeam == Team.Blue)
                 {
-                    redScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
-                    blueScoreText.SetText("Your Team: " + redScore.Value.ToString());
+                    redScoreText.SetText("Red Team: " + blueScore.Value.ToString());
+                    blueScoreText.SetText("Blue Team: " + redScore.Value.ToString());
                 }
                 else if (localClientTeam == Team.Spectator)
                 {
