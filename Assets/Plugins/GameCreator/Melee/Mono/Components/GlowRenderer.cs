@@ -83,6 +83,7 @@ namespace GameCreator.Melee
             }
         }
 
+        private Color defaultColor = new Color(0, 0, 0, 0);
         private void Update()
         {
             if (!allowRender) { return; }
@@ -100,7 +101,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
 
@@ -117,7 +118,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
 
@@ -134,7 +135,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
 
@@ -151,7 +152,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
 
@@ -168,7 +169,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
 
@@ -185,7 +186,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, new Color(0, 0, 0), colorChangeSpeed * Time.deltaTime);
+                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
         }

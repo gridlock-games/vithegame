@@ -148,7 +148,7 @@ namespace LightPat.UI
         {
             if (playerModel)
                 Destroy(playerModel);
-            playerModel = Instantiate(ClientManager.Singleton.playerPrefabOptions[playerModelDropdown.value]);
+            playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[playerModelDropdown.value].playerPrefab);
             playerModel.GetComponent<GameCreator.Melee.CharacterMelee>().enabled = false;
             ulong localClientId = NetworkManager.Singleton.LocalClientId;
             ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(localClientId, playerModelDropdown.value);
@@ -180,9 +180,9 @@ namespace LightPat.UI
         private void Start()
         {
             List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
-            foreach (GameObject playerPrefab in ClientManager.Singleton.playerPrefabOptions)
+            foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
             {
-                playerModelOptions.Add(new TMP_Dropdown.OptionData(playerPrefab.name));
+                playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
             }
             playerModelDropdown.ClearOptions();
             playerModelDropdown.AddOptions(playerModelOptions);
