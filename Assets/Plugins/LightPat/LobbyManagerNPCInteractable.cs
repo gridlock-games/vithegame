@@ -15,6 +15,7 @@ namespace LightPat.Core
         [SerializeField] private GameObject serverButtonPrefab;
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
+        [SerializeField] private Text progressText;
 
         // The minimum number of lobby instances we want to run at one time
         private const int minimumLobbyServersRequired = 1;
@@ -106,6 +107,7 @@ namespace LightPat.Core
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
+            if (waitingForApiChange.Value) { Debug.Log("Waiting for API change, can't join a lobby yet"); return; }
             if (targetIP == null) { Debug.Log("No target IP specified"); return; }
             if (targetPort == null) { Debug.Log("No target port specified"); return; }
             if (joinLobbyCalled) { return; }
@@ -151,7 +153,14 @@ namespace LightPat.Core
 
         private void Update()
         {
-            Debug.Log(waitingForApiChange.Value);
+            if (waitingForApiChange.Value)
+            {
+                progressText.text = "Refreshing Servers...";
+            }
+            else
+            {
+                progressText.text = "";
+            }
 
             if (Input.GetKeyDown(KeyCode.F))
             {
