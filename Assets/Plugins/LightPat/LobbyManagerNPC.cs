@@ -16,6 +16,7 @@ namespace LightPat.Core
         [SerializeField] private Transform serverButtonParent;
         [SerializeField] private GameObject lobbyManagerUI;
         [SerializeField] private Text progressText;
+        [SerializeField] private Button joinLobbyButton;
 
         // The minimum number of lobby instances we want to run at one time
         private const int minimumLobbyServersRequired = 1;
@@ -81,14 +82,22 @@ namespace LightPat.Core
                 Destroy(child.gameObject);
             }
 
-            buttons = new Button[serverList.Count];
-            for (int i = 0; i < serverList.Count; i++)
+            List<Server> notEmptyServerList = new List<Server>();
+            foreach (Server server in serverList)
             {
-                Server server = serverList[i];
+                if (server.population > 0)
+                    notEmptyServerList.Add(server);
+            }
+
+            buttons = new Button[notEmptyServerList.Count];
+            for (int i = 0; i < notEmptyServerList.Count; i++)
+            {
+                Server server = notEmptyServerList[i];
+                // Display servers that have at least 1 player in them
                 GameObject serverElement = Instantiate(serverButtonPrefab, serverButtonParent);
                 serverElement.name = server.label.ToString();
 
-                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText(server.label + " | " + server.ip.ToString() + " | " + server.port.ToString());
+                serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText("Select Game");
                 serverElement.transform.Find("Population").GetComponent<TextMeshProUGUI>().SetText("Player count: " + server.population.ToString());
                 serverElement.transform.Find("Status").GetComponent<TextMeshProUGUI>().SetText("Status: " + (server.progress == 0 ? "Waiting for players" : "In Progress"));
 
@@ -104,6 +113,20 @@ namespace LightPat.Core
             }
         }
 
+        public void CreateLobbyOnClick()
+        {
+            foreach (Server server in serverList)
+            {
+                if (server.population == 0 & server.progress == 0)
+                {
+                    StartCoroutine(ConnectToLobby(server.ip.ToString(), server.port.ToString()));
+                    return;
+                }
+            }
+
+            Debug.LogError("There isn't a server with 0 players in it, wait a bit then try again");
+        }
+
         private bool joinLobbyCalled;
         public void JoinLobbyOnClick()
         {
@@ -113,10 +136,10 @@ namespace LightPat.Core
             if (joinLobbyCalled) { return; }
             joinLobbyCalled = true;
 
-            StartCoroutine(ConnectToLobby());
+            StartCoroutine(ConnectToLobby(targetIP, targetPort));
         }
 
-        private IEnumerator ConnectToLobby()
+        private IEnumerator ConnectToLobby(string targetIP, string targetPort)
         {
             Debug.Log("Shutting down NetworkManager");
             NetworkManager.Singleton.Shutdown();
@@ -153,6 +176,8 @@ namespace LightPat.Core
 
         private void Update()
         {
+            joinLobbyButton.interactable = !waitingForApiChange.Value & serverList.Count > 0;
+
             if (waitingForApiChange.Value)
             {
                 progressText.text = "Refreshing Servers...";
