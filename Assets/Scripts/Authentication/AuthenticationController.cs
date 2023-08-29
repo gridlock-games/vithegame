@@ -12,6 +12,7 @@ using LightPat.Core;
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 public class AuthenticationController : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private TMP_InputField displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
 
-    
+
 
     private Color startGameColor;
     private Color displayNameColor;
@@ -48,7 +49,18 @@ public class AuthenticationController : MonoBehaviour
         bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
-            StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
+            // StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
+            string targetIP = "";
+            foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    targetIP = ip.ToString();
+                    break;
+                }
+            }
+
+            StartCoroutine(StartServer(targetIP));
         }
         else // If we are not a headless build
         {
@@ -59,7 +71,8 @@ public class AuthenticationController : MonoBehaviour
             //     btn_StartGame.SetActive(signedIn);
             // }
 
-            if ( btn_SignIn && btn_StartGame && displayNameInput) {
+            if (btn_SignIn && btn_StartGame && displayNameInput)
+            {
                 // btn_Signedin.SetActive(signedIn);
                 // btn_SignOut.SetActive(signedIn);
                 // displayNameInput.gameObject.SetActive(signedIn);
@@ -141,7 +154,8 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    public void SignInv2() {
+    public void SignInv2()
+    {
         if (datamanager != null)
         {
             GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>

@@ -24,7 +24,8 @@ namespace LightPat.Core
         [SerializeField] private GameObject spectatorPrefab;
 
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
-        [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        // [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        [HideInInspector] public const string serverAPIEndPointURL = "http://192.168.50.232:3000/servers/duels";
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
