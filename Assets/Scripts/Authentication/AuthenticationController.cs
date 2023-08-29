@@ -50,17 +50,7 @@ public class AuthenticationController : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
             // StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
-            string targetIP = "";
-            foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    targetIP = ip.ToString();
-                    break;
-                }
-            }
-
-            StartCoroutine(StartServer(targetIP));
+            StartCoroutine(StartServer("192.168.50.232"));
         }
         else // If we are not a headless build
         {

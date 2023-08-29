@@ -230,7 +230,7 @@ namespace LightPat.Core
 
             if (IsServer)
             {
-                if (!updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
+                if (SceneManager.GetActiveScene().name != "Login" & !updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
 
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
