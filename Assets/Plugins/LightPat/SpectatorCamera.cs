@@ -96,7 +96,7 @@ namespace LightPat.Core
                 }
             }
 
-            if (!ClientManager.Singleton) { return; }
+            //if (!ClientManager.Singleton) { return; }
 
             // Scoreboard
             if (Input.GetKeyDown(KeyCode.Tab))
@@ -111,38 +111,56 @@ namespace LightPat.Core
                     Destroy(scoreboardInstance);
             }
 
-            if (lastLocalNetworkPlayers != ClientManager.Singleton.localNetworkPlayers)
+            // Replace testDict with ClientManager.Singleton.localNetworkPlayers
+            Dictionary<ulong, GameObject> testDict = new Dictionary<ulong, GameObject>();
+            int i = 0;
+            foreach (CharacterMelee melee in FindObjectsOfType<CharacterMelee>())
+            {
+                testDict.Add((ulong)i, melee.gameObject);
+                i++;
+            }
+
+            if (lastLocalNetworkPlayers != testDict)
             {
                 foreach (Transform playerIcon in playerCardParent)
                 {
                     Destroy(playerIcon.gameObject);
                 }
 
-                int counter = 0;
-                foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
+                int rightCounter = 0;
+                int leftCounter = 0;
+                foreach (KeyValuePair<ulong, GameObject> valuePair in testDict)
                 {
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
                     {
-                        Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
+                        //Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
+                        Team playerTeam = valuePair.Key % 2 == 0 ? Team.Red : Team.Blue;
                         if (playerTeam == Team.Blue)
                         {
                             GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
                             playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
-                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, counter * playerCardSpacing, playerCard.transform.localPosition.z);
-                            counter++;
+                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, rightCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            rightCounter++;
+                        }
+                        else if (playerTeam == Team.Red)
+                        {
+                            GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
+                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            leftCounter++;
                         }
                         else
                         {
                             GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
                             playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
-                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, counter * playerCardSpacing, playerCard.transform.localPosition.z);
-                            counter++;
+                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            leftCounter++;
                         }
                     }
                 }
             }
 
-            lastLocalNetworkPlayers = ClientManager.Singleton.localNetworkPlayers;
+            lastLocalNetworkPlayers = testDict;
         }
 
         private Dictionary<ulong, GameObject> lastLocalNetworkPlayers = new Dictionary<ulong, GameObject>();
