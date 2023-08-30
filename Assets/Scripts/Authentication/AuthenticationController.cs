@@ -22,12 +22,17 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private TMP_InputField displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
 
-    
 
+    ClientManager clientManager = new ClientManager();
+    IPManager iPManager = new IPManager();
     private Color startGameColor;
     private Color displayNameColor;
-
     private DataManager datamanager;
+
+    private void Awake()
+    {
+        StartCoroutine(iPManager.CheckAPI());
+    }
     private void Start()
     {
         datamanager = DataManager.Instance;
@@ -41,6 +46,7 @@ public class AuthenticationController : MonoBehaviour
     }
 
     private bool transitioningToCharacterSelect;
+
     private void Update()
     {
         // If we are a headless build
@@ -48,7 +54,8 @@ public class AuthenticationController : MonoBehaviour
         bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
-            StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
+            // StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
+            StartCoroutine(StartServer(iPManager.VMServerHost));
         }
         else // If we are not a headless build
         {
@@ -59,7 +66,8 @@ public class AuthenticationController : MonoBehaviour
             //     btn_StartGame.SetActive(signedIn);
             // }
 
-            if ( btn_SignIn && btn_StartGame && displayNameInput) {
+            if (btn_SignIn && btn_StartGame && displayNameInput)
+            {
                 // btn_Signedin.SetActive(signedIn);
                 // btn_SignOut.SetActive(signedIn);
                 // displayNameInput.gameObject.SetActive(signedIn);
@@ -141,7 +149,8 @@ public class AuthenticationController : MonoBehaviour
         }
     }
 
-    public void SignInv2() {
+    public void SignInv2()
+    {
         if (datamanager != null)
         {
             GoogleAuth.Auth(datamanager.clientId, datamanager.secretId, (success, error, info) =>
@@ -200,12 +209,14 @@ public class AuthenticationController : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = targetIP;
 
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(iPManager.ServerAPIURL);
 
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
+            Debug.LogError("API Endpoint: " + targetIP);
+            Debug.LogError("AuthController Get Request Error in ClientManager.UpdateServerPopulation() " + targetIP);
             Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
         }
 

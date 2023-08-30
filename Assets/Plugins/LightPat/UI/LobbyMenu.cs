@@ -32,6 +32,13 @@ namespace LightPat.UI
         private Vector3 cameraPositionOffset;
 
         private bool leaveLobbyInProgress;
+
+        ClientManager clientManager = new ClientManager();
+        IPManager iPManager = new IPManager();
+
+        private void Awake() {
+            StartCoroutine(iPManager.CheckAPI());
+        }
         public void LeaveLobby()
         {
             if (leaveLobbyInProgress) { return; }
@@ -42,7 +49,7 @@ namespace LightPat.UI
         private IEnumerator ConnectToHub()
         {
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(iPManager.ServerAPIURL);
 
             yield return getRequest.SendWebRequest();
 

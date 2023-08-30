@@ -18,6 +18,10 @@ namespace LightPat.Core
         [SerializeField] private Text progressText;
         [SerializeField] private Button joinLobbyButton;
 
+        
+
+        ClientManager clientManager = new ClientManager();
+
         // The minimum number of lobby instances we want to run at one time
         private const int minimumLobbyServersRequired = 1;
         // The minimum number of EMPTY lobby instances we want to run at one time
@@ -28,6 +32,12 @@ namespace LightPat.Core
         private Button[] buttons;
         private bool localPlayerInRange;
         private Player.NetworkPlayer localPlayer;
+
+        IPManager iPManager = new IPManager();
+
+        private void Awake() {
+            StartCoroutine(iPManager.CheckAPI());
+        }
 
         private struct Server : INetworkSerializable, System.IEquatable<Server>
         {
@@ -279,7 +289,7 @@ namespace LightPat.Core
             string json = JsonUtility.ToJson(lobbyServer);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(ClientManager.serverAPIEndPointURL))
+            using (UnityWebRequest deleteRequest = UnityWebRequest.Delete(iPManager.ServerAPIURL))
             {
                 deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
 
@@ -315,7 +325,7 @@ namespace LightPat.Core
             refreshServerListRunning = true;
 
             // Get list of servers in the API
-            UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(iPManager.ServerAPIURL);
 
             yield return getRequest.SendWebRequest();
 
