@@ -111,16 +111,7 @@ namespace LightPat.Core
                     Destroy(scoreboardInstance);
             }
 
-            // Replace testDict with ClientManager.Singleton.localNetworkPlayers
-            Dictionary<ulong, GameObject> testDict = new Dictionary<ulong, GameObject>();
-            int i = 0;
-            foreach (CharacterMelee melee in FindObjectsOfType<CharacterMelee>())
-            {
-                testDict.Add((ulong)i, melee.gameObject);
-                i++;
-            }
-
-            if (lastLocalNetworkPlayers != testDict)
+            if (lastLocalNetworkPlayers != ClientManager.Singleton.localNetworkPlayers)
             {
                 foreach (Transform playerIcon in playerCardParent)
                 {
@@ -129,12 +120,11 @@ namespace LightPat.Core
 
                 int rightCounter = 0;
                 int leftCounter = 0;
-                foreach (KeyValuePair<ulong, GameObject> valuePair in testDict)
+                foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
                 {
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
                     {
-                        //Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
-                        Team playerTeam = valuePair.Key % 2 == 0 ? Team.Red : Team.Blue;
+                        Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
                         if (playerTeam == Team.Blue)
                         {
                             GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
@@ -160,7 +150,7 @@ namespace LightPat.Core
                 }
             }
 
-            lastLocalNetworkPlayers = testDict;
+            lastLocalNetworkPlayers = ClientManager.Singleton.localNetworkPlayers;
         }
 
         private Dictionary<ulong, GameObject> lastLocalNetworkPlayers = new Dictionary<ulong, GameObject>();
