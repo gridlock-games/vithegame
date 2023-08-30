@@ -120,6 +120,7 @@ namespace LightPat.Core
 
                 int rightCounter = 0;
                 int leftCounter = 0;
+                int elseCounter = 0;
                 foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
                 {
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
@@ -141,10 +142,20 @@ namespace LightPat.Core
                         }
                         else
                         {
-                            GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
-                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
-                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
-                            leftCounter++;
+                            if (elseCounter % 2 == 0)
+                            {
+                                GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                                playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            }
+                            else
+                            {
+                                GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                                playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            }
+
+                            elseCounter++;
                         }
                     }
                 }
