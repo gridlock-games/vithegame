@@ -35,6 +35,14 @@ public class SceneUserDataManager : MonoBehaviour
     private bool isPreviewActive = false;
     private bool connectingToPlayerHub;
 
+    ClientManager clientManager = new ClientManager();
+
+    IPManager iPManager = new IPManager();
+
+    private void Awake() {
+        StartCoroutine(iPManager.CheckAPI());
+    }
+
     public void ConnectToPlayerHub()
     {
         if (connectingToPlayerHub) { return; }
@@ -89,7 +97,7 @@ public class SceneUserDataManager : MonoBehaviour
     {
         serverSelector.ClearOptions();
         // Get list of servers in the API
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(iPManager.ServerAPIURL);
 
         yield return getRequest.SendWebRequest();
 

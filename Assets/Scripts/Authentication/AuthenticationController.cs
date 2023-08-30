@@ -12,7 +12,6 @@ using LightPat.Core;
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
-using System.Net.Sockets;
 
 public class AuthenticationController : MonoBehaviour
 {
@@ -24,11 +23,16 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI infoDisplayText;
 
 
-
+    ClientManager clientManager = new ClientManager();
+    IPManager iPManager = new IPManager();
     private Color startGameColor;
     private Color displayNameColor;
-
     private DataManager datamanager;
+
+    private void Awake()
+    {
+        StartCoroutine(iPManager.CheckAPI());
+    }
     private void Start()
     {
         datamanager = DataManager.Instance;
@@ -42,6 +46,7 @@ public class AuthenticationController : MonoBehaviour
     }
 
     private bool transitioningToCharacterSelect;
+
     private void Update()
     {
         // If we are a headless build
@@ -50,7 +55,7 @@ public class AuthenticationController : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
             // StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
-            StartCoroutine(StartServer("192.168.50.232"));
+            StartCoroutine(StartServer(iPManager.VMServerHost));
         }
         else // If we are not a headless build
         {
@@ -204,12 +209,14 @@ public class AuthenticationController : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = targetIP;
 
-        UnityWebRequest getRequest = UnityWebRequest.Get(ClientManager.serverAPIEndPointURL);
+        UnityWebRequest getRequest = UnityWebRequest.Get(iPManager.ServerAPIURL);
 
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
+            Debug.LogError("API Endpoint: " + targetIP);
+            Debug.LogError("AuthController Get Request Error in ClientManager.UpdateServerPopulation() " + targetIP);
             Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
         }
 

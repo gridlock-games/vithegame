@@ -25,7 +25,7 @@ namespace LightPat.Core
 
         [HideInInspector] public NetworkVariable<ulong> gameLogicManagerNetObjId = new NetworkVariable<ulong>();
         // [HideInInspector] public const string serverAPIEndPointURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
-        [HideInInspector] public const string serverAPIEndPointURL = "http://192.168.50.232:3000/servers/duels";
+        [HideInInspector] public string serverAPIEndPointURL;
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
@@ -35,6 +35,7 @@ namespace LightPat.Core
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
+        IPManager iPManager = new IPManager();
         private static readonly string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }
@@ -46,6 +47,13 @@ namespace LightPat.Core
         public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
+
+        private void Awake()
+        {
+            _singleton = this;
+            DontDestroyOnLoad(gameObject);
+            StartCoroutine(iPManager.CheckAPI());
+        }
 
         public void ResetAllClientData()
         {
@@ -145,12 +153,6 @@ namespace LightPat.Core
             }
         }
 
-        private void Awake()
-        {
-            _singleton = this;
-            DontDestroyOnLoad(gameObject);
-        }
-
         private void Start()
         {
             foreach (PlayerModelOption option in playerModelOptions)
@@ -165,6 +167,8 @@ namespace LightPat.Core
 
             SceneManager.sceneLoaded += OnSceneLoad;
             SceneManager.sceneUnloaded += OnSceneUnload;
+
+            this.serverAPIEndPointURL = iPManager.ServerAPIURL;
         }
 
         [SerializeField] private GameObject sceneLoadingScreenPrefab;
@@ -266,7 +270,8 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in ClientManager.UpdateServerPopulation() " + getRequest.error);
+                Debug.LogError("API Endpoint: " + serverAPIEndPointURL);
+                Debug.LogError("ClientManager Get Request Error in ClientManager.UpdateServerPopulation() " + serverAPIEndPointURL);
                 updateServerStatusRunning = false;
                 yield break;
             }
