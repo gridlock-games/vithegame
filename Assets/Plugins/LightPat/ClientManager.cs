@@ -234,6 +234,12 @@ namespace LightPat.Core
                 }
             }
 
+            // Remove empty player object references from local player object references
+            foreach (var item in localNetworkPlayers.Where(kvp => kvp.Value == null).ToList())
+            {
+                localNetworkPlayers.Remove(item.Key);
+            }
+
             if (IsServer)
             {
                 if (SceneManager.GetActiveScene().name != "Login" & !updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
