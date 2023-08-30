@@ -195,7 +195,13 @@ namespace LightPat.Core
                     Destroy(scoreboardInstance);
             }
 
-            if (lastLocalNetworkPlayers != ClientManager.Singleton.localNetworkPlayers)
+            string playersString = "";
+            foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
+            {
+                playersString += kvp.Key.ToString() + kvp.Value.ToString();
+            }
+
+            if (lastPlayersString != playersString)
             {
                 foreach (Transform playerIcon in playerCardParent)
                 {
@@ -245,10 +251,10 @@ namespace LightPat.Core
                 }
             }
 
-            lastLocalNetworkPlayers = ClientManager.Singleton.localNetworkPlayers;
+            lastPlayersString = playersString;
         }
 
-        private Dictionary<ulong, GameObject> lastLocalNetworkPlayers = new Dictionary<ulong, GameObject>();
+        private string lastPlayersString;
 
         public override void OnNetworkDespawn()
         {
