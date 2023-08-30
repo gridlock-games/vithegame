@@ -5,6 +5,7 @@ using LightPat.Core;
 using UnityEngine.UI;
 using GameCreator.Camera;
 using TMPro;
+using LightPat.Core;
 
 namespace LightPat.UI
 {
@@ -15,7 +16,16 @@ namespace LightPat.UI
 
         private void Start()
         {
-            Vector2 sensitivity = ((CameraMotorTypeAdventure)CameraMotor.MAIN_MOTOR.cameraMotorType).sensitivity.GetValue(gameObject);
+            Vector2 sensitivity = Vector2.zero;
+            if (CameraMotor.MAIN_MOTOR == null)
+            {
+                sensitivity = Camera.main.gameObject.GetComponent<SpectatorCamera>().sensitivity;
+            }
+            else
+            {
+                sensitivity = ((CameraMotorTypeAdventure)CameraMotor.MAIN_MOTOR.cameraMotorType).sensitivity.GetValue(gameObject);
+            }
+
             mouseXSensitivityInput.text = sensitivity.x.ToString();
             mouseYSensitivityInput.text = sensitivity.y.ToString();
         }
@@ -24,10 +34,17 @@ namespace LightPat.UI
         {
             bool success = float.TryParse(mouseXSensitivityInput.text, out float mouseXSens);
             if (!success) return;
-            success = float.TryParse(mouseXSensitivityInput.text, out float mouseYSens);
+            success = float.TryParse(mouseYSensitivityInput.text, out float mouseYSens);
             if (!success) return;
 
-            ((CameraMotorTypeAdventure)CameraMotor.MAIN_MOTOR.cameraMotorType).sensitivity = new GameCreator.Variables.Vector2Property(new Vector2(mouseXSens, mouseYSens));
+            if (CameraMotor.MAIN_MOTOR == null)
+            {
+                Camera.main.gameObject.GetComponent<SpectatorCamera>().sensitivity = new Vector2(mouseXSens, mouseYSens);
+            }
+            else
+            {
+                ((CameraMotorTypeAdventure)CameraMotor.MAIN_MOTOR.cameraMotorType).sensitivity = new GameCreator.Variables.Vector2Property(new Vector2(mouseXSens, mouseYSens));
+            }
         }
     }
 }
