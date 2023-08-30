@@ -4,6 +4,7 @@ using UnityEngine;
 using GameCreator.Melee;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace LightPat.Core
 {
@@ -22,7 +23,19 @@ namespace LightPat.Core
         {
             if (ClientManager.Singleton)
             {
-                nameTag.SetText(ClientManager.Singleton.GetClient(melee.OwnerClientId).clientName);
+                GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
+
+                string nameIntro = "";
+                for (int i = 0; i < localNetworkPlayers.Length; i++)
+                {
+                    if (localNetworkPlayers[i] == melee.gameObject)
+                    {
+                        nameIntro = (i+1).ToString() + ": ";
+                        break;
+                    }
+                }
+
+                nameTag.SetText(nameIntro + ClientManager.Singleton.GetClient(melee.OwnerClientId).clientName);
             }
             else
             {
