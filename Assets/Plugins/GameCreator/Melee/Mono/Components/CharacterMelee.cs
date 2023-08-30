@@ -176,7 +176,8 @@ namespace GameCreator.Melee
             if (IsOwner)
             {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
-                adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+                if (motor != null)
+                    adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
         }
 

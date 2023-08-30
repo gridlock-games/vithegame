@@ -98,6 +98,9 @@ namespace LightPat.UI
             Quaternion rotTarget = Quaternion.identity;
             if (Camera.main)
             {
+                // If we have a spectator camera as the main camera, disable the health bar portion of the world space label
+                healthSlider.gameObject.SetActive(!Camera.main.GetComponent<SpectatorCamera>());
+
                 rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
                 transform.rotation = rotTarget;
 

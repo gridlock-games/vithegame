@@ -39,7 +39,12 @@ public class NetworkStart : MonoBehaviour
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {
                     if (clientPair.Value.PlayerObject)
-                        clientPair.Value.PlayerObject.GetComponent<LightPat.Player.NetworkPlayer>().roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
+                    {
+                        if (clientPair.Value.PlayerObject.TryGetComponent(out LightPat.Player.NetworkPlayer networkPlayer))
+                        {
+                            networkPlayer.roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
+                        }
+                    }
                 }
             }
         }

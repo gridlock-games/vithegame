@@ -68,7 +68,7 @@ namespace LightPat.Player
                 Destroy(playerHUD);
             }
 
-            Debug.Log(modelInstance);
+            ClientManager.Singleton.localNetworkPlayers.Add(OwnerClientId, gameObject);
         }
 
         public override void OnNetworkDespawn()
