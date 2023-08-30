@@ -241,6 +241,10 @@ namespace LightPat.Core
                         {
                             networkPlayer.roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
                         }
+                        else if (clientPair.Value.PlayerObject.TryGetComponent(out SpectatorCamera spectatorCamera))
+                        {
+                            spectatorCamera.roundTripTime.Value = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(clientPair.Key);
+                        }
                     }
                 }
             }
