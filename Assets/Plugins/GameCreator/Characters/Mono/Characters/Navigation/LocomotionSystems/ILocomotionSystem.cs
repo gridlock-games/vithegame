@@ -140,7 +140,11 @@
             this.rootMoveImpulse = impulse;
             this.rootMoveStartTime = Time.time;
 
-            this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
+            if(characterLocomotion.character.GetComponent<PlayerCharacterNetworkTransform>())
+                this.rootMoveTickDuration = Mathf.CeilToInt(duration / (1f / characterLocomotion.character.NetworkManager.NetworkTickSystem.TickRate));
+            else
+                this.rootMoveTickDuration = Mathf.CeilToInt(duration);
+            
             this.rootMoveDuration = duration;
             this.rootMoveGravity = gravityInfluence;
 
