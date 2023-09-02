@@ -288,6 +288,6 @@ public class AuthenticationController : MonoBehaviour
     {
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
 
-        SceneManager.LoadScene("CharacterSelect");
+        SceneManager.LoadScene("Intro");
     }
 }
