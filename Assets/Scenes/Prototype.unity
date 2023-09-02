@@ -4501,6 +4501,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7166917091924597127, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8279661621235182784, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08be6bc05a8bb504b80d4c74cae1c5f1, type: 3}
 --- !u!1 &1316772814
@@ -4847,7 +4857,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh4385778
+  m_Name: pb_Mesh15849544
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5939,7 +5949,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
     NetworkPrefabs:
     - Override: 0
@@ -5995,7 +6005,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh4385494
+  m_Name: pb_Mesh15849266
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11908,6 +11918,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2628522859783436372, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4152970997582326561, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218876012528746997, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8249681813201288000, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
         type: 3}
       propertyPath: GlobalObjectIdHash
