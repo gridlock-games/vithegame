@@ -261,6 +261,7 @@ namespace LightPat.Core
             }
         }
 
+        [SerializeField] private string[] sceneNamesToSpawnPlayerOnConnect;
         private IEnumerator ClientConnectCallback(ulong clientId)
         {
             yield return null;
@@ -272,7 +273,7 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
-            if (SceneManager.GetActiveScene().name == "Hub") { SpawnPlayer(clientId); }
+            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
         }
 
@@ -485,7 +486,10 @@ namespace LightPat.Core
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
 
-                Team clientTeam = SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub" ? Team.Red : Team.Spectator;
+                //string[] spawnPlayerSceneNames = new string[] { "Lobby", "Hub", "Prototype" };
+                //Team clientTeam = spawnPlayerSceneNames.Contains(SceneManager.GetActiveScene().name) ? Team.Red : Team.Spectator;
+                Team clientTeam = SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub" ? Team.Competitor : Team.Spectator;
+                clientTeam = Team.Competitor;
                 if (payloadOptions.Length == 2)
                 {
                     QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), clientTeam));
@@ -550,7 +554,8 @@ namespace LightPat.Core
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeKills(clientDataDictionary[clientId].kills + killsToAdd);
             SynchronizeClientDictionaries();
 
-            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerKill(clientId);
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
+                NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerKill(clientId);
         }
 
         public void AddDeaths(ulong clientId, int deathsToAdd)
@@ -560,7 +565,8 @@ namespace LightPat.Core
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeDeaths(clientDataDictionary[clientId].deaths + deathsToAdd);
             SynchronizeClientDictionaries();
 
-            NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(clientId);
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(gameLogicManagerNetObjId.Value))
+                NetworkManager.SpawnManager.SpawnedObjects[gameLogicManagerNetObjId.Value].GetComponent<GameLogicManager>().OnPlayerDeath(clientId);
         }
 
         public void AddDamage(ulong clientId, int damageToAdd)

@@ -1407,7 +1407,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &320548898
 MonoBehaviour:
@@ -2398,6 +2398,104 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &551897927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 551897930}
+  - component: {fileID: 551897929}
+  - component: {fileID: 551897928}
+  m_Layer: 0
+  m_Name: ClientManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &551897928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551897927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3895516950
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &551897929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551897927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 156adcd4ed0547c429f10ad3446960a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerModelOptions:
+  - name: Malakas
+    playerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
+      type: 3}
+    skinOptions:
+    - {fileID: 8334222067460494079, guid: 229599c99ddb2ff448958ca4dcffeecd, type: 3}
+  - name: Guinevere
+    playerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
+      type: 3}
+    skinOptions:
+    - {fileID: 6461216685500147717, guid: 27b9319a1b0ff3c499fca0d0dd5572c8, type: 3}
+    - {fileID: 2254751552651625958, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
+    - {fileID: 7878422891106188551, guid: fc6b81508964baa43a64a400383ad961, type: 3}
+  - name: Lubu
+    playerPrefab: {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f,
+      type: 3}
+    skinOptions:
+    - {fileID: 6461216685500147717, guid: 036e1d147f62c6441b53b3476ea2b3dd, type: 3}
+    - {fileID: 6461216685500147717, guid: 44b2c0f2ee06d064ca0d77a974625136, type: 3}
+    - {fileID: 6461216685500147717, guid: 19be23d7f65cb5441bab474bd5bf1517, type: 3}
+  - name: Olaf
+    playerPrefab: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
+      type: 3}
+    skinOptions:
+    - {fileID: 2154839920385321583, guid: 08c5a03d6ea03cb4f982846f58b6801f, type: 3}
+    - {fileID: 2154839920385321583, guid: 0384a351536243a43bd0a4ced6e6c01f, type: 3}
+    - {fileID: 2154839920385321583, guid: 31a3f8f33895fb24fa08a51d30a8944f, type: 3}
+  spectatorPrefab: {fileID: 2298131365329834814, guid: 5ef6a7dcb7705a5439eb702be894f48e,
+    type: 3}
+  gameLogicManagerNetObjId:
+    m_InternalValue: 0
+  serverAPIEndPointURL: 
+  sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
+    type: 3}
+  sceneNamesToSpawnPlayerOnConnect:
+  - Hub
+  - Prototype
+--- !u!4 &551897930
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551897927}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &591683519
 GameObject:
   m_ObjectHideFlags: 0
@@ -2765,7 +2863,7 @@ PrefabInstance:
     - target: {fileID: 3427816913848544856, guid: f71b0ff4e1373ca4693713393c768bf9,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3427816913848544858, guid: f71b0ff4e1373ca4693713393c768bf9,
         type: 3}
@@ -3136,7 +3234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &804238609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3938,7 +4036,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &955280901
 PrefabInstance:
@@ -4446,6 +4544,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Greatsword_Training_Dummy
       objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 288998041406652132, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: m_RootOrder
@@ -4545,7 +4648,7 @@ Transform:
   - {fileID: 591683525}
   - {fileID: 1852252234}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1341667310
 GameObject:
@@ -5405,7 +5508,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1551103214
 GameObject:
@@ -5949,8 +6052,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
-      type: 3}
+    PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
       Prefab: {fileID: 0}
@@ -5959,7 +6061,7 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     TickRate: 120
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -5985,7 +6087,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1627123837
 MonoBehaviour:
@@ -5999,6 +6101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99f25be40fbf9e74e9d0495d8a89b3de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  connectionDataString: Name|1
 --- !u!43 &1714004078
 Mesh:
   m_ObjectHideFlags: 0
@@ -7569,7 +7672,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2105585097
 GameObject:
@@ -11952,6 +12055,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brawler_Training_Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8249681813201288002, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8249681813201288061, guid: e8534fcbb8d7db84a9c5d6d7ebd6ef6a,
         type: 3}

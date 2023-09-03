@@ -49,13 +49,9 @@ namespace GameCreator.Melee
         }
 
         private List<Material> glowMaterialInstances = new List<Material>();
-        private bool allowRender;
 
         private void Start()
         {
-            allowRender = SceneManager.GetActiveScene().name != "Hub";
-            if (!allowRender) { return; }
-
             foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
                 List<Material> materialList = new List<Material>();
@@ -86,8 +82,6 @@ namespace GameCreator.Melee
         private Color defaultColor = new Color(0, 0, 0, 0);
         private void Update()
         {
-            if (!allowRender) { return; }
-
             // Invincible
             if (isInvincible)
             {
