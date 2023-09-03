@@ -10,6 +10,14 @@ public class NetworkStart : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(StartNetwork());
+    }
+
+    private IEnumerator StartNetwork()
+    {
+        yield return null;
+        yield return new WaitForSeconds(1);
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionDataString);
 
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)

@@ -480,8 +480,6 @@ namespace LightPat.Core
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
 
-            // Only allow clients to connect if the server is at the lobby scene or the hub scene
-
             if (response.Approved)
             {
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
@@ -492,7 +490,7 @@ namespace LightPat.Core
                 {
                     QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
                 }
-                if (payloadOptions.Length == 2)
+                else if (payloadOptions.Length == 2)
                 {
                     QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
                 }
