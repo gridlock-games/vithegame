@@ -68,7 +68,13 @@ namespace LightPat.Player
                 Destroy(playerHUD);
             }
 
+            // Add this player object to the local player list so that we can access player instances on any client
             ClientManager.Singleton.localNetworkPlayers.Add(OwnerClientId, gameObject);
+
+            // Change player skin
+            int playerPrefabOptionIndex = ClientManager.Singleton.GetClient(OwnerClientId).playerPrefabOptionIndex;
+            int skinIndex = ClientManager.Singleton.GetClient(OwnerClientId).skinIndex;
+            GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[playerPrefabOptionIndex].skinOptions[skinIndex]);
         }
 
         public override void OnNetworkDespawn()

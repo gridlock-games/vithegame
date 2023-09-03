@@ -488,13 +488,17 @@ namespace LightPat.Core
                 string[] payloadOptions = payload.Split(payloadParseString);
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
+                if (payloadOptions.Length == 3)
+                {
+                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
+                }
                 if (payloadOptions.Length == 2)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), clientTeam));
+                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
                 }
                 else
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], 0, clientTeam));
+                    QueueClient(clientId, new ClientData(payloadOptions[0], 0, 0, clientTeam));
                 }
             }
         }
@@ -656,17 +660,19 @@ namespace LightPat.Core
         public string clientName;
         public bool ready;
         public int playerPrefabOptionIndex;
+        public int skinIndex;
         public Team team;
         public int[] spawnWeapons;
         public int kills;
         public int deaths;
         public int damageDealt;
 
-        public ClientData(string clientName, int playerPrefabOptionIndex, Team team)
+        public ClientData(string clientName, int playerPrefabOptionIndex, int skinIndex, Team team)
         {
             this.clientName = clientName;
             ready = false;
             this.playerPrefabOptionIndex = playerPrefabOptionIndex;
+            this.skinIndex = skinIndex;
             this.team = team;
             spawnWeapons = new int[0];
             kills = 0;
