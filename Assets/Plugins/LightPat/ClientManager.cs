@@ -486,8 +486,6 @@ namespace LightPat.Core
                 string[] payloadOptions = payload.Split(payloadParseString);
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
-                if (clientId == 0)
-                    clientTeam = Team.Spectator;
 
                 if (payloadOptions.Length == 3)
                 {
@@ -742,6 +740,7 @@ namespace LightPat.Core
             serializer.SerializeValue(ref clientName);
             serializer.SerializeValue(ref ready);
             serializer.SerializeValue(ref playerPrefabOptionIndex);
+            serializer.SerializeValue(ref skinIndex);
             serializer.SerializeValue(ref team);
             serializer.SerializeValue(ref spawnWeapons);
             serializer.SerializeValue(ref kills);

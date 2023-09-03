@@ -62,19 +62,28 @@ namespace LightPat.Player
             }
             else // If we are not this instance's player object
             {
-                worldSpaceLabel.SetActive(true);
                 Destroy(cameraMotor);
                 Destroy(playerCamera);
                 Destroy(playerHUD);
+            }
+
+            StartCoroutine(WaitForClientConnection());
+        }
+
+        private IEnumerator WaitForClientConnection()
+        {
+            yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(OwnerClientId));
+
+            if (!IsLocalPlayer)
+            {
+                worldSpaceLabel.SetActive(true);
             }
 
             // Add this player object to the local player list so that we can access player instances on any client
             ClientManager.Singleton.localNetworkPlayers.Add(OwnerClientId, gameObject);
 
             // Change player skin
-            int playerPrefabOptionIndex = ClientManager.Singleton.GetClient(OwnerClientId).playerPrefabOptionIndex;
-            int skinIndex = ClientManager.Singleton.GetClient(OwnerClientId).skinIndex;
-            GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[playerPrefabOptionIndex].skinOptions[skinIndex]);
+            GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(OwnerClientId).playerPrefabOptionIndex].skinOptions[ClientManager.Singleton.GetClient(OwnerClientId).skinIndex]);
         }
 
         public override void OnNetworkDespawn()

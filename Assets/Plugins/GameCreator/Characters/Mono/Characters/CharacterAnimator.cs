@@ -460,6 +460,8 @@
                     );
                 }
             }
+
+            GetComponent<Melee.SwitchMelee>().OnModelChange();
         }
 
         public void SetRotation(Quaternion rotation)
