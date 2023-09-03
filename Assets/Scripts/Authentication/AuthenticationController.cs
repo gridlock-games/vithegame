@@ -19,7 +19,7 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private GameObject btn_Signedin;
     [SerializeField] private GameObject btn_SignOut;
     [SerializeField] private GameObject btn_StartGame;
-    [SerializeField] private TMP_InputField displayNameInput;
+    [SerializeField] private Text displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
 
 
@@ -37,7 +37,7 @@ public class AuthenticationController : MonoBehaviour
     {
         datamanager = DataManager.Instance;
         startGameColor = btn_StartGame.GetComponent<Image>().color;
-        displayNameColor = displayNameInput.GetComponent<Image>().color;
+        // displayNameColor = displayNameInput.GetComponent<Image>().color;
         //check if data already cached if not activate sign in page
         if (PlayerPrefs.HasKey("email"))
         {
@@ -78,8 +78,8 @@ public class AuthenticationController : MonoBehaviour
                     btn_SignIn.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
                     btn_StartGame.GetComponent<Button>().interactable = true;
                     btn_StartGame.GetComponent<Image>().color = startGameColor;
-                    displayNameInput.interactable = true;
-                    displayNameInput.GetComponent<Image>().color = displayNameColor;
+                    displayNameInput.enabled = true;
+                    // displayNameInput.GetComponent<Image>().color = displayNameColor;
                     infoDisplayText.SetText("Provide your IGN and click on play to start");
                 }
                 else
@@ -87,15 +87,15 @@ public class AuthenticationController : MonoBehaviour
                     // btn_SignIn.GetComponent<Button>().interactable = true;
                     btn_StartGame.GetComponent<Button>().interactable = false;
                     btn_StartGame.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
-                    displayNameInput.interactable = false;
-                    displayNameInput.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
+                    displayNameInput.enabled = false;
+                    // displayNameInput.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
                     infoDisplayText.SetText("Sign-in with Google to start");
                 }
 
                 if (transitioningToCharacterSelect)
                 {
                     btn_StartGame.GetComponent<Button>().interactable = false;
-                    displayNameInput.interactable = false;
+                    displayNameInput.enabled = false;
                     infoDisplayText.SetText("Loading Character Select Screen, please wait...");
                 }
             }
