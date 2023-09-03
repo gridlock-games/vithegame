@@ -135,10 +135,11 @@ namespace LightPat.Core
 
                         followCamTarget = localNetworkPlayers[followCamIndex].transform;
                         transform.localPosition = followCamTarget.transform.position + (followCamTarget.transform.rotation * followCamOffset);
-                        followCamHorizontalAngle = 0;
-                        followCamVerticalAngle = 0;
                         lastFollowCamPosition = followCamTarget.position;
                         transform.LookAt(followCamTarget);
+
+                        followCamHorizontalAngle = 0;
+                        followCamVerticalAngle = transform.localEulerAngles.x;
                     }
                 }
             }
@@ -164,8 +165,14 @@ namespace LightPat.Core
                     transform.position += followCamTarget.position - lastFollowCamPosition;
 
                     //transform.LookAt(followCamTarget);
-                    transform.RotateAround(followCamTarget.transform.position, Vector3.up, followCamHorizontalAngle + lookInput.x);
-                    transform.RotateAround(followCamTarget.transform.position, Vector3.right, followCamVerticalAngle + lookInput.y);
+                    transform.RotateAround(followCamTarget.transform.position, Vector3.up, lookInput.x);
+                    //transform.RotateAround(followCamTarget.transform.position, Vector3.right, followCamVerticalAngle + lookInput.y);
+
+                    //transform.localPosition = followCamTarget.transform.position + (followCamTarget.transform.rotation * followCamOffset);
+                    transform.LookAt(followCamTarget);
+
+                    followCamVerticalAngle -= lookInput.y;
+                    transform.localEulerAngles = new Vector3(followCamVerticalAngle, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
                     lastFollowCamPosition = followCamTarget.position;
                 }

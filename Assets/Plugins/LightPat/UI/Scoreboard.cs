@@ -22,6 +22,8 @@ namespace LightPat.UI
             int i = 0;
             foreach (KeyValuePair<ulong, ClientData> clientData in ClientManager.Singleton.GetClientDataDictionary())
             {
+                if (clientData.Value.team == Team.Spectator) { continue; }
+
                 GameObject dataInstance = Instantiate(dataPrefab, dataParent);
                 TextMeshProUGUI playerName = dataInstance.transform.Find("Player Name").GetComponent<TextMeshProUGUI>();
                 playerName.SetText(clientData.Value.clientName);
