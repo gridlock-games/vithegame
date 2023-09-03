@@ -454,6 +454,7 @@ namespace LightPat.Core
             RemoveClientRpc(clientId);
         }
 
+        [SerializeField] string[] approvalCheckScenesCompetitorTeam;
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             // The client identifier to be authenticated
@@ -486,10 +487,7 @@ namespace LightPat.Core
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
 
-                //string[] spawnPlayerSceneNames = new string[] { "Lobby", "Hub", "Prototype" };
-                //Team clientTeam = spawnPlayerSceneNames.Contains(SceneManager.GetActiveScene().name) ? Team.Red : Team.Spectator;
-                Team clientTeam = SceneManager.GetActiveScene().name == "Lobby" | SceneManager.GetActiveScene().name == "Hub" ? Team.Competitor : Team.Spectator;
-                clientTeam = Team.Competitor;
+                Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
                 if (payloadOptions.Length == 2)
                 {
                     QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), clientTeam));

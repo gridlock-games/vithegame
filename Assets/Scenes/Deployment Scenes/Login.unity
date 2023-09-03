@@ -1088,6 +1088,13 @@ MonoBehaviour:
   serverAPIEndPointURL: 
   sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
     type: 3}
+  sceneNamesToSpawnPlayerOnConnect:
+  - Hub
+  - Prototype
+  approvalCheckScenesCompetitorTeam:
+  - Lobby
+  - Hub
+  - Prototype
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0
