@@ -66,8 +66,12 @@ namespace LightPat.Player
                 Destroy(playerCamera);
                 Destroy(playerHUD);
             }
-
             StartCoroutine(WaitForClientConnection());
+        }
+
+        private void Start()
+        {
+            StartCoroutine(ChangeSkin());
         }
 
         private IEnumerator WaitForClientConnection()
@@ -81,7 +85,11 @@ namespace LightPat.Player
 
             // Add this player object to the local player list so that we can access player instances on any client
             ClientManager.Singleton.localNetworkPlayers.Add(OwnerClientId, gameObject);
+        }
 
+        private IEnumerator ChangeSkin()
+        {
+            yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(OwnerClientId));
             // Change player skin
             GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(OwnerClientId).playerPrefabOptionIndex].skinOptions[ClientManager.Singleton.GetClient(OwnerClientId).skinIndex]);
         }

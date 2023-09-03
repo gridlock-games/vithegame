@@ -153,12 +153,13 @@ namespace LightPat.UI
 
         public void UpdatePlayerDisplay()
         {
+            if (!NetworkManager.Singleton.IsClient) { return; }
+
             if (playerModel)
                 Destroy(playerModel);
-            playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[playerModelDropdown.value].playerPrefab);
+
+            playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab);
             playerModel.GetComponent<GameCreator.Melee.CharacterMelee>().enabled = false;
-            ulong localClientId = NetworkManager.Singleton.LocalClientId;
-            ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(localClientId, playerModelDropdown.value);
         }
 
         public void UpdateGameModeValue()
