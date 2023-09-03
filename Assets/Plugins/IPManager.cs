@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace UnityEngine
 {
 
-    public class IPManager: MonoBehaviour
+    public class IPManager : MonoBehaviour
     {
 
         public string ServerAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
@@ -25,6 +25,10 @@ namespace UnityEngine
 
                 string FailOverServerAPIURL = "http://" + GetIP(ADDRESSFAM.IPv4) + ":3000/servers/duels";
                 string FailOverVMServerHost = GetIP(ADDRESSFAM.IPv4);
+
+                // Please do not remove
+                // string FailOverServerAPIURL = "http://" + "192.168.130.78" + ":3000/servers/duels";
+                // string FailOverVMServerHost = "192.168.130.78";
 
                 if (www.isNetworkError || www.isHttpError)
                 {
@@ -52,6 +56,11 @@ namespace UnityEngine
                 }
             }
         }
+        
+
+        private string GetSubNet(string IPAddress) {
+           return IPAddress.Substring(0, IPAddress.LastIndexOf('.') + 1);
+        }
 
         public static string GetIP(ADDRESSFAM Addfam)
         {
@@ -65,12 +74,11 @@ namespace UnityEngine
 
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            NetworkInterfaceType _type1 = NetworkInterfaceType.Wireless80211;
-            NetworkInterfaceType _type2 = NetworkInterfaceType.Ethernet;
 
-            if ((item.NetworkInterfaceType == _type1 || item.NetworkInterfaceType == _type2) && item.OperationalStatus == OperationalStatus.Up)
-#endif
+                NetworkInterfaceType _type1 = NetworkInterfaceType.Wireless80211;
+                NetworkInterfaceType _type2 = NetworkInterfaceType.Ethernet;
+
+                if ((item.NetworkInterfaceType == _type1 || item.NetworkInterfaceType == _type2) && item.OperationalStatus == OperationalStatus.Up)
                 {
                     foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                     {

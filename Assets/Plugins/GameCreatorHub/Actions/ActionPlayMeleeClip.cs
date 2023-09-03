@@ -19,9 +19,15 @@ public class ActionPlayMeleeClip : IAction
         if (charTarget != null)
         {
             characterMelee = charTarget.GetComponent<CharacterMelee>();
+            PlayerCharacter playerCharacter = charTarget.GetComponent<PlayerCharacter>();
+
             if (characterMelee != null)
             {
-                meleeclip.PlayNetworked(characterMelee);
+                if(playerCharacter == null) {
+                    meleeclip.PlayLocally(characterMelee);
+                } else {
+                    meleeclip.PlayNetworked(characterMelee);
+                }
                 return true;
             }
             return false;
