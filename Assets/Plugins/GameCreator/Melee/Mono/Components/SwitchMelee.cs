@@ -35,6 +35,11 @@ namespace GameCreator.Melee
             PlayVFX();
         }
 
+        public void OnModelChange()
+        {
+            SwitchWeapon(_currentWeaponType.Value);
+        }
+
         [ServerRpc]
         private void ChangeWeaponTypeServerRpc(WeaponType weaponType)
         {
@@ -73,6 +78,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
+            return;
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;

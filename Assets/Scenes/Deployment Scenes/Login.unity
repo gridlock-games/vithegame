@@ -1059,30 +1059,26 @@ MonoBehaviour:
     playerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
       type: 3}
     skinOptions:
-    - {fileID: 4458752642496622828, guid: 6f9c82e8219f5644ba6f1653e88a4bcd, type: 3}
-    - {fileID: 4458752642496622828, guid: 235cdf983a77417448dba90c6f56560b, type: 3}
-    - {fileID: 4692909319062829812, guid: e7aa361b692b8614d97455d302df7c8e, type: 3}
+    - {fileID: 8334222067460494079, guid: 229599c99ddb2ff448958ca4dcffeecd, type: 3}
   - name: Guinevere
     playerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
     skinOptions:
-    - {fileID: 6260457243822466680, guid: 246c11b250a926b4c8a9cb7756283c77, type: 3}
-    - {fileID: 906920893249937432, guid: 6bcee228487bc9f47b1a12877e9fc268, type: 3}
-    - {fileID: 906920893249937432, guid: 049738c216fd0dd4f9e812a669bce4ba, type: 3}
+    - {fileID: 6461216685500147717, guid: 27b9319a1b0ff3c499fca0d0dd5572c8, type: 3}
+    - {fileID: 2254751552651625958, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
+    - {fileID: 7878422891106188551, guid: fc6b81508964baa43a64a400383ad961, type: 3}
   - name: Lubu
     playerPrefab: {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f,
       type: 3}
     skinOptions:
     - {fileID: 6461216685500147717, guid: 44b2c0f2ee06d064ca0d77a974625136, type: 3}
     - {fileID: 6461216685500147717, guid: 19be23d7f65cb5441bab474bd5bf1517, type: 3}
-    - {fileID: 6461216685500147717, guid: d22117a0bdaa9bf40bc0678cb4a63964, type: 3}
   - name: Olaf
     playerPrefab: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
       type: 3}
     skinOptions:
-    - {fileID: 2154839920385321583, guid: 0384a351536243a43bd0a4ced6e6c01f, type: 3}
     - {fileID: 2154839920385321583, guid: 31a3f8f33895fb24fa08a51d30a8944f, type: 3}
-    - {fileID: 2154839920385321583, guid: b37ebdd98258679438d8ace4dae7e863, type: 3}
+    - {fileID: 2154839920385321583, guid: 0384a351536243a43bd0a4ced6e6c01f, type: 3}
   spectatorPrefab: {fileID: 2298131365329834814, guid: 5ef6a7dcb7705a5439eb702be894f48e,
     type: 3}
   gameLogicManagerNetObjId:
@@ -1090,6 +1086,13 @@ MonoBehaviour:
   serverAPIEndPointURL: 
   sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
     type: 3}
+  sceneNamesToSpawnPlayerOnConnect:
+  - Hub
+  - Prototype
+  approvalCheckScenesCompetitorTeam:
+  - Lobby
+  - Hub
+  - Prototype
 --- !u!4 &331431958
 Transform:
   m_ObjectHideFlags: 0

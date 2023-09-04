@@ -6,8 +6,20 @@ using UnityEngine.Rendering;
 
 public class NetworkStart : MonoBehaviour
 {
+    [SerializeField] private string connectionDataString;
+
     private void Start()
     {
+        StartCoroutine(StartNetwork());
+    }
+
+    private IEnumerator StartNetwork()
+    {
+        yield return null;
+        yield return new WaitForSeconds(1);
+
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionDataString);
+
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             NetworkManager.Singleton.StartServer();
         else if (Application.isEditor)

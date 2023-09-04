@@ -52,7 +52,9 @@ namespace LightPat.Core
 
         private Transform followCamTarget;
         private Vector3 lastFollowCamPosition;
-        private float followCamAngle;
+        private float followCamHorizontalAngle;
+        private float followCamVerticalAngle;
+        private int followCamIndex = -1;
 
         private void Update()
         {
@@ -102,6 +104,7 @@ namespace LightPat.Core
             else if (Input.GetKeyDown(KeyCode.Alpha8))
             {
                 followCamIndex = 7;
+                this.followCamIndex = followCamIndex;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha9))
             {
@@ -110,6 +113,14 @@ namespace LightPat.Core
             else if (Input.GetKeyDown(KeyCode.Alpha0))
             {
                 followCamIndex = 9;
+            }
+            else if (Input.GetMouseButtonDown(0)) // Left click
+            {
+                followCamIndex = this.followCamIndex + 1;
+            }
+            else if (Input.GetMouseButtonDown(1)) // Right click
+            {
+                followCamIndex = this.followCamIndex - 1;
             }
 
             // Check if the follow cam index is in our player list
@@ -120,10 +131,15 @@ namespace LightPat.Core
                 {
                     if (localNetworkPlayers[followCamIndex] != null)
                     {
+                        this.followCamIndex = followCamIndex;
+
                         followCamTarget = localNetworkPlayers[followCamIndex].transform;
                         transform.localPosition = followCamTarget.transform.position + (followCamTarget.transform.rotation * followCamOffset);
-                        followCamAngle = 0;
                         lastFollowCamPosition = followCamTarget.position;
+                        transform.LookAt(followCamTarget);
+
+                        followCamHorizontalAngle = 0;
+                        followCamVerticalAngle = transform.localEulerAngles.x;
                     }
                 }
             }
@@ -131,7 +147,9 @@ namespace LightPat.Core
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 followCamTarget = null;
-                followCamAngle = 0;
+                followCamHorizontalAngle = 0;
+                followCamVerticalAngle = 0;
+                this.followCamIndex = -1;
             }
 
             if (!pauseInstance)
@@ -146,8 +164,15 @@ namespace LightPat.Core
                 {
                     transform.position += followCamTarget.position - lastFollowCamPosition;
 
+                    //transform.LookAt(followCamTarget);
+                    transform.RotateAround(followCamTarget.transform.position, Vector3.up, lookInput.x);
+                    //transform.RotateAround(followCamTarget.transform.position, Vector3.right, followCamVerticalAngle + lookInput.y);
+
+                    //transform.localPosition = followCamTarget.transform.position + (followCamTarget.transform.rotation * followCamOffset);
                     transform.LookAt(followCamTarget);
-                    transform.RotateAround(followCamTarget.transform.position, Vector3.up, followCamAngle + lookInput.x);
+
+                    followCamVerticalAngle -= lookInput.y;
+                    transform.localEulerAngles = new Vector3(followCamVerticalAngle, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
                     lastFollowCamPosition = followCamTarget.position;
                 }
@@ -252,6 +277,8 @@ namespace LightPat.Core
             }
 
             lastPlayersString = playersString;
+
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
         }
 
         private string lastPlayersString;

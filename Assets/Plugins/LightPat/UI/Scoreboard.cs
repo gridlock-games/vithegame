@@ -22,10 +22,23 @@ namespace LightPat.UI
             int i = 0;
             foreach (KeyValuePair<ulong, ClientData> clientData in ClientManager.Singleton.GetClientDataDictionary())
             {
+                if (clientData.Value.team == Team.Spectator) { continue; }
+
                 GameObject dataInstance = Instantiate(dataPrefab, dataParent);
                 TextMeshProUGUI playerName = dataInstance.transform.Find("Player Name").GetComponent<TextMeshProUGUI>();
                 playerName.SetText(clientData.Value.clientName);
-                playerName.color = (Color)typeof(Color).GetProperty(clientData.Value.team.ToString().ToLowerInvariant()).GetValue(null, null);
+
+                Color color = Color.black;
+                if (clientData.Value.team == Team.Red)
+                {
+                    color = Color.red;
+                }
+                else if (clientData.Value.team == Team.Blue)
+                {
+                    color = Color.blue;
+                }
+
+                playerName.color = color;
                 dataInstance.transform.Find("Kills").GetComponent<TextMeshProUGUI>().SetText(clientData.Value.kills.ToString());
                 dataInstance.transform.Find("Deaths").GetComponent<TextMeshProUGUI>().SetText(clientData.Value.deaths.ToString());
                 dataInstance.transform.Find("Damage Dealt").GetComponent<TextMeshProUGUI>().SetText(clientData.Value.damageDealt.ToString());

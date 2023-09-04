@@ -2524,7 +2524,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints:
+  - team: 0
+    spawnPositions:
+    - {x: 8, y: 3, z: 6}
+    spawnRotation: {x: 0, y: 270, z: 0}
+  - team: 1
+    spawnPositions:
+    - {x: 8, y: 3, z: 6}
+    spawnRotation: {x: 0, y: 270, z: 0}
   - team: 2
+    spawnPositions:
+    - {x: 8, y: 3, z: 6}
+    spawnRotation: {x: 0, y: 270, z: 0}
+  - team: 3
+    spawnPositions:
+    - {x: 8, y: 3, z: 6}
+    spawnRotation: {x: 0, y: 270, z: 0}
+  - team: 4
     spawnPositions:
     - {x: 8, y: 3, z: 6}
     spawnRotation: {x: 0, y: 270, z: 0}
@@ -3780,8 +3796,14 @@ MonoBehaviour:
   m_SelectedTrigger: Selected
   m_PressedTrigger: Pressed
   m_ActiveBool: Active
+  m_NormalAlpha: 0
+  m_HighlightedAlpha: 1
+  m_SelectedAlpha: 1
+  m_PressedAlpha: 1
+  m_ActiveAlpha: 1
   m_TargetGraphic: {fileID: 1845233975}
   m_TargetGameObject: {fileID: 0}
+  m_TargetCanvasGroup: {fileID: 0}
   m_UseToggle: 0
   m_TargetToggle: {fileID: 0}
 --- !u!114 &1078802841
@@ -3813,8 +3835,14 @@ MonoBehaviour:
   m_SelectedTrigger: Selected
   m_PressedTrigger: Pressed
   m_ActiveBool: Active
+  m_NormalAlpha: 0
+  m_HighlightedAlpha: 1
+  m_SelectedAlpha: 1
+  m_PressedAlpha: 1
+  m_ActiveAlpha: 1
   m_TargetGraphic: {fileID: 1059471377}
   m_TargetGameObject: {fileID: 0}
+  m_TargetCanvasGroup: {fileID: 0}
   m_UseToggle: 0
   m_TargetToggle: {fileID: 0}
 --- !u!114 &1078802842
@@ -3838,11 +3866,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.94509804, g: 0.25882354, b: 0.13725491, a: 1}
-    m_HighlightedColor: {r: 0.94509804, g: 0.25882354, b: 0.13725491, a: 1}
-    m_PressedColor: {r: 0.7764706, g: 0.2, b: 0.09411765, a: 1}
-    m_SelectedColor: {r: 0.94509804, g: 0.25882354, b: 0.13725491, a: 1}
-    m_DisabledColor: {r: 0.827451, g: 0.2784314, b: 0.1764706, a: 0.49803922}
+    m_NormalColor: {r: 0.6313726, g: 0.5803922, b: 0.5019608, a: 1}
+    m_HighlightedColor: {r: 1, g: 0.29803923, b: 0.29803923, a: 1}
+    m_PressedColor: {r: 0.8235294, g: 0.2784314, b: 0.2784314, a: 1}
+    m_SelectedColor: {r: 1, g: 0.29803923, b: 0.29803923, a: 1}
+    m_DisabledColor: {r: 0.6313726, g: 0.5803922, b: 0.5019608, a: 0.49803922}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -4358,7 +4386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.27058825, b: 0.101960786, a: 1}
+  m_Color: {r: 1, g: 0.2784314, b: 0.2784314, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4486,7 +4514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.91764706, g: 0.19607843, b: 0.07058824, a: 1}
+  m_Color: {r: 1, g: 0.2784314, b: 0.2784314, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4749,7 +4777,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.91764706, g: 0.19607843, b: 0.07058824, a: 1}
+  m_Color: {r: 1, g: 0.2784314, b: 0.2784314, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4872,7 +4900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.91764706, g: 0.19607843, b: 0.07058824, a: 1}
+  m_Color: {r: 1, g: 0.2784314, b: 0.2784314, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5886,7 +5914,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.3764706, b: 0.09411765, a: 1}
+  m_Color: {r: 1, g: 0.37254903, b: 0.37254903, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

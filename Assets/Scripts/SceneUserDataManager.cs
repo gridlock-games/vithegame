@@ -9,6 +9,7 @@ using LightPat.Core;
 using GameCreator.Melee;
 using UnityEngine.Networking;
 using System.Collections;
+using GameCreator.Characters;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -39,7 +40,8 @@ public class SceneUserDataManager : MonoBehaviour
 
     IPManager iPManager = new IPManager();
 
-    private void Awake() {
+    private void Awake() 
+    {
         StartCoroutine(iPManager.CheckAPI());
     }
 
@@ -56,7 +58,7 @@ public class SceneUserDataManager : MonoBehaviour
         {
             if (playerModelOptions[i].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
-                payloadString = displayName + ClientManager.GetPayLoadParseString() + i;
+                payloadString = displayName + ClientManager.GetPayLoadParseString() + i + ClientManager.GetPayLoadParseString() + skinIndex;
                 Debug.Log(payloadString);
                 break;
             }
@@ -90,6 +92,27 @@ public class SceneUserDataManager : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = playerHubServerList[serverSelector.value].ip;
         networkTransport.ConnectionData.Port = ushort.Parse(playerHubServerList[serverSelector.value].port);
+    }
+
+    private int skinIndex;
+    public void ChangeSkin()
+    {
+        // Find player object by weapon type
+        GameObject[] skinArray = new GameObject[0];
+        var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
+        for (int i = 0; i < playerModelOptions.Length; i++)
+        {
+            if (playerModelOptions[i].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
+            {
+                skinArray = playerModelOptions[i].skinOptions;
+                break;
+            }
+        }
+
+        skinIndex += 1;
+        if (skinIndex > skinArray.Length-1) { skinIndex = 0; }
+
+        selectedObject.GetComponent<CharacterAnimator>().ChangeModel(skinArray[skinIndex]);
     }
 
     private List<ClientManager.Server> playerHubServerList = new List<ClientManager.Server>();
@@ -266,6 +289,8 @@ public class SceneUserDataManager : MonoBehaviour
         // Store the selected game object
         this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
         this.selectedObject.GetComponent<SwitchMelee>().SwitchWeaponBeforeSpawn();
+        skinIndex = -1;
+        ChangeSkin();
     }
 
     public void PostCharacterSelectAnalytics(string _panel, string _character = "0")
