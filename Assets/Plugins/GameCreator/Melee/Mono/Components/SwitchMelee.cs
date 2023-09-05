@@ -78,6 +78,7 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
+            return;
             // Only check for keyboard input if a key is currently pressed down
             if (!IsLocalPlayer) return;
             if (!Input.anyKeyDown) return;

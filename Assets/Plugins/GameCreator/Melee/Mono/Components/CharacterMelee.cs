@@ -133,6 +133,7 @@ namespace GameCreator.Melee
         private float anim_ExecutedDuration = 0.0f;
 
         private AbilityManager abilityManager;
+        private GlowRenderer glowRenderer;
         private LightPat.Player.NetworkPlayer networkPlayer;
 
         public bool isLunging = false;
@@ -158,6 +159,7 @@ namespace GameCreator.Melee
             this.CharacterAnimator = GetComponent<CharacterAnimator>();
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
             networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
@@ -181,6 +183,9 @@ namespace GameCreator.Melee
 
         protected virtual void Update()
         {
+            if (SceneManager.GetActiveScene().name == "Hub")
+                SetInvincibility(1000);
+
             if (IsServer)
             {
                 this.UpdatePoise();
@@ -290,8 +295,8 @@ namespace GameCreator.Melee
 
         private void LateUpdate()
         {
-            GetComponentInChildren<GlowRenderer>().RenderInvincible(IsInvincible);
-            GetComponentInChildren<GlowRenderer>().RenderUninterruptable(IsUninterruptable);
+            glowRenderer.RenderInvincible(IsInvincible);
+            glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
 
@@ -377,7 +382,6 @@ namespace GameCreator.Melee
 
         private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
-            if (SceneManager.GetActiveScene().name == "Hub") { return; }
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
             foreach (GameObject hit in hits)
@@ -562,35 +566,34 @@ namespace GameCreator.Melee
             if (!IsServer) { Debug.LogError("RenderHit() should only be called from the server"); return; }
 
             if (!IsClient)
-                GetComponentInChildren<GlowRenderer>().RenderHit();
+                glowRenderer.RenderHit();
             RenderHitClientRpc();
         }
 
-        [ClientRpc] private void RenderHitClientRpc() { GetComponentInChildren<GlowRenderer>().RenderHit(); }
+        [ClientRpc] private void RenderHitClientRpc() { glowRenderer.RenderHit(); }
 
         private void RenderBlock()
         {
             if (!IsServer) { Debug.LogError("RenderBlock() should only be called from the server"); return; }
 
             if (!IsClient)
-                GetComponentInChildren<GlowRenderer>().RenderBlock();
+                glowRenderer.RenderBlock();
             RenderBlockClientRpc();
         }
 
-        [ClientRpc] private void RenderBlockClientRpc() { GetComponentInChildren<GlowRenderer>().RenderBlock(); }
+        [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
 
         private void RenderUnInterruptable()
         {
             if (!IsServer) { Debug.LogError("RenderUninterruptable() should only be called from the server"); return; }
 
-            if (!IsClient)
-            {
-                GetComponentInChildren<GlowRenderer>().RenderUninterruptable();
+            if (!IsClient) { 
+                glowRenderer.RenderUninterruptable();
             }
             RenderUninterruptableClientRpc();
         }
 
-        [ClientRpc] private void RenderUninterruptableClientRpc() { GetComponentInChildren<GlowRenderer>().RenderUninterruptable(); }
+        [ClientRpc] private void RenderUninterruptableClientRpc() { glowRenderer.RenderUninterruptable(); }
 
         public void PropogateMeleeClipChange(MeleeClip meleeClip)
         {
@@ -949,7 +952,7 @@ namespace GameCreator.Melee
             }
             else if (current > prev)
             {
-                GetComponentInChildren<GlowRenderer>().RenderHeal();
+                glowRenderer.RenderHeal();
             }
 
             // Cancel death ailment if we get our health back

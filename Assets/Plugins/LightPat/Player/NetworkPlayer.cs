@@ -15,6 +15,7 @@ namespace LightPat.Player
     {
         [HideInInspector] public NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
+        [SerializeField] private GameObject modelInstance;
         [SerializeField] private GameObject cameraMotor;
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private GameObject worldSpaceLabel;

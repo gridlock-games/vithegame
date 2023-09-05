@@ -12,7 +12,6 @@ namespace LightPat.Core
     {
         [SerializeField] private TextMeshProUGUI nameTag;
         [SerializeField] private Slider healthSlider;
-        [SerializeField] private Image healthImage;
         [SerializeField] private Slider defenseSlider;
         [SerializeField] private Slider poiseSlider;
 
@@ -20,15 +19,8 @@ namespace LightPat.Core
 
         private bool instantiated;
 
-        public void Instantiate(CharacterMelee melee, Team team, bool isTeammateUI)
+        public void Instantiate(CharacterMelee melee, Team team)
         {
-            if (isTeammateUI)
-            {
-                defenseSlider.gameObject.SetActive(false);
-                poiseSlider.gameObject.SetActive(false);
-                healthImage.color = Color.cyan;
-            }
-
             if (ClientManager.Singleton)
             {
                 GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
@@ -50,20 +42,17 @@ namespace LightPat.Core
                 nameTag.SetText("No client manager");
             }
 
-            if (!isTeammateUI)
+            if (team == Team.Red)
             {
-                if (team == Team.Red)
-                {
-                    nameTag.color = Color.red;
-                }
-                else if (team == Team.Blue)
-                {
-                    nameTag.color = Color.blue;
-                }
-                else
-                {
-                    nameTag.color = Color.black;
-                }
+                nameTag.color = Color.red;
+            }
+            else if (team == Team.Blue)
+            {
+                nameTag.color = Color.blue;
+            }
+            else
+            {
+                nameTag.color = Color.black;
             }
 
             this.melee = melee;
