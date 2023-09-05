@@ -10,6 +10,7 @@ namespace GameCreator.Melee
         [SerializeField] private Material glowMaterial;
 
         private const float colorChangeSpeed = 2;
+        private const float fresnelPower = 0.5f;
 
         private float lastHitTime = -5;
         public void RenderHit()
@@ -77,6 +78,11 @@ namespace GameCreator.Melee
                     }
                 }
             }
+
+            foreach (Material glowMaterialInstance in glowMaterialInstances)
+            {
+                glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
+            }
         }
 
         private Color defaultColor = new Color(0, 0, 0, 0);
@@ -87,7 +93,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
-                    glowMaterialInstance.color = new Color(1, 1, 0);
+                    glowMaterialInstance.color = new Color(1, 1, 0, 1);
                 }
                 return;
             }
