@@ -5,8 +5,7 @@
     using UnityEngine;
     using UnityEngine.UI;
     using GameCreator.Core;
-    using GameCreator.Characters;
-    using GameCreator.Variables;
+    using LightPat.Core;
 
     [AddComponentMenu("UI/Game Creator/Character Melee UI", 0)]
     public class CharacterMeleeUI : MonoBehaviour
@@ -48,6 +47,7 @@
         private void LateUpdate()
         {
             this.UpdateWeaponUI();
+            this.UpdateTeammateHPUI();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -87,6 +87,49 @@
                         break;
                 }
             }
+        }
+
+        [SerializeField] private GameObject playerCardPrefab;
+        [SerializeField] private Transform playerCardParent;
+        [SerializeField] private float playerCardSpacing = 100;
+
+        private string lastPlayersString;
+
+        private void UpdateTeammateHPUI()
+        {
+            string playersString = "";
+            foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
+            {
+                playersString += kvp.Key.ToString() + kvp.Value.ToString();
+            }
+
+            if (lastPlayersString != playersString)
+            {
+                foreach (Transform playerIcon in playerCardParent)
+                {
+                    Destroy(playerIcon.gameObject);
+                }
+
+                int counter = 0;
+                foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
+                {
+                    if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
+                    {
+                        if (this.melee == melee) { continue; }
+
+                        Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
+                        if (playerTeam != Team.Red & playerTeam != Team.Blue) { continue; }
+                        if (playerTeam != ClientManager.Singleton.GetClient(melee.OwnerClientId).team) { continue; }
+
+                        GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
+                        playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true);
+                        playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, counter * playerCardSpacing, playerCard.transform.localPosition.z);
+                        counter++;
+                    }
+                }
+            }
+
+            lastPlayersString = playersString;
         }
     }
 }
