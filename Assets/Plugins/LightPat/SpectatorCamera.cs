@@ -169,7 +169,6 @@ namespace LightPat.Core
                     transform.LookAt(followCamTarget);
 
                     followCamVerticalAngle -= lookInput.y;
-                    Debug.Log(followCamVerticalAngle);
                     transform.localEulerAngles = new Vector3(followCamVerticalAngle, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
                     lastFollowCamPosition = followCamTarget.position;
