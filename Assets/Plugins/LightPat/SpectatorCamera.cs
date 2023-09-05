@@ -52,7 +52,6 @@ namespace LightPat.Core
 
         private Transform followCamTarget;
         private Vector3 lastFollowCamPosition;
-        private float followCamHorizontalAngle;
         private float followCamVerticalAngle;
         private int followCamIndex = -1;
 
@@ -138,7 +137,6 @@ namespace LightPat.Core
                         lastFollowCamPosition = followCamTarget.position;
                         transform.LookAt(followCamTarget);
 
-                        followCamHorizontalAngle = 0;
                         followCamVerticalAngle = transform.localEulerAngles.x;
                     }
                 }
@@ -147,7 +145,6 @@ namespace LightPat.Core
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 followCamTarget = null;
-                followCamHorizontalAngle = 0;
                 followCamVerticalAngle = 0;
                 this.followCamIndex = -1;
             }
@@ -244,14 +241,14 @@ namespace LightPat.Core
                         if (playerTeam == Team.Blue)
                         {
                             GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
-                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
                             playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, rightCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             rightCounter++;
                         }
                         else if (playerTeam == Team.Red)
                         {
                             GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
-                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
                             playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             leftCounter++;
                         }
@@ -260,13 +257,13 @@ namespace LightPat.Core
                             if (elseCounter % 2 == 0)
                             {
                                 GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
-                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
                                 playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
                             else
                             {
                                 GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
-                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
                                 playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
 

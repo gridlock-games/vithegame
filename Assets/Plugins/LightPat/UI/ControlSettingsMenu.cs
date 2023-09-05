@@ -5,7 +5,6 @@ using LightPat.Core;
 using UnityEngine.UI;
 using GameCreator.Camera;
 using TMPro;
-using LightPat.Core;
 
 namespace LightPat.UI
 {
