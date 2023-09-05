@@ -485,7 +485,7 @@ namespace LightPat.Core
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
 
-                Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
+                Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Blue : Team.Spectator;
 
                 if (payloadOptions.Length == 3)
                 {
