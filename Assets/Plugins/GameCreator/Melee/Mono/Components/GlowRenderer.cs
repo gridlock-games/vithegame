@@ -10,6 +10,7 @@ namespace GameCreator.Melee
         [SerializeField] private Material glowMaterial;
 
         private const float colorChangeSpeed = 2;
+        private const float fresnelPower = 0.7f;
 
         private float lastHitTime = -5;
         public void RenderHit()
@@ -80,6 +81,7 @@ namespace GameCreator.Melee
         }
 
         private Color defaultColor = new Color(0, 0, 0, 0);
+        private float defaultFresnelPower = 5;
         private void Update()
         {
             // Invincible
@@ -87,6 +89,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(1, 1, 0);
                 }
                 return;
@@ -95,6 +98,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
@@ -104,6 +108,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(1, 1, 1);
                 }
                 return;
@@ -112,6 +117,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
@@ -121,6 +127,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(1, 0, 0);
                 }
                 return;
@@ -129,6 +136,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
@@ -138,6 +146,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(0, 1, 0);
                 }
                 return;
@@ -146,6 +155,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
@@ -155,6 +165,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(0, 0, 1);
                 }
                 return;
@@ -163,6 +174,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }
@@ -172,6 +184,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
                     glowMaterialInstance.color = new Color(1, 1, 1);
                 }
                 return;
@@ -180,6 +193,7 @@ namespace GameCreator.Melee
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
+                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
                     glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
                 }
             }

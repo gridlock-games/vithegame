@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 
 public class NetworkStart : MonoBehaviour
 {
+    [Header("Formatted: Name|CharacterIndex|SkinIndex")]
     [SerializeField] private string connectionDataString;
 
     private void Start()

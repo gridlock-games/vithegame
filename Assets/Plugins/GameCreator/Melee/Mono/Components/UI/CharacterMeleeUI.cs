@@ -42,12 +42,12 @@
         private void Update()
         {
             this.UpdateUI();
-            this.UpdateTeammateHPUI();
         }
 
         private void LateUpdate()
         {
             this.UpdateWeaponUI();
+            this.UpdateTeammateHPUI();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
