@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
 using UnityEngine.Rendering;
+using Unity.Collections;
 
 namespace LightPat.Core
 {
@@ -29,6 +30,7 @@ namespace LightPat.Core
 
         public NetworkVariable<ulong> lobbyLeaderId { get; private set; } = new NetworkVariable<ulong>();
         public NetworkVariable<GameMode> gameMode { get; private set; } = new NetworkVariable<GameMode>();
+        public NetworkVariable<FixedString32Bytes> mapSelectionName { get; private set; } = new NetworkVariable<FixedString32Bytes>();
 
         public Dictionary<ulong, GameObject> localNetworkPlayers = new Dictionary<ulong, GameObject>();
 
@@ -72,6 +74,8 @@ namespace LightPat.Core
         public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
+
+        [ServerRpc(RequireOwnership = false)] public void UpdateMapNameServerRpc(string newMapName) { mapSelectionName.Value = newMapName; }
 
         public override void OnNetworkSpawn()
         {

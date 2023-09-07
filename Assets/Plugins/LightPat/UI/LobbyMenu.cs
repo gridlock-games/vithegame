@@ -170,6 +170,12 @@ namespace LightPat.UI
             ClientManager.Singleton.UpdateGameModeServerRpc(chosenGameMode);
         }
 
+        public void UpdateMapNameValue()
+        {
+            if (loadingGame) { return; }
+            ClientManager.Singleton.UpdateMapNameServerRpc(mapSelectDropdown.options[mapSelectDropdown.value].text);
+        }
+
         public void ChangeTeam()
         {
             Team team = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
@@ -230,6 +236,7 @@ namespace LightPat.UI
             playerModelDropdown.value = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex;
             UpdatePlayerDisplay();
             UpdateGameModeValue();
+            UpdateMapNameValue();
             ChangeTeam();
             primaryWeaponDropdown.value = 0;
             secondaryWeaponDropdown.value = 1;
@@ -241,9 +248,15 @@ namespace LightPat.UI
         {
             // Only let lobby leader change the game mode
             if (NetworkManager.Singleton.LocalClientId == ClientManager.Singleton.lobbyLeaderId.Value)
+            {
                 gameModeDropdown.interactable = true;
+                mapSelectDropdown.interactable = true;
+            }
             else
+            {
                 gameModeDropdown.interactable = false;
+                mapSelectDropdown.interactable = false;
+            }
 
             // Set game mode dropdown
             if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.gameMode.Value.ToString())
@@ -253,6 +266,18 @@ namespace LightPat.UI
                     if (ClientManager.Singleton.gameMode.Value.ToString() == gameModeDropdown.options[i].text)
                     {
                         gameModeDropdown.SetValueWithoutNotify(i);
+                        break;
+                    }
+                }
+            }
+
+            if (mapSelectDropdown.options[mapSelectDropdown.value].text != ClientManager.Singleton.mapSelectionName.Value.ToString())
+            {
+                for (int i = 0; i < mapSelectDropdown.options.Count; i++)
+                {
+                    if (ClientManager.Singleton.gameMode.Value.ToString() == mapSelectDropdown.options[i].text)
+                    {
+                        mapSelectDropdown.SetValueWithoutNotify(i);
                         break;
                     }
                 }
