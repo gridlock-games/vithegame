@@ -1231,15 +1231,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints:
-  - team: 2
+  - gameModes: 
+    team: 2
     spawnPositions:
     - {x: 0, y: 3, z: 15}
     spawnRotation: {x: 0, y: 180, z: 0}
-  - team: 3
+  - gameModes: 
+    team: 3
     spawnPositions:
     - {x: 0, y: 3, z: -3}
     spawnRotation: {x: 0, y: 0, z: 0}
-  - team: 4
+  - gameModes: 
+    team: 4
     spawnPositions:
     - {x: 8, y: 3, z: 6}
     spawnRotation: {x: 0, y: 270, z: 0}
