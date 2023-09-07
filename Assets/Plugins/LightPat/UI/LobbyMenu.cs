@@ -22,6 +22,7 @@ namespace LightPat.UI
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
         public TMP_Dropdown playerModelDropdown;
+        public TMP_Dropdown mapSelectDropdown;
         public TextMeshProUGUI errorDisplay;
         [Header("Loadout dropdowns")]
         public TMP_Dropdown primaryWeaponDropdown;
@@ -129,11 +130,11 @@ namespace LightPat.UI
             Debug.Log("Loading game: " + currentGameMode);
             if (currentGameMode == GameMode.Duel)
             {
-                ClientManager.Singleton.ChangeScene("Duel", true, "OutdoorCastleArena");
+                ClientManager.Singleton.ChangeScene("Duel", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else if (currentGameMode == GameMode.TeamElimination)
             {
-                ClientManager.Singleton.ChangeScene("TeamElimination", true, "OutdoorCastleArena");
+                ClientManager.Singleton.ChangeScene("TeamElimination", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else if (currentGameMode == GameMode.TeamDeathmatch)
             {
@@ -187,14 +188,6 @@ namespace LightPat.UI
 
         private void Start()
         {
-            List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
-            foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
-            {
-                playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
-            }
-            playerModelDropdown.ClearOptions();
-            playerModelDropdown.AddOptions(playerModelOptions);
-
             List<TMP_Dropdown.OptionData> gameModes = new List<TMP_Dropdown.OptionData>();
             foreach (GameMode gameMode in System.Enum.GetValues(typeof(GameMode)).Cast<GameMode>())
             {
@@ -203,17 +196,25 @@ namespace LightPat.UI
             gameModeDropdown.ClearOptions();
             gameModeDropdown.AddOptions(gameModes);
 
-            List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
+            //List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
+            //foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
+            //{
+            //    playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
+            //}
+            //playerModelDropdown.ClearOptions();
+            //playerModelDropdown.AddOptions(playerModelOptions);
+
+            //List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
             //foreach (Weapon weapon in ClientManager.Singleton.weaponPrefabOptions)
             //{
             //    weapons.Add(new TMP_Dropdown.OptionData(weapon.weaponName));
             //}
-            primaryWeaponDropdown.ClearOptions();
-            primaryWeaponDropdown.AddOptions(weapons);
-            secondaryWeaponDropdown.ClearOptions();
-            secondaryWeaponDropdown.AddOptions(weapons);
-            tertiaryWeaponDropdown.ClearOptions();
-            tertiaryWeaponDropdown.AddOptions(weapons);
+            //primaryWeaponDropdown.ClearOptions();
+            //primaryWeaponDropdown.AddOptions(weapons);
+            //secondaryWeaponDropdown.ClearOptions();
+            //secondaryWeaponDropdown.AddOptions(weapons);
+            //tertiaryWeaponDropdown.ClearOptions();
+            //tertiaryWeaponDropdown.AddOptions(weapons);
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
