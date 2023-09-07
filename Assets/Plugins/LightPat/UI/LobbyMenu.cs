@@ -138,7 +138,7 @@ namespace LightPat.UI
             }
             else if (currentGameMode == GameMode.TeamDeathmatch)
             {
-                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true);
+                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else
             {
