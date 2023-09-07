@@ -271,11 +271,12 @@ namespace LightPat.UI
                 }
             }
 
+            // Set map select dropdown
             if (mapSelectDropdown.options[mapSelectDropdown.value].text != ClientManager.Singleton.mapSelectionName.Value.ToString())
             {
                 for (int i = 0; i < mapSelectDropdown.options.Count; i++)
                 {
-                    if (ClientManager.Singleton.gameMode.Value.ToString() == mapSelectDropdown.options[i].text)
+                    if (ClientManager.Singleton.mapSelectionName.Value.ToString() == mapSelectDropdown.options[i].text)
                     {
                         mapSelectDropdown.SetValueWithoutNotify(i);
                         break;
