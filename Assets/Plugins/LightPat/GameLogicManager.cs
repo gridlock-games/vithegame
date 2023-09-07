@@ -4,12 +4,13 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace LightPat.Core
 {
     public class GameLogicManager : NetworkBehaviour
     {
-        [SerializeField] private TeamSpawnPoint[] spawnPoints = new TeamSpawnPoint[0];
+        private TeamSpawnManager spawnManager;
 
         public virtual void OnPlayerKill(ulong killerClientId) { }
 
@@ -18,6 +19,8 @@ namespace LightPat.Core
         private Dictionary<Team, int> spawnCountDict = new Dictionary<Team, int>();
         public KeyValuePair<Vector3, Quaternion> GetSpawnOrientation(Team team)
         {
+            if (GetComponent<TeamSpawnManager>()) { spawnManager = GetComponent<TeamSpawnManager>(); }
+
             if (!spawnCountDict.ContainsKey(team))
                 spawnCountDict.Add(team, 0);
 
@@ -25,6 +28,7 @@ namespace LightPat.Core
             Quaternion spawnRotation = Quaternion.identity;
 
             bool spawnPointFound = false;
+            TeamSpawnPoint[] spawnPoints = spawnManager.GetSpawnPoints(ClientManager.Singleton.gameMode.Value);
             foreach (TeamSpawnPoint teamSpawnPoint in spawnPoints)
             {
                 if (teamSpawnPoint.team == team)
@@ -69,34 +73,28 @@ namespace LightPat.Core
             }
         }
 
-        private void OnDrawGizmos()
+        private void Start()
         {
-            foreach (TeamSpawnPoint spawnPoint in spawnPoints)
-            {
-                try
-                {
-                    Gizmos.color = (Color)typeof(Color).GetProperty(spawnPoint.team.ToString().ToLowerInvariant()).GetValue(null, null);
-                }
-                catch
-                {
-                    Gizmos.color = Color.black;
-                }
+            SceneManager.sceneLoaded += FindSpawnPoints;
+        }
 
-                foreach (Vector3 spawnPosition in spawnPoint.spawnPositions)
+        private new void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= FindSpawnPoints;
+            base.OnDestroy();
+        }
+
+        private void FindSpawnPoints(Scene scene, LoadSceneMode mode)
+        {
+            foreach (GameObject g in scene.GetRootGameObjects())
+            {
+                if (g.TryGetComponent(out TeamSpawnManager spawnManager))
                 {
-                    Gizmos.DrawWireSphere(spawnPosition, 2);
-                    Gizmos.DrawRay(spawnPosition, Quaternion.Euler(spawnPoint.spawnRotation) * Vector3.forward * 5);
+                    this.spawnManager = spawnManager;
+                    break;
                 }
             }
         }
-    }
-
-    [Serializable]
-    public class TeamSpawnPoint
-    {
-        public Team team;
-        public Vector3[] spawnPositions;
-        public Vector3 spawnRotation;
     }
 
     public enum Team

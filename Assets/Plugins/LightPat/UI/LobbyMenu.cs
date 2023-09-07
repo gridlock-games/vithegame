@@ -22,6 +22,7 @@ namespace LightPat.UI
         public GameObject WaitingToStartText;
         public TMP_Dropdown gameModeDropdown;
         public TMP_Dropdown playerModelDropdown;
+        public TMP_Dropdown mapSelectDropdown;
         public TextMeshProUGUI errorDisplay;
         [Header("Loadout dropdowns")]
         public TMP_Dropdown primaryWeaponDropdown;
@@ -129,15 +130,15 @@ namespace LightPat.UI
             Debug.Log("Loading game: " + currentGameMode);
             if (currentGameMode == GameMode.Duel)
             {
-                ClientManager.Singleton.ChangeScene("Duel", true, "OutdoorCastleArena");
+                ClientManager.Singleton.ChangeScene("Duel", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else if (currentGameMode == GameMode.TeamElimination)
             {
-                ClientManager.Singleton.ChangeScene("TeamElimination", true, "OutdoorCastleArena");
+                ClientManager.Singleton.ChangeScene("TeamElimination", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else if (currentGameMode == GameMode.TeamDeathmatch)
             {
-                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true);
+                ClientManager.Singleton.ChangeScene("TeamDeathmatch", true, mapSelectDropdown.options[mapSelectDropdown.value].text);
             }
             else
             {
@@ -169,6 +170,12 @@ namespace LightPat.UI
             ClientManager.Singleton.UpdateGameModeServerRpc(chosenGameMode);
         }
 
+        public void UpdateMapNameValue()
+        {
+            if (loadingGame) { return; }
+            ClientManager.Singleton.UpdateMapNameServerRpc(mapSelectDropdown.options[mapSelectDropdown.value].text);
+        }
+
         public void ChangeTeam()
         {
             Team team = System.Enum.Parse<Team>(changeTeamDropdown.options[changeTeamDropdown.value].text);
@@ -187,14 +194,6 @@ namespace LightPat.UI
 
         private void Start()
         {
-            List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
-            foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
-            {
-                playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
-            }
-            playerModelDropdown.ClearOptions();
-            playerModelDropdown.AddOptions(playerModelOptions);
-
             List<TMP_Dropdown.OptionData> gameModes = new List<TMP_Dropdown.OptionData>();
             foreach (GameMode gameMode in System.Enum.GetValues(typeof(GameMode)).Cast<GameMode>())
             {
@@ -203,17 +202,25 @@ namespace LightPat.UI
             gameModeDropdown.ClearOptions();
             gameModeDropdown.AddOptions(gameModes);
 
-            List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
+            //List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
+            //foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
+            //{
+            //    playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
+            //}
+            //playerModelDropdown.ClearOptions();
+            //playerModelDropdown.AddOptions(playerModelOptions);
+
+            //List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
             //foreach (Weapon weapon in ClientManager.Singleton.weaponPrefabOptions)
             //{
             //    weapons.Add(new TMP_Dropdown.OptionData(weapon.weaponName));
             //}
-            primaryWeaponDropdown.ClearOptions();
-            primaryWeaponDropdown.AddOptions(weapons);
-            secondaryWeaponDropdown.ClearOptions();
-            secondaryWeaponDropdown.AddOptions(weapons);
-            tertiaryWeaponDropdown.ClearOptions();
-            tertiaryWeaponDropdown.AddOptions(weapons);
+            //primaryWeaponDropdown.ClearOptions();
+            //primaryWeaponDropdown.AddOptions(weapons);
+            //secondaryWeaponDropdown.ClearOptions();
+            //secondaryWeaponDropdown.AddOptions(weapons);
+            //tertiaryWeaponDropdown.ClearOptions();
+            //tertiaryWeaponDropdown.AddOptions(weapons);
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
@@ -229,6 +236,7 @@ namespace LightPat.UI
             playerModelDropdown.value = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex;
             UpdatePlayerDisplay();
             UpdateGameModeValue();
+            UpdateMapNameValue();
             ChangeTeam();
             primaryWeaponDropdown.value = 0;
             secondaryWeaponDropdown.value = 1;
@@ -240,9 +248,15 @@ namespace LightPat.UI
         {
             // Only let lobby leader change the game mode
             if (NetworkManager.Singleton.LocalClientId == ClientManager.Singleton.lobbyLeaderId.Value)
+            {
                 gameModeDropdown.interactable = true;
+                mapSelectDropdown.interactable = true;
+            }
             else
+            {
                 gameModeDropdown.interactable = false;
+                mapSelectDropdown.interactable = false;
+            }
 
             // Set game mode dropdown
             if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.gameMode.Value.ToString())
@@ -252,6 +266,19 @@ namespace LightPat.UI
                     if (ClientManager.Singleton.gameMode.Value.ToString() == gameModeDropdown.options[i].text)
                     {
                         gameModeDropdown.SetValueWithoutNotify(i);
+                        break;
+                    }
+                }
+            }
+
+            // Set map select dropdown
+            if (mapSelectDropdown.options[mapSelectDropdown.value].text != ClientManager.Singleton.mapSelectionName.Value.ToString())
+            {
+                for (int i = 0; i < mapSelectDropdown.options.Count; i++)
+                {
+                    if (ClientManager.Singleton.mapSelectionName.Value.ToString() == mapSelectDropdown.options[i].text)
+                    {
+                        mapSelectDropdown.SetValueWithoutNotify(i);
                         break;
                     }
                 }
