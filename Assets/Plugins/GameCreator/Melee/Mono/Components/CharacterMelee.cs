@@ -15,6 +15,7 @@ namespace GameCreator.Melee
     using System.Reflection;
     using GameCreator.Camera;
     using LightPat.Core;
+    using MJM;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -134,6 +135,10 @@ namespace GameCreator.Melee
 
         private AbilityManager abilityManager;
         private GlowRenderer glowRenderer;
+
+    //ComboSystem temp implement
+    private MJMComboSystem mjmComboSystem;
+
         private LightPat.Player.NetworkPlayer networkPlayer;
 
         public bool isLunging = false;
@@ -142,6 +147,7 @@ namespace GameCreator.Melee
             new Keyframe(1f, 0f)
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -160,6 +166,10 @@ namespace GameCreator.Melee
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
             glowRenderer = GetComponentInChildren<GlowRenderer>();
+
+      //Combo System Implementation
+             mjmComboSystem = GetComponent<MJMComboSystem>();
+
             networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
@@ -366,6 +376,7 @@ namespace GameCreator.Melee
             {
                 HitQueueElement queueElement = hitQueue.Dequeue();
                 ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
+        //Hit 
             }
         }
 
@@ -567,6 +578,10 @@ namespace GameCreator.Melee
 
             if (!IsClient)
                 glowRenderer.RenderHit();
+
+            //Added hit
+                mjmComboSystem.AddCount(1);
+
             RenderHitClientRpc();
         }
 
