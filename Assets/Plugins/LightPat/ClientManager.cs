@@ -490,18 +490,6 @@ namespace LightPat.Core
                 string[] payloadOptions = payload.Split(payloadParseString);
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
-                if (clientId == 0)
-                {
-                    clientTeam = Team.Spectator;
-                }
-                else if (clientId == 1)
-                {
-                    clientTeam = Team.Red;
-                }
-                else if (clientId == 2)
-                {
-                    clientTeam = Team.Blue;
-                }
 
                 if (payloadOptions.Length == 3)
                 {
