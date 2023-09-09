@@ -224,9 +224,15 @@ namespace LightPat.UI
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
-            // Can't check if we are the client here, because the network manager may not be started yet if we are client
-            if (!NetworkManager.Singleton.IsServer)
+            if (NetworkManager.Singleton.IsServer)
+            {
+                ClientManager.Singleton.ResetAllClientData();
+            }
+            else
+            {
+                // Can't check if we are the client here, because the network manager may not be started yet if we are client
                 StartCoroutine(WaitForClientConnection());
+            }
         }
 
         private bool clientIsConnected = false;
