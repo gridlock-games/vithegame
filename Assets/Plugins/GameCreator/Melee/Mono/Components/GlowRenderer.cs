@@ -10,7 +10,7 @@ namespace GameCreator.Melee
         [SerializeField] private Material glowMaterial;
 
         private const float colorChangeSpeed = 2;
-        private const float fresnelPower = 0.7f;
+        private const float fresnelPower = 2.0f;
 
         private float lastHitTime = -5;
         public void RenderHit()
