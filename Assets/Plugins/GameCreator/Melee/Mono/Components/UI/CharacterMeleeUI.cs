@@ -123,7 +123,7 @@
                         if (this.melee == melee) { continue; }
 
                         Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
-                        //if (!teamIndicator.teamsAreActive) { continue; }
+                        if (!teamIndicator.teamsAreActive) { continue; }
                         if (playerTeam != localPlayerTeam) { continue; }
 
                         GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
