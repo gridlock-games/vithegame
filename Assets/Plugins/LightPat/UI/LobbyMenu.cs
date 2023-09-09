@@ -86,7 +86,7 @@ namespace LightPat.UI
 
                     ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
 
-                    if (server.type == 1)
+                    if (server.type == 1 & server.ip == NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address)
                     {
                         playerHubServer = server;
                         playerHubServerFound = true;
