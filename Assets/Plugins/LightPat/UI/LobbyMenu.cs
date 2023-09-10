@@ -86,7 +86,7 @@ namespace LightPat.UI
 
                     ClientManager.Server server = JsonUtility.FromJson<ClientManager.Server>(finalJsonElement);
 
-                    if (server.type == 1)
+                    if (server.type == 1 & server.ip == NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address)
                     {
                         playerHubServer = server;
                         playerHubServerFound = true;
@@ -224,9 +224,15 @@ namespace LightPat.UI
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
-            // Can't check if we are the client here, because the network manager may not be started yet if we are client
-            if (!NetworkManager.Singleton.IsServer)
+            if (NetworkManager.Singleton.IsServer)
+            {
+                ClientManager.Singleton.ResetAllClientData();
+            }
+            else
+            {
+                // Can't check if we are the client here, because the network manager may not be started yet if we are client
                 StartCoroutine(WaitForClientConnection());
+            }
         }
 
         private bool clientIsConnected = false;

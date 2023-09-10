@@ -4,12 +4,15 @@ using GameCreator.Melee;
 using UnityEngine.UI;
 using Unity.Netcode;
 using LightPat.Core;
+using System.Linq;
 
 namespace LightPat.UI
 {
     public class WorldSpaceLabel : MonoBehaviour
     {
         public TextMeshProUGUI nameDisplay;
+        public TextMeshProUGUI nameBackground;
+        public GameObject spectatorHotKeyInstance;
 
         public float rotationSpeed = 0.6f;
         public float animationSpeed = 0.1f;
@@ -71,10 +74,14 @@ namespace LightPat.UI
 
             if (teamIndicator)
             {
-                if (teamIndicator.teamsAreActive)
-                    nameDisplay.color = teamIndicator.teamColor;
+                if (teamIndicator.teamColor == Color.black)
+                {
+                    nameDisplay.color = Color.white;
+                }
                 else
+                {
                     nameDisplay.color = Color.black;
+                }
             }
 
             // Set world space label text to client name
@@ -86,6 +93,7 @@ namespace LightPat.UI
                     {
                         string clientName = ClientManager.Singleton.GetClient(netObj.OwnerClientId).clientName;
                         nameDisplay.SetText(clientName);
+                        nameBackground.SetText("<mark=#" + ColorUtility.ToHtmlStringRGBA(teamIndicator.teamColor) + "> " + clientName + " </mark>");
                         target.name = clientName;
                     }
                 }
@@ -99,7 +107,26 @@ namespace LightPat.UI
             if (Camera.main)
             {
                 // If we have a spectator camera as the main camera, disable the health bar portion of the world space label
-                healthSlider.gameObject.SetActive(!Camera.main.GetComponent<SpectatorCamera>());
+                if (Camera.main.GetComponent<SpectatorCamera>())
+                {
+                    GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
+                    for (int i = 0; i < localNetworkPlayers.Length; i++)
+                    {
+                        if (localNetworkPlayers[i] == melee.gameObject)
+                        {
+                            spectatorHotKeyInstance.GetComponentInChildren<Text>().text = (i + 1).ToString();
+                            break;
+                        }
+                    }
+
+                    spectatorHotKeyInstance.SetActive(true);
+                    healthSlider.gameObject.SetActive(false);
+                }
+                else
+                {
+                    spectatorHotKeyInstance.SetActive(false);
+                    healthSlider.gameObject.SetActive(true);
+                }
 
                 rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
                 transform.rotation = rotTarget;
