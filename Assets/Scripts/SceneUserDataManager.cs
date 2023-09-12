@@ -50,7 +50,14 @@ public class SceneUserDataManager : MonoBehaviour
         if (connectingToPlayerHub) { return; }
 
         string payloadString = "";
-        string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+        string displayName = "";
+        foreach (char c in System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData))
+        {
+            if (c.ToString() == ClientManager.GetPayLoadParseString()) { break; }
+            displayName += c;
+        }
+
+        Debug.Log(displayName);
 
         // Find player object by weapon type
         var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
