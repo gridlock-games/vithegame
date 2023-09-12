@@ -14,7 +14,7 @@ namespace UnityEngine
     public class IPManager : MonoBehaviour
     {
 
-        public string ServerAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        public string ServerAPIURL = "38.60.245.223/servers/duels";
         public string VMServerHost = GetIP(ADDRESSFAM.IPv4);
 
         public IEnumerator CheckAPI()
@@ -23,7 +23,7 @@ namespace UnityEngine
             {
                 yield return www.SendWebRequest();
 
-                string FailOverServerAPIURL = "http://" + GetIP(ADDRESSFAM.IPv4) + ":3000/servers/duels";
+                string FailOverServerAPIURL = "http://" + GetIP(ADDRESSFAM.IPv4) + "/servers/duels";
                 string FailOverVMServerHost = GetIP(ADDRESSFAM.IPv4);
 
                 // Please do not remove
