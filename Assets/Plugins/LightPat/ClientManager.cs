@@ -34,12 +34,13 @@ namespace LightPat.Core
 
         public Dictionary<ulong, GameObject> localNetworkPlayers = new Dictionary<ulong, GameObject>();
 
+        public IPManager iPManager { get; private set; } = new IPManager();
+
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
         private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
-        IPManager iPManager = new IPManager();
         private static readonly string payloadParseString = "|";
 
         public static ClientManager Singleton { get { return _singleton; } }

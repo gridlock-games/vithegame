@@ -13,8 +13,8 @@ namespace UnityEngine
 
     public class IPManager : MonoBehaviour
     {
-
         public string ServerAPIURL = "38.60.245.223/servers/duels";
+        //public string ServerAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
         public string VMServerHost = GetIP(ADDRESSFAM.IPv4);
 
         public IEnumerator CheckAPI()

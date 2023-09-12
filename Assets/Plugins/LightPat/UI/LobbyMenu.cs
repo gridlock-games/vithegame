@@ -161,6 +161,7 @@ namespace LightPat.UI
 
             playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab);
             playerModel.GetComponent<GameCreator.Melee.CharacterMelee>().enabled = false;
+            playerModel.GetComponent<Player.NetworkPlayer>().ChangeSkinWithoutSpawn(NetworkManager.Singleton.LocalClientId);
         }
 
         public void UpdateGameModeValue()
