@@ -173,6 +173,11 @@ namespace GameCreator.Melee
             networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
+        private void OnTransformChildrenChanged()
+        {
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
+        }
+
         // FOCUS TARGET: --------------------------------------------------------------------------
 
         public Transform characterCamera;
@@ -193,9 +198,6 @@ namespace GameCreator.Melee
 
         protected virtual void Update()
         {
-            if (SceneManager.GetActiveScene().name == "Hub")
-                SetInvincibility(1000);
-
             if (IsServer)
             {
                 this.UpdatePoise();
@@ -210,7 +212,6 @@ namespace GameCreator.Melee
 
                 return;
             }
-
 
             if (this.comboSystem != null)
             {
@@ -393,6 +394,8 @@ namespace GameCreator.Melee
 
         private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
+            if (SceneManager.GetActiveScene().name == "Hub") { return; }
+
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
             foreach (GameObject hit in hits)
