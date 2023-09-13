@@ -21,6 +21,7 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] public GameObject cameraPrefab;
     [SerializeField] private GameObject charDesc_Panel;
     [SerializeField] private Text charDesc_Name;
+    [SerializeField] private Text charDesc_Role;
     [SerializeField] private Text charDesc_Lore;
     [SerializeField] private Button charDesc_Select;
     [SerializeField] private GridLayoutGroup gridLayoutGroup;
@@ -291,6 +292,7 @@ public class SceneUserDataManager : MonoBehaviour
         Vector3 spawnPosition = startSpawnLoc.position;
 
         this.charDesc_Name.text = charDesc.characterName;
+        this.charDesc_Role.text = charDesc.chracterRole;
         this.charDesc_Lore.text = charDesc.characterDescription;
 
         // Store the selected game object
