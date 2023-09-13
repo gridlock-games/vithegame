@@ -38,7 +38,7 @@ namespace LightPat.Core
 
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
-        private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
+        private Dictionary<ulong, ClientData> queuedClientData = new Dictionary<ulong, ClientData>();
 
         private static ClientManager _singleton;
         private static readonly string payloadParseString = "|";
@@ -73,7 +73,7 @@ namespace LightPat.Core
             }
         }
 
-        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
+        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Add(clientId, clientData); }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
@@ -272,15 +272,17 @@ namespace LightPat.Core
         {
             yield return null;
             if (!IsServer) { yield break; }
-            KeyValuePair<ulong, ClientData> valuePair = queuedClientData.Dequeue();
-            clientDataDictionary.Add(valuePair.Key, valuePair.Value);
-            Debug.Log(valuePair.Value.clientName + " has connected. ID: " + clientId);
-            AddClientRpc(valuePair.Key, valuePair.Value);
+            ClientData clientData = queuedClientData[clientId];
+            clientDataDictionary.Add(clientId, clientData);
+            Debug.Log(clientData.clientName + " has connected. ID: " + clientId);
+            AddClientRpc(clientId, clientData);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
 
             if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
+
+            queuedClientData.Remove(clientId);
         }
 
         private bool updateServerStatusRunning;
