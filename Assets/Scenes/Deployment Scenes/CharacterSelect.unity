@@ -1566,11 +1566,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1089274679}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -421.14426, y: 38.6919}
+  m_AnchoredPosition: {x: -421.14426, y: -21}
   m_SizeDelta: {x: 842.2885, y: 77.3838}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &361319585
@@ -1761,7 +1761,7 @@ PrefabInstance:
     - target: {fileID: 5086427614570082174, guid: 15968a952eebbd7409be1ca42cd1d2ea,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 9.0001
+      value: 14.0249
       objectReference: {fileID: 0}
     - target: {fileID: 5086427614570082174, guid: 15968a952eebbd7409be1ca42cd1d2ea,
         type: 3}
@@ -2092,7 +2092,7 @@ RectTransform:
   - {fileID: 470912180}
   - {fileID: 280771509}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2979,6 +2979,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1352200402}
+  - {fileID: 1627807626}
   - {fileID: 361319584}
   m_Father: {fileID: 3713981612382867845}
   m_RootOrder: 3
@@ -3514,7 +3515,7 @@ RectTransform:
   - {fileID: 1708732463}
   - {fileID: 891128084}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -4905,6 +4906,102 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542784345}
   m_CullTransparentMesh: 1
+--- !u!1 &1627807625
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1627807626}
+  - component: {fileID: 1627807629}
+  - component: {fileID: 1627807628}
+  - component: {fileID: 1627807627}
+  m_Layer: 5
+  m_Name: charDesc_CharRole
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1627807626
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627807625}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1089274679}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -65}
+  m_SizeDelta: {x: 0, y: 87.2853}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1627807627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627807625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.17}
+  m_EffectDistance: {x: 4, y: -4}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1627807628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627807625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 79cb662f273c9614684a8b9febeeb553, type: 3}
+    m_FontSize: 25
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 60
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: role_name
+--- !u!222 &1627807629
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627807625}
+  m_CullTransparentMesh: 1
 --- !u!1 &1629675753
 GameObject:
   m_ObjectHideFlags: 0
@@ -5204,6 +5301,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bottom Bar (Large)
       objectReference: {fileID: 0}
+    - target: {fileID: 1727578327899442, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114336349040092264, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_Type
@@ -5287,7 +5388,7 @@ PrefabInstance:
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
@@ -5302,17 +5403,17 @@ PrefabInstance:
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 935.5725
+      value: -1.6304
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 773.1777
+      value: -94.8724
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
@@ -5352,12 +5453,12 @@ PrefabInstance:
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 24.4276
+      value: 12.213745
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -846
+      value: 23.038025
       objectReference: {fileID: 0}
     - target: {fileID: 224927077429217568, guid: c7a6dfafea927ca4c9b45f7ffe4e43e5,
         type: 3}
@@ -5834,7 +5935,7 @@ RectTransform:
   m_Children:
   - {fileID: 24432465}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -6646,6 +6747,7 @@ MonoBehaviour:
   charactersList:
   - id: 0
     characterName: Malakas
+    chracterRole: Bruiser, Combo
     characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
       sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     characterImage: {fileID: 21300000, guid: 30b5f5d9330c6b44c8b2b8584e6508a6, type: 3}
@@ -6653,6 +6755,7 @@ MonoBehaviour:
       type: 3}
   - id: 1
     characterName: Guinevere
+    chracterRole: Poke, Basic
     characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
       sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
@@ -6660,6 +6763,7 @@ MonoBehaviour:
       type: 3}
   - id: 2
     characterName: Lubu
+    chracterRole: Burst, Assassin
     characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
       sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     characterImage: {fileID: 21300000, guid: 51df2f4ae24cdbd43adf1b7a5a32737b, type: 3}
@@ -6667,6 +6771,7 @@ MonoBehaviour:
       type: 3}
   - id: 3
     characterName: Olaf
+    chracterRole: Tank, Bruiser
     characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
       sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     characterImage: {fileID: 21300000, guid: 48e416de610779544a02991e5672845d, type: 3}
@@ -6682,6 +6787,7 @@ MonoBehaviour:
     type: 3}
   charDesc_Panel: {fileID: 1280690888}
   charDesc_Name: {fileID: 1352200404}
+  charDesc_Role: {fileID: 1627807628}
   charDesc_Lore: {fileID: 361319586}
   charDesc_Select: {fileID: 1760707737}
   gridLayoutGroup: {fileID: 1404141723}
