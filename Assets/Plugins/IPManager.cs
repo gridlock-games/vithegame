@@ -65,6 +65,11 @@ namespace UnityEngine
 
         public static string GetIP(ADDRESSFAM Addfam)
         {
+            if (Application.isEditor)
+            {
+                return "127.0.0.1";
+            }
+
             //Return null if ADDRESSFAM is Ipv6 but Os does not support it
             if (Addfam == ADDRESSFAM.IPv6 && !Socket.OSSupportsIPv6)
             {

@@ -38,7 +38,6 @@ namespace LightPat.Core
 
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
-        private Dictionary<ulong, ClientData> queuedClientData = new Dictionary<ulong, ClientData>();
 
         private static ClientManager _singleton;
         private static readonly string payloadParseString = "|";
@@ -73,7 +72,13 @@ namespace LightPat.Core
             }
         }
 
-        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Add(clientId, clientData); }
+        private Dictionary<ulong, ClientData> queuedClientData = new Dictionary<ulong, ClientData>();
+        private Dictionary<ulong, NetworkManager.ConnectionApprovalResponse> queuedConnectionApprovalResponses = new Dictionary<ulong, NetworkManager.ConnectionApprovalResponse>();
+        public void QueueClient(NetworkManager.ConnectionApprovalResponse response, ulong clientId, ClientData clientData)
+        {
+            queuedClientData.Add(clientId, clientData);
+            queuedConnectionApprovalResponses.Add(clientId, response);
+        }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
@@ -90,6 +95,8 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
+
+                NetworkManager.NetworkTickSystem.Tick += ProcessConnectingClientsQueue;
             }
         }
 
@@ -99,6 +106,21 @@ namespace LightPat.Core
             randomSeed.OnValueChanged -= OnRandomSeedChange;
 
             clientDataDictionary = new Dictionary<ulong, ClientData>();
+
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick -= ProcessConnectingClientsQueue;
+            }
+        }
+
+        private void ProcessConnectingClientsQueue()
+        {
+            if (queuedConnectionApprovalResponses.Count > 0 & !clientConnectingInProgress)
+            {
+                var approvalPair = queuedConnectionApprovalResponses.First();
+                StartCoroutine(ClientConnectCallback(approvalPair.Key, approvalPair.Value));
+                queuedConnectionApprovalResponses.Remove(approvalPair.Key);
+            }
         }
 
         private void OnRandomSeedChange(int prev, int current) { Random.InitState(current); }
@@ -170,7 +192,7 @@ namespace LightPat.Core
             NetworkManager.Singleton.AddNetworkPrefab(spectatorPrefab);
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); Random.InitState(randomSeed.Value); };
+            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { Random.InitState(randomSeed.Value); }; // StartCoroutine(ClientConnectCallback(id));
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); Random.InitState(randomSeed.Value); };
 
             SceneManager.sceneLoaded += OnSceneLoad;
@@ -268,12 +290,16 @@ namespace LightPat.Core
         }
 
         [SerializeField] private string[] sceneNamesToSpawnPlayerOnConnect;
-        private IEnumerator ClientConnectCallback(ulong clientId)
+        private bool clientConnectingInProgress;
+        private IEnumerator ClientConnectCallback(ulong clientId, NetworkManager.ConnectionApprovalResponse response)
         {
+            response.Pending = false;
+            clientConnectingInProgress = true;
             yield return null;
             if (!IsServer) { yield break; }
             ClientData clientData = queuedClientData[clientId];
             clientDataDictionary.Add(clientId, clientData);
+            queuedClientData.Remove(clientId);
             Debug.Log(clientData.clientName + " has connected. ID: " + clientId);
             AddClientRpc(clientId, clientData);
             SynchronizeClientDictionaries();
@@ -282,7 +308,7 @@ namespace LightPat.Core
             if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
 
-            queuedClientData.Remove(clientId);
+            clientConnectingInProgress = false;
         }
 
         private bool updateServerStatusRunning;
@@ -455,6 +481,8 @@ namespace LightPat.Core
 
         void ClientDisconnectCallback(ulong clientId)
         {
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
+
             Debug.Log(clientDataDictionary[clientId].clientName + " has disconnected. ID: " + clientId);
             if (!IsServer) { return; }
             clientDataDictionary.Remove(clientId);
@@ -486,7 +514,7 @@ namespace LightPat.Core
 
             // If additional approval steps are needed, set this to true until the additional steps are complete
             // once it transitions from true to false the connection approval response will be processed.
-            response.Pending = false;
+            response.Pending = true;
 
             if (response.Approved)
             {
@@ -497,15 +525,15 @@ namespace LightPat.Core
 
                 if (payloadOptions.Length == 3)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
                 }
                 else if (payloadOptions.Length == 2)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
                 }
                 else
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], 0, 0, clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], 0, 0, clientTeam));
                 }
             }
         }
