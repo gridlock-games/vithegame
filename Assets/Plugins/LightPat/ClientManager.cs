@@ -595,6 +595,7 @@ namespace LightPat.Core
         [ServerRpc(RequireOwnership = false)]
         public void ChangePlayerPrefabOptionServerRpc(ulong clientId, int newPlayerPrefabIndex)
         {
+            Debug.Log(clientDataDictionary[clientId].playerPrefabOptionIndex + " " + newPlayerPrefabIndex);
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangePlayerPrefabOption(newPlayerPrefabIndex);
             SynchronizeClientDictionaries();
         }
@@ -776,6 +777,13 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.playerPrefabOptionIndex = newOption;
+            return copy;
+        }
+
+        public ClientData ChangePlayerSkinOption(int newSkinIndex)
+        {
+            ClientData copy = this;
+            copy.skinIndex = newSkinIndex;
             return copy;
         }
 

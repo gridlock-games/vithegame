@@ -152,6 +152,13 @@ namespace LightPat.UI
             ClientManager.Singleton.ChangeSpawnWeaponsServerRpc(localClientId, new int[] { primaryWeaponDropdown.value, secondaryWeaponDropdown.value, tertiaryWeaponDropdown.value });
         }
 
+        public void UpdatePlayerModelChoice()
+        {
+            if (!NetworkManager.Singleton.IsClient) { return; }
+            Debug.Log(playerModelDropdown.value);
+            ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(NetworkManager.Singleton.LocalClientId, playerModelDropdown.value);
+        }
+
         public void UpdatePlayerDisplay()
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
@@ -159,7 +166,7 @@ namespace LightPat.UI
             if (playerModel)
                 Destroy(playerModel);
 
-            playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab);
+            playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[playerModelDropdown.value].playerPrefab);
             playerModel.GetComponent<GameCreator.Melee.CharacterMelee>().enabled = false;
             playerModel.GetComponent<Player.NetworkPlayer>().ChangeSkinWithoutSpawn(NetworkManager.Singleton.LocalClientId);
         }
@@ -203,13 +210,13 @@ namespace LightPat.UI
             gameModeDropdown.ClearOptions();
             gameModeDropdown.AddOptions(gameModes);
 
-            //List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
-            //foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
-            //{
-            //    playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
-            //}
-            //playerModelDropdown.ClearOptions();
-            //playerModelDropdown.AddOptions(playerModelOptions);
+            List<TMP_Dropdown.OptionData> playerModelOptions = new List<TMP_Dropdown.OptionData>();
+            foreach (var playerModelOption in ClientManager.Singleton.GetPlayerModelOptions())
+            {
+                playerModelOptions.Add(new TMP_Dropdown.OptionData(playerModelOption.name));
+            }
+            playerModelDropdown.ClearOptions();
+            playerModelDropdown.AddOptions(playerModelOptions);
 
             //List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
             //foreach (Weapon weapon in ClientManager.Singleton.weaponPrefabOptions)
@@ -264,6 +271,11 @@ namespace LightPat.UI
                 gameModeDropdown.interactable = false;
                 mapSelectDropdown.interactable = false;
             }
+
+            //if (playerModelDropdown.value != ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex)
+            //{
+            //    UpdatePlayerDisplay();
+            //}
 
             // Set game mode dropdown
             if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.gameMode.Value.ToString())
