@@ -16,12 +16,9 @@ namespace LightPat.Core
         private string stack;
         private bool enableDisplay;
 
-        private string filename;
-
         private void Start()
         {
             DontDestroyOnLoad(gameObject);
-            filename = Application.dataPath + "/ConsoleLog.txt";
         }
 
         void OnEnable()
@@ -36,10 +33,6 @@ namespace LightPat.Core
 
         public void Log(string logString, string stackTrace, LogType type)
         {
-            TextWriter tw = new StreamWriter(filename, true);
-            tw.WriteLine("[" + System.DateTime.Now + "] " + logString + " --- " + stackTrace);
-            tw.Close();
-
             if (ignoreInfo) { if (type == LogType.Log) { return; } }
             if (ignoreWarnings) { if (type == LogType.Warning) { return; } }
             if (ignoreErrors) { if (type == LogType.Error) { return; } }

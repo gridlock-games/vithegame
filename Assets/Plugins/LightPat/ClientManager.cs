@@ -117,9 +117,8 @@ namespace LightPat.Core
         {
             if (queuedConnectionApprovalResponses.Count > 0 & !clientConnectingInProgress)
             {
-                var approvalPair = queuedConnectionApprovalResponses.First();
-                StartCoroutine(ProcessConnectionRequest(approvalPair.Key, approvalPair.Value));
-                queuedConnectionApprovalResponses.Remove(approvalPair.Key);
+                StartCoroutine(ProcessConnectionRequest(clientApprovalRunningClientID, queuedConnectionApprovalResponses[clientApprovalRunningClientID]));
+                queuedConnectionApprovalResponses.Remove(clientApprovalRunningClientID);
             }
         }
 
@@ -304,8 +303,6 @@ namespace LightPat.Core
             AddClientRpc(clientId, clientData);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
-
-            clientConnectingInProgress = false;
         }
 
         private bool updateServerStatusRunning;
@@ -482,10 +479,28 @@ namespace LightPat.Core
             Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
             if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
             else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
+
+            clientConnectingInProgress = false;
+            clientApprovalRunning = false;
         }
 
         void ClientDisconnectCallback(ulong clientId)
         {
+            if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
+            {
+                Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
+                StartCoroutine(RestartNetworkManager());
+            }
+
+            if (IsServer)
+            {
+                if (clientId == clientApprovalRunningClientID)
+                {
+                    clientConnectingInProgress = false;
+                    clientApprovalRunning = false;
+                }
+            }
+
             if (!clientDataDictionary.ContainsKey(clientId)) { return; }
 
             Debug.Log(clientDataDictionary[clientId].clientName + " has disconnected. ID: " + clientId);
@@ -495,9 +510,32 @@ namespace LightPat.Core
             RemoveClientRpc(clientId);
         }
 
+        private IEnumerator RestartNetworkManager()
+        {
+            yield return new WaitUntil(() => NetworkManager.StartClient());
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            Debug.Log("Started Client at " + networkTransport.ConnectionData.Address + ". Port: " + networkTransport.ConnectionData.Port);
+        }
+
         [SerializeField] string[] approvalCheckScenesCompetitorTeam;
+        private bool clientApprovalRunning = false;
+        private ulong clientApprovalRunningClientID;
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
+            if (clientApprovalRunning)
+            {
+                response.Approved = false;
+                response.Reason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in";
+            }
+            else
+            {
+                clientApprovalRunning = true;
+                response.Approved = true;
+                response.Reason = string.Empty;
+                clientApprovalRunningClientID = request.ClientNetworkId;
+            }
+
             // The client identifier to be authenticated
             var clientId = request.ClientNetworkId;
 
@@ -505,7 +543,6 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = true;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -519,7 +556,7 @@ namespace LightPat.Core
 
             // If additional approval steps are needed, set this to true until the additional steps are complete
             // once it transitions from true to false the connection approval response will be processed.
-            response.Pending = true;
+            response.Pending = response.Approved;
 
             if (response.Approved)
             {
@@ -663,6 +700,7 @@ namespace LightPat.Core
         private void SpawnPlayer(ulong clientId)
         {
             if (!IsServer) { Debug.LogError("SpawnPlayer() should only be called from the server!"); return; }
+            Debug.Log("Spawning player object for Id: " + clientId);
 
             clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
             SynchronizeClientDictionaries();
