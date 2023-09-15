@@ -137,7 +137,7 @@ namespace GameCreator.Melee
         private GlowRenderer glowRenderer;
 
     //ComboSystem temp implement
-    private MJMComboSystem mjmComboSystem;
+    public MJMComboSystem mjmComboSystem;
 
         private LightPat.Player.NetworkPlayer networkPlayer;
 
@@ -375,7 +375,7 @@ namespace GameCreator.Melee
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
             {
-                HitQueueElement queueElement = hitQueue.Dequeue();
+        HitQueueElement queueElement = hitQueue.Dequeue();
                 ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
         //Hit 
             }
@@ -468,7 +468,8 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
-                    targetMelee.HP.Value -= attack.baseDamage;
+          mjmComboSystem.AddCount(1);
+          targetMelee.HP.Value -= attack.baseDamage;
                     targetMelee.RenderHit();
 
                 }
@@ -580,10 +581,8 @@ namespace GameCreator.Melee
             if (!IsServer) { Debug.LogError("RenderHit() should only be called from the server"); return; }
 
             if (!IsClient)
-                glowRenderer.RenderHit();
-
-            //Added hit
-                mjmComboSystem.AddCount(1);
+       glowRenderer.RenderHit();
+                
 
             RenderHitClientRpc();
         }

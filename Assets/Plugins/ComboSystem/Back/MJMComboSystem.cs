@@ -1,5 +1,6 @@
 namespace MJM
 {
+  using GameCreator.Melee;
   using System;
   using System.Collections;
   using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace MJM
 
   public class MJMComboSystem : MonoBehaviour
   {
+    [SerializeField] private CharacterMelee _characterMelee;
     //UI
     private int comboCount;
     public ComboEvent onCounterUpdate;
