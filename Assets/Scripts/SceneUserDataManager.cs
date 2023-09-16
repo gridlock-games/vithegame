@@ -10,6 +10,7 @@ using GameCreator.Melee;
 using UnityEngine.Networking;
 using System.Collections;
 using GameCreator.Characters;
+using UnityEngine.Rendering;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -202,6 +203,11 @@ public class SceneUserDataManager : MonoBehaviour
     private void Update()
     {
         charDesc_Select.gameObject.SetActive(playerHubServerList.Count > 0);
+
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null & playerHubServerList.Count > 0)
+        {
+            ConnectToPlayerHub();
+        }
     }
 
     private void InitDataReferences()

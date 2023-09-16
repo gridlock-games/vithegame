@@ -101,6 +101,8 @@
 
         private void UpdateTeammateHPUI()
         {
+            if (!melee.IsSpawned) { return; }
+
             string playersString = "";
             foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
             {

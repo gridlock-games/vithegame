@@ -38,7 +38,6 @@ namespace LightPat.Core
 
         private NetworkVariable<int> randomSeed = new NetworkVariable<int>();
         private Dictionary<ulong, ClientData> clientDataDictionary = new Dictionary<ulong, ClientData>();
-        private Queue<KeyValuePair<ulong, ClientData>> queuedClientData = new Queue<KeyValuePair<ulong, ClientData>>();
 
         private static ClientManager _singleton;
         private static readonly string payloadParseString = "|";
@@ -73,7 +72,13 @@ namespace LightPat.Core
             }
         }
 
-        public void QueueClient(ulong clientId, ClientData clientData) { queuedClientData.Enqueue(new KeyValuePair<ulong, ClientData>(clientId, clientData)); }
+        private Dictionary<ulong, ClientData> queuedClientData = new Dictionary<ulong, ClientData>();
+        private Dictionary<ulong, NetworkManager.ConnectionApprovalResponse> queuedConnectionApprovalResponses = new Dictionary<ulong, NetworkManager.ConnectionApprovalResponse>();
+        public void QueueClient(NetworkManager.ConnectionApprovalResponse response, ulong clientId, ClientData clientData)
+        {
+            queuedClientData.Add(clientId, clientData);
+            queuedConnectionApprovalResponses.Add(clientId, response);
+        }
 
         [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
 
@@ -90,6 +95,8 @@ namespace LightPat.Core
             {
                 RefreshLobbyLeader();
                 randomSeed.Value = Random.Range(0, 100);
+
+                NetworkManager.NetworkTickSystem.Tick += ProcessConnectingClientsQueue;
             }
         }
 
@@ -99,6 +106,20 @@ namespace LightPat.Core
             randomSeed.OnValueChanged -= OnRandomSeedChange;
 
             clientDataDictionary = new Dictionary<ulong, ClientData>();
+
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick -= ProcessConnectingClientsQueue;
+            }
+        }
+
+        private void ProcessConnectingClientsQueue()
+        {
+            if (queuedConnectionApprovalResponses.Count > 0 & !clientConnectingInProgress)
+            {
+                StartCoroutine(ProcessConnectionRequest(clientApprovalRunningClientID, queuedConnectionApprovalResponses[clientApprovalRunningClientID]));
+                queuedConnectionApprovalResponses.Remove(clientApprovalRunningClientID);
+            }
         }
 
         private void OnRandomSeedChange(int prev, int current) { Random.InitState(current); }
@@ -170,7 +191,7 @@ namespace LightPat.Core
             NetworkManager.Singleton.AddNetworkPrefab(spectatorPrefab);
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { StartCoroutine(ClientConnectCallback(id)); Random.InitState(randomSeed.Value); };
+            NetworkManager.Singleton.OnClientConnectedCallback += (id) => { ClientConnectCallback(id); Random.InitState(randomSeed.Value); };
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) => { ClientDisconnectCallback(id); Random.InitState(randomSeed.Value); };
 
             SceneManager.sceneLoaded += OnSceneLoad;
@@ -268,19 +289,20 @@ namespace LightPat.Core
         }
 
         [SerializeField] private string[] sceneNamesToSpawnPlayerOnConnect;
-        private IEnumerator ClientConnectCallback(ulong clientId)
+        private bool clientConnectingInProgress;
+        private IEnumerator ProcessConnectionRequest(ulong clientId, NetworkManager.ConnectionApprovalResponse response)
         {
+            response.Pending = false;
+            clientConnectingInProgress = true;
             yield return null;
             if (!IsServer) { yield break; }
-            KeyValuePair<ulong, ClientData> valuePair = queuedClientData.Dequeue();
-            clientDataDictionary.Add(valuePair.Key, valuePair.Value);
-            Debug.Log(valuePair.Value.clientName + " has connected. ID: " + clientId);
-            AddClientRpc(valuePair.Key, valuePair.Value);
+            ClientData clientData = queuedClientData[clientId];
+            clientDataDictionary.Add(clientId, clientData);
+            queuedClientData.Remove(clientId);
+            Debug.Log(clientData.clientName + "'s connection has been approved. ID: " + clientId);
+            AddClientRpc(clientId, clientData);
             SynchronizeClientDictionaries();
             if (lobbyLeaderId.Value == 0) { RefreshLobbyLeader(); }
-
-            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
-            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
         }
 
         private bool updateServerStatusRunning;
@@ -451,8 +473,36 @@ namespace LightPat.Core
             }
         }
 
+        private void ClientConnectCallback(ulong clientId)
+        {
+            if (!IsServer) { return; }
+            Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
+            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
+            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
+
+            clientConnectingInProgress = false;
+            clientApprovalRunning = false;
+        }
+
         void ClientDisconnectCallback(ulong clientId)
         {
+            if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
+            {
+                Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
+                StartCoroutine(RestartNetworkManager());
+            }
+
+            if (IsServer)
+            {
+                if (clientId == clientApprovalRunningClientID)
+                {
+                    clientConnectingInProgress = false;
+                    clientApprovalRunning = false;
+                }
+            }
+
+            if (!clientDataDictionary.ContainsKey(clientId)) { return; }
+
             Debug.Log(clientDataDictionary[clientId].clientName + " has disconnected. ID: " + clientId);
             if (!IsServer) { return; }
             clientDataDictionary.Remove(clientId);
@@ -460,9 +510,32 @@ namespace LightPat.Core
             RemoveClientRpc(clientId);
         }
 
+        private IEnumerator RestartNetworkManager()
+        {
+            yield return new WaitUntil(() => NetworkManager.StartClient());
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            Debug.Log("Started Client at " + networkTransport.ConnectionData.Address + ". Port: " + networkTransport.ConnectionData.Port);
+        }
+
         [SerializeField] string[] approvalCheckScenesCompetitorTeam;
+        private bool clientApprovalRunning = false;
+        private ulong clientApprovalRunningClientID;
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
+            if (clientApprovalRunning)
+            {
+                response.Approved = false;
+                response.Reason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in";
+            }
+            else
+            {
+                clientApprovalRunning = true;
+                response.Approved = true;
+                response.Reason = string.Empty;
+                clientApprovalRunningClientID = request.ClientNetworkId;
+            }
+
             // The client identifier to be authenticated
             var clientId = request.ClientNetworkId;
 
@@ -470,7 +543,6 @@ namespace LightPat.Core
             var connectionData = request.Payload;
 
             // Your approval logic determines the following values
-            response.Approved = true;
             response.CreatePlayerObject = false;
 
             // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
@@ -484,7 +556,7 @@ namespace LightPat.Core
 
             // If additional approval steps are needed, set this to true until the additional steps are complete
             // once it transitions from true to false the connection approval response will be processed.
-            response.Pending = false;
+            response.Pending = response.Approved;
 
             if (response.Approved)
             {
@@ -495,15 +567,15 @@ namespace LightPat.Core
 
                 if (payloadOptions.Length == 3)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
                 }
                 else if (payloadOptions.Length == 2)
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), 0, clientTeam));
                 }
                 else
                 {
-                    QueueClient(clientId, new ClientData(payloadOptions[0], 0, 0, clientTeam));
+                    QueueClient(response, clientId, new ClientData(payloadOptions[0], 0, 0, clientTeam));
                 }
             }
         }
@@ -523,6 +595,7 @@ namespace LightPat.Core
         [ServerRpc(RequireOwnership = false)]
         public void ChangePlayerPrefabOptionServerRpc(ulong clientId, int newPlayerPrefabIndex)
         {
+            Debug.Log(clientDataDictionary[clientId].playerPrefabOptionIndex + " " + newPlayerPrefabIndex);
             clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangePlayerPrefabOption(newPlayerPrefabIndex);
             SynchronizeClientDictionaries();
         }
@@ -628,6 +701,7 @@ namespace LightPat.Core
         private void SpawnPlayer(ulong clientId)
         {
             if (!IsServer) { Debug.LogError("SpawnPlayer() should only be called from the server!"); return; }
+            Debug.Log("Spawning player object for Id: " + clientId);
 
             clientDataDictionary[clientId] = clientDataDictionary[clientId].SetReady(false);
             SynchronizeClientDictionaries();
@@ -703,6 +777,13 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.playerPrefabOptionIndex = newOption;
+            return copy;
+        }
+
+        public ClientData ChangePlayerSkinOption(int newSkinIndex)
+        {
+            ClientData copy = this;
+            copy.skinIndex = newSkinIndex;
             return copy;
         }
 
