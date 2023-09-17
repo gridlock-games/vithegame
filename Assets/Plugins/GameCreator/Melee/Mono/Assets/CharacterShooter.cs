@@ -57,6 +57,8 @@ public class CharacterShooter : NetworkBehaviour
         if (melee == null) return;
         if (melee.IsBlocking) return;
         if (melee.IsStaggered) return;
+        if (melee.IsCastingAbility) return;
+        if (melee.Character.isCharacterDashing()) return;
         if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
 
@@ -68,10 +70,8 @@ public class CharacterShooter : NetworkBehaviour
         {
             this.isAimedDown = false;
         }
-
-        if(!melee.Character.isCharacterDashing()) {
-            PerformAimDownSight(isAimedDown);
-        }
+        
+        PerformAimDownSight(isAimedDown);
     }
 
     private void PerformAimDownSight(bool isAimDown)
