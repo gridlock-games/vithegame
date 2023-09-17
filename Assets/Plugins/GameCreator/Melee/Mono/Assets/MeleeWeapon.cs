@@ -4,7 +4,7 @@ namespace GameCreator.Melee
 {
     using System;
     using System.Collections;
-	using System.Collections.Generic;
+    using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.UI;
     using GameCreator.Characters;
@@ -14,7 +14,7 @@ namespace GameCreator.Melee
 
     [CreateAssetMenu(fileName = "Melee Weapon", menuName = "Game Creator/Melee/Melee Weapon")]
     public class MeleeWeapon : ScriptableObject
-	{
+    {
         public enum WeaponBone
         {
             Root = -1,
@@ -41,14 +41,14 @@ namespace GameCreator.Melee
         // general:
         [LocStringNoPostProcess] public LocString weaponName = new LocString("Weapon Name");
         [LocStringNoPostProcess] public LocString weaponDescription = new LocString("Weapon Description");
-        
+
         public string meleeWeaponName;
-        
+
         public MeleeShield defaultShield;
         public CharacterState characterState;
         public AvatarMask characterMask;
         public Sprite weaponImage;
-        
+
 
         // 3d model:
         public List<WeaponModel> weaponModels = new List<WeaponModel>();
@@ -129,8 +129,8 @@ namespace GameCreator.Melee
             var weaponObjectsList = (from item in weaponModels from obj in item.weaponModelDatas select obj).ToList();
 
             var instances = new List<GameObject>();
-        
-            
+
+
             //if (weaponObjectsList.Count == 0) return null;
             if (character == null) return null;
 
@@ -139,38 +139,41 @@ namespace GameCreator.Melee
                 GameObject instance = Instantiate(model.prefabWeapon);
                 instances.Add(instance);
                 instance.transform.localScale = model.prefabWeapon.transform.localScale;
-                
+
                 Transform bone = null;
                 switch (model.attachmentWeapon)
                 {
                     case WeaponBone.Root:
                         bone = character.transform;
                         break;
-        
+
                     case WeaponBone.Camera:
                         bone = HookCamera.Instance.transform;
                         break;
-        
+
                     default:
                         bone = character.animator.GetBoneTransform((HumanBodyBones)model.attachmentWeapon);
                         break;
-        
+
                 }
-        
+
                 if (!bone) return null;
-                instance.transform.SetParent(bone);
-                instance.transform.localPosition = model.positionOffsetWeapon;
-                instance.transform.localRotation = Quaternion.Euler(model.rotationOffsetWeapon);
+                if (instance != null)
+                {
+                    instance.transform.SetParent(bone);
+                    instance.transform.localPosition = model.positionOffsetWeapon;
+                    instance.transform.localRotation = Quaternion.Euler(model.rotationOffsetWeapon);
+                }
             }
-            
+
             return instances;
         }
-        
+
         public GameObject EquipWeapon(CharacterAnimator character)
         {
             if (this.prefab == null) return null;
             if (character == null) return null;
-            
+
             Transform bone = null;
             switch (this.attachment)
             {
@@ -212,7 +215,8 @@ namespace GameCreator.Melee
                 if (this.knockupReaction.Count != 1 && index == this.prevRandomHit) index++;
                 this.prevRandomHit = index;
 
-                switch(location) {
+                switch (location)
+                {
                     case HitLocation.RightMiddle:
                         return this.knockupReaction[4];
 
@@ -221,7 +225,7 @@ namespace GameCreator.Melee
 
                     case HitLocation.BackMiddle:
                         return this.knockupReaction[5];
-                        
+
                     default:
                         return this.knockupReaction[index];
                 }
@@ -237,7 +241,8 @@ namespace GameCreator.Melee
             }
 
 
-            switch(location) {
+            switch (location)
+            {
                 case HitLocation.LeftMiddle:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsLeftMiddle.Count - 1);
                     meleeClip = this.groundHitReactionsLeftMiddle[index];
@@ -263,7 +268,7 @@ namespace GameCreator.Melee
 
                     meleeClip = this.groundHitReactionsBehind[index];
                     break;
-                
+
                 default:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
 

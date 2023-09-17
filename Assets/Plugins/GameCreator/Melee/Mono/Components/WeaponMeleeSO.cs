@@ -25,4 +25,5 @@ public enum WeaponType
     SWORD,
     DAGGER,
     BRAWLER,
+    CROSSBOW
 }
