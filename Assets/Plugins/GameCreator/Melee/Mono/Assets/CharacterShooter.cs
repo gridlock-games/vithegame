@@ -14,14 +14,6 @@ using GameCreator.Melee;
 
 public class CharacterShooter : NetworkBehaviour
 {
-
-    public enum ProjectileType
-    {
-        Bullet,
-        Grenade
-    }
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private ProjectileType projectileType = ProjectileType.Bullet;
     [SerializeField] private int clipSize;
     [SerializeField] private int magCapacity;
     [SerializeField] private float reloadTime;
