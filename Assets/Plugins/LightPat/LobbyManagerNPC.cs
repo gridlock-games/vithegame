@@ -255,7 +255,7 @@ namespace LightPat.Core
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Lobby Server Build\template-tps.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Lobby Server Build\VitheGame.exe";
             }
             else
             {
@@ -263,7 +263,7 @@ namespace LightPat.Core
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "template-tps.exe" : "template-tps.x86_64");
+                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
             }
 
             System.Diagnostics.Process.Start(path);
@@ -331,7 +331,7 @@ namespace LightPat.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() " + getRequest.error);
+                Debug.LogError("Get Request Error in LobbyManagerNPCInteractable.RefreshServerList() - " + iPManager.ServerAPIURL + " - " + getRequest.error);
                 refreshServerListRunning = false;
                 yield break;
             }

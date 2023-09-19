@@ -10,6 +10,7 @@ using GameCreator.Melee;
 using UnityEngine.Networking;
 using System.Collections;
 using GameCreator.Characters;
+using UnityEngine.Rendering;
 
 public class SceneUserDataManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class SceneUserDataManager : MonoBehaviour
     [SerializeField] public GameObject cameraPrefab;
     [SerializeField] private GameObject charDesc_Panel;
     [SerializeField] private Text charDesc_Name;
+    [SerializeField] private Text charDesc_Role;
     [SerializeField] private Text charDesc_Lore;
     [SerializeField] private Button charDesc_Select;
     [SerializeField] private GridLayoutGroup gridLayoutGroup;
@@ -50,7 +52,14 @@ public class SceneUserDataManager : MonoBehaviour
         if (connectingToPlayerHub) { return; }
 
         string payloadString = "";
-        string displayName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+        string displayName = "";
+        foreach (char c in System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData))
+        {
+            if (c.ToString() == ClientManager.GetPayLoadParseString()) { break; }
+            displayName += c;
+        }
+
+        Debug.Log(displayName);
 
         // Find player object by weapon type
         var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
@@ -194,6 +203,11 @@ public class SceneUserDataManager : MonoBehaviour
     private void Update()
     {
         charDesc_Select.gameObject.SetActive(playerHubServerList.Count > 0);
+
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null & playerHubServerList.Count > 0)
+        {
+            ConnectToPlayerHub();
+        }
     }
 
     private void InitDataReferences()
@@ -284,6 +298,7 @@ public class SceneUserDataManager : MonoBehaviour
         Vector3 spawnPosition = startSpawnLoc.position;
 
         this.charDesc_Name.text = charDesc.characterName;
+        this.charDesc_Role.text = charDesc.chracterRole;
         this.charDesc_Lore.text = charDesc.characterDescription;
 
         // Store the selected game object

@@ -6,6 +6,7 @@
     using UnityEngine.UI;
     using GameCreator.Core;
     using LightPat.Core;
+    using LightPat.Player;
 
     [AddComponentMenu("UI/Game Creator/Character Melee UI", 0)]
     public class CharacterMeleeUI : MonoBehaviour
@@ -33,10 +34,13 @@
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
+        private TeamIndicator teamIndicator;
+
         private void Start()
         {
             melee = GetComponentInParent<CharacterMelee>();
             abilityManager = GetComponentInParent<AbilityManager>();
+            teamIndicator = GetComponentInParent<TeamIndicator>();
         }
 
         private void Update()
@@ -97,10 +101,13 @@
 
         private void UpdateTeammateHPUI()
         {
+            if (!melee.IsSpawned) { return; }
+	    if (!ClientManager.Singleton) { return; }
+
             string playersString = "";
             foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
             {
-                playersString += kvp.Key.ToString() + kvp.Value.ToString();
+                playersString += kvp.Key.ToString() + kvp.Value.ToString() + ClientManager.Singleton.GetClient(kvp.Key).team.ToString();
             }
 
             if (lastPlayersString != playersString)
@@ -111,6 +118,7 @@
                 }
 
                 int counter = 0;
+                Team localPlayerTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
                 foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
                 {
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
@@ -118,8 +126,8 @@
                         if (this.melee == melee) { continue; }
 
                         Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
-                        if (playerTeam != Team.Red & playerTeam != Team.Blue) { continue; }
-                        if (playerTeam != ClientManager.Singleton.GetClient(melee.OwnerClientId).team) { continue; }
+                        if (!teamIndicator.teamsAreActive) { continue; }
+                        if (playerTeam != localPlayerTeam) { continue; }
 
                         GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
                         playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true);

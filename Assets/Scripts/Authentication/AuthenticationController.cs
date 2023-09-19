@@ -55,7 +55,14 @@ public class AuthenticationController : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
         {
             // StartCoroutine(StartServer(IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString()));
-            StartCoroutine(StartServer(iPManager.VMServerHost));
+            if (isHubInBuild & isLobbyInBuild)
+            {
+                StoreClient("Headless Client");
+            }
+            else
+            {
+                StartCoroutine(StartServer(iPManager.VMServerHost));
+            }
         }
         else // If we are not a headless build
         {
@@ -288,6 +295,6 @@ public class AuthenticationController : MonoBehaviour
     {
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(displayName.Replace(ClientManager.GetPayLoadParseString(), ""));
 
-        SceneManager.LoadScene("Intro");
+        SceneManager.LoadScene(SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null ? "CharacterSelect" : "Intro");
     }
 }

@@ -75,6 +75,7 @@ namespace LightPat.Player
 
         private IEnumerator WaitForClientConnection()
         {
+	    if (!ClientManager.Singleton) { yield break; }
             yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(OwnerClientId));
 
             if (!IsLocalPlayer)
@@ -86,8 +87,14 @@ namespace LightPat.Player
             ClientManager.Singleton.localNetworkPlayers.Add(OwnerClientId, gameObject);
         }
 
+        public void ChangeSkinWithoutSpawn(ulong clientId)
+        {
+            GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(clientId).playerPrefabOptionIndex].skinOptions[ClientManager.Singleton.GetClient(clientId).skinIndex]);
+        }
+
         private IEnumerator ChangeSkin()
         {
+	    if (!ClientManager.Singleton) { yield break; }
             yield return new WaitUntil(() => ClientManager.Singleton.GetClientDataDictionary().ContainsKey(OwnerClientId));
             // Change player skin
             GetComponent<CharacterAnimator>().ChangeModel(ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(OwnerClientId).playerPrefabOptionIndex].skinOptions[ClientManager.Singleton.GetClient(OwnerClientId).skinIndex]);

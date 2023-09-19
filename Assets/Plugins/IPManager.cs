@@ -13,8 +13,8 @@ namespace UnityEngine
 
     public class IPManager : MonoBehaviour
     {
-
-        public string ServerAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
+        public string ServerAPIURL = "38.60.245.223/servers/duels";
+        // public string ServerAPIURL = "172.21.48.1/servers/duels";
         public string VMServerHost = GetIP(ADDRESSFAM.IPv4);
 
         public IEnumerator CheckAPI()
@@ -42,8 +42,9 @@ namespace UnityEngine
                     if (www.responseCode == 200)
                     {
                         Debug.Log("API request successful (Status 200).");
-                        this.ServerAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/servers/duels";
-                        this.VMServerHost = IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString();
+                        this.ServerAPIURL = "38.60.245.223/servers/duels";
+                        this.VMServerHost = GetIP(ADDRESSFAM.IPv4);
+                        // this.VMServerHost = IPAddress.Parse(new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim()).ToString();
                         // Do nothing
                     }
                     else
@@ -64,6 +65,11 @@ namespace UnityEngine
 
         public static string GetIP(ADDRESSFAM Addfam)
         {
+            if (Application.isEditor)
+            {
+                return "127.0.0.1";
+            }
+
             //Return null if ADDRESSFAM is Ipv6 but Os does not support it
             if (Addfam == ADDRESSFAM.IPv6 && !Socket.OSSupportsIPv6)
             {

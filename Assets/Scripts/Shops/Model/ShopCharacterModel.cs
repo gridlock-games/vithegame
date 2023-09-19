@@ -17,6 +17,7 @@ public class CreateCharacterModel
 {
     public string id;
     public string characterName;
+    public string chracterRole;
     public string characterDescription;
     public Sprite characterImage;
     public GameObject characterObject;

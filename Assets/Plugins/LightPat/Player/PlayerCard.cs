@@ -11,6 +11,7 @@ namespace LightPat.Core
     public class PlayerCard : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI nameTag;
+        [SerializeField] private Text hotKeyNumText;
         [SerializeField] private Slider healthSlider;
         [SerializeField] private Image healthImage;
         [SerializeField] private Slider defenseSlider;
@@ -33,17 +34,18 @@ namespace LightPat.Core
             {
                 GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
 
-                string nameIntro = "";
+                string hotkeyNum = "";
                 for (int i = 0; i < localNetworkPlayers.Length; i++)
                 {
                     if (localNetworkPlayers[i] == melee.gameObject)
                     {
-                        nameIntro = (i+1).ToString() + ": ";
+                        hotkeyNum = (i+1).ToString() + ": ";
                         break;
                     }
                 }
 
-                nameTag.SetText(nameIntro + ClientManager.Singleton.GetClient(melee.OwnerClientId).clientName);
+                nameTag.SetText(ClientManager.Singleton.GetClient(melee.OwnerClientId).clientName);
+                hotKeyNumText.text = hotkeyNum;
             }
             else
             {

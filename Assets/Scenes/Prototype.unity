@@ -2467,108 +2467,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &551897927
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 551897930}
-  - component: {fileID: 551897929}
-  - component: {fileID: 551897928}
-  m_Layer: 0
-  m_Name: ClientManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &551897928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551897927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3895516950
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &551897929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551897927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 156adcd4ed0547c429f10ad3446960a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerModelOptions:
-  - name: Malakas
-    playerPrefab: {fileID: 7527864471004905983, guid: 44b8e4962b8d7e34f98691d3683c11c2,
-      type: 3}
-    skinOptions:
-    - {fileID: 8334222067460494079, guid: 229599c99ddb2ff448958ca4dcffeecd, type: 3}
-  - name: Guinevere
-    playerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
-      type: 3}
-    skinOptions:
-    - {fileID: 6461216685500147717, guid: 27b9319a1b0ff3c499fca0d0dd5572c8, type: 3}
-    - {fileID: 2254751552651625958, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
-    - {fileID: 7878422891106188551, guid: fc6b81508964baa43a64a400383ad961, type: 3}
-  - name: Lubu
-    playerPrefab: {fileID: 7527864471004905983, guid: 5bdcbd27e26c5ae4ca25b8a14cd3be3f,
-      type: 3}
-    skinOptions:
-    - {fileID: 6461216685500147717, guid: 036e1d147f62c6441b53b3476ea2b3dd, type: 3}
-    - {fileID: 6461216685500147717, guid: 44b2c0f2ee06d064ca0d77a974625136, type: 3}
-    - {fileID: 6461216685500147717, guid: 19be23d7f65cb5441bab474bd5bf1517, type: 3}
-  - name: Olaf
-    playerPrefab: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
-      type: 3}
-    skinOptions:
-    - {fileID: 2154839920385321583, guid: 08c5a03d6ea03cb4f982846f58b6801f, type: 3}
-    - {fileID: 2154839920385321583, guid: 0384a351536243a43bd0a4ced6e6c01f, type: 3}
-    - {fileID: 2154839920385321583, guid: 31a3f8f33895fb24fa08a51d30a8944f, type: 3}
-  spectatorPrefab: {fileID: 2298131365329834814, guid: 5ef6a7dcb7705a5439eb702be894f48e,
-    type: 3}
-  gameLogicManagerNetObjId:
-    m_InternalValue: 0
-  serverAPIEndPointURL: 
-  sceneLoadingScreenPrefab: {fileID: 4504488989294531369, guid: 02414866ac4fbfb4fb7a746ad8de4f6a,
-    type: 3}
-  sceneNamesToSpawnPlayerOnConnect:
-  - Hub
-  - Prototype
-  approvalCheckScenesCompetitorTeam:
-  - Lobby
-  - Hub
-  - Prototype
---- !u!4 &551897930
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551897927}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 13
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &591683519
 GameObject:
   m_ObjectHideFlags: 0
@@ -2852,8 +2750,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 591683519}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.08, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.8322, y: 0.08, z: -0.1573}
+  m_LocalScale: {x: 0.9859096, y: 1, z: 0.99596137}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1316772815}
@@ -2936,7 +2834,7 @@ PrefabInstance:
     - target: {fileID: 3427816913848544856, guid: f71b0ff4e1373ca4693713393c768bf9,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3427816913848544858, guid: f71b0ff4e1373ca4693713393c768bf9,
         type: 3}
@@ -3013,7 +2911,7 @@ GameObject:
   - component: {fileID: 650144117}
   - component: {fileID: 650144116}
   - component: {fileID: 650144115}
-  - component: {fileID: 650144114}
+  - component: {fileID: 650144119}
   m_Layer: 0
   m_Name: Animate
   m_TagString: Untagged
@@ -3036,39 +2934,6 @@ Transform:
   m_Father: {fileID: 1164644262}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &650144114
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 650144112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e9cbe49ce69d4c39800705e0941d8c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isExpanded: 1
-  character:
-    target: 2
-    character: {fileID: 804238624}
-    local:
-      allowTypesMask: 512
-      name: 
-      targetType: 2
-      targetObject: {fileID: 0}
-    global:
-      allowTypesMask: 512
-      name: 
-    list:
-      targetType: 3
-      targetObject: {fileID: 0}
-      select: 1
-      index: 0
-    eventChangeVariable:
-      m_PersistentCalls:
-        m_Calls: []
-  blocking: 0
 --- !u!114 &650144115
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3130,7 +2995,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actions:
   - {fileID: 650144115}
-  - {fileID: 650144114}
+  - {fileID: 650144119}
   executingIndex: -1
   isExecuting: 0
 --- !u!114 &650144118
@@ -3153,6 +3018,39 @@ MonoBehaviour:
   onFinish:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &650144119
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650144112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fe688429e3497c46b2e6ba5799514a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  meleeclip: {fileID: 11400000, guid: 6c1ede1b5eb85b54a884699e07eb526d, type: 2}
+  character:
+    target: 2
+    character: {fileID: 804238624}
+    local:
+      allowTypesMask: 512
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    global:
+      allowTypesMask: 512
+      name: 
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+    eventChangeVariable:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &735646247
 GameObject:
   m_ObjectHideFlags: 0
@@ -5033,7 +4931,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh36542
+  m_Name: pb_Mesh829246
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -6125,11 +6023,12 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 0}
+    PlayerPrefab: {fileID: 7527864471004905983, guid: 8a666a11bf01d0442b03675f050f3119,
+      type: 3}
     NetworkPrefabs: []
     TickRate: 120
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 1
+    ConnectionApproval: 0
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -6155,7 +6054,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1627123837
 MonoBehaviour:
@@ -6169,14 +6068,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99f25be40fbf9e74e9d0495d8a89b3de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionDataString: Dev|1|2
+  connectionDataString: Dev|0|0
 --- !u!43 &1714004078
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh36264
+  m_Name: pb_Mesh828968
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
