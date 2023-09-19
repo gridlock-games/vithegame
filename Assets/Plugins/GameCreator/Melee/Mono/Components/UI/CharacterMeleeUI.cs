@@ -82,18 +82,23 @@
                     case KeyCode.Q:
                         abilityAImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         abilityAImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityAImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
+                        break;
                         break;
                     case KeyCode.E:
                         abilityBImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         abilityBImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityBImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.R:
                         abilityCImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         abilityCImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityCImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.T:
                         abilityDImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
                         abilityDImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityDImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
                         break;
                 }
             }

@@ -103,7 +103,9 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if ability is on cooldown
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
-        if (ability && melee.GetPoise() < ability.staminaCost) { return; }
+        if (ability && ability.staminaCost > 0f && melee.GetPoise() < ability.staminaCost) { return; }
+        // Don't activate if poise is not high enough
+        if (ability && ability.hpCost > 0f && melee.GetHP() < ability.hpCost) { return; }
         // Don't activate if Melee is attacking and cancelType is none
         if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None) { return; }
         // Don't activate if Melee is currently playing a Heavy Attack

@@ -9,10 +9,12 @@ namespace GameCreator.Melee
     using GameCreator.Variables;
 
     [AddComponentMenu("")]
-    public class ActionMeleeDrainHP : IAction
+    public class ActionMeleeIncreaseBaseDamage : IAction
     {
         public TargetCharacter character = new TargetCharacter(TargetCharacter.Target.Player);
-        public float drainDuration = 6.0f;
+        public float baseDamageMultiplier = 1.0f;
+        public float durationMultiplier = 1.0f;
+        
         public override bool InstantExecute(GameObject target, IAction[] actions, int index)
         {
             Character _character = this.character.GetCharacter(target);
@@ -22,7 +24,7 @@ namespace GameCreator.Melee
 
             if (melee != null)
             {
-                melee.DrainHP(drainDuration);
+                melee.damageMultiplierDuration(durationMultiplier, baseDamageMultiplier);
             }
 
             return true;
@@ -30,8 +32,8 @@ namespace GameCreator.Melee
 
 #if UNITY_EDITOR
 
-        public static new string NAME = "Melee/Drain Character HP";
-        private const string NODE_TITLE = "Drain HP";
+        public static new string NAME = "Melee/Increase Base Damage";
+        private const string NODE_TITLE = "Increase Base Damage";
 
         public override string GetNodeTitle()
         {

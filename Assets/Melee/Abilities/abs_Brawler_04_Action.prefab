@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 12606668335444864}
   - component: {fileID: -7839100688284635121}
   - component: {fileID: -8055495134371253060}
-  - component: {fileID: 374669964179047103}
+  - component: {fileID: 1754037603669818014}
+  - component: {fileID: 8298525950020673251}
   m_Layer: 0
   m_Name: abs_Brawler_04_Action
   m_TagString: Untagged
@@ -67,10 +68,45 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actions:
-  - {fileID: 374669964179047103}
+  - {fileID: 1754037603669818014}
+  - {fileID: 8298525950020673251}
   executingIndex: -1
   isExecuting: 0
---- !u!114 &374669964179047103
+--- !u!114 &1754037603669818014
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691924476606279429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b02b480cb47cc645a1a5d67a01df896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExpanded: 1
+  character:
+    target: 1
+    character: {fileID: 0}
+    local:
+      allowTypesMask: 512
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    global:
+      allowTypesMask: 512
+      name: 
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+    eventChangeVariable:
+      m_PersistentCalls:
+        m_Calls: []
+  baseDamageMultiplier: 1.3
+  durationMultiplier: 6
+--- !u!114 &8298525950020673251
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,3 +138,4 @@ MonoBehaviour:
     eventChangeVariable:
       m_PersistentCalls:
         m_Calls: []
+  drainDuration: 6

@@ -42,6 +42,7 @@ public class Ability : MonoBehaviour
     public DodgeLockOnPhase dodgeLockOnhase = DodgeLockOnPhase.None;
     public float coolDown = 0.00f;
     public float staminaCost = 0.00f;
+    public float hpCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
 
     public AnimCancellingType canCncelAnimationType = AnimCancellingType.Cancel_NormalAtk;
@@ -75,6 +76,24 @@ public class Ability : MonoBehaviour
             actions.Execute(target, null);
         }
     }
+
+    public void ExecuteActionsOnActivate(Vector3 position, GameObject target)
+        {
+            if (this.actionOnActivate)
+            {
+                GameObject actionsInstance = Instantiate<GameObject>(
+                    this.actionOnActivate.gameObject,
+                    position,
+                    Quaternion.identity
+                );
+
+                actionsInstance.hideFlags = HideFlags.HideInHierarchy;
+                Actions actions = actionsInstance.GetComponent<Actions>();
+
+                if (!actions) return;
+                actions.Execute(target, null);
+            }
+        }
 
     // We're only using this for UI cooldowns for now
     // TO DO: Move ability invoke to this
