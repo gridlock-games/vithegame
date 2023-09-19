@@ -933,6 +933,36 @@ namespace GameCreator.Melee
             Poise.Value = 0;
         }
 
+        
+        private bool isCounting = false;
+
+        public void DrainHP(float drainDuration)
+        {
+            if (!isCounting)
+            {
+                StartCoroutine(HPReductionCoroutine(drainDuration));
+            }
+        }
+
+        private IEnumerator HPReductionCoroutine(float drainDuration)
+        {
+            isCounting = true;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < drainDuration && this.GetHP() > 1f)
+            {
+                float reductionAmount = this.GetHP() * 0.2f * Time.deltaTime;
+                HP.Value -= (int)reductionAmount;
+                HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
+
+                elapsedTime += Time.deltaTime;
+                Debug.Log("RUN THIS SHIT: " + HP.Value);
+                yield return null;
+            }
+
+            isCounting = false;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (IsServer)

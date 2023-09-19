@@ -14,7 +14,7 @@ public class AbilityManager : NetworkBehaviour
         KeyCode.E,
         KeyCode.R,
         KeyCode.F,
-        KeyCode.T,
+        KeyCode.T
     };
 
     private CharacterMelee melee;

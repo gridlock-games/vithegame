@@ -58,6 +58,24 @@ public class Ability : MonoBehaviour
         isOnCoolDownLocally = false;
     }
 
+    public void ExecuteActionsOnStart(Vector3 position, GameObject target)
+    {
+        if (this.actionsOnExecute)
+        {
+            GameObject actionsInstance = Instantiate<GameObject>(
+                this.actionsOnExecute.gameObject,
+                position,
+                Quaternion.identity
+            );
+
+            actionsInstance.hideFlags = HideFlags.HideInHierarchy;
+            Actions actions = actionsInstance.GetComponent<Actions>();
+
+            if (!actions) return;
+            actions.Execute(target, null);
+        }
+    }
+
     // We're only using this for UI cooldowns for now
     // TO DO: Move ability invoke to this
     public void ExecuteAbility(CharacterMelee melee, KeyCode key)
@@ -73,6 +91,7 @@ public class Ability : MonoBehaviour
 
             // Disabling Ability invoke in CharacterMelee
             melee.StartCoroutine(WaitForAbilityCooldown());
+            this.ExecuteActionsOnStart(melee.transform.position, melee.gameObject);
         }
     }
 
@@ -92,6 +111,10 @@ public class Ability : MonoBehaviour
                 break;
             case KeyCode.R:
                 actionKey = CharacterMelee.ActionKey.E;
+                hasValidkey = true;
+                break;
+            case KeyCode.T:
+                actionKey = CharacterMelee.ActionKey.F;
                 hasValidkey = true;
                 break;
         }
