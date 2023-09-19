@@ -15,6 +15,7 @@ namespace GameCreator.Melee
     using System.Reflection;
     using GameCreator.Camera;
     using LightPat.Core;
+    using MJM;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -134,6 +135,9 @@ namespace GameCreator.Melee
 
         private AbilityManager abilityManager;
         private GlowRenderer glowRenderer;
+
+        public MJMComboSystem mjmComboSystem;
+
         private LightPat.Player.NetworkPlayer networkPlayer;
 
         public bool isLunging = false;
@@ -142,6 +146,7 @@ namespace GameCreator.Melee
             new Keyframe(1f, 0f)
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -160,6 +165,9 @@ namespace GameCreator.Melee
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
             glowRenderer = GetComponentInChildren<GlowRenderer>();
+
+            mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
+
             networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
@@ -195,7 +203,8 @@ namespace GameCreator.Melee
             }
 
             // Adding check block to make sure melee animations are cancelled as soon ailment == dead
-            if(this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) {
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead)
+            {
                 this.StopAttack();
                 this.CharacterAnimator.StopGesture(0f);
                 this.currentMeleeClip = null;
@@ -457,6 +466,7 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
+                    mjmComboSystem.AddCount(1);
                     targetMelee.HP.Value -= attack.baseDamage;
                     targetMelee.RenderHit();
 
@@ -466,7 +476,7 @@ namespace GameCreator.Melee
                     targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
                     targetMelee.RenderBlock();
                 }
-                
+
                 // Send messages for stats in NetworkPlayer script
                 if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
 
@@ -570,6 +580,8 @@ namespace GameCreator.Melee
 
             if (!IsClient)
                 glowRenderer.RenderHit();
+
+
             RenderHitClientRpc();
         }
 
@@ -590,7 +602,8 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("RenderUninterruptable() should only be called from the server"); return; }
 
-            if (!IsClient) { 
+            if (!IsClient)
+            {
                 glowRenderer.RenderUninterruptable();
             }
             RenderUninterruptableClientRpc();
@@ -901,7 +914,8 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
-        public Ability GetActivatedAbility(CharacterMelee melee) {
+        public Ability GetActivatedAbility(CharacterMelee melee)
+        {
             return melee.abilityManager.GetActivatedAbility();
         }
 
@@ -1086,7 +1100,8 @@ namespace GameCreator.Melee
         public int GetCurrentPhase()
         {
             if (this.comboSystem == null) return -1;
-            if (this.IsStaggered) {
+            if (this.IsStaggered)
+            {
                 return -1;
             }
 
@@ -1253,22 +1268,22 @@ namespace GameCreator.Melee
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            print ("=============");
-            print ("name: " + melee.name);
-            print ("characterAilment: " + melee.Character.characterAilment);
-            print ("IsUninterruptable: " + melee.IsUninterruptable);
-            print ("IsInvincible: " + melee.IsInvincible);
-            print ("IsAttacking: " + melee.IsAttacking);
-            print ("IsCastingAbility: " + melee.IsCastingAbility);
+            print("=============");
+            print("name: " + melee.name);
+            print("characterAilment: " + melee.Character.characterAilment);
+            print("IsUninterruptable: " + melee.IsUninterruptable);
+            print("IsInvincible: " + melee.IsInvincible);
+            print("IsAttacking: " + melee.IsAttacking);
+            print("IsCastingAbility: " + melee.IsCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
-            
+
             // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
             assailant.didDodgeCancelAilment = false;
 
             OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
-            
+
             this.ReleaseTargetFocus();
 
             MeleeClip hitReaction = null;
@@ -1380,7 +1395,7 @@ namespace GameCreator.Melee
             this.AddPoise(-attack.poiseDamage);
 
 
-            
+
             bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
 
@@ -1515,8 +1530,9 @@ namespace GameCreator.Melee
             if (currentWeapon.audioSwing) { PlayAudio(currentWeapon.audioSwing); }
         }
 
-        public void ExecuteVoiceOver(AudioClip audio) {
-            if(audio) { PlayAudioNoPitchModifier(audio); }
+        public void ExecuteVoiceOver(AudioClip audio)
+        {
+            if (audio) { PlayAudioNoPitchModifier(audio); }
         }
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)

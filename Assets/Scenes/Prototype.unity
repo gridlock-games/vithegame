@@ -3582,6 +3582,7 @@ MonoBehaviour:
       index: 0
   attackInterval: 0.1
   currentMeleeClip: {fileID: 0}
+  mjmComboSystem: {fileID: 0}
   isLunging: 0
   movementForward:
     serializedVersion: 2
@@ -6023,7 +6024,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1627123834}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: 8a666a11bf01d0442b03675f050f3119,
+    PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
       type: 3}
     NetworkPrefabs: []
     TickRate: 120
