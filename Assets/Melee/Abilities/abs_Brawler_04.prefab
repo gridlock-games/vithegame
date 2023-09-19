@@ -10,10 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2239306535429724101}
   - component: {fileID: 2239306535429724102}
-  - component: {fileID: 7152553009544463286}
-  - component: {fileID: -998393536252530573}
   m_Layer: 0
-  m_Name: abs_Brawler_01
+  m_Name: abs_Brawler_04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,46 +44,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7d79ce025661440a7af79c7c24aa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillImageFill: {fileID: 21300000, guid: 674b0afeb4b9de743930aa2b08cde859, type: 3}
+  skillImageFill: {fileID: 21300000, guid: 39d596f741ce8f046b74543cec2eb51d, type: 3}
   weaponBind: 5
-  meleeClip: {fileID: 11400000, guid: 579b2e6f43bdbf54788eefd65f8c1202, type: 2}
-  abilityType: 0
-  dodgeLockOnhase: 0
-  coolDown: 8
-  staminaCost: 15
-  skillKey: 113
-  canCncelAnimationType: 1
+  meleeClip: {fileID: 11400000, guid: 1a430356c96f10b47aba37c41875f46b, type: 2}
+  abilityType: 4
+  dodgeLockOnhase: 1
+  coolDown: 12
+  staminaCost: 18
+  skillKey: 116
+  canCncelAnimationType: 0
   canCancelAnimation: 0
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
---- !u!114 &7152553009544463286
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2239306535429724103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6d5a50368374438dbff3af09a8fefb7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actions: []
-  executingIndex: -1
-  isExecuting: 0
---- !u!114 &-998393536252530573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2239306535429724103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6d5a50368374438dbff3af09a8fefb7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actions: []
-  executingIndex: -1
-  isExecuting: 0

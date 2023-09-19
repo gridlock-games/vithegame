@@ -47,6 +47,10 @@ public class Ability : MonoBehaviour
     public AnimCancellingType canCncelAnimationType = AnimCancellingType.Cancel_NormalAtk;
     public bool canCancelAnimation = false;
 
+    public IActionsList actionsOnExecute;
+    public IActionsList actionOnActivate;
+    public IActionsList actionsOnHit;
+
     public bool isOnCoolDownLocally { get; private set; }
 
     public void ResetAbility()
