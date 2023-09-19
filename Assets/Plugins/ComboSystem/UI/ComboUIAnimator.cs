@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+
 public class ComboUIAnimator : MonoBehaviour
 {
   public RectTransform comboUI;
   public RectTransform comboNumberUI;
+
 
   // Start is called before the first frame update
   void Start()
@@ -36,5 +38,14 @@ public class ComboUIAnimator : MonoBehaviour
   {
     //comboUI.DOAnchorPosX(-1170, 1, true);
     comboNumberUI.DOShakePosition(2,4);
+  }
+
+  public void HeartbeatComboUI()
+  {
+    Sequence heartbeatSequence = DOTween.Sequence();
+
+    heartbeatSequence.Append(comboNumberUI.DOScale(1.1f,0.3f))
+      .Append(comboNumberUI.DOScale(1f, 0.3f))
+      .PrependInterval(1);
   }
 }

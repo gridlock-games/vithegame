@@ -122,7 +122,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1942498273}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ComboUIAnimator, Assembly-CSharp-firstpass
         m_MethodName: ShakeComboUI
         m_Mode: 1
@@ -391,7 +391,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1942498273}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ComboUIAnimator, Assembly-CSharp-firstpass
         m_MethodName: ShowComboUI
         m_Mode: 1
@@ -525,7 +525,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1942498273}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ComboUIAnimator, Assembly-CSharp-firstpass
         m_MethodName: HideComboUI
         m_Mode: 1
@@ -862,7 +862,7 @@ PrefabInstance:
     - target: {fileID: 7428881697666895564, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
         type: 3}
       propertyPath: m_Name
-      value: ComboCanvas
+      value: ComboCanvas Variant
       objectReference: {fileID: 0}
     - target: {fileID: 7428881697666895567, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
         type: 3}
@@ -988,19 +988,25 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1503314290463916833}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &8341907766562573805 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7428881697666895564, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
+--- !u!224 &8341907768068620144 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7428881697134083153, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
     type: 3}
   m_PrefabInstance: {fileID: 1503314290463916833}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1942498273
+--- !u!1 &8341907768068620145 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7428881697134083152, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
+    type: 3}
+  m_PrefabInstance: {fileID: 1503314290463916833}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &313887679101175397
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8341907766562573805}
+  m_GameObject: {fileID: 8341907768068620145}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8a9f3b1e91238cb4e9b26ef0df5a4e0d, type: 3}
@@ -1008,9 +1014,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comboUI: {fileID: 8341907768068620144}
   comboNumberUI: {fileID: 8341907766199992372}
---- !u!224 &8341907768068620144 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7428881697134083153, guid: 71b62c7deaf7d1b4699d0a40a7a73b82,
-    type: 3}
-  m_PrefabInstance: {fileID: 1503314290463916833}
-  m_PrefabAsset: {fileID: 0}
