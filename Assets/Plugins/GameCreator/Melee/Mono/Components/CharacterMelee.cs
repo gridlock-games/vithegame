@@ -947,16 +947,20 @@ namespace GameCreator.Melee
         private IEnumerator HPReductionCoroutine(float drainDuration)
         {
             isCounting = true;
-            float elapsedTime = 0f;
+            float elapsedTime = 0;
+            float reductionAmount = 0;
 
-            while (elapsedTime < drainDuration && this.GetHP() > 1f)
+            while (elapsedTime < drainDuration && HP.Value > 1)
             {
-                float reductionAmount = this.GetHP() * 0.2f * Time.deltaTime;
-                HP.Value -= (int)reductionAmount;
-                HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
-
+                reductionAmount += HP.Value * 0.2f * Time.deltaTime;
+                if (reductionAmount >= 1)
+                {
+                    HP.Value -= (int)reductionAmount;
+                    HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
+                    reductionAmount = 0;
+                }
+                
                 elapsedTime += Time.deltaTime;
-                Debug.Log("RUN THIS SHIT: " + HP.Value);
                 yield return null;
             }
 
@@ -979,6 +983,7 @@ namespace GameCreator.Melee
 
         private void OnHPChanged(int prev, int current)
         {
+            Debug.Log("HP CHANGE Prev: " + prev + " Current: " + current);
             if (current < prev)
             {
                 // Render hit is handled in LateUpdate() on server now
