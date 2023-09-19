@@ -511,6 +511,9 @@ namespace GameCreator.Melee
                         case AttackType.Stun:
                             targetMelee.Character.Stun(melee.Character, targetMelee.Character);
                             break;
+                        case AttackType.Pull:
+                            targetMelee.Character.Pull(melee.Character, targetMelee.Character);
+                            break;
                         case AttackType.Knockdown:
                             if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
                                 targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
