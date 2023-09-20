@@ -8,7 +8,7 @@ using LightPat.Core;
 public class NetworkStart : MonoBehaviour
 {
     [SerializeField] private GameMode gameMode;
-    [Header("Formatted: Name|CharacterIndex|SkinIndex")]
+    [Header("Formatted: Name|CharacterIndex|SkinIndex)]
     [SerializeField] private string connectionDataString;
 
     private void Start()
