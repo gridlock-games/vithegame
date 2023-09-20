@@ -568,9 +568,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1146264348}
+  - component: {fileID: 1146264349}
   - component: {fileID: 1146264347}
   - component: {fileID: 1146264346}
-  - component: {fileID: 1146264349}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -622,8 +622,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1146264346}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: ec8794426b4096f46bbb2a60d6d7e121,
-      type: 3}
+    PlayerPrefab: {fileID: 0}
     NetworkPrefabs: []
     TickRate: 120
     ClientConnectionBufferTimeout: 10
@@ -667,7 +666,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99f25be40fbf9e74e9d0495d8a89b3de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionDataString: 
+  gameMode: 1
+  connectionDataString: Dev|0|1
 --- !u!43 &1860351832
 Mesh:
   m_ObjectHideFlags: 0
