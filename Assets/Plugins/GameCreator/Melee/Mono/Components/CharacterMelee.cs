@@ -140,8 +140,6 @@ namespace GameCreator.Melee
 
         public MJMComboSystem mjmComboSystem;
 
-        private LightPat.Player.NetworkPlayer networkPlayer;
-
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
             new Keyframe(0f, 0f),
@@ -170,8 +168,6 @@ namespace GameCreator.Melee
             glowRenderer = GetComponentInChildren<GlowRenderer>();
 
             mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
-
-            networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
         private void OnTransformChildrenChanged()
@@ -414,7 +410,7 @@ namespace GameCreator.Melee
                 {
                     Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
                     Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
-
+                    Debug.Log(attackerMeleeTeam + " " + targetMeleeTeam);
                     if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                     {
                         // If the attacker's team is the same as the victim's team, do not register this hit
@@ -469,9 +465,9 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
-                    Debug.Log(melee.baseDamageMultiplier);
-                    mjmComboSystem.AddCount(1);
-                    targetMelee.HP.Value -= (attack.baseDamage * melee.baseDamageMultiplier);
+                    if (mjmComboSystem)
+                        mjmComboSystem.AddCount(1);
+                    targetMelee.HP.Value -= attack.baseDamage * melee.baseDamageMultiplier;
                     targetMelee.RenderHit();
                 }
                 else if (hitResult == HitResult.PoiseBlock)
@@ -1368,13 +1364,13 @@ namespace GameCreator.Melee
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            print("=============");
-            print("name: " + melee.name);
-            print("characterAilment: " + melee.Character.characterAilment);
-            print("IsUninterruptable: " + melee.IsUninterruptable);
-            print("IsInvincible: " + melee.IsInvincible);
-            print("IsAttacking: " + melee.IsAttacking);
-            print("IsCastingAbility: " + melee.IsCastingAbility);
+            //print("=============");
+            //print("name: " + melee.name);
+            //print("characterAilment: " + melee.Character.characterAilment);
+            //print("IsUninterruptable: " + melee.IsUninterruptable);
+            //print("IsInvincible: " + melee.IsInvincible);
+            //print("IsAttacking: " + melee.IsAttacking);
+            //print("IsCastingAbility: " + melee.IsCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
