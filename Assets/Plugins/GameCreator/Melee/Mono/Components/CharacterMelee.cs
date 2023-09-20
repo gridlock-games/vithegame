@@ -133,6 +133,8 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
+        private float baseDamageMultiplier = 1.0f;
+
         private AbilityManager abilityManager;
         private GlowRenderer glowRenderer;
 
@@ -155,6 +157,7 @@ namespace GameCreator.Melee
         public BladeComponent Blade { get; protected set; }
 
         public List<BladeComponent> Blades { get; protected set; }
+
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
@@ -458,7 +461,7 @@ namespace GameCreator.Melee
                 }
 
                 // Calculate hit result/HP damage
-                int previousHP = targetMelee.HP.Value;
+                float previousHP = targetMelee.HP.Value;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
 
                 HitResult hitResult = OnRecieveAttackResult.Key;
@@ -466,14 +469,14 @@ namespace GameCreator.Melee
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
+                    Debug.Log(melee.baseDamageMultiplier);
                     mjmComboSystem.AddCount(1);
-                    targetMelee.HP.Value -= attack.baseDamage;
+                    targetMelee.HP.Value -= (attack.baseDamage * melee.baseDamageMultiplier);
                     targetMelee.RenderHit();
-
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
-                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.HP.Value -= (attack.baseDamage * 0.7f);
                     targetMelee.RenderBlock();
                 }
 
@@ -515,6 +518,9 @@ namespace GameCreator.Melee
                     {
                         case AttackType.Stun:
                             targetMelee.Character.Stun(melee.Character, targetMelee.Character);
+                            break;
+                        case AttackType.Pull:
+                            targetMelee.Character.Pull(melee.Character, targetMelee.Character);
                             break;
                         case AttackType.Knockdown:
                             if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
@@ -919,11 +925,11 @@ namespace GameCreator.Melee
             return melee.abilityManager.GetActivatedAbility();
         }
 
-        public int maxHealth = 100;
-        private NetworkVariable<int> HP = new NetworkVariable<int>();
+        public float maxHealth = 100.0f;
+        private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
-        public int GetHP() { return HP.Value; }
+        public float GetHP() { return HP.Value; }
 
         public float GetDefense() { return Defense.Value; }
 
@@ -947,6 +953,96 @@ namespace GameCreator.Melee
             Poise.Value = 0;
         }
 
+
+
+        private bool isCountingdamageMultiplier = false;
+        public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
+        {
+            if (!isCountingdamageMultiplier)
+            {
+                if(this.IsCastingAbility) {
+                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
+
+                    if(currentAbility.abilityType == Ability.AbilityType.SelfBuff) {
+                        StartCoroutine(CompleteAnimBeforeDamageMultiplier(currentAbility.meleeClip.animationClip.length, multiplierDuration, damageMultiplier));
+                    }
+                    
+                } else {
+                    StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
+                }
+            }
+        }
+
+        private IEnumerator CompleteAnimBeforeDamageMultiplier(float animDuration, float multiplierDuration, float damageMultiplier) {
+            yield return new WaitForSeconds(animDuration);
+            StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
+        }
+
+        private IEnumerator DamageMultiplierCoroutine(float multiplierDuration, float damageMultiplier)
+        {
+            isCountingdamageMultiplier = true;
+            float elapsedTime = 0;
+
+            while (elapsedTime < multiplierDuration)
+            {
+                this.baseDamageMultiplier = damageMultiplier;
+                elapsedTime += Time.deltaTime;
+
+                yield return null;
+            }
+
+            this.baseDamageMultiplier = 1.0f;
+            isCountingdamageMultiplier = false;
+        }
+
+
+        private bool isCounting = false;
+
+        public void DrainHP(float drainDuration)
+        {
+            if (!isCounting)
+            {
+                if(this.IsCastingAbility) {
+                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
+
+                    if(currentAbility.abilityType == Ability.AbilityType.SelfBuff) {
+                        StartCoroutine(CompleteAnimBeforeHPDrain(currentAbility.meleeClip.animationClip.length, drainDuration));
+                    }
+                    
+                } else {
+                    StartCoroutine(HPReductionCoroutine(drainDuration));
+                }
+            }
+        }
+
+        private IEnumerator CompleteAnimBeforeHPDrain(float animDuration, float drainDuration) {
+            yield return new WaitForSeconds(animDuration);
+            StartCoroutine(HPReductionCoroutine(drainDuration));
+        }
+
+        private IEnumerator HPReductionCoroutine(float drainDuration)
+        {
+            isCounting = true;
+            float elapsedTime = 0;
+            float reductionAmount = 0;
+
+            while (elapsedTime < drainDuration && HP.Value > 1)
+            {
+                reductionAmount += HP.Value * 0.1f * Time.deltaTime;
+                if (reductionAmount >= 1 && HP.Value > 1)
+                {
+                    HP.Value -= (int)reductionAmount;
+                    HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
+                    reductionAmount = 0;
+                }
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            isCounting = false;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (IsServer)
@@ -961,8 +1057,12 @@ namespace GameCreator.Melee
             HP.OnValueChanged -= OnHPChanged;
         }
 
-        private void OnHPChanged(int prev, int current)
+        private void OnHPChanged(float prev, float current)
         {
+            // DO NOT REMOVE FOR DEBUGGING
+            // Debug.Log(this.gameObject.name + " HP CHANGE Prev: " + prev);
+            // Debug.Log(this.gameObject.name + " HP CHANGE Curr: " + current);
+
             if (current < prev)
             {
                 // Render hit is handled in LateUpdate() on server now

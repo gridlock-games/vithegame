@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.Rendering;
+using LightPat.Core;
 
 public class NetworkStart : MonoBehaviour
 {
+    [SerializeField] private GameMode gameMode;
     [Header("Formatted: Name|CharacterIndex|SkinIndex")]
     [SerializeField] private string connectionDataString;
 
@@ -34,6 +36,11 @@ public class NetworkStart : MonoBehaviour
 
     private void Update()
     {
+        if (NetworkManager.Singleton.IsServer & ClientManager.Singleton.gameMode.Value != gameMode)
+        {
+            ClientManager.Singleton.gameMode.Value = gameMode;
+        }
+
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
         {
             // FPS Counter and Ping Display
@@ -47,7 +54,7 @@ public class NetworkStart : MonoBehaviour
 
         if (NetworkManager.Singleton.IsServer)
         {
-            if (!LightPat.Core.ClientManager.Singleton)
+            if (!ClientManager.Singleton)
             {
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
                 {

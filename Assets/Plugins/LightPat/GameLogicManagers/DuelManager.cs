@@ -291,11 +291,11 @@ namespace LightPat.Core
             timerEnded = true;
 
             Team winningTeam = Team.Environment;
-            int lastHP = -1;
+            float lastHP = -1;
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-                int currentHP = playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
+                float currentHP = playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
                 if (currentHP > lastHP)
                 {
                     winningTeam = clientPair.Value.team;

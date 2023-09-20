@@ -47,6 +47,7 @@
         private SerializedProperty spAbilityA;
         private SerializedProperty spAbilityB;
         private SerializedProperty spAbilityC;
+        private SerializedProperty spAbilityD;
         private SerializedProperty spAbilityRage;
 
         private SerializedProperty spPrefab;
@@ -161,6 +162,7 @@
             this.spAbilityA = this.serializedObject.FindProperty("abilityA");
             this.spAbilityB = this.serializedObject.FindProperty("abilityB");
             this.spAbilityC = this.serializedObject.FindProperty("abilityC");
+            this.spAbilityD = this.serializedObject.FindProperty("abilityD");
             this.spAbilityRage = this.serializedObject.FindProperty("abilityRage");
         
             this.spAudioSheathe = this.serializedObject.FindProperty("audioSheathe");
@@ -416,6 +418,7 @@
                     EditorGUILayout.PropertyField(this.spAbilityA);
                     EditorGUILayout.PropertyField(this.spAbilityB);
                     EditorGUILayout.PropertyField(this.spAbilityC);
+                    EditorGUILayout.PropertyField(this.spAbilityD);
                     EditorGUILayout.PropertyField(this.spAbilityRage);
                     EditorGUILayout.EndVertical();
                 }

@@ -69,6 +69,7 @@ namespace GameCreator.Melee
         public Ability abilityA;
         public Ability abilityB;
         public Ability abilityC;
+        public Ability abilityD;
         public Ability abilityRage;
 
         // reactions:

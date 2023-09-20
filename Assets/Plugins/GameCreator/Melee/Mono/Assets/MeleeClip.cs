@@ -40,7 +40,8 @@
             Knockedup,
             Heavy,
             Stagger,
-            Followup
+            Followup,
+            Pull
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------
