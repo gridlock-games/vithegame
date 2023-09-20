@@ -476,12 +476,26 @@ namespace LightPat.Core
         private void ClientConnectCallback(ulong clientId)
         {
             if (!IsServer) { return; }
-            Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
-            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
-            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
+            Debug.Log(clientId + " has connected.");
+            StartCoroutine(SpawnPlayerAfterConnection(clientId));
 
             clientConnectingInProgress = false;
             clientApprovalRunning = false;
+        }
+
+        private IEnumerator SpawnPlayerAfterConnection(ulong clientId)
+        {
+            yield return new WaitUntil(() => clientDataDictionary.ContainsKey(clientId));
+
+            Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
+            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name))
+            {
+                SpawnPlayer(clientId);
+            }
+            else if (clientDataDictionary[clientId].team == Team.Spectator)
+            {
+                SpawnPlayer(clientId);
+            }
         }
 
         void ClientDisconnectCallback(ulong clientId)
