@@ -15,6 +15,7 @@ namespace GameCreator.Melee
     using System.Reflection;
     using GameCreator.Camera;
     using LightPat.Core;
+    using MJM;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -136,6 +137,9 @@ namespace GameCreator.Melee
 
         private AbilityManager abilityManager;
         private GlowRenderer glowRenderer;
+
+        public MJMComboSystem mjmComboSystem;
+
         private LightPat.Player.NetworkPlayer networkPlayer;
 
         public bool isLunging = false;
@@ -144,6 +148,7 @@ namespace GameCreator.Melee
             new Keyframe(1f, 0f)
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -163,6 +168,9 @@ namespace GameCreator.Melee
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
             glowRenderer = GetComponentInChildren<GlowRenderer>();
+
+            mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
+
             networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
         }
 
@@ -462,9 +470,9 @@ namespace GameCreator.Melee
                 if (hitResult == HitResult.ReceiveDamage)
                 {
                     Debug.Log(melee.baseDamageMultiplier);
+                    mjmComboSystem.AddCount(1);
                     targetMelee.HP.Value -= (attack.baseDamage * melee.baseDamageMultiplier);
                     targetMelee.RenderHit();
-
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
@@ -578,6 +586,8 @@ namespace GameCreator.Melee
 
             if (!IsClient)
                 glowRenderer.RenderHit();
+
+
             RenderHitClientRpc();
         }
 
