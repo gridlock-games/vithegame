@@ -572,6 +572,13 @@ namespace LightPat.Core
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = response.Approved;
 
+            if (SceneManager.GetActiveScene().name == "Prototype")
+            {
+                clientApprovalRunning = false;
+                response.Approved = true;
+                response.Pending = false;
+            }
+
             if (response.Approved)
             {
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
@@ -732,7 +739,8 @@ namespace LightPat.Core
             }
             else
             {
-                Debug.LogError("No game logic manager found in scene. This means that players will not have a set spawn point");
+                if (SceneManager.GetActiveScene().name != "Prototype")
+                    Debug.LogError("No game logic manager found in scene. This means that players will not have a set spawn point");
             }
 
             GameObject g;
