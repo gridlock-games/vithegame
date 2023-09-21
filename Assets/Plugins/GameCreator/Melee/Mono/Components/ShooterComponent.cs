@@ -1,15 +1,6 @@
 namespace GameCreator.Melee
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using GameCreator.Camera;
     using UnityEngine;
-    using UnityEngine.Events;
-    using UnityEngine.UI;
-    using Unity.Netcode;
-    using GameCreator.Variables;
-
 
     public class ShooterComponent : MonoBehaviour
     {
