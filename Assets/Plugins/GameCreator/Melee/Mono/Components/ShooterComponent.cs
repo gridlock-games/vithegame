@@ -1,6 +1,7 @@
 namespace GameCreator.Melee
 {
     using UnityEngine;
+    using Unity.Netcode;
 
     public class ShooterComponent : MonoBehaviour
     {
@@ -8,10 +9,13 @@ namespace GameCreator.Melee
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private GameObject projectilePrefab;
 
-        public void Shoot()
+        public void Shoot(CharacterMelee attacker, MeleeClip meleeClip)
         {
-            Debug.Log("Shoot at " + Time.time);
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
+
             GameObject projectileInstance = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+            projectileInstance.GetComponent<Projectile>().Initialize(attacker, meleeClip);
+            projectileInstance.GetComponent<NetworkObject>().Spawn();
         }
 
         private void OnDrawGizmos()

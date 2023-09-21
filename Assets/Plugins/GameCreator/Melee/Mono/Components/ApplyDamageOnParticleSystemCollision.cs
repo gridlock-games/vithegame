@@ -70,7 +70,7 @@ namespace GameCreator.Melee
                     CharacterMelee targetMelee = potentialHits[j].GetComponentInParent<CharacterMelee>();
                     if (targetMelee)
                     {
-                        attacker.AddHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject }, attack);
+                        attacker.AddMeleeHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject }, attack);
                     }
                 }
             }

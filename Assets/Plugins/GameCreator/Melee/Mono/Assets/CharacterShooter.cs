@@ -23,9 +23,11 @@ namespace GameCreator.Melee
         private Vector3 adventureTargetOffset;
         private CharacterMelee melee;
 
-        public void Shoot()
+        public void Shoot(MeleeClip attackClip)
         {
-            GetComponentInChildren<ShooterComponent>().Shoot();
+            if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
+
+            GetComponentInChildren<ShooterComponent>().Shoot(melee, attackClip);
         }
 
         private void Awake()

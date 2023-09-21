@@ -123,8 +123,7 @@ namespace LightPat.Core
                     }
                     else
                     {
-                        Transform parent = NetworkManager.SpawnManager.SpawnedObjects[(ulong) transformParentId.Value].transform;
-
+                        //Transform parent = NetworkManager.SpawnManager.SpawnedObjects[(ulong) transformParentId.Value].transform;
                         //transform.localPosition = parent.position + Vector3.Lerp(lastPosition, currentPosition.Value, Time.deltaTime * positionSpeed);
                         //transform.localRotation = parent.rotation * Quaternion.Slerp(lastRotation, currentRotation.Value, Time.deltaTime * rotationSpeed);
                         transform.localPosition = Vector3.Lerp(lastPosition, currentPosition.Value, Time.deltaTime * positionSpeed);
@@ -140,8 +139,7 @@ namespace LightPat.Core
                     }
                     else
                     {
-                        Transform parent = NetworkManager.SpawnManager.SpawnedObjects[(ulong)transformParentId.Value].transform;
-
+                        //Transform parent = NetworkManager.SpawnManager.SpawnedObjects[(ulong)transformParentId.Value].transform;
                         //transform.localPosition = parent.position + currentPosition.Value;
                         //transform.localRotation = parent.rotation * currentRotation.Value;
                         transform.localPosition = currentPosition.Value;
