@@ -13,37 +13,24 @@ namespace GameCreator.Melee
 
     public class ShooterComponent : MonoBehaviour
     {
-
-        public enum ProjectilePath
-        {
-            arc,
-            line
-        }
-        
-        public enum ProjectileType
-        {
-            Bullet,
-            Grenade
-        }
-
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
-        private static readonly Color GIZMOS_ACTIVE_COLOR = Color.red;
-        [SerializeField] private GameObject bulletPrefab;
-        [SerializeField] private ProjectileType projectileType = ProjectileType.Bullet;
-        [SerializeField] private Vector3 muzzlePosition = new Vector3(0.3f, 0.3f, 1.5f);
-        public Vector3 boxCenter = new Vector3(0, 0, 0.75f);
-        [SerializeField] private ProjectilePath projectilePath = ProjectilePath.line;
+        [SerializeField] private Transform projectileSpawnPoint;
+        [SerializeField] private GameObject projectilePrefab;
+
+        public void Shoot()
+        {
+            Debug.Log("Shoot at " + Time.time);
+            GameObject projectileInstance = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+        }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = GIZMOS_DEFAULT_COLOR;
-
-            Vector3 center = transform.TransformPoint(this.boxCenter);
-            Matrix4x4 gizmosMatrix = Gizmos.matrix;
-            Gizmos.matrix = transform.localToWorldMatrix;
-
-            Gizmos.DrawWireCube(this.boxCenter, this.muzzlePosition);
-            Gizmos.matrix = gizmosMatrix;
+            if (projectileSpawnPoint)
+            {
+                Gizmos.DrawWireCube(projectileSpawnPoint.position, Vector3.one * 0.05f);
+            }
+            Gizmos.DrawLine(projectileSpawnPoint.position, projectileSpawnPoint.forward * 20);
         }
     }
 }

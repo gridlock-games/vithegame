@@ -29,7 +29,7 @@ public class CharacterShooter : NetworkBehaviour
 
     public void Shoot()
     {
-        Debug.Log("Shoot at " + Time.time);
+        GetComponentInChildren<ShooterComponent>().Shoot();
     }
 
     private void Awake()
