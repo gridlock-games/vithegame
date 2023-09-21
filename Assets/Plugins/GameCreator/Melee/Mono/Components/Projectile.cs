@@ -23,11 +23,6 @@ namespace GameCreator.Melee
             if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.rotation * new Vector3(0, 0, 5), ForceMode.VelocityChange); }
         }
 
-        private void Update()
-        {
-            Debug.DrawRay(transform.position, transform.forward * 5, Color.red, Time.deltaTime);
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
@@ -47,6 +42,7 @@ namespace GameCreator.Melee
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position, new Vector3(0.5f, 0.5f, 0.5f));
+            Gizmos.DrawLine(transform.position, transform.forward * 5);
         }
     }
 }
