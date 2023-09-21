@@ -19,13 +19,18 @@ public class CharacterShooter : NetworkBehaviour
     [SerializeField] private float reloadTime;
     [SerializeField] private float projectileSpeed;
     [SerializeField] private AnimationClip aimDownSight;
-    [SerializeField] public AvatarMask aimDownMask;
+    [SerializeField] private AvatarMask aimDownMask;
 
 
     private CameraMotorTypeAdventure adventureMotor = null;
     private bool isAimedDown = false;
     private Vector3 adventureTargetOffset;
     private CharacterMelee melee;
+
+    public void Shoot()
+    {
+        Debug.Log("Shoot at " + Time.time);
+    }
 
     private void Awake()
     {

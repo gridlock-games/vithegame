@@ -244,6 +244,11 @@ namespace GameCreator.Melee
                             {
                                 OnLightAttack();
                             }
+
+                            if (TryGetComponent(out CharacterShooter characterShooter))
+                            {
+                                characterShooter.Shoot();
+                            }
                         }
 
                         this.inputBuffer.ConsumeInput();
