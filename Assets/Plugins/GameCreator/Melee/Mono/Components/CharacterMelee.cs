@@ -402,6 +402,7 @@ namespace GameCreator.Melee
         private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
         {
             if (SceneManager.GetActiveScene().name == "Hub") { return; }
+            if (!attack.isAttack) { return; }
 
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
@@ -478,6 +479,12 @@ namespace GameCreator.Melee
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
+
+                // DO NOT REMOVE FOR DEBUGGING
+                // if(hitReaction == null) {
+                //     Debug.Log("No Hit Reaction");
+                // }
+
                 if (hitResult == HitResult.ReceiveDamage)
                 {
                     if (mjmComboSystem)
@@ -530,9 +537,6 @@ namespace GameCreator.Melee
                         case AttackType.Stun:
                             targetMelee.Character.Stun(melee.Character, targetMelee.Character);
                             break;
-                        case AttackType.Pull:
-                            targetMelee.Character.Pull(melee.Character, targetMelee.Character);
-                            break;
                         case AttackType.Knockdown:
                             if (targetMelee.knockedUpHitCount.Value < melee.KNOCK_UP_FOLLOWUP_LIMIT)
                                 targetMelee.Character.Knockdown(melee.Character, targetMelee.Character);
@@ -554,6 +558,7 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
+                        case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
@@ -1509,14 +1514,16 @@ namespace GameCreator.Melee
 
             bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isPulled = attack.attackType == AttackType.Pull;
 
             hitReaction = currentWeapon.GetHitReaction(
                 Character.IsGrounded(),
                 hitLocation,
                 isKnockback,
-                isKnockup
+                isKnockup,
+                isPulled
             );
-
+            
             ExecuteEffects(
                 bladeImpactPosition,
                 isKnockback
@@ -1530,8 +1537,10 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
-            if (!shouldPlayHitReaction) { hitReaction = null; }
+            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
+            if (!shouldPlayHitReaction) { 
+                hitReaction = null; 
+            }
 
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
@@ -1603,6 +1612,7 @@ namespace GameCreator.Melee
             // MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isPulled = attack.attackType == AttackType.Pull;
 
             // MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
             //     this.Character.IsGrounded(),
