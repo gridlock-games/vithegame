@@ -94,6 +94,7 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterLocomotion characterLocomotion;
+        public CharacterStatusManager characterStatusManager {get; private set;}
 
         public CharacterLocomotion.CHARACTER_AILMENTS characterAilment { get; private set; }
         public CharacterStatusManager.CHARACTER_STATUS characterStatus { get; set; }
@@ -205,6 +206,7 @@
 
             if (!Application.isPlaying) return;
             this.CharacterAwake();
+            characterStatusManager = this.GetComponent<CharacterStatusManager>();
 
             this.initSaveData = new SaveData()
             {

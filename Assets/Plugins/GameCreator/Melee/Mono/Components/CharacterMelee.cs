@@ -133,9 +133,9 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
-        private float baseDamageMultiplier = 1.0f;
+        public float baseDamageMultiplier = 1.0f;
 
-        private AbilityManager abilityManager;
+        public AbilityManager abilityManager {get; private set;}
         private GlowRenderer glowRenderer;
 
         public MJMComboSystem mjmComboSystem;
