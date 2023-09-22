@@ -464,9 +464,11 @@ namespace GameCreator.Melee
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
-                if(hitReaction == null) {
-                    Debug.Log("No Hit Reaction");
-                }
+
+                // DO NOT REMOVE FOR DEBUGGING
+                // if(hitReaction == null) {
+                //     Debug.Log("No Hit Reaction");
+                // }
 
                 if (hitResult == HitResult.ReceiveDamage)
                 {
