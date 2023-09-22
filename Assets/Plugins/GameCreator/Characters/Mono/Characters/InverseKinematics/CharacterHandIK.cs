@@ -6,6 +6,7 @@ namespace GameCreator.Characters
     using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
+    using GameCreator.Melee;
 
     [AddComponentMenu("")]
     public class CharacterHandIK : MonoBehaviour, IToggleIK
@@ -147,6 +148,16 @@ namespace GameCreator.Characters
 
         // IK METHODS: ----------------------------------------------------------------------------
 
+        private Vector3 aimPoint;
+        private Quaternion aimOffset;
+        private bool activateAim;
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim)
+        {
+            this.aimPoint = aimPoint;
+            aimOffset = IKOffset;
+            this.activateAim = activateAim;
+        }
+
         private void OnAnimatorIK(int layerIndex)
         {
             if (this.animator == null || !this.animator.isHuman) return;
@@ -159,6 +170,29 @@ namespace GameCreator.Characters
 
             UpdateHand(this.handL);
             UpdateHand(this.handR);
+
+            Vector3 rightHandPosition = animator.GetBoneTransform(HumanBodyBones.RightHand).position;
+
+            Vector3 up = Vector3.up;
+            if (TryGetComponent(out LimbReferences limbReferences))
+            {
+                switch (limbReferences.rightHandAimAxis)
+                {
+                    case LimbReferences.Axis.X:
+                        up = Vector3.right;
+                        break;
+                    case LimbReferences.Axis.Y:
+                        up = Vector3.up;
+                        break;
+                    case LimbReferences.Axis.Z:
+                        up = Vector3.forward;
+                        break;
+                }
+            }
+            //limbReferences.transform.localRotation
+            Quaternion aimRotation = Quaternion.LookRotation(aimPoint - rightHandPosition, up) * aimOffset;
+            animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, activateAim ? 1 : 0);
 
             this.eventAfterIK.Invoke(layerIndex);
         }

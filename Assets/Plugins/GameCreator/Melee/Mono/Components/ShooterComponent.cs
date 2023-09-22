@@ -8,6 +8,7 @@ namespace GameCreator.Melee
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private GameObject projectilePrefab;
+        [SerializeField] private Vector3 aimOffset;
 
         public void Shoot(CharacterMelee attacker, MeleeClip meleeClip)
         {
@@ -18,6 +19,11 @@ namespace GameCreator.Melee
             projectileInstance.GetComponent<NetworkObject>().Spawn();
         }
 
+        public Quaternion GetAimOffset()
+        {
+            return Quaternion.Euler(aimOffset);
+        }
+
         private void OnDrawGizmos()
         {
             Gizmos.color = GIZMOS_DEFAULT_COLOR;
@@ -25,7 +31,7 @@ namespace GameCreator.Melee
             {
                 Gizmos.DrawWireCube(projectileSpawnPoint.position, Vector3.one * 0.05f);
             }
-            Gizmos.DrawLine(projectileSpawnPoint.position, projectileSpawnPoint.forward * 20);
+            Gizmos.DrawLine(projectileSpawnPoint.position, projectileSpawnPoint.position + projectileSpawnPoint.forward * 20);
         }
     }
 }

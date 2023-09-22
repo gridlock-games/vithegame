@@ -13,7 +13,7 @@ namespace GameCreator.Melee
         [SerializeField] private int clipSize;
         [SerializeField] private int magCapacity;
         [SerializeField] private float reloadTime;
-        [SerializeField] private float projectileSpeed;
+        [SerializeField] private float projectileSpeed = 10;
         [SerializeField] private AnimationClip aimDownSight;
         [SerializeField] private AvatarMask aimDownMask;
 
@@ -32,10 +32,10 @@ namespace GameCreator.Melee
 
         private void Awake()
         {
-            melee = GetComponentInParent<CharacterMelee>();
+            melee = GetComponent<CharacterMelee>();
         }
 
-        protected virtual void Start()
+        public override void OnNetworkSpawn()
         {
             if (IsOwner)
             {
@@ -48,7 +48,6 @@ namespace GameCreator.Melee
         void Update()
         {
             if (!IsOwner) return;
-            // if (!Input.anyKeyDown) return;
             if (melee == null) return;
             if (melee.IsBlocking) return;
             if (melee.IsStaggered) return;
@@ -56,14 +55,23 @@ namespace GameCreator.Melee
             if (melee.Character.isCharacterDashing()) return;
             if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
+            //if (Input.GetMouseButtonDown(1))
+            //{
+            //    isAimedDown = true;
+            //}
+            //if (Input.GetMouseButtonUp(1))
+            //{
+            //    isAimedDown = false;
+            //}
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                Shoot(null);
+            }
 
             if (Input.GetMouseButtonDown(1))
             {
-                this.isAimedDown = true;
-            }
-            if (Input.GetMouseButtonUp(1))
-            {
-                this.isAimedDown = false;
+                isAimedDown = !isAimedDown;
             }
 
             PerformAimDownSight(isAimedDown);
@@ -100,6 +108,25 @@ namespace GameCreator.Melee
             {
                 characterAnimator.StopGesture(0.0f);
             }
+
+            if (isAimedDown)
+            {
+                GetComponentInChildren<LimbReferences>().transform.localRotation = Quaternion.Euler(ADSModelRotation);
+            }
+
+            Vector3 aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 20;
+            this.aimPoint = aimPoint;
+            Quaternion aimOffset = GetComponentInChildren<ShooterComponent>().GetAimOffset();
+            GetComponentInChildren<CharacterHandIK>().AimRightHand(aimPoint, aimOffset, isAimedDown);
+        }
+
+        [SerializeField] private Vector3 ADSModelRotation;
+
+        Vector3 aimPoint;
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(aimPoint, 0.5f);
         }
     }
 }

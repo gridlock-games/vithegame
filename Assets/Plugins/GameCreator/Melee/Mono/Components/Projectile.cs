@@ -20,7 +20,7 @@ namespace GameCreator.Melee
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.rotation * new Vector3(0, 0, 5), ForceMode.VelocityChange); }
+            if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.forward * 5, ForceMode.VelocityChange); }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -42,7 +42,7 @@ namespace GameCreator.Melee
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position, new Vector3(0.5f, 0.5f, 0.5f));
-            Gizmos.DrawLine(transform.position, transform.forward * 5);
+            Gizmos.DrawLine(transform.position, transform.position + transform.forward * 5);
         }
     }
 }
