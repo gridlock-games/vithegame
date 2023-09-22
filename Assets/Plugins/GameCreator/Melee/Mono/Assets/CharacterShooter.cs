@@ -18,8 +18,10 @@ namespace GameCreator.Melee
         [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
 
+        private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private CameraMotorTypeAdventure adventureMotor = null;
-        private bool isAimedDown = false;
         private Vector3 adventureTargetOffset;
         private CharacterMelee melee;
         private ShooterComponent shooterWeapon;
@@ -50,14 +52,6 @@ namespace GameCreator.Melee
 
         void Update()
         {
-            if (!IsOwner) return;
-            if (melee == null) return;
-            if (melee.IsBlocking) return;
-            if (melee.IsStaggered) return;
-            if (melee.IsCastingAbility) return;
-            if (melee.Character.isCharacterDashing()) return;
-            if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
-
             if (!handIK) handIK = GetComponentInChildren<CharacterHandIK>();
             if (!shooterWeapon) shooterWeapon = GetComponentInChildren<ShooterComponent>();
             if (!limbReferences) limbReferences = GetComponentInChildren<LimbReferences>();
@@ -66,41 +60,69 @@ namespace GameCreator.Melee
             if (!shooterWeapon) return;
             if (!limbReferences) return;
 
-            if (Input.GetMouseButtonDown(1))
+            if (melee == null) return;
+            if (melee.IsBlocking) return;
+            if (melee.IsStaggered) return;
+            if (melee.IsCastingAbility) return;
+            if (melee.Character.isCharacterDashing()) return;
+            if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
+
+            if (IsOwner)
             {
-                isAimedDown = true;
-            }
-            if (Input.GetMouseButtonUp(1))
-            {
-                isAimedDown = false;
+                if (Input.GetMouseButtonDown(1))
+                {
+                    isAimedDown.Value = true;
+                }
+                if (Input.GetMouseButtonUp(1))
+                {
+                    isAimedDown.Value = false;
+                }
+
+                //if (Input.GetMouseButtonDown(1))
+                //{
+                //    isAimedDown = !isAimedDown;
+                //}
+
+                RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                Vector3 aimPoint = Vector3.zero;
+                bool bHit = false;
+                foreach (RaycastHit hit in allHits)
+                {
+                    if (hit.transform == transform) { continue; }
+
+                    aimPoint = hit.point;
+                    bHit = true;
+                    break;
+                }
+
+                if (!bHit)
+                    aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 5;
+
+                this.aimPoint.Value = aimPoint;
             }
 
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                Shoot(null);
-            }
-
-            //if (Input.GetMouseButtonDown(1))
-            //{
-            //    isAimedDown = !isAimedDown;
-            //}
-
-            PerformAimDownSight(isAimedDown);
+            PerformAimDownSight(isAimedDown.Value);
+            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value);
         }
 
         private void PerformAimDownSight(bool isAimDown)
         {
-            UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
-            CameraMotor motor = CameraMotor.MAIN_MOTOR;
-            CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+            PlayADSAnim(melee, isAimDown);
 
-            this.PlayADSAnim(melee, isAimDown);
+            if (IsOwner)
+            {
+                UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
+                CameraMotor motor = CameraMotor.MAIN_MOTOR;
+                CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
 
-            adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
-            mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
+                adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
+                mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
+            }
+            
         }
 
-        public void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
+        private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
 
@@ -124,33 +146,12 @@ namespace GameCreator.Melee
             {
                 limbReferences.transform.localRotation = Quaternion.Euler(ADSModelRotation);
             }
-
-            RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-            Vector3 aimPoint = Vector3.zero;
-            bool bHit = false;
-            foreach (RaycastHit hit in allHits)
-            {
-                if (hit.transform == transform) { continue; }
-
-                aimPoint = hit.point;
-                bHit = true;
-                break;
-            }
-
-            if (!bHit)
-                aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 5;
-
-            this.aimPoint = aimPoint;
-            Quaternion aimOffset = shooterWeapon.GetAimOffset();
-            handIK.AimRightHand(aimPoint, aimOffset, isAimedDown);
         }
 
-        Vector3 aimPoint;
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(aimPoint, 0.5f);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(aimPoint.Value, 0.25f);
         }
     }
 }
