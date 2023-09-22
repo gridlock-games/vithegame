@@ -16,18 +16,21 @@ namespace GameCreator.Melee
         [SerializeField] private float projectileSpeed = 10;
         [SerializeField] private AnimationClip aimDownSight;
         [SerializeField] private AvatarMask aimDownMask;
-
+        [SerializeField] private Vector3 ADSModelRotation;
 
         private CameraMotorTypeAdventure adventureMotor = null;
         private bool isAimedDown = false;
         private Vector3 adventureTargetOffset;
         private CharacterMelee melee;
+        private ShooterComponent shooterWeapon;
+        private CharacterHandIK handIK;
+        private LimbReferences limbReferences;
 
         public void Shoot(MeleeClip attackClip)
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
 
-            GetComponentInChildren<ShooterComponent>().Shoot(melee, attackClip);
+            shooterWeapon.Shoot(melee, attackClip);
         }
 
         private void Awake()
@@ -55,24 +58,32 @@ namespace GameCreator.Melee
             if (melee.Character.isCharacterDashing()) return;
             if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
-            //if (Input.GetMouseButtonDown(1))
-            //{
-            //    isAimedDown = true;
-            //}
-            //if (Input.GetMouseButtonUp(1))
-            //{
-            //    isAimedDown = false;
-            //}
+            if (!handIK) handIK = GetComponentInChildren<CharacterHandIK>();
+            if (!shooterWeapon) shooterWeapon = GetComponentInChildren<ShooterComponent>();
+            if (!limbReferences) limbReferences = GetComponentInChildren<LimbReferences>();
+
+            if (!handIK) return;
+            if (!shooterWeapon) return;
+            if (!limbReferences) return;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                isAimedDown = true;
+            }
+            if (Input.GetMouseButtonUp(1))
+            {
+                isAimedDown = false;
+            }
 
             if (Input.GetKeyDown(KeyCode.C))
             {
                 Shoot(null);
             }
 
-            if (Input.GetMouseButtonDown(1))
-            {
-                isAimedDown = !isAimedDown;
-            }
+            //if (Input.GetMouseButtonDown(1))
+            //{
+            //    isAimedDown = !isAimedDown;
+            //}
 
             PerformAimDownSight(isAimedDown);
         }
@@ -111,16 +122,29 @@ namespace GameCreator.Melee
 
             if (isAimedDown)
             {
-                GetComponentInChildren<LimbReferences>().transform.localRotation = Quaternion.Euler(ADSModelRotation);
+                limbReferences.transform.localRotation = Quaternion.Euler(ADSModelRotation);
             }
 
-            Vector3 aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 20;
-            this.aimPoint = aimPoint;
-            Quaternion aimOffset = GetComponentInChildren<ShooterComponent>().GetAimOffset();
-            GetComponentInChildren<CharacterHandIK>().AimRightHand(aimPoint, aimOffset, isAimedDown);
-        }
+            RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            Vector3 aimPoint = Vector3.zero;
+            bool bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform == transform) { continue; }
 
-        [SerializeField] private Vector3 ADSModelRotation;
+                aimPoint = hit.point;
+                bHit = true;
+                break;
+            }
+
+            if (!bHit)
+                aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 5;
+
+            this.aimPoint = aimPoint;
+            Quaternion aimOffset = shooterWeapon.GetAimOffset();
+            handIK.AimRightHand(aimPoint, aimOffset, isAimedDown);
+        }
 
         Vector3 aimPoint;
         private void OnDrawGizmos()

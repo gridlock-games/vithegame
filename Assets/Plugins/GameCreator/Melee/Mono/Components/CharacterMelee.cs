@@ -379,7 +379,7 @@ namespace GameCreator.Melee
             while (hitQueue.Count > 0)
             {
                 MeleeHitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false);
             }
         }
 
@@ -396,10 +396,10 @@ namespace GameCreator.Melee
 
         public void ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
         {
-            ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack);
+            ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
         {
             if (SceneManager.GetActiveScene().name == "Hub") { return; }
 
@@ -411,7 +411,10 @@ namespace GameCreator.Melee
                 int hitInstanceID = hit.GetInstanceID();
 
                 if (hit.transform.IsChildOf(transform)) continue;
-                if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                if (!projectileHit)
+                {
+                    if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                }
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
@@ -459,11 +462,13 @@ namespace GameCreator.Melee
                 melee.hitCount++;
                 melee.lastHitCountChangeTime = Time.time;
 
-                melee.targetsEvaluated.Add(hitInstanceID);
+                if (!projectileHit)
+                    melee.targetsEvaluated.Add(hitInstanceID);
 
                 if (attack && this.hitCount < attack.hitCount)
                 {
-                    melee.targetsEvaluated.Remove(hitInstanceID);
+                    if (!projectileHit)
+                        melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
                 // Calculate hit result/HP damage

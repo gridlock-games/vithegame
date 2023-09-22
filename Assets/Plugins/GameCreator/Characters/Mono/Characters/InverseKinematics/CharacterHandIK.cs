@@ -185,11 +185,11 @@ namespace GameCreator.Characters
                         break;
                     case LimbReferences.Axis.Y:
                         up = Vector3.up;
-                        Debug.LogError("Please assign a foward direction!");
+                        Debug.LogError("Please assign a forward direction!");
                         break;
                     case LimbReferences.Axis.Z:
                         up = Vector3.forward;
-                        Debug.LogError("Please assign a foward direction!");
+                        Debug.LogError("Please assign a forward direction!");
                         break;
                 }
             }
