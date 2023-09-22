@@ -9,18 +9,20 @@ namespace GameCreator.Melee
     {
         private CharacterMelee attacker;
         private MeleeClip meleeClip;
+        private float projectileSpeed;
         private bool initialized;
 
-        public void Initialize(CharacterMelee attacker, MeleeClip meleeClip)
+        public void Initialize(CharacterMelee attacker, MeleeClip meleeClip, float projectileSpeed)
         {
             this.attacker = attacker;
             this.meleeClip = meleeClip;
+            this.projectileSpeed = projectileSpeed;
             initialized = true;
         }
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.forward * 5, ForceMode.VelocityChange); }
+            if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.forward * projectileSpeed, ForceMode.VelocityChange); }
         }
 
         private void OnTriggerEnter(Collider other)

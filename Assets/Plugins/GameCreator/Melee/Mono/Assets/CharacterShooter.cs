@@ -32,7 +32,7 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
 
-            shooterWeapon.Shoot(melee, attackClip);
+            shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
         private void Awake()

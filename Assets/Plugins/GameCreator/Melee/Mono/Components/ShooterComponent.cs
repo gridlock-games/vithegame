@@ -10,12 +10,12 @@ namespace GameCreator.Melee
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private Vector3 aimOffset;
 
-        public void Shoot(CharacterMelee attacker, MeleeClip meleeClip)
+        public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, float projectileSpeed)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
 
             GameObject projectileInstance = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
-            projectileInstance.GetComponent<Projectile>().Initialize(attacker, meleeClip);
+            projectileInstance.GetComponent<Projectile>().Initialize(attacker, meleeClip, projectileSpeed);
             projectileInstance.GetComponent<NetworkObject>().Spawn();
         }
 
