@@ -205,7 +205,7 @@ namespace GameCreator.Melee
             return instance;
         }
 
-        public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback, bool isKnockup)
+        public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback, bool isKnockup, bool isPulled)
         {
             int index = 0;
             MeleeClip meleeClip = null;
@@ -241,42 +241,39 @@ namespace GameCreator.Melee
                 return this.knockbackReaction[index];
             }
 
-
             switch (location)
             {
                 case HitLocation.LeftMiddle:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsLeftMiddle.Count - 1);
-                    meleeClip = this.groundHitReactionsLeftMiddle[index];
+                    meleeClip = isPulled ? this.groundHitReactionsRightMiddle[0] : this.groundHitReactionsLeftMiddle[index];
                     break;
 
                 case HitLocation.RightMiddle:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsRightMiddle.Count - 1);
-                    meleeClip = this.groundHitReactionsRightMiddle[index];
+                    meleeClip = isPulled ? this.groundHitReactionsLeftMiddle[0] : this.groundHitReactionsRightMiddle[index];
                     break;
 
                 case HitLocation.FrontUpper:
                 case HitLocation.FrontMiddle:
                 case HitLocation.FrontLower:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsFront.Count - 1);
-
-                    meleeClip = this.groundHitReactionsFront[index];
+                    meleeClip = isPulled ? this.groundHitReactionsBehind[0] : this.groundHitReactionsFront[index];
                     break;
 
                 case HitLocation.BackMiddle:
                 case HitLocation.BackUpper:
                 case HitLocation.BackLower:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
-
-                    meleeClip = this.groundHitReactionsBehind[index];
+                    meleeClip = isPulled ? this.groundHitReactionsFront[0] : this.groundHitReactionsBehind[index];
                     break;
 
                 default:
                     index = UnityEngine.Random.Range(0, this.groundHitReactionsBehind.Count);
-
-                    meleeClip = this.groundHitReactionsBehind[index];
+                    meleeClip = isPulled ? this.groundHitReactionsFront[0] : this.groundHitReactionsBehind[index];
                     break;
             }
 
+            meleeClip.movementMultiplier = isPulled ? 1.50f: 0.5f;
             return meleeClip;
         }
     }

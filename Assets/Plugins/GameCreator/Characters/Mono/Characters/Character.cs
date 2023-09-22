@@ -461,21 +461,21 @@
             {
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
 
-                if (IsServer)
-                {
-                    if (target.IsOwnedByServer)
-                    {
-                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
-                        target.transform.rotation = rotationConfig.quaternion;
-                        Vector3 deltaPos = target.transform.position - attacker.transform.position;
-                        target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
-                    }
-                    else
-                    {
-                        target.UpdateAilmentPositionClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
-                        waitForClientRotation = true;
-                    }
-                }
+                // if (IsServer)
+                // {
+                //     if (target.IsOwnedByServer)
+                //     {
+                //         PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                //         target.transform.rotation = rotationConfig.quaternion;
+                //         Vector3 deltaPos = target.transform.position - attacker.transform.position;
+                //         target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
+                //     }
+                //     else
+                //     {
+                //         target.UpdateAilmentPositionClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                //         waitForClientRotation = true;
+                //     }
+                // }
 
                 this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
                 StartCoroutine(StartPullAfterDuration(0f, waitForClientRotation));
@@ -683,7 +683,6 @@
             Vector3 deltaPos = target.transform.position - attacker.transform.position;
             target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
             target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
-            
         }
 
         private bool ailmentRotationRecieved;
