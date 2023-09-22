@@ -171,27 +171,36 @@ namespace GameCreator.Characters
             UpdateHand(this.handL);
             UpdateHand(this.handR);
 
-            Vector3 rightHandPosition = animator.GetBoneTransform(HumanBodyBones.RightHand).position;
+            Transform rightHandTransform = animator.GetBoneTransform(HumanBodyBones.RightHand);
 
             Vector3 up = Vector3.up;
+            Vector3 forward = Vector3.forward;
             if (TryGetComponent(out LimbReferences limbReferences))
             {
                 switch (limbReferences.rightHandAimAxis)
                 {
                     case LimbReferences.Axis.X:
                         up = Vector3.right;
+                        forward = Vector3.up;
                         break;
                     case LimbReferences.Axis.Y:
                         up = Vector3.up;
+                        Debug.LogError("Please assign a foward direction!");
                         break;
                     case LimbReferences.Axis.Z:
                         up = Vector3.forward;
+                        Debug.LogError("Please assign a foward direction!");
                         break;
                 }
             }
-            //limbReferences.transform.localRotation
-            Quaternion aimRotation = Quaternion.LookRotation(aimPoint - rightHandPosition, up) * aimOffset;
-            animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation);
+
+            //find the desired up direction
+            Vector3 targetUpDirection = rightHandTransform.position - aimPoint;
+            //face forward/upward via black magic
+            Quaternion blackMagicRotation = Quaternion.LookRotation(targetUpDirection, rightHandTransform.rotation * forward);
+            Quaternion aimRotation = Quaternion.LookRotation(blackMagicRotation * up, blackMagicRotation * forward);
+
+            animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation * aimOffset);
             animator.SetIKRotationWeight(AvatarIKGoal.RightHand, activateAim ? 1 : 0);
 
             this.eventAfterIK.Invoke(layerIndex);
