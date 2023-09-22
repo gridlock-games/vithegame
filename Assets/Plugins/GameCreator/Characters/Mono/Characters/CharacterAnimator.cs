@@ -325,13 +325,15 @@
             this.characterAnimation.PlayGesture(clip, avatarMask, transitionIn, transitionOut, speed);
         }
 
-        public void CrossFadeGesture(AnimationClip clip, float speed, AvatarMask avatarMask = null,
+        public PlayableGestureClip CrossFadeGesture(AnimationClip clip, float speed, AvatarMask avatarMask = null,
             float transitionIn = 0.15f, float transitionOut = 0.15f)
         {
-            this.characterAnimation.CrossFadeGesture(
+            var gesture = this.characterAnimation.CrossFadeGesture(
                 clip, avatarMask,
                 transitionIn, transitionOut, speed
             );
+
+            return gesture;
         }
 
         public void CrossFadeGesture(RuntimeAnimatorController rtc, float speed, AvatarMask avatarMask = null,
@@ -348,6 +350,11 @@
         public void StopGesture(float transitionOut = 0.0f)
         {
             this.characterAnimation.StopGesture(transitionOut);
+        }
+
+        public void StopGesture(float fadeOut, PlayableGestureClip gesture)
+        {
+            this.characterAnimation.StopGesture(fadeOut, gesture);
         }
 
         public void SetState(CharacterState state, AvatarMask avatarMask,

@@ -61,27 +61,22 @@ namespace GameCreator.Melee
             if (!limbReferences) return;
 
             if (melee == null) return;
-            if (melee.IsBlocking) return;
-            if (melee.IsStaggered) return;
-            if (melee.IsCastingAbility) return;
-            if (melee.Character.isCharacterDashing()) return;
-            if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
             if (IsOwner)
             {
-                if (Input.GetMouseButtonDown(1))
-                {
-                    isAimedDown.Value = true;
-                }
-                if (Input.GetMouseButtonUp(1))
+                if (melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.isCharacterDashing() | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }
+                else
+                {
+                    isAimedDown.Value = Input.GetMouseButton(1);
 
-                //if (Input.GetMouseButtonDown(1))
-                //{
-                //    isAimedDown = !isAimedDown;
-                //}
+                    //if (Input.GetMouseButtonDown(1))
+                    //{
+                    //    isAimedDown.Value = !isAimedDown.Value;
+                    //}
+                }
 
                 RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                 Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
@@ -122,6 +117,7 @@ namespace GameCreator.Melee
             
         }
 
+        private PlayableGestureClip ADSGesture;
         private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
@@ -132,14 +128,17 @@ namespace GameCreator.Melee
 
             if (isAimedDown)
             {
-                characterAnimator.CrossFadeGesture(
+                ADSGesture = characterAnimator.CrossFadeGesture(
                     aimDownSight, 0.25f, aimDownMask,
                     0.15f, 0.15f
                 );
             }
             else
             {
-                characterAnimator.StopGesture(0.0f);
+                if (ADSGesture != null)
+                {
+                    characterAnimator.StopGesture(0, ADSGesture);
+                }
             }
 
             if (isAimedDown)

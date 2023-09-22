@@ -100,30 +100,38 @@
             ));
         }
 
-        public void CrossFadeGesture(AnimationClip animationClip, AvatarMask avatarMask,
+        public PlayableGestureClip CrossFadeGesture(AnimationClip animationClip, AvatarMask avatarMask,
             float fadeIn, float fadeOut, float speed)
         {
             if (this.gestures.Count == 0)
             {
-                this.gestures.Add(PlayableGestureClip.Create(
+                var gesture = PlayableGestureClip.Create(
                     animationClip, avatarMask,
                     fadeIn, fadeOut, speed,
                     ref this.graph,
                     ref this.mixerGesturesInput,
                     ref this.mixerGesturesOutput
-                ));
+                );
+
+                this.gestures.Add(gesture);
+
+                return gesture;
             }
             else
             {
                 PlayableGesture previous = gestures[this.gestures.Count - 1];
                 previous.StretchDuration(fadeIn);
 
-                this.gestures.Add(PlayableGestureClip.CreateAfter(
+                var gesture = PlayableGestureClip.CreateAfter(
                     animationClip, avatarMask,
                     fadeIn, fadeOut, speed,
                     ref this.graph,
                     previous
-                ));
+                );
+
+                this.gestures.Add(gesture);
+
+                return gesture;
             }
         }
         
@@ -161,7 +169,15 @@
         {
             for (int i = this.gestures.Count - 1; i >= 0; --i)
             {
-                this.gestures[i].Stop(fadeOut);
+                gestures[i].Stop(fadeOut);
+            }
+        }
+
+        public void StopGesture(float fadeOut, PlayableGestureClip gesture)
+        {
+            for (int i = this.gestures.Count - 1; i >= 0; --i)
+            {
+                if (gesture == gestures[i]) { gestures[i].Stop(fadeOut); }
             }
         }
 
