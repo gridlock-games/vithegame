@@ -70,12 +70,12 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    isAimedDown.Value = Input.GetMouseButton(1);
+                    //isAimedDown.Value = Input.GetMouseButton(1);
 
-                    //if (Input.GetMouseButtonDown(1))
-                    //{
-                    //    isAimedDown.Value = !isAimedDown.Value;
-                    //}
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        isAimedDown.Value = !isAimedDown.Value;
+                    }
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
