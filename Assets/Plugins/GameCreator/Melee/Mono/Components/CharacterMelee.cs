@@ -423,7 +423,7 @@ namespace GameCreator.Melee
                 {
                     Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
                     Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
-                    Debug.Log(attackerMeleeTeam + " " + targetMeleeTeam);
+                    
                     if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                     {
                         // If the attacker's team is the same as the victim's team, do not register this hit
