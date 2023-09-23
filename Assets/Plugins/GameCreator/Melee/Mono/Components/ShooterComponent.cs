@@ -7,6 +7,7 @@ namespace GameCreator.Melee
     {
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
         [SerializeField] private Transform projectileSpawnPoint;
+        [SerializeField] private Transform leftHandTarget;
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private Vector3 aimOffset;
 
@@ -19,10 +20,9 @@ namespace GameCreator.Melee
             projectileInstance.GetComponent<NetworkObject>().Spawn();
         }
 
-        public Quaternion GetAimOffset()
-        {
-            return Quaternion.Euler(aimOffset);
-        }
+        public Transform GetLeftHandTarget() { return leftHandTarget; }
+
+        public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 
         private void OnDrawGizmos()
         {

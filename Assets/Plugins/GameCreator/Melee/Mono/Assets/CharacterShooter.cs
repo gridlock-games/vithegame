@@ -70,12 +70,12 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    //isAimedDown.Value = Input.GetMouseButton(1);
+                    isAimedDown.Value = Input.GetMouseButton(1);
 
-                    if (Input.GetMouseButtonDown(1))
-                    {
-                        isAimedDown.Value = !isAimedDown.Value;
-                    }
+                    //if (Input.GetMouseButtonDown(1))
+                    //{
+                    //    isAimedDown.Value = !isAimedDown.Value;
+                    //}
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -98,7 +98,7 @@ namespace GameCreator.Melee
             }
 
             PerformAimDownSight(isAimedDown.Value);
-            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value);
+            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, shooterWeapon.GetLeftHandTarget().position, shooterWeapon.GetLeftHandTarget().rotation);
         }
 
         private void PerformAimDownSight(bool isAimDown)
@@ -132,6 +132,8 @@ namespace GameCreator.Melee
                     aimDownSight, 0.25f, aimDownMask,
                     0.15f, 0.15f
                 );
+
+                limbReferences.transform.localRotation = Quaternion.Slerp(limbReferences.transform.localRotation, Quaternion.Euler(ADSModelRotation), Time.deltaTime * 10);
             }
             else
             {
@@ -139,11 +141,6 @@ namespace GameCreator.Melee
                 {
                     characterAnimator.StopGesture(0, ADSGesture);
                 }
-            }
-
-            if (isAimedDown)
-            {
-                limbReferences.transform.localRotation = Quaternion.Euler(ADSModelRotation);
             }
         }
 

@@ -151,11 +151,16 @@ namespace GameCreator.Characters
         private Vector3 aimPoint;
         private Quaternion aimOffset;
         private bool activateAim;
-        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim)
+        private Vector3 leftHandPosition;
+        private Quaternion leftHandRotation;
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, Vector3 leftHandPosition, Quaternion leftHandRotation)
         {
             this.aimPoint = aimPoint;
             aimOffset = IKOffset;
             this.activateAim = activateAim;
+
+            this.leftHandPosition = leftHandPosition;
+            this.leftHandRotation = leftHandRotation;
         }
 
         private void OnAnimatorIK(int layerIndex)
@@ -202,6 +207,14 @@ namespace GameCreator.Characters
 
             animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation * aimOffset);
             animator.SetIKRotationWeight(AvatarIKGoal.RightHand, activateAim ? 1 : 0);
+
+            if (activateAim)
+            {
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandPosition);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandRotation);
+                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+            }
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, activateAim ? 1 : 0);
 
             this.eventAfterIK.Invoke(layerIndex);
         }
