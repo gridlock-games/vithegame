@@ -135,20 +135,22 @@
 
             LocalVariables variables = Melee.Character.gameObject.GetComponent<LocalVariables>();
             bool isDodging = (bool)variables.Get("isDodging").Get();
-            
+
 
             int currPhase = Melee.GetCurrentPhase();
-            
-            if(isDodging) {
+
+            if (isDodging)
+            {
                 Melee.isLunging = false;
                 Melee.ReleaseTargetFocus();
                 Melee.ResetHitCount();
-                if (weaponTrail != null) {
+                if (weaponTrail != null)
+                {
                     weaponTrail.Deactivate(0f);
                 }
                 isVFXActivated = false;
             }
-            
+
             MeleeClip clip = Melee.currentMeleeClip;
 
             if (currPhase == prevPhase) return;
@@ -195,8 +197,9 @@
                         isVFXActivated = true;
                     }
 
-                    if(clip.affectedBones.Contains(weaponBone)) {
-                        Melee.ExecuteVoiceOver(voiceActorManager.GetAttackVO());
+                    if (clip.affectedBones.Contains(weaponBone))
+                    {
+                        if (voiceActorManager) { Melee.ExecuteVoiceOver(voiceActorManager.GetAttackVO()); }
                         Melee.ExecuteSwingAudio();
                     }
                     if (weaponTrail != null) weaponTrail.Activate();

@@ -6,6 +6,7 @@ namespace GameCreator.Characters
     using System.Collections.Generic;
     using UnityEngine;
     using GameCreator.Core;
+    using GameCreator.Melee;
 
     [AddComponentMenu("")]
     public class CharacterHandIK : MonoBehaviour, IToggleIK
@@ -147,6 +148,21 @@ namespace GameCreator.Characters
 
         // IK METHODS: ----------------------------------------------------------------------------
 
+        private Vector3 aimPoint;
+        private Quaternion aimOffset;
+        private bool activateAim;
+        private Vector3 leftHandPosition;
+        private Quaternion leftHandRotation;
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, Vector3 leftHandPosition, Quaternion leftHandRotation)
+        {
+            this.aimPoint = aimPoint;
+            aimOffset = IKOffset;
+            this.activateAim = activateAim;
+
+            this.leftHandPosition = leftHandPosition;
+            this.leftHandRotation = leftHandRotation;
+        }
+
         private void OnAnimatorIK(int layerIndex)
         {
             if (this.animator == null || !this.animator.isHuman) return;
@@ -159,6 +175,46 @@ namespace GameCreator.Characters
 
             UpdateHand(this.handL);
             UpdateHand(this.handR);
+
+            Transform rightHandTransform = animator.GetBoneTransform(HumanBodyBones.RightHand);
+
+            Vector3 up = Vector3.up;
+            Vector3 forward = Vector3.forward;
+            if (TryGetComponent(out LimbReferences limbReferences))
+            {
+                switch (limbReferences.rightHandAimAxis)
+                {
+                    case LimbReferences.Axis.X:
+                        up = Vector3.right;
+                        forward = Vector3.up;
+                        break;
+                    case LimbReferences.Axis.Y:
+                        up = Vector3.up;
+                        Debug.LogError("Please assign a forward direction!");
+                        break;
+                    case LimbReferences.Axis.Z:
+                        up = Vector3.forward;
+                        Debug.LogError("Please assign a forward direction!");
+                        break;
+                }
+            }
+
+            //find the desired up direction
+            Vector3 targetUpDirection = rightHandTransform.position - aimPoint;
+            //face forward/upward via black magic
+            Quaternion blackMagicRotation = Quaternion.LookRotation(targetUpDirection, rightHandTransform.rotation * forward);
+            Quaternion aimRotation = Quaternion.LookRotation(blackMagicRotation * up, blackMagicRotation * forward);
+
+            animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation * aimOffset);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, activateAim ? 1 : 0);
+
+            if (activateAim)
+            {
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandPosition);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandRotation);
+                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+            }
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, activateAim ? 1 : 0);
 
             this.eventAfterIK.Invoke(layerIndex);
         }

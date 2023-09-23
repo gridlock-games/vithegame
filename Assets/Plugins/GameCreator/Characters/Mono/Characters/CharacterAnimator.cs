@@ -427,11 +427,16 @@
                 Destroy(this.animator.gameObject);
             }
 
-            GameObject instance = Instantiate<GameObject>(prefabModel, transform);
+            GameObject instance = Instantiate(prefabModel, transform);
             instance.name = prefabModel.name;
 
             instance.transform.localPosition = Vector3.zero;
             instance.transform.localRotation = Quaternion.identity;
+
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in instance.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                skinnedMeshRenderer.updateWhenOffscreen = true;
+            }
 
             Animator instanceAnimator = instance.GetComponent<Animator>();
             if (instanceAnimator != null)

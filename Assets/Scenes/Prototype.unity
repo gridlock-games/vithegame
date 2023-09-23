@@ -791,9 +791,14 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1146264346}
-    PlayerPrefab: {fileID: 7527864471004905983, guid: f5e8ea9d76a81a748805aad8924526a7,
-      type: 3}
-    NetworkPrefabs: []
+    PlayerPrefab: {fileID: 0}
+    NetworkPrefabs:
+    - Override: 0
+      Prefab: {fileID: 6498076319814241743, guid: ffb5537c97c648f499290d8e925becdc,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1
@@ -837,7 +842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameMode: 0
-  connectionDataString: Dev|5|0
+  connectionDataString: Dev|4|1
 --- !u!1001 &1641333254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -854,6 +859,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Greatsword_Training_Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 288998041406652132, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}

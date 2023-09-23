@@ -244,6 +244,11 @@ namespace GameCreator.Melee
                             {
                                 OnLightAttack();
                             }
+
+                            if (TryGetComponent(out CharacterShooter characterShooter))
+                            {
+                                characterShooter.Shoot(meleeClip);
+                            }
                         }
 
                         this.inputBuffer.ConsumeInput();
@@ -336,24 +341,24 @@ namespace GameCreator.Melee
 
                         if (hitCount < currentMeleeClip.hitCount)
                         {
-                            hitQueue.Enqueue(new HitQueueElement(this, blade.GetImpactPosition(), hits, comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip));
-                            ProcessHitQueue();
+                            hitQueue.Enqueue(new MeleeHitQueueElement(this, blade.GetImpactPosition(), hits, comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip));
+                            ProcessMeleeHitQueue();
                         }
                     }
                 }
             }
         }
 
-        private static Queue<HitQueueElement> hitQueue = new Queue<HitQueueElement>();
+        private static Queue<MeleeHitQueueElement> hitQueue = new Queue<MeleeHitQueueElement>();
 
-        private struct HitQueueElement
+        private struct MeleeHitQueueElement
         {
             public CharacterMelee attackerMelee;
             public Vector3 impactPosition;
             public GameObject[] hits;
             public MeleeClip attack;
 
-            public HitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+            public MeleeHitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
             {
                 this.attackerMelee = attackerMelee;
                 this.impactPosition = impactPosition;
@@ -362,19 +367,19 @@ namespace GameCreator.Melee
             }
         }
 
-        public void AddHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+        public void AddMeleeHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
-            hitQueue.Enqueue(new HitQueueElement(this, impactPosition, hits, attack));
+            hitQueue.Enqueue(new MeleeHitQueueElement(this, impactPosition, hits, attack));
         }
 
-        private void ProcessHitQueue()
+        private void ProcessMeleeHitQueue()
         {
             // Wait for one frame for the hit queue to fill with all hits from the previous frame
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
             {
-                HitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
+                MeleeHitQueueElement queueElement = hitQueue.Dequeue();
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false);
             }
         }
 
@@ -389,7 +394,12 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+        public void ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
+        {
+            ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
+        }
+
+        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
         {
             if (SceneManager.GetActiveScene().name == "Hub") { return; }
             if (!attack.isAttack) { return; }
@@ -402,7 +412,10 @@ namespace GameCreator.Melee
                 int hitInstanceID = hit.GetInstanceID();
 
                 if (hit.transform.IsChildOf(transform)) continue;
-                if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                if (!projectileHit)
+                {
+                    if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                }
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
@@ -411,7 +424,7 @@ namespace GameCreator.Melee
                 {
                     Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
                     Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
-                    Debug.Log(attackerMeleeTeam + " " + targetMeleeTeam);
+                    
                     if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                     {
                         // If the attacker's team is the same as the victim's team, do not register this hit
@@ -450,11 +463,13 @@ namespace GameCreator.Melee
                 melee.hitCount++;
                 melee.lastHitCountChangeTime = Time.time;
 
-                melee.targetsEvaluated.Add(hitInstanceID);
+                if (!projectileHit)
+                    melee.targetsEvaluated.Add(hitInstanceID);
 
                 if (attack && this.hitCount < attack.hitCount)
                 {
-                    melee.targetsEvaluated.Remove(hitInstanceID);
+                    if (!projectileHit)
+                        melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
                 // Calculate hit result/HP damage

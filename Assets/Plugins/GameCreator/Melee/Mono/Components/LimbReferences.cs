@@ -8,5 +8,14 @@ namespace GameCreator.Melee
     {
         public GameObject rightHand;
         public GameObject leftHand;
+
+        public Axis rightHandAimAxis;
+
+        public enum Axis
+        {
+            X,
+            Y,
+            Z
+        }
     }
 }
