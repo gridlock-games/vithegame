@@ -40,6 +40,22 @@ namespace GameCreator.Melee
             NetworkObject.Despawn(true);
         }
 
+        private Vector3 startPosition;
+        private void Start()
+        {
+            startPosition = transform.position;
+        }
+
+        private void Update()
+        {
+            if (!IsServer) { return; }
+
+            if (Vector3.Distance(transform.position, startPosition) > 500)
+            {
+                NetworkObject.Despawn(true);
+            }
+        }
+
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
