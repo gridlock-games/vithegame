@@ -22,12 +22,10 @@ namespace GameCreator.Melee
         }
 
         private ParticleSystem ps;
-        private Vector3 startPosition;
 
         private void Start()
         {
             ps = GetComponent<ParticleSystem>();
-            startPosition = transform.position;
         }
 
         void OnParticleTrigger()
@@ -35,8 +33,9 @@ namespace GameCreator.Melee
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (!attacker) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
 
-            Collider[] collidersInRange = Physics.OverlapBox(startPosition + transform.rotation * positionOffset, colliderLookBoxExtents / 2);
-            
+            //Collider[] collidersInRange = Physics.OverlapBox(startPosition + transform.rotation * positionOffset, colliderLookBoxExtents / 2);
+            Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation);
+
             foreach (Collider col in collidersInRange)
             {
                 bool skip = false;
@@ -51,6 +50,11 @@ namespace GameCreator.Melee
 
                 if (!skip)
                 {
+                    if (col.name == "Greatsword_Training_Dummy")
+                    {
+                        Debug.Log(Time.time + " " + col);
+                    }
+
                     ps.trigger.AddCollider(col);
                 }
             }
@@ -81,8 +85,11 @@ namespace GameCreator.Melee
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(startPosition + transform.rotation * positionOffset, colliderLookBoxExtents);
+            if (!Application.isPlaying)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireCube(transform.position + transform.rotation * positionOffset, colliderLookBoxExtents);
+            }
         }
     }
 }

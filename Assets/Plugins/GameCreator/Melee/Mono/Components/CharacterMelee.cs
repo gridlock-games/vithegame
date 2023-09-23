@@ -379,6 +379,7 @@ namespace GameCreator.Melee
         public void AddMeleeHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
         {
             hitQueue.Enqueue(new MeleeHitQueueElement(this, impactPosition, hits, attack));
+            ProcessMeleeHitQueue();
         }
 
         private void ProcessMeleeHitQueue()
