@@ -94,8 +94,10 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterLocomotion characterLocomotion;
+        public CharacterStatusManager characterStatusManager {get; private set;}
 
         public CharacterLocomotion.CHARACTER_AILMENTS characterAilment { get; private set; }
+        public CharacterStatusManager.CHARACTER_STATUS characterStatus { get; set; }
         private NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS> characterAilmentNetworked = new NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS>();
 
         public State characterState = new State();
@@ -204,6 +206,7 @@
 
             if (!Application.isPlaying) return;
             this.CharacterAwake();
+            characterStatusManager = this.GetComponent<CharacterStatusManager>();
 
             this.initSaveData = new SaveData()
             {
@@ -371,6 +374,8 @@
         }
 
         // Ailments: ----------------------------------------------------------------------------------
+
+        #region Ailments
         private List<CharacterLocomotion.CHARACTER_AILMENTS> allowedKnockupEntries = new List<CharacterLocomotion.CHARACTER_AILMENTS>(){
             CharacterLocomotion.CHARACTER_AILMENTS.None,
             CharacterLocomotion.CHARACTER_AILMENTS.IsStunned,
@@ -843,10 +848,6 @@
                         }
                         else
                         {
-                            // if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
-                            // recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-                            // if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
-
                             if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
                             recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.10f;
                             if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
@@ -929,6 +930,18 @@
 
             return new PreserveRotation(targetRotation, rotationDirection);
         }
+
+        #endregion
+        
+        
+        // STATUS: ----------------------------------------------------------------------------------
+        public CharacterStatusManager.CHARACTER_STATUS Status(CharacterStatusManager.CHARACTER_STATUS characterStatus) {
+            this.characterStatus = characterStatus;
+
+            return this.characterStatus;
+        }
+        
+
 
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)

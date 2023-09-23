@@ -133,9 +133,9 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
-        private float baseDamageMultiplier = 1.0f;
+        public float baseDamageMultiplier = 1.0f;
 
-        private AbilityManager abilityManager;
+        public AbilityManager abilityManager {get; private set;}
         private GlowRenderer glowRenderer;
 
         public MJMComboSystem mjmComboSystem;
@@ -969,7 +969,13 @@ namespace GameCreator.Melee
             Poise.Value = 0;
         }
 
+        public void AddHP(float value) {
+            HP.Value += value;
+        }
 
+        public void SetHP(float value) {
+            HP.Value = value;
+        }
 
         private bool isCountingdamageMultiplier = false;
         public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
@@ -1047,8 +1053,11 @@ namespace GameCreator.Melee
                 reductionAmount += HP.Value * 0.1f * Time.deltaTime;
                 if (reductionAmount >= 1 && HP.Value > 1)
                 {
-                    HP.Value -= (int)reductionAmount;
-                    HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
+
+                    this.AddHP(-1 * reductionAmount);
+                    this.SetHP(Mathf.Max(this.GetHP(), 1f));
+                    // HP.Value -= reductionAmount;
+                    // HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
                     reductionAmount = 0;
                 }
 

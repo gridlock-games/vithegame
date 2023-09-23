@@ -18,11 +18,9 @@ namespace GameCreator.Melee
             Character _character = this.character.GetCharacter(target);
             if (character == null) return true;
 
-            CharacterMelee melee = _character.GetComponent<CharacterMelee>();
-
-            if (melee != null)
+            if (_character != null)
             {
-                melee.DrainHP(drainDuration);
+                _character.characterStatusManager.DrainHP(drainDuration);
             }
 
             return true;
