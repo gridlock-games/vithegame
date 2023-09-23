@@ -193,6 +193,7 @@ namespace GameCreator.Melee
             }
         }
 
+        private bool newInputThisFrame;
         protected virtual void Update()
         {
             if (IsServer)
@@ -245,10 +246,7 @@ namespace GameCreator.Melee
                                 OnLightAttack();
                             }
 
-                            if (TryGetComponent(out CharacterShooter characterShooter))
-                            {
-                                characterShooter.Shoot(meleeClip);
-                            }
+                            newInputThisFrame = true;
                         }
 
                         this.inputBuffer.ConsumeInput();
@@ -307,6 +305,7 @@ namespace GameCreator.Melee
             hitCount = 0;
         }
 
+        private int lastPhase;
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
@@ -321,7 +320,6 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
-
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
@@ -346,6 +344,17 @@ namespace GameCreator.Melee
                         }
                     }
                 }
+
+                if ((IsAttacking & lastPhase < 0) | (IsAttacking & newInputThisFrame))
+                {
+                    if (TryGetComponent(out CharacterShooter characterShooter))
+                    {
+                        characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
+                    }
+                }
+
+                newInputThisFrame = false;
+                lastPhase = phase;
             }
         }
 
