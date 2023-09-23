@@ -206,7 +206,7 @@
 
             if (!Application.isPlaying) return;
             this.CharacterAwake();
-            characterStatusManager = this.GetComponent<CharacterStatusManager>();
+            characterStatusManager = this.GetComponentInChildren<CharacterStatusManager>();
 
             this.initSaveData = new SaveData()
             {
