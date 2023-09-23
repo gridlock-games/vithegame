@@ -26,7 +26,6 @@ namespace MJM
 
         public void ResetCombo()
         {
-            Debug.Log("Reset Combo Called");
             comboCountdownOver.Invoke();
             Resettimer();
         }

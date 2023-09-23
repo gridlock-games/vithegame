@@ -13,14 +13,12 @@ public class ComboUIAnimator : MonoBehaviour
     {
         //comboUI.DOAnchorPosX(-750,1,true);
         comboUI.DOScale(1.0f, 1);
-        Debug.Log("Show Combo UI");
     }
 
     public void HideComboUI()
     {
         //comboUI.DOAnchorPosX(-1170, 1, true);
         comboUI.DOScale(0.0f, 1);
-        Debug.Log("Hide Combo UI");
     }
 
     public void ShakeComboUI()
