@@ -1040,6 +1040,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1953851308
   AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &331431957
@@ -3021,13 +3025,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RunInBackground: 1
-  LogLevel: 1
   NetworkConfig:
     ProtocolVersion: 2
     NetworkTransport: {fileID: 1775991329}
     PlayerPrefab: {fileID: 0}
-    NetworkPrefabs: []
+    Prefabs:
+      NetworkPrefabsLists:
+      - {fileID: 11400000, guid: 583301f4049dec04c832348179990c21, type: 2}
     TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1
@@ -3043,6 +3047,9 @@ MonoBehaviour:
     LoadSceneTimeOut: 500
     SpawnTimeout: 1
     EnableNetworkLogs: 1
+    OldPrefabList: []
+  RunInBackground: 1
+  LogLevel: 1
 --- !u!4 &1775991331
 Transform:
   m_ObjectHideFlags: 0
