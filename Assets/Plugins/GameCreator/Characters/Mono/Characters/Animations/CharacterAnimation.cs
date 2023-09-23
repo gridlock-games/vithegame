@@ -100,7 +100,7 @@
             ));
         }
 
-        public PlayableGestureClip CrossFadeGesture(AnimationClip animationClip, AvatarMask avatarMask,
+        public void CrossFadeGesture(AnimationClip animationClip, AvatarMask avatarMask,
             float fadeIn, float fadeOut, float speed)
         {
             if (this.gestures.Count == 0)
@@ -114,8 +114,6 @@
                 );
 
                 this.gestures.Add(gesture);
-
-                return gesture;
             }
             else
             {
@@ -130,8 +128,6 @@
                 );
 
                 this.gestures.Add(gesture);
-
-                return gesture;
             }
         }
         

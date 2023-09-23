@@ -117,7 +117,7 @@ namespace GameCreator.Melee
             
         }
 
-        private PlayableGestureClip ADSGesture;
+        private bool lastADS;
         private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
@@ -128,7 +128,7 @@ namespace GameCreator.Melee
 
             if (isAimedDown)
             {
-                ADSGesture = characterAnimator.CrossFadeGesture(
+                characterAnimator.CrossFadeGesture(
                     aimDownSight, 0.25f, aimDownMask,
                     0.15f, 0.15f
                 );
@@ -137,11 +137,13 @@ namespace GameCreator.Melee
             }
             else
             {
-                if (ADSGesture != null)
+                if (!isAimedDown & lastADS)
                 {
-                    characterAnimator.StopGesture(0, ADSGesture);
+                    characterAnimator.StopGesture(0);
                 }
             }
+
+            lastADS = isAimedDown;
         }
 
         private void OnDrawGizmos()
