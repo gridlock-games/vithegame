@@ -111,7 +111,6 @@ public class CharacterStatusManager : NetworkBehaviour
         onStatusEvent.Invoke(status);
     }
 
-
     private bool isCountingdamageMultiplier = false;
     public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
     {
@@ -209,6 +208,59 @@ public class CharacterStatusManager : NetworkBehaviour
         }
 
         isCounting = false;
+    }
+
+    private bool isSlowed = false;
+
+    public void SlowMovement(float slowDuration)
+    {
+        if (!isSlowed)
+        {
+            if (melee.IsCastingAbility)
+            {
+                Ability currentAbility = melee.abilityManager.GetActivatedAbility();
+
+                if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
+                {
+                    StartCoroutine(CompleteAnimBeforeSlowDuration(currentAbility.meleeClip.animationClip.length, slowDuration));
+                }
+
+            }
+            else
+            {
+                StartCoroutine(SlowCoroutine(slowDuration));
+            }
+        }
+    }
+
+    private IEnumerator CompleteAnimBeforeSlowDuration(float animDuration, float slowDuration)
+    {
+        yield return new WaitForSeconds(animDuration);
+        StartCoroutine(HPReductionCoroutine(slowDuration));
+    }
+
+    private IEnumerator SlowCoroutine(float slowDuration)
+    {
+        isSlowed = true;
+        float elapsedTime = 0;
+        float reductionAmount = 0;
+
+        while (elapsedTime < slowDuration && melee.GetHP() > 1)
+        {
+            reductionAmount += melee.GetHP() * 0.1f * Time.deltaTime;
+            if (reductionAmount >= 1 && melee.GetHP() > 1)
+            {
+
+                melee.AddHP(-1 * reductionAmount);
+                melee.SetHP(Mathf.Max(melee.GetHP(), 1f));
+                reductionAmount = 0;
+            }
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        isSlowed = false;
     }
 
 
