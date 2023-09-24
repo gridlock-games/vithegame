@@ -8,8 +8,9 @@ OcclusionCullingSettings:
     smallestOccluder: 5
     smallestHole: 0.25
     backfaceThreshold: 100
-  m_SceneGUID: 00000000000000000000000000000000
-  m_OcclusionCullingData: {fileID: 0}
+  m_SceneGUID: 970a92b536b988a4f95be92177ef8ad2
+  m_OcclusionCullingData: {fileID: 36300000, guid: 27bdd033675996f41ac51bb7c398d19e,
+    type: 2}
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
@@ -4021,6 +4022,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Directional Light_SUN
       objectReference: {fileID: 0}
+    - target: {fileID: 7676517750680693136, guid: 5181c2f12b12a0442a0ef82a09e1dc5d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7676517750680693137, guid: 5181c2f12b12a0442a0ef82a09e1dc5d,
         type: 3}
       propertyPath: m_Color.b
@@ -4035,6 +4041,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676517750680693137, guid: 5181c2f12b12a0442a0ef82a09e1dc5d,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7676517750680693137, guid: 5181c2f12b12a0442a0ef82a09e1dc5d,
         type: 3}
@@ -4602,7 +4613,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1316772815
 Transform:
   m_ObjectHideFlags: 0
@@ -4931,7 +4942,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh829246
+  m_Name: pb_Mesh1698028
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -6075,7 +6086,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh828968
+  m_Name: pb_Mesh1697750
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7793,6 +7804,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Global Volume v3
+      objectReference: {fileID: 0}
+    - target: {fileID: 153497101553667453, guid: 1dafd4fd2fcbe3644a51664c1835f294,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 153497101553667454, guid: 1dafd4fd2fcbe3644a51664c1835f294,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 153497101553667455, guid: 1dafd4fd2fcbe3644a51664c1835f294,
         type: 3}
