@@ -376,14 +376,9 @@ namespace GameCreator.Melee
             }
         }
 
-        public void AddMeleeHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
-        {
-            hitQueue.Enqueue(new MeleeHitQueueElement(this, impactPosition, hits, attack));
-            ProcessMeleeHitQueue();
-        }
-
         private void ProcessMeleeHitQueue()
         {
+            //Debug.Log(Time.time + " " + hitQueue.Count);
             // Wait for one frame for the hit queue to fill with all hits from the previous frame
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
@@ -428,6 +423,7 @@ namespace GameCreator.Melee
                 }
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
+                Debug.Log(targetMelee);
                 if (!targetMelee) { continue; }
 
                 if (ClientManager.Singleton)
@@ -603,6 +599,8 @@ namespace GameCreator.Melee
                         rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
                     }
                 }
+
+                //Debug.Log(Time.time + " " + melee + " attacked " + targetMelee);
             }
         }
 
