@@ -10,6 +10,7 @@ namespace GameCreator.Melee
         public Vector3 positionOffset;
         public Vector3 colliderLookBoxExtents = Vector3.one;
         public float particleRadius = 0.1f;
+        public bool onTriggerEnter;
 
         private CharacterMelee attacker;
         private MeleeClip attack;
@@ -33,7 +34,6 @@ namespace GameCreator.Melee
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (!attacker) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
 
-            //Collider[] collidersInRange = Physics.OverlapBox(startPosition + transform.rotation * positionOffset, colliderLookBoxExtents / 2);
             Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 
             foreach (Collider col in collidersInRange)
@@ -58,7 +58,7 @@ namespace GameCreator.Melee
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
 
             // get
-            int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter, out var enterData);
+            int numEnter = ps.GetTriggerParticles(onTriggerEnter ? ParticleSystemTriggerEventType.Enter : ParticleSystemTriggerEventType.Inside, enter, out var enterData);
 
             // iterate
             for (int i = 0; i < numEnter; i++)
@@ -72,13 +72,12 @@ namespace GameCreator.Melee
                     if (targetMelee)
                     {
                         attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
-                        //attacker.AddMeleeHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject }, attack);
                     }
                 }
             }
 
             // set
-            ps.SetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter);
+            ps.SetTriggerParticles(onTriggerEnter ? ParticleSystemTriggerEventType.Enter : ParticleSystemTriggerEventType.Inside, enter);
         }
 
         private void OnDrawGizmos()

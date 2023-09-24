@@ -423,7 +423,6 @@ namespace GameCreator.Melee
                 }
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
-                Debug.Log(targetMelee);
                 if (!targetMelee) { continue; }
 
                 if (ClientManager.Singleton)
