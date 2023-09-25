@@ -97,6 +97,7 @@
         private SerializedProperty spIsHeavy;
         private SerializedProperty spBladeMultiplier;
         private SerializedProperty spIsOrbitLocked;
+        private SerializedProperty spApplyRootMotion;
         private SerializedProperty spIsLunge;
         private SerializedProperty spAttackType;
         private SerializedProperty spIsDodge;
@@ -200,6 +201,7 @@
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
             this.spBladeMultiplier = this.serializedObject.FindProperty("bladeSizeMultiplier"); 
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
+            this.spApplyRootMotion = this.serializedObject.FindProperty("applyRootMotion");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
             this.spHitCountDelay = this.serializedObject.FindProperty("multiHitRegDelay");
@@ -566,6 +568,7 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
+                    EditorGUILayout.PropertyField(this.spApplyRootMotion);
                     EditorGUILayout.PropertyField(this.spBladeMultiplier);
 
                     EditorGUILayout.PropertyField(this.spAttackType);
