@@ -43,6 +43,7 @@ public class Ability : MonoBehaviour
     public float coolDown = 0.00f;
     public float staminaCost = 0.00f;
     public float hpCost = 0.00f;
+    public float rageCost = 0.00f;
     public KeyCode skillKey = KeyCode.Space;
 
     public AnimCancellingType canCncelAnimationType = AnimCancellingType.Cancel_NormalAtk;

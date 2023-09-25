@@ -77,28 +77,38 @@
 
             foreach (Ability ability in abilityManager.GetAbilityInstanceList())
             {
+
+                float cost = 0f;
+                float costRequirement = 0f;
+
+                if(ability.staminaCost > 0) { 
+                    costRequirement = melee.GetPoise();
+                    cost = ability.staminaCost;
+                } else if (ability.hpCost > 0) {
+                    costRequirement = melee.GetHP();
+                    cost = ability.hpCost;
+                } else {
+                    costRequirement = melee.GetRage();
+                    cost = ability.rageCost;
+                }
+
                 switch (ability.skillKey)
                 {
                     case KeyCode.Q:
                         abilityAImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityAImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
-                        abilityAImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
-                        break;
+                        abilityAImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.E:
                         abilityBImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityBImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
-                        abilityBImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
+                        abilityBImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.R:
                         abilityCImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityCImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
-                        abilityCImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
+                        abilityCImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.T:
                         abilityDImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityDImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
-                        abilityDImageFill.color = melee.GetHP() < ability.hpCost ? lowPoiseColor : normalPoiseColor;
+                        abilityDImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                 }
             }

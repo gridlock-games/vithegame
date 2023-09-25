@@ -104,8 +104,10 @@ public class AbilityManager : NetworkBehaviour
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
         if (ability && ability.staminaCost > 0f && melee.GetPoise() < ability.staminaCost) { return; }
-        // Don't activate if poise is not high enough
+        // Don't activate if HP is not high enough
         if (ability && ability.hpCost > 0f && melee.GetHP() < ability.hpCost) { return; }
+        // Don't activate if Rage is not high enough
+        if (ability && ability.rageCost > 0f && melee.GetRage() < ability.rageCost) { return; }
         // Don't activate if Melee is attacking and cancelType is none
         if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None) { return; }
         // Don't activate if Melee is currently playing a Heavy Attack
@@ -119,6 +121,8 @@ public class AbilityManager : NetworkBehaviour
             activatedAbility = ability;
             melee.RevertAbilityCastingStatus();
             melee.AddPoise(-1 * activatedAbility.staminaCost);
+            melee.AddHP(-1 * activatedAbility.hpCost);
+            melee.AddRage(-1 * activatedAbility.rageCost);
             activatedAbility.ExecuteAbility(melee, key);
         }
     }

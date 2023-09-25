@@ -80,6 +80,9 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
+        
+        public NumberProperty maxRage = new NumberProperty(100.0f); 
+
 
         public float attackInterval = 0.10f;
 
@@ -954,9 +957,12 @@ namespace GameCreator.Melee
 
         public float maxHealth = 100.0f;
         private NetworkVariable<float> HP = new NetworkVariable<float>();
+        private NetworkVariable<float> Rage = new NetworkVariable<float>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
         public float GetHP() { return HP.Value; }
+
+        public float GetRage() { return Rage.Value; }
 
         public float GetDefense() { return Defense.Value; }
 
@@ -1315,9 +1321,19 @@ namespace GameCreator.Melee
             this.Poise.Value = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
         }
 
+        public void SetRage(float value)
+        {
+            this.Rage.Value = Mathf.Clamp(value, 0f, this.maxRage.GetValue(gameObject));
+        }
+
         public void AddPoise(float value)
         {
             this.SetPoise(this.Poise.Value + value);
+        }
+
+        public void AddRage(float value)
+        {
+            this.SetRage(this.Rage.Value + value);
         }
 
         public void SetDefense(float value)
