@@ -7,9 +7,9 @@ namespace GameCreator.Melee
 {
     public class ApplyDamageOnParticleSystemCollision : MonoBehaviour
     {
-        public Vector3 positionOffset;
         public Vector3 colliderLookBoxExtents = Vector3.one;
-        public Vector3 particleSize = new Vector3(0.1f, 0.1f, 0.1f);
+        public float particleRadius = 1;
+        public int maxHits = 100;
 
         private CharacterMelee attacker;
         private MeleeClip attack;
@@ -28,13 +28,14 @@ namespace GameCreator.Melee
             ps = GetComponent<ParticleSystem>();
         }
 
+        private Dictionary<CharacterMelee, int> hitCounter = new Dictionary<CharacterMelee, int>();
+
         void OnParticleTrigger()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (!attacker) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
 
-            //Collider[] collidersInRange = Physics.OverlapBox(startPosition + transform.rotation * positionOffset, colliderLookBoxExtents / 2);
-            Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation);
+            Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 
             foreach (Collider col in collidersInRange)
             {
@@ -50,11 +51,6 @@ namespace GameCreator.Melee
 
                 if (!skip)
                 {
-                    if (col.name == "Greatsword_Training_Dummy")
-                    {
-                        Debug.Log(Time.time + " " + col);
-                    }
-
                     ps.trigger.AddCollider(col);
                 }
             }
@@ -68,13 +64,32 @@ namespace GameCreator.Melee
             // iterate
             for (int i = 0; i < numEnter; i++)
             {
-                Collider[] potentialHits = Physics.OverlapBox(transform.TransformPoint(enter[i].position), particleSize);
+                Collider[] potentialHits = Physics.OverlapSphere(transform.TransformPoint(enter[i].position), particleRadius, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                Debug.DrawRay(transform.TransformPoint(enter[i].position), Vector3.up * particleRadius, Color.green, 1);
                 for (int j = 0; j < potentialHits.Length; j++)
                 {
                     CharacterMelee targetMelee = potentialHits[j].GetComponentInParent<CharacterMelee>();
+                    if (targetMelee == attacker) { continue; }
                     if (targetMelee)
                     {
-                        attacker.AddMeleeHitsToQueue(transform.TransformPoint(enter[i].position), new GameObject[] { targetMelee.gameObject }, attack);
+                        bool hitCounterContainsMelee = hitCounter.ContainsKey(targetMelee);
+                        if (hitCounterContainsMelee)
+                        {
+                            if (hitCounter[targetMelee] >= maxHits) { continue; }
+                        }
+                        
+                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
+                        if (hitResult != CharacterMelee.HitResult.Ignore)
+                        {
+                            if (hitCounterContainsMelee)
+                            {
+                                hitCounter[targetMelee] += 1;
+                            }
+                            else
+                            {
+                                hitCounter.Add(targetMelee, 1);
+                            }
+                        }
                     }
                 }
             }
@@ -88,7 +103,7 @@ namespace GameCreator.Melee
             if (!Application.isPlaying)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireCube(transform.position + transform.rotation * positionOffset, colliderLookBoxExtents);
+                Gizmos.DrawWireCube(transform.position, colliderLookBoxExtents);
             }
         }
     }

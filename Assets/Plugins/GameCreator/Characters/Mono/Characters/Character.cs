@@ -185,6 +185,8 @@
             characterAilmentNetworked.OnValueChanged += OnAilmentChange;
             isControllable.OnValueChanged += OnIsControllableChange;
             overrideFaceDirection.OnValueChanged += OnOverrideFaceDirectionChange;
+            
+            characterStatusManager = this.GetComponentInChildren<CharacterStatusManager>();
 
             if (IsServer)
             {
@@ -206,7 +208,6 @@
 
             if (!Application.isPlaying) return;
             this.CharacterAwake();
-            characterStatusManager = this.GetComponentInChildren<CharacterStatusManager>();
 
             this.initSaveData = new SaveData()
             {
