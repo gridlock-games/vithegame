@@ -244,7 +244,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-70638
+  m_Name: pb_Mesh-2217414
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1064,7 +1064,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameMode: 0
-  connectionDataString: Dev|2|0
+  connectionDataString: Dev|4|0
 --- !u!1 &1288735158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1140,6 +1140,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 288998041406652120, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: maxRage.local.allowTypesMask
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652120, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: maxRage.global.allowTypesMask
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652120, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: rageRecoveryRate.local.allowTypesMask
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 288998041406652120, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
+        type: 3}
+      propertyPath: rageRecoveryRate.global.allowTypesMask
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 288998041406652121, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -3288,7 +3308,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-70624
+  m_Name: pb_Mesh-2217400
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

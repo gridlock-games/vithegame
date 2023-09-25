@@ -82,6 +82,7 @@ namespace GameCreator.Melee
 
         
         public NumberProperty maxRage = new NumberProperty(100.0f); 
+        public NumberProperty rageRecoveryRate = new NumberProperty(1f);
 
 
         public float attackInterval = 0.10f;
@@ -203,6 +204,7 @@ namespace GameCreator.Melee
             {
                 this.UpdatePoise();
                 this.UpdateDefense();
+                this.UpdateRage();
             }
 
             // Adding check block to make sure melee animations are cancelled as soon ailment == dead
@@ -485,6 +487,7 @@ namespace GameCreator.Melee
 
                 // Calculate hit result/HP damage
                 float previousHP = targetMelee.HP.Value;
+                melee.Rage.Value += 2;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
 
                 HitResult hitResult = OnRecieveAttackResult.Key;
@@ -501,11 +504,13 @@ namespace GameCreator.Melee
                     if (mjmComboSystem)
                         mjmComboSystem.AddCount(1);
                     targetMelee.HP.Value -= attack.baseDamage * melee.baseDamageMultiplier;
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderHit();
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
                     targetMelee.HP.Value -= (attack.baseDamage * 0.7f);
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderBlock();
                 }
 
@@ -810,6 +815,15 @@ namespace GameCreator.Melee
 
             this.Poise.Value += this.poiseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
             this.Poise.Value = Mathf.Min(this.Poise.Value, this.maxPoise.GetValue(gameObject));
+        }
+
+        protected void UpdateRage()
+        {
+            this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
+            if (this.poiseDelayCooldown > float.Epsilon) return;
+
+            this.Rage.Value += this.rageRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Rage.Value = Mathf.Min(this.Rage.Value, this.maxRage.GetValue(gameObject));
         }
 
         protected void UpdateDefense()

@@ -24,6 +24,7 @@
         public Slider healthSlider;
         public Slider defenseSlider;
         public Slider poiseSlider;
+        public Slider rageSlider;
         public Image weaponImageFill;
 
         public Image abilityAImageFill;
@@ -63,6 +64,7 @@
             healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             if (melee.currentShield) defenseSlider.value = melee.GetDefense() / melee.currentShield.maxDefense.GetValue(gameObject);
             poiseSlider.value = melee.GetPoise() / melee.maxPoise.GetValue(gameObject);
+            rageSlider.value = melee.GetRage() / melee.maxRage.GetValue(gameObject); 
         }
 
         /*

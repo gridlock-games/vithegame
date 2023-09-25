@@ -4953,6 +4953,7 @@ GameObject:
   - component: {fileID: 501073940751052204}
   - component: {fileID: 4009368749408588188}
   - component: {fileID: 6486060066223951497}
+  - component: {fileID: 8707936642618882431}
   m_Layer: 0
   m_Name: PS_VFX_Piercing
   m_TagString: Untagged
@@ -4969,7 +4970,7 @@ Transform:
   m_GameObject: {fileID: 1125471182277475146}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.42, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2561022727397743226}
@@ -8811,18 +8812,18 @@ ParticleSystem:
     collidesWithDynamic: 1
     interiorCollisions: 0
   TriggerModule:
-    enabled: 0
+    enabled: 1
     serializedVersion: 2
-    inside: 1
+    inside: 2
     outside: 0
-    enter: 0
+    enter: 2
     exit: 0
     colliderQueryMode: 0
     radiusScale: 1
     primitives: []
   SubModule:
     serializedVersion: 2
-    enabled: 0
+    enabled: 1
     subEmitters:
     - serializedVersion: 3
       emitter: {fileID: 0}
@@ -9839,6 +9840,21 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &8707936642618882431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125471182277475146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f92ec8667636df4cb53114cc721864c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colliderLookBoxExtents: {x: 9.57, y: 1, z: 2}
+  particleRadius: 100
+  maxHits: 1
 --- !u!1 &4597925975597660890
 GameObject:
   m_ObjectHideFlags: 0
@@ -13638,9 +13654,9 @@ ParticleSystem:
   TriggerModule:
     enabled: 0
     serializedVersion: 2
-    inside: 1
+    inside: 2
     outside: 0
-    enter: 0
+    enter: 2
     exit: 0
     colliderQueryMode: 0
     radiusScale: 1
@@ -13650,9 +13666,9 @@ ParticleSystem:
     enabled: 0
     subEmitters:
     - serializedVersion: 3
-      emitter: {fileID: 0}
+      emitter: {fileID: 4009368749408588188}
       type: 0
-      properties: 0
+      properties: 2
       emitProbability: 1
   LightsModule:
     enabled: 0
@@ -14768,7 +14784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5050677815652134505
 Transform:
   m_ObjectHideFlags: 0
