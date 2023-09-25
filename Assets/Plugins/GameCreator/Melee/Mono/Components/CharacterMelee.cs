@@ -399,15 +399,18 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        public void ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
+        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
         {
-            ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
+            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
+            return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
+        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
         {
-            if (SceneManager.GetActiveScene().name == "Hub") { return; }
-            if (!attack.isAttack) { return; }
+            List<HitResult> hitResults = new List<HitResult>();
+
+            if (SceneManager.GetActiveScene().name == "Hub") { return hitResults; }
+            if (!attack.isAttack) { return hitResults; }
 
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
@@ -441,7 +444,7 @@ namespace GameCreator.Melee
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
-                if (melee.wasHit) { return; }
+                if (melee.wasHit) { return hitResults; }
                 // If the attacker is dead, don't register their hits
                 if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
@@ -599,8 +602,9 @@ namespace GameCreator.Melee
                     }
                 }
 
-                //Debug.Log(Time.time + " " + melee + " attacked " + targetMelee);
+                hitResults.Add(hitResult);
             }
+            return hitResults;
         }
 
         private void RenderHit()

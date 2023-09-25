@@ -7,10 +7,9 @@ namespace GameCreator.Melee
 {
     public class ApplyDamageOnParticleSystemCollision : MonoBehaviour
     {
-        public Vector3 positionOffset;
         public Vector3 colliderLookBoxExtents = Vector3.one;
-        public float particleRadius = 0.1f;
-        public bool onTriggerEnter;
+        public float particleRadius = 1;
+        public int maxHits = 100;
 
         private CharacterMelee attacker;
         private MeleeClip attack;
@@ -28,6 +27,8 @@ namespace GameCreator.Melee
         {
             ps = GetComponent<ParticleSystem>();
         }
+
+        private Dictionary<CharacterMelee, int> hitCounter = new Dictionary<CharacterMelee, int>();
 
         void OnParticleTrigger()
         {
@@ -58,7 +59,7 @@ namespace GameCreator.Melee
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
 
             // get
-            int numEnter = ps.GetTriggerParticles(onTriggerEnter ? ParticleSystemTriggerEventType.Enter : ParticleSystemTriggerEventType.Inside, enter, out var enterData);
+            int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter, out var enterData);
 
             // iterate
             for (int i = 0; i < numEnter; i++)
@@ -71,13 +72,30 @@ namespace GameCreator.Melee
                     if (targetMelee == attacker) { continue; }
                     if (targetMelee)
                     {
-                        attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
+                        bool hitCounterContainsMelee = hitCounter.ContainsKey(targetMelee);
+                        if (hitCounterContainsMelee)
+                        {
+                            if (hitCounter[targetMelee] >= maxHits) { continue; }
+                        }
+                        
+                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
+                        if (hitResult != CharacterMelee.HitResult.Ignore)
+                        {
+                            if (hitCounterContainsMelee)
+                            {
+                                hitCounter[targetMelee] += 1;
+                            }
+                            else
+                            {
+                                hitCounter.Add(targetMelee, 1);
+                            }
+                        }
                     }
                 }
             }
 
             // set
-            ps.SetTriggerParticles(onTriggerEnter ? ParticleSystemTriggerEventType.Enter : ParticleSystemTriggerEventType.Inside, enter);
+            ps.SetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter);
         }
 
         private void OnDrawGizmos()
@@ -85,7 +103,7 @@ namespace GameCreator.Melee
             if (!Application.isPlaying)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireCube(transform.position + transform.rotation * positionOffset, colliderLookBoxExtents);
+                Gizmos.DrawWireCube(transform.position, colliderLookBoxExtents);
             }
         }
     }
