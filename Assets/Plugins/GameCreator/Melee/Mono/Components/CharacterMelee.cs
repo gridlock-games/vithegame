@@ -1448,7 +1448,7 @@ namespace GameCreator.Melee
             // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
             assailant.didDodgeCancelAilment = false;
 
-            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition, attack.name);
 
             this.ReleaseTargetFocus();
 
@@ -1596,22 +1596,14 @@ namespace GameCreator.Melee
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition)
+        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition, string meleeClipName)
         {
             CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CharacterMelee>();
-            MeleeClip attack = attacker.comboSystem.GetCurrentClip() ? attacker.comboSystem.GetCurrentClip() : attacker.currentMeleeClip;
-
-            // Character assailant = attacker.Character;
-            // CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
-            // BladeComponent meleeWeapon = melee.Blades[0];
-            // Character player = this.Character.GetComponent<PlayerCharacter>();
-
-            if (this.currentWeapon == null) return;
-            // if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && isUninterruptable) { return; } 
+            MeleeClip attack = attacker.GetMeleeClipFromWeaponOrShieldByName(meleeClipName);
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+            MeleeWeapon.HitLocation hitLocation = GetHitLocation(attackVectorAngle);
 
             #region Attack and Defense VFX
 

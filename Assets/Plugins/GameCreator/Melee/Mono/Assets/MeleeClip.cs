@@ -113,6 +113,7 @@
         public Vulnerable vulnerability = Vulnerable.Vulnerable;
         public Posture posture = Posture.Steady;
         public bool isOrbitLocked = false;
+        public bool applyRootMotion = true;
         public bool isLunge = false;
         private float disableOrbitDuration = 0.0f;
         public bool isModifyFocus = false;
@@ -251,16 +252,19 @@
 
             if (isAttack)
             {
-                AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
-                AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
-                melee.Character.RootMovement(
-                    this.movementMultiplier,
-                    duration / selectedAnimSpeed,
-                    this.gravityInfluence,
-                    newMovementForwardCurve,
-                    newMovementSidesCurve,
-                    this.movementVertical
-                );
+                if (applyRootMotion)
+                {
+                    AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
+                    AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
+                    melee.Character.RootMovement(
+                        this.movementMultiplier,
+                        duration / selectedAnimSpeed,
+                        this.gravityInfluence,
+                        newMovementForwardCurve,
+                        newMovementSidesCurve,
+                        this.movementVertical
+                    );
+                }
 
                 melee.Character.GetCharacterAnimator().StopGesture(0.1f);
                 melee.Character.GetCharacterAnimator().CrossFadeGesture(
