@@ -24,7 +24,11 @@ public class CharacterStatusManager : NetworkBehaviour
         slowedMovement,
         rooted,
         defenseIncreaseMultiplier,
-        defenseReductionMultiplier
+        defenseReductionMultiplier,
+        silenced,
+        fear,
+        healing,
+        damageReceivedMultiplier
     }
 
     // PRIVATE ------
