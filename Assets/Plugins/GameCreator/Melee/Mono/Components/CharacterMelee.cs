@@ -80,6 +80,10 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
+        
+        public NumberProperty maxRage = new NumberProperty(100.0f); 
+        public NumberProperty rageRecoveryRate = new NumberProperty(1f);
+
 
         public float attackInterval = 0.10f;
 
@@ -200,6 +204,7 @@ namespace GameCreator.Melee
             {
                 this.UpdatePoise();
                 this.UpdateDefense();
+                this.UpdateRage();
             }
 
             // Adding check block to make sure melee animations are cancelled as soon ailment == dead
@@ -482,6 +487,7 @@ namespace GameCreator.Melee
 
                 // Calculate hit result/HP damage
                 float previousHP = targetMelee.HP.Value;
+                melee.Rage.Value += 2;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
 
                 HitResult hitResult = OnRecieveAttackResult.Key;
@@ -498,11 +504,13 @@ namespace GameCreator.Melee
                     if (mjmComboSystem)
                         mjmComboSystem.AddCount(1);
                     targetMelee.HP.Value -= attack.baseDamage * melee.baseDamageMultiplier;
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderHit();
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
                     targetMelee.HP.Value -= (attack.baseDamage * 0.7f);
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderBlock();
                 }
 
@@ -809,6 +817,15 @@ namespace GameCreator.Melee
             this.Poise.Value = Mathf.Min(this.Poise.Value, this.maxPoise.GetValue(gameObject));
         }
 
+        protected void UpdateRage()
+        {
+            this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
+            if (this.poiseDelayCooldown > float.Epsilon) return;
+
+            this.Rage.Value += this.rageRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Rage.Value = Mathf.Min(this.Rage.Value, this.maxRage.GetValue(gameObject));
+        }
+
         protected void UpdateDefense()
         {
             if (this.IsBlocking) return;
@@ -954,9 +971,12 @@ namespace GameCreator.Melee
 
         public float maxHealth = 100.0f;
         private NetworkVariable<float> HP = new NetworkVariable<float>();
+        private NetworkVariable<float> Rage = new NetworkVariable<float>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
         public float GetHP() { return HP.Value; }
+
+        public float GetRage() { return Rage.Value; }
 
         public float GetDefense() { return Defense.Value; }
 
@@ -1315,9 +1335,19 @@ namespace GameCreator.Melee
             this.Poise.Value = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
         }
 
+        public void SetRage(float value)
+        {
+            this.Rage.Value = Mathf.Clamp(value, 0f, this.maxRage.GetValue(gameObject));
+        }
+
         public void AddPoise(float value)
         {
             this.SetPoise(this.Poise.Value + value);
+        }
+
+        public void AddRage(float value)
+        {
+            this.SetRage(this.Rage.Value + value);
         }
 
         public void SetDefense(float value)
