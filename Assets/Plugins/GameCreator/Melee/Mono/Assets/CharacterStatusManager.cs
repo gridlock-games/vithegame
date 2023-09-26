@@ -1,16 +1,9 @@
 using GameCreator.Melee;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 using Unity.Netcode;
 using UnityEngine.Events;
-using GameCreator.Core;
-using GameCreator.Characters;
-using GameCreator.Variables;
-using GameCreator.Pool;
-using static GameCreator.Melee.MeleeClip;
+using System.Collections.Generic;
 
 public class CharacterStatusManager : NetworkBehaviour
 {
@@ -31,89 +24,171 @@ public class CharacterStatusManager : NetworkBehaviour
         damageReceivedMultiplier
     }
 
-    // PRIVATE ------
-    private Character character;
-    private CharacterMelee melee;
-    private NetworkVariable<CHARACTER_STATUS> characterStatusNetworked = new NetworkVariable<CHARACTER_STATUS>();
-
-
-    // Lifecycle hooks ------
-    private void Awake() {}
-
-    void Update() {}
-    // EVENT TRIGGERS ------
-    public class StatusUpdateEvent : UnityEvent<CHARACTER_STATUS> { }
-    public StatusUpdateEvent onStatusEvent = new StatusUpdateEvent();
-
-    private void OnStatusChange(CHARACTER_STATUS prev, CHARACTER_STATUS current)
+    private struct CHARACTER_STATUS_NETWORKED : INetworkSerializable, System.IEquatable<CHARACTER_STATUS_NETWORKED>
     {
-        if (IsServer) { return; }
+        public CHARACTER_STATUS charStatus;
 
-        StartCoroutine(ExcecuteStatusChange(current));
+        public CHARACTER_STATUS_NETWORKED(CHARACTER_STATUS charStatus)
+        {
+            this.charStatus = charStatus;
+        }
+
+        public bool Equals(CHARACTER_STATUS_NETWORKED other)
+        {
+            return true;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref charStatus);
+        }
     }
+
+    public bool TryAddStatus(CHARACTER_STATUS status)
+    {
+        if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
+
+        CHARACTER_STATUS_NETWORKED charStatus = new(status);
+        if (characterStatuses.Contains(charStatus))
+        {
+            return false;
+        }
+        else
+        {
+            characterStatuses.Add(charStatus);
+        }
+        return true;
+    }
+
+    public bool TryRemoveStatus(CHARACTER_STATUS status)
+    {
+        if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
+
+        CHARACTER_STATUS_NETWORKED charStatus = new(status);
+        if (!characterStatuses.Contains(charStatus))
+        {
+            return false;
+        }
+        else
+        {
+            characterStatuses.Remove(charStatus);
+        }
+        return true;
+    }
+
+    public List<CHARACTER_STATUS> GetCharacterStatusList()
+    {
+        List<CHARACTER_STATUS> statuses = new List<CHARACTER_STATUS>();
+        foreach (var status in characterStatuses)
+        {
+            statuses.Add(status.charStatus);
+        }
+        return statuses;
+    }
+
+    private CharacterMelee melee;
+    private CharacterMeleeUI meleeUI;
+    private NetworkList<CHARACTER_STATUS_NETWORKED> characterStatuses;
+
+    private void Awake()
+    {
+        melee = GetComponent<CharacterMelee>();
+        meleeUI = GetComponentInChildren<CharacterMeleeUI>(true);
+        characterStatuses = new NetworkList<CHARACTER_STATUS_NETWORKED>();
+    }
+
+    private float lastChangeTime;
+    private bool add;
+    private void Update()
+    {
+        if (Time.time - lastChangeTime > 3 & add)
+        {
+            Debug.Log("Adding value: " + TryAddStatus(CHARACTER_STATUS.burning));
+            lastChangeTime = Time.time;
+            add = !add;
+        }
+        else if (Time.time - lastChangeTime > 3 & !add)
+        {
+            Debug.Log("Removing value: " + TryRemoveStatus(CHARACTER_STATUS.burning));
+            lastChangeTime = Time.time;
+            add = !add;
+        }
+    }
+
+    // EVENT TRIGGERS ------
+    //public class StatusUpdateEvent : UnityEvent<CHARACTER_STATUS> { }
+    //public StatusUpdateEvent onStatusEvent = new StatusUpdateEvent();
 
     public override void OnNetworkSpawn()
     {
-        this.character = this.GetComponent<Character>();
-        this.melee = this.GetComponent<CharacterMelee>();
-
-        characterStatusNetworked.OnValueChanged += OnStatusChange;
+        characterStatuses.OnListChanged += OnStatusChange;
     }
 
     public override void OnNetworkDespawn()
     {
-        characterStatusNetworked.OnValueChanged -= OnStatusChange;
+        characterStatuses.OnListChanged -= OnStatusChange;
     }
 
-    private IEnumerator ExcecuteStatusChange(CHARACTER_STATUS current)
+    private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
     {
-        yield return null;
+        Debug.Log(networkListEvent.Type + " " + networkListEvent.PreviousValue.charStatus + " " + networkListEvent.Value.charStatus);
 
-        switch (current)
-        {
-            case CHARACTER_STATUS.damageMultiplier:
-                break;
-            case CHARACTER_STATUS.damageReductionMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseReductionMultiplier:
-                break;
-        }
+        meleeUI.UpdateStatusUI();
+
+        //if (IsServer) { return; }
+
+        //StartCoroutine(ExcecuteStatusChange(current));
     }
 
-    public void UpdateStatus(CHARACTER_STATUS status)
-    {
-        StartCoroutine(UpdateStatusCoroutine(status));
-    }
+    //private IEnumerator ExcecuteStatusChange(CHARACTER_STATUS current)
+    //{
+    //    yield return null;
 
-    private IEnumerator UpdateStatusCoroutine(CHARACTER_STATUS status)
-    {
+    //    switch (current)
+    //    {
+    //        case CHARACTER_STATUS.damageMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.damageReductionMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.defenseIncreaseMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.defenseReductionMultiplier:
+    //            break;
+    //    }
+    //}
 
-        if (this.character.IsDead() & this.character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.Dead)
-        {
-            yield break;
-        }
+    //public void UpdateStatus(CHARACTER_STATUS status)
+    //{
+    //    StartCoroutine(UpdateStatusCoroutine(status));
+    //}
 
-        CHARACTER_STATUS prevStatus = this.character.characterStatus;
+    //private IEnumerator UpdateStatusCoroutine(CHARACTER_STATUS status)
+    //{
 
-        switch (status)
-        {
-            // All Ailments should end with reset except Stun which can be cancelled
-            case CHARACTER_STATUS.damageMultiplier:
-                break;
-            case CHARACTER_STATUS.damageReductionMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseReductionMultiplier:
-                break;
-        }
+    //    if (this.character.IsDead() & this.character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.Dead)
+    //    {
+    //        yield break;
+    //    }
 
-        this.character.Status(status);
-        if (IsServer) { characterStatusNetworked.Value = status; }
-        onStatusEvent.Invoke(status);
-    }
+    //    CHARACTER_STATUS prevStatus = this.character.characterStatus;
+
+    //    switch (status)
+    //    {
+    //        // All Ailments should end with reset except Stun which can be cancelled
+    //        case CHARACTER_STATUS.damageMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.damageReductionMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.defenseIncreaseMultiplier:
+    //            break;
+    //        case CHARACTER_STATUS.defenseReductionMultiplier:
+    //            break;
+    //    }
+
+    //    this.character.Status(status);
+    //    if (IsServer) { characterStatusNetworked.Value = status; }
+    //    onStatusEvent.Invoke(status);
+    //}
 
     private bool isCountingdamageMultiplier = false;
     public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
@@ -159,7 +234,6 @@ public class CharacterStatusManager : NetworkBehaviour
         melee.baseDamageMultiplier = 1.0f;
         isCountingdamageMultiplier = false;
     }
-
 
     private bool isCounting = false;
 
@@ -266,6 +340,4 @@ public class CharacterStatusManager : NetworkBehaviour
 
         isSlowed = false;
     }
-
-
 }
