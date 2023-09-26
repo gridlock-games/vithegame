@@ -45,6 +45,7 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         // VFX: ----------------------------------------------------------------------------
+        private SerializedProperty spAttackVFXList;
         private SerializedProperty spAttackVFX;
         private SerializedProperty spVFXAttachmentPhase;
         private SerializedProperty spVFXPositionOffset;
@@ -162,6 +163,7 @@
             this.spAnimationSpeed = this.serializedObject.FindProperty("animSpeed");
 
             // VFX
+            this.spAttackVFXList = this.serializedObject.FindProperty("vfxList");
             this.spAttackVFX = this.serializedObject.FindProperty("abilityVFX");
             this.spVFXAttachmentPhase = this.serializedObject.FindProperty("attachVFXOnPhase");
             this.spVFXPositionOffset = this.serializedObject.FindProperty("vfxPositionOffset");
@@ -509,6 +511,8 @@
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
+                    
+                    EditorGUILayout.PropertyField(this.spAttackVFXList);
                     EditorGUILayout.PropertyField(this.spAttackVFX);
                     EditorGUILayout.PropertyField(this.spVFXAttachmentPhase);
                     EditorGUILayout.PropertyField(this.spVFXPositionOffset);

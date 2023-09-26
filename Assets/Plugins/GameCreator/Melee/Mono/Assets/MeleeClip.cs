@@ -136,6 +136,8 @@
             OnRecovery
         }
 
+        public List<ClipVFX> vfxList = new List<ClipVFX>();
+
 
         // VFX:
         public TargetGameObject abilityVFX = new TargetGameObject();
@@ -169,21 +171,31 @@
 
         public void PlayVFXAttachment(CharacterMelee character)
         {
-            if (this.abilityVFX.gameObject == null) return;
+            if (this.vfxList.Count < 0) return;
             if (character == null) return;
 
-            GameObject abilityVFXPrefab = abilityVFX.GetGameObject(character.gameObject);
-
-            GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
-                character.transform.position + character.transform.rotation * this.vfxPositionOffset,
-                character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
-
-            if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
+            foreach (ClipVFX vfx in this.vfxList)
             {
-                dmg.Initialize(character, this);
+                if (vfx.gameObject == null) return;
+
+                GameObject abilityVFXPrefab = vfx.abilityVFX.GetGameObject(character.gameObject);
+
+                Vector3 vfxPositionOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxPositionOffset;
+                Vector3 vfxRotationOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxRotationOffset;
+
+                GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                    character.transform.position + character.transform.rotation * vfxPositionOffset,
+                    character.transform.rotation * Quaternion.Euler(vfxRotationOffset));
+
+                if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
+                {
+                    dmg.Initialize(character, this);
+                }
+
+                CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
             }
 
-            CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
+            
         }
 
         private IEnumerator DestroyAfterEffectsFinish(GameObject obj)
