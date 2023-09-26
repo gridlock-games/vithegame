@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 290652106646076816}
   - component: {fileID: 290652106646076817}
   m_Layer: 0
-  m_Name: helsingVFX_ArrowShower
+  m_Name: helsingVFX_ArrowFocus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityVFX:
     target: 3
-    gameObject: {fileID: 2251393201902171456, guid: 8397b704c6ff7874e94a641cb7a6af40,
+    gameObject: {fileID: 4621493551335706813, guid: 8acad03f493d7af4a9db3498b27c06b3,
       type: 3}
     global:
       allowTypesMask: 512
@@ -64,7 +64,7 @@ MonoBehaviour:
     eventChangeVariable:
       m_PersistentCalls:
         m_Calls: []
-  vfxPositionOffset: {x: 0, y: 0, z: 8}
+  vfxPositionOffset: {x: 0, y: 1, z: 2}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   attachVFXOnPhase: 1
   attachmentType: 0

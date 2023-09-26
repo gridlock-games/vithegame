@@ -185,7 +185,9 @@
 
                 GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
                     character.transform.position + character.transform.rotation * vfxPositionOffset,
-                    character.transform.rotation * Quaternion.Euler(vfxRotationOffset));
+                    character.transform.rotation * Quaternion.Euler(vfxRotationOffset),
+                    vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? character.transform : null
+                    );
 
                 if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
                 {
