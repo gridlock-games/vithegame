@@ -161,6 +161,8 @@ namespace GameCreator.Melee
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
+        private float originalRunSpeed;
+
         protected virtual void Awake()
         {
             this.Character = GetComponent<Character>();
@@ -170,6 +172,9 @@ namespace GameCreator.Melee
             glowRenderer = GetComponentInChildren<GlowRenderer>();
 
             mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
+
+            originalRunSpeed = Character.characterLocomotion.runSpeed;
+            overrideRunSpeed = originalRunSpeed;
         }
 
         private void OnTransformChildrenChanged()
@@ -274,6 +279,18 @@ namespace GameCreator.Melee
                             StartCoroutine(SequenceClipPlayHandler(currentMeleeClip));
                         }
                     }
+                }
+            }
+
+            if (IsOwner)
+            {
+                if (Time.time < slowEndTime)
+                {
+                    Character.characterLocomotion.runSpeed = slowAmount;
+                }
+                else
+                {
+                    Character.characterLocomotion.runSpeed = overrideRunSpeed;
                 }
             }
         }
@@ -512,7 +529,6 @@ namespace GameCreator.Melee
                     targetMelee.Rage.Value += 1;
                     targetMelee.RenderBlock();
                 }
-                Debug.Log(damage);
 
                 // Send messages for stats in NetworkPlayer script
                 if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
@@ -1008,107 +1024,6 @@ namespace GameCreator.Melee
         public void SetHP(float value)
         {
             HP.Value = value;
-        }
-
-        private bool isCountingdamageMultiplier = false;
-        public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
-        {
-            if (!isCountingdamageMultiplier)
-            {
-                if (this.IsCastingAbility)
-                {
-                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
-
-                    if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
-                    {
-                        StartCoroutine(CompleteAnimBeforeDamageMultiplier(currentAbility.meleeClip.animationClip.length, multiplierDuration, damageMultiplier));
-                    }
-
-                }
-                else
-                {
-                    StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
-                }
-            }
-        }
-
-        private IEnumerator CompleteAnimBeforeDamageMultiplier(float animDuration, float multiplierDuration, float damageMultiplier)
-        {
-            yield return new WaitForSeconds(animDuration);
-            StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
-        }
-
-        private IEnumerator DamageMultiplierCoroutine(float multiplierDuration, float damageMultiplier)
-        {
-            isCountingdamageMultiplier = true;
-            float elapsedTime = 0;
-
-            while (elapsedTime < multiplierDuration)
-            {
-                this.damageMultiplier = damageMultiplier;
-                elapsedTime += Time.deltaTime;
-
-                yield return null;
-            }
-
-            this.damageMultiplier = 1.0f;
-            isCountingdamageMultiplier = false;
-        }
-
-
-        private bool isCounting = false;
-
-        public void DrainHP(float drainDuration)
-        {
-            if (!isCounting)
-            {
-                if (this.IsCastingAbility)
-                {
-                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
-
-                    if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
-                    {
-                        StartCoroutine(CompleteAnimBeforeHPDrain(currentAbility.meleeClip.animationClip.length, drainDuration));
-                    }
-
-                }
-                else
-                {
-                    StartCoroutine(HPReductionCoroutine(drainDuration));
-                }
-            }
-        }
-
-        private IEnumerator CompleteAnimBeforeHPDrain(float animDuration, float drainDuration)
-        {
-            yield return new WaitForSeconds(animDuration);
-            StartCoroutine(HPReductionCoroutine(drainDuration));
-        }
-
-        private IEnumerator HPReductionCoroutine(float drainDuration)
-        {
-            isCounting = true;
-            float elapsedTime = 0;
-            float reductionAmount = 0;
-
-            while (elapsedTime < drainDuration && HP.Value > 1)
-            {
-                reductionAmount += HP.Value * 0.1f * Time.deltaTime;
-                if (reductionAmount >= 1 && HP.Value > 1)
-                {
-
-                    this.AddHP(-1 * reductionAmount);
-                    this.SetHP(Mathf.Max(this.GetHP(), 1f));
-                    // HP.Value -= reductionAmount;
-                    // HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
-                    reductionAmount = 0;
-                }
-
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            isCounting = false;
         }
 
         public override void OnNetworkSpawn()
@@ -2064,7 +1979,7 @@ namespace GameCreator.Melee
         public float healingMultiplier { get; private set; } = 1;
         public void SetHealingMultiplier(float value, float duration)
         {
-            if (!IsServer) { Debug.Log("CharacterMelee.SetHealingMultiplierMultiplier() should only be called on the server."); return; }
+            if (!IsServer) { Debug.Log("CharacterMelee.SetHealingMultiplier() should only be called on the server."); return; }
             if (healingMultiplierCoroutine != null)
             {
                 StopCoroutine(healingMultiplierCoroutine);
@@ -2094,7 +2009,7 @@ namespace GameCreator.Melee
         public float defenseIncreaseMultiplier { get; private set; } = 1;
         public void SetDefenseIncreaseMultiplier(float value, float duration)
         {
-            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseIncreaseMultiplierMultiplier() should only be called on the server."); return; }
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseIncreaseMultiplier() should only be called on the server."); return; }
             if (defenseIncreaseMultiplierCoroutine != null)
             {
                 StopCoroutine(defenseIncreaseMultiplierCoroutine);
@@ -2124,7 +2039,7 @@ namespace GameCreator.Melee
         public float defenseReductionMultiplier { get; private set; } = 1;
         public void SetDefenseReductionMultiplier(float value, float duration)
         {
-            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseReductionMultiplierMultiplier() should only be called on the server."); return; }
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseReductionMultiplier() should only be called on the server."); return; }
             if (defenseReductionMultiplierCoroutine != null)
             {
                 StopCoroutine(defenseReductionMultiplierCoroutine);
@@ -2147,6 +2062,120 @@ namespace GameCreator.Melee
             defenseReductionMultiplier = value;
             yield return new WaitForSeconds(duration);
             defenseReductionMultiplier = 1;
+        }
+
+        public void DrainHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.DrainHPOverTime() should only be called on the server."); return; }
+            StartCoroutine(DrainHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator DrainHPCoroutine(float value, float drainDuration, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            float elapsedTime = 0;
+            float reductionAmount = 0;
+
+            while (elapsedTime < drainDuration && GetHP() > 1)
+            {
+                reductionAmount += GetHP() * value * Time.deltaTime;
+                if (reductionAmount >= 1 && GetHP() > 1)
+                {
+                    if (GetHP() - reductionAmount < 1)
+                    {
+                        SetHP(1);
+                    }
+                    else
+                    {
+                        AddHP(-1 * reductionAmount);
+                    }
+
+                    reductionAmount = 0;
+                }
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+
+        private float slowEndTime;
+        private float slowAmount;
+        public void SlowMovement(float value, float duration)
+        {
+            slowEndTime = Time.time + duration;
+            slowAmount = value;
+        }
+
+        private float overrideRunSpeed;
+        public void SetRunSpeed(float value)
+        {
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed = value;
+            }
+        }
+
+        public void ResetRunSpeed()
+        {
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed = originalRunSpeed;
+            }
+        }
+
+        public float rootEndTime { get; private set; }
+        public void Root(float duration)
+        {
+            rootEndTime = Time.time + duration;
+        }
+
+        public float silenceEndTime { get; private set; }
+        public void Silence(float duration)
+        {
+            silenceEndTime = Time.time + duration;
+        }
+
+        public float fearEndTime { get; private set; }
+        public void Fear(float duration)
+        {
+            fearEndTime = Time.time + duration;
+        }
+
+        public void HealHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.HealHPOverTime() should only be called on the server."); return; }
+            StartCoroutine(HealHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator HealHPCoroutine(float value, float drainDuration, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            float elapsedTime = 0;
+            float healAmount = 0;
+
+            while (elapsedTime < drainDuration && GetHP() > 1)
+            {
+                healAmount += GetHP() * value * Time.deltaTime * healingMultiplier;
+                if (healAmount >= 1)
+                {
+                    if (GetHP() + healAmount > maxHealth)
+                    {
+                        SetHP(maxHealth);
+                    }
+                    else
+                    {
+                        AddHP(healAmount);
+                    }
+
+                    healAmount = 0;
+                }
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
         }
 
         private void OnDrawGizmos()

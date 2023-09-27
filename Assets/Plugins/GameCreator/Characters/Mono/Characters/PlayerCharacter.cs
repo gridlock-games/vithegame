@@ -127,7 +127,29 @@
             // If the input payload hasn't been recieved yet (this happens on non-owner clients)
             if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
 
-            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            bool invertMovement = false;
+            if (TryGetComponent(out Melee.CharacterMelee melee))
+            {
+                if (Time.time < melee.rootEndTime)
+                {
+                    return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+                }
+                else if (Time.time < melee.fearEndTime)
+                {
+                    invertMovement = true;
+                }
+            }
+
+            Vector3 targetDirection;
+            if (invertMovement)
+            {
+                targetDirection = inputPayload.rotation * new Vector3(-inputPayload.inputVector.x, 0, -inputPayload.inputVector.y);
+            }
+            else
+            {
+                targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            }
+            
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 
             characterLocomotion.SetDirectionalDirection(targetDirection);

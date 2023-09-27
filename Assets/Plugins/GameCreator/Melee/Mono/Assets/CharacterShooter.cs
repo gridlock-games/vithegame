@@ -25,7 +25,6 @@ namespace GameCreator.Melee
         private CameraMotorTypeAdventure adventureMotor = null;
         private Vector3 adventureTargetOffset;
         private CharacterMelee melee;
-        private Character character;
 
         private ShooterComponent shooterWeapon;
         private CharacterHandIK handIK;
@@ -39,12 +38,9 @@ namespace GameCreator.Melee
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
-        private float originalRunSpeed;
         private void Awake()
         {
             melee = GetComponent<CharacterMelee>();
-            character = GetComponent<Character>();
-            originalRunSpeed = character.characterLocomotion.runSpeed;
         }
 
         public override void OnNetworkSpawn()
@@ -121,7 +117,14 @@ namespace GameCreator.Melee
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
 
-                character.characterLocomotion.runSpeed = isAimDown ? ADSRunSpeed : originalRunSpeed;
+                if (isAimDown)
+                {
+                    melee.SetRunSpeed(ADSRunSpeed);
+                }
+                else
+                {
+                    melee.ResetRunSpeed();
+                }
             }
         }
 

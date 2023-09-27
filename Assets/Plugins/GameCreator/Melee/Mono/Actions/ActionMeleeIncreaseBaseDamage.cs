@@ -20,12 +20,8 @@ namespace GameCreator.Melee
             Character _character = this.character.GetCharacter(target);
             if (character == null) return true;
 
-            CharacterMelee melee = _character.GetComponent<CharacterMelee>();
-
-            if (melee != null)
-            {
-                melee.damageMultiplierDuration(durationMultiplier, baseDamageMultiplier);
-            }
+            CharacterStatusManager statusManager = _character.GetComponent<CharacterStatusManager>();
+            statusManager.TryAddStatus(CharacterStatusManager.CHARACTER_STATUS.damageMultiplier, baseDamageMultiplier, durationMultiplier, 0);
 
             return true;
         }
