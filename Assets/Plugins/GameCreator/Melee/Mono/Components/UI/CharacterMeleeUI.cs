@@ -113,7 +113,6 @@
 
             foreach (Ability ability in abilityManager.GetAbilityInstanceList())
             {
-
                 float cost = 0f;
                 float costRequirement = 0f;
 
