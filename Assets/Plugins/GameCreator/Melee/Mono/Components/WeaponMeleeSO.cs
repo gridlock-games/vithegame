@@ -27,5 +27,6 @@ public enum WeaponType
     BRAWLER,
     CROSSBOW,
     BROADSWORD,
-    LONGBOW
+    LONGBOW,
+    STAFF
 }
