@@ -200,7 +200,7 @@ namespace GameCreator.Melee
         }
 
         private bool newInputThisFrame;
-        protected virtual void Update()
+        private void Update()
         {
             if (IsServer)
             {
@@ -2033,9 +2033,9 @@ namespace GameCreator.Melee
             float elapsedTime = 0;
             float reductionAmount = 0;
 
-            while (elapsedTime < drainDuration && GetHP() > 1)
+            while (elapsedTime < drainDuration)
             {
-                reductionAmount += GetHP() * value * Time.deltaTime;
+                reductionAmount += GetHP() / maxHealth * value * Time.deltaTime;
                 if (reductionAmount >= 1 && GetHP() > 1)
                 {
                     if (GetHP() - reductionAmount < 1)
@@ -2060,19 +2060,20 @@ namespace GameCreator.Melee
         public void HealHPOverTime(float value, float drainDuration, float delay)
         {
             if (!IsServer) { Debug.Log("CharacterMelee.HealHPOverTime() should only be called on the server."); return; }
+            healActive.Value = true;
             StartCoroutine(HealHPCoroutine(value, drainDuration, delay));
         }
 
-        private IEnumerator HealHPCoroutine(float value, float drainDuration, float delay)
+        private IEnumerator HealHPCoroutine(float value, float healDuration, float delay)
         {
             healActive.Value = true;
             yield return new WaitForSeconds(delay);
             float elapsedTime = 0;
             float healAmount = 0;
 
-            while (elapsedTime < drainDuration && GetHP() > 1)
+            while (elapsedTime < healDuration)
             {
-                healAmount += GetHP() * value * Time.deltaTime * healingMultiplier.Value;
+                healAmount += maxHealth / GetHP() * value * Time.deltaTime * healingMultiplier.Value;
                 if (healAmount >= 1)
                 {
                     if (GetHP() + healAmount > maxHealth)

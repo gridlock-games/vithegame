@@ -2,7 +2,6 @@ using GameCreator.Melee;
 using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEngine.Events;
 using System.Collections.Generic;
 
 public class CharacterStatusManager : NetworkBehaviour
@@ -110,33 +109,101 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private float lastChangeTime;
     private bool add;
-    private int statusInt = -1;
     private void LateUpdate()
     {
         if (!IsServer) { return; }
 
         if (Time.time - lastChangeTime > 3 & add)
         {
-            Debug.Log((CHARACTER_STATUS)statusInt);
-            TryAddStatus((CHARACTER_STATUS)statusInt, 2, 3, 0);
-            //Debug.Log("Adding value: " + TryAddStatus(CHARACTER_STATUS.damageMultiplier, 2, 3));
+            TryAddStatus(CHARACTER_STATUS.healing, 25, 3, 0);
+            TryAddStatus(CHARACTER_STATUS.healingMultiplier, 2, 3, 0);
             lastChangeTime = Time.time;
             add = !add;
         }
         else if (Time.time - lastChangeTime > 3 & !add)
         {
-            //TryAddStatus(CHARACTER_STATUS.healing, 2, 2, 0);
-            //TryAddStatus(CHARACTER_STATUS.healingMultiplier, 5, 3, 0);
-            //TryRemoveStatus(CHARACTER_STATUS.damageMultiplier);
-            //Debug.Log("Removing value: " + TryRemoveStatus(CHARACTER_STATUS.damageMultiplier));
-            statusInt += 1;
+            TryAddStatus(CHARACTER_STATUS.burning, 50, 4, 0);
             lastChangeTime = Time.time;
             add = !add;
         }
 
-        foreach (var status in characterStatuses)
+        RemoveStatusCheck();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        characterStatuses.OnListChanged += OnStatusChange;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        characterStatuses.OnListChanged -= OnStatusChange;
+    }
+
+    private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
+    {
+        if (IsOwner) { meleeUI.UpdateStatusUI(); }
+
+        if (!IsServer) { return; }
+
+        if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Add | networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Value)
         {
-            switch (status.charStatus)
+            switch (networkListEvent.Value.charStatus)
+            {
+                case CHARACTER_STATUS.damageMultiplier:
+                    melee.SetDamageMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.damageReductionMultiplier:
+                    melee.SetDamageReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.damageReceivedMultiplier:
+                    melee.SetDamageReceivedMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.healingMultiplier:
+                    melee.SetHealingMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.defenseIncreaseMultiplier:
+                    melee.SetDefenseIncreaseMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.defenseReductionMultiplier:
+                    melee.SetDefenseReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.burning:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.poisoned:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.drain:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.slowedMovement:
+                    melee.SlowMovement(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.rooted:
+                    melee.Root(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.silenced:
+                    melee.Silence(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.fear:
+                    melee.Fear(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.healing:
+                    melee.HealHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                default:
+                    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status add or value change");
+                    break;
+            }
+        }
+    }
+
+    private void RemoveStatusCheck()
+    {
+        foreach (var status in GetCharacterStatusList())
+        {
+            switch (status)
             {
                 case CHARACTER_STATUS.damageMultiplier:
                     if (melee.damageMultiplier.Value == 1)
@@ -223,82 +290,7 @@ public class CharacterStatusManager : NetworkBehaviour
                     }
                     break;
                 default:
-                    Debug.Log(status.charStatus + " has not been implemented for removal");
-                    break;
-            }
-        }
-    }
-
-    // EVENT TRIGGERS ------
-    //public class StatusUpdateEvent : UnityEvent<CHARACTER_STATUS> { }
-    //public StatusUpdateEvent onStatusEvent = new StatusUpdateEvent();
-
-    public override void OnNetworkSpawn()
-    {
-        characterStatuses.OnListChanged += OnStatusChange;
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        characterStatuses.OnListChanged -= OnStatusChange;
-    }
-
-    private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
-    {
-        if (IsOwner) { meleeUI.UpdateStatusUI(); }
-
-        if (!IsServer) { return; }
-
-        //Debug.Log(networkListEvent.Type + " " + networkListEvent.Value.charStatus);
-
-        if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Add | networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Value)
-        {
-            switch (networkListEvent.Value.charStatus)
-            {
-                case CHARACTER_STATUS.damageMultiplier:
-                    melee.SetDamageMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.damageReductionMultiplier:
-                    melee.SetDamageReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.damageReceivedMultiplier:
-                    melee.SetDamageReceivedMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.healingMultiplier:
-                    melee.SetHealingMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                    melee.SetDefenseIncreaseMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.defenseReductionMultiplier:
-                    melee.SetDefenseReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.burning:
-                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
-                    break;
-                case CHARACTER_STATUS.poisoned:
-                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
-                    break;
-                case CHARACTER_STATUS.drain:
-                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
-                    break;
-                case CHARACTER_STATUS.slowedMovement:
-                    melee.SlowMovement(networkListEvent.Value.value, networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.rooted:
-                    melee.Root(networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.silenced:
-                    melee.Silence(networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.fear:
-                    melee.Fear(networkListEvent.Value.duration);
-                    break;
-                case CHARACTER_STATUS.healing:
-                    melee.HealHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
-                    break;
-                default:
-                    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status add or value change");
+                    Debug.Log(status + " has not been implemented for removal");
                     break;
             }
         }
