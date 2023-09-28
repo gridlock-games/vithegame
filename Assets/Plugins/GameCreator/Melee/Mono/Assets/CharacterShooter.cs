@@ -105,7 +105,10 @@ namespace GameCreator.Melee
             }
 
             PerformAimDownSight(isAimedDown.Value);
-            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, shooterWeapon.GetLeftHandTarget().position, shooterWeapon.GetLeftHandTarget().rotation);
+            Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
+            Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
+
+            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, leftHandPos, leftHandRot);
         }
 
         private void PerformAimDownSight(bool isAimDown)

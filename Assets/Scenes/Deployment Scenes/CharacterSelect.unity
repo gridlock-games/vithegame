@@ -530,13 +530,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RunInBackground: 1
-  LogLevel: 1
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 0}
     PlayerPrefab: {fileID: 0}
-    NetworkPrefabs:
+    Prefabs:
+      NetworkPrefabsLists: []
+    TickRate: 30
+    ClientConnectionBufferTimeout: 10
+    ConnectionApproval: 0
+    ConnectionData: 
+    EnableTimeResync: 0
+    TimeResyncInterval: 30
+    EnsureNetworkVariableLengthSafety: 0
+    EnableSceneManagement: 1
+    ForceSamePrefabs: 1
+    RecycleNetworkIds: 1
+    NetworkIdRecycleDelay: 120
+    RpcHashSize: 0
+    LoadSceneTimeOut: 120
+    SpawnTimeout: 1
+    EnableNetworkLogs: 1
+    OldPrefabList:
     - Override: 0
       Prefab: {fileID: 288998041406652123, guid: 08be6bc05a8bb504b80d4c74cae1c5f1,
         type: 3}
@@ -553,21 +568,8 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
-    TickRate: 30
-    ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
-    ConnectionData: 
-    EnableTimeResync: 0
-    TimeResyncInterval: 30
-    EnsureNetworkVariableLengthSafety: 0
-    EnableSceneManagement: 1
-    ForceSamePrefabs: 1
-    RecycleNetworkIds: 1
-    NetworkIdRecycleDelay: 120
-    RpcHashSize: 0
-    LoadSceneTimeOut: 120
-    SpawnTimeout: 1
-    EnableNetworkLogs: 1
+  RunInBackground: 1
+  LogLevel: 1
 --- !u!4 &116565833
 Transform:
   m_ObjectHideFlags: 0
@@ -4674,15 +4676,15 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 60
+    m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 7
   m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 150, y: 150}
+  m_StartAxis: 1
+  m_CellSize: {x: 120, y: 120}
   m_Spacing: {x: 15, y: 0}
   m_Constraint: 1
-  m_ConstraintCount: 5
+  m_ConstraintCount: 7
 --- !u!1001 &1433379466
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6724,6 +6726,22 @@ MonoBehaviour:
       sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     characterImage: {fileID: 21300000, guid: 48e416de610779544a02991e5672845d, type: 3}
     characterObject: {fileID: 7527864471004905983, guid: cc4fae7c5776b4843b8cd53c9bf099ae,
+      type: 3}
+  - id: 4
+    characterName: Helsing
+    chracterRole: Assassin, Archer
+    characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    characterImage: {fileID: 21300000, guid: ec62a4f0d6a8cb2459625b6c8a7bc042, type: 3}
+    characterObject: {fileID: 7527864471004905983, guid: 8a666a11bf01d0442b03675f050f3119,
+      type: 3}
+  - id: 5
+    characterName: Toga
+    chracterRole: Burst, Bruiser
+    characterDescription: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    characterImage: {fileID: 21300000, guid: 8faf1de23384f83499f62346a7831f5d, type: 3}
+    characterObject: {fileID: 7527864471004905983, guid: f5e8ea9d76a81a748805aad8924526a7,
       type: 3}
   placeholderContainer: {fileID: 3461398562259885945, guid: 0ddda986338a17d4f995c5cd3aabf32f,
     type: 3}

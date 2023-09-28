@@ -20,7 +20,7 @@ namespace GameCreator.Melee
             projectileInstance.GetComponent<NetworkObject>().Spawn();
         }
 
-        public Transform GetLeftHandTarget() { return leftHandTarget; }
+        public Transform GetLeftHandTarget() { return leftHandTarget ? leftHandTarget : null; }
 
         public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 

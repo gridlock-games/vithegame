@@ -354,7 +354,10 @@ namespace GameCreator.Melee
                 {
                     if (TryGetComponent(out CharacterShooter characterShooter))
                     {
-                        characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
+                        // Do not shoot a bullet prefab when casting an Ability
+                        if(!this.IsCastingAbility) {
+                            characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
+                        }
                     }
                 }
 

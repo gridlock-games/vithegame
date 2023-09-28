@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2239306535429724101}
   - component: {fileID: 2239306535429724102}
   m_Layer: 0
-  m_Name: abs_Greatsword_04
+  m_Name: abs_CrossBow_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,17 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7d79ce025661440a7af79c7c24aa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillImageFill: {fileID: 21300000, guid: 0d170b51b97b7d946ae35eb532c04d2e, type: 3}
-  weaponBind: 0
-  meleeClip: {fileID: 11400000, guid: e41ebd91db0de3c46a5fa0d964863059, type: 2}
+  skillImageFill: {fileID: 21300000, guid: 37a767b5efb338443aec7d906b16419f, type: 3}
+  weaponBind: 6
+  meleeClip: {fileID: 11400000, guid: c5c9b338d46a1694281ba60a76bb2cb5, type: 2}
   abilityType: 0
   dodgeLockOnhase: 0
-  coolDown: 30
-  staminaCost: 0
+  coolDown: 10
+  staminaCost: 15
   hpCost: 0
-  rageCost: 75
-  skillKey: 116
-  canCncelAnimationType: 3
+  rageCost: 0
+  skillKey: 101
+  canCncelAnimationType: 1
   canCancelAnimation: 0
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
