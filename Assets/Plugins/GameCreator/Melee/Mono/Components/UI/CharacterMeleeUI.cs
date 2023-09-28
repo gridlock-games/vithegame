@@ -53,6 +53,8 @@
                 Destroy(playerIcon.gameObject);
             }
 
+            bool found = false;
+            CharacterStatusManager.CHARACTER_STATUS missingStatus = CharacterStatusManager.CHARACTER_STATUS.damageMultiplier;
             foreach (var status in statusManager.GetCharacterStatusList())
             {
                 GameObject g = Instantiate(statusImagePrefab, statusImageParent);
@@ -61,9 +63,16 @@
                     if (statusUI.status == status)
                     {
                         g.GetComponent<Image>().sprite = statusUI.sprite;
+                        found = true;
                         break;
                     }
                 }
+                missingStatus = status;
+            }
+
+            if (!found & statusManager.GetCharacterStatusList().Count > 0)
+            {
+                Debug.LogError("You need to assign a character status image for " + missingStatus);
             }
         }
 

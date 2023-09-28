@@ -130,11 +130,18 @@
             bool invertMovement = false;
             if (TryGetComponent(out Melee.CharacterMelee melee))
             {
-                if (Time.time < melee.rootEndTime)
+                if (IsServer)
+                    melee.rooted.Value = Time.time < melee.rootEndTime;
+
+                if (melee.rooted.Value)
                 {
                     return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
                 }
-                else if (Time.time < melee.fearEndTime)
+
+                if (IsServer)
+                    melee.fearing.Value = Time.time < melee.fearEndTime;
+
+                if (melee.fearing.Value)
                 {
                     invertMovement = true;
                 }

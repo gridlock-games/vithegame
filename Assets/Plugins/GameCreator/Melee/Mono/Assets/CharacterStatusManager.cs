@@ -110,23 +110,123 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private float lastChangeTime;
     private bool add;
+    private CHARACTER_STATUS status;
     private void Update()
     {
+        if (!IsServer) { return; }
+
         if (Time.time - lastChangeTime > 3 & add)
         {
-            TryAddStatus(CHARACTER_STATUS.drain, 2, 2, 0);
+            Debug.Log(status);
+            TryAddStatus(status, 0.1f, 3, 0);
             //Debug.Log("Adding value: " + TryAddStatus(CHARACTER_STATUS.damageMultiplier, 2, 3));
             lastChangeTime = Time.time;
             add = !add;
         }
         else if (Time.time - lastChangeTime > 3 & !add)
         {
-            TryAddStatus(CHARACTER_STATUS.healing, 2, 2, 0);
-            TryAddStatus(CHARACTER_STATUS.healingMultiplier, 5, 3, 0);
+            //TryAddStatus(CHARACTER_STATUS.healing, 2, 2, 0);
+            //TryAddStatus(CHARACTER_STATUS.healingMultiplier, 5, 3, 0);
             //TryRemoveStatus(CHARACTER_STATUS.damageMultiplier);
             //Debug.Log("Removing value: " + TryRemoveStatus(CHARACTER_STATUS.damageMultiplier));
+            status += 1;
             lastChangeTime = Time.time;
             add = !add;
+        }
+
+        foreach (var status in characterStatuses)
+        {
+            Debug.Log(status.charStatus);
+            switch (status.charStatus)
+            {
+                case CHARACTER_STATUS.damageMultiplier:
+                    if (melee.damageMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.damageReductionMultiplier:
+                    if (melee.damageReductionMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageReductionMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.damageReceivedMultiplier:
+                    if (melee.damageReceivedMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageReceivedMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.healingMultiplier:
+                    if (melee.healingMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.healingMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.defenseIncreaseMultiplier:
+                    if (melee.defenseIncreaseMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.defenseIncreaseMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.defenseReductionMultiplier:
+                    if (melee.defenseReductionMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.defenseReductionMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.burning:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.burning);
+                    }
+                    break;
+                case CHARACTER_STATUS.poisoned:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.poisoned);
+                    }
+                    break;
+                case CHARACTER_STATUS.drain:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.drain);
+                    }
+                    break;
+                case CHARACTER_STATUS.slowedMovement:
+                    if (melee.slowAmount.Value != melee.Character.characterLocomotion.runSpeed)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.slowedMovement);
+                    }
+                    break;
+                case CHARACTER_STATUS.rooted:
+                    if (!melee.rooted.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.rooted);
+                    }
+                    break;
+                case CHARACTER_STATUS.silenced:
+                    if (!melee.silenced.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.silenced);
+                    }
+                    break;
+                case CHARACTER_STATUS.fear:
+                    if (!melee.fearing.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.fear);
+                    }
+                    break;
+                case CHARACTER_STATUS.healing:
+                    if (!melee.healActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.healing);
+                    }
+                    break;
+                default:
+                    Debug.Log(status.charStatus + " has not been implemented for removal");
+                    break;
+            }
         }
     }
 
@@ -225,9 +325,9 @@ public class CharacterStatusManager : NetworkBehaviour
                 case CHARACTER_STATUS.defenseReductionMultiplier:
                     melee.ResetDefenseReductionMultiplier();
                     break;
-                default:
-                    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status removal");
-                    break;
+                //default:
+                //    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status removal");
+                //    break;
             }
         }
     }
