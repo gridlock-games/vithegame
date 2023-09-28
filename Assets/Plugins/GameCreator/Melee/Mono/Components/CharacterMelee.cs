@@ -80,8 +80,8 @@ namespace GameCreator.Melee
         public NumberProperty maxPoise = new NumberProperty(5f);
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
-        
-        public NumberProperty maxRage = new NumberProperty(100.0f); 
+
+        public NumberProperty maxRage = new NumberProperty(100.0f);
         public NumberProperty rageRecoveryRate = new NumberProperty(1f);
 
 
@@ -137,9 +137,7 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
-        public float baseDamageMultiplier = 1.0f;
-
-        public AbilityManager abilityManager {get; private set;}
+        public AbilityManager abilityManager { get; private set; }
         private GlowRenderer glowRenderer;
 
         public MJMComboSystem mjmComboSystem;
@@ -163,6 +161,8 @@ namespace GameCreator.Melee
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
+        private float originalRunSpeed;
+
         protected virtual void Awake()
         {
             this.Character = GetComponent<Character>();
@@ -172,6 +172,8 @@ namespace GameCreator.Melee
             glowRenderer = GetComponentInChildren<GlowRenderer>();
 
             mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
+
+            originalRunSpeed = Character.characterLocomotion.runSpeed;
         }
 
         private void OnTransformChildrenChanged()
@@ -198,7 +200,7 @@ namespace GameCreator.Melee
         }
 
         private bool newInputThisFrame;
-        protected virtual void Update()
+        private void Update()
         {
             if (IsServer)
             {
@@ -277,6 +279,19 @@ namespace GameCreator.Melee
                         }
                     }
                 }
+            }
+
+            if (Time.time < slowEndTime)
+            {
+                Character.characterLocomotion.runSpeed = slowAmount.Value;
+                if (IsServer)
+                    slowed.Value = true;
+            }
+            else
+            {
+                Character.characterLocomotion.runSpeed = overrideRunSpeed.Value;
+                if (IsServer)
+                    slowed.Value = false;
             }
         }
 
@@ -435,13 +450,16 @@ namespace GameCreator.Melee
 
                 if (ClientManager.Singleton)
                 {
-                    Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
-                    Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
-                    
-                    if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                    if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
                     {
-                        // If the attacker's team is the same as the victim's team, do not register this hit
-                        if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                        Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
+                        Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+
+                        if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                        {
+                            // If the attacker's team is the same as the victim's team, do not register this hit
+                            if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                        }
                     }
                 }
 
@@ -499,17 +517,18 @@ namespace GameCreator.Melee
                 //     Debug.Log("No Hit Reaction");
                 // }
 
+                float damage = attack.baseDamage * melee.damageMultiplier.Value * targetMelee.damageReductionMultiplier.Value * targetMelee.damageReceivedMultiplier.Value;
                 if (hitResult == HitResult.ReceiveDamage)
                 {
                     if (mjmComboSystem)
                         mjmComboSystem.AddCount(1);
-                    targetMelee.HP.Value -= attack.baseDamage * melee.baseDamageMultiplier;
+                    targetMelee.HP.Value -= damage;
                     targetMelee.Rage.Value += 1;
                     targetMelee.RenderHit();
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
-                    targetMelee.HP.Value -= (attack.baseDamage * 0.7f);
+                    targetMelee.HP.Value -= damage * 0.7f;
                     targetMelee.Rage.Value += 1;
                     targetMelee.RenderBlock();
                 }
@@ -828,14 +847,14 @@ namespace GameCreator.Melee
 
         protected void UpdateDefense()
         {
-            if (this.IsBlocking) return;
-            if (!this.currentShield) return;
+            if (IsBlocking) return;
+            if (!currentShield) return;
 
-            this.defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
-            if (this.defenseDelayCooldown > float.Epsilon) return;
+            defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
+            if (defenseDelayCooldown > float.Epsilon) return;
 
-            this.Defense.Value += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Defense.Value = Mathf.Min(this.Defense.Value, this.currentShield.maxDefense.GetValue(gameObject));
+            Defense.Value += currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime * defenseIncreaseMultiplier.Value;
+            Defense.Value = Mathf.Min(Defense.Value, currentShield.maxDefense.GetValue(gameObject));
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -1000,117 +1019,34 @@ namespace GameCreator.Melee
             Poise.Value = 0;
         }
 
-        public void AddHP(float value) {
+        public void AddHP(float value)
+        {
             HP.Value += value;
         }
 
-        public void SetHP(float value) {
+        public void SetHP(float value)
+        {
             HP.Value = value;
-        }
-
-        private bool isCountingdamageMultiplier = false;
-        public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
-        {
-            if (!isCountingdamageMultiplier)
-            {
-                if(this.IsCastingAbility) {
-                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
-
-                    if(currentAbility.abilityType == Ability.AbilityType.SelfBuff) {
-                        StartCoroutine(CompleteAnimBeforeDamageMultiplier(currentAbility.meleeClip.animationClip.length, multiplierDuration, damageMultiplier));
-                    }
-                    
-                } else {
-                    StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
-                }
-            }
-        }
-
-        private IEnumerator CompleteAnimBeforeDamageMultiplier(float animDuration, float multiplierDuration, float damageMultiplier) {
-            yield return new WaitForSeconds(animDuration);
-            StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
-        }
-
-        private IEnumerator DamageMultiplierCoroutine(float multiplierDuration, float damageMultiplier)
-        {
-            isCountingdamageMultiplier = true;
-            float elapsedTime = 0;
-
-            while (elapsedTime < multiplierDuration)
-            {
-                this.baseDamageMultiplier = damageMultiplier;
-                elapsedTime += Time.deltaTime;
-
-                yield return null;
-            }
-
-            this.baseDamageMultiplier = 1.0f;
-            isCountingdamageMultiplier = false;
-        }
-
-
-        private bool isCounting = false;
-
-        public void DrainHP(float drainDuration)
-        {
-            if (!isCounting)
-            {
-                if(this.IsCastingAbility) {
-                    Ability currentAbility = this.abilityManager.GetActivatedAbility();
-
-                    if(currentAbility.abilityType == Ability.AbilityType.SelfBuff) {
-                        StartCoroutine(CompleteAnimBeforeHPDrain(currentAbility.meleeClip.animationClip.length, drainDuration));
-                    }
-                    
-                } else {
-                    StartCoroutine(HPReductionCoroutine(drainDuration));
-                }
-            }
-        }
-
-        private IEnumerator CompleteAnimBeforeHPDrain(float animDuration, float drainDuration) {
-            yield return new WaitForSeconds(animDuration);
-            StartCoroutine(HPReductionCoroutine(drainDuration));
-        }
-
-        private IEnumerator HPReductionCoroutine(float drainDuration)
-        {
-            isCounting = true;
-            float elapsedTime = 0;
-            float reductionAmount = 0;
-
-            while (elapsedTime < drainDuration && HP.Value > 1)
-            {
-                reductionAmount += HP.Value * 0.1f * Time.deltaTime;
-                if (reductionAmount >= 1 && HP.Value > 1)
-                {
-
-                    this.AddHP(-1 * reductionAmount);
-                    this.SetHP(Mathf.Max(this.GetHP(), 1f));
-                    // HP.Value -= reductionAmount;
-                    // HP.Value = (int)Mathf.Max(this.GetHP(), 1f);
-                    reductionAmount = 0;
-                }
-
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            isCounting = false;
         }
 
         public override void OnNetworkSpawn()
         {
             if (IsServer)
+            {
                 HP.Value = maxHealth;
+                overrideRunSpeed.Value = originalRunSpeed;
+            }
+
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
+            rooted.OnValueChanged += OnRootedChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
             HP.OnValueChanged -= OnHPChanged;
+            rooted.OnValueChanged -= OnRootedChange;
         }
 
         private void OnHPChanged(float prev, float current)
@@ -1342,25 +1278,25 @@ namespace GameCreator.Melee
 
         public void AddPoise(float value)
         {
-            this.SetPoise(this.Poise.Value + value);
+            SetPoise(Poise.Value + value);
         }
 
         public void AddRage(float value)
         {
-            this.SetRage(this.Rage.Value + value);
+            SetRage(Rage.Value + value);
         }
 
         public void SetDefense(float value)
         {
-            if (!this.currentShield) return;
+            if (!currentShield) return;
 
-            this.defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
-            this.Defense.Value = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
+            defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
+            Defense.Value = Mathf.Clamp(value, 0f, currentShield.maxDefense.GetValue(gameObject));
         }
 
         public void AddDefense(float value)
         {
-            this.SetDefense(this.Defense.Value + value);
+            SetDefense(Defense.Value + value);
         }
 
         public void SetTargetFocus(TargetMelee target)
@@ -1573,7 +1509,7 @@ namespace GameCreator.Melee
                 isKnockup,
                 isPulled
             );
-            
+
             ExecuteEffects(
                 bladeImpactPosition,
                 isKnockback
@@ -1588,8 +1524,9 @@ namespace GameCreator.Melee
 
             // Play Reaction Clip only if the attackType is not an Ailment
             bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
-            if (!shouldPlayHitReaction) { 
-                hitReaction = null; 
+            if (!shouldPlayHitReaction)
+            {
+                hitReaction = null;
             }
 
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
@@ -1954,6 +1891,280 @@ namespace GameCreator.Melee
             float difference = newValue - oldValue;
 
             return (difference / oldValue);
+        }
+
+        // CHARACTER STATUSES ===============================================================
+
+        public NetworkVariable<float> damageMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDamageMultiplier() should only be called on the server."); return; }
+            if (damageMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageMultiplierCoroutine);
+            }
+            damageMultiplierCoroutine = StartCoroutine(SetDamageMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageMultiplierCoroutine;
+        private IEnumerator SetDamageMultiplierCoroutine(float value, float duration)
+        {
+            damageMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> damageReductionMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageReductionMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetdamageReductionMultiplier() should only be called on the server."); return; }
+            if (damageReductionMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageReductionMultiplierCoroutine);
+            }
+            damageReductionMultiplierCoroutine = StartCoroutine(SetDamageReductionMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageReductionMultiplierCoroutine;
+        private IEnumerator SetDamageReductionMultiplierCoroutine(float value, float duration)
+        {
+            damageReductionMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageReductionMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> damageReceivedMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageReceivedMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDamageReceivedMultiplier() should only be called on the server."); return; }
+            if (damageReceivedMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageReceivedMultiplierCoroutine);
+            }
+            damageReceivedMultiplierCoroutine = StartCoroutine(SetDamageReceivedMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageReceivedMultiplierCoroutine;
+        private IEnumerator SetDamageReceivedMultiplierCoroutine(float value, float duration)
+        {
+            damageReceivedMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageReceivedMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> healingMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetHealingMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetHealingMultiplier() should only be called on the server."); return; }
+            if (healingMultiplierCoroutine != null)
+            {
+                StopCoroutine(healingMultiplierCoroutine);
+            }
+            healingMultiplierCoroutine = StartCoroutine(SetHealingMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine healingMultiplierCoroutine;
+        private IEnumerator SetHealingMultiplierCoroutine(float value, float duration)
+        {
+            healingMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            healingMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> defenseIncreaseMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDefenseIncreaseMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseIncreaseMultiplier() should only be called on the server."); return; }
+            if (defenseIncreaseMultiplierCoroutine != null)
+            {
+                StopCoroutine(defenseIncreaseMultiplierCoroutine);
+            }
+            defenseIncreaseMultiplierCoroutine = StartCoroutine(SetDefenseIncreaseMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine defenseIncreaseMultiplierCoroutine;
+        private IEnumerator SetDefenseIncreaseMultiplierCoroutine(float value, float duration)
+        {
+            defenseIncreaseMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            defenseIncreaseMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> defenseReductionMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDefenseReductionMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseReductionMultiplier() should only be called on the server."); return; }
+            if (defenseReductionMultiplierCoroutine != null)
+            {
+                StopCoroutine(defenseReductionMultiplierCoroutine);
+            }
+            defenseReductionMultiplierCoroutine = StartCoroutine(SetDefenseReductionMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine defenseReductionMultiplierCoroutine;
+        private IEnumerator SetDefenseReductionMultiplierCoroutine(float value, float duration)
+        {
+            defenseReductionMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            defenseReductionMultiplier.Value = 1;
+        }
+
+        public NetworkVariable<bool> drainActive { get; private set; } = new NetworkVariable<bool>();
+        public void DrainHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.DrainHPOverTime() should only be called on the server."); return; }
+            StartCoroutine(DrainHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator DrainHPCoroutine(float value, float drainDuration, float delay)
+        {
+            drainActive.Value = true;
+            yield return new WaitForSeconds(delay);
+            float elapsedTime = 0;
+            float reductionAmount = 0;
+
+            while (elapsedTime < drainDuration)
+            {
+                reductionAmount += GetHP() / maxHealth * value * Time.deltaTime;
+                if (reductionAmount >= 1 && GetHP() > 1)
+                {
+                    if (GetHP() - reductionAmount < 1)
+                    {
+                        SetHP(1);
+                    }
+                    else
+                    {
+                        AddHP(-1 * reductionAmount);
+                    }
+
+                    reductionAmount = 0;
+                }
+                drainActive.Value = true;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            drainActive.Value = false;
+        }
+
+        public NetworkVariable<bool> healActive { get; private set; } = new NetworkVariable<bool>();
+        public void HealHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.HealHPOverTime() should only be called on the server."); return; }
+            healActive.Value = true;
+            StartCoroutine(HealHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator HealHPCoroutine(float value, float healDuration, float delay)
+        {
+            healActive.Value = true;
+            yield return new WaitForSeconds(delay);
+            float elapsedTime = 0;
+            float healAmount = 0;
+
+            while (elapsedTime < healDuration)
+            {
+                healAmount += maxHealth / GetHP() * value * Time.deltaTime * healingMultiplier.Value;
+                if (healAmount >= 1)
+                {
+                    if (GetHP() + healAmount > maxHealth)
+                    {
+                        SetHP(maxHealth);
+                    }
+                    else
+                    {
+                        AddHP(healAmount);
+                    }
+
+                    healAmount = 0;
+                }
+                healActive.Value = true;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            healActive.Value = false;
+        }
+
+        public NetworkVariable<bool> slowed { get; private set; } = new NetworkVariable<bool>();
+        private float slowEndTime;
+        private NetworkVariable<float> slowAmount = new NetworkVariable<float>();
+        public void SlowMovement(float value, float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.SlowMovement() should only be called on the server"); return; }
+            slowed.Value = true;
+            slowEndTime = Time.time + duration;
+            slowAmount.Value = value;
+        }
+
+        private NetworkVariable<float> overrideRunSpeed = new NetworkVariable<float>();
+        public void SetRunSpeed(float value)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.SetRunSpeed() should only be called on the server"); return; }
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed.Value = value;
+            }
+        }
+
+        public void ResetRunSpeed()
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.ResetRunSpeed() should only be called on the server"); return; }
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed.Value = originalRunSpeed;
+            }
+        }
+
+        public NetworkVariable<bool> rooted { get; private set; } = new NetworkVariable<bool>();
+        public float rootEndTime { get; private set; }
+        public void Root(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Root() should only be called on the server"); return; }
+            rooted.Value = true;
+            rootEndTime = Time.time + duration;
+            Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+        }
+
+        private void OnRootedChange(bool prev, bool current)
+        {
+            if (IsServer & Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
+                if (current)
+                {
+                    Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                }
+                else
+                {
+                    Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                }
+            }
+        }
+
+        public NetworkVariable<bool> silenced { get; private set; } = new NetworkVariable<bool>();
+        public float silenceEndTime { get; private set; }
+        public void Silence(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Silence() should only be called on the server"); return; }
+            silenced.Value = true;
+            silenceEndTime = Time.time + duration;
+        }
+
+        public NetworkVariable<bool> fearing { get; private set; } = new NetworkVariable<bool>();
+        public float fearEndTime { get; private set; }
+        public void Fear(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Fear() should only be called on the server"); return; }
+            fearing.Value = true;
+            fearEndTime = Time.time + duration;
         }
 
         private void OnDrawGizmos()

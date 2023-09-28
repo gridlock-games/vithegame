@@ -18,10 +18,7 @@ namespace GameCreator.Melee
             Character _character = this.character.GetCharacter(target);
             if (character == null) return true;
 
-            if (_character != null)
-            {
-                _character.characterStatusManager.DrainHP(drainDuration);
-            }
+            _character.GetComponent<CharacterStatusManager>().TryAddStatus(CharacterStatusManager.CHARACTER_STATUS.drain, 0.1f, drainDuration, 0);
 
             return true;
         }

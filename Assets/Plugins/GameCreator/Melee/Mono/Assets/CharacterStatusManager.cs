@@ -1,271 +1,298 @@
 using GameCreator.Melee;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 using Unity.Netcode;
-using UnityEngine.Events;
-using GameCreator.Core;
-using GameCreator.Characters;
-using GameCreator.Variables;
-using GameCreator.Pool;
-using static GameCreator.Melee.MeleeClip;
+using System.Collections.Generic;
 
 public class CharacterStatusManager : NetworkBehaviour
 {
     public enum CHARACTER_STATUS
     {
-        healingMultiplier,
-        burning,
-        poisoned,
         damageMultiplier,
         damageReductionMultiplier,
-        slowedMovement,
-        rooted,
+        damageReceivedMultiplier,
+        healingMultiplier,
         defenseIncreaseMultiplier,
         defenseReductionMultiplier,
+        burning,
+        poisoned,
+        drain,
+        slowedMovement,
+        rooted,
         silenced,
         fear,
-        healing,
-        damageReceivedMultiplier
+        healing
     }
 
-    // PRIVATE ------
-    private Character character;
-    private CharacterMelee melee;
-    private NetworkVariable<CHARACTER_STATUS> characterStatusNetworked = new NetworkVariable<CHARACTER_STATUS>();
-
-
-    // Lifecycle hooks ------
-    private void Awake() {}
-
-    void Update() {}
-    // EVENT TRIGGERS ------
-    public class StatusUpdateEvent : UnityEvent<CHARACTER_STATUS> { }
-    public StatusUpdateEvent onStatusEvent = new StatusUpdateEvent();
-
-    private void OnStatusChange(CHARACTER_STATUS prev, CHARACTER_STATUS current)
+    private struct CHARACTER_STATUS_NETWORKED : INetworkSerializable, System.IEquatable<CHARACTER_STATUS_NETWORKED>
     {
-        if (IsServer) { return; }
+        public CHARACTER_STATUS charStatus;
+        public float value;
+        public float duration;
+        public float delay;
 
-        StartCoroutine(ExcecuteStatusChange(current));
+        public CHARACTER_STATUS_NETWORKED(CHARACTER_STATUS charStatus, float value, float duration, float delay)
+        {
+            this.charStatus = charStatus;
+            this.value = value;
+            this.duration = duration;
+            this.delay = delay;
+        }
+
+        public bool Equals(CHARACTER_STATUS_NETWORKED other)
+        {
+            return charStatus == other.charStatus;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref charStatus);
+            serializer.SerializeValue(ref value);
+            serializer.SerializeValue(ref duration);
+            serializer.SerializeValue(ref delay);
+        }
+    }
+
+    public bool TryAddStatus(CHARACTER_STATUS status, float value, float duration, float delay)
+    {
+        if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
+
+        CHARACTER_STATUS_NETWORKED charStatus = new(status, value, duration, delay);
+        if (characterStatuses.Contains(charStatus))
+        {
+            int index = characterStatuses.IndexOf(charStatus);
+            characterStatuses[index] = charStatus;
+        }
+        else
+        {
+            characterStatuses.Add(charStatus);
+        }
+        return true;
+    }
+
+    private bool TryRemoveStatus(CHARACTER_STATUS status)
+    {
+        if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
+
+        CHARACTER_STATUS_NETWORKED charStatus = new(status, 0, 0, 0);
+        if (!characterStatuses.Contains(charStatus))
+        {
+            return false;
+        }
+        else
+        {
+            characterStatuses.Remove(charStatus);
+        }
+        return true;
+    }
+
+    public List<CHARACTER_STATUS> GetCharacterStatusList()
+    {
+        List<CHARACTER_STATUS> statuses = new List<CHARACTER_STATUS>();
+        foreach (var status in characterStatuses)
+        {
+            statuses.Add(status.charStatus);
+        }
+        return statuses;
+    }
+
+    private CharacterMelee melee;
+    private CharacterMeleeUI meleeUI;
+    private NetworkList<CHARACTER_STATUS_NETWORKED> characterStatuses;
+
+    private void Awake()
+    {
+        melee = GetComponent<CharacterMelee>();
+        meleeUI = GetComponentInChildren<CharacterMeleeUI>(true);
+        characterStatuses = new NetworkList<CHARACTER_STATUS_NETWORKED>();
+    }
+
+    private float lastChangeTime;
+    private bool add;
+    private void LateUpdate()
+    {
+        if (!IsServer) { return; }
+
+        //if (Time.time - lastChangeTime > 3 & add)
+        //{
+        //    TryAddStatus(CHARACTER_STATUS.healing, 25, 3, 0);
+        //    TryAddStatus(CHARACTER_STATUS.healingMultiplier, 2, 3, 0);
+        //    lastChangeTime = Time.time;
+        //    add = !add;
+        //}
+        //else if (Time.time - lastChangeTime > 3 & !add)
+        //{
+        //    TryAddStatus(CHARACTER_STATUS.burning, 50, 4, 0);
+        //    lastChangeTime = Time.time;
+        //    add = !add;
+        //}
+
+        RemoveStatusCheck();
     }
 
     public override void OnNetworkSpawn()
     {
-        this.character = this.GetComponent<Character>();
-        this.melee = this.GetComponent<CharacterMelee>();
-
-        characterStatusNetworked.OnValueChanged += OnStatusChange;
+        characterStatuses.OnListChanged += OnStatusChange;
     }
 
     public override void OnNetworkDespawn()
     {
-        characterStatusNetworked.OnValueChanged -= OnStatusChange;
+        characterStatuses.OnListChanged -= OnStatusChange;
     }
 
-    private IEnumerator ExcecuteStatusChange(CHARACTER_STATUS current)
+    private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
     {
-        yield return null;
+        if (IsOwner) { meleeUI.UpdateStatusUI(); }
 
-        switch (current)
+        if (!IsServer) { return; }
+
+        if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Add | networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Value)
         {
-            case CHARACTER_STATUS.damageMultiplier:
-                break;
-            case CHARACTER_STATUS.damageReductionMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseReductionMultiplier:
-                break;
-        }
-    }
-
-    public void UpdateStatus(CHARACTER_STATUS status)
-    {
-        StartCoroutine(UpdateStatusCoroutine(status));
-    }
-
-    private IEnumerator UpdateStatusCoroutine(CHARACTER_STATUS status)
-    {
-
-        if (this.character.IsDead() & this.character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.Dead)
-        {
-            yield break;
-        }
-
-        CHARACTER_STATUS prevStatus = this.character.characterStatus;
-
-        switch (status)
-        {
-            // All Ailments should end with reset except Stun which can be cancelled
-            case CHARACTER_STATUS.damageMultiplier:
-                break;
-            case CHARACTER_STATUS.damageReductionMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                break;
-            case CHARACTER_STATUS.defenseReductionMultiplier:
-                break;
-        }
-
-        this.character.Status(status);
-        if (IsServer) { characterStatusNetworked.Value = status; }
-        onStatusEvent.Invoke(status);
-    }
-
-    private bool isCountingdamageMultiplier = false;
-    public void damageMultiplierDuration(float multiplierDuration, float damageMultiplier)
-    {
-        if (!isCountingdamageMultiplier)
-        {
-            if (melee.IsCastingAbility)
+            switch (networkListEvent.Value.charStatus)
             {
-                Ability currentAbility = melee.abilityManager.GetActivatedAbility();
-
-                if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
-                {
-                    StartCoroutine(CompleteAnimBeforeDamageMultiplier(currentAbility.meleeClip.animationClip.length, multiplierDuration, damageMultiplier));
-                }
-
-            }
-            else
-            {
-                StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
+                case CHARACTER_STATUS.damageMultiplier:
+                    melee.SetDamageMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.damageReductionMultiplier:
+                    melee.SetDamageReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.damageReceivedMultiplier:
+                    melee.SetDamageReceivedMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.healingMultiplier:
+                    melee.SetHealingMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.defenseIncreaseMultiplier:
+                    melee.SetDefenseIncreaseMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.defenseReductionMultiplier:
+                    melee.SetDefenseReductionMultiplier(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.burning:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.poisoned:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.drain:
+                    melee.DrainHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                case CHARACTER_STATUS.slowedMovement:
+                    melee.SlowMovement(networkListEvent.Value.value, networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.rooted:
+                    melee.Root(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.silenced:
+                    melee.Silence(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.fear:
+                    melee.Fear(networkListEvent.Value.duration);
+                    break;
+                case CHARACTER_STATUS.healing:
+                    melee.HealHPOverTime(networkListEvent.Value.value, networkListEvent.Value.duration, networkListEvent.Value.delay);
+                    break;
+                default:
+                    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status add or value change");
+                    break;
             }
         }
     }
 
-    private IEnumerator CompleteAnimBeforeDamageMultiplier(float animDuration, float multiplierDuration, float damageMultiplier)
+    private void RemoveStatusCheck()
     {
-        yield return new WaitForSeconds(animDuration);
-        StartCoroutine(DamageMultiplierCoroutine(multiplierDuration, damageMultiplier));
-    }
-
-    private IEnumerator DamageMultiplierCoroutine(float multiplierDuration, float damageMultiplier)
-    {
-        isCountingdamageMultiplier = true;
-        float elapsedTime = 0;
-
-        while (elapsedTime < multiplierDuration)
+        foreach (var status in GetCharacterStatusList())
         {
-            melee.baseDamageMultiplier = damageMultiplier;
-            elapsedTime += Time.deltaTime;
-
-            yield return null;
-        }
-
-        melee.baseDamageMultiplier = 1.0f;
-        isCountingdamageMultiplier = false;
-    }
-
-
-    private bool isCounting = false;
-
-    public void DrainHP(float drainDuration)
-    {
-        if (!isCounting)
-        {
-            if (melee.IsCastingAbility)
+            switch (status)
             {
-                Ability currentAbility = melee.abilityManager.GetActivatedAbility();
-
-                if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
-                {
-                    StartCoroutine(CompleteAnimBeforeHPDrain(currentAbility.meleeClip.animationClip.length, drainDuration));
-                }
-
-            }
-            else
-            {
-                StartCoroutine(HPReductionCoroutine(drainDuration));
-            }
-        }
-    }
-
-    private IEnumerator CompleteAnimBeforeHPDrain(float animDuration, float drainDuration)
-    {
-        yield return new WaitForSeconds(animDuration);
-        StartCoroutine(HPReductionCoroutine(drainDuration));
-    }
-
-    private IEnumerator HPReductionCoroutine(float drainDuration)
-    {
-        isCounting = true;
-        float elapsedTime = 0;
-        float reductionAmount = 0;
-
-        while (elapsedTime < drainDuration && melee.GetHP() > 1)
-        {
-            reductionAmount += melee.GetHP() * 0.1f * Time.deltaTime;
-            if (reductionAmount >= 1 && melee.GetHP() > 1)
-            {
-
-                melee.AddHP(-1 * reductionAmount);
-                melee.SetHP(Mathf.Max(melee.GetHP(), 1f));
-                reductionAmount = 0;
-            }
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        isCounting = false;
-    }
-
-    private bool isSlowed = false;
-
-    public void SlowMovement(float slowDuration)
-    {
-        if (!isSlowed)
-        {
-            if (melee.IsCastingAbility)
-            {
-                Ability currentAbility = melee.abilityManager.GetActivatedAbility();
-
-                if (currentAbility.abilityType == Ability.AbilityType.SelfBuff)
-                {
-                    StartCoroutine(CompleteAnimBeforeSlowDuration(currentAbility.meleeClip.animationClip.length, slowDuration));
-                }
-
-            }
-            else
-            {
-                StartCoroutine(SlowCoroutine(slowDuration));
+                case CHARACTER_STATUS.damageMultiplier:
+                    if (melee.damageMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.damageReductionMultiplier:
+                    if (melee.damageReductionMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageReductionMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.damageReceivedMultiplier:
+                    if (melee.damageReceivedMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.damageReceivedMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.healingMultiplier:
+                    if (melee.healingMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.healingMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.defenseIncreaseMultiplier:
+                    if (melee.defenseIncreaseMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.defenseIncreaseMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.defenseReductionMultiplier:
+                    if (melee.defenseReductionMultiplier.Value == 1)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.defenseReductionMultiplier);
+                    }
+                    break;
+                case CHARACTER_STATUS.burning:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.burning);
+                    }
+                    break;
+                case CHARACTER_STATUS.poisoned:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.poisoned);
+                    }
+                    break;
+                case CHARACTER_STATUS.drain:
+                    if (!melee.drainActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.drain);
+                    }
+                    break;
+                case CHARACTER_STATUS.slowedMovement:
+                    if (!melee.slowed.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.slowedMovement);
+                    }
+                    break;
+                case CHARACTER_STATUS.rooted:
+                    if (!melee.rooted.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.rooted);
+                    }
+                    break;
+                case CHARACTER_STATUS.silenced:
+                    if (!melee.silenced.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.silenced);
+                    }
+                    break;
+                case CHARACTER_STATUS.fear:
+                    if (!melee.fearing.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.fear);
+                    }
+                    break;
+                case CHARACTER_STATUS.healing:
+                    if (!melee.healActive.Value)
+                    {
+                        TryRemoveStatus(CHARACTER_STATUS.healing);
+                    }
+                    break;
+                default:
+                    Debug.Log(status + " has not been implemented for removal");
+                    break;
             }
         }
     }
-
-    private IEnumerator CompleteAnimBeforeSlowDuration(float animDuration, float slowDuration)
-    {
-        yield return new WaitForSeconds(animDuration);
-        StartCoroutine(HPReductionCoroutine(slowDuration));
-    }
-
-    private IEnumerator SlowCoroutine(float slowDuration)
-    {
-        isSlowed = true;
-        float elapsedTime = 0;
-        float reductionAmount = 0;
-
-        while (elapsedTime < slowDuration && melee.GetHP() > 1)
-        {
-            reductionAmount += melee.GetHP() * 0.1f * Time.deltaTime;
-            if (reductionAmount >= 1 && melee.GetHP() > 1)
-            {
-
-                melee.AddHP(-1 * reductionAmount);
-                melee.SetHP(Mathf.Max(melee.GetHP(), 1f));
-                reductionAmount = 0;
-            }
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        isSlowed = false;
-    }
-
-
 }

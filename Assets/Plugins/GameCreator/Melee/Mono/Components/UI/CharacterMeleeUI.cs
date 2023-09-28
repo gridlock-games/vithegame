@@ -25,36 +25,79 @@
         public Slider defenseSlider;
         public Slider poiseSlider;
         public Slider rageSlider;
+
         public Image weaponImageFill;
 
+        [Header("Ability UI")]
         public Image abilityAImageFill;
-
         public Image abilityBImageFill;
-
         public Image abilityCImageFill;
-
         public Image abilityDImageFill;
+
+        [System.Serializable]
+        public struct StatusUI
+        {
+            public CharacterStatusManager.CHARACTER_STATUS status;
+            public Sprite sprite;
+        }
+
+        [Header("Status UI")]
+        public StatusUI[] statusUIAssignments;
+        public Transform statusImageParent;
+        public GameObject statusImagePrefab;
+
+        public void UpdateStatusUI()
+        {
+            foreach (Transform playerIcon in statusImageParent)
+            {
+                Destroy(playerIcon.gameObject);
+            }
+
+            bool found = false;
+            CharacterStatusManager.CHARACTER_STATUS missingStatus = CharacterStatusManager.CHARACTER_STATUS.damageMultiplier;
+            foreach (var status in statusManager.GetCharacterStatusList())
+            {
+                GameObject g = Instantiate(statusImagePrefab, statusImageParent);
+                foreach (StatusUI statusUI in statusUIAssignments)
+                {
+                    if (statusUI.status == status)
+                    {
+                        g.GetComponent<Image>().sprite = statusUI.sprite;
+                        found = true;
+                        break;
+                    }
+                }
+                missingStatus = status;
+            }
+
+            if (!found & statusManager.GetCharacterStatusList().Count > 0)
+            {
+                Debug.LogError("You need to assign a character status image for " + missingStatus);
+            }
+        }
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
         private TeamIndicator teamIndicator;
+        private CharacterStatusManager statusManager;
 
         private void Start()
         {
             melee = GetComponentInParent<CharacterMelee>();
             abilityManager = GetComponentInParent<AbilityManager>();
             teamIndicator = GetComponentInParent<TeamIndicator>();
+            statusManager = GetComponentInParent<CharacterStatusManager>();
         }
 
         private void Update()
         {
-            this.UpdateUI();
+            UpdateUI();
         }
 
         private void LateUpdate()
         {
-            this.UpdateWeaponUI();
-            this.UpdateTeammateHPUI();
+            UpdateWeaponUI();
+            UpdateTeammateHPUI();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -64,7 +107,7 @@
             healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             if (melee.currentShield) defenseSlider.value = melee.GetDefense() / melee.currentShield.maxDefense.GetValue(gameObject);
             poiseSlider.value = melee.GetPoise() / melee.maxPoise.GetValue(gameObject);
-            rageSlider.value = melee.GetRage() / melee.maxRage.GetValue(gameObject); 
+            rageSlider.value = melee.GetRage() / melee.maxRage.GetValue(gameObject);
         }
 
         /*
@@ -79,7 +122,6 @@
 
             foreach (Ability ability in abilityManager.GetAbilityInstanceList())
             {
-
                 float cost = 0f;
                 float costRequirement = 0f;
 
@@ -116,6 +158,7 @@
             }
         }
 
+        [Header("Teammate Player Cards")]
         [SerializeField] private GameObject playerCardPrefab;
         [SerializeField] private Transform playerCardParent;
         [SerializeField] private float playerCardSpacing = 100;
