@@ -113,19 +113,19 @@ public class CharacterStatusManager : NetworkBehaviour
     {
         if (!IsServer) { return; }
 
-        if (Time.time - lastChangeTime > 3 & add)
-        {
-            TryAddStatus(CHARACTER_STATUS.healing, 25, 3, 0);
-            TryAddStatus(CHARACTER_STATUS.healingMultiplier, 2, 3, 0);
-            lastChangeTime = Time.time;
-            add = !add;
-        }
-        else if (Time.time - lastChangeTime > 3 & !add)
-        {
-            TryAddStatus(CHARACTER_STATUS.burning, 50, 4, 0);
-            lastChangeTime = Time.time;
-            add = !add;
-        }
+        //if (Time.time - lastChangeTime > 3 & add)
+        //{
+        //    TryAddStatus(CHARACTER_STATUS.healing, 25, 3, 0);
+        //    TryAddStatus(CHARACTER_STATUS.healingMultiplier, 2, 3, 0);
+        //    lastChangeTime = Time.time;
+        //    add = !add;
+        //}
+        //else if (Time.time - lastChangeTime > 3 & !add)
+        //{
+        //    TryAddStatus(CHARACTER_STATUS.burning, 50, 4, 0);
+        //    lastChangeTime = Time.time;
+        //    add = !add;
+        //}
 
         RemoveStatusCheck();
     }
