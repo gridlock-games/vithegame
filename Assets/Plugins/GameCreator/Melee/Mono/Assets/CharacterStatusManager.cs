@@ -71,7 +71,7 @@ public class CharacterStatusManager : NetworkBehaviour
         return true;
     }
 
-    public bool TryRemoveStatus(CHARACTER_STATUS status)
+    private bool TryRemoveStatus(CHARACTER_STATUS status)
     {
         if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
@@ -110,15 +110,15 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private float lastChangeTime;
     private bool add;
-    private CHARACTER_STATUS status;
-    private void Update()
+    private int statusInt = -1;
+    private void LateUpdate()
     {
         if (!IsServer) { return; }
 
         if (Time.time - lastChangeTime > 3 & add)
         {
-            Debug.Log(status);
-            TryAddStatus(status, 0.1f, 3, 0);
+            Debug.Log((CHARACTER_STATUS)statusInt);
+            TryAddStatus((CHARACTER_STATUS)statusInt, 2, 3, 0);
             //Debug.Log("Adding value: " + TryAddStatus(CHARACTER_STATUS.damageMultiplier, 2, 3));
             lastChangeTime = Time.time;
             add = !add;
@@ -129,14 +129,13 @@ public class CharacterStatusManager : NetworkBehaviour
             //TryAddStatus(CHARACTER_STATUS.healingMultiplier, 5, 3, 0);
             //TryRemoveStatus(CHARACTER_STATUS.damageMultiplier);
             //Debug.Log("Removing value: " + TryRemoveStatus(CHARACTER_STATUS.damageMultiplier));
-            status += 1;
+            statusInt += 1;
             lastChangeTime = Time.time;
             add = !add;
         }
 
         foreach (var status in characterStatuses)
         {
-            Debug.Log(status.charStatus);
             switch (status.charStatus)
             {
                 case CHARACTER_STATUS.damageMultiplier:
@@ -194,7 +193,7 @@ public class CharacterStatusManager : NetworkBehaviour
                     }
                     break;
                 case CHARACTER_STATUS.slowedMovement:
-                    if (melee.slowAmount.Value != melee.Character.characterLocomotion.runSpeed)
+                    if (!melee.slowed.Value)
                     {
                         TryRemoveStatus(CHARACTER_STATUS.slowedMovement);
                     }
@@ -246,7 +245,7 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
     {
-        meleeUI.UpdateStatusUI();
+        if (IsOwner) { meleeUI.UpdateStatusUI(); }
 
         if (!IsServer) { return; }
 
@@ -301,33 +300,6 @@ public class CharacterStatusManager : NetworkBehaviour
                 default:
                     Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status add or value change");
                     break;
-            }
-        }
-        else if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Remove)
-        {
-            switch (networkListEvent.Value.charStatus)
-            {
-                case CHARACTER_STATUS.damageMultiplier:
-                    melee.ResetDamageMultiplier();
-                    break;
-                case CHARACTER_STATUS.damageReductionMultiplier:
-                    melee.ResetDamageReductionMultiplier();
-                    break;
-                case CHARACTER_STATUS.damageReceivedMultiplier:
-                    melee.ResetDamageReceivedMultiplier();
-                    break;
-                case CHARACTER_STATUS.healingMultiplier:
-                    melee.ResetHealingMultiplier();
-                    break;
-                case CHARACTER_STATUS.defenseIncreaseMultiplier:
-                    melee.ResetDefenseIncreaseMultiplier();
-                    break;
-                case CHARACTER_STATUS.defenseReductionMultiplier:
-                    melee.ResetDefenseReductionMultiplier();
-                    break;
-                //default:
-                //    Debug.Log(networkListEvent.Value.charStatus + " has not been implemented for status removal");
-                //    break;
             }
         }
     }

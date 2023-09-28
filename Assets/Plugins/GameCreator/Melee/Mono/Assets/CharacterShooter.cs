@@ -108,6 +108,14 @@ namespace GameCreator.Melee
         {
             PlayADSAnim(melee, isAimDown);
 
+            if (IsServer)
+            {
+                if (isAimDown)
+                    melee.SetRunSpeed(ADSRunSpeed);
+                else
+                    melee.ResetRunSpeed();
+            }
+
             if (IsOwner)
             {
                 UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
@@ -116,15 +124,6 @@ namespace GameCreator.Melee
 
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
-
-                if (isAimDown)
-                {
-                    melee.SetRunSpeed(ADSRunSpeed);
-                }
-                else
-                {
-                    melee.ResetRunSpeed();
-                }
             }
         }
 

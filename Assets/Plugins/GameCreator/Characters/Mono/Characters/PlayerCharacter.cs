@@ -133,10 +133,10 @@
                 if (IsServer)
                     melee.rooted.Value = Time.time < melee.rootEndTime;
 
-                if (melee.rooted.Value)
-                {
-                    return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
-                }
+                //if (melee.rooted.Value)
+                //{
+                //    return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+                //}
 
                 if (IsServer)
                     melee.fearing.Value = Time.time < melee.fearEndTime;
