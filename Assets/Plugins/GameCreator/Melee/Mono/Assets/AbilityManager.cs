@@ -95,6 +95,9 @@ public class AbilityManager : NetworkBehaviour
     [ServerRpc]
     private void ActivateAbilityServerRpc(KeyCode key)
     {
+        melee.silenced.Value = Time.time < melee.silenceEndTime;
+        if (melee.silenced.Value) { return; }
+
         Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
         if (!ability) { return; }
 
