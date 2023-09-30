@@ -18,6 +18,7 @@ namespace GameCreator.Melee
         [SerializeField] private AnimationClip aimDownSight;
         [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
+        [SerializeField] private UnityEngine.Camera ADSCamera;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -73,15 +74,15 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    isAimedDown.Value = Input.GetMouseButton(1);
+                    //isAimedDown.Value = Input.GetMouseButton(1);
 
-                    //if (Input.GetMouseButtonDown(1))
-                    //{
-                    //    isAimedDown.Value = !isAimedDown.Value;
-                    //}
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        isAimedDown.Value = !isAimedDown.Value;
+                    }
                 }
 
-                RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                 Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                 Vector3 aimPoint = Vector3.zero;
                 bool bHit = false;
@@ -95,7 +96,7 @@ namespace GameCreator.Melee
                 }
 
                 if (!bHit)
-                    aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 5;
+                    aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
 
                 this.aimPoint.Value = aimPoint;
             }
@@ -121,6 +122,16 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
+                ADSCamera.enabled = isAimDown;
+                if (isAimDown)
+                {
+
+                }
+                else
+                {
+
+                }
+
                 UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
