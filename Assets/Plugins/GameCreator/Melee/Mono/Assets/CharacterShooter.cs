@@ -40,6 +40,11 @@ namespace GameCreator.Melee
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
+        public bool IsAiming()
+        {
+            return isAimedDown.Value;
+        }
+
         private Vector3 originalADSCamLocalPos;
         private Quaternion originalADSCamLocalRot;
 
@@ -140,13 +145,15 @@ namespace GameCreator.Melee
                     ADSCamera.transform.localRotation = originalADSCamLocalRot;
 
                     camAngle = 0;
-                    //float angle = Vector3.SignedAngle(UnityEngine.Camera.main.transform.forward, transform.forward, Vector3.up);
-                    //ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, -angle);
-                    //Debug.Log(angle);
+
+                    Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
+                    float angle = Vector3.Angle(mainCamForward, transform.forward);
+                    if (mainCamForward.y > 0) { angle *= -1; }
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, angle);
                 }
                 else if (ADSCamera.enabled)
                 {
-                    float mouseY = Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y;
+                    float mouseY = -Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y;
 
                     if (camAngle + mouseY > maxADSPitch)
                     {
@@ -162,6 +169,7 @@ namespace GameCreator.Melee
                 }
 
                 ADSCamera.enabled = isAimDown;
+                adventureMotor.allowOrbitInput = !isAimDown;
 
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
