@@ -114,6 +114,8 @@ namespace GameCreator.Melee
             handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, leftHandPos, leftHandRot);
         }
 
+        [SerializeField] private float maxADSPitch = 40;
+        float camAngle = 0;
         private void PerformAimDownSight(bool isAimDown)
         {
             PlayADSAnim(melee, isAimDown);
@@ -134,18 +136,29 @@ namespace GameCreator.Melee
 
                 if (isAimDown & !ADSCamera.enabled)
                 {
-                    float angle = Vector3.SignedAngle(UnityEngine.Camera.main.transform.forward, transform.forward, Vector3.up);
-                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, -angle);
-                }
-                else if (!isAimDown & ADSCamera.enabled)
-                {
                     ADSCamera.transform.localPosition = originalADSCamLocalPos;
                     ADSCamera.transform.localRotation = originalADSCamLocalRot;
+
+                    camAngle = 0;
+                    //float angle = Vector3.SignedAngle(UnityEngine.Camera.main.transform.forward, transform.forward, Vector3.up);
+                    //ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, -angle);
+                    //Debug.Log(angle);
                 }
                 else if (ADSCamera.enabled)
                 {
-                    Debug.Log(Input.GetAxisRaw("Mouse Y"));
-                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, Input.GetAxisRaw("Mouse Y"));
+                    float mouseY = Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y;
+
+                    if (camAngle + mouseY > maxADSPitch)
+                    {
+                        mouseY = maxADSPitch - camAngle;
+                    }
+                    else if (camAngle + mouseY < -maxADSPitch)
+                    {
+                        mouseY = -(Math.Abs(maxADSPitch) - Math.Abs(camAngle));
+                    }
+
+                    camAngle += mouseY;
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mouseY);
                 }
 
                 ADSCamera.enabled = isAimDown;
