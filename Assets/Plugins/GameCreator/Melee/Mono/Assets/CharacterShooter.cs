@@ -19,6 +19,7 @@ namespace GameCreator.Melee
         [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
+        [SerializeField] private Transform ADSCamPivot;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -39,9 +40,14 @@ namespace GameCreator.Melee
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
+        private Vector3 originalADSCamLocalPos;
+        private Quaternion originalADSCamLocalRot;
+
         private void Awake()
         {
             melee = GetComponent<CharacterMelee>();
+            originalADSCamLocalPos = ADSCamera.transform.localPosition;
+            originalADSCamLocalRot = ADSCamera.transform.localRotation;
         }
 
         public override void OnNetworkSpawn()
@@ -122,19 +128,27 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
-                ADSCamera.enabled = isAimDown;
-                if (isAimDown)
-                {
-
-                }
-                else
-                {
-
-                }
-
                 UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+
+                if (isAimDown & !ADSCamera.enabled)
+                {
+                    float angle = Vector3.SignedAngle(UnityEngine.Camera.main.transform.forward, transform.forward, Vector3.up);
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, -angle);
+                }
+                else if (!isAimDown & ADSCamera.enabled)
+                {
+                    ADSCamera.transform.localPosition = originalADSCamLocalPos;
+                    ADSCamera.transform.localRotation = originalADSCamLocalRot;
+                }
+                else if (ADSCamera.enabled)
+                {
+                    Debug.Log(Input.GetAxisRaw("Mouse Y"));
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, Input.GetAxisRaw("Mouse Y"));
+                }
+
+                ADSCamera.enabled = isAimDown;
 
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
