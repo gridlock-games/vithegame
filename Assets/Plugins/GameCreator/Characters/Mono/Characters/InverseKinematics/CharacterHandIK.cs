@@ -205,16 +205,21 @@ namespace GameCreator.Characters
             Quaternion blackMagicRotation = Quaternion.LookRotation(targetUpDirection, rightHandTransform.rotation * forward);
             Quaternion aimRotation = Quaternion.LookRotation(blackMagicRotation * up, blackMagicRotation * forward);
 
+            float aimWeight = activateAim ? 1 : 0;
+
             animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation * aimOffset);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, activateAim ? 1 : 0);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, aimWeight);
+
+            animator.SetLookAtPosition(aimPoint);
+            animator.SetLookAtWeight(aimWeight);
 
             if (activateAim)
             {
                 animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandPosition);
                 animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandRotation);
-                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
             }
-            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, activateAim ? 1 : 0);
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, aimWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, aimWeight);
 
             this.eventAfterIK.Invoke(layerIndex);
         }
