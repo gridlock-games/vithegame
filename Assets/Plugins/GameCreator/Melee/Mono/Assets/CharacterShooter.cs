@@ -53,6 +53,8 @@ namespace GameCreator.Melee
             melee = GetComponent<CharacterMelee>();
             originalADSCamLocalPos = ADSCamera.transform.localPosition;
             originalADSCamLocalRot = ADSCamera.transform.localRotation;
+
+            ADSCamera.gameObject.SetActive(false);
         }
 
         public override void OnNetworkSpawn()
@@ -62,6 +64,12 @@ namespace GameCreator.Melee
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 this.adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
                 this.adventureTargetOffset = this.adventureMotor.targetOffset;
+
+                ADSCamera.gameObject.SetActive(true);
+            }
+            else
+            {
+                Destroy(ADSCamera.gameObject);
             }
         }
 
@@ -165,7 +173,8 @@ namespace GameCreator.Melee
                 }
                 else if (ADSCamera.enabled)
                 {
-                    float mouseY = -Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y;
+                    float mouseY = -Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y * Time.timeScale;
+                    float mouseX = Input.GetAxisRaw("Mouse X") * adventureMotor.sensitivity.GetValue(gameObject).x * Time.timeScale;
 
                     if (camAngle + mouseY > maxADSPitch)
                     {
@@ -178,6 +187,7 @@ namespace GameCreator.Melee
 
                     camAngle += mouseY;
                     ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mouseY);
+                    adventureMotor.AddRotation(mouseX, 0);
                 }
 
                 ADSCamera.enabled = isAimDown;
