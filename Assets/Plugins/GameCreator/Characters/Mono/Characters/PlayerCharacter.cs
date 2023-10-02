@@ -4,6 +4,7 @@
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
     using Unity.Netcode;
+    using GameCreator.Camera;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -144,6 +145,13 @@
                 if (melee.fearing.Value)
                 {
                     invertMovement = true;
+                }
+
+                if (IsLocalPlayer)
+                {
+                    CameraMotor motor = CameraMotor.MAIN_MOTOR;
+                    CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+                    adventureMotor.invertLookFearStatus = melee.fearing.Value;
                 }
             }
 

@@ -189,7 +189,7 @@
                     vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? character.transform : null
                     );
 
-                if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
+                if (abilityVFXInstance.TryGetComponent(out ParticleSystemProjectile dmg))
                 {
                     dmg.Initialize(character, this);
                 }

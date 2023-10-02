@@ -61,6 +61,8 @@
         [Range(0.0f, 180f)] public float maxPitch = 120f;
         public Vector2Property sensitivity = new Vector2Property(Vector2.one * 10f);
 
+        public bool invertLookFearStatus;
+
         public bool allowZoom = true;
         public float zoomSpeed = 25.0f;
         public float initialZoom = 3.0f;
@@ -305,8 +307,17 @@
                     {
                         Vector2 sensitivityValue = this.sensitivity.GetValue(gameObject);
 
-                        rotationX = (touch.deltaPosition.x / Screen.width) * sensitivityValue.x * 10f * Time.timeScale;
-                        rotationY = (touch.deltaPosition.y / Screen.height) * sensitivityValue.y * 10f * Time.timeScale;
+                        float rotX = (touch.deltaPosition.x / Screen.width) * sensitivityValue.x * 10f * Time.timeScale;
+                        float rotY = (touch.deltaPosition.y / Screen.height) * sensitivityValue.y * 10f * Time.timeScale;
+
+                        if (invertLookFearStatus)
+                        {
+                            rotX *= -1;
+                            rotY *= -1;
+                        }
+
+                        rotationX = rotX;
+                        rotationY = rotY;
                         orbitInputTime = Time.time;
                         this.recoverSpeedX = 0f;
                         this.recoverSpeedY = 0f;
@@ -336,8 +347,17 @@
 
                     Vector2 sensitivityValue = this.sensitivity.GetValue(gameObject);
                     
-                    rotationX = axisX * sensitivityValue.x * Time.timeScale;
-                    rotationY = axisY * sensitivityValue.y * Time.timeScale;
+                    float rotX = axisX * sensitivityValue.x * Time.timeScale;
+                    float rotY = axisY * sensitivityValue.y * Time.timeScale;
+
+                    if (invertLookFearStatus)
+                    {
+                        rotX *= -1;
+                        rotY *= -1;
+                    }
+
+                    rotationX = rotX;
+                    rotationY = rotY;
 
                     if (!Mathf.Approximately(axisX, 0f) || !Mathf.Approximately(axisY, 0f))
                     {

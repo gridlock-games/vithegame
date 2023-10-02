@@ -29478,6 +29478,7 @@ GameObject:
   - component: {fileID: 2251393201902171458}
   - component: {fileID: 2251393201902171457}
   - component: {fileID: 2251393201902171455}
+  - component: {fileID: 4355452387446089033}
   m_Layer: 0
   m_Name: helsing_shower
   m_TagString: Untagged
@@ -34421,6 +34422,23 @@ MonoBehaviour:
   colliderLookBoxExtents: {x: 4, y: 1, z: 4}
   particleRadius: 1
   maxHits: 5
+--- !u!114 &4355452387446089033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2251393201902171456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5845fd2b2a1013846ad36dd8396063f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statuses:
+  - status: 12
+    value: 10
+    duration: 5
+    delay: 0
 --- !u!1 &2251393202068444662
 GameObject:
   m_ObjectHideFlags: 0

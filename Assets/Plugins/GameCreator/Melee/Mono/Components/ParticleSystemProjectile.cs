@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 namespace GameCreator.Melee
 {
-    public class ApplyDamageOnParticleSystemCollision : MonoBehaviour
+    public class ParticleSystemProjectile : MonoBehaviour
     {
         public Vector3 colliderLookBoxExtents = Vector3.one;
         public float particleRadius = 1;
@@ -22,10 +22,12 @@ namespace GameCreator.Melee
         }
 
         private ParticleSystem ps;
+        private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
         private void Start()
         {
             ps = GetComponent<ParticleSystem>();
+            applyStatusOnProjectileCollision = GetComponent<ApplyStatusOnProjectileCollision>();
         }
 
         private Dictionary<CharacterMelee, int> hitCounter = new Dictionary<CharacterMelee, int>();
@@ -90,12 +92,33 @@ namespace GameCreator.Melee
                                 hitCounter.Add(targetMelee, 1);
                             }
                         }
+
+                        if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                        {
+                            applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                        }
                     }
                 }
             }
 
             // set
             ps.SetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter);
+        }
+
+        public struct ProjectileHit
+        {
+            public CharacterMelee attacker;
+            public CharacterMelee targetMelee;
+            public Vector3 impactPosition;
+            public MeleeClip attack;
+
+            public ProjectileHit(CharacterMelee attacker, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
+            {
+                this.attacker = attacker;
+                this.targetMelee = targetMelee;
+                this.impactPosition = impactPosition;
+                this.attack = attack;
+            }
         }
 
         private void OnDrawGizmos()
