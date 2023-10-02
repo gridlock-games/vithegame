@@ -147,9 +147,21 @@ namespace GameCreator.Melee
                     camAngle = 0;
 
                     Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
-                    float angle = Vector3.Angle(mainCamForward, transform.forward);
-                    if (mainCamForward.y > 0) { angle *= -1; }
-                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, angle);
+                    float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
+                    if (mainCamForward.y > 0) { mainCamAngle *= -1; }
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mainCamAngle);
+                }
+                else if (!isAimDown & ADSCamera.enabled)
+                {
+                    Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
+                    float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
+                    if (mainCamForward.y > 0) { mainCamAngle *= -1; }
+
+                    Vector3 adsCamForward = ADSCamera.transform.forward;
+                    float adsCamAngle = Vector3.Angle(adsCamForward, transform.forward);
+                    if (adsCamForward.y > 0) { adsCamAngle *= -1; }
+                    
+                    adventureMotor.AddRotation(0, mainCamAngle - adsCamAngle);
                 }
                 else if (ADSCamera.enabled)
                 {
