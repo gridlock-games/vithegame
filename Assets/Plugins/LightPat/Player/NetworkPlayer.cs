@@ -157,7 +157,14 @@ namespace LightPat.Player
                 }
             }
 
-            cameraMotorInstance.allowOrbitInputOverride = !pauseInstance & !externalUIOpen;
+            if (TryGetComponent(out CharacterShooter characterShooter))
+            {
+                cameraMotorInstance.allowOrbitInputOverride = !pauseInstance & !externalUIOpen & !characterShooter.IsAiming();
+            }
+            else
+            {
+                cameraMotorInstance.allowOrbitInputOverride = !pauseInstance & !externalUIOpen;
+            }
 
             if (!ClientManager.Singleton) { return; }
 

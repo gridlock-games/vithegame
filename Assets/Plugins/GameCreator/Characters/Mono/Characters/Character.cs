@@ -259,6 +259,13 @@
             if (this.ragdoll != null && this.ragdoll.GetState() != CharacterRagdoll.State.Normal) return;
 
             this.characterLocomotion.Update();
+
+            if (IsServer)
+            {
+                LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
+                bool isDodging = (bool)variables.Get("isDodging").Get();
+                isDashing.Value = isDodging;
+            }
         }
 
         private void LateUpdate()
@@ -272,12 +279,10 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        private NetworkVariable<bool> isDashing = new NetworkVariable<bool>();
         public bool isCharacterDashing()
         {
-            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
-            bool isDodging = (bool)variables.Get("isDodging").Get();
-            
-            return isDodging;
+            return isDashing.Value;
         }
 
         public void SetCharacterDashing(bool value)

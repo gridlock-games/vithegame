@@ -18,6 +18,8 @@ namespace GameCreator.Melee
         [SerializeField] private AnimationClip aimDownSight;
         [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
+        [SerializeField] private UnityEngine.Camera ADSCamera;
+        [SerializeField] private Transform ADSCamPivot;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -38,9 +40,21 @@ namespace GameCreator.Melee
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
+        public bool IsAiming()
+        {
+            return isAimedDown.Value;
+        }
+
+        private Vector3 originalADSCamLocalPos;
+        private Quaternion originalADSCamLocalRot;
+
         private void Awake()
         {
             melee = GetComponent<CharacterMelee>();
+            originalADSCamLocalPos = ADSCamera.transform.localPosition;
+            originalADSCamLocalRot = ADSCamera.transform.localRotation;
+
+            ADSCamera.gameObject.SetActive(false);
         }
 
         public override void OnNetworkSpawn()
@@ -50,6 +64,12 @@ namespace GameCreator.Melee
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 this.adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
                 this.adventureTargetOffset = this.adventureMotor.targetOffset;
+
+                ADSCamera.gameObject.SetActive(true);
+            }
+            else
+            {
+                Destroy(ADSCamera.gameObject);
             }
         }
 
@@ -67,7 +87,7 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
-                if (melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.isCharacterDashing() | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }
@@ -81,7 +101,7 @@ namespace GameCreator.Melee
                     //}
                 }
 
-                RaycastHit[] allHits = Physics.RaycastAll(UnityEngine.Camera.main.transform.position, UnityEngine.Camera.main.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                 Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                 Vector3 aimPoint = Vector3.zero;
                 bool bHit = false;
@@ -95,7 +115,7 @@ namespace GameCreator.Melee
                 }
 
                 if (!bHit)
-                    aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 5;
+                    aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
 
                 this.aimPoint.Value = aimPoint;
             }
@@ -107,6 +127,8 @@ namespace GameCreator.Melee
             handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, leftHandPos, leftHandRot);
         }
 
+        [SerializeField] private float maxADSPitch = 40;
+        float camAngle = 0;
         private void PerformAimDownSight(bool isAimDown)
         {
             PlayADSAnim(melee, isAimDown);
@@ -125,12 +147,57 @@ namespace GameCreator.Melee
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
                 CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
 
+                if (isAimDown & !ADSCamera.enabled)
+                {
+                    ADSCamera.transform.localPosition = originalADSCamLocalPos;
+                    ADSCamera.transform.localRotation = originalADSCamLocalRot;
+
+                    camAngle = 0;
+
+                    Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
+                    float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
+                    if (mainCamForward.y > 0) { mainCamAngle *= -1; }
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mainCamAngle);
+                }
+                else if (!isAimDown & ADSCamera.enabled)
+                {
+                    Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
+                    float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
+                    if (mainCamForward.y > 0) { mainCamAngle *= -1; }
+
+                    Vector3 adsCamForward = ADSCamera.transform.forward;
+                    float adsCamAngle = Vector3.Angle(adsCamForward, transform.forward);
+                    if (adsCamForward.y > 0) { adsCamAngle *= -1; }
+                    
+                    adventureMotor.AddRotation(0, mainCamAngle - adsCamAngle);
+                }
+                else if (ADSCamera.enabled)
+                {
+                    float mouseY = -Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y * Time.timeScale;
+                    float mouseX = Input.GetAxisRaw("Mouse X") * adventureMotor.sensitivity.GetValue(gameObject).x * Time.timeScale;
+
+                    if (camAngle + mouseY > maxADSPitch)
+                    {
+                        mouseY = maxADSPitch - camAngle;
+                    }
+                    else if (camAngle + mouseY < -maxADSPitch)
+                    {
+                        mouseY = -(Math.Abs(maxADSPitch) - Math.Abs(camAngle));
+                    }
+
+                    camAngle += mouseY;
+                    ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mouseY);
+                    adventureMotor.AddRotation(mouseX, 0);
+                }
+
+                ADSCamera.enabled = isAimDown;
+                adventureMotor.allowOrbitInput = !isAimDown;
+
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
             }
         }
 
-        private bool lastADS;
         private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
@@ -139,24 +206,12 @@ namespace GameCreator.Melee
             if (aimDownSight == null) { return; }
             if (aimDownMask == null) { return; }
 
+            characterAnimator.animator.SetBool("IsAiming", isAimedDown);
+
             if (isAimedDown)
             {
-                characterAnimator.CrossFadeGesture(
-                    aimDownSight, 0.25f, aimDownMask,
-                    0.15f, 0.15f
-                );
-
                 limbReferences.transform.localRotation = Quaternion.Slerp(limbReferences.transform.localRotation, Quaternion.Euler(ADSModelRotation), Time.deltaTime * 10);
             }
-            else
-            {
-                if (!isAimedDown & lastADS)
-                {
-                    characterAnimator.StopGesture(0);
-                }
-            }
-
-            lastADS = isAimedDown;
         }
 
         private void OnDrawGizmos()
