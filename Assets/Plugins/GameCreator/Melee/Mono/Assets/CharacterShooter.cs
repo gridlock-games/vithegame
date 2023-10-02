@@ -87,18 +87,18 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
-                if (melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.isCharacterDashing() | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }
                 else
                 {
-                    //isAimedDown.Value = Input.GetMouseButton(1);
+                    isAimedDown.Value = Input.GetMouseButton(1);
 
-                    if (Input.GetMouseButtonDown(1))
-                    {
-                        isAimedDown.Value = !isAimedDown.Value;
-                    }
+                    //if (Input.GetMouseButtonDown(1))
+                    //{
+                    //    isAimedDown.Value = !isAimedDown.Value;
+                    //}
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -198,7 +198,6 @@ namespace GameCreator.Melee
             }
         }
 
-        private bool lastADS;
         private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
@@ -207,24 +206,12 @@ namespace GameCreator.Melee
             if (aimDownSight == null) { return; }
             if (aimDownMask == null) { return; }
 
+            characterAnimator.animator.SetBool("IsAiming", isAimedDown);
+
             if (isAimedDown)
             {
-                characterAnimator.CrossFadeGesture(
-                    aimDownSight, 0.25f, aimDownMask,
-                    0.15f, 0.15f
-                );
-
                 limbReferences.transform.localRotation = Quaternion.Slerp(limbReferences.transform.localRotation, Quaternion.Euler(ADSModelRotation), Time.deltaTime * 10);
             }
-            else
-            {
-                if (!isAimedDown & lastADS)
-                {
-                    characterAnimator.StopGesture(0);
-                }
-            }
-
-            lastADS = isAimedDown;
         }
 
         private void OnDrawGizmos()
