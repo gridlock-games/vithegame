@@ -150,12 +150,12 @@ namespace GameCreator.Melee
                     ADSCamera.transform.localPosition = originalADSCamLocalPos;
                     ADSCamera.transform.localRotation = originalADSCamLocalRot;
 
-                    camAngle = 0;
-
                     Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
                     float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
                     if (mainCamForward.y > 0) { mainCamAngle *= -1; }
                     ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mainCamAngle);
+
+                    camAngle = mainCamAngle;
                 }
                 else if (!isAimDown & ADSCamera.enabled)
                 {
@@ -198,6 +198,7 @@ namespace GameCreator.Melee
             PlayADSAnim(melee, isAimDown, camAngle);
         }
 
+        private NetworkVariable<float> aimAnglePercentage = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private void PlayADSAnim(CharacterMelee melee, bool isAimedDown, float verticalAimAngle)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
@@ -207,8 +208,9 @@ namespace GameCreator.Melee
             if (aimDownMask == null) { return; }
 
             characterAnimator.animator.SetBool("IsAiming", isAimedDown);
-            characterAnimator.animator.SetFloat("AimAngle", verticalAimAngle / maxADSPitch);
-            Debug.Log(verticalAimAngle / maxADSPitch);
+
+            if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
+            characterAnimator.animator.SetFloat("AimAngle", aimAnglePercentage.Value);
 
             if (isAimedDown)
             {
