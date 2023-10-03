@@ -93,12 +93,12 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    isAimedDown.Value = Input.GetMouseButton(1);
+                    //isAimedDown.Value = Input.GetMouseButton(1);
 
-                    //if (Input.GetMouseButtonDown(1))
-                    //{
-                    //    isAimedDown.Value = !isAimedDown.Value;
-                    //}
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        isAimedDown.Value = !isAimedDown.Value;
+                    }
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -127,12 +127,10 @@ namespace GameCreator.Melee
             handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, leftHandPos, leftHandRot);
         }
 
-        [SerializeField] private float maxADSPitch = 40;
+        [SerializeField] private float maxADSPitch = 90;
         float camAngle = 0;
         private void PerformAimDownSight(bool isAimDown)
         {
-            PlayADSAnim(melee, isAimDown);
-
             if (IsServer)
             {
                 if (isAimDown)
@@ -196,9 +194,11 @@ namespace GameCreator.Melee
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
             }
+
+            PlayADSAnim(melee, isAimDown, camAngle);
         }
 
-        private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
+        private void PlayADSAnim(CharacterMelee melee, bool isAimedDown, float verticalAimAngle)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
 
@@ -207,6 +207,8 @@ namespace GameCreator.Melee
             if (aimDownMask == null) { return; }
 
             characterAnimator.animator.SetBool("IsAiming", isAimedDown);
+            characterAnimator.animator.SetFloat("AimAngle", verticalAimAngle / maxADSPitch);
+            Debug.Log(verticalAimAngle / maxADSPitch);
 
             if (isAimedDown)
             {
