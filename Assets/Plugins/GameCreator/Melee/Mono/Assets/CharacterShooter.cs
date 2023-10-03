@@ -15,8 +15,6 @@ namespace GameCreator.Melee
         [SerializeField] private float reloadTime;
         [SerializeField] private float projectileSpeed = 10;
         [SerializeField] private float ADSRunSpeed = 3;
-        [SerializeField] private AnimationClip aimDownSight;
-        [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
@@ -204,8 +202,6 @@ namespace GameCreator.Melee
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
 
             if (characterAnimator == null) { return; }
-            if (aimDownSight == null) { return; }
-            if (aimDownMask == null) { return; }
 
             characterAnimator.animator.SetBool("IsAiming", isAimedDown);
 

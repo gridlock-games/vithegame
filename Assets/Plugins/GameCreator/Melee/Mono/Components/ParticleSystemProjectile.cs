@@ -21,6 +21,11 @@ namespace GameCreator.Melee
             this.attack = attack;
         }
 
+        public CharacterMelee GetAttacker()
+        {
+            return attacker;
+        }
+
         private ParticleSystem ps;
         private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
