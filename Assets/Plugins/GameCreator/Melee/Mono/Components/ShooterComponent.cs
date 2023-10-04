@@ -16,11 +16,19 @@ namespace GameCreator.Melee
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
 
             GameObject projectileInstance = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
-            projectileInstance.GetComponent<BulletProjectile>().Initialize(attacker, meleeClip, projectileSpeed);
-            projectileInstance.GetComponent<NetworkObject>().Spawn();
+            
+            if (projectileInstance.TryGetComponent(out BulletProjectile bulletProjectile))
+            {
+                bulletProjectile.Initialize(attacker, meleeClip, projectileSpeed);
+                bulletProjectile.NetworkObject.Spawn();
+            }
+            else if (projectileInstance.TryGetComponent(out ParticleSystemProjectile particleSystemProjectile))
+            {
+                particleSystemProjectile.Initialize(attacker, meleeClip);
+            }
         }
 
-        public Transform GetLeftHandTarget() { return leftHandTarget ? leftHandTarget : null; }
+        public Transform GetLeftHandTarget() { return leftHandTarget; }
 
         public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 

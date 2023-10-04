@@ -14,7 +14,8 @@ namespace GameCreator.Melee
 
         public void Initialize(CharacterMelee attacker, MeleeClip attack)
         {
-            if (this.attacker) { Debug.LogError("Initialize() already called, why are you calling it again idiot?"); return; }
+            if (this.attacker) { Debug.LogError("ParticleSystemProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
+            
             this.attacker = attacker;
             this.attack = attack;
         }
