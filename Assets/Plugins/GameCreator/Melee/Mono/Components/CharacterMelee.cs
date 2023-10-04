@@ -442,13 +442,13 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack, float healTeammatesAmount)
+        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack, float healTeammatesPercentage)
         {
-            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesAmount);
+            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesPercentage);
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
-        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesAmount)
+        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesPercentage)
         {
             List<HitResult> hitResults = new List<HitResult>();
 
@@ -483,7 +483,7 @@ namespace GameCreator.Melee
                             // If the attacker's team is the same as the victim's team, do not register this hit
                             if (attackerMeleeTeam == targetMeleeTeam)
                             {
-                                targetMelee.HP.Value += healTeammatesAmount;
+                                targetMelee.AddHP(targetMelee.HP.Value * healTeammatesPercentage);
                                 continue;
                             }
                         }
@@ -1048,7 +1048,14 @@ namespace GameCreator.Melee
 
         public void AddHP(float value)
         {
-            HP.Value += value;
+            if (HP.Value + value > maxHealth)
+            {
+                HP.Value = maxHealth;
+            }
+            else
+            {
+                HP.Value += value;
+            }
         }
 
         public void SetHP(float value)

@@ -8,7 +8,7 @@ namespace GameCreator.Melee
     [RequireComponent(typeof(Rigidbody))]
     public class BulletProjectile : Projectile
     {
-        [SerializeField] private float healTeammateAmount;
+        [SerializeField] private float healTeammatePercentage;
 
         public override void OnNetworkSpawn()
         {
@@ -25,7 +25,7 @@ namespace GameCreator.Melee
 
             if (otherMelee)
             {
-                attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), attack, healTeammateAmount);
+                attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), attack, healTeammatePercentage);
             }
             NetworkObject.Despawn(true);
         }
