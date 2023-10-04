@@ -6,8 +6,9 @@ namespace GameCreator.Melee
     public class ShooterComponent : MonoBehaviour
     {
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
-        [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Transform leftHandTarget;
+        [SerializeField] private Transform projectileSpawnPoint;
+        [SerializeField] private Vector3 projectilePositionOffset;
         [SerializeField] private Projectile projectilePrefab;
         [SerializeField] private Vector3 aimOffset;
 
@@ -15,17 +16,10 @@ namespace GameCreator.Melee
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
 
-            GameObject projectileInstance = Instantiate(projectilePrefab.gameObject, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
-            
-            if (projectileInstance.TryGetComponent(out BulletProjectile bulletProjectile))
-            {
-                bulletProjectile.Initialize(attacker, meleeClip, projectileSpeed);
-                bulletProjectile.NetworkObject.Spawn();
-            }
-            else if (projectileInstance.TryGetComponent(out ParticleSystemProjectile particleSystemProjectile))
-            {
-                particleSystemProjectile.Initialize(attacker, meleeClip);
-            }
+            GameObject projectileInstance = Instantiate(projectilePrefab.gameObject, projectileSpawnPoint.position + projectileSpawnPoint.rotation * projectilePositionOffset, projectileSpawnPoint.rotation);
+            Projectile proj = projectileInstance.GetComponent<Projectile>();
+            proj.Initialize(attacker, meleeClip, projectileSpeed);
+            proj.NetworkObject.Spawn();
         }
 
         public Transform GetLeftHandTarget() { return leftHandTarget; }

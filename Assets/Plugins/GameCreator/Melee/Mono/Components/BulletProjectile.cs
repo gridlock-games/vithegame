@@ -5,20 +5,10 @@ using Unity.Netcode;
 
 namespace GameCreator.Melee
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class BulletProjectile : Projectile
     {
-        private float projectileSpeed;
-        private bool initialized;
-
-        public void Initialize(CharacterMelee attacker, MeleeClip attack, float projectileSpeed)
-        {
-            if (this.attacker) { Debug.LogError("BulletProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
-
-            this.attacker = attacker;
-            this.attack = attack;
-            this.projectileSpeed = projectileSpeed;
-            initialized = true;
-        }
+        [SerializeField] private float healTeammateAmount;
 
         public override void OnNetworkSpawn()
         {
@@ -35,7 +25,7 @@ namespace GameCreator.Melee
 
             if (otherMelee)
             {
-                attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), attack);
+                attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), attack, healTeammateAmount);
             }
             NetworkObject.Despawn(true);
         }

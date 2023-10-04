@@ -165,6 +165,11 @@ namespace GameCreator.Characters
             this.leftHandRotation = leftHandRotation;
         }
 
+        public bool IsRightHandAiming()
+        {
+            return activateAim;
+        }
+
         private void OnAnimatorIK(int layerIndex)
         {
             if (this.animator == null || !this.animator.isHuman) return;

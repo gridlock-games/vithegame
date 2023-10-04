@@ -94,6 +94,7 @@ namespace GameCreator.Melee
         public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
+        public bool IsInAnticipation { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
@@ -348,6 +349,7 @@ namespace GameCreator.Melee
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
+            IsInAnticipation = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -359,6 +361,7 @@ namespace GameCreator.Melee
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
+                IsInAnticipation = phase == 0;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -381,9 +384,9 @@ namespace GameCreator.Melee
                     }
                 }
 
-                if ((IsAttacking & lastPhase < 0) | (IsAttacking & newInputThisFrame))
+                if (TryGetComponent(out CharacterShooter characterShooter))
                 {
-                    if (TryGetComponent(out CharacterShooter characterShooter))
+                    if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
                     {
                         // Do not shoot a bullet prefab when casting an Ability
                         if (!IsCastingAbility.Value)
@@ -424,7 +427,7 @@ namespace GameCreator.Melee
             while (hitQueue.Count > 0)
             {
                 MeleeHitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false);
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false, 0);
             }
         }
 
@@ -439,13 +442,13 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
+        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack, float healTeammatesAmount)
         {
-            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
+            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesAmount);
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
-        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
+        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesAmount)
         {
             List<HitResult> hitResults = new List<HitResult>();
 
@@ -478,7 +481,11 @@ namespace GameCreator.Melee
                         if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                         {
                             // If the attacker's team is the same as the victim's team, do not register this hit
-                            if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                            if (attackerMeleeTeam == targetMeleeTeam)
+                            {
+                                targetMelee.HP.Value += healTeammatesAmount;
+                                continue;
+                            }
                         }
                     }
                 }

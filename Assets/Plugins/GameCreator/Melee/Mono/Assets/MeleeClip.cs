@@ -191,13 +191,11 @@
 
                 if (abilityVFXInstance.TryGetComponent(out ParticleSystemProjectile dmg))
                 {
-                    dmg.Initialize(character, this);
+                    dmg.Initialize(character, this, 0);
                 }
 
                 CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
             }
-
-            
         }
 
         private IEnumerator DestroyAfterEffectsFinish(GameObject obj)

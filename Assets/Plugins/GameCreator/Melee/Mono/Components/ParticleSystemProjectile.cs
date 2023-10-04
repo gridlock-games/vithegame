@@ -12,14 +12,6 @@ namespace GameCreator.Melee
         public float particleRadius = 1;
         public int maxHits = 100;
 
-        public void Initialize(CharacterMelee attacker, MeleeClip attack)
-        {
-            if (this.attacker) { Debug.LogError("ParticleSystemProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
-            
-            this.attacker = attacker;
-            this.attack = attack;
-        }
-
         private ParticleSystem ps;
         private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
@@ -40,7 +32,7 @@ namespace GameCreator.Melee
         void OnParticleTrigger()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
-            if (!attacker) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
+            if (!initialized) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
 
             Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 
@@ -85,7 +77,7 @@ namespace GameCreator.Melee
                             if (hitCounter[targetMelee] >= maxHits) { continue; }
                         }
                         
-                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
+                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack, 0);
                         if (hitResult != CharacterMelee.HitResult.Ignore)
                         {
                             if (hitCounterContainsMelee)

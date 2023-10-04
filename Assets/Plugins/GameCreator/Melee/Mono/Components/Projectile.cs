@@ -5,13 +5,25 @@ using UnityEngine;
 
 namespace GameCreator.Melee
 {
-    public class Projectile : NetworkBehaviour
+    public abstract class Projectile : NetworkBehaviour
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
 
         protected CharacterMelee attacker;
         protected MeleeClip attack;
+        protected float projectileSpeed;
+        protected bool initialized;
+
+        public void Initialize(CharacterMelee attacker, MeleeClip attack, float projectileSpeed)
+        {
+            if (this.attacker) { Debug.LogError("BulletProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
+
+            this.attacker = attacker;
+            this.attack = attack;
+            this.projectileSpeed = projectileSpeed;
+            initialized = true;
+        }
 
         public CharacterMelee GetAttacker()
         {

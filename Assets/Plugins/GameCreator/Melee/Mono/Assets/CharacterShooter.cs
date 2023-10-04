@@ -18,6 +18,7 @@ namespace GameCreator.Melee
         [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
+        [SerializeField] private bool aimDuringAttackAnticipation = true;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -34,7 +35,21 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
 
-            //Debug.Log(Time.time + " shoot called");
+            if (aimDuringAttackAnticipation)
+            {
+                shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
+            }
+            else
+            {
+                StartCoroutine(WaitForAimShoot(attackClip));
+            }
+        }
+
+        private IEnumerator WaitForAimShoot(MeleeClip attackClip)
+        {
+            yield return new WaitUntil(() => handIK.IsRightHandAiming());
+            yield return null;
+
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
@@ -122,7 +137,12 @@ namespace GameCreator.Melee
             Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
             Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
 
-            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, shooterWeapon.GetLeftHandTarget(), leftHandPos, leftHandRot);
+            handIK.AimRightHand(aimPoint.Value,
+                shooterWeapon.GetAimOffset(),
+                aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
+                shooterWeapon.GetLeftHandTarget(),
+                leftHandPos,
+                leftHandRot);
         }
 
         [SerializeField] private float maxADSPitch = 90;
