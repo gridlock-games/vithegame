@@ -34,10 +34,13 @@ namespace LightPat.Core
                     Gizmos.color = Color.black;
                 }
 
-                foreach (Vector3 spawnPosition in spawnPoint.spawnPositions)
+                for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                 {
+                    Vector3 spawnPosition = spawnPoint.spawnPositions[i];
+                    Quaternion spawnRotation = Quaternion.Euler(spawnPoint.spawnRotations[i]);
+
                     Gizmos.DrawWireSphere(spawnPosition, 2);
-                    Gizmos.DrawRay(spawnPosition, Quaternion.Euler(spawnPoint.spawnRotation) * Vector3.forward * 5);
+                    Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
                 }
             }
         }
@@ -50,5 +53,6 @@ namespace LightPat.Core
         public Team team;
         public Vector3[] spawnPositions;
         public Vector3 spawnRotation;
+        public Vector3[] spawnRotations;
     }
 }

@@ -40,7 +40,7 @@ namespace LightPat.Core
                         spawnCountDict[team] = 0;
                     
                     spawnPosition = teamSpawnPoint.spawnPositions[spawnCountDict[team]];
-                    spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotation);
+                    spawnRotation = Quaternion.Euler(teamSpawnPoint.spawnRotations[spawnCountDict[team]]);
                     break;
                 }
             }
@@ -52,7 +52,7 @@ namespace LightPat.Core
                 if (spawnPoints.Length > 1)
                 {
                     spawnPosition = spawnPoints[0].spawnPositions[0];
-                    spawnRotation = Quaternion.Euler(spawnPoints[0].spawnRotation);
+                    spawnRotation = Quaternion.Euler(spawnPoints[0].spawnRotations[0]);
                 }
                 else
                 {
