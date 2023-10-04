@@ -37,7 +37,6 @@ namespace LightPat.Core
                 for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                 {
                     Vector3 spawnPosition = spawnPoint.spawnPositions[i];
-                    Debug.Log(spawnPoint.team + " " + spawnPoint.gameModes[0]);
                     Quaternion spawnRotation = Quaternion.Euler(spawnPoint.spawnRotations[i]);
 
                     Gizmos.DrawWireSphere(spawnPosition, 2);
