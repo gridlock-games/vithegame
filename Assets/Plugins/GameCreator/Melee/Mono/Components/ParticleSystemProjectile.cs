@@ -5,14 +5,12 @@ using Unity.Netcode;
 
 namespace GameCreator.Melee
 {
-    public class ParticleSystemProjectile : MonoBehaviour
+    public class ParticleSystemProjectile : Projectile
     {
+        [Header("Particle System Projectile Settings")]
         public Vector3 colliderLookBoxExtents = Vector3.one;
         public float particleRadius = 1;
         public int maxHits = 100;
-
-        private CharacterMelee attacker;
-        private MeleeClip attack;
 
         public void Initialize(CharacterMelee attacker, MeleeClip attack)
         {
@@ -21,16 +19,12 @@ namespace GameCreator.Melee
             this.attack = attack;
         }
 
-        public CharacterMelee GetAttacker()
-        {
-            return attacker;
-        }
-
         private ParticleSystem ps;
         private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
-        private void Start()
+        private new void Start()
         {
+            base.Start();
             ps = GetComponent<ParticleSystem>();
             applyStatusOnProjectileCollision = GetComponent<ApplyStatusOnProjectileCollision>();
         }

@@ -14712,6 +14712,7 @@ GameObject:
   - component: {fileID: 744258597443500297}
   - component: {fileID: 744258597443500296}
   - component: {fileID: 6409324723430915454}
+  - component: {fileID: 5815433136629610389}
   m_Layer: 0
   m_Name: FX_EarthSkill_Path_04
   m_TagString: Untagged
@@ -19642,9 +19643,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f92ec8667636df4cb53114cc721864c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destroyDistance: 0
   colliderLookBoxExtents: {x: 2, y: 2, z: 10}
   particleRadius: 1
   maxHits: 1
+--- !u!114 &5815433136629610389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744258597443500299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &744258597897249285
 GameObject:
   m_ObjectHideFlags: 0
