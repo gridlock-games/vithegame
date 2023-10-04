@@ -14,7 +14,7 @@ namespace UnityEngine
     public class IPManager : MonoBehaviour
     {
         public string ServerAPIURL = "38.60.245.223/servers/duels";
-        // public string ServerAPIURL = "172.21.48.1/servers/duels";
+        // public string ServerAPIURL = "192.168.0.106/servers/duels";
         public string VMServerHost = GetIP(ADDRESSFAM.IPv4);
 
         public IEnumerator CheckAPI()
