@@ -23,12 +23,12 @@ namespace UnityEngine
             {
                 yield return www.SendWebRequest();
 
-                string FailOverServerAPIURL = "http://" + GetIP(ADDRESSFAM.IPv4) + ":3000/servers/duels";
-                string FailOverVMServerHost = GetIP(ADDRESSFAM.IPv4);
+                // string FailOverServerAPIURL = "http://" + GetIP(ADDRESSFAM.IPv4) + ":3000/servers/duels";
+                // string FailOverVMServerHost = GetIP(ADDRESSFAM.IPv4);
 
                 // Please do not remove
-                // string FailOverServerAPIURL = "http://" + "192.168.130.78" + ":3000/servers/duels";
-                // string FailOverVMServerHost = "192.168.130.78";
+                string FailOverServerAPIURL = "http://" + "192.168.100.78" + ":3000/servers/duels";
+                string FailOverVMServerHost = "192.168.100.78";
 
                 if (www.isNetworkError || www.isHttpError)
                 {
