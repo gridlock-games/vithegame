@@ -262,9 +262,14 @@
 
             if (IsServer)
             {
-                LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
-                bool isDodging = (bool)variables.Get("isDodging").Get();
-                isDashing.Value = isDodging;
+                if (TryGetComponent(out LocalVariables variables))
+                {
+                    if (variables.Get("isDodging") != null)
+                    {
+                        bool isDodging = (bool)variables.Get("isDodging").Get();
+                        isDashing.Value = isDodging;
+                    }
+                }
             }
         }
 
