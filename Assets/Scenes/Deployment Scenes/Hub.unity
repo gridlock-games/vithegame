@@ -576,6 +576,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 25647636
   AlwaysReplicateAsRoot: 1
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!143 &51868625
@@ -2510,6 +2514,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 2546621437
   AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &747904126
@@ -2541,27 +2549,32 @@ MonoBehaviour:
     team: 0
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: -90, z: 0}
   - gameModes: 00000000
     team: 1
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: -90, z: 0}
   - gameModes: 00000000
     team: 2
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: -90, z: 0}
   - gameModes: 00000000
     team: 3
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: -90, z: 0}
   - gameModes: 00000000
     team: 4
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: -90, z: 0}
 --- !u!1 &758625522
 GameObject:
   m_ObjectHideFlags: 0
@@ -3101,6 +3114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightHand: {fileID: 615693611}
   leftHand: {fileID: 1124960627}
+  rightHandAimAxis: 0
 --- !u!4 &981082853
 Transform:
   m_ObjectHideFlags: 0
