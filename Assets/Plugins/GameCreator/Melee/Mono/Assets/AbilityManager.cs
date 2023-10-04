@@ -116,7 +116,7 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if Melee is currently playing a Heavy Attack
         if (ability && melee.IsAttacking && melee.currentMeleeClip.isHeavy && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_HeavyAtk) { return; }
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
-        if (ability && melee.IsCastingAbility && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
+        if (ability && melee.IsCastingAbility.Value && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
 
 
         if (ability != null && melee != null)

@@ -8,14 +8,14 @@ namespace GameCreator.Melee
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Transform leftHandTarget;
-        [SerializeField] private GameObject projectilePrefab;
+        [SerializeField] private Projectile projectilePrefab;
         [SerializeField] private Vector3 aimOffset;
 
         public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, float projectileSpeed)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
 
-            GameObject projectileInstance = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+            GameObject projectileInstance = Instantiate(projectilePrefab.gameObject, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
             
             if (projectileInstance.TryGetComponent(out BulletProjectile bulletProjectile))
             {

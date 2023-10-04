@@ -85,7 +85,7 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
-                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }

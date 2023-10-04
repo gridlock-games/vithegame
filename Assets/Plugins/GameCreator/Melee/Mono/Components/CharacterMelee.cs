@@ -59,7 +59,7 @@ namespace GameCreator.Melee
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
 
-        public bool IsCastingAbility { get; private set; }
+        public NetworkVariable<bool> IsCastingAbility { get; private set; } = new NetworkVariable<bool>();
 
         private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -370,7 +370,8 @@ namespace GameCreator.Melee
                     if (TryGetComponent(out CharacterShooter characterShooter))
                     {
                         // Do not shoot a bullet prefab when casting an Ability
-                        if(!this.IsCastingAbility) {
+                        if (!IsCastingAbility.Value)
+                        {
                             characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
                         }
                     }
@@ -1156,16 +1157,16 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.IsCastingAbility = true;
+            this.IsCastingAbility.Value = true;
             if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
         public void RevertAbilityCastingStatus()
         {
-            if (IsCastingAbility)
+            if (IsCastingAbility.Value)
             {
-                IsCastingAbility = false;
+                IsCastingAbility.Value = false;
             }
         }
 
@@ -1173,7 +1174,7 @@ namespace GameCreator.Melee
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
             {
-                this.IsCastingAbility = false;
+                this.IsCastingAbility.Value = false;
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();
@@ -1399,7 +1400,7 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             // Uninterruptable Abilities will not be cancelled
-            if (melee.IsCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
+            if (melee.IsCastingAbility.Value && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
             // Uninterruptable Heavy Attacks will not be cancelled
             if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
 
@@ -1526,7 +1527,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
+            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility.Value) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction)
             {
                 hitReaction = null;
