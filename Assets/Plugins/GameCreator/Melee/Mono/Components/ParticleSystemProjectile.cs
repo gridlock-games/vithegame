@@ -92,9 +92,12 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                        if (applyStatusOnProjectileCollision)
                         {
-                            applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                            if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                            {
+                                applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                            }
                         }
                     }
                 }
