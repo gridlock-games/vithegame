@@ -28,6 +28,11 @@ namespace GameCreator.Melee
             base.Start();
             ps = GetComponent<ParticleSystem>();
             applyStatusOnProjectileCollision = GetComponent<ApplyStatusOnProjectileCollision>();
+
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                rb.AddForce(transform.forward * 5, ForceMode.VelocityChange);
+            }
         }
 
         private Dictionary<CharacterMelee, int> hitCounter = new Dictionary<CharacterMelee, int>();
