@@ -15,11 +15,10 @@ namespace GameCreator.Melee
         [SerializeField] private float reloadTime;
         [SerializeField] private float projectileSpeed = 10;
         [SerializeField] private float ADSRunSpeed = 3;
-        [SerializeField] private AnimationClip aimDownSight;
-        [SerializeField] private AvatarMask aimDownMask;
         [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
+        [SerializeField] private bool aimDuringAttackAnticipation = true;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -36,7 +35,21 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
 
-            //Debug.Log(Time.time + " shoot called");
+            if (aimDuringAttackAnticipation)
+            {
+                shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
+            }
+            else
+            {
+                StartCoroutine(WaitForAimShoot(attackClip));
+            }
+        }
+
+        private IEnumerator WaitForAimShoot(MeleeClip attackClip)
+        {
+            yield return new WaitUntil(() => handIK.IsRightHandAiming());
+            yield return null;
+
             shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
         }
 
@@ -87,18 +100,18 @@ namespace GameCreator.Melee
 
             if (IsOwner)
             {
-                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }
                 else
                 {
-                    isAimedDown.Value = Input.GetMouseButton(1);
+                    //isAimedDown.Value = Input.GetMouseButton(1);
 
-                    //if (Input.GetMouseButtonDown(1))
-                    //{
-                    //    isAimedDown.Value = !isAimedDown.Value;
-                    //}
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        isAimedDown.Value = !isAimedDown.Value;
+                    }
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -124,15 +137,18 @@ namespace GameCreator.Melee
             Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
             Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
 
-            handIK.AimRightHand(aimPoint.Value, shooterWeapon.GetAimOffset(), isAimedDown.Value, leftHandPos, leftHandRot);
+            handIK.AimRightHand(aimPoint.Value,
+                shooterWeapon.GetAimOffset(),
+                aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
+                shooterWeapon.GetLeftHandTarget(),
+                leftHandPos,
+                leftHandRot);
         }
 
-        [SerializeField] private float maxADSPitch = 40;
+        [SerializeField] private float maxADSPitch = 90;
         float camAngle = 0;
         private void PerformAimDownSight(bool isAimDown)
         {
-            PlayADSAnim(melee, isAimDown);
-
             if (IsServer)
             {
                 if (isAimDown)
@@ -152,12 +168,12 @@ namespace GameCreator.Melee
                     ADSCamera.transform.localPosition = originalADSCamLocalPos;
                     ADSCamera.transform.localRotation = originalADSCamLocalRot;
 
-                    camAngle = 0;
-
                     Vector3 mainCamForward = UnityEngine.Camera.main.transform.forward;
                     float mainCamAngle = Vector3.Angle(mainCamForward, transform.forward);
                     if (mainCamForward.y > 0) { mainCamAngle *= -1; }
                     ADSCamera.transform.RotateAround(ADSCamPivot.position, transform.right, mainCamAngle);
+
+                    camAngle = mainCamAngle;
                 }
                 else if (!isAimDown & ADSCamera.enabled)
                 {
@@ -196,17 +212,21 @@ namespace GameCreator.Melee
                 adventureMotor.targetOffset = isAimDown ? new Vector3(0.15f, -0.15f, 1.50f) : this.adventureTargetOffset;
                 mainCamera.fieldOfView = isAimDown ? 25.0f : 70.0f;
             }
+
+            PlayADSAnim(melee, isAimDown, camAngle);
         }
 
-        private void PlayADSAnim(CharacterMelee melee, bool isAimedDown)
+        private NetworkVariable<float> aimAnglePercentage = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private void PlayADSAnim(CharacterMelee melee, bool isAimedDown, float verticalAimAngle)
         {
             CharacterAnimator characterAnimator = melee.Character.GetCharacterAnimator();
 
             if (characterAnimator == null) { return; }
-            if (aimDownSight == null) { return; }
-            if (aimDownMask == null) { return; }
 
             characterAnimator.animator.SetBool("IsAiming", isAimedDown);
+
+            if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
+            characterAnimator.animator.SetFloat("AimAngle", aimAnglePercentage.Value);
 
             if (isAimedDown)
             {

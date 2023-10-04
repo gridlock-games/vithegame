@@ -48877,6 +48877,7 @@ GameObject:
   - component: {fileID: 2423455508567624813}
   - component: {fileID: 2425171339617821803}
   - component: {fileID: 2423455508567624814}
+  - component: {fileID: 4271864246871962123}
   m_Layer: 0
   m_Name: toga_tessaiga_v2_2
   m_TagString: Untagged
@@ -53763,9 +53764,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f92ec8667636df4cb53114cc721864c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destroyDistance: 0
   colliderLookBoxExtents: {x: 3, y: 1, z: 8}
   particleRadius: 1.5
   maxHits: 1
+--- !u!114 &4271864246871962123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2550711334294492913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &2551088861679285581
 GameObject:
   m_ObjectHideFlags: 0

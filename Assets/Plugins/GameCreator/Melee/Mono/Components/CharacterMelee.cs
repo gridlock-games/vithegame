@@ -59,7 +59,7 @@ namespace GameCreator.Melee
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
 
-        public bool IsCastingAbility { get; private set; }
+        public NetworkVariable<bool> IsCastingAbility { get; private set; } = new NetworkVariable<bool>();
 
         private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -94,6 +94,7 @@ namespace GameCreator.Melee
         public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
+        public bool IsInAnticipation { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
@@ -235,6 +236,22 @@ namespace GameCreator.Melee
                     {
                         if (IsServer)
                         {
+                            if (TryGetComponent(out CharacterShooter characterShooter))
+                            {
+                                if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
+                                {
+                                    if (!characterShooter.IsAiming())
+                                    {
+                                        if (this.inputBuffer.HasInput())
+                                        {
+                                            this.inputBuffer.ConsumeInput();
+                                        }
+                                        this.comboSystem.Stop();
+                                        return;
+                                    }
+                                }
+                            }
+
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
                                 if (Poise.Value <= 20)
@@ -332,6 +349,7 @@ namespace GameCreator.Melee
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
+            IsInAnticipation = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -343,6 +361,7 @@ namespace GameCreator.Melee
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
+                IsInAnticipation = phase == 0;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -365,12 +384,13 @@ namespace GameCreator.Melee
                     }
                 }
 
-                if ((IsAttacking & lastPhase < 0) | (IsAttacking & newInputThisFrame))
+                if (TryGetComponent(out CharacterShooter characterShooter))
                 {
-                    if (TryGetComponent(out CharacterShooter characterShooter))
+                    if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
                     {
                         // Do not shoot a bullet prefab when casting an Ability
-                        if(!this.IsCastingAbility) {
+                        if (!IsCastingAbility.Value)
+                        {
                             characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
                         }
                     }
@@ -407,7 +427,7 @@ namespace GameCreator.Melee
             while (hitQueue.Count > 0)
             {
                 MeleeHitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false);
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false, 0);
             }
         }
 
@@ -422,13 +442,13 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack)
+        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack, float healTeammatesPercentage)
         {
-            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true);
+            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesPercentage);
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
-        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit)
+        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesPercentage)
         {
             List<HitResult> hitResults = new List<HitResult>();
 
@@ -461,7 +481,11 @@ namespace GameCreator.Melee
                         if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                         {
                             // If the attacker's team is the same as the victim's team, do not register this hit
-                            if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                            if (attackerMeleeTeam == targetMeleeTeam)
+                            {
+                                targetMelee.AddHP(targetMelee.HP.Value * (healTeammatesPercentage / 100));
+                                continue;
+                            }
                         }
                     }
                 }
@@ -1024,7 +1048,14 @@ namespace GameCreator.Melee
 
         public void AddHP(float value)
         {
-            HP.Value += value;
+            if (HP.Value + value > maxHealth)
+            {
+                HP.Value = maxHealth;
+            }
+            else
+            {
+                HP.Value += value;
+            }
         }
 
         public void SetHP(float value)
@@ -1156,16 +1187,16 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.IsCastingAbility = true;
+            this.IsCastingAbility.Value = true;
             if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
         public void RevertAbilityCastingStatus()
         {
-            if (IsCastingAbility)
+            if (IsCastingAbility.Value)
             {
-                IsCastingAbility = false;
+                IsCastingAbility.Value = false;
             }
         }
 
@@ -1173,7 +1204,7 @@ namespace GameCreator.Melee
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
             {
-                this.IsCastingAbility = false;
+                this.IsCastingAbility.Value = false;
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();
@@ -1399,7 +1430,7 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             // Uninterruptable Abilities will not be cancelled
-            if (melee.IsCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
+            if (melee.IsCastingAbility.Value && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
             // Uninterruptable Heavy Attacks will not be cancelled
             if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
 
@@ -1526,7 +1557,7 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
+            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility.Value) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
             if (!shouldPlayHitReaction)
             {
                 hitReaction = null;

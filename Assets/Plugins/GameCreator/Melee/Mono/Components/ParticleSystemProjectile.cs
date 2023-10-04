@@ -5,29 +5,26 @@ using Unity.Netcode;
 
 namespace GameCreator.Melee
 {
-    public class ParticleSystemProjectile : MonoBehaviour
+    public class ParticleSystemProjectile : Projectile
     {
+        [Header("Particle System Projectile Settings")]
         public Vector3 colliderLookBoxExtents = Vector3.one;
         public float particleRadius = 1;
         public int maxHits = 100;
 
-        private CharacterMelee attacker;
-        private MeleeClip attack;
-
-        public void Initialize(CharacterMelee attacker, MeleeClip attack)
-        {
-            if (this.attacker) { Debug.LogError("Initialize() already called, why are you calling it again idiot?"); return; }
-            this.attacker = attacker;
-            this.attack = attack;
-        }
-
         private ParticleSystem ps;
         private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
-        private void Start()
+        private new void Start()
         {
+            base.Start();
             ps = GetComponent<ParticleSystem>();
             applyStatusOnProjectileCollision = GetComponent<ApplyStatusOnProjectileCollision>();
+
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                rb.AddForce(transform.forward * 5, ForceMode.VelocityChange);
+            }
         }
 
         private Dictionary<CharacterMelee, int> hitCounter = new Dictionary<CharacterMelee, int>();
@@ -35,7 +32,7 @@ namespace GameCreator.Melee
         void OnParticleTrigger()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
-            if (!attacker) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
+            if (!initialized) { Debug.LogError("Attacker has not been initialized yet! Call the Initialize() method"); return; }
 
             Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 
@@ -80,7 +77,7 @@ namespace GameCreator.Melee
                             if (hitCounter[targetMelee] >= maxHits) { continue; }
                         }
                         
-                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack);
+                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack, 0);
                         if (hitResult != CharacterMelee.HitResult.Ignore)
                         {
                             if (hitCounterContainsMelee)
@@ -93,9 +90,12 @@ namespace GameCreator.Melee
                             }
                         }
 
-                        if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                        if (applyStatusOnProjectileCollision)
                         {
-                            applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                            if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                            {
+                                applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                            }
                         }
                     }
                 }

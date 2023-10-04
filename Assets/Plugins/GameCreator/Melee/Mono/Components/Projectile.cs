@@ -1,66 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace GameCreator.Melee
 {
-    public class Projectile : NetworkBehaviour
+    public abstract class Projectile : NetworkBehaviour
     {
-        private CharacterMelee attacker;
-        private MeleeClip meleeClip;
-        private float projectileSpeed;
-        private bool initialized;
+        [Header("Projectile Settings")]
+        [SerializeField] private int killDistance = 500;
 
-        public void Initialize(CharacterMelee attacker, MeleeClip meleeClip, float projectileSpeed)
+        protected CharacterMelee attacker;
+        protected MeleeClip attack;
+        protected float projectileSpeed;
+        protected bool initialized;
+
+        public void Initialize(CharacterMelee attacker, MeleeClip attack, float projectileSpeed)
         {
+            if (this.attacker) { Debug.LogError("BulletProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
+
             this.attacker = attacker;
-            this.meleeClip = meleeClip;
+            this.attack = attack;
             this.projectileSpeed = projectileSpeed;
             initialized = true;
         }
 
-        public override void OnNetworkSpawn()
+        public CharacterMelee GetAttacker()
         {
-            if (IsServer) { GetComponent<Rigidbody>().AddForce(transform.forward * projectileSpeed, ForceMode.VelocityChange); }
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!initialized) { return; }
-            if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
-            CharacterMelee otherMelee = other.GetComponentInParent<CharacterMelee>();
-            if (otherMelee == attacker) { return; }
-
-            if (otherMelee)
-            {
-                attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), meleeClip);
-            }
-            NetworkObject.Despawn(true);
+            return attacker;
         }
 
         private Vector3 startPosition;
-        private void Start()
+        protected void Start()
         {
             startPosition = transform.position;
         }
 
-        private void Update()
+        protected void Update()
         {
             if (!IsServer) { return; }
 
-            if (Vector3.Distance(transform.position, startPosition) > 500)
+            if (Vector3.Distance(transform.position, startPosition) > killDistance)
             {
-                NetworkObject.Despawn(true);
+                if (IsSpawned)
+                {
+                    NetworkObject.Despawn(true);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
             }
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(transform.position, new Vector3(0.5f, 0.5f, 0.5f));
-            Gizmos.DrawLine(transform.position, transform.position + transform.forward * 5);
         }
     }
 }
