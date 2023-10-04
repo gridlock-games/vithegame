@@ -235,6 +235,22 @@ namespace GameCreator.Melee
                     {
                         if (IsServer)
                         {
+                            if (TryGetComponent(out CharacterShooter characterShooter))
+                            {
+                                if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
+                                {
+                                    if (!characterShooter.IsAiming())
+                                    {
+                                        if (this.inputBuffer.HasInput())
+                                        {
+                                            this.inputBuffer.ConsumeInput();
+                                        }
+                                        this.comboSystem.Stop();
+                                        return;
+                                    }
+                                }
+                            }
+
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
                                 if (Poise.Value <= 20)
