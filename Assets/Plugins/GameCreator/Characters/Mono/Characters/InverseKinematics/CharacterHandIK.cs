@@ -151,14 +151,16 @@ namespace GameCreator.Characters
         private Vector3 aimPoint;
         private Quaternion aimOffset;
         private bool activateAim;
+        private bool aimLeftHand;
         private Vector3 leftHandPosition;
         private Quaternion leftHandRotation;
-        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, Vector3 leftHandPosition, Quaternion leftHandRotation)
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, bool aimLeftHand, Vector3 leftHandPosition, Quaternion leftHandRotation)
         {
             this.aimPoint = aimPoint;
             aimOffset = IKOffset;
             this.activateAim = activateAim;
 
+            this.aimLeftHand = aimLeftHand;
             this.leftHandPosition = leftHandPosition;
             this.leftHandRotation = leftHandRotation;
         }
@@ -205,21 +207,22 @@ namespace GameCreator.Characters
             Quaternion blackMagicRotation = Quaternion.LookRotation(targetUpDirection, rightHandTransform.rotation * forward);
             Quaternion aimRotation = Quaternion.LookRotation(blackMagicRotation * up, blackMagicRotation * forward);
 
-            float aimWeight = activateAim ? 1 : 0;
+            float rightHandAimWeight = activateAim ? 1 : 0;
 
             animator.SetIKRotation(AvatarIKGoal.RightHand, aimRotation * aimOffset);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, aimWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rightHandAimWeight);
 
             animator.SetLookAtPosition(aimPoint);
-            animator.SetLookAtWeight(aimWeight);
+            animator.SetLookAtWeight(rightHandAimWeight);
 
             if (activateAim)
             {
                 animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandPosition);
                 animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandRotation);
             }
-            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, aimWeight);
-            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, aimWeight);
+            float leftHandAimWeight = aimLeftHand ? 1 : 0;
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, leftHandAimWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, leftHandAimWeight);
 
             this.eventAfterIK.Invoke(layerIndex);
         }
