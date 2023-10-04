@@ -483,7 +483,7 @@ namespace GameCreator.Melee
                             // If the attacker's team is the same as the victim's team, do not register this hit
                             if (attackerMeleeTeam == targetMeleeTeam)
                             {
-                                targetMelee.AddHP(targetMelee.HP.Value * healTeammatesPercentage);
+                                targetMelee.AddHP(targetMelee.HP.Value * (healTeammatesPercentage / 100));
                                 continue;
                             }
                         }
