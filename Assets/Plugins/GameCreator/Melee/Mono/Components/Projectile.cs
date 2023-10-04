@@ -8,7 +8,7 @@ namespace GameCreator.Melee
     public class Projectile : NetworkBehaviour
     {
         [Header("Projectile Settings")]
-        [SerializeField] private int destroyDistance = 500;
+        [SerializeField] private int killDistance = 500;
 
         protected CharacterMelee attacker;
         protected MeleeClip attack;
@@ -28,7 +28,7 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { return; }
 
-            if (Vector3.Distance(transform.position, startPosition) > destroyDistance)
+            if (Vector3.Distance(transform.position, startPosition) > killDistance)
             {
                 if (IsSpawned)
                 {
