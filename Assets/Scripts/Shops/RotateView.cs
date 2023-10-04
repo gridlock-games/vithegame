@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
     public class RotateView : MonoBehaviour, IPointerUpHandler, IDragHandler, IPointerDownHandler
     {
@@ -17,6 +18,10 @@ using UnityEngine.EventSystems;
         private void Start()
         {
             originalRot = transform.rotation;
+            
+            if (SceneManager.GetActiveScene().name != "CharacterSelect") {
+                this.canRotate = false;
+            };
         }
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -32,6 +37,7 @@ using UnityEngine.EventSystems;
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if(!canRotate) return;
             if (!(Input.mousePosition.y > 100) || !canRotate) 
                 return;
 
@@ -49,6 +55,7 @@ using UnityEngine.EventSystems;
         
         private void ResetValue()
         {
+            if(!canRotate) return;
             canRotate = false;
             transform.rotation = originalRot;
             m_fRotationSpeed = 0;

@@ -25,5 +25,8 @@ public enum WeaponType
     SWORD,
     DAGGER,
     BRAWLER,
-    CROSSBOW
+    CROSSBOW,
+    BROADSWORD,
+    LONGBOW,
+    STAFF
 }

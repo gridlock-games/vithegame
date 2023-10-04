@@ -45,6 +45,7 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         // VFX: ----------------------------------------------------------------------------
+        private SerializedProperty spAttackVFXList;
         private SerializedProperty spAttackVFX;
         private SerializedProperty spVFXAttachmentPhase;
         private SerializedProperty spVFXPositionOffset;
@@ -97,6 +98,7 @@
         private SerializedProperty spIsHeavy;
         private SerializedProperty spBladeMultiplier;
         private SerializedProperty spIsOrbitLocked;
+        private SerializedProperty spApplyRootMotion;
         private SerializedProperty spIsLunge;
         private SerializedProperty spAttackType;
         private SerializedProperty spIsDodge;
@@ -161,6 +163,7 @@
             this.spAnimationSpeed = this.serializedObject.FindProperty("animSpeed");
 
             // VFX
+            this.spAttackVFXList = this.serializedObject.FindProperty("vfxList");
             this.spAttackVFX = this.serializedObject.FindProperty("abilityVFX");
             this.spVFXAttachmentPhase = this.serializedObject.FindProperty("attachVFXOnPhase");
             this.spVFXPositionOffset = this.serializedObject.FindProperty("vfxPositionOffset");
@@ -200,6 +203,7 @@
             this.spIsHeavy = this.serializedObject.FindProperty("isHeavy");
             this.spBladeMultiplier = this.serializedObject.FindProperty("bladeSizeMultiplier"); 
             this.spIsOrbitLocked = this.serializedObject.FindProperty("isOrbitLocked");
+            this.spApplyRootMotion = this.serializedObject.FindProperty("applyRootMotion");
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
             this.spHitCountDelay = this.serializedObject.FindProperty("multiHitRegDelay");
@@ -507,6 +511,8 @@
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
+                    
+                    EditorGUILayout.PropertyField(this.spAttackVFXList);
                     EditorGUILayout.PropertyField(this.spAttackVFX);
                     EditorGUILayout.PropertyField(this.spVFXAttachmentPhase);
                     EditorGUILayout.PropertyField(this.spVFXPositionOffset);
@@ -566,6 +572,7 @@
                     EditorGUILayout.PropertyField(this.spIsBlockable);
                     EditorGUILayout.PropertyField(this.spIsHeavy);
                     EditorGUILayout.PropertyField(this.spIsOrbitLocked);
+                    EditorGUILayout.PropertyField(this.spApplyRootMotion);
                     EditorGUILayout.PropertyField(this.spBladeMultiplier);
 
                     EditorGUILayout.PropertyField(this.spAttackType);

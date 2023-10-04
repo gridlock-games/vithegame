@@ -15,6 +15,7 @@ namespace GameCreator.Melee
     using System.Reflection;
     using GameCreator.Camera;
     using LightPat.Core;
+    using MJM;
 
     [RequireComponent(typeof(Character))]
     [AddComponentMenu("Game Creator/Melee/Character Melee")]
@@ -58,7 +59,7 @@ namespace GameCreator.Melee
         private static readonly Vector3 PLANE = new Vector3(1, 0, 1);
 
 
-        public bool IsCastingAbility { get; private set; }
+        public NetworkVariable<bool> IsCastingAbility { get; private set; } = new NetworkVariable<bool>();
 
         private CameraMotorTypeAdventure adventureMotor = null;
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -80,6 +81,10 @@ namespace GameCreator.Melee
         public NumberProperty poiseRecoveryRate = new NumberProperty(1f);
 
 
+        public NumberProperty maxRage = new NumberProperty(100.0f);
+        public NumberProperty rageRecoveryRate = new NumberProperty(1f);
+
+
         public float attackInterval = 0.10f;
 
         private NetworkVariable<float> Defense = new NetworkVariable<float>();
@@ -89,6 +94,7 @@ namespace GameCreator.Melee
         public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
+        public bool IsInAnticipation { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
@@ -132,9 +138,10 @@ namespace GameCreator.Melee
         private float anim_ExecuterDuration = 0.0f;
         private float anim_ExecutedDuration = 0.0f;
 
-        private AbilityManager abilityManager;
+        public AbilityManager abilityManager { get; private set; }
         private GlowRenderer glowRenderer;
-        private LightPat.Player.NetworkPlayer networkPlayer;
+
+        public MJMComboSystem mjmComboSystem;
 
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
@@ -142,6 +149,7 @@ namespace GameCreator.Melee
             new Keyframe(1f, 0f)
         };
         public AnimationCurve movementForward = new AnimationCurve(DEFAULT_KEY_MOVEMENT);
+
 
         // ACCESSORS: -----------------------------------------------------------------------------
 
@@ -151,7 +159,10 @@ namespace GameCreator.Melee
 
         public List<BladeComponent> Blades { get; protected set; }
 
+
         // INITIALIZERS: --------------------------------------------------------------------------
+
+        private float originalRunSpeed;
 
         protected virtual void Awake()
         {
@@ -160,7 +171,10 @@ namespace GameCreator.Melee
             this.inputBuffer = new InputBuffer(INPUT_BUFFER_TIME);
             abilityManager = GetComponentInParent<AbilityManager>();
             glowRenderer = GetComponentInChildren<GlowRenderer>();
-            networkPlayer = GetComponent<LightPat.Player.NetworkPlayer>();
+
+            mjmComboSystem = GetComponentInChildren<MJMComboSystem>();
+
+            originalRunSpeed = Character.characterLocomotion.runSpeed;
         }
 
         private void OnTransformChildrenChanged()
@@ -186,16 +200,19 @@ namespace GameCreator.Melee
             }
         }
 
-        protected virtual void Update()
+        private bool newInputThisFrame;
+        private void Update()
         {
             if (IsServer)
             {
                 this.UpdatePoise();
                 this.UpdateDefense();
+                this.UpdateRage();
             }
 
             // Adding check block to make sure melee animations are cancelled as soon ailment == dead
-            if(this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) {
+            if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead)
+            {
                 this.StopAttack();
                 this.CharacterAnimator.StopGesture(0f);
                 this.currentMeleeClip = null;
@@ -219,6 +236,22 @@ namespace GameCreator.Melee
                     {
                         if (IsServer)
                         {
+                            if (TryGetComponent(out CharacterShooter characterShooter))
+                            {
+                                if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
+                                {
+                                    if (!characterShooter.IsAiming())
+                                    {
+                                        if (this.inputBuffer.HasInput())
+                                        {
+                                            this.inputBuffer.ConsumeInput();
+                                        }
+                                        this.comboSystem.Stop();
+                                        return;
+                                    }
+                                }
+                            }
+
                             if (meleeClip.isHeavy) // Heavy Attack
                             {
                                 if (Poise.Value <= 20)
@@ -236,6 +269,8 @@ namespace GameCreator.Melee
                             {
                                 OnLightAttack();
                             }
+
+                            newInputThisFrame = true;
                         }
 
                         this.inputBuffer.ConsumeInput();
@@ -261,6 +296,19 @@ namespace GameCreator.Melee
                         }
                     }
                 }
+            }
+
+            if (Time.time < slowEndTime)
+            {
+                Character.characterLocomotion.runSpeed = slowAmount.Value;
+                if (IsServer)
+                    slowed.Value = true;
+            }
+            else
+            {
+                Character.characterLocomotion.runSpeed = overrideRunSpeed.Value;
+                if (IsServer)
+                    slowed.Value = false;
             }
         }
 
@@ -294,12 +342,14 @@ namespace GameCreator.Melee
             hitCount = 0;
         }
 
+        private int lastPhase;
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
+            IsInAnticipation = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -308,10 +358,10 @@ namespace GameCreator.Melee
 
             if (this.comboSystem != null)
             {
-
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
+                IsInAnticipation = phase == 0;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -328,24 +378,39 @@ namespace GameCreator.Melee
 
                         if (hitCount < currentMeleeClip.hitCount)
                         {
-                            hitQueue.Enqueue(new HitQueueElement(this, blade.GetImpactPosition(), hits, comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip));
-                            ProcessHitQueue();
+                            hitQueue.Enqueue(new MeleeHitQueueElement(this, blade.GetImpactPosition(), hits, comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip));
+                            ProcessMeleeHitQueue();
                         }
                     }
                 }
+
+                if (TryGetComponent(out CharacterShooter characterShooter))
+                {
+                    if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
+                    {
+                        // Do not shoot a bullet prefab when casting an Ability
+                        if (!IsCastingAbility.Value)
+                        {
+                            characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
+                        }
+                    }
+                }
+
+                newInputThisFrame = false;
+                lastPhase = phase;
             }
         }
 
-        private static Queue<HitQueueElement> hitQueue = new Queue<HitQueueElement>();
+        private static Queue<MeleeHitQueueElement> hitQueue = new Queue<MeleeHitQueueElement>();
 
-        private struct HitQueueElement
+        private struct MeleeHitQueueElement
         {
             public CharacterMelee attackerMelee;
             public Vector3 impactPosition;
             public GameObject[] hits;
             public MeleeClip attack;
 
-            public HitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+            public MeleeHitQueueElement(CharacterMelee attackerMelee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
             {
                 this.attackerMelee = attackerMelee;
                 this.impactPosition = impactPosition;
@@ -354,19 +419,15 @@ namespace GameCreator.Melee
             }
         }
 
-        public void AddHitsToQueue(Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+        private void ProcessMeleeHitQueue()
         {
-            hitQueue.Enqueue(new HitQueueElement(this, impactPosition, hits, attack));
-        }
-
-        private void ProcessHitQueue()
-        {
+            //Debug.Log(Time.time + " " + hitQueue.Count);
             // Wait for one frame for the hit queue to fill with all hits from the previous frame
             // Empty the hit queue and process the hits for each element
             while (hitQueue.Count > 0)
             {
-                HitQueueElement queueElement = hitQueue.Dequeue();
-                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack);
+                MeleeHitQueueElement queueElement = hitQueue.Dequeue();
+                ProcessAttackedObjects(queueElement.attackerMelee, queueElement.impactPosition, queueElement.hits, queueElement.attack, false, 0);
             }
         }
 
@@ -381,9 +442,18 @@ namespace GameCreator.Melee
             wasHit = false;
         }
 
-        private void ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack)
+        public HitResult ProcessProjectileHit(CharacterMelee attackerMelee, CharacterMelee targetMelee, Vector3 impactPosition, MeleeClip attack, float healTeammatesPercentage)
         {
-            if (SceneManager.GetActiveScene().name == "Hub") { return; }
+            List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesPercentage);
+            return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
+        }
+
+        private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesPercentage)
+        {
+            List<HitResult> hitResults = new List<HitResult>();
+
+            if (SceneManager.GetActiveScene().name == "Hub") { return hitResults; }
+            if (!attack.isAttack) { return hitResults; }
 
             // Repeat the action on each attacked object for a specific number of times
             // Perform the action on the attacked object
@@ -393,20 +463,30 @@ namespace GameCreator.Melee
                 int hitInstanceID = hit.GetInstanceID();
 
                 if (hit.transform.IsChildOf(transform)) continue;
-                if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                if (!projectileHit)
+                {
+                    if (melee.targetsEvaluated.Contains(hitInstanceID)) continue;
+                }
 
                 CharacterMelee targetMelee = hit.GetComponent<CharacterMelee>();
                 if (!targetMelee) { continue; }
 
                 if (ClientManager.Singleton)
                 {
-                    Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
-                    Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
-
-                    if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                    if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
                     {
-                        // If the attacker's team is the same as the victim's team, do not register this hit
-                        if (attackerMeleeTeam == targetMeleeTeam) { continue; }
+                        Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
+                        Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+
+                        if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                        {
+                            // If the attacker's team is the same as the victim's team, do not register this hit
+                            if (attackerMeleeTeam == targetMeleeTeam)
+                            {
+                                targetMelee.AddHP(targetMelee.HP.Value * (healTeammatesPercentage / 100));
+                                continue;
+                            }
+                        }
                     }
                 }
 
@@ -414,7 +494,7 @@ namespace GameCreator.Melee
                 if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
                 // If this attacker melee has already been hit on this frame, ignore the all hits
-                if (melee.wasHit) { return; }
+                if (melee.wasHit) { return hitResults; }
                 // If the attacker is dead, don't register their hits
                 if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Dead) { continue; }
 
@@ -441,32 +521,45 @@ namespace GameCreator.Melee
                 melee.hitCount++;
                 melee.lastHitCountChangeTime = Time.time;
 
-                melee.targetsEvaluated.Add(hitInstanceID);
+                if (!projectileHit)
+                    melee.targetsEvaluated.Add(hitInstanceID);
 
                 if (attack && this.hitCount < attack.hitCount)
                 {
-                    melee.targetsEvaluated.Remove(hitInstanceID);
+                    if (!projectileHit)
+                        melee.targetsEvaluated.Remove(hitInstanceID);
                 }
 
                 // Calculate hit result/HP damage
-                int previousHP = targetMelee.HP.Value;
+                float previousHP = targetMelee.HP.Value;
+                melee.Rage.Value += 2;
                 KeyValuePair<HitResult, MeleeClip> OnRecieveAttackResult = targetMelee.OnReceiveAttack(melee, attack, impactPosition);
 
                 HitResult hitResult = OnRecieveAttackResult.Key;
                 MeleeClip hitReaction = OnRecieveAttackResult.Value;
 
+
+                // DO NOT REMOVE FOR DEBUGGING
+                // if(hitReaction == null) {
+                //     Debug.Log("No Hit Reaction");
+                // }
+
+                float damage = attack.baseDamage * melee.damageMultiplier.Value * targetMelee.damageReductionMultiplier.Value * targetMelee.damageReceivedMultiplier.Value;
                 if (hitResult == HitResult.ReceiveDamage)
                 {
-                    targetMelee.HP.Value -= attack.baseDamage;
+                    if (mjmComboSystem)
+                        mjmComboSystem.AddCount(1);
+                    targetMelee.HP.Value -= damage;
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderHit();
-
                 }
                 else if (hitResult == HitResult.PoiseBlock)
                 {
-                    targetMelee.HP.Value -= (int)(attack.baseDamage * 0.7f);
+                    targetMelee.HP.Value -= damage * 0.7f;
+                    targetMelee.Rage.Value += 1;
                     targetMelee.RenderBlock();
                 }
-                
+
                 // Send messages for stats in NetworkPlayer script
                 if (NetworkObject.IsPlayerObject) { SendMessage("OnDamageDealt", previousHP - targetMelee.HP.Value); }
 
@@ -527,6 +620,7 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
+                        case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
@@ -561,7 +655,10 @@ namespace GameCreator.Melee
                         rigidbodies[j].AddForce(direction.normalized * attack.pushForce, ForceMode.Impulse);
                     }
                 }
+
+                hitResults.Add(hitResult);
             }
+            return hitResults;
         }
 
         private void RenderHit()
@@ -570,6 +667,8 @@ namespace GameCreator.Melee
 
             if (!IsClient)
                 glowRenderer.RenderHit();
+
+
             RenderHitClientRpc();
         }
 
@@ -590,7 +689,8 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("RenderUninterruptable() should only be called from the server"); return; }
 
-            if (!IsClient) { 
+            if (!IsClient)
+            {
                 glowRenderer.RenderUninterruptable();
             }
             RenderUninterruptableClientRpc();
@@ -763,16 +863,25 @@ namespace GameCreator.Melee
             this.Poise.Value = Mathf.Min(this.Poise.Value, this.maxPoise.GetValue(gameObject));
         }
 
+        protected void UpdateRage()
+        {
+            this.poiseDelayCooldown = Mathf.Max(0f, poiseDelayCooldown - Time.deltaTime);
+            if (this.poiseDelayCooldown > float.Epsilon) return;
+
+            this.Rage.Value += this.rageRecoveryRate.GetValue(gameObject) * Time.deltaTime;
+            this.Rage.Value = Mathf.Min(this.Rage.Value, this.maxRage.GetValue(gameObject));
+        }
+
         protected void UpdateDefense()
         {
-            if (this.IsBlocking) return;
-            if (!this.currentShield) return;
+            if (IsBlocking) return;
+            if (!currentShield) return;
 
-            this.defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
-            if (this.defenseDelayCooldown > float.Epsilon) return;
+            defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
+            if (defenseDelayCooldown > float.Epsilon) return;
 
-            this.Defense.Value += this.currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime;
-            this.Defense.Value = Mathf.Min(this.Defense.Value, this.currentShield.maxDefense.GetValue(gameObject));
+            Defense.Value += currentShield.defenseRecoveryRate.GetValue(gameObject) * Time.deltaTime * defenseIncreaseMultiplier.Value;
+            Defense.Value = Mathf.Min(Defense.Value, currentShield.maxDefense.GetValue(gameObject));
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -901,15 +1010,19 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
-        public Ability GetActivatedAbility(CharacterMelee melee) {
+        public Ability GetActivatedAbility(CharacterMelee melee)
+        {
             return melee.abilityManager.GetActivatedAbility();
         }
 
-        public int maxHealth = 100;
-        private NetworkVariable<int> HP = new NetworkVariable<int>();
+        public float maxHealth = 100.0f;
+        private NetworkVariable<float> HP = new NetworkVariable<float>();
+        private NetworkVariable<float> Rage = new NetworkVariable<float>();
         private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
-        public int GetHP() { return HP.Value; }
+        public float GetHP() { return HP.Value; }
+
+        public float GetRage() { return Rage.Value; }
 
         public float GetDefense() { return Defense.Value; }
 
@@ -933,22 +1046,49 @@ namespace GameCreator.Melee
             Poise.Value = 0;
         }
 
+        public void AddHP(float value)
+        {
+            if (HP.Value + value > maxHealth)
+            {
+                HP.Value = maxHealth;
+            }
+            else
+            {
+                HP.Value += value;
+            }
+        }
+
+        public void SetHP(float value)
+        {
+            HP.Value = value;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (IsServer)
+            {
                 HP.Value = maxHealth;
+                overrideRunSpeed.Value = originalRunSpeed;
+            }
+
             isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
             HP.OnValueChanged += OnHPChanged;
+            rooted.OnValueChanged += OnRootedChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
             HP.OnValueChanged -= OnHPChanged;
+            rooted.OnValueChanged -= OnRootedChange;
         }
 
-        private void OnHPChanged(int prev, int current)
+        private void OnHPChanged(float prev, float current)
         {
+            // DO NOT REMOVE FOR DEBUGGING
+            // Debug.Log(this.gameObject.name + " HP CHANGE Prev: " + prev);
+            // Debug.Log(this.gameObject.name + " HP CHANGE Curr: " + current);
+
             if (current < prev)
             {
                 // Render hit is handled in LateUpdate() on server now
@@ -1047,16 +1187,16 @@ namespace GameCreator.Melee
             if (!this.currentWeapon) return;
             if (!this.CanAttack()) return;
 
-            this.IsCastingAbility = true;
+            this.IsCastingAbility.Value = true;
             if (IsOwner) this.StopBlockingServerRpc();
             this.inputBuffer.AddInput(actionKey);
         }
 
         public void RevertAbilityCastingStatus()
         {
-            if (IsCastingAbility)
+            if (IsCastingAbility.Value)
             {
-                IsCastingAbility = false;
+                IsCastingAbility.Value = false;
             }
         }
 
@@ -1064,7 +1204,7 @@ namespace GameCreator.Melee
         {
             if (this != null && this.currentMeleeClip != null && this.currentMeleeClip.isAttack == true)
             {
-                this.IsCastingAbility = false;
+                this.IsCastingAbility.Value = false;
                 if (this.inputBuffer.HasInput())
                 {
                     this.inputBuffer.ConsumeInput();
@@ -1086,7 +1226,8 @@ namespace GameCreator.Melee
         public int GetCurrentPhase()
         {
             if (this.comboSystem == null) return -1;
-            if (this.IsStaggered) {
+            if (this.IsStaggered)
+            {
                 return -1;
             }
 
@@ -1164,22 +1305,32 @@ namespace GameCreator.Melee
             this.Poise.Value = Mathf.Clamp(value, 0f, this.maxPoise.GetValue(gameObject));
         }
 
+        public void SetRage(float value)
+        {
+            this.Rage.Value = Mathf.Clamp(value, 0f, this.maxRage.GetValue(gameObject));
+        }
+
         public void AddPoise(float value)
         {
-            this.SetPoise(this.Poise.Value + value);
+            SetPoise(Poise.Value + value);
+        }
+
+        public void AddRage(float value)
+        {
+            SetRage(Rage.Value + value);
         }
 
         public void SetDefense(float value)
         {
-            if (!this.currentShield) return;
+            if (!currentShield) return;
 
-            this.defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
-            this.Defense.Value = Mathf.Clamp(value, 0f, this.currentShield.maxDefense.GetValue(gameObject));
+            defenseDelayCooldown = this.currentShield.delayDefense.GetValue(gameObject);
+            Defense.Value = Mathf.Clamp(value, 0f, currentShield.maxDefense.GetValue(gameObject));
         }
 
         public void AddDefense(float value)
         {
-            this.SetDefense(this.Defense.Value + value);
+            SetDefense(Defense.Value + value);
         }
 
         public void SetTargetFocus(TargetMelee target)
@@ -1253,22 +1404,22 @@ namespace GameCreator.Melee
 
             // Please comment out instead of deleting this block
             #region Debug Results
-            print ("=============");
-            print ("name: " + melee.name);
-            print ("characterAilment: " + melee.Character.characterAilment);
-            print ("IsUninterruptable: " + melee.IsUninterruptable);
-            print ("IsInvincible: " + melee.IsInvincible);
-            print ("IsAttacking: " + melee.IsAttacking);
-            print ("IsCastingAbility: " + melee.IsCastingAbility);
+            //print("=============");
+            //print("name: " + melee.name);
+            //print("characterAilment: " + melee.Character.characterAilment);
+            //print("IsUninterruptable: " + melee.IsUninterruptable);
+            //print("IsInvincible: " + melee.IsInvincible);
+            //print("IsAttacking: " + melee.IsAttacking);
+            //print("IsCastingAbility: " + melee.IsCastingAbility);
             //print ("IsDashing: " + melee.Character.isCharacterDashing());
             #endregion
 
-            
+
             // Making sure didDodgeCancelAilment is Reset everytime targetMelee is attacked
             assailant.didDodgeCancelAilment = false;
 
-            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition);
-            
+            OnReceiveAttackClientRpc(assailant.NetworkObjectId, bladeImpactPosition, attack.name);
+
             this.ReleaseTargetFocus();
 
             MeleeClip hitReaction = null;
@@ -1279,7 +1430,7 @@ namespace GameCreator.Melee
             if (this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
             if (this.IsInvincible) return new KeyValuePair<HitResult, MeleeClip>(HitResult.Ignore, hitReaction);
             // Uninterruptable Abilities will not be cancelled
-            if (melee.IsCastingAbility && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
+            if (melee.IsCastingAbility.Value && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
             // Uninterruptable Heavy Attacks will not be cancelled
             if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && IsUninterruptable) { return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction); }
 
@@ -1380,15 +1531,17 @@ namespace GameCreator.Melee
             this.AddPoise(-attack.poiseDamage);
 
 
-            
+
             bool isKnockback = attack.attackType == AttackType.Knockdown | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isPulled = attack.attackType == AttackType.Pull;
 
             hitReaction = currentWeapon.GetHitReaction(
                 Character.IsGrounded(),
                 hitLocation,
                 isKnockback,
-                isKnockup
+                isKnockup,
+                isPulled
             );
 
             ExecuteEffects(
@@ -1404,29 +1557,24 @@ namespace GameCreator.Melee
             attack.ExecuteHitPause();
 
             // Play Reaction Clip only if the attackType is not an Ailment
-            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility) || (!IsUninterruptable && attack.attackType == AttackType.None) || (attack.attackType == AttackType.Followup && !isKnockup);
-            if (!shouldPlayHitReaction) { hitReaction = null; }
+            bool shouldPlayHitReaction = (IsUninterruptable && !IsCastingAbility.Value) || (!IsUninterruptable && attack.attackType == AttackType.None) || (!IsUninterruptable && attack.attackType == AttackType.Pull) || (attack.attackType == AttackType.Followup && !isKnockup);
+            if (!shouldPlayHitReaction)
+            {
+                hitReaction = null;
+            }
 
             return new KeyValuePair<HitResult, MeleeClip>(HitResult.ReceiveDamage, hitReaction);
         }
 
         [ClientRpc]
-        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition)
+        void OnReceiveAttackClientRpc(ulong attackerNetObjId, Vector3 bladeImpactPosition, string meleeClipName)
         {
             CharacterMelee attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CharacterMelee>();
-            MeleeClip attack = attacker.comboSystem.GetCurrentClip() ? attacker.comboSystem.GetCurrentClip() : attacker.currentMeleeClip;
-
-            // Character assailant = attacker.Character;
-            // CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
-            // BladeComponent meleeWeapon = melee.Blades[0];
-            // Character player = this.Character.GetComponent<PlayerCharacter>();
-
-            if (this.currentWeapon == null) return;
-            // if (melee.IsAttacking && melee.currentMeleeClip.isHeavy && isUninterruptable) { return; } 
+            MeleeClip attack = attacker.GetMeleeClipFromWeaponOrShieldByName(meleeClipName);
 
             float attackVectorAngle = Vector3.SignedAngle(transform.forward, attacker.transform.position - this.transform.position, Vector3.up);
 
-            MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
+            MeleeWeapon.HitLocation hitLocation = GetHitLocation(attackVectorAngle);
 
             #region Attack and Defense VFX
 
@@ -1477,6 +1625,7 @@ namespace GameCreator.Melee
             // MeleeWeapon.HitLocation hitLocation = this.GetHitLocation(attackVectorAngle);
             bool isKnockback = attack.attackType == AttackType.Knockdown | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown;
             bool isKnockup = attack.attackType == AttackType.Knockedup | this.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp;
+            bool isPulled = attack.attackType == AttackType.Pull;
 
             // MeleeClip hitReaction = this.currentWeapon.GetHitReaction(
             //     this.Character.IsGrounded(),
@@ -1515,8 +1664,9 @@ namespace GameCreator.Melee
             if (currentWeapon.audioSwing) { PlayAudio(currentWeapon.audioSwing); }
         }
 
-        public void ExecuteVoiceOver(AudioClip audio) {
-            if(audio) { PlayAudioNoPitchModifier(audio); }
+        public void ExecuteVoiceOver(AudioClip audio)
+        {
+            if (audio) { PlayAudioNoPitchModifier(audio); }
         }
 
         private void ExecuteEffects(Vector3 position, AudioClip audio, GameObject prefab)
@@ -1775,6 +1925,280 @@ namespace GameCreator.Melee
             float difference = newValue - oldValue;
 
             return (difference / oldValue);
+        }
+
+        // CHARACTER STATUSES ===============================================================
+
+        public NetworkVariable<float> damageMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDamageMultiplier() should only be called on the server."); return; }
+            if (damageMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageMultiplierCoroutine);
+            }
+            damageMultiplierCoroutine = StartCoroutine(SetDamageMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageMultiplierCoroutine;
+        private IEnumerator SetDamageMultiplierCoroutine(float value, float duration)
+        {
+            damageMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> damageReductionMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageReductionMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetdamageReductionMultiplier() should only be called on the server."); return; }
+            if (damageReductionMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageReductionMultiplierCoroutine);
+            }
+            damageReductionMultiplierCoroutine = StartCoroutine(SetDamageReductionMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageReductionMultiplierCoroutine;
+        private IEnumerator SetDamageReductionMultiplierCoroutine(float value, float duration)
+        {
+            damageReductionMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageReductionMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> damageReceivedMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDamageReceivedMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDamageReceivedMultiplier() should only be called on the server."); return; }
+            if (damageReceivedMultiplierCoroutine != null)
+            {
+                StopCoroutine(damageReceivedMultiplierCoroutine);
+            }
+            damageReceivedMultiplierCoroutine = StartCoroutine(SetDamageReceivedMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine damageReceivedMultiplierCoroutine;
+        private IEnumerator SetDamageReceivedMultiplierCoroutine(float value, float duration)
+        {
+            damageReceivedMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            damageReceivedMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> healingMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetHealingMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetHealingMultiplier() should only be called on the server."); return; }
+            if (healingMultiplierCoroutine != null)
+            {
+                StopCoroutine(healingMultiplierCoroutine);
+            }
+            healingMultiplierCoroutine = StartCoroutine(SetHealingMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine healingMultiplierCoroutine;
+        private IEnumerator SetHealingMultiplierCoroutine(float value, float duration)
+        {
+            healingMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            healingMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> defenseIncreaseMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDefenseIncreaseMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseIncreaseMultiplier() should only be called on the server."); return; }
+            if (defenseIncreaseMultiplierCoroutine != null)
+            {
+                StopCoroutine(defenseIncreaseMultiplierCoroutine);
+            }
+            defenseIncreaseMultiplierCoroutine = StartCoroutine(SetDefenseIncreaseMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine defenseIncreaseMultiplierCoroutine;
+        private IEnumerator SetDefenseIncreaseMultiplierCoroutine(float value, float duration)
+        {
+            defenseIncreaseMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            defenseIncreaseMultiplier.Value = 1;
+        }
+
+
+
+        public NetworkVariable<float> defenseReductionMultiplier { get; private set; } = new NetworkVariable<float>(1);
+        public void SetDefenseReductionMultiplier(float value, float duration)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.SetDefenseReductionMultiplier() should only be called on the server."); return; }
+            if (defenseReductionMultiplierCoroutine != null)
+            {
+                StopCoroutine(defenseReductionMultiplierCoroutine);
+            }
+            defenseReductionMultiplierCoroutine = StartCoroutine(SetDefenseReductionMultiplierCoroutine(value, duration));
+        }
+
+        private Coroutine defenseReductionMultiplierCoroutine;
+        private IEnumerator SetDefenseReductionMultiplierCoroutine(float value, float duration)
+        {
+            defenseReductionMultiplier.Value = value;
+            yield return new WaitForSeconds(duration);
+            defenseReductionMultiplier.Value = 1;
+        }
+
+        public NetworkVariable<bool> drainActive { get; private set; } = new NetworkVariable<bool>();
+        public void DrainHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.DrainHPOverTime() should only be called on the server."); return; }
+            StartCoroutine(DrainHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator DrainHPCoroutine(float value, float drainDuration, float delay)
+        {
+            drainActive.Value = true;
+            yield return new WaitForSeconds(delay);
+            float elapsedTime = 0;
+            float reductionAmount = 0;
+
+            while (elapsedTime < drainDuration)
+            {
+                reductionAmount += GetHP() / maxHealth * value * Time.deltaTime;
+                if (reductionAmount >= 1 && GetHP() > 1)
+                {
+                    if (GetHP() - reductionAmount < 1)
+                    {
+                        SetHP(1);
+                    }
+                    else
+                    {
+                        AddHP(-1 * reductionAmount);
+                    }
+
+                    reductionAmount = 0;
+                }
+                drainActive.Value = true;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            drainActive.Value = false;
+        }
+
+        public NetworkVariable<bool> healActive { get; private set; } = new NetworkVariable<bool>();
+        public void HealHPOverTime(float value, float drainDuration, float delay)
+        {
+            if (!IsServer) { Debug.Log("CharacterMelee.HealHPOverTime() should only be called on the server."); return; }
+            healActive.Value = true;
+            StartCoroutine(HealHPCoroutine(value, drainDuration, delay));
+        }
+
+        private IEnumerator HealHPCoroutine(float value, float healDuration, float delay)
+        {
+            healActive.Value = true;
+            yield return new WaitForSeconds(delay);
+            float elapsedTime = 0;
+            float healAmount = 0;
+
+            while (elapsedTime < healDuration)
+            {
+                healAmount += maxHealth / GetHP() * value * Time.deltaTime * healingMultiplier.Value;
+                if (healAmount >= 1)
+                {
+                    if (GetHP() + healAmount > maxHealth)
+                    {
+                        SetHP(maxHealth);
+                    }
+                    else
+                    {
+                        AddHP(healAmount);
+                    }
+
+                    healAmount = 0;
+                }
+                healActive.Value = true;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            healActive.Value = false;
+        }
+
+        public NetworkVariable<bool> slowed { get; private set; } = new NetworkVariable<bool>();
+        private float slowEndTime;
+        private NetworkVariable<float> slowAmount = new NetworkVariable<float>();
+        public void SlowMovement(float value, float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.SlowMovement() should only be called on the server"); return; }
+            slowed.Value = true;
+            slowEndTime = Time.time + duration;
+            slowAmount.Value = value;
+        }
+
+        private NetworkVariable<float> overrideRunSpeed = new NetworkVariable<float>();
+        public void SetRunSpeed(float value)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.SetRunSpeed() should only be called on the server"); return; }
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed.Value = value;
+            }
+        }
+
+        public void ResetRunSpeed()
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.ResetRunSpeed() should only be called on the server"); return; }
+            if (Time.time > slowEndTime)
+            {
+                overrideRunSpeed.Value = originalRunSpeed;
+            }
+        }
+
+        public NetworkVariable<bool> rooted { get; private set; } = new NetworkVariable<bool>();
+        public float rootEndTime { get; private set; }
+        public void Root(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Root() should only be called on the server"); return; }
+            rooted.Value = true;
+            rootEndTime = Time.time + duration;
+            Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+        }
+
+        private void OnRootedChange(bool prev, bool current)
+        {
+            if (IsServer & Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.None)
+            {
+                if (current)
+                {
+                    Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                }
+                else
+                {
+                    Character.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection, true);
+                }
+            }
+        }
+
+        public NetworkVariable<bool> silenced { get; private set; } = new NetworkVariable<bool>();
+        public float silenceEndTime { get; private set; }
+        public void Silence(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Silence() should only be called on the server"); return; }
+            silenced.Value = true;
+            silenceEndTime = Time.time + duration;
+        }
+
+        public NetworkVariable<bool> fearing { get; private set; } = new NetworkVariable<bool>();
+        public float fearEndTime { get; private set; }
+        public void Fear(float duration)
+        {
+            if (!IsServer) { Debug.LogError("CharacterMelee.Fear() should only be called on the server"); return; }
+            fearing.Value = true;
+            fearEndTime = Time.time + duration;
         }
 
         private void OnDrawGizmos()

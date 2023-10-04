@@ -17,6 +17,9 @@ namespace GameCreator.Melee
         private SerializedProperty spPoiseDelay;
         private SerializedProperty spPoiseMax;
         private SerializedProperty spPoiseRecovery;
+        
+        private SerializedProperty spRageMax;
+        private SerializedProperty spRageRecovery;
 
         private SerializedProperty spEventKnockedUpHitLimitReached;
 
@@ -35,6 +38,8 @@ namespace GameCreator.Melee
             this.spPoiseDelay = this.serializedObject.FindProperty("delayPoise");
             this.spPoiseMax = this.serializedObject.FindProperty("maxPoise");
             this.spPoiseRecovery = this.serializedObject.FindProperty("poiseRecoveryRate");
+            this.spRageMax = this.serializedObject.FindProperty("maxRage");
+            this.spRageRecovery = this.serializedObject.FindProperty("rageRecoveryRate");
 
             
             this.spCharacterCamera = this.serializedObject.FindProperty("characterCamera");
@@ -60,6 +65,8 @@ namespace GameCreator.Melee
             EditorGUILayout.PropertyField(this.spPoiseDelay);
             EditorGUILayout.PropertyField(this.spPoiseMax);
             EditorGUILayout.PropertyField(this.spPoiseRecovery);
+            EditorGUILayout.PropertyField(this.spRageMax);
+            EditorGUILayout.PropertyField(this.spRageRecovery);
 
             
 

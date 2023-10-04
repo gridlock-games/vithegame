@@ -94,8 +94,10 @@
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterLocomotion characterLocomotion;
+        public CharacterStatusManager characterStatusManager {get; private set;}
 
         public CharacterLocomotion.CHARACTER_AILMENTS characterAilment { get; private set; }
+        public CharacterStatusManager.CHARACTER_STATUS characterStatus { get; set; }
         private NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS> characterAilmentNetworked = new NetworkVariable<CharacterLocomotion.CHARACTER_AILMENTS>();
 
         public State characterState = new State();
@@ -154,6 +156,9 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.Dead:
                     UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.Dead, null);
                     break;
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsPulled:
+                    UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsPulled, null);
+                    break;
                 case CharacterLocomotion.CHARACTER_AILMENTS.None:
                     CancelAilment();
                     break;
@@ -180,6 +185,8 @@
             characterAilmentNetworked.OnValueChanged += OnAilmentChange;
             isControllable.OnValueChanged += OnIsControllableChange;
             overrideFaceDirection.OnValueChanged += OnOverrideFaceDirectionChange;
+            
+            characterStatusManager = this.GetComponentInChildren<CharacterStatusManager>();
 
             if (IsServer)
             {
@@ -252,6 +259,13 @@
             if (this.ragdoll != null && this.ragdoll.GetState() != CharacterRagdoll.State.Normal) return;
 
             this.characterLocomotion.Update();
+
+            if (IsServer)
+            {
+                LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
+                bool isDodging = (bool)variables.Get("isDodging").Get();
+                isDashing.Value = isDodging;
+            }
         }
 
         private void LateUpdate()
@@ -265,12 +279,10 @@
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        private NetworkVariable<bool> isDashing = new NetworkVariable<bool>();
         public bool isCharacterDashing()
         {
-            LocalVariables variables = this.gameObject.GetComponent<LocalVariables>();
-            bool isDodging = (bool)variables.Get("isDodging").Get();
-            
-            return isDodging;
+            return isDashing.Value;
         }
 
         public void SetCharacterDashing(bool value)
@@ -368,6 +380,8 @@
         }
 
         // Ailments: ----------------------------------------------------------------------------------
+
+        #region Ailments
         private List<CharacterLocomotion.CHARACTER_AILMENTS> allowedKnockupEntries = new List<CharacterLocomotion.CHARACTER_AILMENTS>(){
             CharacterLocomotion.CHARACTER_AILMENTS.None,
             CharacterLocomotion.CHARACTER_AILMENTS.IsStunned,
@@ -439,6 +453,43 @@
                         this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStunned, null);
                         break;
                 }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Pull(Character attacker, Character target)
+        {
+            if (dead.Value) { return false; }
+
+            bool waitForClientRotation = false;
+
+            if (allowedStunEntries.Contains(this.characterAilment))
+            {
+                CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
+
+                // if (IsServer)
+                // {
+                //     if (target.IsOwnedByServer)
+                //     {
+                //         PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
+                //         target.transform.rotation = rotationConfig.quaternion;
+                //         Vector3 deltaPos = target.transform.position - attacker.transform.position;
+                //         target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
+                //     }
+                //     else
+                //     {
+                //         target.UpdateAilmentPositionClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                //         waitForClientRotation = true;
+                //     }
+                // }
+
+                this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null);
+                StartCoroutine(StartPullAfterDuration(0f, waitForClientRotation));
 
                 return true;
             }
@@ -632,6 +683,19 @@
             target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
         }
 
+        [ClientRpc]
+        private void UpdateAilmentPositionClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
+        {
+            //this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+            Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
+            Character attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].GetComponent<Character>();
+            PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
+            target.transform.rotation = rotationConfig.quaternion;
+            Vector3 deltaPos = target.transform.position - attacker.transform.position;
+            target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
+            target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
+        }
+
         private bool ailmentRotationRecieved;
         [ServerRpc]
         private void AilmentRotationHasBeenRecievedServerRpc(Vector3 targetEulerAngles)
@@ -677,6 +741,19 @@
             }
             if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
             this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered, null, waitForClientRotation);
+        }
+
+        /* Pause for a given duration if the target character is coming from another ailment
+        Ailments: Pull*/
+        private IEnumerator StartPullAfterDuration(float duration, bool waitForClientRotation)
+        {
+            float initTime = Time.time;
+            while (initTime + duration >= Time.time)
+            {
+                yield return null;
+            }
+            if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }
+            this.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.IsPulled, null, waitForClientRotation);
         }
 
         /* Pause for a given duration if the target character is coming from another ailment
@@ -777,10 +854,6 @@
                         }
                         else
                         {
-                            // if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
-                            // recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.25f;
-                            // if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
-
                             if(!isDodging) melee.currentWeapon.recoveryStandUp.PlayNetworked(melee);
                             recoveryAnimDuration = isDodging ? 0.05f : melee.currentWeapon.recoveryStandUp.animationClip.length * 1.10f;
                             if(!isDodging) resetDefaultStateCoroutine = CoroutinesManager.Instance.StartCoroutine(ResetDefaultState(recoveryAnimDuration, melee));
@@ -807,6 +880,11 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered:
                     if (melee.currentWeapon.staggerF)
                         melee.currentWeapon.staggerF.PlayNetworked(melee);
+                    break;
+
+                case CharacterLocomotion.CHARACTER_AILMENTS.IsPulled:
+                    // if (melee.currentWeapon.staggerF)
+                    //     melee.currentWeapon.staggerF.PlayNetworked(melee);
                     break;
             }
 
@@ -858,6 +936,18 @@
 
             return new PreserveRotation(targetRotation, rotationDirection);
         }
+
+        #endregion
+        
+        
+        // STATUS: ----------------------------------------------------------------------------------
+        public CharacterStatusManager.CHARACTER_STATUS Status(CharacterStatusManager.CHARACTER_STATUS characterStatus) {
+            this.characterStatus = characterStatus;
+
+            return this.characterStatus;
+        }
+        
+
 
         public void RootMovement(float impulse, float duration, float gravityInfluence,
             AnimationCurve acForward, AnimationCurve acSides, AnimationCurve acVertical)

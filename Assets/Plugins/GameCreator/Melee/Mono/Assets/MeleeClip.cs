@@ -40,7 +40,8 @@
             Knockedup,
             Heavy,
             Stagger,
-            Followup
+            Followup,
+            Pull
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------
@@ -112,6 +113,7 @@
         public Vulnerable vulnerability = Vulnerable.Vulnerable;
         public Posture posture = Posture.Steady;
         public bool isOrbitLocked = false;
+        public bool applyRootMotion = true;
         public bool isLunge = false;
         private float disableOrbitDuration = 0.0f;
         public bool isModifyFocus = false;
@@ -133,6 +135,8 @@
             OnHit,
             OnRecovery
         }
+
+        public List<ClipVFX> vfxList = new List<ClipVFX>();
 
 
         // VFX:
@@ -167,21 +171,31 @@
 
         public void PlayVFXAttachment(CharacterMelee character)
         {
-            if (this.abilityVFX.gameObject == null) return;
+            if (this.vfxList.Count < 0) return;
             if (character == null) return;
 
-            GameObject abilityVFXPrefab = abilityVFX.GetGameObject(character.gameObject);
-
-            GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
-                character.transform.position + character.transform.rotation * this.vfxPositionOffset,
-                character.transform.rotation * Quaternion.Euler(this.vfxRotationOffset));
-
-            if (abilityVFXInstance.TryGetComponent(out ApplyDamageOnParticleSystemCollision dmg))
+            foreach (ClipVFX vfx in this.vfxList)
             {
-                dmg.Initialize(character, this);
-            }
+                if (vfx.gameObject == null) return;
 
-            CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
+                GameObject abilityVFXPrefab = vfx.abilityVFX.GetGameObject(character.gameObject);
+
+                Vector3 vfxPositionOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxPositionOffset;
+                Vector3 vfxRotationOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxRotationOffset;
+
+                GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                    character.transform.position + character.transform.rotation * vfxPositionOffset,
+                    character.transform.rotation * Quaternion.Euler(vfxRotationOffset),
+                    vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? character.transform : null
+                    );
+
+                if (abilityVFXInstance.TryGetComponent(out ParticleSystemProjectile dmg))
+                {
+                    dmg.Initialize(character, this, 0);
+                }
+
+                CoroutinesManager.Instance.StartCoroutine(DestroyAfterEffectsFinish(abilityVFXInstance));
+            }
         }
 
         private IEnumerator DestroyAfterEffectsFinish(GameObject obj)
@@ -250,16 +264,19 @@
 
             if (isAttack)
             {
-                AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
-                AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
-                melee.Character.RootMovement(
-                    this.movementMultiplier,
-                    duration / selectedAnimSpeed,
-                    this.gravityInfluence,
-                    newMovementForwardCurve,
-                    newMovementSidesCurve,
-                    this.movementVertical
-                );
+                if (applyRootMotion)
+                {
+                    AnimationCurve newMovementForwardCurve = melee.isLunging ? melee.movementForward : this.movementForward;
+                    AnimationCurve newMovementSidesCurve = melee.isLunging ? new AnimationCurve(DEFAULT_KEY_MOVEMENT) : this.movementSides;
+                    melee.Character.RootMovement(
+                        this.movementMultiplier,
+                        duration / selectedAnimSpeed,
+                        this.gravityInfluence,
+                        newMovementForwardCurve,
+                        newMovementSidesCurve,
+                        this.movementVertical
+                    );
+                }
 
                 melee.Character.GetCharacterAnimator().StopGesture(0.1f);
                 melee.Character.GetCharacterAnimator().CrossFadeGesture(

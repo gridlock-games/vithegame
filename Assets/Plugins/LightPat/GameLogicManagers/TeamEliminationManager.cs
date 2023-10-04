@@ -304,7 +304,7 @@ namespace LightPat.Core
 
             Team winningTeam = Team.Environment;
 
-            Dictionary<Team, int> teamHPs = new Dictionary<Team, int>();
+            Dictionary<Team, float> teamHPs = new Dictionary<Team, float>();
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;

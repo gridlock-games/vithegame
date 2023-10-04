@@ -17,41 +17,87 @@
         private CharacterMelee melee;
         private AbilityManager abilityManager;
 
-        private Color lowPoiseColor = new Color(3,0,147);
+        private Color lowPoiseColor = new Color(3, 0, 147);
 
-        private Color normalPoiseColor = new Color(200,200,200);
+        private Color normalPoiseColor = new Color(200, 200, 200);
 
         public Slider healthSlider;
         public Slider defenseSlider;
         public Slider poiseSlider;
+        public Slider rageSlider;
+
         public Image weaponImageFill;
 
+        [Header("Ability UI")]
         public Image abilityAImageFill;
-
         public Image abilityBImageFill;
-
         public Image abilityCImageFill;
+        public Image abilityDImageFill;
+
+        [System.Serializable]
+        public struct StatusUI
+        {
+            public CharacterStatusManager.CHARACTER_STATUS status;
+            public Sprite sprite;
+        }
+
+        [Header("Status UI")]
+        public StatusUI[] statusUIAssignments;
+        public Transform statusImageParent;
+        public GameObject statusImagePrefab;
+
+        public void UpdateStatusUI()
+        {
+            foreach (Transform playerIcon in statusImageParent)
+            {
+                Destroy(playerIcon.gameObject);
+            }
+
+            bool found = false;
+            CharacterStatusManager.CHARACTER_STATUS missingStatus = CharacterStatusManager.CHARACTER_STATUS.damageMultiplier;
+            foreach (var status in statusManager.GetCharacterStatusList())
+            {
+                GameObject g = Instantiate(statusImagePrefab, statusImageParent);
+                foreach (StatusUI statusUI in statusUIAssignments)
+                {
+                    if (statusUI.status == status)
+                    {
+                        g.GetComponent<Image>().sprite = statusUI.sprite;
+                        found = true;
+                        break;
+                    }
+                }
+                missingStatus = status;
+            }
+
+            if (!found & statusManager.GetCharacterStatusList().Count > 0)
+            {
+                Debug.LogError("You need to assign a character status image for " + missingStatus);
+            }
+        }
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
         private TeamIndicator teamIndicator;
+        private CharacterStatusManager statusManager;
 
         private void Start()
         {
             melee = GetComponentInParent<CharacterMelee>();
             abilityManager = GetComponentInParent<AbilityManager>();
             teamIndicator = GetComponentInParent<TeamIndicator>();
+            statusManager = GetComponentInParent<CharacterStatusManager>();
         }
 
         private void Update()
         {
-            this.UpdateUI();
+            UpdateUI();
         }
 
         private void LateUpdate()
         {
-            this.UpdateWeaponUI();
-            this.UpdateTeammateHPUI();
+            UpdateWeaponUI();
+            UpdateTeammateHPUI();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -61,6 +107,7 @@
             healthSlider.value = melee.GetHP() / (float)melee.maxHealth;
             if (melee.currentShield) defenseSlider.value = melee.GetDefense() / melee.currentShield.maxDefense.GetValue(gameObject);
             poiseSlider.value = melee.GetPoise() / melee.maxPoise.GetValue(gameObject);
+            rageSlider.value = melee.GetRage() / melee.maxRage.GetValue(gameObject);
         }
 
         /*
@@ -75,24 +122,43 @@
 
             foreach (Ability ability in abilityManager.GetAbilityInstanceList())
             {
+                float cost = 0f;
+                float costRequirement = 0f;
+
+                if(ability.staminaCost > 0) { 
+                    costRequirement = melee.GetPoise();
+                    cost = ability.staminaCost;
+                } else if (ability.hpCost > 0) {
+                    costRequirement = melee.GetHP();
+                    cost = ability.hpCost;
+                } else {
+                    costRequirement = melee.GetRage();
+                    cost = ability.rageCost;
+                }
+
                 switch (ability.skillKey)
                 {
                     case KeyCode.Q:
                         abilityAImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityAImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityAImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.E:
                         abilityBImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityBImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityBImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                     case KeyCode.R:
                         abilityCImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
-                        abilityCImageFill.color = melee.GetPoise() < ability.staminaCost ? lowPoiseColor : normalPoiseColor;
+                        abilityCImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
+                        break;
+                    case KeyCode.T:
+                        abilityDImageFill.sprite = abilityManager.IsAbilityOnCooldown(ability) == false ? ability.skillImageFill : null;
+                        abilityDImageFill.color = costRequirement < cost ? lowPoiseColor : normalPoiseColor;
                         break;
                 }
             }
         }
 
+        [Header("Teammate Player Cards")]
         [SerializeField] private GameObject playerCardPrefab;
         [SerializeField] private Transform playerCardParent;
         [SerializeField] private float playerCardSpacing = 100;
@@ -102,11 +168,13 @@
         private void UpdateTeammateHPUI()
         {
             if (!melee.IsSpawned) { return; }
-	    if (!ClientManager.Singleton) { return; }
+            if (!ClientManager.Singleton) { return; }
 
             string playersString = "";
             foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
             {
+                if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(kvp.Key)) { return; }
+
                 playersString += kvp.Key.ToString() + kvp.Value.ToString() + ClientManager.Singleton.GetClient(kvp.Key).team.ToString();
             }
 

@@ -14,6 +14,7 @@ public class AbilityManager : NetworkBehaviour
         KeyCode.E,
         KeyCode.R,
         KeyCode.F,
+        KeyCode.T
     };
 
     private CharacterMelee melee;
@@ -94,6 +95,9 @@ public class AbilityManager : NetworkBehaviour
     [ServerRpc]
     private void ActivateAbilityServerRpc(KeyCode key)
     {
+        melee.silenced.Value = Time.time < melee.silenceEndTime;
+        if (melee.silenced.Value) { return; }
+
         Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
         if (!ability) { return; }
 
@@ -102,13 +106,17 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if ability is on cooldown
         if (ability.isOnCoolDownLocally == true) { return; }
         // Don't activate if poise is not high enough
-        if (ability && melee.GetPoise() < ability.staminaCost) { return; }
+        if (ability && ability.staminaCost > 0f && melee.GetPoise() < ability.staminaCost) { return; }
+        // Don't activate if HP is not high enough
+        if (ability && ability.hpCost > 0f && melee.GetHP() < ability.hpCost) { return; }
+        // Don't activate if Rage is not high enough
+        if (ability && ability.rageCost > 0f && melee.GetRage() < ability.rageCost) { return; }
         // Don't activate if Melee is attacking and cancelType is none
         if (ability && melee.IsAttacking && ability.canCncelAnimationType == Ability.AnimCancellingType.None) { return; }
         // Don't activate if Melee is currently playing a Heavy Attack
         if (ability && melee.IsAttacking && melee.currentMeleeClip.isHeavy && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_HeavyAtk) { return; }
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
-        if (ability && melee.IsCastingAbility && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
+        if (ability && melee.IsCastingAbility.Value && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
 
 
         if (ability != null && melee != null)
@@ -116,6 +124,8 @@ public class AbilityManager : NetworkBehaviour
             activatedAbility = ability;
             melee.RevertAbilityCastingStatus();
             melee.AddPoise(-1 * activatedAbility.staminaCost);
+            melee.AddHP(-1 * activatedAbility.hpCost);
+            melee.AddRage(-1 * activatedAbility.rageCost);
             activatedAbility.ExecuteAbility(melee, key);
         }
     }

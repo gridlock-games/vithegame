@@ -4,6 +4,7 @@
     using GameCreator.Core;
     using GameCreator.Core.Hooks;
     using Unity.Netcode;
+    using GameCreator.Camera;
 
     [AddComponentMenu("Game Creator/Characters/Player Character", 100)]
     public class PlayerCharacter : Character
@@ -127,7 +128,43 @@
             // If the input payload hasn't been recieved yet (this happens on non-owner clients)
             if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
 
-            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            bool invertMovement = false;
+            if (TryGetComponent(out Melee.CharacterMelee melee))
+            {
+                if (IsServer)
+                    melee.rooted.Value = Time.time < melee.rootEndTime;
+
+                //if (melee.rooted.Value)
+                //{
+                //    return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
+                //}
+
+                if (IsServer)
+                    melee.fearing.Value = Time.time < melee.fearEndTime;
+
+                if (melee.fearing.Value)
+                {
+                    invertMovement = true;
+                }
+
+                if (IsLocalPlayer)
+                {
+                    CameraMotor motor = CameraMotor.MAIN_MOTOR;
+                    CameraMotorTypeAdventure adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
+                    adventureMotor.invertLookFearStatus = melee.fearing.Value;
+                }
+            }
+
+            Vector3 targetDirection;
+            if (invertMovement)
+            {
+                targetDirection = inputPayload.rotation * new Vector3(-inputPayload.inputVector.x, 0, -inputPayload.inputVector.y);
+            }
+            else
+            {
+                targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            }
+            
             if (!inputPayload.isControllable) { targetDirection = Vector3.zero; }
 
             characterLocomotion.SetDirectionalDirection(targetDirection);

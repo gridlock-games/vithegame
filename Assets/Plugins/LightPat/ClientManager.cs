@@ -476,12 +476,26 @@ namespace LightPat.Core
         private void ClientConnectCallback(ulong clientId)
         {
             if (!IsServer) { return; }
-            Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
-            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name)) { SpawnPlayer(clientId); }
-            else if (clientDataDictionary[clientId].team == Team.Spectator) { SpawnPlayer(clientId); }
+            Debug.Log(clientId + " has connected.");
+            StartCoroutine(SpawnPlayerAfterConnection(clientId));
 
             clientConnectingInProgress = false;
             clientApprovalRunning = false;
+        }
+
+        private IEnumerator SpawnPlayerAfterConnection(ulong clientId)
+        {
+            yield return new WaitUntil(() => clientDataDictionary.ContainsKey(clientId));
+
+            Debug.Log(clientDataDictionary[clientId].clientName + " has connected. ID: " + clientId);
+            if (sceneNamesToSpawnPlayerOnConnect.Contains(SceneManager.GetActiveScene().name))
+            {
+                SpawnPlayer(clientId);
+            }
+            else if (clientDataDictionary[clientId].team == Team.Spectator)
+            {
+                SpawnPlayer(clientId);
+            }
         }
 
         void ClientDisconnectCallback(ulong clientId)
@@ -558,12 +572,32 @@ namespace LightPat.Core
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = response.Approved;
 
+            if (SceneManager.GetActiveScene().name == "Prototype")
+            {
+                clientApprovalRunning = false;
+                response.Approved = true;
+                response.Pending = false;
+            }
+
             if (response.Approved)
             {
                 string payload = System.Text.Encoding.ASCII.GetString(connectionData);
                 string[] payloadOptions = payload.Split(payloadParseString);
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
+
+                if (clientId == 0)
+                {
+                    clientTeam = Team.Red;
+                }
+                else if (clientId == 1)
+                {
+                    clientTeam = Team.Blue;
+                }
+                else
+                {
+                    clientTeam = Team.Blue;
+                }
 
                 if (payloadOptions.Length == 3)
                 {
@@ -718,7 +752,8 @@ namespace LightPat.Core
             }
             else
             {
-                Debug.LogError("No game logic manager found in scene. This means that players will not have a set spawn point");
+                if (SceneManager.GetActiveScene().name != "Prototype")
+                    Debug.LogError("No game logic manager found in scene. This means that players will not have a set spawn point");
             }
 
             GameObject g;
