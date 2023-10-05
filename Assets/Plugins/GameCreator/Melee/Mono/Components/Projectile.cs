@@ -12,16 +12,16 @@ namespace GameCreator.Melee
 
         protected CharacterMelee attacker;
         protected MeleeClip attack;
-        protected float projectileSpeed;
+        protected Vector3 projectileForce;
         protected bool initialized;
 
-        public void Initialize(CharacterMelee attacker, MeleeClip attack, float projectileSpeed)
+        public void Initialize(CharacterMelee attacker, MeleeClip attack, Vector3 projectileForce)
         {
             if (this.attacker) { Debug.LogError("BulletProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
 
             this.attacker = attacker;
             this.attack = attack;
-            this.projectileSpeed = projectileSpeed;
+            this.projectileForce = projectileForce;
             initialized = true;
         }
 
