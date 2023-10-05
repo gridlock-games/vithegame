@@ -12,7 +12,7 @@ namespace GameCreator.Melee
         [SerializeField] private Projectile projectilePrefab;
         [SerializeField] private Vector3 aimOffset;
 
-        public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, float projectileSpeed)
+        public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, Vector3 projectileSpeed)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("ShooterComponent.Shoot() should only be called on the server"); return; }
 

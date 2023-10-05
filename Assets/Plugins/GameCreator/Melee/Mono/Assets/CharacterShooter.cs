@@ -13,7 +13,7 @@ namespace GameCreator.Melee
         [SerializeField] private int clipSize;
         [SerializeField] private int magCapacity;
         [SerializeField] private float reloadTime;
-        [SerializeField] private float projectileSpeed = 10;
+        [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
         [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
@@ -37,7 +37,7 @@ namespace GameCreator.Melee
 
             if (aimDuringAttackAnticipation)
             {
-                shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
+                shooterWeapon.Shoot(melee, attackClip, projectileForce);
             }
             else
             {
@@ -50,7 +50,7 @@ namespace GameCreator.Melee
             yield return new WaitUntil(() => handIK.IsRightHandAiming());
             yield return null;
 
-            shooterWeapon.Shoot(melee, attackClip, projectileSpeed);
+            shooterWeapon.Shoot(melee, attackClip, projectileForce);
         }
 
         public bool IsAiming()
@@ -106,12 +106,12 @@ namespace GameCreator.Melee
                 }
                 else
                 {
-                    isAimedDown.Value = Input.GetMouseButton(1);
+                    //isAimedDown.Value = Input.GetMouseButton(1);
 
-                    // if (Input.GetMouseButtonDown(1))
-                    // {
-                    //     isAimedDown.Value = !isAimedDown.Value;
-                    // }
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        isAimedDown.Value = !isAimedDown.Value;
+                    }
                 }
 
                 RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
