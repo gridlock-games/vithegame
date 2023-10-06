@@ -27,6 +27,7 @@ namespace GameCreator.Melee
             {
                 attacker.ProcessProjectileHit(attacker, otherMelee, other.ClosestPointOnBounds(transform.position), attack, healTeammatePercentage);
             }
+            Debug.Log(other);
             NetworkObject.Despawn(true);
         }
 

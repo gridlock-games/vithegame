@@ -238,6 +238,7 @@ namespace GameCreator.Melee
                         {
                             if (TryGetComponent(out CharacterShooter characterShooter))
                             {
+                                characterShooter.ResetShootCount();
                                 if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
                                 {
                                     if (!characterShooter.IsAiming())
@@ -386,13 +387,10 @@ namespace GameCreator.Melee
 
                 if (TryGetComponent(out CharacterShooter characterShooter))
                 {
-                    if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
+                    //if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
+                    if (phase > 0)
                     {
-                        // Do not shoot a bullet prefab when casting an Ability
-                        if (!IsCastingAbility.Value)
-                        {
-                            characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
-                        }
+                        characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
                     }
                 }
 

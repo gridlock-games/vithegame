@@ -31,9 +31,15 @@ namespace GameCreator.Melee
         private CharacterHandIK handIK;
         private LimbReferences limbReferences;
 
+        private int shootCount;
+        private float lastShootTime;
+
         public void Shoot(MeleeClip attackClip)
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
+
+            if (shootCount >= attackClip.hitCount) { return; }
+            if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return; }
 
             if (aimDuringAttackAnticipation)
             {
@@ -43,7 +49,15 @@ namespace GameCreator.Melee
             {
                 StartCoroutine(WaitForAimShoot(attackClip));
             }
+
+            Debug.Log("Shoot at " + (Time.time - lastShootTime));
+            lastShootTime = Time.time;
+            shootCount++;
         }
+
+        public int GetShootCount() { return shootCount; }
+
+        public void ResetShootCount() { shootCount = 0; }
 
         private IEnumerator WaitForAimShoot(MeleeClip attackClip)
         {
