@@ -50,12 +50,9 @@ namespace GameCreator.Melee
                 StartCoroutine(WaitForAimShoot(attackClip));
             }
 
-            Debug.Log("Shoot at " + (Time.time - lastShootTime));
             lastShootTime = Time.time;
             shootCount++;
         }
-
-        public int GetShootCount() { return shootCount; }
 
         public void ResetShootCount() { shootCount = 0; }
 

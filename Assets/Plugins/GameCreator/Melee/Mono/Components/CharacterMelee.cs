@@ -200,7 +200,6 @@ namespace GameCreator.Melee
             }
         }
 
-        private bool newInputThisFrame;
         private void Update()
         {
             if (IsServer)
@@ -270,8 +269,6 @@ namespace GameCreator.Melee
                             {
                                 OnLightAttack();
                             }
-
-                            newInputThisFrame = true;
                         }
 
                         this.inputBuffer.ConsumeInput();
@@ -343,7 +340,6 @@ namespace GameCreator.Melee
             hitCount = 0;
         }
 
-        private int lastPhase;
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
@@ -393,9 +389,6 @@ namespace GameCreator.Melee
                         characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
                     }
                 }
-
-                newInputThisFrame = false;
-                lastPhase = phase;
             }
         }
 
@@ -486,6 +479,11 @@ namespace GameCreator.Melee
                             }
                         }
                     }
+                }
+
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed)
+                {
+                    if (targetMelee.Character.grabAssailant != melee.Character) { continue; }
                 }
 
                 if (targetMelee.IsInvincible) { continue; }
@@ -625,9 +623,6 @@ namespace GameCreator.Melee
                             {
                                 targetMelee.Character.CancelAilment();
                             }
-                            break;
-                        case AttackType.Grab:
-                            targetMelee.Character.Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                             break;
                     }
                 }

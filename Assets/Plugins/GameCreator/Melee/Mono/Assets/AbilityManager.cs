@@ -118,6 +118,30 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
         if (ability && melee.IsCastingAbility.Value && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
 
+        if (ability.meleeClip.attackType == MeleeClip.AttackType.Grab)
+        {
+            int raycastDistance = 2;
+            bool bHit = false;
+            RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform == transform) { continue; }
+                CharacterMelee otherMelee = hit.transform.GetComponentInParent<CharacterMelee>();
+                if (!otherMelee) { return; }
+                if (otherMelee == melee) { return; }
+
+                bHit = true;
+                otherMelee.Character.Grab(melee.Character, 2);
+                //melee.Character.Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                break;
+            }
+
+            // Make sure that there is a detected target
+            if (!bHit) { return; }
+        }
 
         if (ability != null && melee != null)
         {
