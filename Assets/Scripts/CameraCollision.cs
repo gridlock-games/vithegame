@@ -81,6 +81,8 @@ namespace LylekGames.Tools
 
             if (Physics.SphereCast(focusPosition, detectionRadius, rayDirection, out RaycastHit hit, distance + cushionOffset, maskedLayers) || Physics.Raycast(focusPosition, rayDirection, out hit, distance + cushionOffset, maskedLayers))
             {
+                if (hit.transform.GetComponentInParent<GameCreator.Melee.CharacterMelee>()) { return; }
+
                 if (!IsTagged(hit.transform.gameObject))
                 {
                     CheckCollision(hit);
@@ -91,6 +93,8 @@ namespace LylekGames.Tools
                     bool col = false;
                     foreach (RaycastHit h in hits)
                     {
+                        if (h.transform.GetComponentInParent<GameCreator.Melee.CharacterMelee>()) { return; }
+
                         if (!IsTagged(h.transform.gameObject))
                         {
                             CheckCollision(h);
