@@ -412,7 +412,7 @@
         {
             if (dead.Value) { return false; }
 
-            if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
+            if (characterLocomotion == null || characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
             if (IsServer) { characterLocomotion.UpdateDirectionControl(direction, isControllable); }
             return true;
         }

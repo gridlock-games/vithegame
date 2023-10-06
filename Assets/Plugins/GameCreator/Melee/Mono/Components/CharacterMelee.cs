@@ -475,8 +475,8 @@ namespace GameCreator.Melee
                 {
                     if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
                     {
-                        Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
-                        Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+                        Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
+                        Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
 
                         if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                         {
@@ -620,12 +620,16 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
+                            break;
                         case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
                                 targetMelee.Character.CancelAilment();
                             }
+                            break;
+                        case AttackType.Grab:
+                            targetMelee.Character.Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                             break;
                     }
                 }
