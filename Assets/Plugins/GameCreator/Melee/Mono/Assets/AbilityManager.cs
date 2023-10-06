@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GameCreator.Characters;
 using GameCreator.Melee;
 using Unity.Netcode;
+using LightPat.Core;
 
 public class AbilityManager : NetworkBehaviour
 {
@@ -129,12 +130,28 @@ public class AbilityManager : NetworkBehaviour
             foreach (RaycastHit hit in allHits)
             {
                 if (hit.transform == transform) { continue; }
-                CharacterMelee otherMelee = hit.transform.GetComponentInParent<CharacterMelee>();
-                if (!otherMelee) { return; }
-                if (otherMelee == melee) { return; }
+                CharacterMelee targetMelee = hit.transform.GetComponentInParent<CharacterMelee>();
+                if (!targetMelee) { return; }
+                if (targetMelee == melee) { return; }
 
                 bHit = true;
-                otherMelee.Character.Grab(melee.Character, 0.5f);
+
+                if (ClientManager.Singleton)
+                {
+                    if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
+                    {
+                        Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
+                        Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
+
+                        if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                        {
+                            // If the attacker's team is the same as the victim's team, do not register this hit
+                            if (attackerMeleeTeam == targetMeleeTeam) { return; }
+                        }
+                    }
+                }
+
+                targetMelee.Character.Grab(melee.Character, 0.5f);
                 break;
             }
 
