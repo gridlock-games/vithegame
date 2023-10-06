@@ -41,7 +41,8 @@
             Heavy,
             Stagger,
             Followup,
-            Pull
+            Pull,
+            Grab
         }
 
         // STATIC & CONSTS: -----------------------------------------------------------------------

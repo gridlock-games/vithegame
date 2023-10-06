@@ -200,7 +200,6 @@ namespace GameCreator.Melee
             }
         }
 
-        private bool newInputThisFrame;
         private void Update()
         {
             if (IsServer)
@@ -238,6 +237,7 @@ namespace GameCreator.Melee
                         {
                             if (TryGetComponent(out CharacterShooter characterShooter))
                             {
+                                characterShooter.ResetShootCount();
                                 if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
                                 {
                                     if (!characterShooter.IsAiming())
@@ -269,8 +269,6 @@ namespace GameCreator.Melee
                             {
                                 OnLightAttack();
                             }
-
-                            newInputThisFrame = true;
                         }
 
                         this.inputBuffer.ConsumeInput();
@@ -342,7 +340,6 @@ namespace GameCreator.Melee
             hitCount = 0;
         }
 
-        private int lastPhase;
         private void LateUpdate()
         {
             glowRenderer.RenderInvincible(IsInvincible);
@@ -386,18 +383,12 @@ namespace GameCreator.Melee
 
                 if (TryGetComponent(out CharacterShooter characterShooter))
                 {
-                    if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
+                    //if ((phase > 0 & lastPhase <= 0) | (phase > 0 & newInputThisFrame))
+                    if (phase > 0)
                     {
-                        // Do not shoot a bullet prefab when casting an Ability
-                        if (!IsCastingAbility.Value)
-                        {
-                            characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
-                        }
+                        characterShooter.Shoot(comboSystem.GetCurrentClip() ? comboSystem.GetCurrentClip() : currentMeleeClip);
                     }
                 }
-
-                newInputThisFrame = false;
-                lastPhase = phase;
             }
         }
 
@@ -475,8 +466,8 @@ namespace GameCreator.Melee
                 {
                     if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
                     {
-                        Team attackerMeleeTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
-                        Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team;
+                        Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
+                        Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
 
                         if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                         {
@@ -488,6 +479,11 @@ namespace GameCreator.Melee
                             }
                         }
                     }
+                }
+
+                if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed)
+                {
+                    if (targetMelee.Character.grabAssailant != melee.Character) { continue; }
                 }
 
                 if (targetMelee.IsInvincible) { continue; }
@@ -620,6 +616,7 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
+                            break;
                         case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
@@ -1194,6 +1191,8 @@ namespace GameCreator.Melee
 
         public void RevertAbilityCastingStatus()
         {
+            if (!IsServer) { Debug.LogError("CharacterMelee.RevertAbilityCastingStatus() should only be called on the server"); return; }
+
             if (IsCastingAbility.Value)
             {
                 IsCastingAbility.Value = false;

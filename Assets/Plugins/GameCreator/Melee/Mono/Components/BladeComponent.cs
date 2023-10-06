@@ -207,7 +207,7 @@
                     break;
 
                 case 2:
-                    Melee.RevertAbilityCastingStatus();
+                    if (NetworkManager.Singleton.IsServer) { Melee.RevertAbilityCastingStatus(); }
                     if (clip.attachVFXOnPhase == MeleeClip.AttachVFXPhase.OnRecovery && clip.affectedBones.Contains(weaponBone))
                     {
                         clip.PlayVFXAttachment(Melee);

@@ -34420,7 +34420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f92ec8667636df4cb53114cc721864c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyDistance: 0
+  killDistance: 500
   colliderLookBoxExtents: {x: 4, y: 1, z: 4}
   particleRadius: 1
   maxHits: 5
@@ -34438,9 +34438,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetType: 0
   statuses:
-  - status: 12
+  - status: 10
     value: 10
-    duration: 5
+    duration: 3
     delay: 0
 --- !u!114 &-849339899433197527
 MonoBehaviour:

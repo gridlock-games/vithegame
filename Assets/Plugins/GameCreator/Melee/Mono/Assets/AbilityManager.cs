@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GameCreator.Characters;
 using GameCreator.Melee;
 using Unity.Netcode;
+using LightPat.Core;
 
 public class AbilityManager : NetworkBehaviour
 {
@@ -91,7 +92,7 @@ public class AbilityManager : NetworkBehaviour
             }
         }
     }
-
+    
     [ServerRpc]
     private void ActivateAbilityServerRpc(KeyCode key)
     {
@@ -118,7 +119,46 @@ public class AbilityManager : NetworkBehaviour
         // Don't activate if Melee is currently playing a previous abiity and ability is not allowed to cancel previous Ability
         if (ability && melee.IsCastingAbility.Value && ability.canCncelAnimationType != Ability.AnimCancellingType.Cancel_AbilityAtk) { return; }
 
+        if (ability.meleeClip.attackType == MeleeClip.AttackType.Grab)
+        {
+            int raycastDistance = 2;
+            bool bHit = false;
+            RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform == transform) { continue; }
+                CharacterMelee targetMelee = hit.transform.GetComponentInParent<CharacterMelee>();
+                if (!targetMelee) { return; }
+                if (targetMelee == melee) { return; }
+
+                bHit = true;
+
+                if (ClientManager.Singleton)
+                {
+                    if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
+                    {
+                        Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
+                        Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
+
+                        if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                        {
+                            // If the attacker's team is the same as the victim's team, do not register this hit
+                            if (attackerMeleeTeam == targetMeleeTeam) { return; }
+                        }
+                    }
+                }
+
+                targetMelee.Character.Grab(melee.Character, 0.5f);
+                break;
+            }
+
+            // Make sure that there is a detected target
+            if (!bHit) { return; }
+        }
+        
         if (ability != null && melee != null)
         {
             activatedAbility = ability;

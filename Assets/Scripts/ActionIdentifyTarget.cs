@@ -127,8 +127,8 @@ public class ActionIdentifyTarget : IAction
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
-            executioner.Grab(direction, false);
-            targetChar.Grab(direction, false);
+            //executioner.Grab(direction, false);
+            //targetChar.Grab(direction, false);
             targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null);
 
             // Teleport Target to GrabPlaceholder
@@ -185,8 +185,8 @@ public class ActionIdentifyTarget : IAction
 
             // Change Camera Input and Player Controls
             var direction = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection;
-            executioner.Grab(direction, false);
-            targetChar.Grab(direction, false);
+            //executioner.Grab(direction, false);
+            //targetChar.Grab(direction, false);
             targetChar.UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null);
 
             // Teleport Target to GrabPlaceholder
@@ -196,8 +196,8 @@ public class ActionIdentifyTarget : IAction
             targetChar.characterLocomotion.SetRotation(targetCharRotation.eulerAngles);
 
             // GetAnim Duration
-            this.anim_ExecuterDuration = (characterMeleeA.currentWeapon.grabAttack.animationClip.length);
-            this.anim_ExecutedDuration = (characterMeleeA.currentWeapon.grabReaction.animationClip.length);
+            anim_ExecuterDuration = characterMeleeA.currentWeapon.grabAttack.animationClip.length;
+            anim_ExecutedDuration = characterMeleeA.currentWeapon.grabReaction.animationClip.length;
 
             bool isGrabbing = characterMeleeA.Grab(characterMeleeB);
 
@@ -237,7 +237,7 @@ public class ActionIdentifyTarget : IAction
 
         // Update Camera Input and Player Controls
         var directionUpdate = CharacterLocomotion.OVERRIDE_FACE_DIRECTION.CameraDirection;
-        executioner.Grab(directionUpdate, true);
+        //executioner.Grab(directionUpdate, true);
         yield return 0;
     }
 

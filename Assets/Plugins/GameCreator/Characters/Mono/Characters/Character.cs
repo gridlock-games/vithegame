@@ -408,13 +408,23 @@
             CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered
         };
 
-        public bool Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION direction, bool isControllable)
+        public Character grabAssailant { get; private set; }
+        public bool Grab(Character attacker, float duration)
         {
             if (dead.Value) { return false; }
 
-            if (this.characterLocomotion == null || this.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
-            if (IsServer) { characterLocomotion.UpdateDirectionControl(direction, isControllable); }
+            if (characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return false;
+
+            UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed, null, false);
+            grabAssailant = attacker;
+            StartCoroutine(EndGrab(duration));
             return true;
+        }
+
+        private IEnumerator EndGrab(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            UpdateAilment(CharacterLocomotion.CHARACTER_AILMENTS.None, null, false);
         }
 
         public bool Stun(Character attacker, Character target)
@@ -890,6 +900,10 @@
                 case CharacterLocomotion.CHARACTER_AILMENTS.IsPulled:
                     // if (melee.currentWeapon.staggerF)
                     //     melee.currentWeapon.staggerF.PlayNetworked(melee);
+                    break;
+
+                case CharacterLocomotion.CHARACTER_AILMENTS.WasGrabbed:
+                    characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
                     break;
             }
 
