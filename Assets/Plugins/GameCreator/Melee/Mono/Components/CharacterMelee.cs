@@ -1191,6 +1191,8 @@ namespace GameCreator.Melee
 
         public void RevertAbilityCastingStatus()
         {
+            if (!IsServer) { Debug.LogError("CharacterMelee.RevertAbilityCastingStatus() should only be called on the server"); return; }
+
             if (IsCastingAbility.Value)
             {
                 IsCastingAbility.Value = false;

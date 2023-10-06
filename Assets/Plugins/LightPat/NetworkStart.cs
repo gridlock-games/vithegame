@@ -26,7 +26,7 @@ public class NetworkStart : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             NetworkManager.Singleton.StartServer();
         else if (Application.isEditor)
-            NetworkManager.Singleton.StartHost();
+            NetworkManager.Singleton.StartServer();
         else
             NetworkManager.Singleton.StartClient();
     }
