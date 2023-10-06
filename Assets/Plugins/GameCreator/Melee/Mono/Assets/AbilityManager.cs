@@ -91,7 +91,7 @@ public class AbilityManager : NetworkBehaviour
             }
         }
     }
-
+    
     [ServerRpc]
     private void ActivateAbilityServerRpc(KeyCode key)
     {
@@ -134,15 +134,14 @@ public class AbilityManager : NetworkBehaviour
                 if (otherMelee == melee) { return; }
 
                 bHit = true;
-                otherMelee.Character.Grab(melee.Character, 2);
-                //melee.Character.Grab(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
+                otherMelee.Character.Grab(melee.Character, 0.5f);
                 break;
             }
 
             // Make sure that there is a detected target
             if (!bHit) { return; }
         }
-
+        
         if (ability != null && melee != null)
         {
             activatedAbility = ability;
