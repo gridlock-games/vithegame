@@ -100,7 +100,11 @@
         private SerializedProperty spIsOrbitLocked;
         private SerializedProperty spApplyRootMotion;
         private SerializedProperty spIsLunge;
+        
         private SerializedProperty spAttackType;
+        private SerializedProperty spGrabDistance;
+        private SerializedProperty spGrabDuration;
+
         private SerializedProperty spIsDodge;
         private SerializedProperty spIsBlockable;
 
@@ -207,7 +211,11 @@
             this.spIsLunge = this.serializedObject.FindProperty("isLunge");
             this.spHitCount = this.serializedObject.FindProperty("hitCount");
             this.spHitCountDelay = this.serializedObject.FindProperty("multiHitRegDelay");
+
             this.spAttackType = this.serializedObject.FindProperty("attackType");
+            this.spGrabDistance = this.serializedObject.FindProperty("grabDistance");
+            this.spGrabDuration = this.serializedObject.FindProperty("grabDuration");
+
             this.spIsDodge = this.serializedObject.FindProperty("isDodge");
             this.spIsBlockable = this.serializedObject.FindProperty("isBlockable");
 
@@ -576,6 +584,12 @@
                     EditorGUILayout.PropertyField(this.spBladeMultiplier);
 
                     EditorGUILayout.PropertyField(this.spAttackType);
+                    if ((MeleeClip.AttackType)spAttackType.intValue == MeleeClip.AttackType.Grab)
+                    {
+                        EditorGUILayout.PropertyField(this.spGrabDistance);
+                        EditorGUILayout.PropertyField(this.spGrabDuration);
+                    }
+
                     EditorGUILayout.PropertyField(this.spDefenseDamage);
                     EditorGUILayout.PropertyField(this.spPoiseDamage);
                     EditorGUILayout.PropertyField(this.spBaseDamage);
