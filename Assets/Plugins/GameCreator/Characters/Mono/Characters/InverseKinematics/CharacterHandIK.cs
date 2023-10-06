@@ -148,7 +148,7 @@ namespace GameCreator.Characters
 
         // IK METHODS: ----------------------------------------------------------------------------
 
-        private Vector3 aimPoint;
+        public Vector3 aimPoint { get; private set; }
         private Quaternion aimOffset;
         private bool activateAim;
         private bool aimLeftHand;
