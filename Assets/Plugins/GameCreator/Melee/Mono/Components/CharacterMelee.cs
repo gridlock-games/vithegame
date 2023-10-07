@@ -440,6 +440,26 @@ namespace GameCreator.Melee
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
+        public static bool CheckHitTeams(CharacterMelee melee, CharacterMelee targetMelee)
+        {
+            if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
+            {
+                Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
+                Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
+
+                if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                {
+                    // If the attacker's team is the same as the victim's team, do not register this hit
+                    if (attackerMeleeTeam == targetMeleeTeam)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesPercentage)
         {
             List<HitResult> hitResults = new List<HitResult>();
