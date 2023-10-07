@@ -34,8 +34,6 @@
         // 3d model:
         public GameObject prefab;
         public ShieldBone attachment = ShieldBone.RightHand;
-        public Vector3 positionOffset;
-        public Vector3 rotationOffset;
 
         // reactions:
         public MeleeClip perfectBlockClip;
@@ -96,9 +94,6 @@
             instance.transform.localScale = this.prefab.transform.localScale;
 
             instance.transform.SetParent(bone);
-
-            instance.transform.localPosition = this.positionOffset;
-            instance.transform.localRotation = Quaternion.Euler(this.rotationOffset);
 
             return instance;
         }
