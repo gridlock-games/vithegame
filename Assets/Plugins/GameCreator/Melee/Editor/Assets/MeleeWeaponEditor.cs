@@ -108,10 +108,11 @@
         public SerializedProperty spStaggerF;
 
         private SerializedProperty spWeaponModels;
-        
+        private SerializedProperty spWeaponModelData;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        
+
 
         // INITIALIZER: ---------------------------------------------------------------------------
 
@@ -276,18 +277,19 @@
             this.comboList.drawElementCallback += this.PaintCombo_Element;
 
             //weapon model
-             this.spWeaponModels = this.serializedObject.FindProperty("weaponModels");
-             //
-             // this.weaponModelsList = new ReorderableList(
-             //     this.serializedObject,
-             //     this.spWeaponModels,
-             //     true, true, true, true
-             // );
-             //
-             // this.weaponModelsList.drawHeaderCallback += this.PaintWeaponModel_Header;
-             // this.weaponModelsList.drawElementCallback += this.PaintWeaponModel_Element;
-            
-           
+            this.spWeaponModels = this.serializedObject.FindProperty("weaponModels");
+            this.spWeaponModelData = this.serializedObject.FindProperty("weaponModelData");
+            //
+            // this.weaponModelsList = new ReorderableList(
+            //     this.serializedObject,
+            //     this.spWeaponModels,
+            //     true, true, true, true
+            // );
+            //
+            // this.weaponModelsList.drawHeaderCallback += this.PaintWeaponModel_Header;
+            // this.weaponModelsList.drawElementCallback += this.PaintWeaponModel_Element;
+
+
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -381,6 +383,7 @@
                     EditorGUILayout.PropertyField(this.spWeaponImage);
 
                     EditorGUILayout.PropertyField(this.spWeaponModels);
+                    EditorGUILayout.PropertyField(this.spWeaponModelData);
                     EditorGUILayout.EndVertical();
                 }
             }
@@ -394,14 +397,8 @@
                 if (group.visible)
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
-
                     EditorGUILayout.PropertyField(this.spPrefab);
                     EditorGUILayout.PropertyField(this.spAttachment);
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(this.spPosition);
-                    EditorGUILayout.PropertyField(this.spRotation);
-
                     EditorGUILayout.EndVertical();
                 }
             }

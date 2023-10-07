@@ -49,13 +49,21 @@ namespace GameCreator.Melee
         public AvatarMask characterMask;
         public Sprite weaponImage;
 
+        [Serializable]
+        public class WeaponModelData
+        {
+            public CharacterMelee skinPrefab;
+            public GameObject prefabWeapon;
+            public WeaponBone attachmentWeapon = WeaponBone.RightHand;
+            public Vector3 positionOffsetWeapon;
+            public Vector3 rotationOffsetWeapon;
+        }
 
         // 3d model:
         public List<WeaponModel> weaponModels = new List<WeaponModel>();
+        public List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
         public GameObject prefab;
         public WeaponBone attachment = WeaponBone.RightHand;
-        public Vector3 positionOffset;
-        public Vector3 rotationOffset;
 
         // audio:
         public AudioClip audioSheathe;
@@ -169,42 +177,7 @@ namespace GameCreator.Melee
 
             return instances;
         }
-
-        public GameObject EquipWeapon(CharacterAnimator character)
-        {
-            if (this.prefab == null) return null;
-            if (character == null) return null;
-
-            Transform bone = null;
-            switch (this.attachment)
-            {
-                case WeaponBone.Root:
-                    bone = character.transform;
-                    break;
-
-                case WeaponBone.Camera:
-                    bone = HookCamera.Instance.transform;
-                    break;
-
-                default:
-                    bone = character.animator.GetBoneTransform((HumanBodyBones)this.attachment);
-                    break;
-
-            }
-
-            if (!bone) return null;
-
-            GameObject instance = Instantiate(this.prefab);
-            instance.transform.localScale = this.prefab.transform.localScale;
-
-            instance.transform.SetParent(bone);
-
-            instance.transform.localPosition = this.positionOffset;
-            instance.transform.localRotation = Quaternion.Euler(this.rotationOffset);
-
-            return instance;
-        }
-
+        
         public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback, bool isKnockup, bool isPulled)
         {
             int index = 0;
