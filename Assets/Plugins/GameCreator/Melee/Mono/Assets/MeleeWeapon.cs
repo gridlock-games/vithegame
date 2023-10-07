@@ -165,10 +165,10 @@ namespace GameCreator.Melee
                 }
             }
 
-            if (!broken)
-            {
-                Debug.LogError("Could not find a weapon model data element for this skin: " + character.GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
-            }
+            //if (!broken)
+            //{
+            //    Debug.LogError("Could not find a weapon model data element for this skin: " + character.GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
+            //}
 
             return instances;
         }
