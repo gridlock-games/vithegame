@@ -644,13 +644,6 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void ChangeSpawnWeaponsServerRpc(ulong clientId, int[] newSpawnWeaponIndexes)
-        {
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeSpawnWeapons(newSpawnWeaponIndexes);
-            SynchronizeClientDictionaries();
-        }
-
         public void AddKills(ulong clientId, int killsToAdd)
         {
             if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
@@ -766,7 +759,6 @@ namespace LightPat.Core
         public int playerPrefabOptionIndex;
         public int skinIndex;
         public Team team;
-        public int[] spawnWeapons;
         public int kills;
         public int deaths;
         public int damageDealt;
@@ -778,7 +770,6 @@ namespace LightPat.Core
             this.playerPrefabOptionIndex = playerPrefabOptionIndex;
             this.skinIndex = skinIndex;
             this.team = team;
-            spawnWeapons = new int[0];
             kills = 0;
             deaths = 0;
             damageDealt = 0;
@@ -819,13 +810,6 @@ namespace LightPat.Core
             return copy;
         }
 
-        public ClientData ChangeSpawnWeapons(int[] newWeapons)
-        {
-            ClientData copy = this;
-            copy.spawnWeapons = newWeapons;
-            return copy;
-        }
-
         public ClientData ChangeKills(int newKills)
         {
             ClientData copy = this;
@@ -854,7 +838,6 @@ namespace LightPat.Core
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref skinIndex);
             serializer.SerializeValue(ref team);
-            serializer.SerializeValue(ref spawnWeapons);
             serializer.SerializeValue(ref kills);
             serializer.SerializeValue(ref deaths);
             serializer.SerializeValue(ref damageDealt);

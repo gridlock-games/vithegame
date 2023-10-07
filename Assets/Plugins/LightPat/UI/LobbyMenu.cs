@@ -37,7 +37,8 @@ namespace LightPat.UI
         ClientManager clientManager = new ClientManager();
         IPManager iPManager = new IPManager();
 
-        private void Awake() {
+        private void Awake()
+        {
             StartCoroutine(iPManager.CheckAPI());
         }
         public void LeaveLobby()
@@ -146,12 +147,6 @@ namespace LightPat.UI
             }
         }
 
-        public void UpdateWeaponLoadout()
-        {
-            ulong localClientId = NetworkManager.Singleton.LocalClientId;
-            ClientManager.Singleton.ChangeSpawnWeaponsServerRpc(localClientId, new int[] { primaryWeaponDropdown.value, secondaryWeaponDropdown.value, tertiaryWeaponDropdown.value });
-        }
-
         public void UpdatePlayerModelChoice()
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
@@ -217,18 +212,6 @@ namespace LightPat.UI
             }
             playerModelDropdown.ClearOptions();
             playerModelDropdown.AddOptions(playerModelOptions);
-
-            //List<TMP_Dropdown.OptionData> weapons = new List<TMP_Dropdown.OptionData>();
-            //foreach (Weapon weapon in ClientManager.Singleton.weaponPrefabOptions)
-            //{
-            //    weapons.Add(new TMP_Dropdown.OptionData(weapon.weaponName));
-            //}
-            //primaryWeaponDropdown.ClearOptions();
-            //primaryWeaponDropdown.AddOptions(weapons);
-            //secondaryWeaponDropdown.ClearOptions();
-            //secondaryWeaponDropdown.AddOptions(weapons);
-            //tertiaryWeaponDropdown.ClearOptions();
-            //tertiaryWeaponDropdown.AddOptions(weapons);
 
             cameraPositionOffset = Camera.main.transform.localPosition;
 
@@ -370,7 +353,7 @@ namespace LightPat.UI
 
                         changeTeamDropdown.ClearOptions();
                         changeTeamDropdown.AddOptions(teamOptions);
-                        
+
                         if (NetworkManager.Singleton.IsClient)
                         {
                             if (teamOptionsAsEnum.Contains(prevTeam))
@@ -501,7 +484,7 @@ namespace LightPat.UI
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
                         readyButton.GetComponent<Image>().color = newColor;
                 }
-                
+
                 // Only make crown icon visible on the lobby leader
                 if (valuePair.Key == ClientManager.Singleton.lobbyLeaderId.Value)
                     nameIcon.transform.Find("CrownIcon").GetComponent<RawImage>().color = new Color(255, 255, 255, 255);
