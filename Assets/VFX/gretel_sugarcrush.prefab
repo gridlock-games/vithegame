@@ -4917,7 +4917,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4322369068968722
 Transform:
   m_ObjectHideFlags: 0
@@ -4941,7 +4941,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1452456380556416}
   serializedVersion: 8
-  lengthInSec: 4
+  lengthInSec: 10
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 1
@@ -9772,7 +9772,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1537275176687550}
   serializedVersion: 8
-  lengthInSec: 7
+  lengthInSec: 13
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 1
@@ -13590,14 +13590,13 @@ ParticleSystem:
   TriggerModule:
     enabled: 1
     serializedVersion: 2
-    inside: 0
-    outside: 2
-    enter: 0
-    exit: 2
+    inside: 2
+    outside: 0
+    enter: 2
+    exit: 0
     colliderQueryMode: 0
     radiusScale: 1
-    primitives:
-    - {fileID: 0}
+    primitives: []
   SubModule:
     serializedVersion: 2
     enabled: 0
@@ -14678,7 +14677,7 @@ MonoBehaviour:
   statuses:
   - status: 11
     value: 0
-    duration: 0
+    duration: 0.1
     delay: 0
 --- !u!1 &1805127793544216
 GameObject:
@@ -14721,7 +14720,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1805127793544216}
   serializedVersion: 8
-  lengthInSec: 5
+  lengthInSec: 8
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 1
