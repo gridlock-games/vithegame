@@ -14,7 +14,6 @@ using UnityEngine.Rendering;
 
 public class SceneUserDataManager : MonoBehaviour
 {
-    [SerializeField] private List<CreateCharacterModel> charactersList = new List<CreateCharacterModel>();
     [SerializeField] private GameObject placeholderContainer;
     [SerializeField] private Transform startSpawnLoc;
     [SerializeField] private TextMeshProUGUI nameTMP;
@@ -229,15 +228,16 @@ public class SceneUserDataManager : MonoBehaviour
     {
         gridLayoutGroup.padding = new RectOffset(10, 10, 60, 0);
 
-        for (int i = 0; i < charactersList.Count; i++)
+        var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
+        for (int i = 0; i < playerModelOptions.Length; i++)
         {
-            gridImgPrefab.sprite = charactersList[i].characterImage;
-            gridImgPrefab.gameObject.name = charactersList[i].characterName;
+            gridImgPrefab.sprite = playerModelOptions[i].characterImage;
+            gridImgPrefab.gameObject.name = playerModelOptions[i].name;
             gridImgPrefab.gameObject.SetActive(true);
             characterOptionImages.Add(Instantiate(gridImgPrefab.gameObject, gridLayoutGroup.transform));
         }
 
-        this.SelectGameObject(null);
+        SelectGameObject(null);
     }
 
     private void SelectPreviousObject()
@@ -280,29 +280,29 @@ public class SceneUserDataManager : MonoBehaviour
     {
         if (isPreviewActive) return;
 
-        CreateCharacterModel charDesc = null;
+        ClientManager.PlayerModelOption charDesc = null;
 
         if (this.selectedObject == null)
         {
-            charDesc = charactersList[0];
+            charDesc = ClientManager.Singleton.GetPlayerModelOptions()[0];
         }
         else
         {
             Destroy(this.selectedObject, 0f);
-            charDesc = charactersList.FirstOrDefault(model => model.characterName == selectedObject.name.Replace("(Clone)", ""));
+            charDesc = ClientManager.Singleton.GetPlayerModelOptions().FirstOrDefault(model => model.name == selectedObject.name.Replace("(Clone)", ""));
         }
 
         if (charDesc == null) return;
-        if (charDesc.characterObject == this.selectedObject) return;
+        if (charDesc.playerPrefab == this.selectedObject) return;
 
         Vector3 spawnPosition = startSpawnLoc.position;
 
-        this.charDesc_Name.text = charDesc.characterName;
-        this.charDesc_Role.text = charDesc.chracterRole;
+        this.charDesc_Name.text = charDesc.name;
+        this.charDesc_Role.text = charDesc.role;
         this.charDesc_Lore.text = charDesc.characterDescription;
 
         // Store the selected game object
-        this.selectedObject = Instantiate(charDesc.characterObject, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
+        this.selectedObject = Instantiate(charDesc.playerPrefab, spawnPosition, Quaternion.Euler(0f, 180f, 0f));
         this.selectedObject.GetComponent<SwitchMelee>().SwitchWeaponBeforeSpawn();
         skinIndex = -1;
         ChangeSkin();

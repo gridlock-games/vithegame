@@ -18,6 +18,9 @@ namespace LightPat.Core
         public class PlayerModelOption
         {
             public string name;
+            public string role;
+            public string characterDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            public Sprite characterImage;
             public GameObject playerPrefab;
             public GameObject[] skinOptions;
         }
@@ -359,7 +362,11 @@ namespace LightPat.Core
                 if (server.ip == networkTransport.ConnectionData.Address & ushort.Parse(server.port) == networkTransport.ConnectionData.Port)
                 {
                     thisServerIsInAPI = true;
-                    yield return PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port));
+                    yield return PutRequest(new ServerPutPayload(server._id,
+                                                                 clientDataDictionary.Count,
+                                                                 gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                 clientDataDictionary.ContainsKey(lobbyLeaderId.Value) ? clientDataDictionary[lobbyLeaderId.Value].clientName : SceneManager.GetActiveScene().name,
+                                                                 server.port));
                     break;
                 }
             }
@@ -376,7 +383,7 @@ namespace LightPat.Core
                                                                       clientDataDictionary.Count,
                                                                       gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
                                                                       networkTransport.ConnectionData.Address,
-                                                                      SceneManager.GetActiveScene().name,
+                                                                      clientDataDictionary.ContainsKey(lobbyLeaderId.Value) ? clientDataDictionary[lobbyLeaderId.Value].clientName : SceneManager.GetActiveScene().name,
                                                                       networkTransport.ConnectionData.Port.ToString());
                     yield return PostRequest(payload);
                 }
@@ -420,13 +427,15 @@ namespace LightPat.Core
             public string serverId;
             public int population;
             public int progress;
+            public string label;
             public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress, string port)
+            public ServerPutPayload(string serverId, int population, int progress, string label, string port)
             {
                 this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
+                this.label = label;
                 this.port = port;
             }
         }
@@ -641,13 +650,6 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void ChangeSpawnWeaponsServerRpc(ulong clientId, int[] newSpawnWeaponIndexes)
-        {
-            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangeSpawnWeapons(newSpawnWeaponIndexes);
-            SynchronizeClientDictionaries();
-        }
-
         public void AddKills(ulong clientId, int killsToAdd)
         {
             if (!IsServer) { Debug.LogError("This should only be modified on the server"); return; }
@@ -763,7 +765,6 @@ namespace LightPat.Core
         public int playerPrefabOptionIndex;
         public int skinIndex;
         public Team team;
-        public int[] spawnWeapons;
         public int kills;
         public int deaths;
         public int damageDealt;
@@ -775,7 +776,6 @@ namespace LightPat.Core
             this.playerPrefabOptionIndex = playerPrefabOptionIndex;
             this.skinIndex = skinIndex;
             this.team = team;
-            spawnWeapons = new int[0];
             kills = 0;
             deaths = 0;
             damageDealt = 0;
@@ -816,13 +816,6 @@ namespace LightPat.Core
             return copy;
         }
 
-        public ClientData ChangeSpawnWeapons(int[] newWeapons)
-        {
-            ClientData copy = this;
-            copy.spawnWeapons = newWeapons;
-            return copy;
-        }
-
         public ClientData ChangeKills(int newKills)
         {
             ClientData copy = this;
@@ -851,7 +844,6 @@ namespace LightPat.Core
             serializer.SerializeValue(ref playerPrefabOptionIndex);
             serializer.SerializeValue(ref skinIndex);
             serializer.SerializeValue(ref team);
-            serializer.SerializeValue(ref spawnWeapons);
             serializer.SerializeValue(ref kills);
             serializer.SerializeValue(ref deaths);
             serializer.SerializeValue(ref damageDealt);
