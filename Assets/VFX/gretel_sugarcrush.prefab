@@ -13590,14 +13590,13 @@ ParticleSystem:
   TriggerModule:
     enabled: 1
     serializedVersion: 2
-    inside: 0
-    outside: 2
-    enter: 0
-    exit: 2
+    inside: 2
+    outside: 0
+    enter: 2
+    exit: 0
     colliderQueryMode: 0
     radiusScale: 1
-    primitives:
-    - {fileID: 0}
+    primitives: []
   SubModule:
     serializedVersion: 2
     enabled: 0

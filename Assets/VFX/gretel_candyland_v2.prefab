@@ -50,7 +50,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7433327436901350391}
   serializedVersion: 8
-  lengthInSec: 15
+  lengthInSec: 20
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 1
@@ -125,7 +125,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.88
+      scalar: 2.43
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -3873,9 +3873,8 @@ ParticleSystem:
     enter: 2
     exit: 0
     colliderQueryMode: 0
-    radiusScale: 0.67
-    primitives:
-    - {fileID: 0}
+    radiusScale: 1
+    primitives: []
   SubModule:
     serializedVersion: 2
     enabled: 0
@@ -4908,9 +4907,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killDistance: 500
-  colliderLookBoxExtents: {x: 1, y: 1, z: 1}
-  particleRadius: 1
-  maxHits: 100
+  colliderLookBoxExtents: {x: 4, y: 1, z: 4}
+  particleRadius: 3
+  maxHits: 0
 --- !u!114 &7433327436901350388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19646,7 +19645,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7433648629766075957}
   serializedVersion: 8
-  lengthInSec: 7
+  lengthInSec: 12
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 3
