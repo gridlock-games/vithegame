@@ -13,7 +13,8 @@ namespace LightPat.UI
     public class LobbyMenu : Menu
     {
         public GameObject playerNamePrefab;
-        public Transform playerNamesParent;
+        public Transform teammatePlayerIconsParent;
+        public Transform enemyPlayerIconsParent;
         public Vector3 iconSpacing;
         public GameObject startButton;
         public GameObject readyButton;
@@ -24,10 +25,6 @@ namespace LightPat.UI
         public TMP_Dropdown playerModelDropdown;
         public TMP_Dropdown mapSelectDropdown;
         public TextMeshProUGUI errorDisplay;
-        [Header("Loadout dropdowns")]
-        public TMP_Dropdown primaryWeaponDropdown;
-        public TMP_Dropdown secondaryWeaponDropdown;
-        public TMP_Dropdown tertiaryWeaponDropdown;
 
         private GameObject playerModel;
         private Vector3 cameraPositionOffset;
@@ -151,7 +148,6 @@ namespace LightPat.UI
         public void UpdatePlayerModelChoice()
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
-            Debug.Log(playerModelDropdown.value);
             ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(NetworkManager.Singleton.LocalClientId, playerModelDropdown.value);
         }
 
@@ -236,9 +232,6 @@ namespace LightPat.UI
             UpdateGameModeValue();
             UpdateMapNameValue();
             ChangeTeam();
-            primaryWeaponDropdown.value = 0;
-            secondaryWeaponDropdown.value = 1;
-            tertiaryWeaponDropdown.value = 2;
             clientIsConnected = true;
         }
 
@@ -442,7 +435,12 @@ namespace LightPat.UI
                 Camera.main.transform.position = playerModel.transform.position + cameraPositionOffset;
 
             // Player names logic
-            foreach (Transform child in playerNamesParent)
+            foreach (Transform child in teammatePlayerIconsParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in enemyPlayerIconsParent)
             {
                 Destroy(child.gameObject);
             }
@@ -452,14 +450,25 @@ namespace LightPat.UI
                 everyoneIsReady = false;
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
-                GameObject nameIcon = Instantiate(playerNamePrefab, playerNamesParent);
-                nameIcon.GetComponentInChildren<TextMeshProUGUI>().SetText(valuePair.Value.clientName);
+                Transform iconParent = enemyPlayerIconsParent;
+
+                if (enableTeams)
+                {
+                    if (ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team == valuePair.Value.team)
+                    {
+                        iconParent = teammatePlayerIconsParent;
+                    }
+                }
+                
+                GameObject nameIcon = Instantiate(playerNamePrefab, iconParent);
+                TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
+                nameText.SetText(valuePair.Value.clientName);
 
                 // Enable switch teams button if we are the local client for that nameIcon
-                if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
-                    nameIcon.GetComponentInChildren<Button>().interactable = true;
-                else
-                    nameIcon.GetComponentInChildren<Button>().interactable = false;
+                //if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
+                //    nameIcon.transform.Find("TeamOutline").gameObject.SetActive(true);
+                //else
+                //    nameIcon.GetComponentInChildren<Button>().interactable = false;
 
                 // Set the color of the team button
                 Color teamColor = Color.black;
@@ -467,21 +476,21 @@ namespace LightPat.UI
                 if (clientTeam == Team.Red) { teamColor = Color.red; }
                 else if (clientTeam == Team.Blue) { teamColor = Color.blue; }
                 else if (clientTeam == Team.Spectator) { teamColor = Color.clear; }
-                nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
-                nameIcon.GetComponentInChildren<Button>(true).gameObject.SetActive(enableTeams);
+                nameIcon.transform.Find("TeamOutline").GetComponent<Image>().color = teamColor;
+                nameIcon.transform.Find("TeamOutline").gameObject.SetActive(enableTeams);
 
-                // Change color of ready icon
+                // Change color of name text based on if we are ready
                 if (valuePair.Value.ready)
                 {
                     Color newColor = new Color(0, 255, 0, 255);
-                    nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
+                    nameText.color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
                         readyButton.GetComponent<Image>().color = newColor;
                 }
                 else
                 {
                     Color newColor = new Color(255, 0, 0, 255);
-                    nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
+                    nameText.color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
                         readyButton.GetComponent<Image>().color = newColor;
                 }
@@ -492,15 +501,20 @@ namespace LightPat.UI
                 else
                     nameIcon.transform.Find("CrownIcon").GetComponent<RawImage>().color = new Color(255, 255, 255, 0);
 
+                if (nameIcon.transform.parent == teammatePlayerIconsParent)
+                {
+                    nameIcon.transform.Find("CharacterIcon").GetComponent<Image>().sprite = ClientManager.Singleton.GetPlayerModelOptions()[valuePair.Value.playerPrefabOptionIndex].characterImage;
+                }
+
                 // Enable start button if everyone is ready
                 if (!valuePair.Value.ready)
                     everyoneIsReady = false;
 
-                // Set positions of all name icons
-                for (int i = 0; i < playerNamesParent.childCount; i++)
-                {
-                    playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
-                }
+                //// Set positions of all name icons
+                //for (int i = 0; i < playerNamesParent.childCount; i++)
+                //{
+                //    playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
+                //}
             }
 
             if (everyoneIsReady)
