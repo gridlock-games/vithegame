@@ -362,7 +362,11 @@ namespace LightPat.Core
                 if (server.ip == networkTransport.ConnectionData.Address & ushort.Parse(server.port) == networkTransport.ConnectionData.Port)
                 {
                     thisServerIsInAPI = true;
-                    yield return PutRequest(new ServerPutPayload(server._id, clientDataDictionary.Count, gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0, server.port));
+                    yield return PutRequest(new ServerPutPayload(server._id,
+                                                                 clientDataDictionary.Count,
+                                                                 gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
+                                                                 clientDataDictionary.ContainsKey(lobbyLeaderId.Value) ? clientDataDictionary[lobbyLeaderId.Value].clientName : SceneManager.GetActiveScene().name,
+                                                                 server.port));
                     break;
                 }
             }
@@ -379,7 +383,7 @@ namespace LightPat.Core
                                                                       clientDataDictionary.Count,
                                                                       gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
                                                                       networkTransport.ConnectionData.Address,
-                                                                      SceneManager.GetActiveScene().name,
+                                                                      clientDataDictionary.ContainsKey(lobbyLeaderId.Value) ? clientDataDictionary[lobbyLeaderId.Value].clientName : SceneManager.GetActiveScene().name,
                                                                       networkTransport.ConnectionData.Port.ToString());
                     yield return PostRequest(payload);
                 }
@@ -423,13 +427,15 @@ namespace LightPat.Core
             public string serverId;
             public int population;
             public int progress;
+            public string label;
             public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress, string port)
+            public ServerPutPayload(string serverId, int population, int progress, string label, string port)
             {
                 this.serverId = serverId;
                 this.population = population;
                 this.progress = progress;
+                this.label = label;
                 this.port = port;
             }
         }
