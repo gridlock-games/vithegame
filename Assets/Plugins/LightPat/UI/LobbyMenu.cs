@@ -24,10 +24,6 @@ namespace LightPat.UI
         public TMP_Dropdown playerModelDropdown;
         public TMP_Dropdown mapSelectDropdown;
         public TextMeshProUGUI errorDisplay;
-        [Header("Loadout dropdowns")]
-        public TMP_Dropdown primaryWeaponDropdown;
-        public TMP_Dropdown secondaryWeaponDropdown;
-        public TMP_Dropdown tertiaryWeaponDropdown;
 
         private GameObject playerModel;
         private Vector3 cameraPositionOffset;
@@ -235,9 +231,6 @@ namespace LightPat.UI
             UpdateGameModeValue();
             UpdateMapNameValue();
             ChangeTeam();
-            primaryWeaponDropdown.value = 0;
-            secondaryWeaponDropdown.value = 1;
-            tertiaryWeaponDropdown.value = 2;
             clientIsConnected = true;
         }
 
@@ -452,7 +445,8 @@ namespace LightPat.UI
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 GameObject nameIcon = Instantiate(playerNamePrefab, playerNamesParent);
-                nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().SetText(valuePair.Value.clientName);
+                TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
+                nameText.SetText(valuePair.Value.clientName);
 
                 // Enable switch teams button if we are the local client for that nameIcon
                 //if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
@@ -469,18 +463,18 @@ namespace LightPat.UI
                 nameIcon.transform.Find("TeamOutline").GetComponent<Image>().color = teamColor;
                 nameIcon.transform.Find("TeamOutline").gameObject.SetActive(enableTeams);
 
-                // Change color of ready icon
+                // Change color of name text based on if we are ready
                 if (valuePair.Value.ready)
                 {
                     Color newColor = new Color(0, 255, 0, 255);
-                    nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
+                    nameText.color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
                         readyButton.GetComponent<Image>().color = newColor;
                 }
                 else
                 {
                     Color newColor = new Color(255, 0, 0, 255);
-                    nameIcon.transform.Find("ReadyIcon").GetComponent<Image>().color = newColor;
+                    nameText.color = newColor;
                     if (valuePair.Key == NetworkManager.Singleton.LocalClientId) // If this is the local player
                         readyButton.GetComponent<Image>().color = newColor;
                 }
@@ -495,11 +489,11 @@ namespace LightPat.UI
                 if (!valuePair.Value.ready)
                     everyoneIsReady = false;
 
-                // Set positions of all name icons
-                for (int i = 0; i < playerNamesParent.childCount; i++)
-                {
-                    playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
-                }
+                //// Set positions of all name icons
+                //for (int i = 0; i < playerNamesParent.childCount; i++)
+                //{
+                //    playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
+                //}
             }
 
             if (everyoneIsReady)
