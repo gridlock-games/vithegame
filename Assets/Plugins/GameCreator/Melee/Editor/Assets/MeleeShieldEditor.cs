@@ -29,8 +29,6 @@
 
         private SerializedProperty spPrefab;
         private SerializedProperty spAttachment;
-        private SerializedProperty spPositionOffset;
-        private SerializedProperty spRotationOffset;
 
         private SerializedProperty spDefenseState;
         private SerializedProperty spDefenseMask;
@@ -71,8 +69,6 @@
 
             this.spPrefab = this.serializedObject.FindProperty("prefab");
             this.spAttachment = this.serializedObject.FindProperty("attachment");
-            this.spPositionOffset = this.serializedObject.FindProperty("positionOffset");
-            this.spRotationOffset = this.serializedObject.FindProperty("rotationOffset");
 
             this.spDefenseState = this.serializedObject.FindProperty("defendState");
             this.spDefenseMask = this.serializedObject.FindProperty("defendMask");
@@ -153,11 +149,6 @@
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(this.spPrefab);
                     EditorGUILayout.PropertyField(this.spAttachment);
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(this.spPositionOffset);
-                    EditorGUILayout.PropertyField(this.spRotationOffset);
-
                     EditorGUILayout.EndVertical();
                 }
             }

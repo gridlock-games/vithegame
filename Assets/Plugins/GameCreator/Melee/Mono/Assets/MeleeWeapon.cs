@@ -49,13 +49,24 @@ namespace GameCreator.Melee
         public AvatarMask characterMask;
         public Sprite weaponImage;
 
+        [Serializable]
+        public class WeaponModelData
+        {
+            public LimbReferences skinPrefab;
+            public Data[] data;
+
+            [Serializable]
+            public class Data
+            {
+                public GameObject prefabWeapon;
+                public WeaponBone attachmentWeapon = WeaponBone.RightHand;
+                public Vector3 positionOffsetWeapon;
+                public Vector3 rotationOffsetWeapon;
+            }
+        }
 
         // 3d model:
-        public List<WeaponModel> weaponModels = new List<WeaponModel>();
-        public GameObject prefab;
-        public WeaponBone attachment = WeaponBone.RightHand;
-        public Vector3 positionOffset;
-        public Vector3 rotationOffset;
+        public List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
 
         // audio:
         public AudioClip audioSheathe;
@@ -63,14 +74,6 @@ namespace GameCreator.Melee
         public AudioClip audioImpactNormal;
         public AudioClip audioImpactKnockback;
         public AudioClip audioSwing;
-
-
-        // abilities
-        public Ability abilityA;
-        public Ability abilityB;
-        public Ability abilityC;
-        public Ability abilityD;
-        public Ability abilityRage;
 
         // reactions:
         public List<MeleeClip> groundHitReactionsFront = new List<MeleeClip>();
@@ -126,85 +129,50 @@ namespace GameCreator.Melee
         // PUBLIC METHODS: ------------------------------------------------------------------------
         public List<GameObject> EquipNewWeapon(CharacterAnimator character)
         {
-            if (weaponModels.Count == 0) return null;
-            var weaponObjectsList = (from item in weaponModels from obj in item.weaponModelDatas select obj).ToList();
+            List<GameObject> instances = new List<GameObject>();
 
-            var instances = new List<GameObject>();
-
-
-            //if (weaponObjectsList.Count == 0) return null;
-            if (character == null) return null;
-
-            foreach (var model in weaponObjectsList)
+            bool broken = false;
+            foreach (WeaponModelData data in weaponModelData)
             {
-                GameObject instance = Instantiate(model.prefabWeapon);
-                instances.Add(instance);
-                instance.transform.localScale = model.prefabWeapon.transform.localScale;
-
-                Transform bone = null;
-                switch (model.attachmentWeapon)
+                if (data.skinPrefab.name == character.GetComponentInChildren<LimbReferences>().name)
                 {
-                    case WeaponBone.Root:
-                        bone = character.transform;
-                        break;
+                    foreach (WeaponModelData.Data modelData in data.data)
+                    {
+                        GameObject instance = Instantiate(modelData.prefabWeapon);
+                        instances.Add(instance);
+                        instance.transform.localScale = modelData.prefabWeapon.transform.localScale;
 
-                    case WeaponBone.Camera:
-                        bone = HookCamera.Instance.transform;
-                        break;
+                        Transform bone = null;
+                        switch (modelData.attachmentWeapon)
+                        {
+                            case WeaponBone.Root:
+                                bone = character.transform;
+                                break;
+                            case WeaponBone.Camera:
+                                bone = HookCamera.Instance.transform;
+                                break;
+                            default:
+                                bone = character.animator.GetBoneTransform((HumanBodyBones)modelData.attachmentWeapon);
+                                break;
+                        }
 
-                    default:
-                        bone = character.animator.GetBoneTransform((HumanBodyBones)model.attachmentWeapon);
-                        break;
-
+                        instance.transform.SetParent(bone);
+                        instance.transform.localPosition = modelData.positionOffsetWeapon;
+                        instance.transform.localRotation = Quaternion.Euler(modelData.rotationOffsetWeapon);
+                    }
+                    broken = true;
+                    break;
                 }
+            }
 
-                if (!bone) return null;
-                if (instance != null)
-                {
-                    instance.transform.SetParent(bone);
-                    instance.transform.localPosition = model.positionOffsetWeapon;
-                    instance.transform.localRotation = Quaternion.Euler(model.rotationOffsetWeapon);
-                }
+            if (!broken)
+            {
+                Debug.LogError("Could not find a weapon model data element for this skin: " + character.GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
             return instances;
         }
-
-        public GameObject EquipWeapon(CharacterAnimator character)
-        {
-            if (this.prefab == null) return null;
-            if (character == null) return null;
-
-            Transform bone = null;
-            switch (this.attachment)
-            {
-                case WeaponBone.Root:
-                    bone = character.transform;
-                    break;
-
-                case WeaponBone.Camera:
-                    bone = HookCamera.Instance.transform;
-                    break;
-
-                default:
-                    bone = character.animator.GetBoneTransform((HumanBodyBones)this.attachment);
-                    break;
-
-            }
-
-            if (!bone) return null;
-
-            GameObject instance = Instantiate(this.prefab);
-            instance.transform.localScale = this.prefab.transform.localScale;
-
-            instance.transform.SetParent(bone);
-
-            instance.transform.localPosition = this.positionOffset;
-            instance.transform.localRotation = Quaternion.Euler(this.rotationOffset);
-
-            return instance;
-        }
-
+        
         public MeleeClip GetHitReaction(bool isGrounded, HitLocation location, bool isKnockback, bool isKnockup, bool isPulled)
         {
             int index = 0;

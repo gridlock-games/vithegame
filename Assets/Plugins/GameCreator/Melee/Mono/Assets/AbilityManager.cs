@@ -121,7 +121,7 @@ public class AbilityManager : NetworkBehaviour
 
         if (ability.meleeClip.attackType == MeleeClip.AttackType.Grab)
         {
-            int raycastDistance = 2;
+            float raycastDistance = ability.meleeClip.grabDistance;
             bool bHit = false;
             RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
@@ -151,7 +151,7 @@ public class AbilityManager : NetworkBehaviour
                     }
                 }
 
-                targetMelee.Character.Grab(melee.Character, 0.5f);
+                targetMelee.Character.Grab(melee.Character, ability.meleeClip.grabDuration);
                 break;
             }
 

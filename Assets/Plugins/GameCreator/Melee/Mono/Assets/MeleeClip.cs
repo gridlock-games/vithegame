@@ -99,6 +99,9 @@
         public bool isAttack = true;
         public bool isHeavy = false;
         public AttackType attackType = AttackType.None;
+        public float grabDistance = 1;
+        public float grabDuration = 0.5f;
+
         public bool isBlockable = true;
         public float pushForce = 50f;
 

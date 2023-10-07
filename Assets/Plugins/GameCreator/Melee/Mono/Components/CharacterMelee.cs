@@ -1397,9 +1397,6 @@ namespace GameCreator.Melee
 
             Character assailant = attacker.Character;
             CharacterMelee melee = this.Character.GetComponent<CharacterMelee>();
-            BladeComponent meleeWeapon = melee.Blades[0];
-            Character player = this.Character.GetComponent<PlayerCharacter>();
-
 
             // Please comment out instead of deleting this block
             #region Debug Results

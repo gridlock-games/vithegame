@@ -237,7 +237,7 @@ namespace GameCreator.Melee
             characterAnimator.animator.SetBool("IsAiming", isAimedDown);
 
             if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
-            characterAnimator.animator.SetFloat("AimAngle", aimAnglePercentage.Value);
+            characterAnimator.animator.SetFloat("AimAngle", 0); // aimAnglePercentage.Value
 
             if (isAimedDown)
             {

@@ -43,18 +43,6 @@
         private SerializedProperty spAvatarMask;
         private SerializedProperty spWeaponImage;
 
-        
-        private SerializedProperty spAbilityA;
-        private SerializedProperty spAbilityB;
-        private SerializedProperty spAbilityC;
-        private SerializedProperty spAbilityD;
-        private SerializedProperty spAbilityRage;
-
-        private SerializedProperty spPrefab;
-        private SerializedProperty spAttachment;
-        private SerializedProperty spPosition;
-        private SerializedProperty spRotation;
-
         private SerializedProperty spAudioSheathe;
         private SerializedProperty spAudioDraw;
         private SerializedProperty spAudioImpactNormal;
@@ -106,12 +94,12 @@
         public SerializedProperty spKnockbackF;
         public SerializedProperty spKnockupF;
         public SerializedProperty spStaggerF;
-
-        private SerializedProperty spWeaponModels;
         
+        private SerializedProperty spWeaponModelData;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        
+
 
         // INITIALIZER: ---------------------------------------------------------------------------
 
@@ -154,17 +142,6 @@
             this.spAvatarMask = this.serializedObject.FindProperty("characterMask");
             this.spWeaponImage = this.serializedObject.FindProperty("weaponImage");
 
-            this.spPrefab = this.serializedObject.FindProperty("prefab");
-            this.spAttachment = this.serializedObject.FindProperty("attachment");
-            this.spPosition = this.serializedObject.FindProperty("positionOffset");
-            this.spRotation = this.serializedObject.FindProperty("rotationOffset");
-
-            this.spAbilityA = this.serializedObject.FindProperty("abilityA");
-            this.spAbilityB = this.serializedObject.FindProperty("abilityB");
-            this.spAbilityC = this.serializedObject.FindProperty("abilityC");
-            this.spAbilityD = this.serializedObject.FindProperty("abilityD");
-            this.spAbilityRage = this.serializedObject.FindProperty("abilityRage");
-        
             this.spAudioSheathe = this.serializedObject.FindProperty("audioSheathe");
             this.spAudioSwing = this.serializedObject.FindProperty("audioSwing");
             this.spAudioDraw = this.serializedObject.FindProperty("audioDraw");
@@ -275,19 +252,7 @@
             this.comboList.drawElementBackgroundCallback += this.PaintCombo_ElementBg;
             this.comboList.drawElementCallback += this.PaintCombo_Element;
 
-            //weapon model
-             this.spWeaponModels = this.serializedObject.FindProperty("weaponModels");
-             //
-             // this.weaponModelsList = new ReorderableList(
-             //     this.serializedObject,
-             //     this.spWeaponModels,
-             //     true, true, true, true
-             // );
-             //
-             // this.weaponModelsList.drawHeaderCallback += this.PaintWeaponModel_Header;
-             // this.weaponModelsList.drawElementCallback += this.PaintWeaponModel_Element;
-            
-           
+            this.spWeaponModelData = this.serializedObject.FindProperty("weaponModelData");
         }
 
         // PAINT METHODS: -------------------------------------------------------------------------
@@ -300,17 +265,10 @@
             this.PaintSectionGeneral();
             
             EditorGUILayout.Space();
-            // this.weaponModelsList.DoLayoutList();
             EditorGUILayout.Space(5f);
 
             GUILayout.Space(SPACING);
-            this.PaintSectionModel();
-
-            GUILayout.Space(SPACING);
             this.PaintSectionEffects();
-
-            GUILayout.Space(SPACING);
-            this.PaintSectionAbilities();
 
             EditorGUILayout.Space();
             this.comboList.DoLayoutList();
@@ -380,46 +338,7 @@
                     EditorGUILayout.PropertyField(this.spAvatarMask);
                     EditorGUILayout.PropertyField(this.spWeaponImage);
 
-                    EditorGUILayout.PropertyField(this.spWeaponModels);
-                    EditorGUILayout.EndVertical();
-                }
-            }
-        }
-
-        private void PaintSectionModel()
-        {
-            this.sectionModel.PaintSection();
-            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionModel.state.faded))
-            {
-                if (group.visible)
-                {
-                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
-
-                    EditorGUILayout.PropertyField(this.spPrefab);
-                    EditorGUILayout.PropertyField(this.spAttachment);
-
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(this.spPosition);
-                    EditorGUILayout.PropertyField(this.spRotation);
-
-                    EditorGUILayout.EndVertical();
-                }
-            }
-        }
-
-        private void PaintSectionAbilities()
-        {
-            this.sectionAbilities.PaintSection();
-            using (var group = new EditorGUILayout.FadeGroupScope(this.sectionAbilities.state.faded)) {
-                if (group.visible)
-                {
-                    EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
-
-                    EditorGUILayout.PropertyField(this.spAbilityA);
-                    EditorGUILayout.PropertyField(this.spAbilityB);
-                    EditorGUILayout.PropertyField(this.spAbilityC);
-                    EditorGUILayout.PropertyField(this.spAbilityD);
-                    EditorGUILayout.PropertyField(this.spAbilityRage);
+                    EditorGUILayout.PropertyField(this.spWeaponModelData);
                     EditorGUILayout.EndVertical();
                 }
             }
@@ -704,25 +623,5 @@
             this.serializedObject.ApplyModifiedProperties();
             this.serializedObject.Update();
         }
-        
-        //Weapon model methods
-        
-        // private void PaintWeaponModel_Header(Rect rect)
-        // {
-        //     EditorGUI.LabelField(rect, "Weapon Model");
-        // }
-        //
-        // private void PaintWeaponModel_Element(Rect rect, int index, bool isActive, bool isFocused)
-        // {
-        //     rect = new Rect(
-        //         rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
-        //         rect.width, EditorGUIUtility.singleLineHeight
-        //     );
-        //
-        //     EditorGUI.PropertyField(
-        //         rect, this.spWeaponModels.GetArrayElementAtIndex(index),
-        //         GC_WM, true
-        //     );
-        // }
     }
 }
