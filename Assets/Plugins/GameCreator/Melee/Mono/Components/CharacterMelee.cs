@@ -367,6 +367,7 @@ namespace GameCreator.Melee
                 {
                     foreach (BladeComponent blade in this.Blades)
                     {
+                        Debug.Log(blade);
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         if (this.IsStaggered) return;
 
