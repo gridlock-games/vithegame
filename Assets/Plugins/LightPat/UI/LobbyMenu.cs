@@ -41,6 +41,7 @@ namespace LightPat.UI
         {
             StartCoroutine(iPManager.CheckAPI());
         }
+
         public void LeaveLobby()
         {
             if (leaveLobbyInProgress) { return; }
