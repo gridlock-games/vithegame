@@ -13,7 +13,8 @@ namespace LightPat.UI
     public class LobbyMenu : Menu
     {
         public GameObject playerNamePrefab;
-        public Transform playerNamesParent;
+        public Transform teammatePlayerIconsParent;
+        public Transform enemyPlayerIconsParent;
         public Vector3 iconSpacing;
         public GameObject startButton;
         public GameObject readyButton;
@@ -434,7 +435,12 @@ namespace LightPat.UI
                 Camera.main.transform.position = playerModel.transform.position + cameraPositionOffset;
 
             // Player names logic
-            foreach (Transform child in playerNamesParent)
+            foreach (Transform child in teammatePlayerIconsParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in enemyPlayerIconsParent)
             {
                 Destroy(child.gameObject);
             }
@@ -444,7 +450,17 @@ namespace LightPat.UI
                 everyoneIsReady = false;
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
-                GameObject nameIcon = Instantiate(playerNamePrefab, playerNamesParent);
+                Transform iconParent = enemyPlayerIconsParent;
+
+                if (enableTeams)
+                {
+                    if (ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team == valuePair.Value.team)
+                    {
+                        iconParent = teammatePlayerIconsParent;
+                    }
+                }
+                
+                GameObject nameIcon = Instantiate(playerNamePrefab, iconParent);
                 TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 nameText.SetText(valuePair.Value.clientName);
 
@@ -484,6 +500,11 @@ namespace LightPat.UI
                     nameIcon.transform.Find("CrownIcon").GetComponent<RawImage>().color = new Color(255, 255, 255, 255);
                 else
                     nameIcon.transform.Find("CrownIcon").GetComponent<RawImage>().color = new Color(255, 255, 255, 0);
+
+                if (nameIcon.transform.parent == teammatePlayerIconsParent)
+                {
+                    nameIcon.transform.Find("CharacterIcon").GetComponent<Image>().sprite = ClientManager.Singleton.GetPlayerModelOptions()[valuePair.Value.playerPrefabOptionIndex].characterImage;
+                }
 
                 // Enable start button if everyone is ready
                 if (!valuePair.Value.ready)
