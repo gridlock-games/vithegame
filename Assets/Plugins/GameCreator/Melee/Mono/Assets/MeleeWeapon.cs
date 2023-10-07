@@ -66,7 +66,6 @@ namespace GameCreator.Melee
         }
 
         // 3d model:
-        public List<WeaponModel> weaponModels = new List<WeaponModel>();
         public List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
 
         // audio:

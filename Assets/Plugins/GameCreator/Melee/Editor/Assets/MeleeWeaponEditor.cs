@@ -94,8 +94,7 @@
         public SerializedProperty spKnockbackF;
         public SerializedProperty spKnockupF;
         public SerializedProperty spStaggerF;
-
-        private SerializedProperty spWeaponModels;
+        
         private SerializedProperty spWeaponModelData;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -253,7 +252,6 @@
             this.comboList.drawElementBackgroundCallback += this.PaintCombo_ElementBg;
             this.comboList.drawElementCallback += this.PaintCombo_Element;
 
-            this.spWeaponModels = this.serializedObject.FindProperty("weaponModels");
             this.spWeaponModelData = this.serializedObject.FindProperty("weaponModelData");
         }
 
@@ -267,7 +265,6 @@
             this.PaintSectionGeneral();
             
             EditorGUILayout.Space();
-            // this.weaponModelsList.DoLayoutList();
             EditorGUILayout.Space(5f);
 
             GUILayout.Space(SPACING);
@@ -341,7 +338,6 @@
                     EditorGUILayout.PropertyField(this.spAvatarMask);
                     EditorGUILayout.PropertyField(this.spWeaponImage);
 
-                    EditorGUILayout.PropertyField(this.spWeaponModels);
                     EditorGUILayout.PropertyField(this.spWeaponModelData);
                     EditorGUILayout.EndVertical();
                 }
@@ -627,25 +623,5 @@
             this.serializedObject.ApplyModifiedProperties();
             this.serializedObject.Update();
         }
-        
-        //Weapon model methods
-        
-        // private void PaintWeaponModel_Header(Rect rect)
-        // {
-        //     EditorGUI.LabelField(rect, "Weapon Model");
-        // }
-        //
-        // private void PaintWeaponModel_Element(Rect rect, int index, bool isActive, bool isFocused)
-        // {
-        //     rect = new Rect(
-        //         rect.x, rect.y + (rect.height - EditorGUIUtility.singleLineHeight) / 2f,
-        //         rect.width, EditorGUIUtility.singleLineHeight
-        //     );
-        //
-        //     EditorGUI.PropertyField(
-        //         rect, this.spWeaponModels.GetArrayElementAtIndex(index),
-        //         GC_WM, true
-        //     );
-        // }
     }
 }
