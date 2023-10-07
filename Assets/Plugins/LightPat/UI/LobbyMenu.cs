@@ -452,13 +452,13 @@ namespace LightPat.UI
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 GameObject nameIcon = Instantiate(playerNamePrefab, playerNamesParent);
-                nameIcon.GetComponentInChildren<TextMeshProUGUI>().SetText(valuePair.Value.clientName);
+                nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().SetText(valuePair.Value.clientName);
 
                 // Enable switch teams button if we are the local client for that nameIcon
-                if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
-                    nameIcon.GetComponentInChildren<Button>().interactable = true;
-                else
-                    nameIcon.GetComponentInChildren<Button>().interactable = false;
+                //if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
+                //    nameIcon.transform.Find("TeamOutline").gameObject.SetActive(true);
+                //else
+                //    nameIcon.GetComponentInChildren<Button>().interactable = false;
 
                 // Set the color of the team button
                 Color teamColor = Color.black;
@@ -466,8 +466,8 @@ namespace LightPat.UI
                 if (clientTeam == Team.Red) { teamColor = Color.red; }
                 else if (clientTeam == Team.Blue) { teamColor = Color.blue; }
                 else if (clientTeam == Team.Spectator) { teamColor = Color.clear; }
-                nameIcon.GetComponentInChildren<Button>(true).GetComponent<Image>().color = teamColor;
-                nameIcon.GetComponentInChildren<Button>(true).gameObject.SetActive(enableTeams);
+                nameIcon.transform.Find("TeamOutline").GetComponent<Image>().color = teamColor;
+                nameIcon.transform.Find("TeamOutline").gameObject.SetActive(enableTeams);
 
                 // Change color of ready icon
                 if (valuePair.Value.ready)
