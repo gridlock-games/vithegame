@@ -151,7 +151,6 @@ namespace LightPat.UI
         public void UpdatePlayerModelChoice()
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
-            Debug.Log(playerModelDropdown.value);
             ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(NetworkManager.Singleton.LocalClientId, playerModelDropdown.value);
         }
 
