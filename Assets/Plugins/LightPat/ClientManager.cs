@@ -18,6 +18,7 @@ namespace LightPat.Core
         public class PlayerModelOption
         {
             public string name;
+            public string role;
             public string characterDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             public Sprite characterImage;
             public GameObject playerPrefab;
