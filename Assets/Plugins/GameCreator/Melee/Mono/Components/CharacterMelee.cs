@@ -440,12 +440,13 @@ namespace GameCreator.Melee
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
         }
 
-        public static bool CheckHitTeams(CharacterMelee melee, CharacterMelee targetMelee)
+        public static bool CheckHitTeams(ulong attackerClientId, ulong targetClientId)
         {
-            if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(melee.OwnerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetMelee.OwnerClientId))
+            // False means they are teaammates, true means they are enemies
+            if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(attackerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetClientId))
             {
-                Team attackerMeleeTeam = melee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(melee.OwnerClientId).team : Team.Environment;
-                Team targetMeleeTeam = targetMelee.NetworkObject.IsPlayerObject ? ClientManager.Singleton.GetClient(targetMelee.OwnerClientId).team : Team.Environment;
+                Team attackerMeleeTeam = ClientManager.Singleton.GetClient(attackerClientId).team;
+                Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetClientId).team;
 
                 if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
                 {

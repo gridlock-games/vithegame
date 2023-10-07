@@ -455,15 +455,18 @@ namespace LightPat.UI
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 Transform iconParent = enemyPlayerIconsParent;
-
-                if (enableTeams)
+                bool enemy;
+                if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
                 {
-                    if (ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team == valuePair.Value.team)
-                    {
-                        iconParent = teammatePlayerIconsParent;
-                    }
+                    enemy = false;
+                }
+                else
+                {
+                    enemy = GameCreator.Melee.CharacterMelee.CheckHitTeams(NetworkManager.Singleton.LocalClientId, valuePair.Key);
                 }
                 
+                iconParent = enemy ? enemyPlayerIconsParent : teammatePlayerIconsParent;
+
                 GameObject nameIcon = Instantiate(playerNamePrefab, iconParent);
                 TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 nameText.SetText(valuePair.Value.clientName);
