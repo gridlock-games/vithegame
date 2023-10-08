@@ -637,8 +637,6 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
-                            break;
-                        case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
