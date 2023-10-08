@@ -16,7 +16,6 @@ namespace GameCreator.Melee
         [SerializeField] private CharacterState ADSState;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
-        [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
         [SerializeField] private bool aimDuringAttackAnticipation = true;
@@ -282,11 +281,6 @@ namespace GameCreator.Melee
 
             if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
             characterAnimator.animator.SetFloat("AimAngle", 0); // aimAnglePercentage.Value
-
-            if (isAimedDown)
-            {
-                limbReferences.transform.localRotation = Quaternion.Slerp(limbReferences.transform.localRotation, Quaternion.Euler(ADSModelRotation), Time.deltaTime * 10);
-            }
         }
 
         private void OnDrawGizmos()
