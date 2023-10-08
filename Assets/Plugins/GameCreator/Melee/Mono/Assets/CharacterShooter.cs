@@ -10,6 +10,7 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
+        [SerializeField] private CharacterState ADSState;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
         [SerializeField] private Vector3 ADSModelRotation;
@@ -80,6 +81,7 @@ namespace GameCreator.Melee
 
         public override void OnNetworkSpawn()
         {
+            isAimedDown.OnValueChanged += OnAimChange;
             if (IsOwner)
             {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
@@ -91,6 +93,33 @@ namespace GameCreator.Melee
             else
             {
                 Destroy(ADSCamera.gameObject);
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            isAimedDown.OnValueChanged -= OnAimChange;
+        }
+
+        private void OnAimChange(bool prev, bool current)
+        {
+            if (current)
+            {
+                melee.ChangeState(
+                    ADSState,
+                    melee.currentWeapon.characterMask,
+                    MeleeWeapon.LAYER_STANCE,
+                    melee.GetComponent<CharacterAnimator>()
+                );
+            }
+            else
+            {
+                melee.ChangeState(
+                    melee.currentWeapon.characterState,
+                    melee.currentWeapon.characterMask,
+                    MeleeWeapon.LAYER_STANCE,
+                    melee.GetComponent<CharacterAnimator>()
+                );
             }
         }
 
@@ -147,7 +176,6 @@ namespace GameCreator.Melee
 
             if (melee.IsAttacking & !isAimedDown.Value)
             {
-                Debug.Log(Time.time);
                 handIK.AimRightHand(aimPoint.Value,
                     shooterWeapon.GetAimOffset(),
                     true,

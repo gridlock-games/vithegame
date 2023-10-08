@@ -1747,7 +1747,7 @@ namespace GameCreator.Melee
                 //     animator.ResetControllerTopology(state.GetRuntimeAnimatorController(), true);
                 // }
             }
-
+            Debug.Log(state);
             return time;
         }
 
