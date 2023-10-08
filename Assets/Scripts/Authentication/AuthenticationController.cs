@@ -22,7 +22,6 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private Text displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
 
-
     ClientManager clientManager = new ClientManager();
     IPManager iPManager = new IPManager();
     private Color startGameColor;
@@ -33,6 +32,7 @@ public class AuthenticationController : MonoBehaviour
     {
         StartCoroutine(iPManager.CheckAPI());
     }
+
     private void Start()
     {
         datamanager = DataManager.Instance;
@@ -81,21 +81,30 @@ public class AuthenticationController : MonoBehaviour
 
                 if (signedIn)
                 {
-                    // btn_SignIn.GetComponent<Button>().interactable = false;
                     btn_SignIn.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
-                    btn_StartGame.GetComponent<Button>().interactable = true;
-                    btn_StartGame.GetComponent<Image>().color = startGameColor;
                     displayNameInput.enabled = true;
-                    // displayNameInput.GetComponent<Image>().color = displayNameColor;
-                    infoDisplayText.SetText("Provide your IGN and click on play to start");
+                    btn_StartGame.GetComponent<Image>().color = startGameColor;
+                    if (displayNameInput.text.Length > 10)
+                    {
+                        btn_StartGame.GetComponent<Button>().interactable = false;
+                        infoDisplayText.SetText("Name cannot exceed 10 characters");
+                    }
+                    else if (displayNameInput.text.Length == 0)
+                    {
+                        btn_StartGame.GetComponent<Button>().interactable = false;
+                        infoDisplayText.SetText("Name cannot be empty");
+                    }
+                    else
+                    {
+                        btn_StartGame.GetComponent<Button>().interactable = true;
+                        infoDisplayText.SetText("Click on play to start");
+                    }
                 }
                 else
                 {
-                    // btn_SignIn.GetComponent<Button>().interactable = true;
                     btn_StartGame.GetComponent<Button>().interactable = false;
                     btn_StartGame.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
                     displayNameInput.enabled = false;
-                    // displayNameInput.GetComponent<Image>().color = new Color(192f / 255f, 192f / 255f, 192f / 255f);
                     infoDisplayText.SetText("Sign-in with Google to start");
                 }
 

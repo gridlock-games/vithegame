@@ -15,7 +15,7 @@ namespace LightPat.UI
         public GameObject playerNamePrefab;
         public Transform teammatePlayerIconsParent;
         public Transform enemyPlayerIconsParent;
-        public Vector3 iconSpacing;
+        public Sprite placeholderCharacterIcon;
         public GameObject startButton;
         public GameObject readyButton;
         public TMP_Dropdown changeTeamDropdown;
@@ -249,10 +249,14 @@ namespace LightPat.UI
                 mapSelectDropdown.interactable = false;
             }
 
-            //if (playerModelDropdown.value != ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex)
-            //{
-            //    UpdatePlayerDisplay();
-            //}
+            if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId))
+            {
+                WeaponType weaponType = ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab.GetComponent<GameCreator.Melee.SwitchMelee>().GetCurrentWeaponType();
+                if (playerModel.GetComponent<GameCreator.Melee.SwitchMelee>().GetCurrentWeaponType() != weaponType)
+                {
+                    UpdatePlayerDisplay();
+                }
+            }
 
             // Set game mode dropdown
             if (gameModeDropdown.options[gameModeDropdown.value].text != ClientManager.Singleton.gameMode.Value.ToString())
@@ -451,15 +455,18 @@ namespace LightPat.UI
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 Transform iconParent = enemyPlayerIconsParent;
-
-                if (enableTeams)
+                bool enemy;
+                if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
                 {
-                    if (ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team == valuePair.Value.team)
-                    {
-                        iconParent = teammatePlayerIconsParent;
-                    }
+                    enemy = false;
+                }
+                else
+                {
+                    enemy = GameCreator.Melee.CharacterMelee.CheckHitTeams(NetworkManager.Singleton.LocalClientId, valuePair.Key);
                 }
                 
+                iconParent = enemy ? enemyPlayerIconsParent : teammatePlayerIconsParent;
+
                 GameObject nameIcon = Instantiate(playerNamePrefab, iconParent);
                 TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 nameText.SetText(valuePair.Value.clientName);
@@ -505,16 +512,14 @@ namespace LightPat.UI
                 {
                     nameIcon.transform.Find("CharacterIcon").GetComponent<Image>().sprite = ClientManager.Singleton.GetPlayerModelOptions()[valuePair.Value.playerPrefabOptionIndex].characterImage;
                 }
+                else
+                {
+                    nameIcon.transform.Find("CharacterIcon").GetComponent<Image>().sprite = placeholderCharacterIcon;
+                }
 
                 // Enable start button if everyone is ready
                 if (!valuePair.Value.ready)
                     everyoneIsReady = false;
-
-                //// Set positions of all name icons
-                //for (int i = 0; i < playerNamesParent.childCount; i++)
-                //{
-                //    playerNamesParent.GetChild(i).localPosition = new Vector3(iconSpacing.x, -(i + 1) * iconSpacing.y, 0);
-                //}
             }
 
             if (everyoneIsReady)

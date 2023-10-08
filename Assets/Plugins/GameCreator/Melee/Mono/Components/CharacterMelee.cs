@@ -367,7 +367,6 @@ namespace GameCreator.Melee
                 {
                     foreach (BladeComponent blade in this.Blades)
                     {
-                        Debug.Log(blade);
                         if (!this.currentMeleeClip.affectedBones.Contains(blade.weaponBone)) continue;
                         if (this.IsStaggered) return;
 
@@ -438,6 +437,27 @@ namespace GameCreator.Melee
         {
             List<HitResult> hitResults = ProcessAttackedObjects(attackerMelee, impactPosition, new GameObject[] { targetMelee.gameObject }, attack, true, healTeammatesPercentage);
             return hitResults.Count > 0 ? hitResults[0] : HitResult.Ignore;
+        }
+
+        public static bool CheckHitTeams(ulong attackerClientId, ulong targetClientId)
+        {
+            // False means they are teaammates, true means they are enemies
+            if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(attackerClientId) & ClientManager.Singleton.GetClientDataDictionary().ContainsKey(targetClientId))
+            {
+                Team attackerMeleeTeam = ClientManager.Singleton.GetClient(attackerClientId).team;
+                Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetClientId).team;
+
+                if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                {
+                    // If the attacker's team is the same as the victim's team, do not register this hit
+                    if (attackerMeleeTeam == targetMeleeTeam)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private List<HitResult> ProcessAttackedObjects(CharacterMelee melee, Vector3 impactPosition, GameObject[] hits, MeleeClip attack, bool projectileHit, float healTeammatesPercentage)

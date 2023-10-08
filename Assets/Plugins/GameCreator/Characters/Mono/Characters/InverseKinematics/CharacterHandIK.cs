@@ -154,7 +154,8 @@ namespace GameCreator.Characters
         private bool aimLeftHand;
         private Vector3 leftHandPosition;
         private Quaternion leftHandRotation;
-        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, bool aimLeftHand, Vector3 leftHandPosition, Quaternion leftHandRotation)
+        private CharacterShooter shooter;
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, bool aimLeftHand, Vector3 leftHandPosition, Quaternion leftHandRotation, CharacterShooter shooter)
         {
             this.aimPoint = aimPoint;
             aimOffset = IKOffset;
@@ -163,6 +164,7 @@ namespace GameCreator.Characters
             this.aimLeftHand = aimLeftHand;
             this.leftHandPosition = leftHandPosition;
             this.leftHandRotation = leftHandRotation;
+            this.shooter = shooter;
         }
 
         public bool IsRightHandAiming()
@@ -222,8 +224,8 @@ namespace GameCreator.Characters
 
             if (activateAim)
             {
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandPosition);
-                animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandRotation);
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position + aimRotation * shooter.leftHandPosOffset);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, aimRotation * Quaternion.Euler(shooter.leftHandRotOffset));
             }
             float leftHandAimWeight = aimLeftHand & activateAim ? 1 : 0;
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, leftHandAimWeight);

@@ -10,12 +10,12 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
-        [SerializeField] private int clipSize;
-        [SerializeField] private int magCapacity;
-        [SerializeField] private float reloadTime;
+        public Vector3 leftHandPosOffset;
+        public Vector3 leftHandRotOffset;
+
+        [SerializeField] private CharacterState ADSState;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
-        [SerializeField] private Vector3 ADSModelRotation;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
         [SerializeField] private bool aimDuringAttackAnticipation = true;
@@ -83,6 +83,7 @@ namespace GameCreator.Melee
 
         public override void OnNetworkSpawn()
         {
+            isAimedDown.OnValueChanged += OnAimChange;
             if (IsOwner)
             {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
@@ -94,6 +95,33 @@ namespace GameCreator.Melee
             else
             {
                 Destroy(ADSCamera.gameObject);
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            isAimedDown.OnValueChanged -= OnAimChange;
+        }
+
+        private void OnAimChange(bool prev, bool current)
+        {
+            if (current)
+            {
+                melee.ChangeState(
+                    ADSState,
+                    melee.currentWeapon.characterMask,
+                    MeleeWeapon.LAYER_STANCE,
+                    melee.GetComponent<CharacterAnimator>()
+                );
+            }
+            else
+            {
+                melee.ChangeState(
+                    melee.currentWeapon.characterState,
+                    melee.currentWeapon.characterMask,
+                    MeleeWeapon.LAYER_STANCE,
+                    melee.GetComponent<CharacterAnimator>()
+                );
             }
         }
 
@@ -141,19 +169,34 @@ namespace GameCreator.Melee
                 if (!bHit)
                     aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
 
+                aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
                 this.aimPoint.Value = aimPoint;
             }
 
             PerformAimDownSight(isAimedDown.Value);
             Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
             Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
-
-            handIK.AimRightHand(aimPoint.Value,
-                shooterWeapon.GetAimOffset(),
-                aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
-                shooterWeapon.GetLeftHandTarget(),
-                leftHandPos,
-                leftHandRot);
+            
+            if (melee.IsAttacking & !isAimedDown.Value)
+            {
+                handIK.AimRightHand(aimPoint.Value,
+                    shooterWeapon.GetAimOffset(),
+                    true,
+                    false,
+                    leftHandPos,
+                    leftHandRot,
+                    this);
+            }
+            else
+            {
+                handIK.AimRightHand(aimPoint.Value,
+                   shooterWeapon.GetAimOffset(),
+                   aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
+                   shooterWeapon.GetLeftHandTarget(),
+                   leftHandPos,
+                   leftHandRot,
+                   this);
+            }
         }
 
         [SerializeField] private float maxADSPitch = 90;
@@ -238,11 +281,6 @@ namespace GameCreator.Melee
 
             if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
             characterAnimator.animator.SetFloat("AimAngle", 0); // aimAnglePercentage.Value
-
-            if (isAimedDown)
-            {
-                limbReferences.transform.localRotation = Quaternion.Slerp(limbReferences.transform.localRotation, Quaternion.Euler(ADSModelRotation), Time.deltaTime * 10);
-            }
         }
 
         private void OnDrawGizmos()
