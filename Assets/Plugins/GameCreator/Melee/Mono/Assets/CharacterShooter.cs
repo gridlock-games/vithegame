@@ -10,9 +10,6 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
-        [SerializeField] private int clipSize;
-        [SerializeField] private int magCapacity;
-        [SerializeField] private float reloadTime;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
         [SerializeField] private Vector3 ADSModelRotation;
@@ -148,12 +145,25 @@ namespace GameCreator.Melee
             Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
             Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
 
-            handIK.AimRightHand(aimPoint.Value,
-                shooterWeapon.GetAimOffset(),
-                aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
-                shooterWeapon.GetLeftHandTarget(),
-                leftHandPos,
-                leftHandRot);
+            if (melee.IsAttacking & !isAimedDown.Value)
+            {
+                Debug.Log(Time.time);
+                handIK.AimRightHand(aimPoint.Value,
+                    shooterWeapon.GetAimOffset(),
+                    true,
+                    false,
+                    leftHandPos,
+                    leftHandRot);
+            }
+            else
+            {
+                handIK.AimRightHand(aimPoint.Value,
+                   shooterWeapon.GetAimOffset(),
+                   aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
+                   shooterWeapon.GetLeftHandTarget(),
+                   leftHandPos,
+                   leftHandRot);
+            }
         }
 
         [SerializeField] private float maxADSPitch = 90;
