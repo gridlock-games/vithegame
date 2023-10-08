@@ -10,6 +10,9 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
+        public Vector3 leftHandPosOffset;
+        public Vector3 leftHandRotOffset;
+
         [SerializeField] private CharacterState ADSState;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
@@ -167,13 +170,14 @@ namespace GameCreator.Melee
                 if (!bHit)
                     aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
 
+                aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
                 this.aimPoint.Value = aimPoint;
             }
 
             PerformAimDownSight(isAimedDown.Value);
             Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
             Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
-
+            
             if (melee.IsAttacking & !isAimedDown.Value)
             {
                 handIK.AimRightHand(aimPoint.Value,
@@ -181,7 +185,8 @@ namespace GameCreator.Melee
                     true,
                     false,
                     leftHandPos,
-                    leftHandRot);
+                    leftHandRot,
+                    this);
             }
             else
             {
@@ -190,7 +195,8 @@ namespace GameCreator.Melee
                    aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
                    shooterWeapon.GetLeftHandTarget(),
                    leftHandPos,
-                   leftHandRot);
+                   leftHandRot,
+                   this);
             }
         }
 
