@@ -642,7 +642,7 @@ namespace GameCreator.Melee
                             {
                                 targetMelee.Character.CancelAilment();
                             }
-                        break;
+                            break;
                     }
                 }
 
