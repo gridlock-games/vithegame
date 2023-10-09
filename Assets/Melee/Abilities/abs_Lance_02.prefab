@@ -51,6 +51,15 @@ MonoBehaviour:
   dodgeLockOnhase: 0
   coolDown: 7
   staminaCost: 15
+  hpCost: 0
+  rageCost: 0
   skillKey: 101
-  canCncelAnimationType: 2
+  canCncelAnimationType: 1
   canCancelAnimation: 0
+  actionsOnExecute: {fileID: 0}
+  actionOnActivate: {fileID: 0}
+  actionsOnHit: {fileID: 0}
+  aimDuringAttackAnticipation: 0
+  aimDuringAttack: 1
+  aimDuringAttackRecovery: 0
+  aimLeftHand: 0
