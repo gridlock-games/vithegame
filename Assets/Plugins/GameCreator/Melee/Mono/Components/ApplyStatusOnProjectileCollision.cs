@@ -28,7 +28,8 @@ namespace GameCreator.Melee
                 case TargetType.AllPlayers:
                     break;
                 case TargetType.SameTeam:
-                    // If the attacker's team is NOT the same as the victim's team, do not register this hit
+                    if (attackerMeleeTeam == Team.Competitor | targetMeleeTeam == Team.Competitor) { return; }
+                    // If the attacker's team is not the same as the victim's team, do not register this hit
                     if (attackerMeleeTeam != targetMeleeTeam) { return; }
                     break;
                 case TargetType.Enemies:
