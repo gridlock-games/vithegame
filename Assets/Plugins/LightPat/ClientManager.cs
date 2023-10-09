@@ -629,6 +629,13 @@ namespace LightPat.Core
             SynchronizeClientDictionaries();
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        public void ChangePlayerSkinOptionServerRpc(ulong clientId, int newSkinIndex)
+        {
+            clientDataDictionary[clientId] = clientDataDictionary[clientId].ChangePlayerSkinOption(newSkinIndex);
+            SynchronizeClientDictionaries();
+        }
+
         public void ChangeTeamOnServer(ulong clientId, Team newTeam)
         {
             if (!IsServer) { Debug.LogError("ChangeTeamOnServer() should only be called on the server."); return; }
@@ -798,6 +805,7 @@ namespace LightPat.Core
         {
             ClientData copy = this;
             copy.playerPrefabOptionIndex = newOption;
+            copy.skinIndex = 0;
             return copy;
         }
 
