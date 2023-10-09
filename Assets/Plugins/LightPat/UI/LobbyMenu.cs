@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.Networking;
+using GameCreator.Melee;
 
 namespace LightPat.UI
 {
@@ -149,6 +150,31 @@ namespace LightPat.UI
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
             ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(NetworkManager.Singleton.LocalClientId, playerModelDropdown.value);
+            skinIndex = -1;
+        }
+
+        int skinIndex = -1;
+        public void ChangeSkin()
+        {
+            if (!NetworkManager.Singleton.IsClient) { return; }
+
+            GameObject[] skinArray = new GameObject[0];
+            var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
+            for (int i = 0; i < playerModelOptions.Length; i++)
+            {
+                if (playerModelOptions[i].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType() == playerModel.GetComponent<SwitchMelee>().GetCurrentWeaponType())
+                {
+                    skinArray = playerModelOptions[i].skinOptions;
+                    break;
+                }
+            }
+
+            skinIndex += 1;
+            if (skinIndex > skinArray.Length - 1) { skinIndex = 0; }
+
+            playerModel.GetComponent<GameCreator.Characters.CharacterAnimator>().ChangeModel(skinArray[skinIndex]);
+
+            ClientManager.Singleton.ChangePlayerSkinOptionServerRpc(NetworkManager.Singleton.LocalClientId, skinIndex);
         }
 
         public void UpdatePlayerDisplay()
@@ -159,7 +185,7 @@ namespace LightPat.UI
                 Destroy(playerModel);
 
             playerModel = Instantiate(ClientManager.Singleton.GetPlayerModelOptions()[playerModelDropdown.value].playerPrefab);
-            playerModel.GetComponent<GameCreator.Melee.CharacterMelee>().enabled = false;
+            playerModel.GetComponent<CharacterMelee>().enabled = false;
             playerModel.GetComponent<Player.NetworkPlayer>().ChangeSkinWithoutSpawn(NetworkManager.Singleton.LocalClientId);
         }
 
@@ -251,8 +277,8 @@ namespace LightPat.UI
 
             if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId))
             {
-                WeaponType weaponType = ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab.GetComponent<GameCreator.Melee.SwitchMelee>().GetCurrentWeaponType();
-                if (playerModel.GetComponent<GameCreator.Melee.SwitchMelee>().GetCurrentWeaponType() != weaponType)
+                WeaponType weaponType = ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType();
+                if (playerModel.GetComponent<SwitchMelee>().GetCurrentWeaponType() != weaponType)
                 {
                     UpdatePlayerDisplay();
                 }
@@ -462,7 +488,7 @@ namespace LightPat.UI
                 }
                 else
                 {
-                    enemy = GameCreator.Melee.CharacterMelee.CheckHitTeams(NetworkManager.Singleton.LocalClientId, valuePair.Key);
+                    enemy = CharacterMelee.CheckHitTeams(NetworkManager.Singleton.LocalClientId, valuePair.Key);
                 }
                 
                 iconParent = enemy ? enemyPlayerIconsParent : teammatePlayerIconsParent;
