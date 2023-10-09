@@ -8,12 +8,14 @@ using GameCreator.Melee;
 using GameCreator.Core;
 using Unity.Netcode;
 
-public class ClipVFX: MonoBehaviour {
+public class ClipVFX : MonoBehaviour
+{
     public enum ATTACHMENT_TYPE
     {
         AttachSelf,
         AttachTarget,
-        DetachedSelf
+        DetachedSelf,
+        Projectile
     }
 
     public TargetGameObject abilityVFX = new TargetGameObject();

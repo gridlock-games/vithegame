@@ -22,6 +22,8 @@ namespace GameCreator.Melee
             proj.NetworkObject.Spawn();
         }
 
+        public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
+
         public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 
         private void OnDrawGizmos()
