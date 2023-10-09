@@ -275,6 +275,8 @@ namespace LightPat.UI
                 mapSelectDropdown.interactable = false;
             }
 
+            Debug.Log(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).skinIndex);
+
             if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId))
             {
                 WeaponType weaponType = ClientManager.Singleton.GetPlayerModelOptions()[ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).playerPrefabOptionIndex].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType();
