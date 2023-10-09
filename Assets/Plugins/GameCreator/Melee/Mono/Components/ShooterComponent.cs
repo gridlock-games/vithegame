@@ -24,8 +24,6 @@ namespace GameCreator.Melee
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
 
-        public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
-
         private void OnDrawGizmos()
         {
             Gizmos.color = GIZMOS_DEFAULT_COLOR;

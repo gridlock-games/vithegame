@@ -219,7 +219,7 @@ namespace GameCreator.Melee
             shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
 
             handIK.AimRightHand(aimPoint.Value,
-                   shooterWeapon.GetAimOffset(),
+                   Quaternion.Euler(limbReferences.rightHandAimIKOffset),
                    shouldAim,
                    shouldAimLeftHand,
                    this);
