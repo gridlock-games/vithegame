@@ -184,14 +184,45 @@
 
                 GameObject abilityVFXPrefab = vfx.abilityVFX.GetGameObject(character.gameObject);
 
-                Vector3 vfxPositionOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxPositionOffset;
-                Vector3 vfxRotationOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ?  new Vector3(0, 0, 0) : vfx.vfxRotationOffset;
+                Vector3 vfxPositionOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? new Vector3(0, 0, 0) : vfx.vfxPositionOffset;
+                Vector3 vfxRotationOffset = vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? new Vector3(0, 0, 0) : vfx.vfxRotationOffset;
 
-                GameObject abilityVFXInstance = Instantiate(abilityVFXPrefab,
-                    character.transform.position + character.transform.rotation * vfxPositionOffset,
-                    character.transform.rotation * Quaternion.Euler(vfxRotationOffset),
-                    vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf ? character.transform : null
+                Transform parent = null;
+                if (vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.AttachSelf)
+                {
+                    parent = character.transform;
+                }
+                else if (vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.Projectile)
+                {
+                    ShooterComponent shooter = character.GetComponentInChildren<ShooterComponent>();
+
+                    if (shooter)
+                    {
+                        parent = shooter.GetProjectileSpawnPoint();
+                    }
+                    else
+                    {
+                        Debug.LogError(vfx + " has attachment type set to " + vfx.attachmentType + " but can't find a ShooterComponent to base off of");
+                    }
+                }
+
+                GameObject abilityVFXInstance = null;
+                if (parent)
+                {
+                    abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                        parent.position + parent.rotation * vfxPositionOffset,
+                        parent.rotation * Quaternion.Euler(vfxRotationOffset),
+                        vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.Projectile ? null : parent
                     );
+                }
+                else
+                {
+                    abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                        character.transform.position + character.transform.rotation * vfxPositionOffset,
+                        character.transform.rotation * Quaternion.Euler(vfxRotationOffset),
+                        parent
+                    );
+                }
 
                 if (abilityVFXInstance.TryGetComponent(out ParticleSystemProjectile dmg))
                 {
@@ -306,7 +337,7 @@
                     selectedTransitionIn, selectedTransitionOut
                 );
 
-                melee.StartCoroutine(DashValueRoutine(melee, false, animationClip.length ));
+                melee.StartCoroutine(DashValueRoutine(melee, false, animationClip.length));
             }
             else
             {
@@ -344,7 +375,7 @@
         public void ExecuteHitPause()
         {
             if (!this.hitPause) return;
-            
+
             TimeManager.Instance.SetTimeScale(this.hitPauseAmount, HITPAUSE_TIME_LAYER);
             CoroutinesManager.Instance.StartCoroutine(this.ExecuteHitPause(
                 this.hitPauseDuration
@@ -431,8 +462,8 @@
         private IEnumerator DashValueRoutine(CharacterMelee melee, bool value, float duration)
         {
             yield return new WaitForSeconds(duration * 0.90f);
-            
-           melee.Character.SetCharacterDashing(false);
+
+            melee.Character.SetCharacterDashing(false);
         }
 
         private IEnumerator ExecuteHitPause(float duration)

@@ -152,19 +152,20 @@ namespace GameCreator.Characters
         private Quaternion aimOffset;
         private bool activateAim;
         private bool aimLeftHand;
-        private Vector3 leftHandPosition;
-        private Quaternion leftHandRotation;
         private CharacterShooter shooter;
-        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, bool aimLeftHand, Vector3 leftHandPosition, Quaternion leftHandRotation, CharacterShooter shooter)
+        public void AimRightHand(Vector3 aimPoint, Quaternion IKOffset, bool activateAim, bool aimLeftHand, CharacterShooter shooter)
         {
             this.aimPoint = aimPoint;
             aimOffset = IKOffset;
             this.activateAim = activateAim;
-
             this.aimLeftHand = aimLeftHand;
-            this.leftHandPosition = leftHandPosition;
-            this.leftHandRotation = leftHandRotation;
             this.shooter = shooter;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(aimPoint, 0.25f);
         }
 
         public bool IsRightHandAiming()

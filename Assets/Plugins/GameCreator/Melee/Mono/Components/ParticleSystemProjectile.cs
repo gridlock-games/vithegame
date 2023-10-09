@@ -77,16 +77,19 @@ namespace GameCreator.Melee
                             if (hitCounter[targetMelee] >= maxHits) { continue; }
                         }
                         
-                        CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack, 0);
-                        if (hitResult != CharacterMelee.HitResult.Ignore)
+                        if (maxHits > 0)
                         {
-                            if (hitCounterContainsMelee)
+                            CharacterMelee.HitResult hitResult = attacker.ProcessProjectileHit(attacker, targetMelee, transform.TransformPoint(enter[i].position), attack, 0);
+                            if (hitResult != CharacterMelee.HitResult.Ignore)
                             {
-                                hitCounter[targetMelee] += 1;
-                            }
-                            else
-                            {
-                                hitCounter.Add(targetMelee, 1);
+                                if (hitCounterContainsMelee)
+                                {
+                                    hitCounter[targetMelee] += 1;
+                                }
+                                else
+                                {
+                                    hitCounter.Add(targetMelee, 1);
+                                }
                             }
                         }
 

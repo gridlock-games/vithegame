@@ -21,7 +21,7 @@ public class AbilityManager : NetworkBehaviour
     private CharacterMelee melee;
     private List<Ability> abilityInstances = new List<Ability>();
 
-    private Ability activatedAbility;
+    private NetworkVariable<int> activatedAbilityIndex = new NetworkVariable<int>();
 
     private NetworkList<bool> abilitiesOnCooldown;
 
@@ -161,17 +161,17 @@ public class AbilityManager : NetworkBehaviour
         
         if (ability != null && melee != null)
         {
-            activatedAbility = ability;
+            activatedAbilityIndex.Value = abilityInstances.IndexOf(ability);
             melee.RevertAbilityCastingStatus();
-            melee.AddPoise(-1 * activatedAbility.staminaCost);
-            melee.AddHP(-1 * activatedAbility.hpCost);
-            melee.AddRage(-1 * activatedAbility.rageCost);
-            activatedAbility.ExecuteAbility(melee, key);
+            melee.AddPoise(-1 * ability.staminaCost);
+            melee.AddHP(-1 * ability.hpCost);
+            melee.AddRage(-1 * ability.rageCost);
+            ability.ExecuteAbility(melee, key);
         }
     }
 
     public Ability GetActivatedAbility()
     {
-        return activatedAbility;
+        return abilityInstances[activatedAbilityIndex.Value];
     }
 }

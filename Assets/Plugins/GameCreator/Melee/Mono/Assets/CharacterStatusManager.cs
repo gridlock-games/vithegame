@@ -144,6 +144,8 @@ public class CharacterStatusManager : NetworkBehaviour
     {
         if (IsOwner) { meleeUI.UpdateStatusUI(); }
 
+        Debug.Log(this + " " + networkListEvent.Type + " " + networkListEvent.Value.charStatus);
+
         if (!IsServer) { return; }
 
         if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Add | networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Value)

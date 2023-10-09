@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillImageFill: {fileID: 21300000, guid: 3c7ccecc924911c4984c92e07104862c, type: 3}
   weaponBind: 9
-  meleeClip: {fileID: 11400000, guid: 7e17b939af1b13d4cbfbd1dd1f0b4c03, type: 2}
+  meleeClip: {fileID: 11400000, guid: 1877ad141f7964d65b4877c4ac4abb68, type: 2}
   abilityType: 0
   dodgeLockOnhase: 1
   coolDown: 5
@@ -59,3 +59,7 @@ MonoBehaviour:
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
+  aimDuringAttackAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringAttackRecovery: 0
+  aimLeftHand: 0

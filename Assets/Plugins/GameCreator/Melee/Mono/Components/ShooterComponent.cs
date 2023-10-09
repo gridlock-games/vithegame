@@ -6,7 +6,7 @@ namespace GameCreator.Melee
     public class ShooterComponent : MonoBehaviour
     {
         private static readonly Color GIZMOS_DEFAULT_COLOR = Color.yellow;
-        [SerializeField] private Transform leftHandTarget;
+
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Vector3 projectilePositionOffset;
         [SerializeField] private Projectile projectilePrefab;
@@ -22,7 +22,7 @@ namespace GameCreator.Melee
             proj.NetworkObject.Spawn();
         }
 
-        public Transform GetLeftHandTarget() { return leftHandTarget; }
+        public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
 
         public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 
