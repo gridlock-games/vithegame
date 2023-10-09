@@ -192,21 +192,8 @@ namespace GameCreator.Characters
             Vector3 forward = Vector3.forward;
             if (TryGetComponent(out LimbReferences limbReferences))
             {
-                switch (limbReferences.rightHandAimAxis)
-                {
-                    case LimbReferences.Axis.X:
-                        up = Vector3.right;
-                        forward = Vector3.up;
-                        break;
-                    case LimbReferences.Axis.Y:
-                        up = Vector3.up;
-                        Debug.LogError("Please assign a forward direction!");
-                        break;
-                    case LimbReferences.Axis.Z:
-                        up = Vector3.forward;
-                        Debug.LogError("Please assign a forward direction!");
-                        break;
-                }
+                up = limbReferences.rightHandAimUpDir;
+                forward = limbReferences.rightHandAimForwardDir;
             }
 
             //find the desired up direction
