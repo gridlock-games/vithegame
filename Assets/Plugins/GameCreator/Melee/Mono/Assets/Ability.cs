@@ -53,6 +53,11 @@ public class Ability : MonoBehaviour
     public IActionsList actionOnActivate;
     public IActionsList actionsOnHit;
 
+    [Header("Shooter characters only")]
+    public bool aimDuringAttackAnticipation;
+    public bool aimDuringAttackRecovery;
+    public bool aimLeftHand;
+
     public bool isOnCoolDownLocally { get; private set; }
 
     public void ResetAbility()

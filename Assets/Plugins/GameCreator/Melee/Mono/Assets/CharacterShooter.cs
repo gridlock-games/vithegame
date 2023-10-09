@@ -18,6 +18,7 @@ namespace GameCreator.Melee
         [SerializeField] private float ADSRunSpeed = 3;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
+        [SerializeField] private bool aimLeftHand = true;
         [SerializeField] private bool aimDuringAttackAnticipation = true;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -40,6 +41,9 @@ namespace GameCreator.Melee
 
             if (shootCount >= attackClip.hitCount) { return; }
             if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return; }
+
+            if (!handIK.IsRightHandAiming())
+                Debug.LogError(Time.time + " " + handIK.IsRightHandAiming());
 
             if (aimDuringAttackAnticipation)
             {
@@ -153,50 +157,72 @@ namespace GameCreator.Melee
                     }
                 }
 
-                RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-                Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                 Vector3 aimPoint = Vector3.zero;
-                bool bHit = false;
-                foreach (RaycastHit hit in allHits)
+                if (isAimedDown.Value)
                 {
-                    if (hit.transform == transform) { continue; }
+                    RaycastHit[] allHits = Physics.RaycastAll(ADSCamera.transform.position, ADSCamera.transform.forward, 100, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    bool bHit = false;
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        if (hit.transform == transform) { continue; }
 
-                    aimPoint = hit.point;
-                    bHit = true;
-                    break;
+                        aimPoint = hit.point;
+                        bHit = true;
+                        break;
+                    }
+
+                    if (!bHit)
+                        aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
+                }
+                else
+                {
+                    aimPoint = UnityEngine.Camera.main.transform.position + UnityEngine.Camera.main.transform.forward * 10;
                 }
 
-                if (!bHit)
-                    aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
-
-                aimPoint = ADSCamera.transform.position + ADSCamera.transform.forward * 5;
                 this.aimPoint.Value = aimPoint;
             }
 
             PerformAimDownSight(isAimedDown.Value);
-            Vector3 leftHandPos = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().position : new Vector3(0, 0, 0);
-            Quaternion leftHandRot = shooterWeapon.GetLeftHandTarget() != null ? shooterWeapon.GetLeftHandTarget().rotation : new Quaternion(0, 0, 0, 0);
-            
-            if (melee.IsAttacking & !isAimedDown.Value)
+
+            int phase = melee.GetCurrentPhase();
+            bool shouldAim = isAimedDown.Value;
+            bool shouldAimLeftHand = aimLeftHand;
+
+            if (melee.IsCastingAbility.Value)
             {
-                handIK.AimRightHand(aimPoint.Value,
-                    shooterWeapon.GetAimOffset(),
-                    true,
-                    false,
-                    leftHandPos,
-                    leftHandRot,
-                    this);
+                switch (phase)
+                {
+                    case -1:
+                        shouldAim = false;
+                        shouldAimLeftHand = false;
+                        break;
+                    case 0:
+                        shouldAim = melee.GetActivatedAbility().aimDuringAttackAnticipation;
+                        shouldAimLeftHand = shouldAim & melee.GetActivatedAbility().aimLeftHand;
+                        break;
+                    case 1:
+                        shouldAim = true;
+                        shouldAimLeftHand = shouldAim & melee.GetActivatedAbility().aimLeftHand;
+                        break;
+                    case 2:
+                        shouldAim = melee.GetActivatedAbility().aimDuringAttackRecovery;
+                        shouldAimLeftHand = shouldAim & melee.GetActivatedAbility().aimLeftHand;
+                        break;
+                }
             }
             else
             {
-                handIK.AimRightHand(aimPoint.Value,
-                   shooterWeapon.GetAimOffset(),
-                   aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & !melee.IsInAnticipation,
-                   shooterWeapon.GetLeftHandTarget(),
-                   leftHandPos,
-                   leftHandRot,
-                   this);
+                shouldAim = aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & phase != 0;
             }
+
+            shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
+
+            handIK.AimRightHand(aimPoint.Value,
+                   shooterWeapon.GetAimOffset(),
+                   shouldAim,
+                   shouldAimLeftHand,
+                   this);
         }
 
         [SerializeField] private float maxADSPitch = 90;
@@ -281,12 +307,6 @@ namespace GameCreator.Melee
 
             if (IsOwner) { aimAnglePercentage.Value = verticalAimAngle / maxADSPitch; }
             characterAnimator.animator.SetFloat("AimAngle", 0); // aimAnglePercentage.Value
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(aimPoint.Value, 0.25f);
         }
     }
 }

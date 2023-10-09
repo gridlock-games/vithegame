@@ -94,7 +94,6 @@ namespace GameCreator.Melee
         public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
-        public bool IsInAnticipation { get; private set; }
         public bool IsBlocking { get; private set; }
         public bool HasFocusTarget { get; private set; }
 
@@ -141,7 +140,7 @@ namespace GameCreator.Melee
         public AbilityManager abilityManager { get; private set; }
         private GlowRenderer glowRenderer;
 
-        public MJMComboSystem mjmComboSystem;
+        private MJMComboSystem mjmComboSystem;
 
         public bool isLunging = false;
         private static readonly Keyframe[] DEFAULT_KEY_MOVEMENT = {
@@ -346,7 +345,6 @@ namespace GameCreator.Melee
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             IsAttacking = false;
-            IsInAnticipation = false;
 
             if (this.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
             {
@@ -358,7 +356,6 @@ namespace GameCreator.Melee
                 int phase = this.comboSystem.GetCurrentPhase(this.currentMeleeClip);
 
                 IsAttacking = phase >= 0f;
-                IsInAnticipation = phase == 0;
 
                 // Only want hit registration on the owner
                 if (!IsServer) { return; }
@@ -637,7 +634,6 @@ namespace GameCreator.Melee
                             }
                             break;
                         case AttackType.None:
-                            break;
                         case AttackType.Pull:
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
@@ -1028,9 +1024,9 @@ namespace GameCreator.Melee
             this.currentShield = shield;
         }
 
-        public Ability GetActivatedAbility(CharacterMelee melee)
+        public Ability GetActivatedAbility()
         {
-            return melee.abilityManager.GetActivatedAbility();
+            return abilityManager.GetActivatedAbility();
         }
 
         public float maxHealth = 100.0f;
