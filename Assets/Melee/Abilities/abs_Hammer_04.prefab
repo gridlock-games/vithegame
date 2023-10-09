@@ -44,17 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7d79ce025661440a7af79c7c24aa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillImageFill: {fileID: 21300000, guid: 9bf97dcba80142747b174163e2666a20, type: 3}
+  skillImageFill: {fileID: 21300000, guid: 521d188f691f925488b018c3f7fb014a, type: 3}
   weaponBind: 2
   meleeClip: {fileID: 11400000, guid: ace8c7116356846f1af5ea0716b3795b, type: 2}
   abilityType: 0
   dodgeLockOnhase: 0
-  coolDown: 0
-  staminaCost: 0
+  coolDown: 20
+  staminaCost: 50
   hpCost: 0
   rageCost: 0
-  skillKey: 116
-  canCncelAnimationType: 2
+  skillKey: 114
+  canCncelAnimationType: 1
   canCancelAnimation: 0
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
