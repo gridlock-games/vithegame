@@ -244,9 +244,8 @@
 #if UNITY_EDITOR
             this.capturingHitsTime = Time.time;
 #endif
-
+            if (GetComponent<ShooterComponent>()) { return EMPTY_GO_LIST; }
             GameObject[] candidates = EMPTY_GO_LIST;
-
 
             MeleeClip clip = this.Melee.currentMeleeClip;
             float multiplier = 1.0f;
