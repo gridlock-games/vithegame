@@ -212,8 +212,8 @@ namespace GameCreator.Characters
 
             if (activateAim)
             {
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position + aimRotation * shooter.leftHandPosOffset);
-                animator.SetIKRotation(AvatarIKGoal.LeftHand, aimRotation * Quaternion.Euler(shooter.leftHandRotOffset));
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position + aimRotation * limbReferences.leftHandPosOffset);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, aimRotation * Quaternion.Euler(limbReferences.leftHandRotOffset));
             }
             float leftHandAimWeight = aimLeftHand & activateAim ? 1 : 0;
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, leftHandAimWeight);
