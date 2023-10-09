@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7d79ce025661440a7af79c7c24aa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillImageFill: {fileID: 21300000, guid: 37a767b5efb338443aec7d906b16419f, type: 3}
+  skillImageFill: {fileID: 21300000, guid: 1498fbdae44f5ff4bbd566721a388977, type: 3}
   weaponBind: 6
   meleeClip: {fileID: 11400000, guid: 780c6044d6a50a843b4dde961abc3751, type: 2}
   abilityType: 0
@@ -60,5 +60,6 @@ MonoBehaviour:
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
   aimDuringAttackAnticipation: 0
+  aimDuringAttack: 1
   aimDuringAttackRecovery: 0
   aimLeftHand: 1
