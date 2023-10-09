@@ -55,6 +55,7 @@ public class Ability : MonoBehaviour
 
     [Header("Shooter characters only")]
     public bool aimDuringAttackAnticipation;
+    public bool aimDuringAttack = true;
     public bool aimDuringAttackRecovery;
     public bool aimLeftHand;
 

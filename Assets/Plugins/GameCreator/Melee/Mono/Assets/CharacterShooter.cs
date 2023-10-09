@@ -202,7 +202,7 @@ namespace GameCreator.Melee
                         shouldAimLeftHand = shouldAim & melee.GetActivatedAbility().aimLeftHand;
                         break;
                     case 1:
-                        shouldAim = true;
+                        shouldAim = melee.GetActivatedAbility().aimDuringAttack;
                         shouldAimLeftHand = shouldAim & melee.GetActivatedAbility().aimLeftHand;
                         break;
                     case 2:
