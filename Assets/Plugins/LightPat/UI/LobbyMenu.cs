@@ -150,7 +150,7 @@ namespace LightPat.UI
         {
             if (!NetworkManager.Singleton.IsClient) { return; }
             ClientManager.Singleton.ChangePlayerPrefabOptionServerRpc(NetworkManager.Singleton.LocalClientId, playerModelDropdown.value);
-            skinIndex = -1;
+            skinIndex = 0;
         }
 
         int skinIndex = -1;
@@ -274,8 +274,6 @@ namespace LightPat.UI
                 gameModeDropdown.interactable = false;
                 mapSelectDropdown.interactable = false;
             }
-
-            Debug.Log(ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).skinIndex);
 
             if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(NetworkManager.Singleton.LocalClientId))
             {
