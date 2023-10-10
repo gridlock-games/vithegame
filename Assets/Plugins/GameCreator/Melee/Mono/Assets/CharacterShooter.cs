@@ -10,9 +10,6 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
-        public Vector3 leftHandPosOffset;
-        public Vector3 leftHandRotOffset;
-
         [SerializeField] private CharacterState ADSState;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
         [SerializeField] private float ADSRunSpeed = 3;
@@ -219,7 +216,7 @@ namespace GameCreator.Melee
             shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
 
             handIK.AimRightHand(aimPoint.Value,
-                   shooterWeapon.GetAimOffset(),
+                   Quaternion.Euler(limbReferences.rightHandAimIKOffset),
                    shouldAim,
                    shouldAimLeftHand,
                    this);

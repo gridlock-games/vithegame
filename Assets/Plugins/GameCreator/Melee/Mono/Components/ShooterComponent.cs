@@ -10,7 +10,6 @@ namespace GameCreator.Melee
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Vector3 projectilePositionOffset;
         [SerializeField] private Projectile projectilePrefab;
-        [SerializeField] private Vector3 aimOffset;
 
         public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, Vector3 projectileSpeed)
         {
@@ -23,8 +22,6 @@ namespace GameCreator.Melee
         }
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
-
-        public Quaternion GetAimOffset() { return Quaternion.Euler(aimOffset); }
 
         private void OnDrawGizmos()
         {
