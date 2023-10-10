@@ -1541,7 +1541,7 @@ namespace GameCreator.Melee
             }
             #endregion
 
-            this.AddPoise(-attack.poiseDamage);
+            // this.AddPoise(-attack.poiseDamage);
 
 
 
