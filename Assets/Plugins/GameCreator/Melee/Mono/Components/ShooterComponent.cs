@@ -10,6 +10,8 @@ namespace GameCreator.Melee
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Vector3 projectilePositionOffset;
         [SerializeField] private Projectile projectilePrefab;
+        [SerializeField] private float magSize;
+        [SerializeField] private AnimationClip reloadClip;
 
         public void Shoot(CharacterMelee attacker, MeleeClip meleeClip, Vector3 projectileSpeed)
         {
