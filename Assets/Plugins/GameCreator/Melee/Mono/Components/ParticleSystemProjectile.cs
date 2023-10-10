@@ -68,6 +68,18 @@ namespace GameCreator.Melee
                 for (int j = 0; j < potentialHits.Length; j++)
                 {
                     CharacterMelee targetMelee = potentialHits[j].GetComponentInParent<CharacterMelee>();
+                    
+                    if (targetMelee)
+                    {
+                        if (applyStatusOnProjectileCollision)
+                        {
+                            if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
+                            {
+                                applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
+                            }
+                        }
+                    }
+                    
                     if (targetMelee == attacker) { continue; }
                     if (targetMelee)
                     {
@@ -90,14 +102,6 @@ namespace GameCreator.Melee
                                 {
                                     hitCounter.Add(targetMelee, 1);
                                 }
-                            }
-                        }
-
-                        if (applyStatusOnProjectileCollision)
-                        {
-                            if (targetMelee.TryGetComponent(out CharacterStatusManager characterStatusManager))
-                            {
-                                applyStatusOnProjectileCollision.ApplyStatus(characterStatusManager);
                             }
                         }
                     }
