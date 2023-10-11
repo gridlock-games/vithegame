@@ -595,6 +595,11 @@ namespace LightPat.Core
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
 
+                if (clientId == 1)
+                {
+                    clientTeam = Team.Spectator;
+                }
+
                 if (payloadOptions.Length == 3)
                 {
                     QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));

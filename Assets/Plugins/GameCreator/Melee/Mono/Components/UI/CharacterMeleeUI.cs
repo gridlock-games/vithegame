@@ -82,8 +82,16 @@
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
+        public static StatusUI[] staticStatusUIAssignments { get; private set; }
+
         private TeamIndicator teamIndicator;
         private CharacterStatusManager statusManager;
+
+        private void Awake()
+        {
+            staticStatusUIAssignments = new StatusUI[statusUIAssignments.Length];
+            statusUIAssignments.CopyTo(staticStatusUIAssignments, 0);
+        }
 
         private void Start()
         {
