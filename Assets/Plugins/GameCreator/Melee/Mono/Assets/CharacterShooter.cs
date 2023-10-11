@@ -73,25 +73,15 @@ namespace GameCreator.Melee
             shooterWeapon.Shoot(melee, attackClip, projectileForce);
         }
 
-        public bool IsAiming()
-        {
-            return isAimedDown.Value;
-        }
+        public UnityEngine.Camera GetADSCamera() { return ADSCamera; }
 
-        public bool IsReloading()
-        {
-            return reloading.Value;
-        }
+        public bool IsAiming() { return isAimedDown.Value; }
 
-        public int GetCurrentAmmo()
-        {
-            return currentAmmo.Value;
-        }
+        public bool IsReloading() { return reloading.Value; }
 
-        public int GetMagSize()
-        {
-            return magSize;
-        }
+        public int GetCurrentAmmo() { return currentAmmo.Value; }
+
+        public int GetMagSize() { return magSize; }
 
         private bool CanShoot(MeleeClip attackClip)
         {
