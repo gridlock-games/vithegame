@@ -31,8 +31,6 @@
         private SerializedProperty spAttachment;
 
         private SerializedProperty spDefenseRunSpeed;
-        private SerializedProperty spDefenseState;
-        private SerializedProperty spDefenseMask;
         private SerializedProperty spLowerBodyRotation;
 
         private SerializedProperty spDefenseAngle;
@@ -72,8 +70,6 @@
             this.spAttachment = this.serializedObject.FindProperty("attachment");
 
             this.spDefenseRunSpeed = serializedObject.FindProperty("defenseRunSpeed");
-            this.spDefenseState = this.serializedObject.FindProperty("defendState");
-            this.spDefenseMask = this.serializedObject.FindProperty("defendMask");
             this.spLowerBodyRotation = this.serializedObject.FindProperty("lowerBodyRotation");
 
             this.spDefenseAngle = this.serializedObject.FindProperty("defenseAngle");
@@ -187,8 +183,6 @@
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
 
                     EditorGUILayout.PropertyField(this.spDefenseRunSpeed);
-                    EditorGUILayout.PropertyField(this.spDefenseState);
-                    EditorGUILayout.PropertyField(this.spDefenseMask);
                     EditorGUILayout.PropertyField(this.spLowerBodyRotation);
 
                     EditorGUILayout.Space();

@@ -44,8 +44,6 @@
 
         // defense system:
         public float defenseRunSpeed = 5;
-        public CharacterState defendState;
-        public AvatarMask defendMask;
 
         [Range(0f, 180f)] public float lowerBodyRotation;
         public NumberProperty defenseAngle = new NumberProperty(120f);
