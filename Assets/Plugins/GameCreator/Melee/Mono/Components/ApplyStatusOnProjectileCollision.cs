@@ -8,6 +8,7 @@ namespace GameCreator.Melee
     [RequireComponent(typeof(ParticleSystemProjectile))]
     public class ApplyStatusOnProjectileCollision : MonoBehaviour
     {
+        [SerializeField] private bool applyStatusToAttacker;
         [SerializeField] private TargetType targetType;
         [SerializeField] private Status[] statuses;
 
@@ -20,25 +21,32 @@ namespace GameCreator.Melee
 
         public void ApplyStatus(CharacterStatusManager targetStatusCharacter)
         {
-            Team attackerMeleeTeam = ClientManager.Singleton.GetClient(projectile.GetAttacker().OwnerClientId).team;
-            Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetStatusCharacter.OwnerClientId).team;
-
-            switch (targetType)
+            if (projectile.GetAttacker() == targetStatusCharacter.GetComponent<CharacterMelee>())
             {
-                case TargetType.AllPlayers:
-                    break;
-                case TargetType.SameTeam:
-                    if (attackerMeleeTeam == Team.Competitor | targetMeleeTeam == Team.Competitor) { return; }
-                    // If the attacker's team is not the same as the victim's team, do not register this hit
-                    if (attackerMeleeTeam != targetMeleeTeam) { return; }
-                    break;
-                case TargetType.Enemies:
-                    if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
-                    {
-                        // If the attacker's team is the same as the victim's team, do not register this hit
-                        if (attackerMeleeTeam == targetMeleeTeam) { return; }
-                    }
-                    break;
+                if (!applyStatusToAttacker) { return; }
+            }
+            else // If the attacker isn't the same as the target
+            {
+                Team attackerMeleeTeam = ClientManager.Singleton.GetClient(projectile.GetAttacker().OwnerClientId).team;
+                Team targetMeleeTeam = ClientManager.Singleton.GetClient(targetStatusCharacter.OwnerClientId).team;
+
+                switch (targetType)
+                {
+                    case TargetType.AllPlayers:
+                        break;
+                    case TargetType.SameTeam:
+                        if (attackerMeleeTeam == Team.Competitor | targetMeleeTeam == Team.Competitor) { return; }
+                        // If the attacker's team is not the same as the victim's team, do not register this hit
+                        if (attackerMeleeTeam != targetMeleeTeam) { return; }
+                        break;
+                    case TargetType.Enemies:
+                        if (attackerMeleeTeam != Team.Competitor | targetMeleeTeam != Team.Competitor)
+                        {
+                            // If the attacker's team is the same as the victim's team, do not register this hit
+                            if (attackerMeleeTeam == targetMeleeTeam) { return; }
+                        }
+                        break;
+                }
             }
 
             foreach (Status status in statuses)

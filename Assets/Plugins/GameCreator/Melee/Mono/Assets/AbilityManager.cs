@@ -88,6 +88,21 @@ public class AbilityManager : NetworkBehaviour
         {
             if (Input.GetKeyDown(key))
             {
+                if (melee.TryGetComponent(out CharacterShooter characterShooter))
+                {
+                    if (characterShooter.IsReloading()) { return; }
+
+                    Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
+                    if (ability.requireAmmo)
+                    {
+                        if (ability.ammoRequirement > characterShooter.GetCurrentAmmo())
+                        {
+                            characterShooter.triggerReload = true;
+                            return;
+                        }
+                    }
+                }
+
                 ActivateAbilityServerRpc(key);
             }
         }

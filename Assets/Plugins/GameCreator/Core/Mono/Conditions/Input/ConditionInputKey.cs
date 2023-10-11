@@ -53,7 +53,7 @@
             {
                 if (Time.time - lastKeyPressTime <= doublePressInterval)
                 {
-                    Debug.Log("Key " + this.key.ToString() + " pressed twice!");
+                    //Debug.Log("Key " + this.key.ToString() + " pressed twice!");
                     isPressedTwice = true;
                 }
                 lastKeyPressTime = Time.time;

@@ -7,6 +7,7 @@
     using GameCreator.Core;
     using LightPat.Core;
     using LightPat.Player;
+    using TMPro;
 
     [AddComponentMenu("UI/Game Creator/Character Melee UI", 0)]
     public class CharacterMeleeUI : MonoBehaviour
@@ -33,6 +34,9 @@
         public Image abilityBImageFill;
         public Image abilityCImageFill;
         public Image abilityDImageFill;
+
+        [Header("Ammo UI")]
+        public TextMeshProUGUI ammoDisplayText;
 
         [System.Serializable]
         public struct StatusUI
@@ -98,6 +102,11 @@
         {
             UpdateWeaponUI();
             UpdateTeammateHPUI();
+
+            if (melee.TryGetComponent(out CharacterShooter characterShooter))
+            {
+                ammoDisplayText.SetText(characterShooter.GetCurrentAmmo() + " / " + characterShooter.GetMagSize());
+            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -125,13 +134,18 @@
                 float cost = 0f;
                 float costRequirement = 0f;
 
-                if(ability.staminaCost > 0) { 
+                if (ability.staminaCost > 0)
+                {
                     costRequirement = melee.GetPoise();
                     cost = ability.staminaCost;
-                } else if (ability.hpCost > 0) {
+                }
+                else if (ability.hpCost > 0)
+                {
                     costRequirement = melee.GetHP();
                     cost = ability.hpCost;
-                } else {
+                }
+                else
+                {
                     costRequirement = melee.GetRage();
                     cost = ability.rageCost;
                 }
