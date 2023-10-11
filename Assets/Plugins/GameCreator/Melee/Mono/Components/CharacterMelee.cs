@@ -300,7 +300,7 @@ namespace GameCreator.Melee
             }
             else
             {
-                Character.characterLocomotion.runSpeed = overrideRunSpeed.Value;
+                Character.characterLocomotion.runSpeed = IsBlocking.Value ? currentShield.defenseRunSpeed : overrideRunSpeed.Value;
                 if (IsServer)
                     slowed.Value = false;
             }

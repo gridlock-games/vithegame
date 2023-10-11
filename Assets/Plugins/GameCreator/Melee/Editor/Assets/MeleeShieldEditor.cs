@@ -30,6 +30,7 @@
         private SerializedProperty spPrefab;
         private SerializedProperty spAttachment;
 
+        private SerializedProperty spDefenseRunSpeed;
         private SerializedProperty spDefenseState;
         private SerializedProperty spDefenseMask;
         private SerializedProperty spLowerBodyRotation;
@@ -70,6 +71,7 @@
             this.spPrefab = this.serializedObject.FindProperty("prefab");
             this.spAttachment = this.serializedObject.FindProperty("attachment");
 
+            this.spDefenseRunSpeed = serializedObject.FindProperty("defenseRunSpeed");
             this.spDefenseState = this.serializedObject.FindProperty("defendState");
             this.spDefenseMask = this.serializedObject.FindProperty("defendMask");
             this.spLowerBodyRotation = this.serializedObject.FindProperty("lowerBodyRotation");
@@ -184,6 +186,7 @@
                 {
                     EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
 
+                    EditorGUILayout.PropertyField(this.spDefenseRunSpeed);
                     EditorGUILayout.PropertyField(this.spDefenseState);
                     EditorGUILayout.PropertyField(this.spDefenseMask);
                     EditorGUILayout.PropertyField(this.spLowerBodyRotation);
