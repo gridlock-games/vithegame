@@ -90,6 +90,8 @@ public class AbilityManager : NetworkBehaviour
             {
                 if (melee.TryGetComponent(out CharacterShooter characterShooter))
                 {
+                    if (characterShooter.IsReloading()) { return; }
+
                     Ability ability = abilityInstances.Find(ablty => ablty.skillKey == key);
                     if (ability.requireAmmo)
                     {
