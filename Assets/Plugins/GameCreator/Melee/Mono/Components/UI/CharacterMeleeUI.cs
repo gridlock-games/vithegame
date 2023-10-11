@@ -229,6 +229,7 @@
                         Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
                         if (!teamIndicator.teamsAreActive) { continue; }
                         if (playerTeam != localPlayerTeam) { continue; }
+                        if (playerTeam == Team.Competitor | localPlayerTeam == Team.Competitor) { continue; }
 
                         GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
                         playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true);
