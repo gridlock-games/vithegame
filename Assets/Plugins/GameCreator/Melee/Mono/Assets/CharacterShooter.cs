@@ -21,7 +21,7 @@ namespace GameCreator.Melee
         [SerializeField] private float ADSRunSpeed = 3;
         [SerializeField] private float maxADSPitch = 90;
         [Header("Reload Settings")]
-        [SerializeField] private bool enableReload;
+        public bool enableReload;
         [SerializeField] private int magSize;
 
         private NetworkVariable<int> currentAmmo = new NetworkVariable<int>(1);
@@ -209,6 +209,7 @@ namespace GameCreator.Melee
                 currentAmmo.Value = magSize;
         }
 
+        public bool triggerReload;
         private NetworkVariable<bool> reloading = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool reloadReached;
 
@@ -242,7 +243,7 @@ namespace GameCreator.Melee
 
                     if (enableReload & !melee.IsAttacking)
                     {
-                        if ((Input.GetKeyDown(KeyCode.Z) & currentAmmo.Value < magSize) | currentAmmo.Value <= 0)
+                        if (((Input.GetKeyDown(KeyCode.Z) | triggerReload) & currentAmmo.Value < magSize) | currentAmmo.Value <= 0)
                         {
                             reloading.Value = true;
                         }
@@ -337,6 +338,8 @@ namespace GameCreator.Melee
                    shouldAim & !reloading.Value,
                    shouldAimLeftHand & !reloading.Value,
                    this);
+
+            triggerReload = false;
         }
 
         float camAngle = 0;

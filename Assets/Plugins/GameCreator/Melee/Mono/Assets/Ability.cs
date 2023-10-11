@@ -58,6 +58,9 @@ public class Ability : MonoBehaviour
     public bool aimDuringAttack = true;
     public bool aimDuringAttackRecovery;
     public bool aimLeftHand;
+    [Header("Ammo Settings")]
+    public bool requireAmmo;
+    public int ammoRequirement;
 
     public bool isOnCoolDownLocally { get; private set; }
 
