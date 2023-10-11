@@ -215,6 +215,42 @@
                         vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.Projectile ? null : parent
                     );
                 }
+                else if (vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.StickToGround)
+                {
+                    Vector3 startPos = character.transform.position + character.transform.rotation * vfxPositionOffset;
+                    startPos.y += vfxPositionOffset.y;
+                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+                    bool bHit = false;
+                    RaycastHit floorHit = new RaycastHit();
+
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        if (hit.transform.GetComponentInParent<CharacterMelee>()) { continue; }
+
+                        bHit = true;
+                        floorHit = hit;
+
+                        break;
+                    }
+
+                    if (bHit)
+                    {
+                        abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                            floorHit.point,
+                            character.transform.rotation * Quaternion.Euler(vfxRotationOffset)
+                        );
+                    }
+                    else
+                    {
+                        abilityVFXInstance = Instantiate(abilityVFXPrefab,
+                            character.transform.position + character.transform.rotation * vfxPositionOffset,
+                            character.transform.rotation * Quaternion.Euler(vfxRotationOffset)
+                        );
+                    }
+                }
                 else
                 {
                     abilityVFXInstance = Instantiate(abilityVFXPrefab,

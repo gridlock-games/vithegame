@@ -15,7 +15,8 @@ public class ClipVFX : MonoBehaviour
         AttachSelf,
         AttachTarget,
         DetachedSelf,
-        Projectile
+        Projectile,
+        StickToGround
     }
 
     public TargetGameObject abilityVFX = new TargetGameObject();
