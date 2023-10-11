@@ -240,13 +240,11 @@ namespace GameCreator.Melee
                         isAimedDown.Value = !isAimedDown.Value;
                     }
 
-                    if (enableReload)
+                    if (enableReload & !melee.IsAttacking)
                     {
                         if ((Input.GetKeyDown(KeyCode.Z) & currentAmmo.Value < magSize) | currentAmmo.Value <= 0)
                         {
                             reloading.Value = true;
-                            melee.CharacterAnimator.StopGesture();
-                            melee.StopAttack();
                         }
                     }
                 }
