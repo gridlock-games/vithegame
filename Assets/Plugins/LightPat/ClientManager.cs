@@ -595,7 +595,7 @@ namespace LightPat.Core
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
 
-                if (clientId == 1)
+                if (clientId == 0)
                 {
                     clientTeam = Team.Spectator;
                 }

@@ -110,9 +110,6 @@ namespace LightPat.Core
             }
         }
 
-        private CharacterMeleeUI.StatusUI[] statusUIAssignments;
-
-
         private void Update()
         {
             if (!instantiated) { return; }
@@ -120,6 +117,8 @@ namespace LightPat.Core
             healthSlider.value = melee.GetHP() / melee.maxHealth;
             if (melee.currentShield) defenseSlider.value = melee.GetDefense() / melee.currentShield.maxDefense.GetValue(gameObject);
             poiseSlider.value = melee.GetPoise() / melee.maxPoise.GetValue(gameObject);
+
+            UpdateStatusUI();
         }
     }
 }
