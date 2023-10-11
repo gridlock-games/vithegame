@@ -50,7 +50,7 @@ MonoBehaviour:
   abilityType: 0
   dodgeLockOnhase: 0
   coolDown: 20
-  staminaCost: 20
+  staminaCost: 40
   hpCost: 0
   rageCost: 0
   skillKey: 114
@@ -59,3 +59,9 @@ MonoBehaviour:
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
+  aimDuringAttackAnticipation: 0
+  aimDuringAttack: 1
+  aimDuringAttackRecovery: 0
+  aimLeftHand: 0
+  requireAmmo: 0
+  ammoRequirement: 0
