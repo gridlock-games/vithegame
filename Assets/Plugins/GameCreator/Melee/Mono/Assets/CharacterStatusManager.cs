@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using LightPat.UI;
 
 public class CharacterStatusManager : NetworkBehaviour
 {
@@ -98,12 +99,14 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private CharacterMelee melee;
     private CharacterMeleeUI meleeUI;
+    private WorldSpaceLabel worldSpaceLabel;
     private NetworkList<CHARACTER_STATUS_NETWORKED> characterStatuses;
 
     private void Awake()
     {
         melee = GetComponent<CharacterMelee>();
         meleeUI = GetComponentInChildren<CharacterMeleeUI>(true);
+        worldSpaceLabel = GetComponentInChildren<WorldSpaceLabel>(true);
         characterStatuses = new NetworkList<CHARACTER_STATUS_NETWORKED>();
     }
 
@@ -142,6 +145,16 @@ public class CharacterStatusManager : NetworkBehaviour
 
     private void OnStatusChange(NetworkListEvent<CHARACTER_STATUS_NETWORKED> networkListEvent)
     {
+        if (meleeUI)
+        {
+            meleeUI.UpdateStatusUI();
+        }
+
+        if (worldSpaceLabel)
+        {
+            worldSpaceLabel.UpdateStatusUI();
+        }
+
         if (IsOwner) { meleeUI.UpdateStatusUI(); }
 
         if (!IsServer) { return; }

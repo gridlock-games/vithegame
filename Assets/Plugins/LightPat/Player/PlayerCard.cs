@@ -39,7 +39,7 @@ namespace LightPat.Core
                 {
                     if (localNetworkPlayers[i] == melee.gameObject)
                     {
-                        hotkeyNum = (i+1).ToString() + ": ";
+                        hotkeyNum = (i+1).ToString();
                         break;
                     }
                 }

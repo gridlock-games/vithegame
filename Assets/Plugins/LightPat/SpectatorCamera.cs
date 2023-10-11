@@ -159,19 +159,19 @@ namespace LightPat.Core
 
                 if (followCamTarget)
                 {
-                    transform.position += followCamTarget.position - lastFollowCamPosition;
+                    Player.NetworkPlayer networkPlayer = followCamTarget.GetComponent<Player.NetworkPlayer>();
 
+                    transform.position = Vector3.Lerp(transform.position, networkPlayer.GetCamPosition(), Time.deltaTime * 8);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, networkPlayer.GetCamRotation(), Time.deltaTime * 8);
+
+                    //transform.position += followCamTarget.position - lastFollowCamPosition;
+                    //transform.RotateAround(followCamTarget.transform.position, Vector3.up, lookInput.x);
                     //transform.LookAt(followCamTarget);
-                    transform.RotateAround(followCamTarget.transform.position, Vector3.up, lookInput.x);
-                    //transform.RotateAround(followCamTarget.transform.position, Vector3.right, followCamVerticalAngle + lookInput.y);
 
-                    //transform.localPosition = followCamTarget.transform.position + (followCamTarget.transform.rotation * followCamOffset);
-                    transform.LookAt(followCamTarget);
+                    //followCamVerticalAngle -= lookInput.y;
+                    //transform.localEulerAngles = new Vector3(followCamVerticalAngle, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
-                    followCamVerticalAngle -= lookInput.y;
-                    transform.localEulerAngles = new Vector3(followCamVerticalAngle, transform.localEulerAngles.y, transform.localEulerAngles.z);
-
-                    lastFollowCamPosition = followCamTarget.position;
+                    //lastFollowCamPosition = followCamTarget.position;
                 }
                 else
                 {
