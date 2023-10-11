@@ -43,8 +43,7 @@
         public MeleeClip airbornPerfectBlockReaction;
 
         // defense system:
-        public CharacterState defendState;
-        public AvatarMask defendMask;
+        public float defenseRunSpeed = 5;
 
         [Range(0f, 180f)] public float lowerBodyRotation;
         public NumberProperty defenseAngle = new NumberProperty(120f);
