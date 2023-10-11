@@ -1722,6 +1722,11 @@ namespace GameCreator.Melee
             return time;
         }
 
+        public ComboSystem GetComboSystem()
+        {
+            return comboSystem;
+        }
+
         public float ChangeState(CharacterState state, AvatarMask mask, CharacterAnimation.Layer layer, CharacterAnimator animator)
         {
             float time = 0f;
