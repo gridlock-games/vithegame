@@ -27,6 +27,19 @@ namespace LightPat.Player
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        private NetworkVariable<Vector3> camPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Quaternion> camRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public Vector3 GetCamPosition()
+        {
+            return camPosition.Value;
+        }
+
+        public Quaternion GetCamRotation()
+        {
+            return camRotation.Value;
+        }
+
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
         public override void OnNetworkSpawn()
@@ -126,6 +139,9 @@ namespace LightPat.Player
             if (!IsSpawned) { return; }
 
             if (!IsOwner) { return; }
+
+            camPosition.Value = playerCamera.transform.position;
+            camRotation.Value = playerCamera.transform.rotation;
 
             // FPS Counter and Ping Display
             if (Time.unscaledTime > _timer)
