@@ -128,6 +128,14 @@
             // If the input payload hasn't been recieved yet (this happens on non-owner clients)
             if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
 
+            if (TryGetComponent(out Melee.CharacterShooter characterShooter))
+            {
+                if (characterShooter.IsReloading())
+                {
+                    inputPayload.inputVector = Vector2.zero;
+                }
+            }
+
             bool invertMovement = false;
             if (TryGetComponent(out Melee.CharacterMelee melee))
             {

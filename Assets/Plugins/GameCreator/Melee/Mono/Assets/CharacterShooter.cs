@@ -78,6 +78,11 @@ namespace GameCreator.Melee
             return isAimedDown.Value;
         }
 
+        public bool IsReloading()
+        {
+            return reloading.Value;
+        }
+
         public int GetCurrentAmmo()
         {
             return currentAmmo.Value;
@@ -237,10 +242,11 @@ namespace GameCreator.Melee
 
                     if (enableReload)
                     {
-                        if (Input.GetKeyDown(KeyCode.Z) | currentAmmo.Value <= 0)
+                        if ((Input.GetKeyDown(KeyCode.Z) & currentAmmo.Value < magSize) | currentAmmo.Value <= 0)
                         {
                             reloading.Value = true;
-                            melee.Character.GetCharacterAnimator().StopGesture();
+                            melee.CharacterAnimator.StopGesture();
+                            melee.StopAttack();
                         }
                     }
                 }
@@ -330,8 +336,8 @@ namespace GameCreator.Melee
             
             handIK.AimRightHand(aimPoint.Value,
                    Quaternion.Euler(limbReferences.rightHandAimIKOffset),
-                   shouldAim,
-                   shouldAimLeftHand,
+                   shouldAim & !reloading.Value,
+                   shouldAimLeftHand & !reloading.Value,
                    this);
         }
 
