@@ -239,10 +239,10 @@
                     if (bHit)
                     {
                         abilityVFXInstance = Instantiate(abilityVFXPrefab,
-                            floorHit.point,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection)
+                            floorHit.point + vfx.vfxPositionOffset,
+                            character.transform.rotation * Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection) * Quaternion.Euler(vfx.vfxRotationOffset)
                         );
-                        Debug.Log(Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection).eulerAngles);
+                        Debug.Log(abilityVFXInstance.transform.eulerAngles);
                     }
                     else
                     {

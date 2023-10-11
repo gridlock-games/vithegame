@@ -64,7 +64,10 @@ MonoBehaviour:
     eventChangeVariable:
       m_PersistentCalls:
         m_Calls: []
-  vfxPositionOffset: {x: 0.34, y: 0, z: 1.8}
-  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxRotationOffset: {x: 0, y: 180, z: 0}
   attachVFXOnPhase: 1
-  attachmentType: 2
+  attachmentType: 4
+  raycastOffset: {x: 0.34, y: 1.5, z: 1.8}
+  crossProductDirection: {x: 1, y: 0, z: 0}
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
