@@ -110,6 +110,7 @@ namespace LightPat.UI
             networkTransport.ConnectionData.Address = playerHubServer.ip;
             networkTransport.ConnectionData.Port = ushort.Parse(playerHubServer.port);
 
+            getRequest.Dispose();
             Debug.Log("Starting client: " + NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address + " " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             // Change the scene locally, then connect to the target IP
             NetworkManager.Singleton.StartClient();

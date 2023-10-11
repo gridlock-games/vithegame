@@ -266,6 +266,7 @@ public class AuthenticationController : MonoBehaviour
             }
         }
 
+        getRequest.Dispose();
         // If lobby is in our build settings, change scene to lobby. Otherwise, change scene to hub.
         int hubPort = 7777;
         if (SceneUtility.GetBuildIndexByScenePath("Lobby") != -1)

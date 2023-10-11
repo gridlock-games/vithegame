@@ -304,6 +304,7 @@ namespace LightPat.Core
                 {
                     Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
                 }
+                deleteRequest.Dispose();
             }
             waitingForApiChange.Value = false;
         }
@@ -411,6 +412,7 @@ namespace LightPat.Core
                 SyncUIWithList();
             }
 
+            getRequest.Dispose();
             serverListRefreshedOnce = true;
             refreshServerListRunning = false;
         }
