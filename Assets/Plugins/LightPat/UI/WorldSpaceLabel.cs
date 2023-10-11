@@ -27,6 +27,54 @@ namespace LightPat.UI
         Transform target;
         Vector3 positionOffset;
 
+        [Header("Status UI")]
+        public Transform statusImageParent;
+        public GameObject statusImagePrefab;
+
+        public void UpdateStatusUI()
+        {
+            foreach (Transform playerIcon in statusImageParent)
+            {
+                Destroy(playerIcon.gameObject);
+            }
+
+            bool found = false;
+            CharacterStatusManager.CHARACTER_STATUS missingStatus = CharacterStatusManager.CHARACTER_STATUS.damageMultiplier;
+            foreach (var status in statusManager.GetCharacterStatusList())
+            {
+                GameObject g = Instantiate(statusImagePrefab, statusImageParent);
+                foreach (CharacterMeleeUI.StatusUI statusUI in meleeUI.statusUIAssignments)
+                {
+                    if (statusUI.status == status)
+                    {
+                        g.GetComponent<Image>().sprite = statusUI.sprite;
+                        found = true;
+                        break;
+                    }
+                }
+                missingStatus = status;
+            }
+
+            if (!found & statusManager.GetCharacterStatusList().Count > 0)
+            {
+                Debug.LogError("You need to assign a character status image for " + missingStatus);
+            }
+        }
+
+        private CharacterMeleeUI.StatusUI[] statusUIAssignments;
+
+        private CharacterStatusManager statusManager;
+        [SerializeField] private CharacterMeleeUI meleeUI;
+        private void Awake()
+        {
+            statusManager = transform.root.GetComponent<CharacterStatusManager>();
+
+            if (meleeUI)
+            {
+                meleeUI.statusUIAssignments.CopyTo(statusUIAssignments, 0);
+            }
+        }
+
         private void OnEnable()
         {
             if (!transform.parent) return;
