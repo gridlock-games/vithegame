@@ -24,4 +24,8 @@ public class ClipVFX : MonoBehaviour
     public Vector3 vfxRotationOffset = new Vector3(0, 0, 0);
     public MeleeClip.AttachVFXPhase attachVFXOnPhase = MeleeClip.AttachVFXPhase.OnExecute;
     public ATTACHMENT_TYPE attachmentType = ATTACHMENT_TYPE.DetachedSelf;
+    [Header("For Attachment Type: StickToGround")]
+    public Vector3 raycastOffset = new Vector3(0, 2, 0);
+    public Vector3 crossProductDirection = new Vector3(1, 0, 0);
+    public Vector3 lookRotationUpDirection = new Vector3(0, 1, 0);
 }

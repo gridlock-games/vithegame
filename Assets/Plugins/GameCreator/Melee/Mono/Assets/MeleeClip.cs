@@ -217,8 +217,8 @@
                 }
                 else if (vfx.attachmentType == ClipVFX.ATTACHMENT_TYPE.StickToGround)
                 {
-                    Vector3 startPos = character.transform.position + character.transform.rotation * vfxPositionOffset;
-                    startPos.y += vfxPositionOffset.y;
+                    Vector3 startPos = character.transform.position + character.transform.rotation * vfx.raycastOffset;
+                    startPos.y += vfx.raycastOffset.y;
                     RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
@@ -240,8 +240,9 @@
                     {
                         abilityVFXInstance = Instantiate(abilityVFXPrefab,
                             floorHit.point,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, Vector3.right))
+                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection)
                         );
+                        Debug.Log(Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection).eulerAngles);
                     }
                     else
                     {
