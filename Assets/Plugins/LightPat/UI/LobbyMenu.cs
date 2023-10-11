@@ -480,6 +480,13 @@ namespace LightPat.UI
                 everyoneIsReady = false;
             foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
             {
+                if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
+                {
+                    readyButton.SetActive(valuePair.Value.team != Team.Spectator);
+                }
+
+                if (valuePair.Value.team == Team.Spectator) { continue; }
+
                 Transform iconParent = enemyPlayerIconsParent;
                 bool enemy;
                 if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
