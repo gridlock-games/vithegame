@@ -105,7 +105,14 @@
 
             if (melee.TryGetComponent(out CharacterShooter characterShooter))
             {
-                ammoDisplayText.SetText(characterShooter.GetCurrentAmmo() + " / " + characterShooter.GetMagSize());
+                if (characterShooter.enableReload)
+                {
+                    ammoDisplayText.SetText(characterShooter.GetCurrentAmmo() + " / " + characterShooter.GetMagSize());
+                }
+                else
+                {
+                    ammoDisplayText.SetText("");
+                }
             }
         }
 
