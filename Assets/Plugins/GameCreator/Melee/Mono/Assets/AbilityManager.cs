@@ -80,7 +80,7 @@ public class AbilityManager : NetworkBehaviour
         if (abilityInstances.Count <= 0) return;
         if (!Input.anyKeyDown) return;
         if (melee == null) return;
-        if (melee.IsBlocking) return;
+        if (melee.IsBlocking.Value) return;
         if (melee.IsStaggered) return;
         if (melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 

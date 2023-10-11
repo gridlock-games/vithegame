@@ -29,8 +29,8 @@
 
             switch (this.blocking)
             {
-				case Blocking.IsBlocking: return melee.IsBlocking;
-				case Blocking.IsNotBlocking: return !melee.IsBlocking;
+				case Blocking.IsBlocking: return melee.IsBlocking.Value;
+				case Blocking.IsNotBlocking: return !melee.IsBlocking.Value;
 			}
 
 			return false;

@@ -94,7 +94,7 @@ namespace GameCreator.Melee
         public bool IsSheathing { get; protected set; }
 
         public bool IsAttacking { get; private set; }
-        public bool IsBlocking { get; private set; }
+        public NetworkVariable<bool> IsBlocking = new NetworkVariable<bool>();
         public bool HasFocusTarget { get; private set; }
 
 
@@ -303,6 +303,36 @@ namespace GameCreator.Melee
                 Character.characterLocomotion.runSpeed = overrideRunSpeed.Value;
                 if (IsServer)
                     slowed.Value = false;
+            }
+
+            if (IsLocalPlayer)
+            {
+                if (IsBlocking.Value)
+                {
+                    if (!Input.GetKey(KeyCode.LeftShift))
+                    {
+                        StopBlockingServerRpc();
+                    }
+                }
+                else // not blocking
+                {
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        StartBlockingServerRpc();
+                    }
+                }
+
+                //if (Input.GetKeyDown(KeyCode.LeftShift))
+                //{
+                //    if (IsBlocking.Value)
+                //    {
+                //        StopBlockingServerRpc();
+                //    }
+                //    else
+                //    {
+                //        StartBlockingServerRpc();
+                //    }
+                //}
             }
         }
 
@@ -885,7 +915,7 @@ namespace GameCreator.Melee
 
         protected void UpdateDefense()
         {
-            if (IsBlocking) return;
+            if (IsBlocking.Value) return;
             if (!currentShield) return;
 
             defenseDelayCooldown = Mathf.Max(0f, defenseDelayCooldown - Time.deltaTime);
@@ -1029,7 +1059,6 @@ namespace GameCreator.Melee
         public float maxHealth = 100.0f;
         private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<float> Rage = new NetworkVariable<float>();
-        private NetworkVariable<bool> isBlockingNetworked = new NetworkVariable<bool>();
 
         public float GetHP() { return HP.Value; }
 
@@ -1082,14 +1111,14 @@ namespace GameCreator.Melee
                 overrideRunSpeed.Value = originalRunSpeed;
             }
 
-            isBlockingNetworked.OnValueChanged += OnIsBlockingNetworkedChange;
+            IsBlocking.OnValueChanged += OnIsBlockingChange;
             HP.OnValueChanged += OnHPChanged;
             rooted.OnValueChanged += OnRootedChange;
         }
 
         public override void OnNetworkDespawn()
         {
-            isBlockingNetworked.OnValueChanged -= OnIsBlockingNetworkedChange;
+            IsBlocking.OnValueChanged -= OnIsBlockingChange;
             HP.OnValueChanged -= OnHPChanged;
             rooted.OnValueChanged -= OnRootedChange;
         }
@@ -1119,46 +1148,9 @@ namespace GameCreator.Melee
             }
         }
 
-        void OnIsBlockingNetworkedChange(bool prev, bool current)
+        void OnIsBlockingChange(bool prev, bool current)
         {
-            if (current) // Start blocking
-            {
-                if (currentShield.defendState != null)
-                {
-                    CharacterAnimator.SetState(
-                        currentShield.defendState,
-                        currentShield.defendMask,
-                        1f, 0.15f, 1f,
-                        LAYER_DEFEND
-                    );
-                }
-
-                if (!IsBlocking && EventBlock != null)
-                {
-                    EventBlock.Invoke(true);
-                }
-
-                startBlockingTime = GetTime();
-                IsBlocking = true;
-            }
-            else // Stop blocking
-            {
-                if (Poise.Value == 0 & Defense.Value == 0)
-                {
-                    if (EventBreakDefense != null) this.EventBreakDefense.Invoke();
-                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
-                    IsBlocking = false;
-                }
-                else
-                {
-                    if (EventBlock != null) EventBlock.Invoke(false);
-                    CharacterAnimator.ResetState(0.25f, LAYER_DEFEND);
-                    IsBlocking = false;
-                }
-            }
-
-            if (IsServer)
-                Character.characterLocomotion.SetIsControllable(!current);
+            CharacterAnimator.animator.SetBool("Blocking", current);
         }
 
         [ServerRpc]
@@ -1173,15 +1165,13 @@ namespace GameCreator.Melee
 
             if (this.currentShield == null) return;
 
-            isBlockingNetworked.Value = true;
+            IsBlocking.Value = true;
         }
 
         [ServerRpc]
         public void StopBlockingServerRpc()
         {
-            if (!this.IsBlocking) return;
-
-            isBlockingNetworked.Value = false;
+            IsBlocking.Value = false;
         }
 
         public virtual void Execute(ActionKey actionKey)
@@ -1468,7 +1458,7 @@ namespace GameCreator.Melee
                 : 0f;
 
             if (this.currentShield != null &&
-                attack.isBlockable && this.IsBlocking &&
+                attack.isBlockable && IsBlocking.Value &&
                 hitLocation == MeleeWeapon.HitLocation.FrontMiddle)
             {
                 this.AddDefense(-attack.defenseDamage);
@@ -1529,12 +1519,12 @@ namespace GameCreator.Melee
                 {
                     Defense.Value = 0f;
                     Poise.Value = 0f;
-                    isBlockingNetworked.Value = false;
+                    IsBlocking.Value = false;
                 }
             }
             else // If we are not blocking, or if attack is not blockable, or we are hit by an attack outside of the defense angle
             {
-                isBlockingNetworked.Value = false;
+                IsBlocking.Value = false;
             }
             #endregion
 
@@ -1597,8 +1587,8 @@ namespace GameCreator.Melee
                 ? this.currentShield.defenseAngle.GetValue(gameObject)
                 : 0f;
 
-            if (this.currentShield != null &&
-                attack.isBlockable && this.IsBlocking &&
+            if (currentShield != null &&
+                attack.isBlockable && IsBlocking.Value &&
                 hitLocation == MeleeWeapon.HitLocation.FrontMiddle)
             {
                 if (this.Defense.Value > 0)

@@ -242,18 +242,18 @@ namespace GameCreator.Melee
             Animator animator = melee.Character.GetCharacterAnimator().animator;
             if (IsOwner)
             {
-                if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking.Value | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
                 }
                 else
                 {
-                    //isAimedDown.Value = Input.GetMouseButton(1);
+                    isAimedDown.Value = Input.GetMouseButton(1);
 
-                    if (Input.GetMouseButtonDown(1))
-                    {
-                        isAimedDown.Value = !isAimedDown.Value;
-                    }
+                    //if (Input.GetMouseButtonDown(1))
+                    //{
+                    //    isAimedDown.Value = !isAimedDown.Value;
+                    //}
 
                     if (enableReload & !melee.IsAttacking)
                     {
