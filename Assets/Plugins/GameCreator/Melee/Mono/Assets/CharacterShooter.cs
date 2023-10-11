@@ -10,13 +10,19 @@ namespace GameCreator.Melee
 {
     public class CharacterShooter : NetworkBehaviour
     {
-        [SerializeField] private CharacterState ADSState;
+        [Header("Projectile Setttings")]
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 10);
-        [SerializeField] private float ADSRunSpeed = 3;
+        [Header("ADS Settings")]
+        [SerializeField] private CharacterState ADSState;
         [SerializeField] private UnityEngine.Camera ADSCamera;
         [SerializeField] private Transform ADSCamPivot;
         [SerializeField] private bool aimLeftHand = true;
         [SerializeField] private bool aimDuringAttackAnticipation = true;
+        [SerializeField] private float ADSRunSpeed = 3;
+        [SerializeField] private float maxADSPitch = 90;
+        [Header("Reload Settings")]
+        [SerializeField] private bool enableReload;
+        [SerializeField] private int magSize;
 
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -70,6 +76,11 @@ namespace GameCreator.Melee
             return isAimedDown.Value;
         }
 
+        public bool IsReloading()
+        {
+            return reloading.Value;
+        }
+
         private Vector3 originalADSCamLocalPos;
         private Quaternion originalADSCamLocalRot;
 
@@ -85,6 +96,7 @@ namespace GameCreator.Melee
         public override void OnNetworkSpawn()
         {
             isAimedDown.OnValueChanged += OnAimChange;
+            reloading.OnValueChanged += OnReloadingChange;
             if (IsOwner)
             {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
@@ -102,10 +114,47 @@ namespace GameCreator.Melee
         public override void OnNetworkDespawn()
         {
             isAimedDown.OnValueChanged -= OnAimChange;
+            reloading.OnValueChanged -= OnReloadingChange;
         }
 
         private void OnAimChange(bool prev, bool current)
         {
+            if (reloading.Value)
+            {
+                if (changeStateAfterReloadCoroutine != null)
+                {
+                    StopCoroutine(changeStateAfterReloadCoroutine);
+                }
+                changeStateAfterReloadCoroutine = StartCoroutine(ChangeStateAfterReload(current));
+            }
+            else
+            {
+                if (current)
+                {
+                    melee.ChangeState(
+                        ADSState,
+                        melee.currentWeapon.characterMask,
+                        MeleeWeapon.LAYER_STANCE,
+                        melee.GetComponent<CharacterAnimator>()
+                    );
+                }
+                else
+                {
+                    melee.ChangeState(
+                        melee.currentWeapon.characterState,
+                        melee.currentWeapon.characterMask,
+                        MeleeWeapon.LAYER_STANCE,
+                        melee.GetComponent<CharacterAnimator>()
+                    );
+                }
+            }
+        }
+
+        private Coroutine changeStateAfterReloadCoroutine;
+        private IEnumerator ChangeStateAfterReload(bool current)
+        {
+            yield return new WaitUntil(() => !reloading.Value);
+            if (aimStateOnReload == current) { yield break; }
             if (current)
             {
                 melee.ChangeState(
@@ -126,6 +175,17 @@ namespace GameCreator.Melee
             }
         }
 
+        private bool aimStateOnReload;
+        private void OnReloadingChange(bool prev, bool current)
+        {
+            melee.Character.GetCharacterAnimator().animator.SetBool("Reload", current);
+            if (current)
+                aimStateOnReload = isAimedDown.Value;
+        }
+
+        private NetworkVariable<bool> reloading = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private bool reloadReached;
+
         void Update()
         {
             if (!handIK) handIK = GetComponentInChildren<CharacterHandIK>();
@@ -138,6 +198,7 @@ namespace GameCreator.Melee
 
             if (melee == null) return;
 
+            Animator animator = melee.Character.GetCharacterAnimator().animator;
             if (IsOwner)
             {
                 if (melee.Character.isCharacterDashing() | melee.IsBlocking | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
@@ -151,6 +212,14 @@ namespace GameCreator.Melee
                     if (Input.GetMouseButtonDown(1))
                     {
                         isAimedDown.Value = !isAimedDown.Value;
+                    }
+
+                    if (enableReload)
+                    {
+                        if (Input.GetKeyDown(KeyCode.Z))
+                        {
+                            reloading.Value = true;
+                        }
                     }
                 }
 
@@ -215,6 +284,28 @@ namespace GameCreator.Melee
 
             shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
 
+            if (IsOwner)
+            {
+                if (reloading.Value)
+                {
+                    if (reloadReached)
+                    {
+                        if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
+                        {
+                            reloading.Value = false;
+                            reloadReached = false;
+                        }
+                    }
+                    else
+                    {
+                        if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
+                        {
+                            reloadReached = true;
+                        }
+                    }
+                }
+            }
+            
             handIK.AimRightHand(aimPoint.Value,
                    Quaternion.Euler(limbReferences.rightHandAimIKOffset),
                    shouldAim,
@@ -222,7 +313,6 @@ namespace GameCreator.Melee
                    this);
         }
 
-        [SerializeField] private float maxADSPitch = 90;
         float camAngle = 0;
         private void PerformAimDownSight(bool isAimDown)
         {
