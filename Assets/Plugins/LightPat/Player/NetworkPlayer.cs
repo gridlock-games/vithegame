@@ -21,6 +21,8 @@ namespace LightPat.Player
         [SerializeField] private GameObject playerHUD;
         [SerializeField] private GameObject[] crosshairs;
 
+        [HideInInspector] public Camera cameraCollisionDuplicate;
+        [HideInInspector] public Camera ADSCamera;
         [HideInInspector] public bool externalUIOpen;
 
         private CameraMotorTypeAdventure cameraMotorInstance;
@@ -30,15 +32,9 @@ namespace LightPat.Player
         private NetworkVariable<Vector3> camPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Quaternion> camRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        public Vector3 GetCamPosition()
-        {
-            return camPosition.Value;
-        }
+        public Vector3 GetCamPosition() { return camPosition.Value; }
 
-        public Quaternion GetCamRotation()
-        {
-            return camRotation.Value;
-        }
+        public Quaternion GetCamRotation() { return camRotation.Value; }
 
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
@@ -140,8 +136,36 @@ namespace LightPat.Player
 
             if (!IsOwner) { return; }
 
-            camPosition.Value = playerCamera.transform.position;
-            camRotation.Value = playerCamera.transform.rotation;
+            bool camFound = false;
+            if (TryGetComponent(out CharacterShooter shooter))
+            {
+                if (shooter.GetADSCamera().enabled)
+                {
+                    camPosition.Value = shooter.GetADSCamera().transform.position;
+                    camRotation.Value = shooter.GetADSCamera().transform.rotation;
+                    camFound = true;
+                }
+            }
+
+            if (!camFound)
+            {
+                if (cameraCollisionDuplicate)
+                {
+                    if (cameraCollisionDuplicate.enabled)
+                    {
+                        camPosition.Value = cameraCollisionDuplicate.transform.position;
+                        camRotation.Value = cameraCollisionDuplicate.transform.rotation;
+                        camFound = true;
+                    }
+                }
+            }
+            
+            if (!camFound)
+            {
+                camPosition.Value = playerCamera.transform.position;
+                camRotation.Value = playerCamera.transform.rotation;
+                camFound = true;
+            }
 
             // FPS Counter and Ping Display
             if (Time.unscaledTime > _timer)

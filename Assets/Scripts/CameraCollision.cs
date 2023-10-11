@@ -49,6 +49,12 @@ namespace LylekGames.Tools
             }
         }
 
+        private LightPat.Player.NetworkPlayer networkPlayer;
+        private void Awake()
+        {
+            networkPlayer = GetComponentInParent<LightPat.Player.NetworkPlayer>();
+        }
+
         public void Start()
         {
             if (!mainCamera)
@@ -151,6 +157,7 @@ namespace LylekGames.Tools
                         if (duplicatePrefab != null)
                         {
                             duplicate = Instantiate(duplicatePrefab, mainCamera.transform.position, mainCamera.transform.rotation).GetComponent<Camera>();
+                            networkPlayer.cameraCollisionDuplicate = duplicate.GetComponent<Camera>();
                         }
                         else
                         {
@@ -159,6 +166,8 @@ namespace LylekGames.Tools
                             duplicate.transform.rotation = mainCamera.transform.rotation;
 
                             duplicate.CopyProperties(mainCamera);
+
+                            networkPlayer.cameraCollisionDuplicate = duplicate.GetComponent<Camera>();
                         }
 
                         duplicate.transform.SetParent(mainCamera.transform.parent);
