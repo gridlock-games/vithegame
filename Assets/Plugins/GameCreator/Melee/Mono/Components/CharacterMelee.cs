@@ -239,13 +239,10 @@ namespace GameCreator.Melee
                                 characterShooter.ResetShootCount();
                                 if (new List<ActionKey>() { ActionKey.A, ActionKey.B }.Contains(key))
                                 {
-                                    if (!characterShooter.IsAiming())
+                                    if (!characterShooter.IsAiming() | characterShooter.GetCurrentAmmo() <= 0)
                                     {
-                                        if (this.inputBuffer.HasInput())
-                                        {
-                                            this.inputBuffer.ConsumeInput();
-                                        }
-                                        this.comboSystem.Stop();
+                                        if (inputBuffer.HasInput()) { inputBuffer.ConsumeInput(); }
+                                        comboSystem.Stop();
                                         return;
                                     }
                                 }

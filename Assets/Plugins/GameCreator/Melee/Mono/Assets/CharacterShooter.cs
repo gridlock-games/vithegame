@@ -118,6 +118,8 @@ namespace GameCreator.Melee
         {
             isAimedDown.OnValueChanged += OnAimChange;
             reloading.OnValueChanged += OnReloadingChange;
+            currentAmmo.OnValueChanged += OnAmmoChange;
+
             if (IsOwner)
             {
                 CameraMotor motor = CameraMotor.MAIN_MOTOR;
@@ -139,6 +141,7 @@ namespace GameCreator.Melee
         {
             isAimedDown.OnValueChanged -= OnAimChange;
             reloading.OnValueChanged -= OnReloadingChange;
+            currentAmmo.OnValueChanged -= OnAmmoChange;
         }
 
         private void OnAimChange(bool prev, bool current)
@@ -204,14 +207,25 @@ namespace GameCreator.Melee
         {
             melee.Character.GetCharacterAnimator().animator.SetBool("Reload", current);
             if (current)
+            {
                 aimStateOnReload = isAimedDown.Value;
+                waitForAmmoChange = true;
+            }
             else if (IsServer)
+            {
                 currentAmmo.Value = magSize;
+            }
+        }
+
+        private void OnAmmoChange(int prev, int current)
+        {
+            waitForAmmoChange = false;
         }
 
         public bool triggerReload;
         private NetworkVariable<bool> reloading = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool reloadReached;
+        private bool waitForAmmoChange;
 
         void Update()
         {
@@ -243,7 +257,7 @@ namespace GameCreator.Melee
 
                     if (enableReload & !melee.IsAttacking)
                     {
-                        if (((Input.GetKeyDown(KeyCode.Z) | triggerReload) & currentAmmo.Value < magSize) | currentAmmo.Value <= 0)
+                        if (((Input.GetKeyDown(KeyCode.Z) | triggerReload) & currentAmmo.Value < magSize) | (currentAmmo.Value <= 0 & !waitForAmmoChange))
                         {
                             reloading.Value = true;
                         }
@@ -319,6 +333,7 @@ namespace GameCreator.Melee
                     {
                         if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
                         {
+                            Debug.Log("Reload finished");
                             reloading.Value = false;
                             reloadReached = false;
                         }
@@ -327,6 +342,7 @@ namespace GameCreator.Melee
                     {
                         if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
                         {
+                            Debug.Log("Reload reached");
                             reloadReached = true;
                         }
                     }
