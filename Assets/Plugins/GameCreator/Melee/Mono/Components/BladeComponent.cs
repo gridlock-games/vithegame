@@ -133,9 +133,7 @@
         {
             if (!this.Melee) return;
 
-            LocalVariables variables = Melee.Character.gameObject.GetComponent<LocalVariables>();
-            bool isDodging = (bool)variables.Get("isDodging").Get();
-
+            bool isDodging = Melee.Character.isCharacterDashing();
 
             int currPhase = Melee.GetCurrentPhase();
 
@@ -149,6 +147,7 @@
                     weaponTrail.Deactivate(0f);
                 }
                 isVFXActivated = false;
+                Melee.GetComboSystem().Stop();
             }
 
             MeleeClip clip = Melee.currentMeleeClip;

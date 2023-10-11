@@ -75,7 +75,7 @@
 
             if (characterTarget == null) { Destroy(target); return; }
             if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered ||
-                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned || 
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { Destroy(target); return; }
             if (characterTarget.disableActions.Value) { Destroy(target); return; }
             if (isDashing) { Destroy(target); return; }
@@ -85,7 +85,7 @@
             if (melee.IsStaggered) { Destroy(target); return; }
             if (melee.GetHP() <= 0) { Destroy(target); return; }
             if (melee.GetPoise() <= 10) { Destroy(target); return; }
-            
+
             // if (melee.GetCurrentPhase() >= 1 ) { Destroy(target); return; }
 
             // TO DO: Do not activate ability if it matches the current melee Phase
@@ -166,13 +166,14 @@
                 adventureMotor = (CameraMotorTypeAdventure)motor.cameraMotorType;
             }
 
-            if(characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Reset || 
-                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown) {
+            if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.Reset ||
+                characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown)
+            {
                 characterTarget.didDodgeCancelAilment = true;
                 characterTarget.CancelAilment();
             }
 
-            if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true ))
+            if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true))
             {
                 if (adventureMotor != null) adventureMotor.allowOrbitInput = true;
                 melee.StopAttack();

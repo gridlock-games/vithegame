@@ -114,6 +114,10 @@
                     ammoDisplayText.SetText("");
                 }
             }
+            else
+            {
+                ammoDisplayText.SetText("");
+            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
