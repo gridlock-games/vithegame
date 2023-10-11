@@ -206,7 +206,7 @@
             string playersString = "";
             foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
             {
-                if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(kvp.Key)) { return; }
+                if (!ClientManager.Singleton.GetClientDataDictionary().ContainsKey(kvp.Key)) { continue; }
 
                 playersString += kvp.Key.ToString() + kvp.Value.ToString() + ClientManager.Singleton.GetClient(kvp.Key).team.ToString();
             }
