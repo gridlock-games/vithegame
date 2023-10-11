@@ -24,6 +24,8 @@ namespace GameCreator.Melee
         [SerializeField] private bool enableReload;
         [SerializeField] private int magSize;
 
+        private NetworkVariable<int> currentAmmo = new NetworkVariable<int>(1);
+
         private NetworkVariable<bool> isAimedDown = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -42,8 +44,7 @@ namespace GameCreator.Melee
         {
             if (!IsServer) { Debug.LogError("CharacterShooter.Shoot() should only be called on the server"); return; }
 
-            if (shootCount >= attackClip.hitCount) { return; }
-            if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return; }
+            if (!CanShoot(attackClip)) { return; }
 
             if (!handIK.IsRightHandAiming())
                 Debug.LogError(Time.time + " " + handIK.IsRightHandAiming());
@@ -59,6 +60,7 @@ namespace GameCreator.Melee
 
             lastShootTime = Time.time;
             shootCount++;
+            currentAmmo.Value -= 1;
         }
 
         public void ResetShootCount() { shootCount = 0; }
@@ -76,9 +78,23 @@ namespace GameCreator.Melee
             return isAimedDown.Value;
         }
 
-        public bool IsReloading()
+        public int GetCurrentAmmo()
         {
-            return reloading.Value;
+            return currentAmmo.Value;
+        }
+
+        public int GetMagSize()
+        {
+            return magSize;
+        }
+
+        private bool CanShoot(MeleeClip attackClip)
+        {
+            if (reloading.Value) { return false; }
+            if (shootCount >= attackClip.hitCount) { return false; }
+            if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return false; }
+
+            return true;
         }
 
         private Vector3 originalADSCamLocalPos;
@@ -109,6 +125,9 @@ namespace GameCreator.Melee
             {
                 Destroy(ADSCamera.gameObject);
             }
+
+            if (IsServer)
+                currentAmmo.Value = magSize;
         }
 
         public override void OnNetworkDespawn()
@@ -181,6 +200,8 @@ namespace GameCreator.Melee
             melee.Character.GetCharacterAnimator().animator.SetBool("Reload", current);
             if (current)
                 aimStateOnReload = isAimedDown.Value;
+            else if (IsServer)
+                currentAmmo.Value = magSize;
         }
 
         private NetworkVariable<bool> reloading = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -216,9 +237,10 @@ namespace GameCreator.Melee
 
                     if (enableReload)
                     {
-                        if (Input.GetKeyDown(KeyCode.Z))
+                        if (Input.GetKeyDown(KeyCode.Z) | currentAmmo.Value <= 0)
                         {
                             reloading.Value = true;
+                            melee.Character.GetCharacterAnimator().StopGesture();
                         }
                     }
                 }
