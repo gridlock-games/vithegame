@@ -333,7 +333,6 @@ namespace GameCreator.Melee
                     {
                         if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
                         {
-                            Debug.Log("Reload finished");
                             reloading.Value = false;
                             reloadReached = false;
                         }
@@ -342,7 +341,6 @@ namespace GameCreator.Melee
                     {
                         if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Reload")).IsName("Reload"))
                         {
-                            Debug.Log("Reload reached");
                             reloadReached = true;
                         }
                     }
