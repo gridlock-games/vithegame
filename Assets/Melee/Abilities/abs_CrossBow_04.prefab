@@ -49,13 +49,19 @@ MonoBehaviour:
   meleeClip: {fileID: 11400000, guid: d9b7de062dde6f343be90dc42a1928e8, type: 2}
   abilityType: 0
   dodgeLockOnhase: 0
-  coolDown: 10
-  staminaCost: 15
+  coolDown: 50
+  staminaCost: 0
   hpCost: 0
-  rageCost: 0
+  rageCost: 50
   skillKey: 116
   canCncelAnimationType: 1
   canCancelAnimation: 0
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
+  aimDuringAttackAnticipation: 0
+  aimDuringAttack: 1
+  aimDuringAttackRecovery: 0
+  aimLeftHand: 0
+  requireAmmo: 0
+  ammoRequirement: 0
