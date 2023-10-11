@@ -240,7 +240,7 @@
                     {
                         abilityVFXInstance = Instantiate(abilityVFXPrefab,
                             floorHit.point,
-                            character.transform.rotation * Quaternion.Euler(vfxRotationOffset)
+                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, Vector3.right))
                         );
                     }
                     else
