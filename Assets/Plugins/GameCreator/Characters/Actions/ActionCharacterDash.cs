@@ -72,15 +72,18 @@
 
             Character characterTarget = this.character.GetCharacter(target);
             bool isDashing = characterTarget.isCharacterDashing();
+            if (isDashing) { Destroy(target); return; }
+
+            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
+            if (melee.rooted.Value) { return; }
 
             if (characterTarget == null) { Destroy(target); return; }
             if (characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered ||
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { Destroy(target); return; }
             if (characterTarget.disableActions.Value) { Destroy(target); return; }
-            if (isDashing) { Destroy(target); return; }
+            
 
-            CharacterMelee melee = characterTarget.GetComponent<CharacterMelee>();
             if (melee == null) { Destroy(target); return; }
             if (melee.IsStaggered) { Destroy(target); return; }
             if (melee.GetHP() <= 0) { Destroy(target); return; }
