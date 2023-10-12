@@ -222,6 +222,7 @@
                 Team localPlayerTeam = ClientManager.Singleton.GetClient(melee.OwnerClientId).team;
                 foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
                 {
+                    if (!valuePair.Value) { continue; }
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
                     {
                         if (this.melee == melee) { continue; }
