@@ -185,6 +185,7 @@
             characterAilmentNetworked.OnValueChanged += OnAilmentChange;
             isControllable.OnValueChanged += OnIsControllableChange;
             overrideFaceDirection.OnValueChanged += OnOverrideFaceDirectionChange;
+            dead.OnValueChanged += OnDeadChange;
             
             characterStatusManager = this.GetComponentInChildren<CharacterStatusManager>();
 
@@ -200,6 +201,16 @@
             characterAilmentNetworked.OnValueChanged -= OnAilmentChange;
             isControllable.OnValueChanged -= OnIsControllableChange;
             overrideFaceDirection.OnValueChanged -= OnOverrideFaceDirectionChange;
+            dead.OnValueChanged -= OnDeadChange;
+        }
+
+        private void OnDeadChange(bool prev, bool current)
+        {
+            characterLocomotion.characterController.enabled = !current;
+            foreach (Collider c in GetComponentsInChildren<Collider>())
+            {
+                c.enabled = !current;
+            }
         }
 
         protected override void Awake()

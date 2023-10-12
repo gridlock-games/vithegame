@@ -82,8 +82,16 @@
 
         // INITIALIZERS: --------------------------------------------------------------------------
 
+        public static StatusUI[] staticStatusUIAssignments { get; private set; }
+
         private TeamIndicator teamIndicator;
         private CharacterStatusManager statusManager;
+
+        private void Awake()
+        {
+            staticStatusUIAssignments = new StatusUI[statusUIAssignments.Length];
+            statusUIAssignments.CopyTo(staticStatusUIAssignments, 0);
+        }
 
         private void Start()
         {
@@ -198,7 +206,7 @@
             string playersString = "";
             foreach (var kvp in ClientManager.Singleton.localNetworkPlayers)
             {
-                if (ClientManager.Singleton.GetClientDataDictionary().ContainsKey(kvp.Key)) { return; }
+                if (!ClientManager.Singleton.GetClientDataDictionary().ContainsKey(kvp.Key)) { continue; }
 
                 playersString += kvp.Key.ToString() + kvp.Value.ToString() + ClientManager.Singleton.GetClient(kvp.Key).team.ToString();
             }
@@ -221,6 +229,7 @@
                         Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
                         if (!teamIndicator.teamsAreActive) { continue; }
                         if (playerTeam != localPlayerTeam) { continue; }
+                        if (playerTeam == Team.Competitor | localPlayerTeam == Team.Competitor) { continue; }
 
                         GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
                         playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true);

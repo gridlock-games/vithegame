@@ -388,6 +388,8 @@ namespace LightPat.Core
                     yield return PostRequest(payload);
                 }
             }
+
+            getRequest.Dispose();
             updateServerStatusRunning = false;
         }
 
@@ -419,6 +421,7 @@ namespace LightPat.Core
             {
                 Debug.LogError("Put request error in ClientManager.PutRequest " + putRequest.error);
             }
+            putRequest.Dispose();
             putRequestCalled = true;
         }
 
@@ -459,6 +462,7 @@ namespace LightPat.Core
             {
                 Debug.LogError("Post request error in ClientManager.PostRequest " + postRequest.error);
             }
+            postRequest.Dispose();
             postRequestCalled = true;
         }
 

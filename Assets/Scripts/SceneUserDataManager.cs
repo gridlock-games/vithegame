@@ -189,6 +189,7 @@ public class SceneUserDataManager : MonoBehaviour
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         networkTransport.ConnectionData.Address = playerHubServerList[0].ip;
         networkTransport.ConnectionData.Port = ushort.Parse(playerHubServerList[0].port);
+        getRequest.Dispose();
     }
 
     void Start()

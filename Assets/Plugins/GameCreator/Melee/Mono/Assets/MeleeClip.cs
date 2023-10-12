@@ -239,7 +239,7 @@
                     if (bHit)
                     {
                         abilityVFXInstance = Instantiate(abilityVFXPrefab,
-                            floorHit.point + vfx.vfxPositionOffset,
+                            floorHit.point + character.transform.rotation * vfx.vfxPositionOffset,
                             Quaternion.LookRotation(Vector3.Cross(floorHit.normal, vfx.crossProductDirection), vfx.lookRotationUpDirection) * character.transform.rotation * Quaternion.Euler(vfx.vfxRotationOffset)
                         );
                     }

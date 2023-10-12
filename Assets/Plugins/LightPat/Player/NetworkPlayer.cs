@@ -79,6 +79,11 @@ namespace LightPat.Player
 
         private void Start()
         {
+            if (!IsSpawned)
+            {
+                playerHUD.SetActive(false);
+            }
+
             StartCoroutine(ChangeSkin());
         }
 
