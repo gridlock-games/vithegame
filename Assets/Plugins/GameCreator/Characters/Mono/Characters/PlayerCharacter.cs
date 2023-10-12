@@ -126,7 +126,7 @@
         public PlayerCharacterNetworkTransform.StatePayload ProcessMovement(PlayerCharacterNetworkTransform.InputPayload inputPayload)
         {
             // If the input payload hasn't been recieved yet (this happens on non-owner clients)
-            if (!inputPayload.initialized) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+            if (!inputPayload.initialized | IsDead()) { return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
 
             if (TryGetComponent(out Melee.CharacterShooter characterShooter))
             {
@@ -141,11 +141,6 @@
             {
                 if (IsServer)
                     melee.rooted.Value = Time.time < melee.rootEndTime;
-
-                //if (melee.rooted.Value)
-                //{
-                //    return new PlayerCharacterNetworkTransform.StatePayload(inputPayload.tick, transform.position, transform.rotation);
-                //}
 
                 if (IsServer)
                     melee.fearing.Value = Time.time < melee.fearEndTime;
