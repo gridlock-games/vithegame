@@ -232,9 +232,13 @@ namespace GameCreator.Melee
             Animator animator = melee.Character.GetCharacterAnimator().animator;
             if (IsOwner)
             {
-                if (melee.Character.isCharacterDashing() | melee.IsBlocking.Value | melee.IsStaggered | melee.IsCastingAbility.Value | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
+                if (melee.Character.isCharacterDashing() | melee.IsBlocking.Value | melee.IsStaggered | melee.Character.characterAilment != CharacterLocomotion.CHARACTER_AILMENTS.None)
                 {
                     isAimedDown.Value = false;
+                }
+                else if (melee.IsCastingAbility.Value)
+                {
+                    if (!melee.abilityManager.GetActivatedAbility().allowADS) { isAimedDown.Value = false; }
                 }
                 else
                 {
