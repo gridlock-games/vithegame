@@ -112,6 +112,13 @@ namespace LightPat.UI
                 return;
             }
 
+            if (melee.Character.IsDead())
+            {
+                spectatorHotKeyInstance.SetActive(false);
+                healthSlider.gameObject.SetActive(false);
+                return;
+            }
+
             if (teamIndicator)
             {
                 if (teamIndicator.teamColor == Color.black)
