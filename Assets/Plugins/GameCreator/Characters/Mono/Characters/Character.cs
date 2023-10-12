@@ -453,14 +453,14 @@
                         bool waitForClientRotation = false;
                         if (IsServer)
                         {
+                            PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                             if (target.IsOwnedByServer)
                             {
-                                PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                                 target.transform.rotation = rotationConfig.quaternion;
                             }
                             else
                             {
-                                target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                                target.UpdateAilmentRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                                 waitForClientRotation = true;
                             }
                         }
@@ -537,14 +537,14 @@
                 bool waitForClientRotation = false;
                 if (IsServer)
                 {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                     if (target.IsOwnedByServer)
                     {
-                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                         target.transform.rotation = rotationConfig.quaternion;
                     }
                     else
                     {
-                        target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                        target.UpdateAilmentRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                         waitForClientRotation = true;
                     }
                 }
@@ -582,14 +582,14 @@
                 CharacterLocomotion.CHARACTER_AILMENTS prevAilment = this.characterAilment;
                 if (IsServer)
                 {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                     if (target.IsOwnedByServer)
                     {
-                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                         target.transform.rotation = rotationConfig.quaternion;
                     }
                     else
                     {
-                        target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                        target.UpdateAilmentRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                         waitForClientRotation = true;
                     }
                 }
@@ -665,14 +665,14 @@
                 bool waitForClientRotation = false;
                 if (IsServer)
                 {
+                    PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                     if (target.IsOwnedByServer)
                     {
-                        PreserveRotation rotationConfig = Rotation(attacker.gameObject, target);
                         target.transform.rotation = rotationConfig.quaternion;
                     }
                     else
                     {
-                        target.UpdateAilmentRotationClientRpc(attacker.NetworkObjectId, target.NetworkObjectId, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
+                        target.UpdateAilmentRotationClientRpc(rotationConfig.quaternion, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { target.OwnerClientId } } });
                         waitForClientRotation = true;
                     }
                 }
@@ -699,36 +699,41 @@
 
         [ClientRpc] public void UpdateRotationClientRpc(Quaternion targetRotation, ClientRpcParams clientRpcParams) { transform.rotation = targetRotation; }
 
-        [ClientRpc]
-        private void UpdateAilmentRotationClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
-        {
-            //this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
-            PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
-            target.transform.rotation = rotationConfig.quaternion;
-            target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
-        }
+        //[ClientRpc]
+        //private void UpdateAilmentRotationOLDClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
+        //{
+        //    Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
+        //    PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
+        //    if (target.TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+        //    {
+        //        networkTransform.SetRotation(rotationConfig.quaternion);
+        //    }
+        //    else
+        //    {
+        //        target.transform.rotation = rotationConfig.quaternion;
+        //    }
+        //    target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
+        //    Debug.Log("Rotation on client calcuated: " + rotationConfig.vector3);
+        //}
 
         [ClientRpc]
-        private void UpdateAilmentPositionClientRpc(ulong attackerObjId, ulong targetObjId, ClientRpcParams clientRpcParams)
+        private void UpdateAilmentRotationClientRpc(Quaternion rotation, ClientRpcParams clientRpcParams)
         {
-            //this.characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false);
-            Character target = NetworkManager.SpawnManager.SpawnedObjects[targetObjId].GetComponent<Character>();
-            Character attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].GetComponent<Character>();
-            PreserveRotation rotationConfig = Rotation(NetworkManager.SpawnManager.SpawnedObjects[attackerObjId].gameObject, target);
-            target.transform.rotation = rotationConfig.quaternion;
-            Vector3 deltaPos = target.transform.position - attacker.transform.position;
-            target.transform.position =  target.transform.position - deltaPos.normalized * 0.5f;
-            target.AilmentRotationHasBeenRecievedServerRpc(rotationConfig.vector3);
+            if (TryGetComponent(out PlayerCharacterNetworkTransform networkTransform))
+            {
+                networkTransform.SetRotation(rotation);
+            }
+            else
+            {
+                transform.rotation = rotation;
+            }
+            AilmentRotationHasBeenRecievedServerRpc(rotation);
+            Debug.Log("Rotation on client calcuated: " + rotation.eulerAngles);
         }
+
 
         private bool ailmentRotationRecieved;
-        [ServerRpc]
-        private void AilmentRotationHasBeenRecievedServerRpc(Vector3 targetEulerAngles)
-        {
-            transform.rotation = Quaternion.Euler(targetEulerAngles);
-            ailmentRotationRecieved = true;
-        }
+        [ServerRpc] private void AilmentRotationHasBeenRecievedServerRpc(Quaternion rotation) { ailmentRotationRecieved = true; }
 
         /* Pause for a given duration if the target character is coming from another ailment.
         Ailments: Stun, Knockup*/
@@ -853,7 +858,7 @@
             CharacterMelee melee = this.GetComponent<CharacterMelee>();
 
             melee.SetUninterruptable(0f);
-            melee.RevertAbilityCastingStatus();
+            if (IsServer) { melee.RevertAbilityCastingStatus(); }
             bool isDodging = this.isCharacterDashing();
 
             if (IsServer) { characterLocomotion.UpdateDirectionControl(CharacterLocomotion.OVERRIDE_FACE_DIRECTION.MovementDirection, false); }

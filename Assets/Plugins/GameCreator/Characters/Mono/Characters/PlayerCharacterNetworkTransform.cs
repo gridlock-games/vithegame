@@ -92,6 +92,16 @@ namespace GameCreator.Characters
             overwritePosition = true;
         }
 
+        private Quaternion queuedRotationOverwrite;
+        private bool overwriteRotation;
+        public void SetRotation(Quaternion newRotation)
+        {
+            if (!IsOwner) { Debug.LogError("SetPosition() needs to be called from the server"); return; }
+
+            queuedRotationOverwrite = newRotation;
+            overwriteRotation = true;
+        }
+
         public override void OnNetworkSpawn()
         {
             currentPosition = transform.position;
@@ -247,6 +257,13 @@ namespace GameCreator.Characters
                 playerCharacter.characterLocomotion.characterController.enabled = false;
                 transform.position = statePayload.position;
                 playerCharacter.characterLocomotion.characterController.enabled = true;
+            }
+
+            if (overwriteRotation)
+            {
+                statePayload.rotation = queuedRotationOverwrite;
+                overwriteRotation = false;
+                transform.rotation = statePayload.rotation;
             }
 
             return statePayload;

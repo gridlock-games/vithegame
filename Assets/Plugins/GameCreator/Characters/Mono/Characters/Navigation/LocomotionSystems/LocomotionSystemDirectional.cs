@@ -45,8 +45,8 @@
                 // If distance is greater than teleport threshold, teleport player object to the network position
                 if (Vector3.Distance(networkTransform.currentPosition, networkTransform.transform.position) > networkTransform.playerObjectTeleportThreshold)
                 {
-                    if (!networkTransform.NetworkManager.IsServer)
-                        Debug.Log("Teleporting player " + networkTransform.OwnerClientId);
+                    //if (!networkTransform.NetworkManager.IsServer)
+                    //    Debug.Log("Teleporting player " + networkTransform.OwnerClientId);
                     characterLocomotion.characterController.enabled = false;
                     characterLocomotion.characterController.transform.position = networkTransform.currentPosition;
                     characterLocomotion.characterController.enabled = true;
