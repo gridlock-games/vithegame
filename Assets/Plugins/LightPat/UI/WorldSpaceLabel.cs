@@ -43,7 +43,7 @@ namespace LightPat.UI
             foreach (var status in statusManager.GetCharacterStatusList())
             {
                 GameObject g = Instantiate(statusImagePrefab, statusImageParent);
-                foreach (CharacterMeleeUI.StatusUI statusUI in meleeUI.statusUIAssignments)
+                foreach (CharacterMeleeUI.StatusUI statusUI in CharacterMeleeUI.staticStatusUIAssignments)
                 {
                     if (statusUI.status == status)
                     {
@@ -61,18 +61,10 @@ namespace LightPat.UI
             }
         }
 
-        private CharacterMeleeUI.StatusUI[] statusUIAssignments;
-
         private CharacterStatusManager statusManager;
-        [SerializeField] private CharacterMeleeUI meleeUI;
         private void Awake()
         {
             statusManager = transform.root.GetComponent<CharacterStatusManager>();
-
-            if (meleeUI)
-            {
-                meleeUI.statusUIAssignments.CopyTo(statusUIAssignments, 0);
-            }
         }
 
         private void OnEnable()
@@ -117,6 +109,13 @@ namespace LightPat.UI
             if (target == null)
             {
                 Destroy(gameObject);
+                return;
+            }
+
+            if (melee.Character.IsDead())
+            {
+                spectatorHotKeyInstance.SetActive(false);
+                healthSlider.gameObject.SetActive(false);
                 return;
             }
 

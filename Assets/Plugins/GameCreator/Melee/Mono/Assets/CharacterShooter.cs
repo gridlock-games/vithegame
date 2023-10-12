@@ -392,6 +392,12 @@ namespace GameCreator.Melee
                     float mouseY = -Input.GetAxisRaw("Mouse Y") * adventureMotor.sensitivity.GetValue(gameObject).y * Time.timeScale;
                     float mouseX = Input.GetAxisRaw("Mouse X") * adventureMotor.sensitivity.GetValue(gameObject).x * Time.timeScale;
 
+                    if (adventureMotor.invertLookFearStatus)
+                    {
+                        mouseY *= -1;
+                        mouseX *= -1;
+                    }
+
                     if (camAngle + mouseY > maxADSPitch)
                     {
                         mouseY = maxADSPitch - camAngle;

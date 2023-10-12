@@ -155,8 +155,6 @@ public class CharacterStatusManager : NetworkBehaviour
             worldSpaceLabel.UpdateStatusUI();
         }
 
-        if (IsOwner) { meleeUI.UpdateStatusUI(); }
-
         if (!IsServer) { return; }
 
         if (networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Add | networkListEvent.Type == NetworkListEvent<CHARACTER_STATUS_NETWORKED>.EventType.Value)

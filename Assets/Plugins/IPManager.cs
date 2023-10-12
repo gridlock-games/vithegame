@@ -55,12 +55,14 @@ namespace UnityEngine
                         this.VMServerHost = FailOverVMServerHost;
                     }
                 }
+                www.Dispose();
             }
         }
-        
 
-        private string GetSubNet(string IPAddress) {
-           return IPAddress.Substring(0, IPAddress.LastIndexOf('.') + 1);
+
+        private string GetSubNet(string IPAddress)
+        {
+            return IPAddress.Substring(0, IPAddress.LastIndexOf('.') + 1);
         }
 
         public static string GetIP(ADDRESSFAM Addfam)
