@@ -199,6 +199,8 @@ namespace GameCreator.Melee
             }
         }
 
+        public ActionKey LastActionKey { get; private set; }
+
         private void Update()
         {
             if (IsServer)
@@ -228,6 +230,7 @@ namespace GameCreator.Melee
                 if (this.CanAttack() && this.inputBuffer.HasInput())
                 {
                     ActionKey key = this.inputBuffer.GetInput();
+                    LastActionKey = key;
                     MeleeClip meleeClip = this.comboSystem.Select(key);
 
                     if (meleeClip)

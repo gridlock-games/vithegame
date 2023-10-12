@@ -188,6 +188,11 @@
             float speed;
             MeleeClip dodgeMeleeClip;
 
+            if (melee.LastActionKey != CharacterMelee.ActionKey.A & melee.IsAttacking)
+            {
+                if (angle <= 15f && angle >= -15f) { angle = 180; }
+            }
+
             float transitionIn;
             float transitionOut;
             #region Compute Angle
@@ -260,8 +265,8 @@
                 clip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 this.meleeAnimationClip = !melee.IsAttacking ? dodgeMeleeClip.animationClip : dodgeMeleeClip.attackDodgeClip;
                 speed = meleeweapon.dodgeB.animSpeed;
-                transitionIn = meleeweapon.dodgeF.transitionIn;
-                transitionOut = meleeweapon.dodgeF.transitionOut;
+                transitionIn = meleeweapon.dodgeB.transitionIn;
+                transitionOut = meleeweapon.dodgeB.transitionOut;
             }
             #endregion
 
