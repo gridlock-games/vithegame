@@ -169,10 +169,12 @@ namespace LightPat.UI
                     spectatorHotKeyInstance.SetActive(true);
                     healthSlider.gameObject.SetActive(false);
                 }
-                else
+                else // If the local player is not a spectator
                 {
+                    bool canHit = CharacterMelee.CheckHitTeams(melee.OwnerClientId, NetworkManager.Singleton.LocalClientId);
+
                     spectatorHotKeyInstance.SetActive(false);
-                    healthSlider.gameObject.SetActive(true);
+                    healthSlider.gameObject.SetActive(canHit);
                 }
 
                 rotTarget = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), rotationSpeed);
