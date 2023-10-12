@@ -58,6 +58,7 @@ public class Ability : MonoBehaviour
     public bool aimDuringAttack = true;
     public bool aimDuringAttackRecovery;
     public bool aimLeftHand;
+    public bool allowADS;
     [Header("Ammo Settings")]
     public bool requireAmmo;
     public int ammoRequirement;
