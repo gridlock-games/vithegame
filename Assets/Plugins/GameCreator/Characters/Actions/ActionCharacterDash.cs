@@ -82,7 +82,6 @@
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedUp) { Destroy(target); return; }
             if (characterTarget.disableActions.Value) { Destroy(target); return; }
-            
 
             if (melee == null) { Destroy(target); return; }
             if (melee.IsStaggered) { Destroy(target); return; }
