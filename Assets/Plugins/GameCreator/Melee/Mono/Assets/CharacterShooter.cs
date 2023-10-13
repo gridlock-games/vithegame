@@ -326,8 +326,6 @@ namespace GameCreator.Melee
                 {
                     shouldAim = true;
                 }
-
-                Debug.Log(Time.time);
             }
 
             shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
