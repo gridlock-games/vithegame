@@ -204,12 +204,29 @@
             dead.OnValueChanged -= OnDeadChange;
         }
 
+        [SerializeField] private GameObject deathCameraPrefab;
+        private GameObject deathCameraInstance;
         private void OnDeadChange(bool prev, bool current)
         {
             characterLocomotion.characterController.enabled = !current;
             foreach (Collider c in GetComponentsInChildren<Collider>())
             {
                 c.enabled = !current;
+            }
+
+            if (IsLocalPlayer)
+            {
+                if (current)
+                {
+                    deathCameraInstance = Instantiate(deathCameraPrefab, transform.position + Vector3.up, transform.rotation);
+                    deathCameraInstance.GetComponent<LightPat.Core.SpectatorCamera>().ActivateDeathCam(GetComponent<LightPat.Player.NetworkPlayer>());
+                    GetComponent<LightPat.Player.NetworkPlayer>().SetDeathCamStatus(true);
+                }
+                else
+                {
+                    GetComponent<LightPat.Player.NetworkPlayer>().SetDeathCamStatus(false);
+                    Destroy(deathCameraInstance);
+                }
             }
         }
 

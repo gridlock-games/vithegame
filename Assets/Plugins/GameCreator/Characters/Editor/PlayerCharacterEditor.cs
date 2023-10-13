@@ -121,7 +121,7 @@
                     EditorGUI.EndDisabledGroup();
                     EditorGUI.indentLevel--;
 
-                    EditorGUILayout.EndVertical();
+					EditorGUILayout.EndVertical();
 				}
 			}
 

@@ -101,6 +101,8 @@
         protected SerializedProperty spFaceDirectionTarget;
 		protected SerializedProperty spUseNavmesh;
 
+		private SerializedProperty spDeathCamPrefab;
+
 		// INITIALIZERS: -----------------------------------------------------------------------------------------------
 
 		protected void OnEnable()
@@ -132,6 +134,8 @@
             this.spFaceDirection = spCharLocomotion.FindPropertyRelative(PROP_FACEDR);
             this.spFaceDirectionTarget = spCharLocomotion.FindPropertyRelative(PROP_FACEDT);
 			this.spUseNavmesh = spCharLocomotion.FindPropertyRelative(PROP_NAVMES);
+
+			spDeathCamPrefab = serializedObject.FindProperty("deathCameraPrefab");
 		}
 
 		protected void OnDisable()
@@ -178,6 +182,7 @@
 				if (group.visible)
 				{
 					EditorGUILayout.BeginVertical(CoreGUIStyles.GetBoxExpanded());
+					EditorGUILayout.PropertyField(spDeathCamPrefab);
 
 					EditorGUILayout.LabelField("Locomotion:", EditorStyles.boldLabel);
 					EditorGUI.indentLevel++;

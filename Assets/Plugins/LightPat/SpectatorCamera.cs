@@ -20,6 +20,20 @@ namespace LightPat.Core
         [SerializeField] private GameObject playerCardLeftAnchorPrefab;
         [SerializeField] private GameObject playerCardRightAnchorPrefab;
 
+        private bool isDeathCam;
+        private Player.NetworkPlayer networkPlayer;
+        public void ActivateDeathCam(Player.NetworkPlayer networkPlayer)
+        {
+            isDeathCam = true;
+            //gameObject.AddComponent<GameCreator.Core.Hooks.HookCamera>();
+            gameObject.AddComponent<AudioListener>();
+            GetComponent<Camera>().enabled = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            UICanvasInstance.SetActive(true);
+            tag = "MainCamera";
+            this.networkPlayer = networkPlayer;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (IsOwner)
@@ -57,9 +71,11 @@ namespace LightPat.Core
 
         private void Update()
         {
-            if (!IsSpawned) { return; }
-
-            if (!IsOwner) { return; }
+            if (!isDeathCam)
+            {
+                if (!IsSpawned) { return; }
+                if (!IsOwner) { return; }
+            }
 
             // FPS Counter and Ping Display
             if (Time.unscaledTime > _timer)
@@ -186,35 +202,38 @@ namespace LightPat.Core
                 }
             }
 
-            // Pause menu
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (!isDeathCam)
             {
-                if (!pauseInstance)
+                // Pause menu
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
-                    Cursor.lockState = CursorLockMode.None;
-                    pauseInstance = Instantiate(pauseMenuPrefab);
+                    if (!pauseInstance)
+                    {
+                        Cursor.lockState = CursorLockMode.None;
+                        pauseInstance = Instantiate(pauseMenuPrefab);
+                    }
+                    else
+                    {
+                        Cursor.lockState = CursorLockMode.Locked;
+                        pauseInstance.GetComponent<Menu>().DestroyAllMenus();
+                        Destroy(pauseInstance);
+                    }
                 }
-                else
+
+                if (!ClientManager.Singleton) { return; }
+
+                // Scoreboard
+                if (Input.GetKeyDown(KeyCode.Tab))
                 {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    pauseInstance.GetComponent<Menu>().DestroyAllMenus();
-                    Destroy(pauseInstance);
+                    if (!scoreboardInstance)
+                        scoreboardInstance = Instantiate(scoreboardPrefab);
                 }
-            }
 
-            if (!ClientManager.Singleton) { return; }
-
-            // Scoreboard
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                if (!scoreboardInstance)
-                    scoreboardInstance = Instantiate(scoreboardPrefab);
-            }
-
-            if (Input.GetKeyUp(KeyCode.Tab))
-            {
-                if (scoreboardInstance)
-                    Destroy(scoreboardInstance);
+                if (Input.GetKeyUp(KeyCode.Tab))
+                {
+                    if (scoreboardInstance)
+                        Destroy(scoreboardInstance);
+                }
             }
 
             string playersString = "";
@@ -238,6 +257,12 @@ namespace LightPat.Core
                     if (valuePair.Value.TryGetComponent(out CharacterMelee melee))
                     {
                         Team playerTeam = ClientManager.Singleton.GetClient(valuePair.Key).team;
+                        if (isDeathCam)
+                        {
+                            Team localTeam = ClientManager.Singleton.GetClient(networkPlayer.OwnerClientId).team;
+                            if (localTeam != playerTeam) { continue; }
+                        }
+
                         if (playerTeam == Team.Blue)
                         {
                             GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
