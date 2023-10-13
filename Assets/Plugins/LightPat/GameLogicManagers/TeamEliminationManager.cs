@@ -308,13 +308,16 @@ namespace LightPat.Core
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-                if (teamHPs.ContainsKey(clientPair.Value.team))
+                if (playerObject.TryGetComponent(out GameCreator.Melee.CharacterMelee melee))
                 {
-                    teamHPs[clientPair.Value.team] += playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
-                }
-                else
-                {
-                    teamHPs.Add(clientPair.Value.team, playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP());
+                    if (teamHPs.ContainsKey(clientPair.Value.team))
+                    {
+                        teamHPs[clientPair.Value.team] += melee.GetHP();
+                    }
+                    else
+                    {
+                        teamHPs.Add(clientPair.Value.team, melee.GetHP());
+                    }
                 }
             }
 
