@@ -274,7 +274,7 @@ namespace LightPat.Core
                 if (clientPair.Value.team == Team.Spectator) { continue; }
 
                 Character playerChar = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject.GetComponent<Character>();
-                playerChar.CancelAilment();
+                playerChar.CancelAilment(null);
 
                 GameCreator.Melee.CharacterMelee charMelee = playerChar.GetComponent<GameCreator.Melee.CharacterMelee>();
                 charMelee.ResetHP();

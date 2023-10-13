@@ -266,6 +266,12 @@ namespace GameCreator.Characters
                 transform.rotation = statePayload.rotation;
             }
 
+            if (playerCharacter.ShouldApplyAilmentRotation())
+            {
+                statePayload.rotation = playerCharacter.GetAilmentRotation();
+                transform.rotation = statePayload.rotation;
+            }
+
             return statePayload;
         }
 
