@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17676239, g: 0.22125976, b: 0.30355546, a: 1}
+  m_IndirectSpecularColor: {r: 0.17676294, g: 0.22126085, b: 0.30355734, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -24638,20 +24638,28 @@ MonoBehaviour:
     - {x: -46, y: 6, z: -19}
     - {x: 36, y: 15, z: -47}
     - {x: 29.5, y: -12, z: 53.5}
+    - {x: -50, y: 6, z: -16}
+    - {x: 36, y: 15, z: -43}
     spawnRotations:
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 210, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: -25, z: 0}
   - gameModes: 0100000002000000
     team: 3
     spawnPositions:
     - {x: -47, y: 6, z: 35}
     - {x: 52, y: 15, z: -31}
     - {x: 48.2, y: -12, z: 36.1}
+    - {x: -50, y: 6, z: 32}
+    - {x: 53, y: 15, z: -27}
     spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: -62, z: 0}
     - {x: 0, y: 240, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 250, z: 0}
 --- !u!4 &567158832
 Transform:
   m_ObjectHideFlags: 0
