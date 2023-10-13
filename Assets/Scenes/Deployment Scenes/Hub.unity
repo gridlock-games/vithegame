@@ -721,6 +721,7 @@ MonoBehaviour:
     m_InternalValue: 0
   overrideFaceDirection:
     m_InternalValue: 0
+  deathCameraPrefab: {fileID: 0}
 --- !u!4 &51868628
 Transform:
   m_ObjectHideFlags: 0
@@ -3114,7 +3115,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightHand: {fileID: 615693611}
   leftHand: {fileID: 1124960627}
-  rightHandAimAxis: 0
+  rightHandAimForwardDir: {x: 0, y: 0, z: 1}
+  rightHandAimUpDir: {x: 0, y: 1, z: 0}
+  rightHandAimIKOffset: {x: 0, y: 0, z: 0}
+  leftHandPosOffset: {x: 0, y: 0, z: 0}
+  leftHandRotOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &981082853
 Transform:
   m_ObjectHideFlags: 0
