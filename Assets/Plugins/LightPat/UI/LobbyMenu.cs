@@ -479,7 +479,9 @@ namespace LightPat.UI
             bool everyoneIsReady = true;
             if (ClientManager.Singleton.GetClientDataDictionary().Count == 0)
                 everyoneIsReady = false;
-            foreach (KeyValuePair<ulong, ClientData> valuePair in ClientManager.Singleton.GetClientDataDictionary())
+            int iconCount = 0;
+            var dataDictionary = ClientManager.Singleton.GetClientDataDictionary();
+            foreach (KeyValuePair<ulong, ClientData> valuePair in dataDictionary)
             {
                 if (valuePair.Key == NetworkManager.Singleton.LocalClientId)
                 {
@@ -501,6 +503,38 @@ namespace LightPat.UI
                 
                 iconParent = enemy ? enemyPlayerIconsParent : teammatePlayerIconsParent;
 
+                Team localTeam = Team.Environment;
+                if (dataDictionary.ContainsKey(NetworkManager.Singleton.LocalClientId))
+                {
+                    localTeam = ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team;
+                    if (localTeam == Team.Spectator)
+                    {
+                        if (valuePair.Value.team == Team.Competitor)
+                        {
+                            if (iconCount % 2 == 0)
+                            {
+                                iconParent = teammatePlayerIconsParent;
+                            }
+                            else
+                            {
+                                iconParent = enemyPlayerIconsParent;
+                            }
+                        }
+                        else
+                        {
+                            if (valuePair.Value.team == Team.Red)
+                            {
+                                iconParent = teammatePlayerIconsParent;
+                            }
+                            else if (valuePair.Value.team == Team.Blue)
+                            {
+                                iconParent = enemyPlayerIconsParent;
+                            }
+                        }
+                    }
+                }
+
+                iconCount++;
                 GameObject nameIcon = Instantiate(playerNamePrefab, iconParent);
                 TextMeshProUGUI nameText = nameIcon.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 nameText.SetText(valuePair.Value.clientName);
@@ -542,7 +576,7 @@ namespace LightPat.UI
                 else
                     nameIcon.transform.Find("CrownIcon").GetComponent<RawImage>().color = new Color(255, 255, 255, 0);
 
-                if (nameIcon.transform.parent == teammatePlayerIconsParent)
+                if (nameIcon.transform.parent == teammatePlayerIconsParent | localTeam == Team.Spectator)
                 {
                     nameIcon.transform.Find("CharacterIcon").GetComponent<Image>().sprite = ClientManager.Singleton.GetPlayerModelOptions()[valuePair.Value.playerPrefabOptionIndex].characterImage;
                 }
