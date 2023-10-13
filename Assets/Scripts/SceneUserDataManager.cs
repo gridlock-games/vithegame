@@ -58,8 +58,6 @@ public class SceneUserDataManager : MonoBehaviour
             displayName += c;
         }
 
-        Debug.Log(displayName);
-
         // Find player object by weapon type
         var playerModelOptions = ClientManager.Singleton.GetPlayerModelOptions();
         for (int i = 0; i < playerModelOptions.Length; i++)
@@ -67,7 +65,6 @@ public class SceneUserDataManager : MonoBehaviour
             if (playerModelOptions[i].playerPrefab.GetComponent<SwitchMelee>().GetCurrentWeaponType() == selectedObject.GetComponent<SwitchMelee>().GetCurrentWeaponType())
             {
                 payloadString = displayName + ClientManager.GetPayLoadParseString() + i + ClientManager.GetPayLoadParseString() + skinIndex;
-                Debug.Log(payloadString);
                 break;
             }
         }
@@ -88,11 +85,32 @@ public class SceneUserDataManager : MonoBehaviour
             characterOptionImage.GetComponent<Button>().interactable = false;
         }
 
-        loadingText.text = "Connecting to player hub...";
+        NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectCallback;
+        loadingText.text = "Connecting to player hub..\nIf your game freezes that means you are loading in.";
         NetworkManager.Singleton.StartClient();
 
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         Debug.Log("Started Client at " + networkTransport.ConnectionData.Address + ". Port: " + networkTransport.ConnectionData.Port);
+    }
+
+    private void ClientConnectCallback(ulong clientId)
+    {
+        loadingText.text = "Connection Established, loading game now...";
+    }
+
+    private void ClientDisconnectCallback(ulong clientId)
+    {
+        if (!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.DisconnectReason != string.Empty)
+        {
+            loadingText.text = NetworkManager.Singleton.DisconnectReason;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectCallback;
     }
 
     public void UpdateTargetIP()

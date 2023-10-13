@@ -252,6 +252,7 @@ namespace LightPat.Core
         }
 
         private AsyncOperation currentSceneLoadingOperation;
+        [SerializeField] private float clientConnectTimeoutThreshold = 60;
 
         private void Update()
         {
@@ -282,6 +283,18 @@ namespace LightPat.Core
 
             if (IsServer)
             {
+                if (clientApprovalRunning)
+                {
+                    Debug.Log(Time.time - clientLoadingStartTime);
+                    if (Time.time - clientLoadingStartTime > clientConnectTimeoutThreshold)
+                    {
+                        NetworkManager.DisconnectClient(clientApprovalRunningClientID, "Timed out while connecting to server");
+                        // set approval response to false
+                        clientConnectingInProgress = false;
+                        clientApprovalRunning = false;
+                    }
+                }
+
                 if (SceneManager.GetActiveScene().name != "Login" & !updateServerStatusRunning) { StartCoroutine(UpdateServerStatus()); }
 
                 foreach (KeyValuePair<ulong, NetworkClient> clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -499,7 +512,7 @@ namespace LightPat.Core
         private void ClientConnectCallback(ulong clientId)
         {
             if (!IsServer) { return; }
-            Debug.Log(clientId + " has connected.");
+            Debug.Log(clientId + " has connected. It took them " + (Time.time - clientLoadingStartTime) + " seconds to load in.");
             StartCoroutine(SpawnPlayerAfterConnection(clientId));
 
             clientConnectingInProgress = false;
@@ -558,12 +571,13 @@ namespace LightPat.Core
         [SerializeField] string[] approvalCheckScenesCompetitorTeam;
         private bool clientApprovalRunning = false;
         private ulong clientApprovalRunningClientID;
+        private float clientLoadingStartTime;
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             if (clientApprovalRunning)
             {
                 response.Approved = false;
-                response.Reason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in";
+                response.Reason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in\nIf your game freezes that means you are loading in.";
             }
             else
             {
@@ -571,6 +585,7 @@ namespace LightPat.Core
                 response.Approved = true;
                 response.Reason = string.Empty;
                 clientApprovalRunningClientID = request.ClientNetworkId;
+                clientLoadingStartTime = Time.time;
             }
 
             // The client identifier to be authenticated
