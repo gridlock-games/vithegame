@@ -668,7 +668,7 @@ namespace GameCreator.Melee
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
-                                targetMelee.Character.CancelAilment();
+                                targetMelee.Character.CancelAilment(null);
                             }
                             break;
                     }

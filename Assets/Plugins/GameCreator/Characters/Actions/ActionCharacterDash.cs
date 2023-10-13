@@ -172,7 +172,7 @@
                 characterTarget.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsKnockedDown)
             {
                 characterTarget.didDodgeCancelAilment = true;
-                characterTarget.CancelAilment();
+                characterTarget.CancelAilment(null);
             }
 
             if ((melee.currentMeleeClip != null && melee.currentMeleeClip.isAttack == true))
