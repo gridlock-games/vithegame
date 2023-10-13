@@ -51,11 +51,6 @@ namespace GameCreator.Melee
 
             shooterWeapon.Shoot(melee, attackClip, projectileForce);
 
-            if (aimDuringAttackAnticipation)
-            {
-                
-            }
-
             lastShootTime = Time.time;
             shootCount++;
             currentAmmo.Value -= 1;
