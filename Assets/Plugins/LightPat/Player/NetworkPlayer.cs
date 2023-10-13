@@ -38,6 +38,15 @@ namespace LightPat.Player
 
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
+        private bool deathCamEnabled;
+        public void SetDeathCamStatus(bool activated)
+        {
+            playerHUD.SetActive(!activated);
+            playerCamera.GetComponent<AudioListener>().enabled = !activated;
+            playerCamera.GetComponent<Camera>().enabled = !activated;
+            deathCamEnabled = activated;
+        }
+
         public override void OnNetworkSpawn()
         {
             GetComponent<PlayerCharacter>().enabled = true;
@@ -210,6 +219,8 @@ namespace LightPat.Player
             {
                 cameraMotorInstance.allowOrbitInputOverride = !pauseInstance & !externalUIOpen;
             }
+
+            cameraMotorInstance.allowOrbitInputOverride &= !deathCamEnabled;
 
             if (!ClientManager.Singleton) { return; }
 

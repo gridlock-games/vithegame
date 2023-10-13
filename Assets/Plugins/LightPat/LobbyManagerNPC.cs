@@ -107,6 +107,7 @@ namespace LightPat.Core
                 GameObject serverElement = Instantiate(serverButtonPrefab, serverButtonParent);
                 serverElement.name = server.label.ToString();
 
+                serverElement.transform.Find("ServerLabel").GetComponent<TextMeshProUGUI>().SetText(server.label.ToString());
                 serverElement.transform.Find("Button").GetComponentInChildren<TextMeshProUGUI>().SetText("Select Game");
                 serverElement.transform.Find("Population").GetComponent<TextMeshProUGUI>().SetText("Player count: " + server.population.ToString());
                 serverElement.transform.Find("Status").GetComponent<TextMeshProUGUI>().SetText("Status: " + (server.progress == 0 ? "Waiting for players" : "In Progress"));

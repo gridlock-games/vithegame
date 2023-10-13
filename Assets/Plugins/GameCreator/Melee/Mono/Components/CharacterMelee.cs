@@ -338,6 +338,11 @@ namespace GameCreator.Melee
                 //    }
                 //}
             }
+
+            if (IsServer)
+            {
+                if (Character.isCharacterDashing()) { IsBlocking.Value = false; }
+            }
         }
 
         private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent)
@@ -669,7 +674,7 @@ namespace GameCreator.Melee
                             if (targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStunned ||
                                 targetMelee.Character.characterAilment == CharacterLocomotion.CHARACTER_AILMENTS.IsStaggered)
                             {
-                                targetMelee.Character.CancelAilment();
+                                targetMelee.Character.CancelAilment(null);
                             }
                             break;
                     }
