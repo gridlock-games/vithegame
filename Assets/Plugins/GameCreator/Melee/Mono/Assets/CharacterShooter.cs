@@ -238,7 +238,14 @@ namespace GameCreator.Melee
                 }
                 else if (melee.IsCastingAbility.Value)
                 {
-                    if (!melee.abilityManager.GetActivatedAbility().allowADS) { isAimedDown.Value = false; }
+                    if (!melee.abilityManager.GetActivatedAbility().allowADS)
+                    {
+                        isAimedDown.Value = false;
+                    }
+                    else
+                    {
+                        isAimedDown.Value = Input.GetMouseButton(1);
+                    }
                 }
                 else
                 {
@@ -340,7 +347,7 @@ namespace GameCreator.Melee
                     }
                 }
             }
-            
+
             handIK.AimRightHand(aimPoint.Value,
                    Quaternion.Euler(limbReferences.rightHandAimIKOffset),
                    shouldAim & !reloading.Value,
@@ -388,7 +395,7 @@ namespace GameCreator.Melee
                     Vector3 adsCamForward = ADSCamera.transform.forward;
                     float adsCamAngle = Vector3.Angle(adsCamForward, transform.forward);
                     if (adsCamForward.y > 0) { adsCamAngle *= -1; }
-                    
+
                     adventureMotor.AddRotation(0, mainCamAngle - adsCamAngle);
                 }
                 else if (ADSCamera.enabled)
