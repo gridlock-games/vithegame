@@ -343,7 +343,6 @@ namespace GameCreator.Melee
             {
                 if (Character.isCharacterDashing()) { IsBlocking.Value = false; }
             }
-
         }
 
         private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent)
