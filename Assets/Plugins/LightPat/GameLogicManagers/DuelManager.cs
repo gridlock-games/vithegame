@@ -295,16 +295,19 @@ namespace LightPat.Core
             foreach (KeyValuePair<ulong, ClientData> clientPair in ClientManager.Singleton.GetClientDataDictionary())
             {
                 NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientPair.Key].PlayerObject;
-                float currentHP = playerObject.GetComponent<GameCreator.Melee.CharacterMelee>().GetHP();
-                if (currentHP > lastHP)
+                if (playerObject.TryGetComponent(out GameCreator.Melee.CharacterMelee melee))
                 {
-                    winningTeam = clientPair.Value.team;
+                    float currentHP = melee.GetHP();
+                    if (currentHP > lastHP)
+                    {
+                        winningTeam = clientPair.Value.team;
+                    }
+                    else if (currentHP == lastHP)
+                    {
+                        winningTeam = Team.Environment;
+                    }
+                    lastHP = currentHP;
                 }
-                else if (currentHP == lastHP)
-                {
-                    winningTeam = Team.Environment;
-                }
-                lastHP = currentHP;
             }
 
             if (winningTeam == Team.Red)
