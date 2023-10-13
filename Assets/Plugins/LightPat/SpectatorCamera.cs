@@ -141,8 +141,21 @@ namespace LightPat.Core
             // Check if the follow cam index is in our player list
             if (followCamIndex != -1)
             {
-                GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
-                if (followCamIndex < localNetworkPlayers.Length)
+                List<GameObject> localNetworkPlayers = new List<GameObject>();
+                foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
+                {
+                    if (isDeathCam)
+                    {
+                        if (ClientManager.Singleton.GetClient(valuePair.Key).team != ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team) { continue; }
+                        localNetworkPlayers.Add(valuePair.Value);
+                    }
+                    else
+                    {
+                        localNetworkPlayers.Add(valuePair.Value);
+                    }
+                }
+                
+                if (followCamIndex < localNetworkPlayers.Count)
                 {
                     if (localNetworkPlayers[followCamIndex] != null)
                     {
