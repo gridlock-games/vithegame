@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using LightPat.Core;
 
 namespace GameCreator.Melee
 {
@@ -12,6 +13,9 @@ namespace GameCreator.Melee
         public float particleRadius = 1;
         public int maxHits = 100;
 
+        [Header("Visualization Settings")]
+        public bool changeColorBasedOnTeam;
+
         private ParticleSystem ps;
         private ApplyStatusOnProjectileCollision applyStatusOnProjectileCollision;
 
@@ -20,10 +24,28 @@ namespace GameCreator.Melee
             base.Start();
             ps = GetComponent<ParticleSystem>();
             applyStatusOnProjectileCollision = GetComponent<ApplyStatusOnProjectileCollision>();
+            StartCoroutine(WaitForInit());
+        }
 
-            if (TryGetComponent(out Rigidbody rb))
+        private IEnumerator WaitForInit()
+        {
+            if (NetworkManager.LocalClientId == attacker.OwnerClientId) { yield break; }
+            yield return new WaitUntil(() => initialized);
+
+            var dataDictionary = ClientManager.Singleton.GetClientDataDictionary();
+            if (dataDictionary.ContainsKey(NetworkManager.LocalClientId) & dataDictionary.ContainsKey(attacker.OwnerClientId))
             {
-                rb.AddForce(transform.forward * 5, ForceMode.VelocityChange);
+                if (changeColorBasedOnTeam)
+                {
+                    if (CharacterMelee.CheckHitTeams(NetworkManager.LocalClientId, attacker.OwnerClientId))
+                    {
+                        var main = ps.main;
+                        main.startColor = Color.red;
+
+                        ps.Clear();
+                        ps.Play();
+                    }
+                }
             }
         }
 
