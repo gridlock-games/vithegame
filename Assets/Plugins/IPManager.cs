@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace UnityEngine
 {
 
-    public class IPManager : MonoBehaviour
+    public class IPManager
     {
         public string ServerAPIURL = "38.60.245.223/servers/duels";
         // public string ServerAPIURL = "192.168.0.106/servers/duels";
@@ -29,8 +29,8 @@ namespace UnityEngine
                 // Please do not remove
                 //string FailOverServerAPIURL = "http://" + "192.168.100.78" + ":3000/servers/duels";
                 //string FailOverVMServerHost = "192.168.100.78";
-
-                if (www.isNetworkError || www.isHttpError)
+                
+                if (www.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError("API request error: " + www.error);
                     Debug.LogWarning("API FailOverServerAPIURL: " + FailOverServerAPIURL);

@@ -76,44 +76,43 @@ namespace GameCreator.Melee
             if (_switchWeaponVFX != null) { StopVFX(); }
         }
 
-        private void LateUpdate()
-        {
-            return;
-            // Only check for keyboard input if a key is currently pressed down
-            if (!IsLocalPlayer) return;
-            if (!Input.anyKeyDown) return;
-            if (_characterMelee.IsBlocking.Value) return;
-            if (_characterMelee.IsStaggered) return;
-            if (_characterMelee.IsAttacking) return;
-            if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
+        //private void LateUpdate()
+        //{
+        //    // Only check for keyboard input if a key is currently pressed down
+        //    if (!IsLocalPlayer) return;
+        //    if (!Input.anyKeyDown) return;
+        //    if (_characterMelee.IsBlocking.Value) return;
+        //    if (_characterMelee.IsStaggered) return;
+        //    if (_characterMelee.IsAttacking) return;
+        //    if (_characterMelee.Character.characterAilment != Characters.CharacterLocomotion.CHARACTER_AILMENTS.None) return;
 
-            //if (SceneManager.GetActiveScene().name != "Prototype") return;
+        //    //if (SceneManager.GetActiveScene().name != "Prototype") return;
 
-            // Loop through each key in the dictionary and check if it's been pressed down
-            foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
-            {
-                // If there is a melee weapon assigned to this weaponType and the weaponType is present in our scriptable object
-                bool weaponIsValid = false;
-                foreach (var weaponData in _weaponMeleeSO.weaponCollections)
-                {
-                    if (weaponData.weaponType == _keyToWeaponType[key])
-                    {
-                        //_switchWeaponVFX.Play();
-                        if (weaponData.meleeWeapon) { weaponIsValid = true; }
-                        break;
-                    }
-                }
+        //    // Loop through each key in the dictionary and check if it's been pressed down
+        //    foreach (var key in _keyToWeaponType.Keys.Where(key => Input.GetKeyDown(key)))
+        //    {
+        //        // If there is a melee weapon assigned to this weaponType and the weaponType is present in our scriptable object
+        //        bool weaponIsValid = false;
+        //        foreach (var weaponData in _weaponMeleeSO.weaponCollections)
+        //        {
+        //            if (weaponData.weaponType == _keyToWeaponType[key])
+        //            {
+        //                //_switchWeaponVFX.Play();
+        //                if (weaponData.meleeWeapon) { weaponIsValid = true; }
+        //                break;
+        //            }
+        //        }
 
-                if (weaponIsValid)
-                {
-                    // Get the weapon type corresponding to the pressed key
-                    if (IsServer) { _currentWeaponType.Value = _keyToWeaponType[key]; }
-                    else { ChangeWeaponTypeServerRpc(_keyToWeaponType[key]); }
-                    // SwitchWeapon() call occurs in OnCurrentWeaponTypeChange() method
-                }
-                break;
-            }
-        }
+        //        if (weaponIsValid)
+        //        {
+        //            // Get the weapon type corresponding to the pressed key
+        //            if (IsServer) { _currentWeaponType.Value = _keyToWeaponType[key]; }
+        //            else { ChangeWeaponTypeServerRpc(_keyToWeaponType[key]); }
+        //            // SwitchWeapon() call occurs in OnCurrentWeaponTypeChange() method
+        //        }
+        //        break;
+        //    }
+        //}
 
         void StopVFX()
         {

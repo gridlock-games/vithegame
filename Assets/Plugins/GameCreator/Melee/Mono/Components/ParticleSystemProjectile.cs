@@ -58,7 +58,7 @@ namespace GameCreator.Melee
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
 
             // get
-            int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter, out var enterData);
+            int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, enter);
 
             // iterate
             for (int i = 0; i < numEnter; i++)
