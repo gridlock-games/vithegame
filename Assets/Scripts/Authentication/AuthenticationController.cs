@@ -21,6 +21,7 @@ public class AuthenticationController : MonoBehaviour
     [SerializeField] private GameObject btn_StartGame;
     [SerializeField] private Text displayNameInput;
     [SerializeField] private TextMeshProUGUI infoDisplayText;
+    [SerializeField] private TextMeshProUGUI connectionErrorDisplayText;
 
     ClientManager clientManager = new ClientManager();
     IPManager iPManager = new IPManager();
@@ -49,6 +50,8 @@ public class AuthenticationController : MonoBehaviour
 
     private void Update()
     {
+        connectionErrorDisplayText.SetText(NetworkManager.Singleton.DisconnectReason);
+
         // If we are a headless build
         bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
         bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;

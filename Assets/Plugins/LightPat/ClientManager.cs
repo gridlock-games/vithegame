@@ -285,11 +285,10 @@ namespace LightPat.Core
             {
                 if (clientApprovalRunning)
                 {
-                    Debug.Log(Time.time - clientLoadingStartTime);
                     if (Time.time - clientLoadingStartTime > clientConnectTimeoutThreshold)
                     {
                         NetworkManager.DisconnectClient(clientApprovalRunningClientID, "Timed out while connecting to server");
-                        // set approval response to false
+                        // set approval response to false?
                         clientConnectingInProgress = false;
                         clientApprovalRunning = false;
                     }
@@ -539,7 +538,16 @@ namespace LightPat.Core
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
-                StartCoroutine(RestartNetworkManager());
+                if (NetworkManager.DisconnectReason == queuedDisconnectReason)
+                {
+                    Debug.Log("Restarting Network Manager");
+                    StartCoroutine(RestartNetworkManager());
+                }
+                else
+                {
+                    Debug.Log("Returning to login screen");
+                    SceneManager.LoadScene("Login");
+                }
             }
 
             if (IsServer)
@@ -572,12 +580,13 @@ namespace LightPat.Core
         private bool clientApprovalRunning = false;
         private ulong clientApprovalRunningClientID;
         private float clientLoadingStartTime;
+        private const string queuedDisconnectReason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in\nIf your game freezes that means you are loading in.";
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             if (clientApprovalRunning)
             {
                 response.Approved = false;
-                response.Reason = "There is already 1 client connecting to the server, please wait your turn and you'll eventually get in\nIf your game freezes that means you are loading in.";
+                response.Reason = queuedDisconnectReason;
             }
             else
             {
