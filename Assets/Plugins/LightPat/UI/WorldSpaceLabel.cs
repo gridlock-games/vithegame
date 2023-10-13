@@ -154,7 +154,7 @@ namespace LightPat.UI
             if (Camera.main)
             {
                 // If we have a spectator camera as the main camera, disable the health bar portion of the world space label
-                if (Camera.main.GetComponent<SpectatorCamera>())
+                if (Camera.main.TryGetComponent(out SpectatorCamera spectatorCamera))
                 {
                     GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
                     for (int i = 0; i < localNetworkPlayers.Length; i++)
@@ -166,8 +166,8 @@ namespace LightPat.UI
                         }
                     }
 
-                    spectatorHotKeyInstance.SetActive(true);
-                    healthSlider.gameObject.SetActive(false);
+                    spectatorHotKeyInstance.SetActive(!spectatorCamera.isDeathCam);
+                    healthSlider.gameObject.SetActive(spectatorCamera.isDeathCam);
                 }
                 else // If the local player is not a spectator
                 {

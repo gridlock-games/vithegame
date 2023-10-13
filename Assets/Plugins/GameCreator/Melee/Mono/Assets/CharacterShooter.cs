@@ -49,14 +49,16 @@ namespace GameCreator.Melee
             if (!handIK.IsRightHandAiming())
                 Debug.LogError(Time.time + " " + handIK.IsRightHandAiming());
 
+            shooterWeapon.Shoot(melee, attackClip, projectileForce);
+
             if (aimDuringAttackAnticipation)
             {
-                shooterWeapon.Shoot(melee, attackClip, projectileForce);
+                
             }
-            else
-            {
-                StartCoroutine(WaitForAimShoot(attackClip));
-            }
+            //else
+            //{
+            //    StartCoroutine(WaitForAimShoot(attackClip));
+            //}
 
             lastShootTime = Time.time;
             shootCount++;
