@@ -233,7 +233,7 @@
                         if (playerTeam == Team.Competitor | localPlayerTeam == Team.Competitor) { continue; }
 
                         GameObject playerCard = Instantiate(playerCardPrefab, playerCardParent);
-                        playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true);
+                        playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, true, null);
                         playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, counter * playerCardSpacing, playerCard.transform.localPosition.z);
                         counter++;
                     }

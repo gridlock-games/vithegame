@@ -635,11 +635,15 @@ namespace LightPat.Core
 
                 if (clientId == 0)
                 {
-                    clientTeam = Team.Red;
+                    clientTeam = Team.Spectator;
+                }
+                else if (clientId == 1)
+                {
+                    clientTeam = Team.Blue;
                 }
                 else
                 {
-                    clientTeam = Team.Blue;
+                    clientTeam = Team.Red;
                 }
 
                 if (payloadOptions.Length == 3)
