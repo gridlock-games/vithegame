@@ -29,8 +29,8 @@ namespace GameCreator.Melee
 
         private IEnumerator WaitForInit()
         {
-            if (NetworkManager.LocalClientId == attacker.OwnerClientId) { yield break; }
             yield return new WaitUntil(() => initialized);
+            if (NetworkManager.LocalClientId == attacker.OwnerClientId) { yield break; }
 
             var dataDictionary = ClientManager.Singleton.GetClientDataDictionary();
             if (dataDictionary.ContainsKey(NetworkManager.LocalClientId) & dataDictionary.ContainsKey(attacker.OwnerClientId))
