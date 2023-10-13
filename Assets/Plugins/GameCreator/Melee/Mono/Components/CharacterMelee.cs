@@ -338,6 +338,12 @@ namespace GameCreator.Melee
                 //    }
                 //}
             }
+
+            if (IsServer)
+            {
+                if (Character.isCharacterDashing()) { IsBlocking.Value = false; }
+            }
+
         }
 
         private IEnumerator SequenceClipPlayHandler(MeleeClip sequenceClipParent)
