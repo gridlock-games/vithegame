@@ -76,7 +76,7 @@ namespace GameCreator.Melee
         private bool CanShoot(MeleeClip attackClip)
         {
             if (reloading.Value) { return false; }
-            if (currentAmmo.Value <= 0) { return false; }
+            if (enableReload & currentAmmo.Value <= 0) { return false; }
             if (shootCount >= attackClip.hitCount) { return false; }
             if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return false; }
 
