@@ -83,9 +83,19 @@ namespace LightPat.Core
             queuedConnectionApprovalResponses.Add(clientId, response);
         }
 
-        [ServerRpc(RequireOwnership = false)] public void UpdateGameModeServerRpc(GameMode newGameMode) { gameMode.Value = newGameMode; }
+        [ServerRpc(RequireOwnership = false)]
+        public void UpdateGameModeServerRpc(ulong clientId, GameMode newGameMode)
+        {
+            if (clientId != lobbyLeaderId.Value) { Debug.LogError("You should only try to change the game mode if you are the lobby leader"); return; }
+            gameMode.Value = newGameMode;
+        }
 
-        [ServerRpc(RequireOwnership = false)] public void UpdateMapNameServerRpc(string newMapName) { mapSelectionName.Value = newMapName; }
+        [ServerRpc(RequireOwnership = false)]
+        public void UpdateMapNameServerRpc(ulong clientId, string newMapName)
+        {
+            if (clientId != lobbyLeaderId.Value) { Debug.LogError("You should only try to change the map if you are the lobby leader"); return; }
+            mapSelectionName.Value = newMapName;
+        }
 
         public override void OnNetworkSpawn()
         {

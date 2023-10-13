@@ -194,13 +194,13 @@ namespace LightPat.UI
         {
             if (loadingGame) { return; }
             System.Enum.TryParse(gameModeDropdown.options[gameModeDropdown.value].text, out GameMode chosenGameMode);
-            ClientManager.Singleton.UpdateGameModeServerRpc(chosenGameMode);
+            ClientManager.Singleton.UpdateGameModeServerRpc(NetworkManager.Singleton.LocalClientId, chosenGameMode);
         }
 
         public void UpdateMapNameValue()
         {
             if (loadingGame) { return; }
-            ClientManager.Singleton.UpdateMapNameServerRpc(mapSelectDropdown.options[mapSelectDropdown.value].text);
+            ClientManager.Singleton.UpdateMapNameServerRpc(NetworkManager.Singleton.LocalClientId, mapSelectDropdown.options[mapSelectDropdown.value].text);
         }
 
         public void ChangeTeam()
