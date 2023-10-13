@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 290652106646076816}
   - component: {fileID: 290652106646076817}
   m_Layer: 0
-  m_Name: slash_vfx_180deg_straight
+  m_Name: slash_vfx_ur_straight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityVFX:
     target: 3
-    gameObject: {fileID: 3107684147940596628, guid: d76b6b8262cfc054ebcbf5c5ec62e2ce,
+    gameObject: {fileID: 3107684147940596628, guid: 10f2158c5fb4f4c90b024ae12173ba30,
       type: 3}
     global:
       allowTypesMask: 512
@@ -64,7 +64,10 @@ MonoBehaviour:
     eventChangeVariable:
       m_PersistentCalls:
         m_Calls: []
-  vfxPositionOffset: {x: 0.2, y: 1, z: -0.5}
-  vfxRotationOffset: {x: 0, y: 90, z: 0}
+  vfxPositionOffset: {x: 0, y: 0.75, z: 1.55}
+  vfxRotationOffset: {x: -35, y: 230, z: -90}
   attachVFXOnPhase: 1
   attachmentType: 2
+  raycastOffset: {x: 0, y: 2, z: 0}
+  crossProductDirection: {x: 1, y: 0, z: 0}
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
