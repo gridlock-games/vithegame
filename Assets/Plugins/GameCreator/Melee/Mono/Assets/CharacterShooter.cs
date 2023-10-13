@@ -55,10 +55,6 @@ namespace GameCreator.Melee
             {
                 
             }
-            //else
-            //{
-            //    StartCoroutine(WaitForAimShoot(attackClip));
-            //}
 
             lastShootTime = Time.time;
             shootCount++;
@@ -66,14 +62,6 @@ namespace GameCreator.Melee
         }
 
         public void ResetShootCount() { shootCount = 0; }
-
-        private IEnumerator WaitForAimShoot(MeleeClip attackClip)
-        {
-            yield return new WaitUntil(() => handIK.IsRightHandAiming());
-            yield return null;
-
-            shooterWeapon.Shoot(melee, attackClip, projectileForce);
-        }
 
         public UnityEngine.Camera GetADSCamera() { return ADSCamera; }
 
@@ -88,6 +76,7 @@ namespace GameCreator.Melee
         private bool CanShoot(MeleeClip attackClip)
         {
             if (reloading.Value) { return false; }
+            if (currentAmmo.Value <= 0) { return false; }
             if (shootCount >= attackClip.hitCount) { return false; }
             if (Time.time - lastShootTime < attackClip.multiHitRegDelay) { return false; }
 
@@ -323,7 +312,22 @@ namespace GameCreator.Melee
             }
             else
             {
-                shouldAim = aimDuringAttackAnticipation ? isAimedDown.Value : isAimedDown.Value & phase != 0;
+                shouldAim = isAimedDown.Value;
+
+                if (!aimDuringAttackAnticipation)
+                {
+                    if (phase == 0)
+                    {
+                        shouldAim = false;
+                    }
+                }
+
+                if (phase == 1)
+                {
+                    shouldAim = true;
+                }
+
+                Debug.Log(Time.time);
             }
 
             shouldAimLeftHand = aimLeftHand & shouldAimLeftHand;
