@@ -25,6 +25,15 @@ public class CharacterStatusManager : NetworkBehaviour
         healing
     }
 
+    [System.Serializable]
+    public struct Status
+    {
+        public CHARACTER_STATUS status;
+        public float value;
+        public float duration;
+        public float delay;
+    }
+
     private struct CHARACTER_STATUS_NETWORKED : INetworkSerializable, System.IEquatable<CHARACTER_STATUS_NETWORKED>
     {
         public CHARACTER_STATUS charStatus;

@@ -2082,7 +2082,7 @@ namespace GameCreator.Melee
 
             while (elapsedTime < drainDuration)
             {
-                float reductionAmount = GetHP() / maxHealth * value * Time.deltaTime;
+                float reductionAmount = GetHP() * value * Time.deltaTime;
                 if (GetHP() - reductionAmount < 1)
                 {
                     SetHP(1);
