@@ -10,7 +10,7 @@ namespace GameCreator.Melee
     {
         [SerializeField] private bool applyStatusToAttacker;
         [SerializeField] private TargetType targetType;
-        [SerializeField] private Status[] statuses;
+        [SerializeField] private CharacterStatusManager.Status[] statuses;
 
         public enum TargetType
         {
@@ -49,7 +49,7 @@ namespace GameCreator.Melee
                 }
             }
 
-            foreach (Status status in statuses)
+            foreach (CharacterStatusManager.Status status in statuses)
             {
                 targetStatusCharacter.TryAddStatus(status.status, status.value, status.duration, status.delay);
             }
@@ -60,15 +60,6 @@ namespace GameCreator.Melee
         private void Start()
         {
             projectile = GetComponent<ParticleSystemProjectile>();
-        }
-
-        [System.Serializable]
-        private struct Status
-        {
-            public CharacterStatusManager.CHARACTER_STATUS status;
-            public float value;
-            public float duration;
-            public float delay;
         }
     }
 }

@@ -2079,24 +2079,19 @@ namespace GameCreator.Melee
             drainActive.Value = true;
             yield return new WaitForSeconds(delay);
             float elapsedTime = 0;
-            float reductionAmount = 0;
 
             while (elapsedTime < drainDuration)
             {
-                reductionAmount += GetHP() / maxHealth * value * Time.deltaTime;
-                if (reductionAmount >= 1 && GetHP() > 1)
+                float reductionAmount = GetHP() * value * Time.deltaTime;
+                if (GetHP() - reductionAmount < 1)
                 {
-                    if (GetHP() - reductionAmount < 1)
-                    {
-                        SetHP(1);
-                    }
-                    else
-                    {
-                        AddHP(-1 * reductionAmount);
-                    }
-
-                    reductionAmount = 0;
+                    SetHP(1);
                 }
+                else
+                {
+                    AddHP(-1 * reductionAmount);
+                }
+
                 drainActive.Value = true;
                 elapsedTime += Time.deltaTime;
                 yield return null;
@@ -2117,24 +2112,19 @@ namespace GameCreator.Melee
             healActive.Value = true;
             yield return new WaitForSeconds(delay);
             float elapsedTime = 0;
-            float healAmount = 0;
 
             while (elapsedTime < healDuration)
             {
-                healAmount += maxHealth / GetHP() * value * Time.deltaTime * healingMultiplier.Value;
-                if (healAmount >= 1)
+                float healAmount = maxHealth / GetHP() * value * Time.deltaTime * healingMultiplier.Value;
+                if (GetHP() + healAmount > maxHealth)
                 {
-                    if (GetHP() + healAmount > maxHealth)
-                    {
-                        SetHP(maxHealth);
-                    }
-                    else
-                    {
-                        AddHP(healAmount);
-                    }
-
-                    healAmount = 0;
+                    SetHP(maxHealth);
                 }
+                else
+                {
+                    AddHP(healAmount);
+                }
+
                 healActive.Value = true;
                 elapsedTime += Time.deltaTime;
                 yield return null;

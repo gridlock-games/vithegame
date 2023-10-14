@@ -37,11 +37,29 @@ namespace GameCreator.Melee
             {
                 if (changeColorBasedOnTeam)
                 {
-                    if (CharacterMelee.CheckHitTeams(NetworkManager.LocalClientId, attacker.OwnerClientId))
+                    if (ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team == Team.Spectator)
+                    {
+                        Team attackerTeam = ClientManager.Singleton.GetClient(attacker.OwnerClientId).team;
+
+                        if (attackerTeam == Team.Red)
+                        {
+                            var main = ps.main;
+                            main.startColor = Color.red;
+                            ps.Clear();
+                            ps.Play();
+                        }
+                        else if (attackerTeam == Team.Blue)
+                        {
+                            var main = ps.main;
+                            main.startColor = Color.blue;
+                            ps.Clear();
+                            ps.Play();
+                        }
+                    }
+                    else if (CharacterMelee.CheckHitTeams(NetworkManager.LocalClientId, attacker.OwnerClientId))
                     {
                         var main = ps.main;
                         main.startColor = Color.red;
-
                         ps.Clear();
                         ps.Play();
                     }

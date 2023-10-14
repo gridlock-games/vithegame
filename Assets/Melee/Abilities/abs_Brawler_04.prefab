@@ -56,6 +56,19 @@ MonoBehaviour:
   skillKey: 116
   canCncelAnimationType: 1
   canCancelAnimation: 1
+  statusesToApplyToCaster:
+  - status: 8
+    value: 0.1
+    duration: 6
+    delay: 2
+  - status: 0
+    value: 3
+    duration: 8
+    delay: 0
+  - status: 9
+    value: 7
+    duration: 8
+    delay: 0
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
@@ -63,5 +76,6 @@ MonoBehaviour:
   aimDuringAttack: 1
   aimDuringAttackRecovery: 0
   aimLeftHand: 0
+  allowADS: 0
   requireAmmo: 0
   ammoRequirement: 0

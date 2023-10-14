@@ -49,6 +49,8 @@ public class Ability : MonoBehaviour
     public AnimCancellingType canCncelAnimationType = AnimCancellingType.Cancel_NormalAtk;
     public bool canCancelAnimation = false;
 
+    [SerializeField] private CharacterStatusManager.Status[] statusesToApplyToCaster;
+
     public IActionsList actionsOnExecute;
     public IActionsList actionOnActivate;
     public IActionsList actionsOnHit;
@@ -118,6 +120,7 @@ public class Ability : MonoBehaviour
             isOnCoolDownLocally = true;
 
             InvokeSkill(melee, key);
+            ApplyStatuses(melee.GetComponent<CharacterStatusManager>());
 
             // Disabling Ability invoke in CharacterMelee
             melee.StartCoroutine(WaitForAbilityCooldown());
@@ -159,6 +162,14 @@ public class Ability : MonoBehaviour
         }
 
         melee.ExecuteAbility(actionKey);
+    }
+
+    public void ApplyStatuses(CharacterStatusManager characterStatusManager)
+    {
+        foreach (CharacterStatusManager.Status status in statusesToApplyToCaster)
+        {
+            characterStatusManager.TryAddStatus(status.status, status.value, status.duration, status.delay);
+        }
     }
 
     private IEnumerator WaitForAbilityCooldown()
