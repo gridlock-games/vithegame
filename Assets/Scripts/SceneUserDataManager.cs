@@ -88,7 +88,7 @@ public class SceneUserDataManager : MonoBehaviour
         NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectCallback;
         NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectCallback;
         loadingText.text = "Connecting to player hub..\nIf your game freezes that means you are loading in.";
-        NetworkManager.Singleton.StartClient();
+        Debug.Log("StartClient() Result = " + NetworkManager.Singleton.StartClient());
 
         var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         Debug.Log("Started Client at " + networkTransport.ConnectionData.Address + ". Port: " + networkTransport.ConnectionData.Port);
@@ -101,6 +101,7 @@ public class SceneUserDataManager : MonoBehaviour
 
     private void ClientDisconnectCallback(ulong clientId)
     {
+        Debug.Log("Client Disconnected " + NetworkManager.Singleton.DisconnectReason);
         if (!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.DisconnectReason != string.Empty)
         {
             loadingText.text = NetworkManager.Singleton.DisconnectReason;

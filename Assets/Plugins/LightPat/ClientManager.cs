@@ -224,6 +224,11 @@ namespace LightPat.Core
         {
             Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
 
+            foreach (ulong id in sceneEvent.ClientsThatTimedOut)
+            {
+                Debug.Log(id + " timed out while loading scene: " + sceneEvent.SceneName);
+            }
+
             currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
             if (IsServer)

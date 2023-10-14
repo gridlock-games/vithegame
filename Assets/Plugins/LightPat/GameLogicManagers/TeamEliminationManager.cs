@@ -253,6 +253,31 @@ namespace LightPat.Core
             else
             {
                 countdownTimeMessage.Value = winningTeam + " team won the round!";
+
+                Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
+
+                if (localClientTeam == Team.Red)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownTimeMessage.Value = "Your team won the round!";
+                    else
+                        countdownTimeMessage.Value = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Blue)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownTimeMessage.Value = "Your team won the round!";
+                    else
+                        countdownTimeMessage.Value = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Spectator)
+                {
+                    countdownTimeMessage.Value = winningTeam + " team won the round!";
+                }
+                else
+                {
+                    countdownTimeMessage.Value = winningTeam + " team won the round!";
+                }
             }
 
             if (!gameOver)
