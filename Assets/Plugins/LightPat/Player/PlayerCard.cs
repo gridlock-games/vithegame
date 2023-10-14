@@ -4,7 +4,7 @@ using UnityEngine;
 using GameCreator.Melee;
 using TMPro;
 using UnityEngine.UI;
-using System.Linq;
+using Unity.Netcode;
 
 namespace LightPat.Core
 {
@@ -25,7 +25,7 @@ namespace LightPat.Core
 
         private bool instantiated;
 
-        public void Instantiate(CharacterMelee melee, Team team, bool isTeammateUI)
+        public void Instantiate(CharacterMelee melee, Team team, bool isTeammateUI, SpectatorCamera spectatorCamera)
         {
             if (isTeammateUI)
             {
@@ -36,10 +36,29 @@ namespace LightPat.Core
 
             if (ClientManager.Singleton)
             {
-                GameObject[] localNetworkPlayers = ClientManager.Singleton.localNetworkPlayers.Values.ToArray();
+                List<GameObject> localNetworkPlayers = new List<GameObject>();
+                foreach (KeyValuePair<ulong, GameObject> valuePair in ClientManager.Singleton.localNetworkPlayers)
+                {
+                    if (spectatorCamera)
+                    {
+                        if (spectatorCamera.isDeathCam)
+                        {
+                            if (ClientManager.Singleton.GetClient(valuePair.Key).team != ClientManager.Singleton.GetClient(NetworkManager.Singleton.LocalClientId).team) { continue; }
+                            localNetworkPlayers.Add(valuePair.Value);
+                        }
+                        else
+                        {
+                            localNetworkPlayers.Add(valuePair.Value);
+                        }
+                    }
+                    else
+                    {
+                        localNetworkPlayers.Add(valuePair.Value);
+                    }
+                }
 
                 string hotkeyNum = "";
-                for (int i = 0; i < localNetworkPlayers.Length; i++)
+                for (int i = 0; i < localNetworkPlayers.Count; i++)
                 {
                     if (localNetworkPlayers[i] == melee.gameObject)
                     {

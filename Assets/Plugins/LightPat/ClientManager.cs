@@ -51,7 +51,11 @@ namespace LightPat.Core
 
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
-        public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
+        public ClientData GetClient(ulong clientId)
+        {
+            if (!clientDataDictionary.ContainsKey(clientId)) { Debug.LogError("ClientManager does not contain a data struct for ID: " + clientId); return new ClientData(); }
+            return clientDataDictionary[clientId];
+        }
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
 
@@ -224,6 +228,14 @@ namespace LightPat.Core
         {
             Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
 
+            if (sceneEvent.ClientsThatTimedOut != null)
+            {
+                foreach (ulong id in sceneEvent.ClientsThatTimedOut)
+                {
+                    Debug.Log(id + " timed out while loading scene: " + sceneEvent.SceneName);
+                }
+            }
+            
             currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
             if (IsServer)
@@ -633,14 +645,18 @@ namespace LightPat.Core
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
 
-                if (clientId == 0)
-                {
-                    clientTeam = Team.Red;
-                }
-                else
-                {
-                    clientTeam = Team.Blue;
-                }
+                //if (clientId == 0)
+                //{
+                //    clientTeam = Team.Spectator;
+                //}
+                //else if (clientId == 1)
+                //{
+                //    clientTeam = Team.Red;
+                //}
+                //else
+                //{
+                //    clientTeam = Team.Blue;
+                //}
 
                 if (payloadOptions.Length == 3)
                 {

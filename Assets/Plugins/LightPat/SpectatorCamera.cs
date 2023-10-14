@@ -20,8 +20,10 @@ namespace LightPat.Core
         [SerializeField] private GameObject playerCardLeftAnchorPrefab;
         [SerializeField] private GameObject playerCardRightAnchorPrefab;
 
-        private bool isDeathCam;
+        public bool isDeathCam { get; private set; }
+
         private Player.NetworkPlayer networkPlayer;
+        
         public void ActivateDeathCam(Player.NetworkPlayer networkPlayer)
         {
             isDeathCam = true;
@@ -279,14 +281,14 @@ namespace LightPat.Core
                         if (playerTeam == Team.Blue)
                         {
                             GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
-                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
+                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
                             playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, rightCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             rightCounter++;
                         }
                         else if (playerTeam == Team.Red)
                         {
                             GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
-                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
+                            playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
                             playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             leftCounter++;
                         }
@@ -295,13 +297,13 @@ namespace LightPat.Core
                             if (elseCounter % 2 == 0)
                             {
                                 GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
-                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
                                 playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
                             else
                             {
                                 GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
-                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false);
+                                playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
                                 playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
 

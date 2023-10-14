@@ -211,7 +211,65 @@ namespace LightPat.Core
                 timerDisplay.enabled = true;
             }
 
-            countdownText.SetText(allPlayersSpawned.Value ? countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0") : countdownTimeMessage.Value.ToString());
+            string countdownMessage = allPlayersSpawned.Value ? countdownTimeMessage.Value.ToString() + "\n" + countdownTime.Value.ToString("F0") : countdownTimeMessage.Value.ToString();
+            if (countdownMessage.Contains("team won the round!"))
+            {
+                Team winningTeam = System.Enum.Parse<Team>(countdownMessage.Split(" ")[0]);
+                Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
+
+                if (localClientTeam == Team.Red)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownMessage = "Your team won the round!";
+                    else
+                        countdownMessage = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Blue)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownMessage = "Your team won the round!";
+                    else
+                        countdownMessage = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Spectator)
+                {
+                    countdownMessage = winningTeam + " team won the round!";
+                }
+                else
+                {
+                    countdownMessage = winningTeam + " team won the round!";
+                }
+            }
+            else if (countdownMessage.Contains("team wins!"))
+            {
+                Team winningTeam = System.Enum.Parse<Team>(countdownMessage.Split(" ")[0]);
+                Team localClientTeam = ClientManager.Singleton.GetClient(NetworkManager.LocalClientId).team;
+
+                if (localClientTeam == Team.Red)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownMessage = "Your team won the round!";
+                    else
+                        countdownMessage = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Blue)
+                {
+                    if (winningTeam == localClientTeam)
+                        countdownMessage = "Your team won the round!";
+                    else
+                        countdownMessage = "The enemy team won the round!";
+                }
+                else if (localClientTeam == Team.Spectator)
+                {
+                    countdownMessage = winningTeam + " team won the round!";
+                }
+                else
+                {
+                    countdownMessage = winningTeam + " team won the round!";
+                }
+            }
+
+            countdownText.SetText(countdownMessage);
             timerDisplay.SetText(roundTimeInSeconds.Value.ToString("F4"));
 
             if (IsClient)
@@ -220,13 +278,13 @@ namespace LightPat.Core
 
                 if (localClientTeam == Team.Red)
                 {
-                    redScoreText.SetText("Red Team: " + redScore.Value.ToString());
-                    blueScoreText.SetText("Blue Team: " + blueScore.Value.ToString());
+                    redScoreText.SetText("Your Team: " + redScore.Value.ToString());
+                    blueScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
                 }
                 else if (localClientTeam == Team.Blue)
                 {
-                    redScoreText.SetText("Red Team: " + blueScore.Value.ToString());
-                    blueScoreText.SetText("Blue Team: " + redScore.Value.ToString());
+                    redScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
+                    blueScoreText.SetText("Your Team: " + redScore.Value.ToString());
                 }
                 else if (localClientTeam == Team.Spectator)
                 {
