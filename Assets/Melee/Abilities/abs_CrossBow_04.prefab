@@ -52,10 +52,11 @@ MonoBehaviour:
   coolDown: 50
   staminaCost: 0
   hpCost: 0
-  rageCost: 50
+  rageCost: 35
   skillKey: 116
   canCncelAnimationType: 1
   canCancelAnimation: 0
+  statusesToApplyToCaster: []
   actionsOnExecute: {fileID: 0}
   actionOnActivate: {fileID: 0}
   actionsOnHit: {fileID: 0}
@@ -63,5 +64,6 @@ MonoBehaviour:
   aimDuringAttack: 1
   aimDuringAttackRecovery: 0
   aimLeftHand: 0
+  allowADS: 0
   requireAmmo: 0
   ammoRequirement: 0

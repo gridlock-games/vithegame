@@ -295,7 +295,7 @@ namespace GameCreator.Melee
                 }
             }
 
-            if (Time.time < slowEndTime)
+            if (Time.time < slowEndTime | slowed.Value)
             {
                 Character.characterLocomotion.runSpeed = slowAmount.Value;
                 if (IsServer)
@@ -1165,7 +1165,7 @@ namespace GameCreator.Melee
         [ServerRpc]
         public void StartBlockingServerRpc()
         {
-            if (this.Character.characterLocomotion.isBusy) return;
+            if (this.Character.characterLocomotion.isBusy & !rooted.Value) return;
 
             if (this.IsDrawing) return;
             if (this.IsSheathing) return;
