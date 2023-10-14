@@ -180,7 +180,7 @@ namespace LightPat.Core
                 this.followCamIndex = -1;
             }
 
-            if (!pauseInstance)
+            if (!pauseInstance | isDeathCam)
             {
                 Vector2 lookInput = Vector2.zero;
                 lookInput.x = Input.GetAxis("Mouse X");
