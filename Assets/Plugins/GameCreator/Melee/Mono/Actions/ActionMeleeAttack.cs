@@ -46,7 +46,10 @@
 			CharacterMelee melee = _character.GetComponent<CharacterMelee>();
 			if (melee == null) return true;
 
-			melee.Execute(this.key);
+			if (key == CharacterMelee.ActionKey.A | key == CharacterMelee.ActionKey.B)
+            {
+				melee.Execute(this.key);
+			}
 			return true;
         }
 
