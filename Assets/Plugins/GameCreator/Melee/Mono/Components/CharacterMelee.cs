@@ -1165,7 +1165,7 @@ namespace GameCreator.Melee
         [ServerRpc]
         public void StartBlockingServerRpc()
         {
-            if (this.Character.characterLocomotion.isBusy) return;
+            if (this.Character.characterLocomotion.isBusy & !rooted.Value) return;
 
             if (this.IsDrawing) return;
             if (this.IsSheathing) return;
