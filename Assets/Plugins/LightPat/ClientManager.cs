@@ -645,18 +645,18 @@ namespace LightPat.Core
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
 
-                //if (clientId == 0)
-                //{
-                //    clientTeam = Team.Spectator;
-                //}
-                //else if (clientId == 1)
-                //{
-                //    clientTeam = Team.Red;
-                //}
-                //else
-                //{
-                //    clientTeam = Team.Blue;
-                //}
+                if (clientId == 0)
+                {
+                    clientTeam = Team.Spectator;
+                }
+                else if (clientId == 1)
+                {
+                    clientTeam = Team.Red;
+                }
+                else
+                {
+                    clientTeam = Team.Blue;
+                }
 
                 if (payloadOptions.Length == 3)
                 {
