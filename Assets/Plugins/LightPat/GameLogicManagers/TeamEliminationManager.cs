@@ -283,8 +283,8 @@ namespace LightPat.Core
                 }
                 else if (localClientTeam == Team.Blue)
                 {
-                    redScoreText.SetText("Enemy Team: " + blueScore.Value.ToString());
-                    blueScoreText.SetText("Your Team: " + redScore.Value.ToString());
+                    redScoreText.SetText("Your Team: " + blueScore.Value.ToString());
+                    blueScoreText.SetText("Enemy Team: " + redScore.Value.ToString());
                 }
                 else if (localClientTeam == Team.Spectator)
                 {
