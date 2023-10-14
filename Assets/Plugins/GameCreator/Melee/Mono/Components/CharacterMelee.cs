@@ -295,7 +295,7 @@ namespace GameCreator.Melee
                 }
             }
 
-            if (Time.time < slowEndTime)
+            if (Time.time < slowEndTime | slowed.Value)
             {
                 Character.characterLocomotion.runSpeed = slowAmount.Value;
                 if (IsServer)
