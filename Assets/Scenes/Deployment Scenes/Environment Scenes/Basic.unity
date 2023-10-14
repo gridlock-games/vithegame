@@ -260,7 +260,14 @@ MonoBehaviour:
     - {x: 6, y: 3, z: 15}
     - {x: -9, y: 3, z: 15}
     - {x: 9, y: 3, z: 15}
-    spawnRotation: {x: 0, y: 180, z: 0}
+    spawnRotations:
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
   - gameModes: 000000000100000002000000
     team: 3
     spawnPositions:
@@ -271,12 +278,20 @@ MonoBehaviour:
     - {x: 6, y: 3, z: -3}
     - {x: -9, y: 3, z: -3}
     - {x: 9, y: 3, z: -3}
-    spawnRotation: {x: 0, y: 0, z: 0}
+    spawnRotations:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
   - gameModes: 000000000100000002000000
     team: 4
     spawnPositions:
     - {x: 8, y: 3, z: 6}
-    spawnRotation: {x: 0, y: 270, z: 0}
+    spawnRotations:
+    - {x: 0, y: 0, z: 0}
 --- !u!4 &2025989084
 Transform:
   m_ObjectHideFlags: 0

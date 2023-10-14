@@ -51,7 +51,11 @@ namespace LightPat.Core
 
         public Dictionary<ulong, ClientData> GetClientDataDictionary() { return clientDataDictionary; }
 
-        public ClientData GetClient(ulong clientId) { return clientDataDictionary[clientId]; }
+        public ClientData GetClient(ulong clientId)
+        {
+            if (!clientDataDictionary.ContainsKey(clientId)) { Debug.LogError("ClientManager does not contain a data struct for ID: " + clientId); return new ClientData(); }
+            return clientDataDictionary[clientId];
+        }
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
 
@@ -224,11 +228,14 @@ namespace LightPat.Core
         {
             Debug.Log("Network Scene Event " + sceneEvent.SceneEventType + " " + sceneEvent.SceneName);
 
-            foreach (ulong id in sceneEvent.ClientsThatTimedOut)
+            if (sceneEvent.ClientsThatTimedOut != null)
             {
-                Debug.Log(id + " timed out while loading scene: " + sceneEvent.SceneName);
+                foreach (ulong id in sceneEvent.ClientsThatTimedOut)
+                {
+                    Debug.Log(id + " timed out while loading scene: " + sceneEvent.SceneName);
+                }
             }
-
+            
             currentSceneLoadingOperation = sceneEvent.AsyncOperation;
 
             if (IsServer)
