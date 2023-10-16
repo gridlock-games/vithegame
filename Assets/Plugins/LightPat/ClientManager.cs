@@ -547,7 +547,12 @@ namespace LightPat.Core
 
         void ClientDisconnectCallback(ulong clientId)
         {
-            if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
+            if (SceneManager.GetActiveScene().name == "CharacterSelect")
+            {
+                Debug.Log("Restarting Network Manager");
+                StartCoroutine(RestartNetworkManager());
+            }
+            else if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
                 if (NetworkManager.DisconnectReason == queuedDisconnectReason)
