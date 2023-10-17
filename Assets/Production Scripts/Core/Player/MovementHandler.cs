@@ -68,8 +68,6 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
-            //targetPosition += transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * Time.deltaTime * runSpeed;
-
             UpdateLocomotion();
             UpdateAnimationParameters();
         }

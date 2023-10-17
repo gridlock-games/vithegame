@@ -565,6 +565,7 @@ GameObject:
   - component: {fileID: 722433283}
   - component: {fileID: 722433284}
   - component: {fileID: 722433285}
+  - component: {fileID: 722433286}
   m_Layer: 0
   m_Name: PlayerRework
   m_TagString: Untagged
@@ -702,6 +703,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
+--- !u!114 &722433286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722433277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20176c6a7394596408b95d672a28319b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  maxDefense: 100
+  maxStamina: 100
+  maxRage: 100
 --- !u!1 &1145048898
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,7 +784,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 583301f4049dec04c832348179990c21, type: 2}
-    TickRate: 30
+    TickRate: 120
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
