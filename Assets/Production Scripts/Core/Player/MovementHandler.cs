@@ -40,9 +40,14 @@ namespace Vi.Player
             // Apply movement to charactercontroller
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion();
             if (rootMotion != Vector3.zero)
+            {
+                rootMotion += Physics.gravity;
                 characterController.Move(rootMotion);
+            }
             else
+            {
                 characterController.Move(targetDirection * (1f / NetworkManager.NetworkTickSystem.TickRate));
+            }
 
             Vector3 newPosition = transform.position;
 
@@ -87,15 +92,43 @@ namespace Vi.Player
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
 
-            Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
+            Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
             if (rootMotion != Vector3.zero) // is root moving
             {
-                //UpdateRootMovement(Physics.gravity);
+                rootMotion = transform.rotation * rootMotion;
+
+                // Calculate rotation to look at the current network position
+                Quaternion relativeRotation = Quaternion.identity;
+                if ((movementPrediction.currentPosition - transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((movementPrediction.currentPosition - transform.position).normalized, transform.up); }
+
+                // Calculate rotation to look in the direction of our movement
+                Quaternion movementRotation = Quaternion.identity;
+                if (rootMotion.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(rootMotion.normalized, transform.up); }
+
+                // Apply the direction of movement to the direction to move towards the current network position
+                Quaternion finalRotation = relativeRotation * movementRotation;
+
+                // Invert movement along the local x axis, idk why I need to do this
+                rootMotion.x *= -1;
+                // Apply rotation to movement vector
+                rootMotion = finalRotation * rootMotion;
+
+                // Scale movement vector according to distance between network position and local position
+                float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
+                rootMotion = rootMotion.normalized * localDistance;
+
+                // If our movement vector isn't going to reduce the distance between the local position and network position, simply move straight to the network position
+                // This prevents some jitters
+                float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + (rootMotion.normalized * localDistance));
+                if (localDistance < afterMoveDistance)
+                {
+                    rootMotion = movementPrediction.currentPosition - transform.position;
+                }
+
+                rootMotion += Physics.gravity;
+
                 characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
             }
@@ -106,8 +139,8 @@ namespace Vi.Player
             }
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            //animator.SetFloat("MoveForward", animDir.z);
-            //animator.SetFloat("MoveSides", animDir.x);
+            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
+            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
         [Header("Animation Settings")]
