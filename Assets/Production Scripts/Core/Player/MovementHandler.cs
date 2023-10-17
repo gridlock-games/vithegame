@@ -174,11 +174,7 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
 
-            Debug.Log(angle);
-
             ActionClip dodgeClip;
-
-            #region Compute Angle
             if (angle <= 15f && angle >= -15f)
             {
                 dodgeClip = dodgeF;
@@ -211,10 +207,8 @@ namespace Vi.Player
             {
                 dodgeClip = dodgeB;
             }
-            #endregion
 
             animationHandler.PlayAction(dodgeClip);
-            //animator.Play(dodgeStateName, animator.GetLayerIndex("Actions"));
         }
     }
 }

@@ -41,9 +41,11 @@ namespace Vi.Player
 
         private void Update()
         {
+            if (animator.IsInTransition(animator.GetLayerIndex("Actions"))) { return; }
+
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionStateName.Value.ToString()))
             {
-                Debug.LogError(Time.time + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
+                Debug.LogError(Time.time + " " + currentActionStateName.Value.ToString() + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
             }
         }
 
