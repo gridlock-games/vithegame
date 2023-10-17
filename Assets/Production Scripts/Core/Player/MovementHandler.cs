@@ -38,7 +38,11 @@ namespace Vi.Player
             characterController.enabled = true;
 
             // Apply movement to charactercontroller
-            characterController.Move(targetDirection * (1f / NetworkManager.NetworkTickSystem.TickRate));
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion();
+            if (rootMotion != Vector3.zero)
+                characterController.Move(rootMotion);
+            else
+                characterController.Move(targetDirection * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             Vector3 newPosition = transform.position;
 
@@ -58,11 +62,13 @@ namespace Vi.Player
         private CharacterController characterController;
         private NetworkMovementPrediction movementPrediction;
         private Animator animator;
+        private AnimationHandler animationHandler;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<NetworkMovementPrediction>();
             animator = GetComponentInChildren<Animator>();
+            animationHandler = GetComponentInChildren<AnimationHandler>();
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -86,9 +92,11 @@ namespace Vi.Player
 
             Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
 
-            if (false) // is root moving
+            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
+            if (rootMotion != Vector3.zero) // is root moving
             {
                 //UpdateRootMovement(Physics.gravity);
+                characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
             }
             else
