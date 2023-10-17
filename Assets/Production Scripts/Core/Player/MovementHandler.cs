@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
@@ -13,9 +14,10 @@ namespace Vi.Player
 
         [Header("Locomotion Settings")]
         [SerializeField] private float runSpeed = 5;
-
         [SerializeField] private float angularSpeed = 540;
         [SerializeField] private Vector2 lookSensitivity = new Vector2(0.2f, 0.2f);
+        [Header("Animation Settings")]
+        [SerializeField] private float moveAnimSpeed = 5;
 
         public NetworkMovementPrediction.StatePayload ProcessMovement(NetworkMovementPrediction.InputPayload inputPayload)
         {
@@ -80,7 +82,6 @@ namespace Vi.Player
         private void Update()
         {
             UpdateLocomotion();
-            UpdateAnimationParameters();
         }
 
         private void UpdateLocomotion()
@@ -143,14 +144,6 @@ namespace Vi.Player
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
-        [Header("Animation Settings")]
-        [SerializeField] private float moveAnimSpeed = 5;
-        private void UpdateAnimationParameters()
-        {
-            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveInput.y, Time.deltaTime * moveAnimSpeed));
-            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), moveInput.x, Time.deltaTime * moveAnimSpeed));
-        }
-
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
 
         private Vector2 lookInput;
@@ -167,9 +160,61 @@ namespace Vi.Player
             moveInput = value.Get<Vector2>();
         }
 
+        [Header("Dodge Assignments")]
+        [SerializeField] private ActionClip dodgeF;
+        [SerializeField] private ActionClip dodgeFL;
+        [SerializeField] private ActionClip dodgeFR;
+        [SerializeField] private ActionClip dodgeB;
+        [SerializeField] private ActionClip dodgeBL;
+        [SerializeField] private ActionClip dodgeBR;
+        [SerializeField] private ActionClip dodgeL;
+        [SerializeField] private ActionClip dodgeR;
+
         void OnDodge()
         {
-            animator.Play("DodgeF", animator.GetLayerIndex("Actions"));
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
+
+            Debug.Log(angle);
+
+            ActionClip dodgeClip;
+
+            #region Compute Angle
+            if (angle <= 15f && angle >= -15f)
+            {
+                dodgeClip = dodgeF;
+            }
+            else if (angle < 80f && angle > 15f)
+            {
+                dodgeClip = dodgeFL;
+            }
+            else if (angle > -80f && angle < -15f)
+            {
+                dodgeClip = dodgeFR;
+            }
+            else if (angle > 80f && angle < 100f)
+            {
+                dodgeClip = dodgeL;
+            }
+            else if (angle < -80f && angle > -100f)
+            {
+                dodgeClip = dodgeR;
+            }
+            else if (angle < -100f && angle > -170f)
+            {
+                dodgeClip = dodgeBR;
+            }
+            else if (angle > 100f && angle < 170f)
+            {
+                dodgeClip = dodgeBL;
+            }
+            else
+            {
+                dodgeClip = dodgeB;
+            }
+            #endregion
+
+            animationHandler.PlayAction(dodgeClip);
+            //animator.Play(dodgeStateName, animator.GetLayerIndex("Actions"));
         }
     }
 }

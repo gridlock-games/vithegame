@@ -7,6 +7,8 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "ActionClip", menuName = "Production/ActionClip")]
     public class ActionClip : ScriptableObject
     {
-        [SerializeField] private AnimationClip animationClip;
+        [SerializeField] private string actionStateName;
+
+        public string GetActionStateName() { return actionStateName; }
     }
 }

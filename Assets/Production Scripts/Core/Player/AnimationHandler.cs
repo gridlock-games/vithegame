@@ -1,18 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using Unity.Collections;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
     [RequireComponent(typeof(Animator))]
-    public class AnimationHandler : MonoBehaviour
+    public class AnimationHandler : NetworkBehaviour
     {
+        private NetworkVariable<FixedString32Bytes> currentActionStateName = new NetworkVariable<FixedString32Bytes>("Empty");
+
+        public void PlayAction(ActionClip actionClip)
+        {
+            currentActionStateName.Value = actionClip.name;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            currentActionStateName.OnValueChanged += OnCurrentActionStateNameChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            currentActionStateName.OnValueChanged -= OnCurrentActionStateNameChange;
+        }
+
+        private void OnCurrentActionStateNameChange(FixedString32Bytes prev, FixedString32Bytes current)
+        {
+            animator.Play(current.ToString(), animator.GetLayerIndex("Actions"));
+        }
+
         Animator animator;
-        MovementHandler movementHandler;
+
         private void Start()
         {
-            movementHandler = GetComponentInParent<MovementHandler>();
             animator = GetComponent<Animator>();
+        }
+
+        private void Update()
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionStateName.Value.ToString()))
+            {
+                Debug.LogError(Time.time + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
+            }
         }
 
         private Vector3 networkRootMotion;
