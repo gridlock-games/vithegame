@@ -30,7 +30,6 @@ namespace Vi.Player
 
             Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
 
-            
             Vector3 oldPosition = transform.position;
 
             // Set position to current position
