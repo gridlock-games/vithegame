@@ -9,14 +9,6 @@ namespace Vi.Player
     [RequireComponent(typeof(CharacterController))]
     public class MovementHandler : NetworkBehaviour
     {
-        public Vector3 targetPosition;
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(targetPosition, 0.25f);
-        }
-
         [SerializeField] private Camera cameraInstance;
 
         [Header("Locomotion Settings")]
@@ -25,34 +17,68 @@ namespace Vi.Player
         [SerializeField] private float angularSpeed = 540;
         [SerializeField] private Vector2 lookSensitivity = new Vector2(0.2f, 0.2f);
 
-        public NetworkMovementPrediction.StatePayload ProcessMovement()
+        public NetworkMovementPrediction.StatePayload ProcessMovement(NetworkMovementPrediction.InputPayload inputPayload)
         {
+            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
 
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
+            targetDirection *= characterController.isGrounded ? runSpeed : 0;
+            targetDirection += Physics.gravity;
+
+            Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
+            camDirection.Scale(HORIZONTAL_PLANE);
+
+            Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
+
+            
+            Vector3 oldPosition = transform.position;
+
+            // Set position to current position
+            characterController.enabled = false;
+            transform.position = movementPrediction.currentPosition;
+            characterController.enabled = true;
+
+            // Apply movement to charactercontroller
+            characterController.Move(targetDirection * (1f / NetworkManager.NetworkTickSystem.TickRate));
+
+            Vector3 newPosition = transform.position;
+
+            // Revert movement change
+            characterController.enabled = false;
+            transform.position = oldPosition;
+            characterController.enabled = true;
+
+            if (IsOwner)
+                transform.rotation = targetRotation;
+            else
+                transform.rotation = inputPayload.rotation;
+
+            return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, transform.rotation);
         }
 
         private CharacterController characterController;
+        private NetworkMovementPrediction movementPrediction;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
+            movementPrediction = GetComponent<NetworkMovementPrediction>();
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
-            targetPosition += transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * Time.deltaTime * runSpeed;
+            //targetPosition += transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * Time.deltaTime * runSpeed;
 
             UpdateLocomotion();
         }
 
         private void UpdateLocomotion()
         {
-            Vector3 targetDirection = targetPosition - transform.position;
+            Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
-
-            //Quaternion targetRotation = this.UpdateRotation(targetDirection);
 
             Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
             camDirection.Scale(HORIZONTAL_PLANE);
@@ -78,6 +104,8 @@ namespace Vi.Player
         {
             lookInput = value.Get<Vector2>();
         }
+
+        public Vector2 GetMoveInput() { return moveInput; }
 
         private Vector2 moveInput;
         void OnMove(InputValue value)

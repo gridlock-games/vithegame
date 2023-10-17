@@ -36,6 +36,8 @@ public class NetworkStart : MonoBehaviour
 
     private void Update()
     {
+        if (!ClientManager.Singleton) { return; }
+
         if (NetworkManager.Singleton.IsServer & ClientManager.Singleton.gameMode.Value != gameMode)
         {
             ClientManager.Singleton.gameMode.Value = gameMode;
