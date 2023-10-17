@@ -2,19 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 namespace Vi.Player
 {
-    public class InputHandler : MonoBehaviour
+    public class PlayerController : NetworkBehaviour
     {
-        void OnLook(InputValue value)
+        Animator animator;
+
+        private void Start()
         {
-            Debug.Log(value.Get<Vector2>());
+            animator = GetComponentInChildren<Animator>();
         }
 
+        private void Update()
+        {
+            animator.SetFloat("MoveForward", moveInput.y);
+            animator.SetFloat("MoveSides", moveInput.x);
+        }
+
+        private Vector2 lookInput;
+        void OnLook(InputValue value)
+        {
+            lookInput = value.Get<Vector2>();
+        }
+
+        private Vector2 moveInput;
         void OnMove(InputValue value)
         {
-            Debug.Log(value.Get<Vector2>());
+            moveInput = value.Get<Vector2>();
         }
 
         void OnInteract()
