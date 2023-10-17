@@ -494,11 +494,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: guin_battle
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1342002850858579257, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
 --- !u!4 &530862631 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1441622728665718620, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
+    type: 3}
+  m_PrefabInstance: {fileID: 530862630}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &530862632 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7211126797128615789, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
+    type: 3}
+  m_PrefabInstance: {fileID: 530862630}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &530862633 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7200003263580952538, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
     type: 3}
   m_PrefabInstance: {fileID: 530862630}
   m_PrefabAsset: {fileID: 0}
@@ -518,6 +531,25 @@ MonoBehaviour:
   - m_Rig: {fileID: 1207456917}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &530862637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375147726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightHand: {fileID: 530862632}
+  leftHand: {fileID: 530862633}
+  rightHandAimForwardDir: {x: 0, y: 0, z: 1}
+  rightHandAimUpDir: {x: 0, y: 1, z: 0}
+  rightHandAimIKOffset: {x: 0, y: 0, z: 0}
+  leftHandPosOffset: {x: 0, y: 0, z: 0}
+  leftHandRotOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &722433277
 GameObject:
   m_ObjectHideFlags: 0
@@ -668,6 +700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
 --- !u!1 &1145048898
 GameObject:
   m_ObjectHideFlags: 0

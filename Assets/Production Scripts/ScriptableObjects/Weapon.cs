@@ -20,7 +20,7 @@ namespace Vi.ScriptableObjects
         }
 
         [System.Serializable]
-        private class WeaponModelData
+        public class WeaponModelData
         {
             public GameObject skinPrefab;
             public Data[] data;
@@ -37,5 +37,7 @@ namespace Vi.ScriptableObjects
 
         // 3d model:
         [SerializeField] private List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
+
+        public List<WeaponModelData> GetWeaponModelData() { return weaponModelData; }
     }
 }
