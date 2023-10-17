@@ -78,6 +78,7 @@ namespace Vi.Player
             Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
+            Vector3 animDir = targetDirection;
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
 
@@ -97,8 +98,7 @@ namespace Vi.Player
                 transform.rotation = targetRotation;
             }
 
-            Vector3 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
-            animDir = transform.InverseTransformDirection(animDir.magnitude > 1 ? animDir.normalized : Vector3.zero);
+            animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             animator.SetFloat("MoveForward", animDir.z);
             animator.SetFloat("MoveSides", animDir.x);
         }
