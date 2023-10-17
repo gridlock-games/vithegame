@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-namespace Vi.GameLogicManager
+namespace Vi.Core.GameLogicManager
 {
-    public class GameLogicManager : MonoBehaviour
+    public class GameLogicManager : NetworkBehaviour
     {
         public enum GameMode
         {

@@ -125,6 +125,11 @@ namespace Vi.Player
         {
             moveInput = value.Get<Vector2>();
         }
+
+        void OnDodge()
+        {
+            animator.Play("DodgeF", animator.GetLayerIndex("Actions"));
+        }
     }
 }
 

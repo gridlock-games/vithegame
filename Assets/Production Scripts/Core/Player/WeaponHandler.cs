@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using UnityEngine.InputSystem;
 
 namespace Vi.Player
 {
@@ -65,6 +66,46 @@ namespace Vi.Player
             }
 
             weaponInstances = instances;
+        }
+
+        void OnLightAttack()
+        {
+
+        }
+
+        void OnHeavyAttack()
+        {
+
+        }
+
+        void OnAbility1()
+        {
+
+        }
+
+        void OnAbility2()
+        {
+
+        }
+
+        void OnAbility3()
+        {
+
+        }
+
+        void OnAbility4()
+        {
+
+        }
+
+        void OnReload()
+        {
+
+        }
+
+        void OnBlock(InputValue value)
+        {
+
         }
     }
 }
