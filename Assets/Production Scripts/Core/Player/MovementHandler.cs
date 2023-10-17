@@ -71,6 +71,7 @@ namespace Vi.Player
             //targetPosition += transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * Time.deltaTime * runSpeed;
 
             UpdateLocomotion();
+            UpdateAnimationParameters();
         }
 
         private void UpdateLocomotion()
@@ -99,8 +100,16 @@ namespace Vi.Player
             }
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            animator.SetFloat("MoveForward", animDir.z);
-            animator.SetFloat("MoveSides", animDir.x);
+            //animator.SetFloat("MoveForward", animDir.z);
+            //animator.SetFloat("MoveSides", animDir.x);
+        }
+
+        [Header("Animation Settings")]
+        [SerializeField] private float moveAnimSpeed = 5;
+        private void UpdateAnimationParameters()
+        {
+            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveInput.y, Time.deltaTime * moveAnimSpeed));
+            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), moveInput.x, Time.deltaTime * moveAnimSpeed));
         }
 
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
