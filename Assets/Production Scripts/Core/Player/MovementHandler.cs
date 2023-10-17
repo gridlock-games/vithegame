@@ -57,10 +57,12 @@ namespace Vi.Player
 
         private CharacterController characterController;
         private NetworkMovementPrediction movementPrediction;
+        private Animator animator;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<NetworkMovementPrediction>();
+            animator = GetComponentInChildren<Animator>();
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -94,6 +96,11 @@ namespace Vi.Player
                 characterController.Move(targetDirection * Time.deltaTime);
                 transform.rotation = targetRotation;
             }
+
+            Vector3 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
+            animDir = transform.InverseTransformDirection(animDir.magnitude > 1 ? animDir.normalized : Vector3.zero);
+            animator.SetFloat("MoveForward", animDir.z);
+            animator.SetFloat("MoveSides", animDir.x);
         }
 
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
