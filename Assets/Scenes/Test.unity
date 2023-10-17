@@ -255,9 +255,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraPivot: {fileID: 1383272771}
-  orbitSpeed: 8
+  orbitSpeed: 15
   smoothTime: 0.1
   maxPitch: 40
+  positionOffset: {x: 0, y: 0, z: 3}
 --- !u!1 &346043804
 GameObject:
   m_ObjectHideFlags: 0
@@ -568,6 +569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraInstance: {fileID: 20858573}
+  angularSpeed: 540
   lookSensitivity: {x: 0.2, y: 0.2}
 --- !u!1 &1383272770
 GameObject:

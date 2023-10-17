@@ -15,17 +15,21 @@ namespace Vi.Player
 
         }
 
+        public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+        [SerializeField] private float angularSpeed = 540;
         private void Update()
         {
-            Vector3 targetEulers = Quaternion.LookRotation(cameraInstance.transform.forward, Vector3.up).eulerAngles;
-            targetEulers.x = 0;
-            targetEulers.z = 0;
+            Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
+            camDirection.Scale(HORIZONTAL_PLANE);
 
-            transform.eulerAngles = targetEulers;
+            Quaternion srcRotation = transform.rotation;
+            Quaternion dstRotation = Quaternion.LookRotation(camDirection);
+
+            transform.rotation = Quaternion.RotateTowards(srcRotation, dstRotation, Time.deltaTime * angularSpeed);
         }
 
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
-        
+
         [SerializeField] private Vector2 lookSensitivity = new Vector2(0.2f, 0.2f);
 
         private Vector2 lookInput;

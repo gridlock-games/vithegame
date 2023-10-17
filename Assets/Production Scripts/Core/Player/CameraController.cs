@@ -6,32 +6,34 @@ namespace Vi.Player
 {
     public class CameraController : MonoBehaviour
     {
-        [Header("Camera Settings")]
+        [Header("Camera Transform Settings")]
         [SerializeField] private Transform cameraPivot;
         [SerializeField] private float orbitSpeed = 8;
         [SerializeField] private float smoothTime = 0.1f;
         [SerializeField] private float maxPitch = 40;
+        [SerializeField] private Vector3 positionOffset = new Vector3(0, 0, 3);
 
         private float targetRotationX;
         private float targetRotationY;
 
         private Vector3 _velocityPosition;
 
-        private Vector3 targetOffset;
         private MovementHandler movementHandler;
         private void Awake()
         {
-            targetOffset = transform.position - cameraPivot.position;
             movementHandler = GetComponentInParent<MovementHandler>();
         }
 
+        private GameObject cameraInterp;
         private void Start()
         {
             transform.SetParent(null, true);
+            cameraInterp = new GameObject("Camera Interp");
         }
 
         private void Update()
         {
+            // Update camera interp transform
             targetRotationX += movementHandler.GetLookInput().x;
             targetRotationY -= movementHandler.GetLookInput().y;
 
@@ -42,16 +44,20 @@ namespace Vi.Player
 
             Quaternion targetRotation = Quaternion.Euler(targetRotationY, targetRotationX, 0);
 
-            transform.position = Vector3.SmoothDamp(
-                transform.position,
-                cameraPivot.TransformPoint(targetOffset),
+            cameraInterp.transform.position = Vector3.SmoothDamp(
+                cameraInterp.transform.position,
+                cameraPivot.TransformPoint(Vector3.zero),
                 ref _velocityPosition,
                 smoothTime
             );
 
-            Vector3 eulers = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
+            Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
             eulers.z = 0;
-            transform.eulerAngles = eulers;
+            cameraInterp.transform.eulerAngles = eulers;
+
+            // Update camera transform itself
+            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * positionOffset;
+            transform.LookAt(cameraInterp.transform);
         }
     }
 }
