@@ -413,7 +413,7 @@ namespace LightPat.Core
                 }
                 else
                 {
-                    ServerPostPayload payload = new ServerPostPayload(1,
+                    ServerPostPayload payload = new ServerPostPayload(SceneManager.GetActiveScene().name == "Hub" ? 1 : 0,
                                                                       clientDataDictionary.Count,
                                                                       gameplayScenes.Contains(SceneManager.GetActiveScene().name) ? 1 : 0,
                                                                       networkTransport.ConnectionData.Address,
