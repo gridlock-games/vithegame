@@ -16,7 +16,8 @@ namespace LightPat.Core
         public Vector3 followCamOffset = new Vector3(0, 3, -3);
 
         [SerializeField] private GameObject UICanvasInstance;
-        [SerializeField] private Transform playerCardParent;
+        [SerializeField] private Transform playerCardLeftParent;
+        [SerializeField] private Transform playerCardRightParent;
         [SerializeField] private GameObject playerCardLeftAnchorPrefab;
         [SerializeField] private GameObject playerCardRightAnchorPrefab;
 
@@ -259,7 +260,12 @@ namespace LightPat.Core
 
             if (lastPlayersString != playersString)
             {
-                foreach (Transform playerIcon in playerCardParent)
+                foreach (Transform playerIcon in playerCardLeftParent)
+                {
+                    Destroy(playerIcon.gameObject);
+                }
+
+                foreach (Transform playerIcon in playerCardRightParent)
                 {
                     Destroy(playerIcon.gameObject);
                 }
@@ -280,31 +286,31 @@ namespace LightPat.Core
 
                         if (playerTeam == Team.Blue)
                         {
-                            GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
+                            GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardRightParent);
                             playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
-                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, rightCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            //playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, rightCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             rightCounter++;
                         }
                         else if (playerTeam == Team.Red)
                         {
-                            GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
+                            GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardLeftParent);
                             playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
-                            playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                            //playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, leftCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             leftCounter++;
                         }
                         else
                         {
                             if (elseCounter % 2 == 0)
                             {
-                                GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardParent);
+                                GameObject playerCard = Instantiate(playerCardLeftAnchorPrefab, playerCardLeftParent);
                                 playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
-                                playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                                //playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
                             else
                             {
-                                GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardParent);
+                                GameObject playerCard = Instantiate(playerCardRightAnchorPrefab, playerCardRightParent);
                                 playerCard.GetComponent<PlayerCard>().Instantiate(melee, playerTeam, false, this);
-                                playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
+                                //playerCard.transform.localPosition = new Vector3(playerCard.transform.localPosition.x, elseCounter * playerCardSpacing, playerCard.transform.localPosition.z);
                             }
 
                             elseCounter++;
