@@ -41,16 +41,6 @@ namespace Vi.Player
             animator = GetComponent<Animator>();
         }
 
-        private void Update()
-        {
-            //if (animator.IsInTransition(animator.GetLayerIndex("Actions"))) { return; }
-
-            //if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionStateName.Value.ToString()))
-            //{
-            //    Debug.LogError(Time.time + " " + currentActionStateName.Value.ToString() + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
-            //}
-        }
-
         private Vector3 networkRootMotion;
         public Vector3 ApplyNetworkRootMotion()
         {

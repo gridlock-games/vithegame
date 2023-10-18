@@ -27,11 +27,6 @@ namespace Vi.Player
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
 
-            Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
-
             Vector3 oldPosition = transform.position;
 
             // Set position to current position
@@ -59,9 +54,16 @@ namespace Vi.Player
             characterController.enabled = true;
 
             if (IsOwner)
+            {
+                Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
+                camDirection.Scale(HORIZONTAL_PLANE);
+                Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
                 transform.rotation = targetRotation;
+            }
             else
+            {
                 transform.rotation = inputPayload.rotation;
+            }
 
             return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, transform.rotation);
         }
@@ -77,7 +79,7 @@ namespace Vi.Player
             }
             else
             {
-                Destroy(cameraInstance);
+                Destroy(cameraInstance.gameObject);
                 GetComponent<PlayerInput>().enabled = false;
             }
         }
