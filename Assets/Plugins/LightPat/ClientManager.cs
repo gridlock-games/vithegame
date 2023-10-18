@@ -649,7 +649,7 @@ namespace LightPat.Core
                 string[] payloadOptions = payload.Split(payloadParseString);
 
                 Team clientTeam = approvalCheckScenesCompetitorTeam.Contains(SceneManager.GetActiveScene().name) ? Team.Competitor : Team.Spectator;
-
+                
                 if (payloadOptions.Length == 3)
                 {
                     QueueClient(response, clientId, new ClientData(payloadOptions[0], int.Parse(payloadOptions[1]), int.Parse(payloadOptions[2]), clientTeam));
