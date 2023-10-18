@@ -23,9 +23,9 @@ public class NetworkStart : MonoBehaviour
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionDataString);
 
-        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            NetworkManager.Singleton.StartServer();
-        else if (Application.isEditor)
+        //if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+        //    NetworkManager.Singleton.StartServer();
+        if (Application.isEditor)
             NetworkManager.Singleton.StartHost();
         else
             NetworkManager.Singleton.StartClient();
