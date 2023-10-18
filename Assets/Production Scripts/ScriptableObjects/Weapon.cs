@@ -38,6 +38,8 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
 
+        public List<WeaponModelData> GetWeaponModelData() { return weaponModelData; }
+
         public enum HitLocation
         {
             Front,
@@ -66,6 +68,24 @@ namespace Vi.ScriptableObjects
             return hitReaction.reactionClip;
         }
 
-        public List<WeaponModelData> GetWeaponModelData() { return weaponModelData; }
+        public enum InputAttackType
+        {
+            LightAttack,
+            HeavyAttack
+        }
+
+        [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
+        [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
+
+        private float lastGetAttackTime;
+        public ActionClip GetAttack(InputAttackType inputAttackType)
+        {
+            ActionClip actionClip = lightAttacks[0];
+
+            lastGetAttackTime = Time.time;
+            if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
+
+            return actionClip;
+        }
     }
 }

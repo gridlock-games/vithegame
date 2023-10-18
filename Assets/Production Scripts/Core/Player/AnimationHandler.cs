@@ -12,20 +12,27 @@ namespace Vi.Player
     {
         public void PlayAction(ActionClip actionClip)
         {
-            PlayActionServerRpc(actionClip.name);
+            PlayActionServerRpc(actionClip.name, actionClip.GetClipType());
         }
 
+        private ActionClip.ClipType lastClipType;
         [ServerRpc]
-        private void PlayActionServerRpc(string actionStateName)
+        private void PlayActionServerRpc(string actionStateName, ActionClip.ClipType clipType)
         {
-            // If we are not at or transitioning to the empty state, do not perform an action
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            {
+                if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { Debug.Log("Skipping " + Time.time); return; }
+            }
+
+            //// If we are not at or transitioning to the empty state, do not perform an action
+            //if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
             
             if (!IsClient)
             {
                 animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
             }
             PlayActionClientRpc(actionStateName);
+            lastClipType = clipType;
         }
 
         [ClientRpc]

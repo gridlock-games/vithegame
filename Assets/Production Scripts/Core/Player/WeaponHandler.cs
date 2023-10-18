@@ -14,15 +14,16 @@ namespace Vi.Player
         private List<GameObject> weaponInstances = new List<GameObject>();
 
         Animator animator;
+        AnimationHandler animationHandler;
         
         private void Start()
         {
             animator = GetComponentInChildren<Animator>();
-
-            EquipWeapon(weapon);
+            animationHandler = GetComponentInChildren<AnimationHandler>();
+            EquipWeapon();
         }
 
-        private void EquipWeapon(Weapon weapon)
+        private void EquipWeapon()
         {
             List<GameObject> instances = new List<GameObject>();
 
@@ -70,12 +71,14 @@ namespace Vi.Player
 
         void OnLightAttack()
         {
-
+            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.LightAttack);
+            animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-
+            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.HeavyAttack);
+            animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()
