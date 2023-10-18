@@ -80,9 +80,21 @@ namespace Vi.ScriptableObjects
         private int lightAttackIndex;
         public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
         {
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
-                lightAttackIndex++;
+                return null;
+            }
+            else if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            {
+                //Debug.Log(animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime);
+                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].nextAttackCanBePlayedTime)
+                {
+                    lightAttackIndex++;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {

@@ -29,7 +29,6 @@ namespace Vi.Player
             
             if (!IsClient)
             {
-                //animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
             PlayActionClientRpc(actionStateName);
@@ -39,7 +38,6 @@ namespace Vi.Player
         [ClientRpc]
         private void PlayActionClientRpc(string actionStateName)
         {
-            //animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
         }
 

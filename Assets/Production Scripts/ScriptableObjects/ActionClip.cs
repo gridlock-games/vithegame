@@ -16,5 +16,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
+
+        public float nextAttackCanBePlayedTime = 0.5f;
     }
 }

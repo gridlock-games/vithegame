@@ -72,7 +72,8 @@ namespace Vi.Player
         void OnLightAttack()
         {
             ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.LightAttack, animator);
-            animationHandler.PlayAction(actionClip);
+            if (actionClip != null)
+                animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()

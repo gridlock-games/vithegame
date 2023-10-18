@@ -12,9 +12,13 @@ namespace Vi.Editor
     {
         private SerializedProperty spClipType;
 
+        private SerializedProperty spNextAttackCanBePlayedTime;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
+
+            spNextAttackCanBePlayedTime = serializedObject.FindProperty("nextAttackCanBePlayedTime");
         }
 
         public override void OnInspectorGUI()
@@ -23,12 +27,13 @@ namespace Vi.Editor
 
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
-
+                EditorGUILayout.PropertyField(spNextAttackCanBePlayedTime);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
-
+                EditorGUILayout.PropertyField(spNextAttackCanBePlayedTime);
             }
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
