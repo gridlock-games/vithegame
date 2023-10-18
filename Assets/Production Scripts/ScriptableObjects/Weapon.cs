@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -35,8 +36,35 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        // 3d model:
         [SerializeField] private List<WeaponModelData> weaponModelData = new List<WeaponModelData>();
+
+        public enum HitLocation
+        {
+            Front,
+            Back,
+            Left,
+            Right
+        }
+
+        [System.Serializable]
+        private class HitReaction
+        {
+            public HitLocation hitLocation;
+            public ActionClip reactionClip;
+        }
+
+        [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
+
+        public ActionClip GetHitReaction(HitLocation hitLocation)
+        {
+            HitReaction hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
+            if (hitReaction == null)
+            {
+                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this);
+                return null;
+            }
+            return hitReaction.reactionClip;
+        }
 
         public List<WeaponModelData> GetWeaponModelData() { return weaponModelData; }
     }

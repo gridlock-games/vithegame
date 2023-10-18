@@ -66,6 +66,22 @@ namespace Vi.Player
             return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, transform.rotation);
         }
 
+        public override void OnNetworkSpawn()
+        {
+            if (IsLocalPlayer)
+            {
+                cameraInstance.GetComponent<AudioListener>().enabled = true;
+                cameraInstance.enabled = true;
+                GetComponent<PlayerInput>().enabled = true;
+                GetComponent<ActionMapHandler>().enabled = true;
+            }
+            else
+            {
+                Destroy(cameraInstance);
+                GetComponent<PlayerInput>().enabled = false;
+            }
+        }
+
         private CharacterController characterController;
         private NetworkMovementPrediction movementPrediction;
         private Animator animator;

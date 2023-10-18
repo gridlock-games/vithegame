@@ -15,18 +15,12 @@ namespace Vi.Player
 
         private float targetRotationX;
         private float targetRotationY;
-
         private Vector3 _velocityPosition;
-
         private MovementHandler movementHandler;
-        private void Awake()
-        {
-            movementHandler = GetComponentInParent<MovementHandler>();
-        }
-
         private GameObject cameraInterp;
         private void Start()
         {
+            movementHandler = GetComponentInParent<MovementHandler>();
             transform.SetParent(null, true);
             cameraInterp = new GameObject("Camera Interp");
         }
