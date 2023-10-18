@@ -71,14 +71,14 @@ namespace Vi.Player
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.LightAttack);
+            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.LightAttack, animator);
             animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.HeavyAttack);
-            animationHandler.PlayAction(actionClip);
+            //ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.HeavyAttack);
+            //animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()

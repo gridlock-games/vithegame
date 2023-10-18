@@ -77,12 +77,19 @@ namespace Vi.ScriptableObjects
         [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
         [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
 
-        private float lastGetAttackTime;
-        public ActionClip GetAttack(InputAttackType inputAttackType)
+        private int lightAttackIndex;
+        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
         {
-            ActionClip actionClip = lightAttacks[0];
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            {
+                lightAttackIndex++;
+            }
+            else
+            {
+                lightAttackIndex = 0;
+            }
 
-            lastGetAttackTime = Time.time;
+            ActionClip actionClip = lightAttacks[lightAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
 
             return actionClip;

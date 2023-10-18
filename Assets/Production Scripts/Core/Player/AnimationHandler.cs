@@ -21,7 +21,7 @@ namespace Vi.Player
         {
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
-                if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { Debug.Log("Skipping " + Time.time); return; }
+                if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
 
             //// If we are not at or transitioning to the empty state, do not perform an action
@@ -29,7 +29,8 @@ namespace Vi.Player
             
             if (!IsClient)
             {
-                animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
+                //animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
+                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
             PlayActionClientRpc(actionStateName);
             lastClipType = clipType;
@@ -38,7 +39,8 @@ namespace Vi.Player
         [ClientRpc]
         private void PlayActionClientRpc(string actionStateName)
         {
-            animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
+            //animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
+            animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
         }
 
         Animator animator;
