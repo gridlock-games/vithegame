@@ -10,26 +10,28 @@ namespace Vi.Player
     [RequireComponent(typeof(Animator))]
     public class AnimationHandler : NetworkBehaviour
     {
-        private NetworkVariable<FixedString32Bytes> currentActionStateName = new NetworkVariable<FixedString32Bytes>("Empty");
-
         public void PlayAction(ActionClip actionClip)
         {
-            currentActionStateName.Value = actionClip.name;
+            PlayActionServerRpc(actionClip.name);
         }
 
-        public override void OnNetworkSpawn()
+        [ServerRpc]
+        private void PlayActionServerRpc(string actionStateName)
         {
-            currentActionStateName.OnValueChanged += OnCurrentActionStateNameChange;
+            // If we are not at the empty state, do not perform an action
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
+
+            if (!IsClient)
+            {
+                animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
+            }
+            PlayActionClientRpc(actionStateName);
         }
 
-        public override void OnNetworkDespawn()
+        [ClientRpc]
+        private void PlayActionClientRpc(string actionStateName)
         {
-            currentActionStateName.OnValueChanged -= OnCurrentActionStateNameChange;
-        }
-
-        private void OnCurrentActionStateNameChange(FixedString32Bytes prev, FixedString32Bytes current)
-        {
-            animator.Play(current.ToString(), animator.GetLayerIndex("Actions"));
+            animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
         }
 
         Animator animator;
@@ -41,12 +43,12 @@ namespace Vi.Player
 
         private void Update()
         {
-            if (animator.IsInTransition(animator.GetLayerIndex("Actions"))) { return; }
+            //if (animator.IsInTransition(animator.GetLayerIndex("Actions"))) { return; }
 
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionStateName.Value.ToString()))
-            {
-                Debug.LogError(Time.time + " " + currentActionStateName.Value.ToString() + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
-            }
+            //if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionStateName.Value.ToString()))
+            //{
+            //    Debug.LogError(Time.time + " " + currentActionStateName.Value.ToString() + " actions layer state does not match network state name, don't play animations except from the animation handler script!");
+            //}
         }
 
         private Vector3 networkRootMotion;
