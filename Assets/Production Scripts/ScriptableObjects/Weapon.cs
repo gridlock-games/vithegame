@@ -105,7 +105,7 @@ namespace Vi.ScriptableObjects
                 lightAttackIndex = 0;
             }
 
-            if (lightAttackIndex > lightAttacks.Count) { return null; }
+            if (lightAttackIndex >= lightAttacks.Count) { return null; }
 
             ActionClip actionClip = lightAttacks[lightAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
@@ -144,7 +144,7 @@ namespace Vi.ScriptableObjects
                 heavyAttackIndex = 0;
             }
 
-            if (heavyAttackIndex > heavyAttacks.Count) { return null; }
+            if (heavyAttackIndex >= heavyAttacks.Count) { return null; }
 
             ActionClip actionClip = heavyAttacks[heavyAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
