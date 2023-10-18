@@ -75,10 +75,8 @@ namespace Vi.ScriptableObjects
         }
 
         [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
-        [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
-
         private int lightAttackIndex;
-        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
+        public ActionClip GetLightAttack(InputAttackType inputAttackType, Animator animator)
         {
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
@@ -86,10 +84,16 @@ namespace Vi.ScriptableObjects
             }
             else if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
-                //Debug.Log(animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime);
-                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].nextAttackCanBePlayedTime)
+                if (lightAttackIndex < lightAttacks.Count)
                 {
-                    lightAttackIndex++;
+                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].nextAttackCanBePlayedTime)
+                    {
+                        lightAttackIndex++;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 else
                 {
@@ -101,7 +105,48 @@ namespace Vi.ScriptableObjects
                 lightAttackIndex = 0;
             }
 
+            if (lightAttackIndex > lightAttacks.Count) { return null; }
+
             ActionClip actionClip = lightAttacks[lightAttackIndex];
+            if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
+
+            return actionClip;
+        }
+
+        [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
+        private int heavyAttackIndex;
+        public ActionClip GetHeavyAttack(InputAttackType inputAttackType, Animator animator)
+        {
+            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            {
+                return null;
+            }
+            else if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            {
+                if (heavyAttackIndex < heavyAttacks.Count)
+                {
+                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].nextAttackCanBePlayedTime)
+                    {
+                        heavyAttackIndex++;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                heavyAttackIndex = 0;
+            }
+
+            if (heavyAttackIndex > heavyAttacks.Count) { return null; }
+
+            ActionClip actionClip = heavyAttacks[heavyAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
 
             return actionClip;
