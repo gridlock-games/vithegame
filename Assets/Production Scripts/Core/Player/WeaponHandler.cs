@@ -105,7 +105,7 @@ namespace Vi.Player
 
         void OnBlock(InputValue value)
         {
-
+            animator.SetBool("Blocking", value.isPressed);
         }
     }
 }

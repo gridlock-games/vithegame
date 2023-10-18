@@ -18,9 +18,9 @@ namespace Vi.Player
         [ServerRpc]
         private void PlayActionServerRpc(string actionStateName)
         {
-            // If we are not at the empty state, do not perform an action
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
-
+            // If we are not at or transitioning to the empty state, do not perform an action
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
+            
             if (!IsClient)
             {
                 animator.Play(actionStateName, animator.GetLayerIndex("Actions"));
