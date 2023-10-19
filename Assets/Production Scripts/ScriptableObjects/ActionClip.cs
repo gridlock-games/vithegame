@@ -11,7 +11,8 @@ namespace Vi.ScriptableObjects
         {
             Dodge,
             LightAttack,
-            HeavyAttack
+            HeavyAttack,
+            HitReaction
         }
 
         [SerializeField] private ClipType clipType;

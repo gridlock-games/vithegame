@@ -620,6 +620,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1342002850858579257, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
+    - {fileID: 2225121906973124884, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
 --- !u!4 &1816064758899135709 stripped
 Transform:
@@ -686,6 +687,19 @@ MonoBehaviour:
   - m_Rig: {fileID: 3945128957276793452}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &4847259118938395815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3023487056660965689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
 --- !u!1 &5957409633981033394 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7211126797128615789, guid: f1b4a5b3b48212d4c9f535d679d4fae7,

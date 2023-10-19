@@ -29,24 +29,38 @@ namespace Vi.Player
             
             if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
 
-            if (!IsClient)
+            animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+
+            if (clipType == ActionClip.ClipType.Dodge)
             {
-                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+                StartCoroutine(SetStatusOnDodge(actionStateName));
             }
+
             PlayActionClientRpc(actionStateName);
             lastClipType = clipType;
+        }
+
+        private IEnumerator SetStatusOnDodge(string actionStateName)
+        {
+            attributes.SetInviniciblity(5);
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName));
+            attributes.SetInviniciblity(animator.GetCurrentAnimatorClipInfo(animator.GetLayerIndex("Actions"))[0].clip.length * 0.35f);
         }
 
         [ClientRpc]
         private void PlayActionClientRpc(string actionStateName)
         {
+            if (IsServer) { return; }
+
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
         }
 
         Animator animator;
+        Attributes attributes;
 
         private void Awake()
         {
+            attributes = GetComponentInParent<Attributes>();
             animator = GetComponent<Animator>();
         }
 

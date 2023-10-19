@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.Player
 {
-    public class StatHandler : NetworkBehaviour
+    public class Attributes : NetworkBehaviour
     {
         [SerializeField] private float maxHP = 100;
         [SerializeField] private float maxDefense = 100;
@@ -25,6 +26,26 @@ namespace Vi.Player
         public override void OnNetworkSpawn()
         {
             HP.Value = maxHP;
+        }
+
+        private GlowRenderer glowRenderer;
+        private void Awake()
+        {
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
+        }
+
+        public bool IsInvincible => Time.time <= invincibilityEndTime;
+
+        private float invincibilityEndTime;
+
+        public void SetInviniciblity(float duration)
+        {
+            invincibilityEndTime = Time.time + duration;
+        }
+
+        private void Update()
+        {
+            glowRenderer.RenderInvincible(IsInvincible);
         }
     }
 }
