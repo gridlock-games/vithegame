@@ -27,6 +27,8 @@ namespace Vi.Player
             //// If we are not at or transitioning to the empty state, do not perform an action
             //if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
             
+            if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+
             if (!IsClient)
             {
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
