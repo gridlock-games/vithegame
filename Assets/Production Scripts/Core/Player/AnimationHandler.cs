@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Collections;
+using Vi.Core;
 using Vi.ScriptableObjects;
 
 namespace Vi.Player
@@ -16,6 +16,7 @@ namespace Vi.Player
         }
 
         private ActionClip.ClipType lastClipType;
+
         [ServerRpc]
         private void PlayActionServerRpc(string actionStateName, ActionClip.ClipType clipType)
         {

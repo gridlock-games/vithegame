@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Vi.Core;
 
-namespace Vi.Player
+namespace Vi.Core
 {
     public class Attributes : NetworkBehaviour
     {
