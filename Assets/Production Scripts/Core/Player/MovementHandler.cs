@@ -23,7 +23,7 @@ namespace Vi.Player
         {
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
 
-            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
 
@@ -145,8 +145,6 @@ namespace Vi.Player
                 {
                     rootMotion = movementPrediction.currentPosition - transform.position;
                 }
-
-                rootMotion += Physics.gravity;
 
                 characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
