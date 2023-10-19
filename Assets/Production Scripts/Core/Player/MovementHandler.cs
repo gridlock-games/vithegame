@@ -53,19 +53,19 @@ namespace Vi.Player
             transform.position = oldPosition;
             characterController.enabled = true;
 
+            Quaternion newRotation;
             if (IsOwner)
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
-                Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
-                transform.rotation = targetRotation;
+                newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
             }
             else
             {
-                transform.rotation = inputPayload.rotation;
+                newRotation = inputPayload.rotation;
             }
 
-            return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, transform.rotation);
+            return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
         public override void OnNetworkSpawn()
@@ -144,6 +144,7 @@ namespace Vi.Player
 
                 // Scale movement vector according to distance between network position and local position
                 rootMotion = rootMotion.normalized * localDistance;
+                //if (localDistance > 0.25f) { rootMotion *= localDistance * 4; }
 
                 characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
