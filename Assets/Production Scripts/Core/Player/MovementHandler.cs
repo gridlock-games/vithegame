@@ -112,7 +112,11 @@ namespace Vi.Player
             }
 
             Vector3 animDir = targetDirection;
+            
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
+
+            float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
+            if (localDistance > 0.25f) { targetDirection *= localDistance * 4; }
             targetDirection += Physics.gravity;
 
             Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
@@ -139,16 +143,7 @@ namespace Vi.Player
                 rootMotion = finalRotation * rootMotion;
 
                 // Scale movement vector according to distance between network position and local position
-                float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
                 rootMotion = rootMotion.normalized * localDistance;
-
-                // If our movement vector isn't going to reduce the distance between the local position and network position, simply move straight to the network position
-                // This prevents some jitters
-                float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + (rootMotion.normalized * localDistance));
-                if (localDistance < afterMoveDistance)
-                {
-                    rootMotion = movementPrediction.currentPosition - transform.position;
-                }
 
                 characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
