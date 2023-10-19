@@ -105,8 +105,12 @@ namespace Vi.Player
         private void UpdateLocomotion()
         {
             Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
+            if (targetDirection.magnitude > 0.1f)
+            {
+                Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
+                targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
+            }
 
-            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1.0f);
             Vector3 animDir = targetDirection;
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
             targetDirection += Physics.gravity;
