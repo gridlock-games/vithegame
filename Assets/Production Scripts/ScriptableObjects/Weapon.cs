@@ -74,9 +74,26 @@ namespace Vi.ScriptableObjects
             HeavyAttack
         }
 
+        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
+        {
+            if (inputAttackType == InputAttackType.LightAttack)
+            {
+                return GetLightAttack(animator);
+            }
+            else if (inputAttackType == InputAttackType.HeavyAttack)
+            {
+                return GetHeavyAttack(animator);
+            }
+            else
+            {
+                Debug.LogError("Trying to get an attack for an inputAttackType that hasn't been implemented! " + inputAttackType);
+            }
+            return null;
+        }
+
         [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
         private int lightAttackIndex;
-        public ActionClip GetLightAttack(InputAttackType inputAttackType, Animator animator)
+        private ActionClip GetLightAttack(Animator animator)
         {
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
@@ -108,14 +125,14 @@ namespace Vi.ScriptableObjects
             if (lightAttackIndex >= lightAttacks.Count) { return null; }
 
             ActionClip actionClip = lightAttacks[lightAttackIndex];
-            if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
+            if (actionClip == null) { Debug.LogError("No action clip found for index: " + lightAttackIndex + " on weapon: " + this); }
 
             return actionClip;
         }
 
         [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
         private int heavyAttackIndex;
-        public ActionClip GetHeavyAttack(InputAttackType inputAttackType, Animator animator)
+        private ActionClip GetHeavyAttack(Animator animator)
         {
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
@@ -147,7 +164,7 @@ namespace Vi.ScriptableObjects
             if (heavyAttackIndex >= heavyAttacks.Count) { return null; }
 
             ActionClip actionClip = heavyAttacks[heavyAttackIndex];
-            if (actionClip == null) { Debug.LogError("No action clip found for " + inputAttackType + " on weapon: " + this); }
+            if (actionClip == null) { Debug.LogError("No action clip found for index: " + heavyAttackIndex + " on weapon: " + this); }
 
             return actionClip;
         }
