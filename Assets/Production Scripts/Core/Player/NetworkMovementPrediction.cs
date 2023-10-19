@@ -64,8 +64,9 @@ namespace Vi.Player
             }
         }
 
-
-        [SerializeField] private float playerObjectTeleportThreshold = 2;
+        public float playerObjectTeleportThreshold = 2;
+        public float locomotionDistanceScaleThreshold = 0.25f;
+        public float rootMotionDistanceScaleThreshold = 0.2f;
 
         private const int BUFFER_SIZE = 1024;
 

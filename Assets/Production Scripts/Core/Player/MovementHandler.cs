@@ -112,11 +112,11 @@ namespace Vi.Player
             }
 
             Vector3 animDir = targetDirection;
-            
+
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
 
             float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
-            if (localDistance > 0.25f) { targetDirection *= localDistance * 4; }
+            if (localDistance > movementPrediction.playerObjectTeleportThreshold) { targetDirection *= localDistance * (1/movementPrediction.playerObjectTeleportThreshold); }
             targetDirection += Physics.gravity;
 
             Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
@@ -143,8 +143,8 @@ namespace Vi.Player
                 rootMotion = finalRotation * rootMotion;
 
                 // Scale movement vector according to distance between network position and local position
-                rootMotion = rootMotion.normalized * localDistance;
-                //if (localDistance > 0.25f) { rootMotion *= localDistance * 4; }
+                //rootMotion = rootMotion.normalized * localDistance;
+                if (localDistance > movementPrediction.rootMotionDistanceScaleThreshold) { rootMotion *= localDistance * (1/movementPrediction.rootMotionDistanceScaleThreshold); }
 
                 characterController.Move(rootMotion);
                 transform.rotation = targetRotation;
