@@ -85,6 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522d8de94b0f84e4188f4482edf2e4d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreboardPrefab: {fileID: 0}
   inventoryPrefab: {fileID: 0}
   pausePrefab: {fileID: 0}
 --- !u!143 &3945128955595459576
@@ -548,7 +549,8 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: f43717b4443424143a76fa91375634b0, type: 2}
+      objectReference: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
+        type: 2}
     - target: {fileID: 1408242701769554095, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
         type: 3}
       propertyPath: m_ApplyRootMotion
