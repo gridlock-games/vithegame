@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Vi.Core;
 using UnityEngine.InputSystem;
 
-namespace Vi.Player
+namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {

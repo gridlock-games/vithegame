@@ -5,8 +5,8 @@ using Unity.Netcode;
 
 namespace Vi.Player
 {
-    [RequireComponent(typeof(MovementHandler))]
-    public class NetworkMovementPrediction : NetworkBehaviour
+    [RequireComponent(typeof(PlayerMovementHandler))]
+    public class PlayerNetworkMovementPrediction : NetworkBehaviour
     {
         public struct InputPayload : INetworkSerializable
         {
@@ -81,11 +81,11 @@ namespace Vi.Player
         public Vector3 currentPosition { get; private set; }
         public Quaternion currentRotation { get; private set; }
 
-        private MovementHandler movementHandler;
+        private PlayerMovementHandler movementHandler;
 
         private void Start()
         {
-            movementHandler = GetComponent<MovementHandler>();
+            movementHandler = GetComponent<PlayerMovementHandler>();
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new InputPayload[BUFFER_SIZE];
             inputQueue = new Queue<InputPayload>();

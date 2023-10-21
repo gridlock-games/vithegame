@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -54,7 +55,7 @@ namespace Vi.Core
         //    }
         //}
 
-        public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition)
+        public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction)
         {
             Debug.Log(attacker + " hit " + this);
         }

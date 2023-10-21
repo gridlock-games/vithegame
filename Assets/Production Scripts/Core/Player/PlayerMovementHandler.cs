@@ -4,11 +4,12 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
+using Vi.Core;
 
 namespace Vi.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public class MovementHandler : NetworkBehaviour
+    public class PlayerMovementHandler : NetworkBehaviour
     {
         [SerializeField] private Camera cameraInstance;
 
@@ -19,7 +20,7 @@ namespace Vi.Player
         [Header("Animation Settings")]
         [SerializeField] private float moveAnimSpeed = 5;
 
-        public NetworkMovementPrediction.StatePayload ProcessMovement(NetworkMovementPrediction.InputPayload inputPayload)
+        public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
 
@@ -65,7 +66,7 @@ namespace Vi.Player
                 newRotation = inputPayload.rotation;
             }
 
-            return new NetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
         public override void OnNetworkSpawn()
@@ -85,13 +86,13 @@ namespace Vi.Player
         }
 
         private CharacterController characterController;
-        private NetworkMovementPrediction movementPrediction;
+        private PlayerNetworkMovementPrediction movementPrediction;
         private Animator animator;
         private AnimationHandler animationHandler;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
-            movementPrediction = GetComponent<NetworkMovementPrediction>();
+            movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
         }

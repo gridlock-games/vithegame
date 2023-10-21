@@ -20,7 +20,7 @@ namespace Vi.Player
             {
                 if (parentAttributes == attributes) { return; }
 
-                attributes.ProcessMeleeHit(parentAttributes, other.ClosestPointOnBounds(transform.position));
+                //attributes.ProcessMeleeHit(parentAttributes, other.ClosestPointOnBounds(transform.position));
             }
         }
     }
