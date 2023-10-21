@@ -5,22 +5,18 @@ using Vi.Core;
 
 namespace Vi.Player
 {
-    public class ColliderWeapon : MonoBehaviour
+    public class ColliderWeapon : RuntimeWeapon
     {
-        Attributes parentAttributes;
-
-        private void Start()
-        {
-            parentAttributes = GetComponentInParent<Attributes>();
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
 
-                //attributes.ProcessMeleeHit(parentAttributes, other.ClosestPointOnBounds(transform.position));
+                attributes.ProcessMeleeHit(parentAttributes,
+                    other.ClosestPointOnBounds(transform.position),
+                    GetHitReaction(Vector3.SignedAngle(transform.forward, attributes.transform.position - transform.position, Vector3.up))
+                );
             }
         }
     }

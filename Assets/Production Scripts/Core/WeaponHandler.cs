@@ -17,6 +17,8 @@ namespace Vi.Core
         Animator animator;
         AnimationHandler animationHandler;
         
+        public Weapon GetWeapon() { return weapon; }
+
         private void Start()
         {
             animator = GetComponentInChildren<Animator>();
