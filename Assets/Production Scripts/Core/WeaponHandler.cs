@@ -91,16 +91,24 @@ namespace Vi.Core
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionClip.name))
                 {
                     float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
-
-                    if (normalizedTime >= currentActionClip.recoveryNormalizedTime)
-                    {
-                        Debug.Log(Time.time + " is recovering");
-                    }
-                    else if (normalizedTime >= currentActionClip.attackingNormalizedTime)
-                    {
-                        Debug.Log(Time.time + " is attacking");
-                    }
+                    IsInRecovery = normalizedTime >= currentActionClip.recoveryNormalizedTime;
+                    IsAttacking = normalizedTime >= currentActionClip.attackingNormalizedTime & !IsInRecovery;
+                    IsInAnticipation = !IsAttacking & !IsInRecovery;
                 }
+                else
+                {
+                    Debug.Log(Time.time + " reached1");
+                    IsInAnticipation = false;
+                    IsAttacking = false;
+                    IsInRecovery = false;
+                }
+            }
+            else
+            {
+                Debug.Log(Time.time + " reached2");
+                IsInAnticipation = false;
+                IsAttacking = false;
+                IsInRecovery = false;
             }
         }
 
