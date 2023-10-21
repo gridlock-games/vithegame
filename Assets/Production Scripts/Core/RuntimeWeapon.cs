@@ -12,12 +12,14 @@ namespace Vi.Core
 
         protected void Start()
         {
-            parentAttributes = GetComponentInParent<Attributes>();
-            parentWeaponHandler = GetComponentInParent<WeaponHandler>();
+            parentAttributes = transform.root.GetComponent<Attributes>();
+            parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
         }
 
         protected ActionClip GetHitReaction(float attackVectorAngle)
         {
+            if (!parentWeaponHandler) { return null; }
+
             Weapon.HitLocation hitLocation;
             if (attackVectorAngle <= 45.00f && attackVectorAngle >= -45.00f)
             {
@@ -35,6 +37,7 @@ namespace Vi.Core
             {
                 hitLocation = Weapon.HitLocation.Back;
             }
+
             return parentWeaponHandler.GetWeapon().GetHitReaction(hitLocation);
         }
     }

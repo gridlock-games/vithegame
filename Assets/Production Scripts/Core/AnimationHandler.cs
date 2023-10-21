@@ -23,18 +23,13 @@ namespace Vi.Core
             {
                 if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
-
-            //// If we are not at or transitioning to the empty state, do not perform an action
-            //if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) { return; }
             
             if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
 
-            if (clipType == ActionClip.ClipType.Dodge)
-            {
-                StartCoroutine(SetStatusOnDodge(actionStateName));
-            }
+            if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
 
             PlayActionClientRpc(actionStateName);
             lastClipType = clipType;
@@ -53,15 +48,18 @@ namespace Vi.Core
             if (IsServer) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
         }
 
         Animator animator;
         Attributes attributes;
+        WeaponHandler weaponHandler;
 
         private void Awake()
         {
-            attributes = GetComponentInParent<Attributes>();
             animator = GetComponent<Animator>();
+            attributes = GetComponentInParent<Attributes>();
+            weaponHandler = GetComponentInParent<WeaponHandler>();
         }
 
         private Vector3 networkRootMotion;

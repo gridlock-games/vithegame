@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Vi.Core;
+using System.Linq;
 using UnityEngine.InputSystem;
 
 namespace Vi.Core
@@ -70,6 +70,38 @@ namespace Vi.Core
             }
 
             weaponInstances = instances;
+        }
+
+        private ActionClip currentActionClip;
+
+        public void SetActionClip(ActionClip actionClip) { currentActionClip = actionClip; }
+
+        public bool IsInAnticipation { get; private set; }
+        public bool IsAttacking { get; private set; }
+        public bool IsInRecovery { get; private set; }
+
+        private void Update()
+        {
+            if (!currentActionClip) { return; }
+            //Debug.Log(animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime);
+
+            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack };
+            if (attackClipTypes.Contains(currentActionClip.GetClipType()))
+            {
+                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionClip.name))
+                {
+                    float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+
+                    if (normalizedTime >= currentActionClip.recoveryNormalizedTime)
+                    {
+                        Debug.Log(Time.time + " is recovering");
+                    }
+                    else if (normalizedTime >= currentActionClip.attackingNormalizedTime)
+                    {
+                        Debug.Log(Time.time + " is attacking");
+                    }
+                }
+            }
         }
 
         void OnLightAttack()

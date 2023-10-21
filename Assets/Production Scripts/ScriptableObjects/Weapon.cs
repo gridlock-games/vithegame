@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using System.Reflection;
 
 namespace Vi.ScriptableObjects
 {
@@ -167,6 +167,40 @@ namespace Vi.ScriptableObjects
             if (actionClip == null) { Debug.LogError("No action clip found for index: " + heavyAttackIndex + " on weapon: " + this); }
 
             return actionClip;
+        }
+        
+        public ActionClip GetActionClipByName(string clipName)
+        {
+            IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
+            foreach (FieldInfo propertyInfo in propertyList)
+            {
+                if (propertyInfo.FieldType == typeof(ActionClip))
+                {
+                    var ActionClipObject = propertyInfo.GetValue(this);
+                    ActionClip ActionClip = (ActionClip)ActionClipObject;
+
+                    if (ActionClip)
+                    {
+                        if (ActionClip.name == clipName) { return ActionClip; }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<ActionClip>))
+                {
+                    var ActionClipListObject = propertyInfo.GetValue(this);
+                    List<ActionClip> ActionClipList = (List<ActionClip>)ActionClipListObject;
+
+                    foreach (ActionClip ActionClip in ActionClipList)
+                    {
+                        if (ActionClip)
+                        {
+                            if (ActionClip.name == clipName) { return ActionClip; }
+                        }
+                    }
+                }
+            }
+
+            Debug.LogError("Melee clip Not Found: " + clipName);
+            return null;
         }
     }
 }

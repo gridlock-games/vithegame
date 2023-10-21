@@ -57,7 +57,7 @@ namespace Vi.Core
 
         public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction)
         {
-            Debug.Log(hitReaction);
+            Debug.Log(attacker + " is attacking " + this + " " + hitReaction);
         }
 
         public void ProcessProjectileHit()

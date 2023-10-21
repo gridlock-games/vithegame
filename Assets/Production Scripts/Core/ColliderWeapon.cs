@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
 
-namespace Vi.Player
+namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
@@ -15,7 +14,7 @@ namespace Vi.Player
 
                 attributes.ProcessMeleeHit(parentAttributes,
                     other.ClosestPointOnBounds(transform.position),
-                    GetHitReaction(Vector3.SignedAngle(transform.forward, attributes.transform.position - transform.position, Vector3.up))
+                    GetHitReaction(Vector3.SignedAngle(parentAttributes.transform.forward, attributes.transform.position - parentAttributes.transform.position, Vector3.up))
                 );
             }
         }
