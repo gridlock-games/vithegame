@@ -785,7 +785,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1499099670
 Transform:
   m_ObjectHideFlags: 0
@@ -835,9 +835,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
-  maxDefense: 100
   maxStamina: 100
+  staminaRecoveryRate: 1
+  staminaDelay: 1
+  maxDefense: 100
+  defenseRecoveryRate: 1
+  defenseDelay: 1
   maxRage: 100
+  rageRecoveryRate: 1
 --- !u!143 &1499099673
 CharacterController:
   m_ObjectHideFlags: 0

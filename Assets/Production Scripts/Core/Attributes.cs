@@ -48,9 +48,9 @@ namespace Vi.Core
 
         public void AddHP(float amount)
         {
-            if (HP.Value > maxHP)
+            if (HP.Value + amount > maxHP)
                 HP.Value = maxHP;
-            else if (HP.Value < 0)
+            else if (HP.Value + amount < 0)
                 HP.Value = 0;
             else
                 HP.Value += amount;
@@ -105,6 +105,7 @@ namespace Vi.Core
 
         private void OnHPChanged(float prev, float current)
         {
+            Debug.Log(prev + " " + current);
             if (current < prev)
             {
                 glowRenderer.RenderHit();
