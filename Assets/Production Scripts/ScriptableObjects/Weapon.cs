@@ -59,6 +59,8 @@ namespace Vi.ScriptableObjects
 
         public ActionClip GetHitReaction(HitLocation hitLocation)
         {
+            lightAttackIndex = 0;
+            heavyAttackIndex = 0;
             HitReaction hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
             if (hitReaction == null)
             {

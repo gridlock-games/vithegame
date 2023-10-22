@@ -21,6 +21,7 @@ namespace Vi.ScriptableObjects
         public Weapon.WeaponBone weaponBone;
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
+        public float damage = 20;
         public int maxHitLimit = 1;
     }
 }

@@ -72,10 +72,21 @@ namespace Vi.Core
             invincibilityEndTime = Time.time + duration;
         }
 
-        public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction)
+        private bool wasStaggeredThisFrame;
+        public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction, float damage)
         {
+            if (attacker.wasStaggeredThisFrame) { return; }
+
+            wasStaggeredThisFrame = true;
             animationHandler.PlayAction(hitReaction);
-            glowRenderer.RenderHit();
+            HP.Value -= damage;
+            StartCoroutine(ResetStaggerBool());
+        }
+
+        private IEnumerator ResetStaggerBool()
+        {
+            yield return null;
+            wasStaggeredThisFrame = false;
         }
 
         public void ProcessProjectileHit()

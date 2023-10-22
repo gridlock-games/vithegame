@@ -15,6 +15,7 @@ namespace Vi.Editor
         private SerializedProperty spWeaponBone;
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
+        private SerializedProperty spDamage;
         private SerializedProperty spMaxHitLimit;
 
         private void OnEnable()
@@ -24,6 +25,7 @@ namespace Vi.Editor
             spWeaponBone = serializedObject.FindProperty("weaponBone");
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
+            spDamage = serializedObject.FindProperty("damage");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
         }
 
@@ -34,6 +36,7 @@ namespace Vi.Editor
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -43,6 +46,7 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
