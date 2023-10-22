@@ -32,6 +32,11 @@ namespace Vi.Core
                 if (actionClip.GetClipType() == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
 
+            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+            {
+                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+            }
+
             // Check stamina and rage requirements and apply statuses
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
@@ -45,7 +50,6 @@ namespace Vi.Core
                 attributes.AddStamina(-actionClip.agentStaminaDamage);
             }
 
-            //Debug.Log(Time.time + " " + actionClip);
             weaponHandler.SetActionClip(actionClip);
 
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)

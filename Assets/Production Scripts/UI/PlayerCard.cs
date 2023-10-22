@@ -8,10 +8,17 @@ namespace Vi.UI
 {
     public class PlayerCard : MonoBehaviour
     {
+        [Header("True Value Images")]
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image staminaFillImage;
         [SerializeField] private Image defenseFillImage;
         [SerializeField] private Image rageFillImage;
+
+        [Header("Interm Images")]
+        [SerializeField] private Image interimHealthFillImage;
+        [SerializeField] private Image interimStaminaFillImage;
+        [SerializeField] private Image interimDefenseFillImage;
+        [SerializeField] private Image interimRageFillImage;
 
         private Attributes attributes;
 
@@ -25,15 +32,15 @@ namespace Vi.UI
         {
             if (!attributes) { return; }
 
-            //healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
-            //staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
-            //defenseFillImage.fillAmount = attributes.GetDefense() / attributes.GetMaxDefense();
-            //rageFillImage.fillAmount = attributes.GetRage() / attributes.GetMaxRage();
+            healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
+            staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
+            defenseFillImage.fillAmount = attributes.GetDefense() / attributes.GetMaxDefense();
+            rageFillImage.fillAmount = attributes.GetRage() / attributes.GetMaxRage();
 
-            healthFillImage.fillAmount = Mathf.Lerp(healthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * fillSpeed);
-            staminaFillImage.fillAmount = Mathf.Lerp(staminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
-            defenseFillImage.fillAmount = Mathf.Lerp(defenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
-            rageFillImage.fillAmount = Mathf.Lerp(rageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * fillSpeed);
+            interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
+            interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
+            interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
         }
     }
 }
