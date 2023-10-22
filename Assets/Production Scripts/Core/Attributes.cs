@@ -105,7 +105,6 @@ namespace Vi.Core
 
         private void OnHPChanged(float prev, float current)
         {
-            Debug.Log(prev + " " + current);
             if (current < prev)
             {
                 glowRenderer.RenderHit();
@@ -127,10 +126,12 @@ namespace Vi.Core
 
         private GlowRenderer glowRenderer;
         private AnimationHandler animationHandler;
+        private WeaponHandler weaponHandler;
         private void Awake()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         public bool IsInvincible => Time.time <= invincibilityEndTime;
@@ -142,16 +143,36 @@ namespace Vi.Core
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         private bool wasStaggeredThisFrame;
-        public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction, ActionClip attack)
+        public void ProcessMeleeHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle)
         {
-            if (attacker.wasStaggeredThisFrame) { return; }
+            if (IsInvincible) { return; }
+            if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return; }
 
             if (!IsUninterruptable)
             {
                 wasStaggeredThisFrame = true;
-                animationHandler.PlayAction(hitReaction);
                 StartCoroutine(ResetStaggerBool());
             }
+
+            Weapon.HitLocation hitLocation;
+            if (attackAngle <= 45.00f && attackAngle >= -45.00f)
+            {
+                hitLocation = Weapon.HitLocation.Front;
+            }
+            else if (attackAngle > 45.00f && attackAngle < 135.00f)
+            {
+                hitLocation = Weapon.HitLocation.Right;
+            }
+            else if (attackAngle < -45.00f && attackAngle > -135.00f)
+            {
+                hitLocation = Weapon.HitLocation.Left;
+            }
+            else
+            {
+                hitLocation = Weapon.HitLocation.Back;
+            }
+            animationHandler.PlayAction(weaponHandler.GetWeapon().GetHitReaction(hitLocation));
+
             AddHP(-attack.damage);
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
@@ -204,5 +225,19 @@ namespace Vi.Core
             if (rageDelayCooldown > 0) return;
             AddRage(rageRecoveryRate * Time.deltaTime);
         }
+
+        //public enum CHARACTER_AILMENTS
+        //{
+        //    None,
+        //    WasGrabbed,
+        //    IsKnockedDown,
+        //    IsKnockedUp,
+        //    IsStunned,
+        //    Reset,
+        //    Dead,
+        //    IsWallBound,
+        //    IsStaggered,
+        //    IsPulled
+        //}
     }
 }

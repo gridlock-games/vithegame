@@ -21,11 +21,11 @@ namespace Vi.Core
                 {
                     if (hitCounter[attributes] > parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
                 }
-                
+
                 attributes.ProcessMeleeHit(parentAttributes,
+                    parentWeaponHandler.currentActionClip,
                     other.ClosestPointOnBounds(transform.position),
-                    GetHitReaction(Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)),
-                    parentWeaponHandler.currentActionClip
+                    Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
                 );
             }
         }
