@@ -32,6 +32,8 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
+            if (!parentWeaponHandler) { return; }
+
             if (TryGetComponent(out BoxCollider boxCollider))
             {
                 if (parentWeaponHandler.currentActionClip)
