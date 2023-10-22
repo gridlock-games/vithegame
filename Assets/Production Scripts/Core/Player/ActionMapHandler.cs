@@ -2,22 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Vi.Core;
 
 namespace Vi.Player
 {
     public class ActionMapHandler : MonoBehaviour
     {
+        [SerializeField] private Menu playerHUD;
+
         PlayerInput playerInput;
-        GameObject HUD;
 
         private void OnEnable()
         {
             playerInput = GetComponent<PlayerInput>();
-            //HUD = transform.Find("PlayerHUD").gameObject;
             if (playerInput.currentActionMap.name == "Base")
                 Cursor.lockState = CursorLockMode.Locked;
-            //if (HUD == null)
-            //    Debug.LogError("Player HUD not found " + this);
         }
 
         [SerializeField] private GameObject scoreboardPrefab;
@@ -37,16 +36,16 @@ namespace Vi.Player
             if (inventoryEnabled)
             {
                 Cursor.lockState = CursorLockMode.None;
-                HUD.SetActive(false);
+                playerHUD.gameObject.SetActive(false);
                 inventoryObject = Instantiate(inventoryPrefab, transform);
                 playerInput.SwitchCurrentActionMap("Inventory");
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                HUD.SetActive(true);
+                playerHUD.gameObject.SetActive(true);
                 Destroy(inventoryObject);
-                playerInput.SwitchCurrentActionMap("First Person");
+                playerInput.SwitchCurrentActionMap("Base");
             }
         }
 
@@ -61,17 +60,17 @@ namespace Vi.Player
             if (pauseEnabled)
             {
                 Cursor.lockState = CursorLockMode.None;
-                HUD.SetActive(false);
+                playerHUD.gameObject.SetActive(false);
                 pauseObject = Instantiate(pausePrefab, transform);
                 playerInput.SwitchCurrentActionMap("Menu");
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                HUD.SetActive(true);
-                //pauseObject.GetComponent<Menu>().DestroyAllMenus();
+                playerHUD.gameObject.SetActive(true);
+                pauseObject.GetComponent<Menu>().DestroyAllMenus();
                 Destroy(pauseObject);
-                playerInput.SwitchCurrentActionMap("First Person");
+                playerInput.SwitchCurrentActionMap("Base");
             }
         }
     }

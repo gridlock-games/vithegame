@@ -22,6 +22,8 @@ namespace Vi.ScriptableObjects
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;
+        public float staminaDamage = 0;
+        public float defenseDamage = 0;
         public int maxHitLimit = 1;
     }
 }

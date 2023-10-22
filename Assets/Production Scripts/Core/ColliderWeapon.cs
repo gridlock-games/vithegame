@@ -25,7 +25,7 @@ namespace Vi.Core
                 attributes.ProcessMeleeHit(parentAttributes,
                     other.ClosestPointOnBounds(transform.position),
                     GetHitReaction(Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)),
-                    parentWeaponHandler.currentActionClip.damage
+                    parentWeaponHandler.currentActionClip
                 );
             }
         }
