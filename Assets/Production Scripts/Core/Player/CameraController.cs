@@ -29,7 +29,7 @@ namespace Vi.Player
         {
             // Update camera interp transform
             targetRotationX += movementHandler.GetLookInput().x;
-            targetRotationY -= movementHandler.GetLookInput().y;
+            targetRotationY += movementHandler.GetLookInput().y;
 
             targetRotationX %= 360f;
             targetRotationY %= 360f;
