@@ -36,14 +36,16 @@ namespace Vi.Core
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
                 if (actionClip.agentStaminaDamage > attributes.GetStamina()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaDamage);
                 StartCoroutine(SetInvincibleStatusOnDodge(actionStateName));
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
                 if (actionClip.agentStaminaDamage > attributes.GetStamina()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaDamage);
             }
 
-            attributes.AddStamina(-actionClip.agentStaminaDamage);
+            //Debug.Log(Time.time + " " + actionClip);
             weaponHandler.SetActionClip(actionClip);
 
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
