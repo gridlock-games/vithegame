@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -8,6 +9,8 @@ namespace Vi.Core
     {
         private void OnTriggerEnter(Collider other)
         {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (parentWeaponHandler.currentActionClip.weaponBone != weaponBone) { return; }

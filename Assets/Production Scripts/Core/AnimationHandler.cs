@@ -11,13 +11,19 @@ namespace Vi.Core
     {
         public void PlayAction(ActionClip actionClip)
         {
-            PlayActionServerRpc(actionClip.name, actionClip.GetClipType());
+            if (IsServer)
+            {
+                PlayActionOnServer(actionClip.name, actionClip.GetClipType());
+            }
+            else
+            {
+                PlayActionServerRpc(actionClip.name, actionClip.GetClipType());
+            }
         }
 
         private ActionClip.ClipType lastClipType;
 
-        [ServerRpc]
-        private void PlayActionServerRpc(string actionStateName, ActionClip.ClipType clipType)
+        private void PlayActionOnServer(string actionStateName, ActionClip.ClipType clipType)
         {
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
@@ -35,20 +41,30 @@ namespace Vi.Core
             }
 
             weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
-
             if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
 
-            PlayActionClientRpc(actionStateName);
+            PlayActionClientRpc(actionStateName, clipType);
             lastClipType = clipType;
         }
 
+        [ServerRpc(RequireOwnership = false)] private void PlayActionServerRpc(string actionStateName, ActionClip.ClipType clipType) { PlayActionOnServer(actionStateName, clipType); }
+
         [ClientRpc]
-        private void PlayActionClientRpc(string actionStateName)
+        private void PlayActionClientRpc(string actionStateName, ActionClip.ClipType clipType)
         {
             if (IsServer) { return; }
 
-            animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+            if (clipType == ActionClip.ClipType.HitReaction)
+            {
+                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
+            }
+            else
+            {
+                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+            }
+
             weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
+            if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
         }
 
         private IEnumerator SetStatusOnDodge(string actionStateName)

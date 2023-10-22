@@ -26,6 +26,33 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             HP.Value = maxHP;
+            HP.OnValueChanged += OnHPChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            HP.OnValueChanged -= OnHPChanged;
+        }
+
+        private void OnHPChanged(float prev, float current)
+        {
+            if (current < prev)
+            {
+                glowRenderer.RenderHit();
+
+                if (prev <= 0 & current > 0)
+                {
+                    // Character.CancelDeath();
+                }
+                else
+                {
+                    
+                }
+            }
+            else if (current > prev)
+            {
+                glowRenderer.RenderHeal();
+            }
         }
 
         private GlowRenderer glowRenderer;
