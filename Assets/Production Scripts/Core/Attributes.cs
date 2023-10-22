@@ -61,9 +61,9 @@ namespace Vi.Core
             if (activateCooldown)
                 staminaDelayCooldown = staminaDelay;
 
-            if (stamina.Value > maxStamina)
+            if (stamina.Value + amount > maxStamina)
                 stamina.Value = maxStamina;
-            else if (stamina.Value < 0)
+            else if (stamina.Value + amount < 0)
                 stamina.Value = 0;
             else
                 stamina.Value += amount;
@@ -74,9 +74,9 @@ namespace Vi.Core
             if (activateCooldown)
                 defenseDelayCooldown = defenseDelay;
 
-            if (defense.Value > maxDefense)
+            if (defense.Value + amount > maxDefense)
                 defense.Value = maxDefense;
-            else if (defense.Value < 0)
+            else if (defense.Value + amount < 0)
                 defense.Value = 0;
             else
                 defense.Value += amount;
@@ -84,9 +84,9 @@ namespace Vi.Core
 
         public void AddRage(float amount)
         {
-            if (rage.Value > maxRage)
+            if (rage.Value + amount > maxRage)
                 rage.Value = maxRage;
-            else if (rage.Value < 0)
+            else if (rage.Value + amount < 0)
                 rage.Value = 0;
             else
                 rage.Value += amount;
