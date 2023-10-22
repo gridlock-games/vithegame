@@ -27,12 +27,7 @@ namespace Vi.Core
             if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
-
-            if (Application.isEditor)
-                animator.speed = actionClip.animationSpeed;
-            
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
 
             if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
 
@@ -46,9 +41,7 @@ namespace Vi.Core
             if (IsServer) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
-
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
         }
 
         private IEnumerator SetStatusOnDodge(string actionStateName)

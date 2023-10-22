@@ -29,9 +29,11 @@ namespace Vi.Core
         }
 
         private GlowRenderer glowRenderer;
+        private AnimationHandler animationHandler;
         private void Awake()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
+            animationHandler = GetComponentInChildren<AnimationHandler>();
         }
 
         public bool IsInvincible => Time.time <= invincibilityEndTime;
@@ -43,21 +45,12 @@ namespace Vi.Core
             invincibilityEndTime = Time.time + duration;
         }
 
-        //public struct MeleeHit
-        //{
-        //    public Attributes attacker;
-        //    public Vector3 impactPosition;
-
-        //    public MeleeHit(Attributes attacker, Vector3 impactPosition)
-        //    {
-        //        this.attacker = attacker;
-        //        this.impactPosition = impactPosition;
-        //    }
-        //}
-
         public void ProcessMeleeHit(Attributes attacker, Vector3 impactPosition, ActionClip hitReaction)
         {
             Debug.Log(attacker + " is attacking " + this + " " + hitReaction);
+            animationHandler.PlayAction(hitReaction);
+
+            glowRenderer.RenderHit();
         }
 
         public void ProcessProjectileHit()

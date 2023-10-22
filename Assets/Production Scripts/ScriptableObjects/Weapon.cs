@@ -245,6 +245,19 @@ namespace Vi.ScriptableObjects
                         }
                     }
                 }
+                else if (propertyInfo.FieldType == typeof(List<HitReaction>))
+                {
+                    var HitReactionListObject = propertyInfo.GetValue(this);
+                    List<HitReaction> hitReactions = (List<HitReaction>)HitReactionListObject;
+
+                    foreach (HitReaction hitReaction in hitReactions)
+                    {
+                        if (hitReaction.reactionClip)
+                        {
+                            if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
+                        }
+                    }
+                }
             }
 
             Debug.LogError("Melee clip Not Found: " + clipName);

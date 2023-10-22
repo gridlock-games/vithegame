@@ -7,6 +7,10 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
+        protected Weapon.WeaponBone weaponBone;
+
+        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.weaponBone = weaponBone; }
+
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;
 

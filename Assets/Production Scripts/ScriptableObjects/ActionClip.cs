@@ -18,9 +18,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
 
+        public Weapon.WeaponBone weaponBone;
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
-
-        public float animationSpeed = 1;
     }
 }

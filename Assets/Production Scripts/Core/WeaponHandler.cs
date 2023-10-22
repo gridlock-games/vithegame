@@ -58,6 +58,8 @@ namespace Vi.Core
                         instance.transform.SetParent(bone);
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
+
+                        instance.GetComponent<RuntimeWeapon>().SetWeaponBone(modelData.weaponBone);
                     }
                     broken = true;
                     break;
@@ -72,7 +74,7 @@ namespace Vi.Core
             weaponInstances = instances;
         }
 
-        private ActionClip currentActionClip;
+        public ActionClip currentActionClip { get; private set; }
 
         public void SetActionClip(ActionClip actionClip) { currentActionClip = actionClip; }
 
