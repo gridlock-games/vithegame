@@ -7,6 +7,25 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
+        protected Dictionary<Attributes, int> hitCounter = new Dictionary<Attributes, int>();
+
+        public void AddHit(Attributes attributes)
+        {
+            if (hitCounter.ContainsKey(attributes))
+            {
+                hitCounter.Add(attributes, 1);
+            }
+            else
+            {
+                hitCounter[attributes] += 1;
+            }
+        }
+
+        public void ResetHitCounter()
+        {
+            hitCounter.Clear();
+        }
+
         protected Weapon.WeaponBone weaponBone;
 
         public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.weaponBone = weaponBone; }

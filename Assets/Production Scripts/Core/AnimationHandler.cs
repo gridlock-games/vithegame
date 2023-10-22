@@ -23,8 +23,11 @@ namespace Vi.Core
             {
                 if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
-            
-            if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+
+            if (clipType != ActionClip.ClipType.HitReaction)
+            {
+                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+            }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));

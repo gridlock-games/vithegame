@@ -76,7 +76,14 @@ namespace Vi.Core
 
         public ActionClip currentActionClip { get; private set; }
 
-        public void SetActionClip(ActionClip actionClip) { currentActionClip = actionClip; }
+        public void SetActionClip(ActionClip actionClip)
+        {
+            currentActionClip = actionClip;
+            foreach (GameObject weaponInstance in weaponInstances)
+            {
+                weaponInstance.GetComponent<RuntimeWeapon>().ResetHitCounter();
+            }
+        }
 
         public bool IsInAnticipation { get; private set; }
         public bool IsAttacking { get; private set; }

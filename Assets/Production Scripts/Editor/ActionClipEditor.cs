@@ -15,6 +15,7 @@ namespace Vi.Editor
         private SerializedProperty spWeaponBone;
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
+        private SerializedProperty spMaxHitLimit;
 
         private void OnEnable()
         {
@@ -23,6 +24,7 @@ namespace Vi.Editor
             spWeaponBone = serializedObject.FindProperty("weaponBone");
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
+            spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
         }
 
         public override void OnInspectorGUI()
@@ -32,6 +34,7 @@ namespace Vi.Editor
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -40,6 +43,7 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);

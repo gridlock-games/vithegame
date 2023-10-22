@@ -13,7 +13,11 @@ namespace Vi.Core
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
-
+                if (hitCounter.ContainsKey(attributes))
+                {
+                    if (hitCounter[attributes] > parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
+                }
+                
                 attributes.ProcessMeleeHit(parentAttributes,
                     other.ClosestPointOnBounds(transform.position),
                     GetHitReaction(Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up))
