@@ -27,19 +27,17 @@ namespace Vi.Core
             if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
-            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+
+            if (Application.isEditor)
+                animator.speed = actionClip.animationSpeed;
+            
+            weaponHandler.SetActionClip(actionClip);
 
             if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
 
             PlayActionClientRpc(actionStateName);
             lastClipType = clipType;
-        }
-
-        private IEnumerator SetStatusOnDodge(string actionStateName)
-        {
-            attributes.SetInviniciblity(5);
-            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName));
-            attributes.SetInviniciblity(animator.GetCurrentAnimatorClipInfo(animator.GetLayerIndex("Actions"))[0].clip.length * 0.35f);
         }
 
         [ClientRpc]
@@ -48,7 +46,20 @@ namespace Vi.Core
             if (IsServer) { return; }
 
             animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
-            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+
+            weaponHandler.SetActionClip(actionClip);
+        }
+
+        private IEnumerator SetStatusOnDodge(string actionStateName)
+        {
+            attributes.SetInviniciblity(5);
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName));
+            AnimatorClipInfo[] dodgeClips = animator.GetCurrentAnimatorClipInfo(animator.GetLayerIndex("Actions"));
+            if (dodgeClips.Length > 0)
+                attributes.SetInviniciblity(dodgeClips[0].clip.length * 0.35f);
+            else
+                attributes.SetInviniciblity(0);
         }
 
         Animator animator;

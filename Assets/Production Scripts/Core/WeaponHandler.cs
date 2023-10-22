@@ -83,7 +83,6 @@ namespace Vi.Core
         private void Update()
         {
             if (!currentActionClip) { return; }
-            //Debug.Log(animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime);
 
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack };
             if (attackClipTypes.Contains(currentActionClip.GetClipType()))
@@ -95,9 +94,15 @@ namespace Vi.Core
                     IsAttacking = normalizedTime >= currentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
                 }
+                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionClip.name))
+                {
+                    float normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    IsInRecovery = normalizedTime >= currentActionClip.recoveryNormalizedTime;
+                    IsAttacking = normalizedTime >= currentActionClip.attackingNormalizedTime & !IsInRecovery;
+                    IsInAnticipation = !IsAttacking & !IsInRecovery;
+                }
                 else
                 {
-                    Debug.Log(Time.time + " reached1");
                     IsInAnticipation = false;
                     IsAttacking = false;
                     IsInRecovery = false;
@@ -105,7 +110,6 @@ namespace Vi.Core
             }
             else
             {
-                Debug.Log(Time.time + " reached2");
                 IsInAnticipation = false;
                 IsAttacking = false;
                 IsInRecovery = false;

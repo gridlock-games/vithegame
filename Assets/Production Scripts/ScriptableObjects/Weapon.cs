@@ -103,7 +103,7 @@ namespace Vi.ScriptableObjects
             {
                 if (lightAttackIndex < lightAttacks.Count)
                 {
-                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].nextAttackCanBePlayedTime)
+                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].recoveryNormalizedTime)
                     {
                         lightAttackIndex++;
                     }
@@ -142,7 +142,7 @@ namespace Vi.ScriptableObjects
             {
                 if (heavyAttackIndex < heavyAttacks.Count)
                 {
-                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].nextAttackCanBePlayedTime)
+                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].recoveryNormalizedTime)
                     {
                         heavyAttackIndex++;
                     }
@@ -168,7 +168,55 @@ namespace Vi.ScriptableObjects
 
             return actionClip;
         }
-        
+
+        [Header("Dodge Assignments")]
+        [SerializeField] private ActionClip dodgeF;
+        [SerializeField] private ActionClip dodgeFL;
+        [SerializeField] private ActionClip dodgeFR;
+        [SerializeField] private ActionClip dodgeB;
+        [SerializeField] private ActionClip dodgeBL;
+        [SerializeField] private ActionClip dodgeBR;
+        [SerializeField] private ActionClip dodgeL;
+        [SerializeField] private ActionClip dodgeR;
+
+        public ActionClip GetDodgeClip(float angle)
+        {
+            ActionClip dodgeClip;
+            if (angle <= 15f && angle >= -15f)
+            {
+                dodgeClip = dodgeF;
+            }
+            else if (angle < 80f && angle > 15f)
+            {
+                dodgeClip = dodgeFL;
+            }
+            else if (angle > -80f && angle < -15f)
+            {
+                dodgeClip = dodgeFR;
+            }
+            else if (angle > 80f && angle < 100f)
+            {
+                dodgeClip = dodgeL;
+            }
+            else if (angle < -80f && angle > -100f)
+            {
+                dodgeClip = dodgeR;
+            }
+            else if (angle < -100f && angle > -170f)
+            {
+                dodgeClip = dodgeBR;
+            }
+            else if (angle > 100f && angle < 170f)
+            {
+                dodgeClip = dodgeBL;
+            }
+            else
+            {
+                dodgeClip = dodgeB;
+            }
+            return dodgeClip;
+        }
+
         public ActionClip GetActionClipByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();

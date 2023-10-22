@@ -89,12 +89,14 @@ namespace Vi.Player
         private PlayerNetworkMovementPrediction movementPrediction;
         private Animator animator;
         private AnimationHandler animationHandler;
+        private WeaponHandler weaponHandler;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -177,55 +179,10 @@ namespace Vi.Player
             moveInput = value.Get<Vector2>();
         }
 
-        [Header("Dodge Assignments")]
-        [SerializeField] private ActionClip dodgeF;
-        [SerializeField] private ActionClip dodgeFL;
-        [SerializeField] private ActionClip dodgeFR;
-        [SerializeField] private ActionClip dodgeB;
-        [SerializeField] private ActionClip dodgeBL;
-        [SerializeField] private ActionClip dodgeBR;
-        [SerializeField] private ActionClip dodgeL;
-        [SerializeField] private ActionClip dodgeR;
-
         void OnDodge()
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
-
-            ActionClip dodgeClip;
-            if (angle <= 15f && angle >= -15f)
-            {
-                dodgeClip = dodgeF;
-            }
-            else if (angle < 80f && angle > 15f)
-            {
-                dodgeClip = dodgeFL;
-            }
-            else if (angle > -80f && angle < -15f)
-            {
-                dodgeClip = dodgeFR;
-            }
-            else if (angle > 80f && angle < 100f)
-            {
-                dodgeClip = dodgeL;
-            }
-            else if (angle < -80f && angle > -100f)
-            {
-                dodgeClip = dodgeR;
-            }
-            else if (angle < -100f && angle > -170f)
-            {
-                dodgeClip = dodgeBR;
-            }
-            else if (angle > 100f && angle < 170f)
-            {
-                dodgeClip = dodgeBL;
-            }
-            else
-            {
-                dodgeClip = dodgeB;
-            }
-
-            animationHandler.PlayAction(dodgeClip);
+            animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
 }
