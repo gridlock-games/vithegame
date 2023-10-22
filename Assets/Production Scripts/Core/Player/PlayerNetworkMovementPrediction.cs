@@ -11,35 +11,21 @@ namespace Vi.Player
         public struct InputPayload : INetworkSerializable
         {
             public int tick;
-            public bool initialized;
-            public bool isControllable;
             public Vector2 inputVector;
             public Quaternion rotation;
-            //public PlayerCharacter.RootMotionResult rootMotionResult;
 
-            public InputPayload(int tick, bool isControllable, Vector2 inputVector, Quaternion rotation) // , PlayerCharacter.RootMotionResult rootMotionResult
+            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation)
             {
                 this.tick = tick;
-                initialized = true;
-                this.isControllable = isControllable;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
-                //this.rootMotionResult = rootMotionResult;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref isControllable);
+                serializer.SerializeValue(ref inputVector);
                 serializer.SerializeValue(ref rotation);
-                serializer.SerializeValue(ref initialized);
-
-                if (isControllable)
-                {
-                    serializer.SerializeValue(ref inputVector);
-                }
-
-                //serializer.SerializeNetworkSerializable(ref rootMotionResult);
             }
         }
 
@@ -135,7 +121,7 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(currentTick, true, movementHandler.GetMoveInput(), transform.rotation);
+                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
 
                 //// If we are in the middle of root motion, do not take an input vector
                 //if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
