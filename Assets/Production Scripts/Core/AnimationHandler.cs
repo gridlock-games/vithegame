@@ -24,12 +24,16 @@ namespace Vi.Core
                 if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
 
-            if (clipType != ActionClip.ClipType.HitReaction)
+            if (clipType == ActionClip.ClipType.HitReaction)
+            {
+                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
+            }
+            else
             {
                 if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
 
-            animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
 
             if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }

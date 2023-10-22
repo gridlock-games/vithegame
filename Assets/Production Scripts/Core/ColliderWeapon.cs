@@ -8,6 +8,7 @@ namespace Vi.Core
     {
         private void OnTriggerEnter(Collider other)
         {
+            if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (parentWeaponHandler.currentActionClip.weaponBone != weaponBone) { return; }
             if (other.TryGetComponent(out Attributes attributes))
