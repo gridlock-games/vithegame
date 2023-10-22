@@ -13,24 +13,40 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                PlayActionOnServer(actionClip.name, actionClip.GetClipType());
+                PlayActionOnServer(actionClip.name);
             }
             else
             {
-                PlayActionServerRpc(actionClip.name, actionClip.GetClipType());
+                PlayActionServerRpc(actionClip.name);
             }
         }
 
         private ActionClip.ClipType lastClipType;
 
-        private void PlayActionOnServer(string actionStateName, ActionClip.ClipType clipType)
+        private void PlayActionOnServer(string actionStateName)
         {
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
-                if (clipType == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
+                if (actionClip.GetClipType() == ActionClip.ClipType.Dodge & lastClipType == ActionClip.ClipType.Dodge) { return; }
             }
 
-            if (clipType == ActionClip.ClipType.HitReaction)
+            // Check stamina and rage requirements and apply statuses
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            {
+                if (actionClip.agentStaminaDamage > attributes.GetStamina()) { return; }
+                StartCoroutine(SetInvincibleStatusOnDodge(actionStateName));
+            }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                if (actionClip.agentStaminaDamage > attributes.GetStamina()) { return; }
+            }
+
+            attributes.AddStamina(-actionClip.agentStaminaDamage);
+            weaponHandler.SetActionClip(actionClip);
+
+            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
             }
@@ -40,21 +56,19 @@ namespace Vi.Core
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
 
-            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
-            if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
-
-            PlayActionClientRpc(actionStateName, clipType);
-            lastClipType = clipType;
+            PlayActionClientRpc(actionStateName);
+            lastClipType = actionClip.GetClipType();
         }
 
-        [ServerRpc(RequireOwnership = false)] private void PlayActionServerRpc(string actionStateName, ActionClip.ClipType clipType) { PlayActionOnServer(actionStateName, clipType); }
+        [ServerRpc(RequireOwnership = false)] private void PlayActionServerRpc(string actionStateName) { PlayActionOnServer(actionStateName); }
 
         [ClientRpc]
-        private void PlayActionClientRpc(string actionStateName, ActionClip.ClipType clipType)
+        private void PlayActionClientRpc(string actionStateName)
         {
             if (IsServer) { return; }
 
-            if (clipType == ActionClip.ClipType.HitReaction)
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
             }
@@ -63,11 +77,11 @@ namespace Vi.Core
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
 
-            weaponHandler.SetActionClip(weaponHandler.GetWeapon().GetActionClipByName(actionStateName));
-            if (clipType == ActionClip.ClipType.Dodge) { StartCoroutine(SetStatusOnDodge(actionStateName)); }
+            weaponHandler.SetActionClip(actionClip);
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
         }
 
-        private IEnumerator SetStatusOnDodge(string actionStateName)
+        private IEnumerator SetInvincibleStatusOnDodge(string actionStateName)
         {
             attributes.SetInviniciblity(5);
             yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName));

@@ -18,6 +18,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
 
+        public float agentStaminaDamage = 20;
+
         public Weapon.WeaponBone weaponBone;
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
