@@ -8,6 +8,8 @@ namespace Vi.Core
 {
     public class Attributes : NetworkBehaviour
     {
+        [SerializeField] private GameObject worldSpaceLabelPrefab;
+
         [Header("Health")]
         [SerializeField] private float maxHP = 100;
         [Header("Stamina")]
@@ -96,6 +98,11 @@ namespace Vi.Core
         {
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
+
+            if (!IsLocalPlayer)
+            {
+                Instantiate(worldSpaceLabelPrefab, transform);
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -159,7 +166,6 @@ namespace Vi.Core
 
             runtimeWeapon.AddHit(this);
             AddHP(hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage);
-            Debug.Log(attacker + " attacked " + this + " for " + -attack.damage + " damage");
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
         }

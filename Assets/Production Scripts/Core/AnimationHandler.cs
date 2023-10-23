@@ -36,7 +36,7 @@ namespace Vi.Core
             // If we are not at rest and the last clip was a dodge, don't play this clip
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
-                if (lastClipType == ActionClip.ClipType.Dodge | lastClipType == ActionClip.ClipType.HitReaction) { return; }
+                if (lastClipType == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipType == ActionClip.ClipType.HitReaction)) { return; }
             }
 
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
