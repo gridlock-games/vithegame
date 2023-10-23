@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
+        private List<Attributes> hitsThisFrame = new List<Attributes>();
+
         private void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
@@ -22,12 +25,22 @@ namespace Vi.Core
                     if (hitCounter[attributes] > parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
                 }
 
+                if (hitsThisFrame.Contains(attributes)) { return; }
+
+                hitsThisFrame.Add(attributes);
                 attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.currentActionClip,
                     other.ClosestPointOnBounds(transform.position),
                     Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
                 );
             }
+        }
+
+        private bool clearListNextUpdate;
+        private void FixedUpdate()
+        {
+            if (clearListNextUpdate) { hitsThisFrame.Clear(); }
+            clearListNextUpdate = hitsThisFrame.Count > 0;
         }
 
         private void OnDrawGizmos()
