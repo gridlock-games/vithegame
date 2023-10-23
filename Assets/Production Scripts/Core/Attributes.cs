@@ -154,9 +154,10 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            animationHandler.PlayAction(weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking));
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking);
+            animationHandler.PlayAction(hitReaction);
 
-            AddHP(-attack.damage);
+            AddHP(hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage);
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
         }
