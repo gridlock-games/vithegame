@@ -112,7 +112,6 @@ namespace Vi.Core
 
         private void OnHPChanged(float prev, float current)
         {
-            Debug.Log(current + " " + prev);
             if (current < prev)
             {
                 //glowRenderer.RenderHit();

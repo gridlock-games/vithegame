@@ -8,7 +8,7 @@ namespace Vi.Player
 {
     public class ActionMapHandler : MonoBehaviour
     {
-        [SerializeField] private Menu playerHUD;
+        [SerializeField] private GameObject playerHUD;
 
         PlayerInput playerInput;
 
@@ -22,7 +22,7 @@ namespace Vi.Player
         [SerializeField] private GameObject scoreboardPrefab;
         void OnScoreboardToggle()
         {
-
+            
         }
 
         [SerializeField] private GameObject inventoryPrefab;
@@ -30,20 +30,20 @@ namespace Vi.Player
         bool inventoryEnabled;
         void OnInventoryToggle()
         {
-            if (pauseEnabled) { return; }
+            //if (pauseEnabled) { return; }
 
             inventoryEnabled = !inventoryEnabled;
             if (inventoryEnabled)
             {
                 Cursor.lockState = CursorLockMode.None;
-                playerHUD.gameObject.SetActive(false);
+                playerHUD.SetActive(false);
                 inventoryObject = Instantiate(inventoryPrefab, transform);
                 playerInput.SwitchCurrentActionMap("Inventory");
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                playerHUD.gameObject.SetActive(true);
+                playerHUD.SetActive(true);
                 Destroy(inventoryObject);
                 playerInput.SwitchCurrentActionMap("Base");
             }
@@ -51,26 +51,21 @@ namespace Vi.Player
 
         [SerializeField] private GameObject pausePrefab;
         GameObject pauseObject;
-        bool pauseEnabled;
         void OnPause()
         {
-            if (inventoryEnabled) { return; }
-
-            pauseEnabled = !pauseEnabled;
-            if (pauseEnabled)
+            if (pauseObject)
             {
-                Cursor.lockState = CursorLockMode.None;
-                playerHUD.gameObject.SetActive(false);
-                pauseObject = Instantiate(pausePrefab, transform);
-                playerInput.SwitchCurrentActionMap("Menu");
+                Cursor.lockState = CursorLockMode.Locked;
+                pauseObject.GetComponent<Menu>().DestroyAllMenus();
+                playerHUD.SetActive(true);
+                playerInput.SwitchCurrentActionMap("Base");
             }
             else
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                playerHUD.gameObject.SetActive(true);
-                pauseObject.GetComponent<Menu>().DestroyAllMenus();
-                Destroy(pauseObject);
-                playerInput.SwitchCurrentActionMap("Base");
+                Cursor.lockState = CursorLockMode.None;
+                playerHUD.SetActive(false);
+                pauseObject = Instantiate(pausePrefab, transform);
+                playerInput.SwitchCurrentActionMap("Menu");
             }
         }
     }

@@ -26,11 +26,17 @@ namespace Vi.Core
             lastMenu.SetActive(true);
         }
 
-        public void DestroyAllMenus()
+        public void DestroyAllMenus(string message = "")
         {
+            if (message != "")
+            {
+                transform.parent.SendMessage(message);
+                return;
+            }
+
             if (childMenu)
             {
-                childMenu.GetComponent<Menu>().DestroyAllMenus();
+                childMenu.GetComponent<Menu>().DestroyAllMenus(message);
             }
             Destroy(gameObject);
         }

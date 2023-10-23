@@ -1046,6 +1046,7 @@ namespace Photon.Pun
         #endif
         private static void StaticReset()
         {
+            return;
             #if UNITY_EDITOR
             if (!EditorApplication.isPlayingOrWillChangePlaymode)
             {

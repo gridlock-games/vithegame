@@ -35,9 +35,9 @@ namespace Photon.Pun
                     instance = FindObjectOfType<PhotonHandler>();
                     if (instance == null)
                     {
-                        GameObject obj = new GameObject();
-                        obj.name = "PhotonMono";
-                        instance = obj.AddComponent<PhotonHandler>();
+                        //GameObject obj = new GameObject();
+                        //obj.name = "PhotonMono";
+                        //instance = obj.AddComponent<PhotonHandler>();
                     }
                 }
 
