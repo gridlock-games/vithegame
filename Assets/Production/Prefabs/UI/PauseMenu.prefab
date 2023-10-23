@@ -2931,7 +2931,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displaySettingsMenu: {fileID: 1283958268088914234, guid: 8c84a6b90cda9054ebd85b4ce0323b5b,
     type: 3}
-  controlSettingsMenu: {fileID: 0}
+  controlSettingsMenu: {fileID: 760765561020720752, guid: d3756acb23f05ab4283c45280d8624b3,
+    type: 3}
   volumeSlider: {fileID: 7309343886541365622}
 --- !u!1 &7309343887203894616
 GameObject:
@@ -3886,7 +3887,7 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3897,7 +3898,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 7309343886950099502}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -3911,7 +3912,7 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: LightPat.UI.PauseMenu, Assembly-CSharp-firstpass
+      value: Vi.UI.PauseMenu, Vi.UI
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}

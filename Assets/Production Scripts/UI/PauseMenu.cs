@@ -9,7 +9,7 @@ namespace Vi.UI
     public class PauseMenu : Menu
     {
         [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
-        [SerializeField] private GameObject controlSettingsMenu;
+        [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private Slider volumeSlider;
 
         public void OpenDisplayMenu()
@@ -22,7 +22,7 @@ namespace Vi.UI
 
         public void OpenControlMenu()
         {
-            GameObject _settings = Instantiate(controlSettingsMenu);
+            GameObject _settings = Instantiate(controlSettingsMenu.gameObject);
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
             gameObject.SetActive(false);

@@ -16,7 +16,6 @@ namespace Vi.Player
         [Header("Locomotion Settings")]
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float angularSpeed = 540;
-        [SerializeField] private Vector2 lookSensitivity = new Vector2(0.2f, 0.2f);
         [Header("Animation Settings")]
         [SerializeField] private float moveAnimSpeed = 5;
 
@@ -97,6 +96,10 @@ namespace Vi.Player
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
+
+            if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
+            if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
+            lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -163,7 +166,10 @@ namespace Vi.Player
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
+        private Vector2 lookSensitivity;
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
+        public Vector2 GetLookSensitivity() { return lookSensitivity; }
+        public void SetLookSensitivity(Vector2 newLookSensitivity) { lookSensitivity = newLookSensitivity; }
 
         private Vector2 lookInput;
         void OnLook(InputValue value)
