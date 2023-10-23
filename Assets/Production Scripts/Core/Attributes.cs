@@ -112,9 +112,10 @@ namespace Vi.Core
 
         private void OnHPChanged(float prev, float current)
         {
+            Debug.Log(current + " " + prev);
             if (current < prev)
             {
-                glowRenderer.RenderHit();
+                //glowRenderer.RenderHit();
 
                 if (prev <= 0 & current > 0)
                 {
@@ -165,7 +166,18 @@ namespace Vi.Core
             animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
-            AddHP(hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage);
+
+            if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            {
+                RenderBlock();
+                AddHP(-attack.damage * 0.7f);
+            }
+            else // Not blocking
+            {
+                RenderHit();
+                AddHP(-attack.damage);
+            }
+
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
         }
@@ -181,11 +193,35 @@ namespace Vi.Core
 
         }
 
+        private void RenderHit()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderHit();
+
+            RenderHitClientRpc();
+        }
+
+        [ClientRpc] private void RenderHitClientRpc() { glowRenderer.RenderHit(); }
+
+        private void RenderBlock()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
+
+            if (!IsClient)
+                glowRenderer.RenderBlock();
+            RenderBlockClientRpc();
+        }
+
+        [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
+
         private void Update()
         {
             if (!IsServer) { return; }
 
             glowRenderer.RenderInvincible(IsInvincible);
+            glowRenderer.RenderUninterruptable(IsUninterruptable);
 
             UpdateStamina();
             UpdateDefense();
