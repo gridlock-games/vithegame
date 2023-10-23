@@ -85,20 +85,6 @@ namespace Vi.ScriptableObjects
 
             possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
 
-            //HitReaction hitReaction = null;
-            //foreach (HitReaction hr in possibleHitReactions)
-            //{
-            //    if (isBlocking)
-            //    {
-            //        Debug.Log(hr.reactionClip.GetHitReactionType());
-            //    }
-            //    else
-            //    {
-            //        hitReaction = hr;
-            //        break;
-            //    }
-            //}
-
             HitReaction hitReaction = null;
             if (isBlocking)
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);

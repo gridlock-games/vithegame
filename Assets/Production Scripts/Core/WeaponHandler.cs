@@ -17,7 +17,7 @@ namespace Vi.Core
         Animator animator;
         AnimationHandler animationHandler;
         
-        public Weapon GetWeapon() { return weapon; }
+        public Weapon GetWeapon() { return weaponInstance; }
 
         public override void OnNetworkSpawn()
         {
@@ -34,8 +34,12 @@ namespace Vi.Core
             animator.SetBool("Blocking", current);
         }
 
+        private Weapon weaponInstance;
+
         private void Start()
         {
+            weaponInstance = Instantiate(weapon);
+
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             EquipWeapon();
@@ -46,7 +50,7 @@ namespace Vi.Core
             List<GameObject> instances = new List<GameObject>();
 
             bool broken = false;
-            foreach (Weapon.WeaponModelData data in weapon.GetWeaponModelData())
+            foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
                 if (data.skinPrefab.name == GetComponentInChildren<LimbReferences>().name)
                 {
@@ -152,14 +156,14 @@ namespace Vi.Core
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.LightAttack, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weapon.GetAttack(Weapon.InputAttackType.HeavyAttack, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
