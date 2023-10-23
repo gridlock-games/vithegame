@@ -154,24 +154,7 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            Weapon.HitLocation hitLocation;
-            if (attackAngle <= 45.00f && attackAngle >= -45.00f)
-            {
-                hitLocation = Weapon.HitLocation.Front;
-            }
-            else if (attackAngle > 45.00f && attackAngle < 135.00f)
-            {
-                hitLocation = Weapon.HitLocation.Right;
-            }
-            else if (attackAngle < -45.00f && attackAngle > -135.00f)
-            {
-                hitLocation = Weapon.HitLocation.Left;
-            }
-            else
-            {
-                hitLocation = Weapon.HitLocation.Back;
-            }
-            animationHandler.PlayAction(weaponHandler.GetWeapon().GetHitReaction(hitLocation));
+            animationHandler.PlayAction(weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking));
 
             AddHP(-attack.damage);
             AddStamina(-attack.staminaDamage);
@@ -204,14 +187,14 @@ namespace Vi.Core
         private void UpdateStamina()
         {
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
-            if (staminaDelayCooldown > 0) return;
+            if (staminaDelayCooldown > 0) { return; }
             AddStamina(staminaRecoveryRate * Time.deltaTime, false);
         }
 
         private float defenseDelayCooldown;
         private void UpdateDefense()
         {
-            //if (IsBlocking.Value) return;
+            if (weaponHandler.IsBlocking) { return; }
 
             defenseDelayCooldown = Mathf.Max(0, defenseDelayCooldown - Time.deltaTime);
             if (defenseDelayCooldown > 0) return;
@@ -222,7 +205,7 @@ namespace Vi.Core
         private void UpdateRage()
         {
             rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
-            if (rageDelayCooldown > 0) return;
+            if (rageDelayCooldown > 0) { return; }
             AddRage(rageRecoveryRate * Time.deltaTime);
         }
 

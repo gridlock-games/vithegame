@@ -15,8 +15,17 @@ namespace Vi.ScriptableObjects
             HitReaction
         }
 
+        public enum HitReactionType
+        {
+            Normal,
+            Blocking
+        }
+
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
+
+        [SerializeField] private HitReactionType hitReactionType;
+        public HitReactionType GetHitReactionType() { return hitReactionType; }
 
         public float agentStaminaDamage = 20;
 

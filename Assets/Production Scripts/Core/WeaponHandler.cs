@@ -19,6 +19,21 @@ namespace Vi.Core
         
         public Weapon GetWeapon() { return weapon; }
 
+        public override void OnNetworkSpawn()
+        {
+            isBlocking.OnValueChanged += OnIsBlockingChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            isBlocking.OnValueChanged -= OnIsBlockingChanged;
+        }
+
+        private void OnIsBlockingChanged(bool prev, bool current)
+        {
+            animator.SetBool("Blocking", current);
+        }
+
         private void Start()
         {
             animator = GetComponentInChildren<Animator>();
@@ -91,7 +106,41 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (!currentActionClip) { return; }
+            if (!currentActionClip) { currentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
+
+            bool canBlock = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.IsInTransition(animator.GetLayerIndex("Actions"));
+            if (currentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            {
+                canBlock = true;
+            }
+
+            if (canBlock)
+            {
+                IsBlocking = isBlocking.Value;
+            }
+            else
+            {
+                IsBlocking = false;
+            }
+
+            //if (currentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            //{
+
+            //}
+
+            //if (currentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            //{
+            //    IsBlocking = isBlocking.Value;
+            //}
+            //else
+            //{
+            //    IsBlocking = false;
+            //}
+
+            //if (IsLocalPlayer)
+            //{
+            //    Debug.Log(IsBlocking);
+            //}
 
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack };
             if (attackClipTypes.Contains(currentActionClip.GetClipType()))
@@ -164,9 +213,11 @@ namespace Vi.Core
 
         }
 
+        public bool IsBlocking { get; private set; }
+        private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            animator.SetBool("Blocking", value.isPressed);
+            isBlocking.Value = value.isPressed;
         }
     }
 }

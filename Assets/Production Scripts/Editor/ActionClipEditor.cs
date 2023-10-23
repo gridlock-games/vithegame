@@ -22,6 +22,8 @@ namespace Vi.Editor
         private SerializedProperty spDefenseDamage;
         private SerializedProperty spMaxHitLimit;
 
+        private SerializedProperty spHitReactionClipType;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -35,6 +37,8 @@ namespace Vi.Editor
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spDefenseDamage = serializedObject.FindProperty("defenseDamage");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
+
+            spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
         }
 
         public override void OnInspectorGUI()
@@ -69,6 +73,10 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+            }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HitReaction)
+            {
+                EditorGUILayout.PropertyField(spHitReactionClipType);
             }
 
             serializedObject.ApplyModifiedProperties();

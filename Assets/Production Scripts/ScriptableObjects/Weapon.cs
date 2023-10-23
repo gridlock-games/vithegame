@@ -57,16 +57,61 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetHitReaction(HitLocation hitLocation)
+        public ActionClip GetHitReaction(float attackAngle, bool isBlocking)
         {
+            HitLocation hitLocation;
+            if (attackAngle <= 45.00f && attackAngle >= -45.00f)
+            {
+                hitLocation = HitLocation.Front;
+            }
+            else if (attackAngle > 45.00f && attackAngle < 135.00f)
+            {
+                hitLocation = HitLocation.Right;
+            }
+            else if (attackAngle < -45.00f && attackAngle > -135.00f)
+            {
+                hitLocation = HitLocation.Left;
+            }
+            else
+            {
+                hitLocation = HitLocation.Back;
+            }
+
+            // Reset combo system
             lightAttackIndex = 0;
             heavyAttackIndex = 0;
-            HitReaction hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
+
+            List<HitReaction> possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
+
+            possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
+
+            //HitReaction hitReaction = null;
+            //foreach (HitReaction hr in possibleHitReactions)
+            //{
+            //    if (isBlocking)
+            //    {
+            //        Debug.Log(hr.reactionClip.GetHitReactionType());
+            //    }
+            //    else
+            //    {
+            //        hitReaction = hr;
+            //        break;
+            //    }
+            //}
+
+            HitReaction hitReaction = null;
+            if (isBlocking)
+                hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
+
+            if (hitReaction == null)
+                hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
+
             if (hitReaction == null)
             {
                 Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this);
                 return null;
             }
+
             return hitReaction.reactionClip;
         }
 
@@ -216,6 +261,11 @@ namespace Vi.ScriptableObjects
             {
                 dodgeClip = dodgeB;
             }
+
+            // Reset combo system
+            lightAttackIndex = 0;
+            heavyAttackIndex = 0;
+
             return dodgeClip;
         }
 
