@@ -30,6 +30,7 @@ namespace Vi.Core
                 hitsThisFrame.Add(attributes);
                 attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.currentActionClip,
+                    this,
                     other.ClosestPointOnBounds(transform.position),
                     Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
                 );

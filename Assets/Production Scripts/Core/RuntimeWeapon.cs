@@ -11,7 +11,7 @@ namespace Vi.Core
 
         public void AddHit(Attributes attributes)
         {
-            if (hitCounter.ContainsKey(attributes))
+            if (!hitCounter.ContainsKey(attributes))
             {
                 hitCounter.Add(attributes, 1);
             }

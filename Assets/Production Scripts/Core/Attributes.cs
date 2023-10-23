@@ -143,7 +143,7 @@ namespace Vi.Core
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         private bool wasStaggeredThisFrame;
-        public void ProcessMeleeHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle)
+        public void ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
         {
             if (IsInvincible) { return; }
             if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return; }
@@ -157,7 +157,9 @@ namespace Vi.Core
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking);
             animationHandler.PlayAction(hitReaction);
 
+            runtimeWeapon.AddHit(this);
             AddHP(hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage);
+            Debug.Log(attacker + " attacked " + this + " for " + -attack.damage + " damage");
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
         }
