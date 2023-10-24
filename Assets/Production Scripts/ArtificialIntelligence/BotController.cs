@@ -15,23 +15,21 @@ namespace Vi.ArtificialIntelligence
         private CharacterController characterController;
         private AnimationHandler animationHandler;
         private Animator animator;
+        private WeaponHandler weaponHandler;
 
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             animator = GetComponentInChildren<Animator>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         private void Update()
         {
-            if (lightAttack)
-            {
-                SendMessage("OnLightAttack");
-            }
+            weaponHandler.SetIsBlocking(isBlocking);
 
-            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
-            if (rootMotion == Vector3.zero)
+            if (!animationHandler.ShouldApplyRootMotion())
             {
                 if (!NetworkManager.LocalClient.PlayerObject) { return; }
 
@@ -39,7 +37,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Vector3 dir = (NetworkManager.LocalClient.PlayerObject.transform.position - transform.position).normalized;
                     dir.Scale(new Vector3(1, 0, 1));
-                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 15);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
 
                     if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f)
                     {
@@ -57,7 +55,7 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                characterController.Move(rootMotion);
+                characterController.Move(animationHandler.ApplyLocalRootMotion());
             }
         }
     }

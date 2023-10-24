@@ -21,35 +21,35 @@ namespace Vi.Player
                 Cursor.lockState = CursorLockMode.Locked;
         }
 
-        [SerializeField] private GameObject scoreboardPrefab;
-        void OnScoreboardToggle()
-        {
+        //[SerializeField] private GameObject scoreboardPrefab;
+        //void OnScoreboardToggle()
+        //{
             
-        }
+        //}
 
-        [SerializeField] private GameObject inventoryPrefab;
-        GameObject inventoryObject;
-        bool inventoryEnabled;
-        void OnInventoryToggle()
-        {
-            //if (pauseEnabled) { return; }
+        //[SerializeField] private GameObject inventoryPrefab;
+        //GameObject inventoryObject;
+        //bool inventoryEnabled;
+        //void OnInventoryToggle()
+        //{
+        //    //if (pauseEnabled) { return; }
 
-            inventoryEnabled = !inventoryEnabled;
-            if (inventoryEnabled)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                playerHUD.SetActive(false);
-                inventoryObject = Instantiate(inventoryPrefab, transform);
-                playerInput.SwitchCurrentActionMap("Inventory");
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                playerHUD.SetActive(true);
-                Destroy(inventoryObject);
-                playerInput.SwitchCurrentActionMap("Base");
-            }
-        }
+        //    inventoryEnabled = !inventoryEnabled;
+        //    if (inventoryEnabled)
+        //    {
+        //        Cursor.lockState = CursorLockMode.None;
+        //        playerHUD.SetActive(false);
+        //        inventoryObject = Instantiate(inventoryPrefab, transform);
+        //        playerInput.SwitchCurrentActionMap("Inventory");
+        //    }
+        //    else
+        //    {
+        //        Cursor.lockState = CursorLockMode.Locked;
+        //        playerHUD.SetActive(true);
+        //        Destroy(inventoryObject);
+        //        playerInput.SwitchCurrentActionMap("Base");
+        //    }
+        //}
 
         [SerializeField] private GameObject pausePrefab;
         GameObject pauseObject;

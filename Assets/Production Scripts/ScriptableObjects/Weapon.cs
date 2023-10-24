@@ -58,7 +58,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetHitReaction(float attackAngle, bool isBlocking, ActionClip.Ailment ailment)
+        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking)
         {
             HitLocation hitLocation;
             if (attackAngle <= 45.00f && attackAngle >= -45.00f)
@@ -87,18 +87,18 @@ namespace Vi.ScriptableObjects
             possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
 
             HitReaction hitReaction = null;
-            if (isBlocking)
+            if (isBlocking & attack.isBlockable)
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
 
             if (hitReaction == null)
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
 
-            if (hitReaction.reactionClip.ailment != ailment)
-                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == ailment);
+            if (hitReaction.reactionClip.ailment != attack.ailment)
+                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == attack.ailment);
 
             if (hitReaction == null)
             {
-                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + ailment + " blocking: " + isBlocking);
+                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + attack.ailment + " blocking: " + isBlocking);
                 return null;
             }
 

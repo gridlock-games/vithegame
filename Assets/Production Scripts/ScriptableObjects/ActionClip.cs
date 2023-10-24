@@ -46,6 +46,7 @@ namespace Vi.ScriptableObjects
         public float staminaDamage = 0;
         public float defenseDamage = 0;
         public int maxHitLimit = 1;
+        public bool isBlockable = true;
         public Ailment ailment = Ailment.None;
     }
 }

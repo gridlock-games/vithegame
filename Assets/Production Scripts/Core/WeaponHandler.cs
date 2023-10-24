@@ -193,6 +193,11 @@ namespace Vi.Core
 
         }
 
+        public void SetIsBlocking(bool isBlocking)
+        {
+            this.isBlocking.Value = isBlocking;
+        }
+
         public bool IsBlocking { get; private set; }
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)

@@ -186,7 +186,7 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking, attack.ailment);
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking);
             animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);

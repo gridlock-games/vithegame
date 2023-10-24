@@ -21,6 +21,7 @@ namespace Vi.Editor
         private SerializedProperty spStaminaDamage;
         private SerializedProperty spDefenseDamage;
         private SerializedProperty spMaxHitLimit;
+        private SerializedProperty spIsBlockable;
         private SerializedProperty spAilment;
 
         private SerializedProperty spHitReactionClipType;
@@ -38,6 +39,7 @@ namespace Vi.Editor
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spDefenseDamage = serializedObject.FindProperty("defenseDamage");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
+            spIsBlockable = serializedObject.FindProperty("isBlockable");
             spAilment = serializedObject.FindProperty("ailment");
 
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
@@ -58,6 +60,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
+                EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spAilment);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -72,6 +75,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
+                EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spAilment);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);

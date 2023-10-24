@@ -156,7 +156,7 @@ namespace Vi.Player
 
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
             {
-                Debug.Log("Teleporting player: " + OwnerClientId);
+                //Debug.Log("Teleporting player: " + OwnerClientId);
                 characterController.enabled = false;
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
