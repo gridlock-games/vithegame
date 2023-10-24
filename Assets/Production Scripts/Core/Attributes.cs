@@ -309,6 +309,7 @@ namespace Vi.Core
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
+        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTime = 1;

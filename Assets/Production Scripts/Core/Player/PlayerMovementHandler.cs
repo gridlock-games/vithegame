@@ -21,7 +21,7 @@ namespace Vi.Player
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (attributes.GetAilment() != ActionClip.Ailment.None)
+            if (attributes.ShouldApplyAilmentRotation())
             {
                 Vector3 oldPos = transform.position;
 
@@ -56,7 +56,7 @@ namespace Vi.Player
 
             // Apply movement to charactercontroller
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion();
-            if (rootMotion != Vector3.zero)
+            if (animationHandler.ShouldApplyRootMotion())
             {
                 characterController.Move(rootMotion);
             }
@@ -147,8 +147,10 @@ namespace Vi.Player
             
             targetDirection += Physics.gravity;
 
-            Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
-            transform.rotation = targetRotation;
+            if (attributes.ShouldApplyAilmentRotation())
+                transform.rotation = attributes.GetAilmentRotation();
+            else
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
 
@@ -159,7 +161,7 @@ namespace Vi.Player
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
             }
-            else if (rootMotion != Vector3.zero) // is root moving
+            else if (animationHandler.ShouldApplyRootMotion()) // is root moving
             {
                 rootMotion = transform.rotation * rootMotion;
 

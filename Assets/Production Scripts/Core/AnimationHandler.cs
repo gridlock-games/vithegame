@@ -153,11 +153,13 @@ namespace Vi.Core
             return _;
         }
 
+        public bool ShouldApplyRootMotion() { return !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"); }
+
         // Event handler for animator's movement
         private void OnAnimatorMove()
         {
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            if (ShouldApplyRootMotion())
             {
                 networkRootMotion += animator.deltaPosition;
                 localRootMotion += animator.deltaPosition;
