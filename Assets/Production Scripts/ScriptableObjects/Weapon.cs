@@ -42,6 +42,7 @@ namespace Vi.ScriptableObjects
 
         public enum HitLocation
         {
+            AllDirections,
             Front,
             Back,
             Left,
@@ -51,13 +52,13 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         private class HitReaction
         {
-            public HitLocation hitLocation;
+            public HitLocation hitLocation = HitLocation.Front;
             public ActionClip reactionClip;
         }
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetHitReaction(float attackAngle, bool isBlocking)
+        public ActionClip GetHitReaction(float attackAngle, bool isBlocking, ActionClip.Ailment ailment)
         {
             HitLocation hitLocation;
             if (attackAngle <= 45.00f && attackAngle >= -45.00f)
@@ -92,9 +93,12 @@ namespace Vi.ScriptableObjects
             if (hitReaction == null)
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
 
+            if (hitReaction.reactionClip.ailment != ailment)
+                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == ailment);
+
             if (hitReaction == null)
             {
-                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this);
+                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + ailment + " blocking: " + isBlocking);
                 return null;
             }
 

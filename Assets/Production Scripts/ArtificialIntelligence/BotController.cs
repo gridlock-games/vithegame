@@ -12,8 +12,19 @@ namespace Vi.ArtificialIntelligence
         [SerializeField] private bool isBlocking;
         [SerializeField] private bool attackPlayer;
 
+        private CharacterController characterController;
+        private AnimationHandler animationHandler;
+
+        private void Start()
+        {
+            characterController = GetComponent<CharacterController>();
+            animationHandler = GetComponentInChildren<AnimationHandler>();
+        }
+
         private void Update()
         {
+            characterController.Move(animationHandler.ApplyLocalRootMotion());
+
             if (lightAttack)
             {
                 SendMessage("OnLightAttack");

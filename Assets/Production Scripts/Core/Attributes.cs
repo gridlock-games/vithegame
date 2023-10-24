@@ -24,6 +24,28 @@ namespace Vi.Core
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
 
+        [Header("Ailment Settings")]
+        [SerializeField] private float knockdownDuration = 2;
+
+        public enum Status
+        {
+            damageMultiplier,
+            damageReductionMultiplier,
+            damageReceivedMultiplier,
+            healingMultiplier,
+            defenseIncreaseMultiplier,
+            defenseReductionMultiplier,
+            burning,
+            poisoned,
+            drain,
+            movementSpeedDecrease,
+            movementSpeedIncrease,
+            rooted,
+            silenced,
+            fear,
+            healing
+        }
+
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
         public float GetMaxDefense() { return maxDefense; }
@@ -98,6 +120,7 @@ namespace Vi.Core
         {
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
+            ailment.OnValueChanged += OnAilmentChanged;
 
             if (!IsLocalPlayer)
             {
@@ -108,6 +131,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            ailment.OnValueChanged -= OnAilmentChanged;
         }
 
         private void OnHPChanged(float prev, float current)
@@ -161,7 +185,7 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking);
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attackAngle, weaponHandler.IsBlocking, attack.ailment);
             animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
@@ -179,6 +203,8 @@ namespace Vi.Core
 
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
+
+            if (attack.ailment != ActionClip.Ailment.None) { ailment.Value = attack.ailment; }
         }
 
         private IEnumerator ResetStaggerBool()
@@ -253,18 +279,26 @@ namespace Vi.Core
             AddRage(rageRecoveryRate * Time.deltaTime);
         }
 
-        //public enum CHARACTER_AILMENTS
-        //{
-        //    None,
-        //    WasGrabbed,
-        //    IsKnockedDown,
-        //    IsKnockedUp,
-        //    IsStunned,
-        //    Reset,
-        //    Dead,
-        //    IsWallBound,
-        //    IsStaggered,
-        //    IsPulled
-        //}
+        private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
+
+        private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        {
+            GetComponentInChildren<Animator>().SetBool("CanResetAction", current == ActionClip.Ailment.None);
+
+            switch (current)
+            {
+                case ActionClip.Ailment.Knockdown:
+                    StartCoroutine(ResetAilmentAfterTime(knockdownDuration));
+                    break;
+            }
+        }
+
+        public ActionClip.Ailment GetAilment() { return ailment.Value; }
+
+        private IEnumerator ResetAilmentAfterTime(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            ailment.Value = ActionClip.Ailment.None;
+        }
     }
 }

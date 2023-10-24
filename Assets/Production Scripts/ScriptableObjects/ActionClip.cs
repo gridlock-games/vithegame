@@ -18,7 +18,17 @@ namespace Vi.ScriptableObjects
         public enum HitReactionType
         {
             Normal,
-            Blocking
+            Blocking,
+        }
+
+        public enum Ailment
+        {
+            None,
+            Knockdown,
+            Knockup,
+            Stun,
+            Stagger,
+            Pull
         }
 
         [SerializeField] private ClipType clipType;
@@ -36,5 +46,6 @@ namespace Vi.ScriptableObjects
         public float staminaDamage = 0;
         public float defenseDamage = 0;
         public int maxHitLimit = 1;
+        public Ailment ailment = Ailment.None;
     }
 }
