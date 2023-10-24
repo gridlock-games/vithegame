@@ -846,6 +846,7 @@ MonoBehaviour:
   defenseDelay: 1
   maxRage: 100
   rageRecoveryRate: 1
+  knockdownDuration: 2
 --- !u!143 &1499099673
 CharacterController:
   m_ObjectHideFlags: 0
@@ -891,7 +892,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightAttack: 0
   isBlocking: 0
-  attackPlayer: 0
+  moveToPlayer: 0
 --- !u!1 &1686335000
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,6 +21,26 @@ namespace Vi.Player
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
+            if (attributes.GetAilment() != ActionClip.Ailment.None)
+            {
+                Vector3 oldPos = transform.position;
+
+                // Set position to current position
+                characterController.enabled = false;
+                transform.position = movementPrediction.currentPosition;
+                characterController.enabled = true;
+
+                characterController.Move(animationHandler.ApplyNetworkRootMotion());
+                Vector3 newPos = transform.position;
+
+                // Revert movement change
+                characterController.enabled = false;
+                transform.position = oldPos;
+                characterController.enabled = true;
+
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPos, attributes.GetAilmentRotation());
+            }
+
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
@@ -38,7 +58,6 @@ namespace Vi.Player
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion();
             if (rootMotion != Vector3.zero)
             {
-                rootMotion += Physics.gravity;
                 characterController.Move(rootMotion);
             }
             else
@@ -89,6 +108,7 @@ namespace Vi.Player
         private Animator animator;
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
@@ -96,6 +116,7 @@ namespace Vi.Player
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
+            attributes = GetComponentInParent<Attributes>();
 
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
@@ -122,13 +143,23 @@ namespace Vi.Player
             targetDirection *= characterController.isGrounded ? runSpeed : 0;
 
             float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
-            if (localDistance > movementPrediction.playerObjectTeleportThreshold) { targetDirection *= localDistance * (1/movementPrediction.playerObjectTeleportThreshold); }
+            //if (localDistance > movementPrediction.playerObjectTeleportThreshold) { targetDirection *= localDistance * (1/movementPrediction.playerObjectTeleportThreshold); }
+            
             targetDirection += Physics.gravity;
 
             Quaternion targetRotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
+            transform.rotation = targetRotation;
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
-            if (rootMotion != Vector3.zero) // is root moving
+
+            if (localDistance > movementPrediction.playerObjectTeleportThreshold)
+            {
+                Debug.Log("Teleporting player: " + OwnerClientId);
+                characterController.enabled = false;
+                transform.position = movementPrediction.currentPosition;
+                characterController.enabled = true;
+            }
+            else if (rootMotion != Vector3.zero) // is root moving
             {
                 rootMotion = transform.rotation * rootMotion;
 
@@ -153,12 +184,10 @@ namespace Vi.Player
                 if (localDistance > movementPrediction.rootMotionDistanceScaleThreshold) { rootMotion *= localDistance * (1/movementPrediction.rootMotionDistanceScaleThreshold); }
 
                 characterController.Move(rootMotion);
-                transform.rotation = targetRotation;
             }
             else
             {
                 characterController.Move(targetDirection * Time.deltaTime);
-                transform.rotation = targetRotation;
             }
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));

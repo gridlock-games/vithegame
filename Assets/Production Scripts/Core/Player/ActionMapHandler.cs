@@ -8,12 +8,14 @@ namespace Vi.Player
 {
     public class ActionMapHandler : MonoBehaviour
     {
-        [SerializeField] private GameObject playerHUD;
+        [SerializeField] private GameObject playerHUDPrefab;
 
-        PlayerInput playerInput;
+        private GameObject playerHUD;
+        private PlayerInput playerInput;
 
         private void OnEnable()
         {
+            playerHUD = Instantiate(playerHUDPrefab, transform);
             playerInput = GetComponent<PlayerInput>();
             if (playerInput.currentActionMap.name == "Base")
                 Cursor.lockState = CursorLockMode.Locked;

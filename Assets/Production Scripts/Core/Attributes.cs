@@ -116,22 +116,22 @@ namespace Vi.Core
                 rage.Value += amount;
         }
 
+        GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
 
-            if (!IsLocalPlayer)
-            {
-                Instantiate(worldSpaceLabelPrefab, transform);
-            }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
         }
 
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
+
+            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
         }
 
         private void OnHPChanged(float prev, float current)
@@ -176,6 +176,7 @@ namespace Vi.Core
         private bool wasStaggeredThisFrame;
         public void ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
         {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return; }
             if (IsInvincible) { return; }
             if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return; }
 
@@ -204,7 +205,16 @@ namespace Vi.Core
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
 
-            if (attack.ailment != ActionClip.Ailment.None) { ailment.Value = attack.ailment; }
+            if (attack.ailment != ActionClip.Ailment.None)
+            {
+                Vector3 startPos = transform.position;
+                Vector3 endPos = attacker.transform.position;
+                startPos.y = 0;
+                endPos.y = 0;
+                ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
+
+                ailment.Value = attack.ailment;
+            }
         }
 
         private IEnumerator ResetStaggerBool()
@@ -280,23 +290,31 @@ namespace Vi.Core
         }
 
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
+        private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
+        private Coroutine resetCoroutine;
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             GetComponentInChildren<Animator>().SetBool("CanResetAction", current == ActionClip.Ailment.None);
 
+            if (!IsServer) { return; }
+            if (resetCoroutine != null) { StopCoroutine(resetCoroutine); }
+
             switch (current)
             {
                 case ActionClip.Ailment.Knockdown:
-                    StartCoroutine(ResetAilmentAfterTime(knockdownDuration));
+                    resetCoroutine = StartCoroutine(ResetAilmentAfterTime(knockdownDuration));
                     break;
             }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
+        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
+        private const float recoveryTime = 1;
         private IEnumerator ResetAilmentAfterTime(float duration)
         {
+            SetInviniciblity(duration + recoveryTime);
             yield return new WaitForSeconds(duration);
             ailment.Value = ActionClip.Ailment.None;
         }
