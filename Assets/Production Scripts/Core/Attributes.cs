@@ -122,6 +122,8 @@ namespace Vi.Core
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
+            isInvincible.OnValueChanged += OnIsInvincibleChange;
+            isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
         }
@@ -130,6 +132,8 @@ namespace Vi.Core
         {
             HP.OnValueChanged -= OnHPChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
+            isInvincible.OnValueChanged -= OnIsInvincibleChange;
+            isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
         }
@@ -165,11 +169,15 @@ namespace Vi.Core
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
-        public bool IsInvincible => Time.time <= invincibilityEndTime;
+        public bool IsInvincible { get; private set; }
+        private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
+        private void OnIsInvincibleChange(bool prev, bool current) { IsInvincible = current; }
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
-        public bool IsUninterruptable => Time.time <= uninterruptableEndTime;
+        public bool IsUninterruptable { get; private set; }
+        private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
+        private void OnIsUninterruptableChange(bool prev, bool current) { IsUninterruptable = current; }
         private float uninterruptableEndTime;
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
@@ -253,10 +261,13 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (!IsServer) { return; }
-
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
+
+            if (!IsServer) { return; }
+
+            isInvincible.Value = Time.time <= invincibilityEndTime;
+            isUninterruptable.Value = Time.time <= uninterruptableEndTime;
 
             UpdateStamina();
             UpdateDefense();
