@@ -56,15 +56,14 @@ namespace Vi.ScriptableObjects
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
 
-        //public enum DodgeLock
-        //{
-        //    None,
-        //    Anticipation,
-        //    Attacking,
-        //    Recovery
-        //}
+        public enum DodgeLock
+        {
+            None,
+            EntireAnimation,
+            Recovery
+        }
 
-        //public DodgeLock dodgeLock = DodgeLock.None;
+        public DodgeLock dodgeLock = DodgeLock.None;
 
         //public enum AnimCancellingType
         //{

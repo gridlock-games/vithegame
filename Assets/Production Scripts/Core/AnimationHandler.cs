@@ -34,9 +34,22 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
             // If we are not at rest and the last clip was a dodge, don't play this clip
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") | animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
                 if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+
+                // Dodge lock checks
+                if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                {
+                    if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
+                    {
+                        return;
+                    }
+                    else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
+                    {
+                        if (weaponHandler.IsInRecovery) { return; }
+                    }
+                }
             }
 
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
