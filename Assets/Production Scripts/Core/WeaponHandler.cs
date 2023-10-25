@@ -122,7 +122,7 @@ namespace Vi.Core
                 IsBlocking = false;
             }
 
-            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack };
+            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability };
             if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
@@ -211,6 +211,20 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             isBlocking.Value = value.isPressed;
+        }
+
+        void OnTimeScaleChange()
+        {
+            if (!Application.isEditor) { return; }
+
+            if (Time.timeScale == 1)
+            {
+                Time.timeScale = 0.1f;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
     }
 }

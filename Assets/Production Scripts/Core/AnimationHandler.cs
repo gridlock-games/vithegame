@@ -25,7 +25,7 @@ namespace Vi.Core
         }
 
         // Stores the type of the last action clip played
-        private ActionClip.ClipType lastClipType;
+        private ActionClip lastClipPlayed;
 
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
@@ -36,7 +36,7 @@ namespace Vi.Core
             // If we are not at rest and the last clip was a dodge, don't play this clip
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
-                if (lastClipType == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipType == ActionClip.ClipType.HitReaction)) { return; }
+                if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
             }
 
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
@@ -84,7 +84,7 @@ namespace Vi.Core
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionStateName);
             // Update the lastClipType to the current action clip type
-            lastClipType = actionClip.GetClipType();
+            lastClipPlayed = actionClip;
         }
 
         // Remote Procedure Call method for playing the action on the server

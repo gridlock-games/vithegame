@@ -62,7 +62,7 @@ namespace Vi.Player
             }
             else
             {
-                characterController.Move(targetDirection * (1f / NetworkManager.NetworkTickSystem.TickRate));
+                characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection);
             }
 
             Vector3 newPosition = transform.position;

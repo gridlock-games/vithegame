@@ -54,5 +54,24 @@ namespace Vi.ScriptableObjects
         public bool isBlockable = true;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
+
+        public enum DodgeLock
+        {
+            None,
+            Anticipation,
+            Attacking,
+            Recovery
+        }
+
+        public DodgeLock dodgeLock = DodgeLock.None;
+
+        //public enum AnimCancellingType
+        //{
+        //    None,
+        //    Cancel_NormalAtk,
+        //    Cancel_AbilityAtk,
+        //    Cancel_HeavyAtk,
+        //    Cancel_Dodge
+        //}
     }
 }
