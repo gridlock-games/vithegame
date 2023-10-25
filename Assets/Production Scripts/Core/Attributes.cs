@@ -192,7 +192,7 @@ namespace Vi.Core
                 wasStaggeredThisFrame = true;
                 StartCoroutine(ResetStaggerBool());
             }
-
+            
             // Combination ailment logic here
             ActionClip.Ailment attackAilment = attack.ailment;
             if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }

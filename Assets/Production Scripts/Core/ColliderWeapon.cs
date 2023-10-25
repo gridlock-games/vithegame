@@ -22,11 +22,11 @@ namespace Vi.Core
                 if (parentAttributes == attributes) { return; }
                 if (hitCounter.ContainsKey(attributes))
                 {
-                    if (hitCounter[attributes] > parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
+                    if (hitCounter[attributes] >= parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
                 }
 
                 if (hitsThisFrame.Contains(attributes)) { return; }
-
+                
                 hitsThisFrame.Add(attributes);
                 attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.currentActionClip,
