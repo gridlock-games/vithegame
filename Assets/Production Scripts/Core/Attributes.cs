@@ -227,29 +227,26 @@ namespace Vi.Core
                     ailmentChangedOnThisAttack = ailment.Value != attack.ailment;
                     ailment.Value = attack.ailment;
                 }
-                else
+                else // If this attack's ailment is none
                 {
                     if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
                     {
-                        StopCoroutine(ailmentResetCoroutine);
                         ailment.Value = ActionClip.Ailment.None;
                     }
                 }
 
+                // If we started a new ailment on this attack, we want to start a reset coroutine
                 if (ailmentChangedOnThisAttack)
                 {
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            Debug.Log(Time.time + " Knockdown reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
-                            Debug.Log(Time.time + " Knockup reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            Debug.Log(Time.time + " Stun reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
@@ -346,10 +343,16 @@ namespace Vi.Core
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
+        public bool ShouldApplyAilmentRotation()
+        {
+            return ailment.Value == ActionClip.Ailment.Knockdown
+                | ailment.Value == ActionClip.Ailment.Knockup
+                | ailment.Value == ActionClip.Ailment.Stagger;
+        }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
