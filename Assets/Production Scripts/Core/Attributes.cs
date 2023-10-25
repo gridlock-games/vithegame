@@ -228,14 +228,16 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, true));
                             break;
-                        //case ActionClip.Ailment.Knockup:
-                        //    break;
+                        case ActionClip.Ailment.Knockup:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
+                            break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
                             break;
                         //case ActionClip.Ailment.Pull:
                         //    break;
@@ -328,8 +330,6 @@ namespace Vi.Core
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-
-            if (!IsServer) { return; }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
@@ -338,11 +338,12 @@ namespace Vi.Core
 
         private const float recoveryTimeInvincibilityBuffer = 1;
         private Coroutine ailmentResetCoroutine;
-        private IEnumerator ResetAilmentAfterTime(float duration)
+        private IEnumerator ResetAilmentAfterTime(float duration, bool shouldMakeInvincible)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            SetInviniciblity(duration + recoveryTimeInvincibilityBuffer);
+            if (shouldMakeInvincible) { SetInviniciblity(duration); }
             yield return new WaitForSeconds(duration);
+            SetInviniciblity(recoveryTimeInvincibilityBuffer);
             ailment.Value = ActionClip.Ailment.None;
         }
 
