@@ -12,7 +12,8 @@ namespace Vi.ScriptableObjects
             Dodge,
             LightAttack,
             HeavyAttack,
-            HitReaction
+            HitReaction,
+            Ability
         }
 
         public enum HitReactionType
@@ -40,6 +41,8 @@ namespace Vi.ScriptableObjects
         public float rootMotionMulitplier = 1;
 
         public float agentStaminaCost = 20;
+        public float agentDefenseCost = 0;
+        public float agentRageCost = 50;
 
         public Weapon.WeaponBone weaponBone;
         public float attackingNormalizedTime = 0.25f;

@@ -57,6 +57,15 @@ namespace Vi.Core
                 if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
                 attributes.AddStamina(-actionClip.agentStaminaCost);
             }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+            {
+                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
+                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
+                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaCost);
+                attributes.AddStamina(-actionClip.agentDefenseCost);
+                attributes.AddStamina(-actionClip.agentRageCost);
+            }
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip);
