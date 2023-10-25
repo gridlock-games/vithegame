@@ -25,18 +25,20 @@ namespace Vi.Core
                 if (parentAttributes == attributes) { return; }
                 if (hitCounter.ContainsKey(attributes))
                 {
-                    if (hitCounter[attributes] >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
+                    if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
+                    if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return; }
                 }
 
                 if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
 
-                hitsOnThisPhysicsUpdate.Add(attributes);
-                attributes.ProcessMeleeHit(parentAttributes,
+                bool bHit = attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
                 );
+
+                if (bHit) { hitsOnThisPhysicsUpdate.Add(attributes); }
             }
         }
 

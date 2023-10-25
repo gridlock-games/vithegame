@@ -51,19 +51,20 @@ namespace Vi.ScriptableObjects
         public float staminaDamage = 0;
         public float defenseDamage = 0;
         public int maxHitLimit = 1;
+        public float timeBetweenHits = 1;
         public bool isBlockable = true;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
 
-        public enum DodgeLock
-        {
-            None,
-            Anticipation,
-            Attacking,
-            Recovery
-        }
+        //public enum DodgeLock
+        //{
+        //    None,
+        //    Anticipation,
+        //    Attacking,
+        //    Recovery
+        //}
 
-        public DodgeLock dodgeLock = DodgeLock.None;
+        //public DodgeLock dodgeLock = DodgeLock.None;
 
         //public enum AnimCancellingType
         //{

@@ -7,17 +7,29 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
-        protected Dictionary<Attributes, int> hitCounter = new Dictionary<Attributes, int>();
+        protected struct HitCounterData
+        {
+            public int hitNumber;
+            public float timeOfHit;
+
+            public HitCounterData(int hitNumber, float timeOfHit)
+            {
+                this.hitNumber = hitNumber;
+                this.timeOfHit = timeOfHit;
+            }
+        }
+
+        protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
 
         public void AddHit(Attributes attributes)
         {
             if (!hitCounter.ContainsKey(attributes))
             {
-                hitCounter.Add(attributes, 1);
+                hitCounter.Add(attributes, new HitCounterData(1, Time.time));
             }
             else
             {
-                hitCounter[attributes] += 1;
+                hitCounter[attributes] = new HitCounterData(hitCounter[attributes].hitNumber, Time.time);
             }
         }
 

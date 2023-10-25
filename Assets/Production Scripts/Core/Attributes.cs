@@ -181,11 +181,11 @@ namespace Vi.Core
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         private bool wasStaggeredThisFrame;
-        public void ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
+        public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
         {
-            if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return; }
-            if (IsInvincible) { return; }
-            if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return; }
+            if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
+            if (IsInvincible) { return false; }
+            if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
 
             if (!IsUninterruptable)
             {
@@ -271,6 +271,7 @@ namespace Vi.Core
                     }
                 }
             }
+            return true;
         }
 
         private IEnumerator ResetStaggerBool()
