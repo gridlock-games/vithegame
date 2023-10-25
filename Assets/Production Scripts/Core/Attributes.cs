@@ -256,9 +256,9 @@ namespace Vi.Core
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
                             break;
-                        //case ActionClip.Ailment.Pull:
-                        //    ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
-                        //    break;
+                        case ActionClip.Ailment.Pull:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
+                            break;
                         default:
                             Debug.LogWarning(attackAilment + " has not been implemented yet!");
                             break;

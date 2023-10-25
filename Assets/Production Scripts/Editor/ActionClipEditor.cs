@@ -13,6 +13,7 @@ namespace Vi.Editor
         private SerializedProperty spClipType;
 
         private SerializedProperty spAgentStaminaDamage;
+        private SerializedProperty spRootMotionMulitplier;
 
         private SerializedProperty spWeaponBone;
         private SerializedProperty spAttackingNormalizedTime;
@@ -30,6 +31,7 @@ namespace Vi.Editor
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
+            spRootMotionMulitplier = serializedObject.FindProperty("rootMotionMulitplier");
 
             spAgentStaminaDamage = serializedObject.FindProperty("agentStaminaDamage");
 
@@ -50,6 +52,7 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             EditorGUILayout.PropertyField(spClipType);
+            EditorGUILayout.PropertyField(spRootMotionMulitplier);
 
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Dodge)
             {

@@ -37,6 +37,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 
+        public float rootMotionMulitplier = 1;
+
         public float agentStaminaDamage = 20;
 
         public Weapon.WeaponBone weaponBone;
