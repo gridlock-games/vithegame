@@ -193,7 +193,10 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
+            // Combination ailment logic here
             ActionClip.Ailment attackAilment = attack.ailment;
+            if (ailment.Value == ActionClip.Ailment.Stagger & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
+
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             animationHandler.PlayAction(hitReaction);
 
@@ -254,6 +257,7 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
                             break;
                         //case ActionClip.Ailment.Pull:
+                        //    ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
                         //    break;
                         default:
                             Debug.LogWarning(attackAilment + " has not been implemented yet!");
