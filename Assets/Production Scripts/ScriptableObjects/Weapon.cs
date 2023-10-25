@@ -111,9 +111,6 @@ namespace Vi.ScriptableObjects
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
             }
             
-            //if (hitReaction.reactionClip.ailment != ailment)
-            //    hitReaction = hitReactions.Find(item => item.reactionClip.ailment == ailment);
-
             if (hitReaction == null)
             {
                 Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + currentAilment + " blocking: " + isBlocking);
