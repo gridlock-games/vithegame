@@ -54,11 +54,12 @@ namespace Vi.ScriptableObjects
         {
             public HitLocation hitLocation = HitLocation.Front;
             public ActionClip reactionClip;
+            public bool shouldAlreadyHaveAilment;
         }
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking)
+        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment currentAilment)
         {
             HitLocation hitLocation;
             if (attackAngle <= 45.00f && attackAngle >= -45.00f)
@@ -82,23 +83,40 @@ namespace Vi.ScriptableObjects
             lightAttackIndex = 0;
             heavyAttackIndex = 0;
 
-            List<HitReaction> possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
-
-            possibleHitReactions = hitReactions.FindAll(item => item.hitLocation == hitLocation);
-
             HitReaction hitReaction = null;
             if (isBlocking & attack.isBlockable)
+            {
+                // Block the attack
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
+            }
+            else if (currentAilment != attack.ailment & attack.ailment != ActionClip.Ailment.None)
+            {
+                // Find the start reaction for the attack's ailment
+                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == attack.ailment & !item.shouldAlreadyHaveAilment);
+            }
+            else if (currentAilment != ActionClip.Ailment.None)
+            {
+                // Find a hit reaction for an in progress ailment
+                hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
 
-            if (hitReaction == null)
-                hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation);
-
-            if (hitReaction.reactionClip.ailment != attack.ailment)
-                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == attack.ailment);
+                // If we can't find an in progress reaction, just get a normal reaction
+                if (hitReaction == null)
+                {
+                    hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                }
+            }
+            else
+            {
+                // Find a normal hit reaction
+                hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+            }
+            
+            //if (hitReaction.reactionClip.ailment != ailment)
+            //    hitReaction = hitReactions.Find(item => item.reactionClip.ailment == ailment);
 
             if (hitReaction == null)
             {
-                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + attack.ailment + " blocking: " + isBlocking);
+                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + currentAilment + " blocking: " + isBlocking);
                 return null;
             }
 

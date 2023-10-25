@@ -193,7 +193,7 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking);
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, ailment.Value);
             animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
@@ -213,27 +213,43 @@ namespace Vi.Core
             AddDefense(-attack.defenseDamage);
 
             // Ailments
-            if (attack.ailment != ActionClip.Ailment.None)
+            if (attack.ailment != ailment.Value)
             {
-                Vector3 startPos = transform.position;
-                Vector3 endPos = attacker.transform.position;
-                startPos.y = 0;
-                endPos.y = 0;
-                ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
-
-                if (attack.ailment != ailment.Value)
+                bool ailmentChangedOnThisAttack = false;
+                if (attack.ailment != ActionClip.Ailment.None)
                 {
-                    ailment.Value = attack.ailment;
+                    Vector3 startPos = transform.position;
+                    Vector3 endPos = attacker.transform.position;
+                    startPos.y = 0;
+                    endPos.y = 0;
+                    ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
+                    ailmentChangedOnThisAttack = ailment.Value != attack.ailment;
+                    ailment.Value = attack.ailment;
+                }
+                else
+                {
+                    if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
+                    {
+                        StopCoroutine(ailmentResetCoroutine);
+                        ailment.Value = ActionClip.Ailment.None;
+                    }
+                }
+
+                if (ailmentChangedOnThisAttack)
+                {
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
+                            Debug.Log(Time.time + " Knockdown reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
+                            Debug.Log(Time.time + " Knockup reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
+                            Debug.Log(Time.time + " Stun reset called");
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
