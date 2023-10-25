@@ -24,9 +24,6 @@ namespace Vi.Core
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
 
-        [Header("Ailment Settings")]
-        [SerializeField] private float knockdownDuration = 2;
-
         public enum Status
         {
             damageMultiplier,
@@ -213,6 +210,7 @@ namespace Vi.Core
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
 
+            // Ailments
             if (attack.ailment != ActionClip.Ailment.None)
             {
                 Vector3 startPos = transform.position;
@@ -221,7 +219,17 @@ namespace Vi.Core
                 endPos.y = 0;
                 ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
-                ailment.Value = attack.ailment;
+                if (attack.ailment != ailment.Value)
+                {
+                    ailment.Value = attack.ailment;
+
+                    switch (ailment.Value)
+                    {
+                        case ActionClip.Ailment.Knockdown:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration));
+                            break;
+                    }
+                }
             }
         }
 
@@ -303,30 +311,23 @@ namespace Vi.Core
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
-        private Coroutine resetCoroutine;
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             GetComponentInChildren<Animator>().SetBool("CanResetAction", current == ActionClip.Ailment.None);
 
             if (!IsServer) { return; }
-            if (resetCoroutine != null) { StopCoroutine(resetCoroutine); }
-
-            switch (current)
-            {
-                case ActionClip.Ailment.Knockdown:
-                    resetCoroutine = StartCoroutine(ResetAilmentAfterTime(knockdownDuration));
-                    break;
-            }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
-        private const float recoveryTime = 1;
+        private const float recoveryTimeBuffer = 1;
+        private Coroutine ailmentResetCoroutine;
         private IEnumerator ResetAilmentAfterTime(float duration)
         {
-            SetInviniciblity(duration + recoveryTime);
+            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+            SetInviniciblity(duration + recoveryTimeBuffer);
             yield return new WaitForSeconds(duration);
             ailment.Value = ActionClip.Ailment.None;
         }

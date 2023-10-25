@@ -23,6 +23,7 @@ namespace Vi.Editor
         private SerializedProperty spMaxHitLimit;
         private SerializedProperty spIsBlockable;
         private SerializedProperty spAilment;
+        private SerializedProperty spAilmentDuration;
 
         private SerializedProperty spHitReactionClipType;
 
@@ -41,6 +42,7 @@ namespace Vi.Editor
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
             spIsBlockable = serializedObject.FindProperty("isBlockable");
             spAilment = serializedObject.FindProperty("ailment");
+            spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
 
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
         }
@@ -62,6 +64,13 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spAilment);
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                }
+
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -77,6 +86,14 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spAilment);
+
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                }
+                    
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
