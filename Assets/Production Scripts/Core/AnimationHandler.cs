@@ -161,8 +161,8 @@ namespace Vi.Core
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
-                networkRootMotion += animator.deltaPosition * weaponHandler.currentActionClip.rootMotionMulitplier;
-                localRootMotion += animator.deltaPosition * weaponHandler.currentActionClip.rootMotionMulitplier;
+                networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
+                localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
             }
         }
 

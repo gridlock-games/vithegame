@@ -16,20 +16,20 @@ namespace Vi.Core
 
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
-            if (parentWeaponHandler.currentActionClip.weaponBone != weaponBone) { return; }
+            if (parentWeaponHandler.CurrentActionClip.weaponBone != weaponBone) { return; }
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
                 if (hitCounter.ContainsKey(attributes))
                 {
-                    if (hitCounter[attributes] >= parentWeaponHandler.currentActionClip.maxHitLimit) { return; }
+                    if (hitCounter[attributes] >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
                 }
 
                 if (hitsThisFrame.Contains(attributes)) { return; }
                 
                 hitsThisFrame.Add(attributes);
                 attributes.ProcessMeleeHit(parentAttributes,
-                    parentWeaponHandler.currentActionClip,
+                    parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
@@ -50,9 +50,9 @@ namespace Vi.Core
 
             if (TryGetComponent(out BoxCollider boxCollider))
             {
-                if (parentWeaponHandler.currentActionClip)
+                if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.currentActionClip.weaponBone == weaponBone)
+                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
                     {
                         if (parentWeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;
@@ -79,9 +79,9 @@ namespace Vi.Core
             }
             else if (TryGetComponent(out SphereCollider sphereCollider))
             {
-                if (parentWeaponHandler.currentActionClip)
+                if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.currentActionClip.weaponBone == weaponBone)
+                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
                     {
                         if (parentWeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;

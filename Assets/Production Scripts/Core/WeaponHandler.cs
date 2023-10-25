@@ -93,11 +93,11 @@ namespace Vi.Core
             weaponInstances = instances;
         }
 
-        public ActionClip currentActionClip { get; private set; }
+        public ActionClip CurrentActionClip { get; private set; }
 
         public void SetActionClip(ActionClip actionClip)
         {
-            currentActionClip = actionClip;
+            CurrentActionClip = actionClip;
             foreach (GameObject weaponInstance in weaponInstances)
             {
                 weaponInstance.GetComponent<RuntimeWeapon>().ResetHitCounter();
@@ -110,10 +110,10 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (!currentActionClip) { currentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
+            if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
             if ((animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.IsInTransition(animator.GetLayerIndex("Actions")))
-                | currentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+                | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 IsBlocking = isBlocking.Value;
             }
@@ -123,20 +123,20 @@ namespace Vi.Core
             }
 
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack };
-            if (attackClipTypes.Contains(currentActionClip.GetClipType()))
+            if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
-                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionClip.name))
+                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
                     float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
-                    IsInRecovery = normalizedTime >= currentActionClip.recoveryNormalizedTime;
-                    IsAttacking = normalizedTime >= currentActionClip.attackingNormalizedTime & !IsInRecovery;
+                    IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
+                    IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
                 }
-                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(currentActionClip.name))
+                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
                     float normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
-                    IsInRecovery = normalizedTime >= currentActionClip.recoveryNormalizedTime;
-                    IsAttacking = normalizedTime >= currentActionClip.attackingNormalizedTime & !IsInRecovery;
+                    IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
+                    IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
                 }
                 else
