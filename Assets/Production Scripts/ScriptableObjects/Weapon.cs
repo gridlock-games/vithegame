@@ -123,8 +123,17 @@ namespace Vi.ScriptableObjects
         public enum InputAttackType
         {
             LightAttack,
-            HeavyAttack
+            HeavyAttack,
+            Ability1,
+            Ability2,
+            Ability3,
+            Ability4
         }
+
+        [SerializeField] private ActionClip ability1;
+        [SerializeField] private ActionClip ability2;
+        [SerializeField] private ActionClip ability3;
+        [SerializeField] private ActionClip ability4;
 
         public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
         {
@@ -135,6 +144,22 @@ namespace Vi.ScriptableObjects
             else if (inputAttackType == InputAttackType.HeavyAttack)
             {
                 return GetHeavyAttack(animator);
+            }
+            else if (inputAttackType == InputAttackType.Ability1)
+            {
+                return ability1;
+            }
+            else if (inputAttackType == InputAttackType.Ability2)
+            {
+                return ability2;
+            }
+            else if (inputAttackType == InputAttackType.Ability3)
+            {
+                return ability3;
+            }
+            else if (inputAttackType == InputAttackType.Ability4)
+            {
+                return ability4;
             }
             else
             {

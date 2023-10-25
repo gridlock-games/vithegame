@@ -39,7 +39,7 @@ namespace Vi.ScriptableObjects
 
         public float rootMotionMulitplier = 1;
 
-        public float agentStaminaDamage = 20;
+        public float agentStaminaCost = 20;
 
         public Weapon.WeaponBone weaponBone;
         public float attackingNormalizedTime = 0.25f;

@@ -12,7 +12,7 @@ namespace Vi.Editor
     {
         private SerializedProperty spClipType;
 
-        private SerializedProperty spAgentStaminaDamage;
+        private SerializedProperty spAgentStaminaCost;
         private SerializedProperty spRootMotionMulitplier;
 
         private SerializedProperty spWeaponBone;
@@ -33,7 +33,7 @@ namespace Vi.Editor
             spClipType = serializedObject.FindProperty("clipType");
             spRootMotionMulitplier = serializedObject.FindProperty("rootMotionMulitplier");
 
-            spAgentStaminaDamage = serializedObject.FindProperty("agentStaminaDamage");
+            spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
 
             spWeaponBone = serializedObject.FindProperty("weaponBone");
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
@@ -56,7 +56,7 @@ namespace Vi.Editor
 
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Dodge)
             {
-                EditorGUILayout.PropertyField(spAgentStaminaDamage);
+                EditorGUILayout.PropertyField(spAgentStaminaCost);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
@@ -82,7 +82,7 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
-                EditorGUILayout.PropertyField(spAgentStaminaDamage);
+                EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);

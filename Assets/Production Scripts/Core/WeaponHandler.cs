@@ -170,22 +170,30 @@ namespace Vi.Core
 
         void OnAbility1()
         {
-
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability1, animator);
+            if (actionClip != null)
+                animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility2()
         {
-
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability2, animator);
+            if (actionClip != null)
+                animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility3()
         {
-
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability3, animator);
+            if (actionClip != null)
+                animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility4()
         {
-
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animator);
+            if (actionClip != null)
+                animationHandler.PlayAction(actionClip);
         }
 
         void OnReload()
