@@ -183,7 +183,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: CanResetAction
+    m_ConditionEvent: CanResetAilment
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 6358545565180582519}
@@ -350,7 +350,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 2
-    m_ConditionEvent: CanResetAction
+    m_ConditionEvent: CanResetAilment
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 6615991930389039573}
@@ -972,7 +972,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: CanResetAction
+  - m_Name: CanResetAilment
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -1638,7 +1638,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: CanResetAction
+    m_ConditionEvent: CanResetAilment
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -8812558500030469198}

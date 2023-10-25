@@ -16,6 +16,7 @@ namespace Vi.ArtificialIntelligence
         private AnimationHandler animationHandler;
         private Animator animator;
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
 
         private void Start()
         {
@@ -23,6 +24,7 @@ namespace Vi.ArtificialIntelligence
             animationHandler = GetComponentInChildren<AnimationHandler>();
             animator = GetComponentInChildren<Animator>();
             weaponHandler = GetComponent<WeaponHandler>();
+            attributes = GetComponent<Attributes>();
         }
 
         private void Update()
@@ -56,6 +58,11 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 characterController.Move(animationHandler.ApplyLocalRootMotion());
+            }
+
+            if (attributes.ShouldApplyAilmentRotation())
+            {
+                transform.rotation = attributes.GetAilmentRotation();
             }
         }
     }

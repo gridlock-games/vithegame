@@ -159,11 +159,13 @@ namespace Vi.Core
         private GlowRenderer glowRenderer;
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
+        private Animator animator;
         private void Awake()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
+            animator = GetComponentInChildren<Animator>();
         }
 
         public bool IsInvincible { get; private set; }
@@ -227,6 +229,18 @@ namespace Vi.Core
                     {
                         case ActionClip.Ailment.Knockdown:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration));
+                            break;
+                        //case ActionClip.Ailment.Knockup:
+                        //    break;
+                        case ActionClip.Ailment.Stun:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
+                            break;
+                        case ActionClip.Ailment.Stagger:
+                            break;
+                        //case ActionClip.Ailment.Pull:
+                        //    break;
+                        default:
+                            Debug.LogWarning(attack.ailment + " has not been implemented yet!");
                             break;
                     }
                 }
@@ -313,7 +327,7 @@ namespace Vi.Core
 
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
-            GetComponentInChildren<Animator>().SetBool("CanResetAction", current == ActionClip.Ailment.None);
+            animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
 
             if (!IsServer) { return; }
         }
@@ -322,13 +336,19 @@ namespace Vi.Core
         public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
-        private const float recoveryTimeBuffer = 1;
+        private const float recoveryTimeInvincibilityBuffer = 1;
         private Coroutine ailmentResetCoroutine;
         private IEnumerator ResetAilmentAfterTime(float duration)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            SetInviniciblity(duration + recoveryTimeBuffer);
+            SetInviniciblity(duration + recoveryTimeInvincibilityBuffer);
             yield return new WaitForSeconds(duration);
+            ailment.Value = ActionClip.Ailment.None;
+        }
+
+        private IEnumerator ResetAilmentAfterEmptyStateIsReached()
+        {
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
         }
     }
