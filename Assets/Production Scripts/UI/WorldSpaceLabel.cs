@@ -45,6 +45,8 @@ namespace Vi.UI
 
         private void LateUpdate()
         {
+            nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
+
             Vector3 localScaleTarget = Vector3.zero;
             if (Camera.main)
             {
