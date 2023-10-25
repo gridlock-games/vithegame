@@ -59,7 +59,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment currentAilment)
+        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
             HitLocation hitLocation;
             if (attackAngle <= 45.00f && attackAngle >= -45.00f)
@@ -89,10 +89,10 @@ namespace Vi.ScriptableObjects
                 // Block the attack
                 hitReaction = hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
-            else if (currentAilment != attack.ailment & attack.ailment != ActionClip.Ailment.None)
+            else if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
             {
                 // Find the start reaction for the attack's ailment
-                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == attack.ailment & !item.shouldAlreadyHaveAilment);
+                hitReaction = hitReactions.Find(item => item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
             }
             else if (currentAilment != ActionClip.Ailment.None)
             {

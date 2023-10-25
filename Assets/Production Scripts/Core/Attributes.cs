@@ -193,7 +193,8 @@ namespace Vi.Core
                 StartCoroutine(ResetStaggerBool());
             }
 
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, ailment.Value);
+            ActionClip.Ailment attackAilment = attack.ailment;
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
@@ -213,10 +214,10 @@ namespace Vi.Core
             AddDefense(-attack.defenseDamage);
 
             // Ailments
-            if (attack.ailment != ailment.Value)
+            if (attackAilment != ailment.Value)
             {
                 bool ailmentChangedOnThisAttack = false;
-                if (attack.ailment != ActionClip.Ailment.None)
+                if (attackAilment != ActionClip.Ailment.None)
                 {
                     Vector3 startPos = transform.position;
                     Vector3 endPos = attacker.transform.position;
@@ -224,8 +225,8 @@ namespace Vi.Core
                     endPos.y = 0;
                     ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
-                    ailmentChangedOnThisAttack = ailment.Value != attack.ailment;
-                    ailment.Value = attack.ailment;
+                    ailmentChangedOnThisAttack = ailment.Value != attackAilment;
+                    ailment.Value = attackAilment;
                 }
                 else // If this attack's ailment is none
                 {
@@ -255,7 +256,7 @@ namespace Vi.Core
                         //case ActionClip.Ailment.Pull:
                         //    break;
                         default:
-                            Debug.LogWarning(attack.ailment + " has not been implemented yet!");
+                            Debug.LogWarning(attackAilment + " has not been implemented yet!");
                             break;
                     }
                 }
