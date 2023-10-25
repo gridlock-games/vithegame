@@ -8,9 +8,12 @@ namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<Attributes> hitsThisFrame = new List<Attributes>();
+        private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
+        private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
+
+        private void ProcessTriggerEvent(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
@@ -25,9 +28,9 @@ namespace Vi.Core
                     if (hitCounter[attributes] >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
                 }
 
-                if (hitsThisFrame.Contains(attributes)) { return; }
-                
-                hitsThisFrame.Add(attributes);
+                if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
+
+                hitsOnThisPhysicsUpdate.Add(attributes);
                 attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.CurrentActionClip,
                     this,
@@ -40,8 +43,8 @@ namespace Vi.Core
         private bool clearListNextUpdate;
         private void FixedUpdate()
         {
-            if (clearListNextUpdate) { hitsThisFrame.Clear(); }
-            clearListNextUpdate = hitsThisFrame.Count > 0;
+            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
+            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
         }
 
         private void OnDrawGizmos()
