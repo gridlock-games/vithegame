@@ -251,19 +251,19 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterTime(attack.ailmentDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
                             break;
                         case ActionClip.Ailment.Pull:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterEmptyStateIsReached());
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
                             break;
                         default:
                             Debug.LogWarning(attackAilment + " has not been implemented yet!");
@@ -369,7 +369,7 @@ namespace Vi.Core
 
         private const float recoveryTimeInvincibilityBuffer = 1;
         private Coroutine ailmentResetCoroutine;
-        private IEnumerator ResetAilmentAfterTime(float duration, bool shouldMakeInvincible)
+        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
             if (shouldMakeInvincible) { SetInviniciblity(duration); }
@@ -378,8 +378,9 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        private IEnumerator ResetAilmentAfterEmptyStateIsReached()
+        private IEnumerator ResetAilmentAfterAnimationPlays()
         {
+            yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
             yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
         }
