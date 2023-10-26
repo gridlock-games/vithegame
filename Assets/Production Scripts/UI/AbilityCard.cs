@@ -22,16 +22,39 @@ namespace Vi.UI
             this.keybindText.text = keybindText;
         }
 
+        private Image borderImage;
+        private Color originalBorderImageColor;
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
         private void Start()
         {
+            borderImage = GetComponent<Image>();
+            originalBorderImageColor = borderImage.color;
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = GetComponentInParent<Attributes>();
         }
 
         private void Update()
         {
             if (ability == null) { return; }
             cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
+
+            if (ability.agentStaminaCost > attributes.GetStamina())
+            {
+                borderImage.color = Color.red;
+            }
+            else if (ability.agentDefenseCost > attributes.GetDefense())
+            {
+                borderImage.color = Color.red;
+            }
+            else if (ability.agentRageCost > attributes.GetRage())
+            {
+                borderImage.color = Color.red;
+            }
+            else
+            {
+                borderImage.color = originalBorderImageColor;
+            }
         }
     }
 }
