@@ -65,13 +65,8 @@ namespace Vi.ScriptableObjects
 
         public DodgeLock dodgeLock = DodgeLock.None;
 
-        //public enum AnimCancellingType
-        //{
-        //    None,
-        //    Cancel_NormalAtk,
-        //    Cancel_AbilityAtk,
-        //    Cancel_HeavyAtk,
-        //    Cancel_Dodge
-        //}
+        public bool canCancelLightAttacks;
+        public bool canCancelHeavyAttacks;
+        public bool canCancelAbilities;
     }
 }

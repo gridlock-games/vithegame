@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 // Define the namespace for the script
 namespace Vi.Core
@@ -33,6 +34,11 @@ namespace Vi.Core
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+            {
+                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+            }
+
             // If we are not at rest and the last clip was a dodge, don't play this clip
             if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") | animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
@@ -49,6 +55,25 @@ namespace Vi.Core
                     {
                         if (weaponHandler.IsInRecovery) { return; }
                     }
+                }
+                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+                {
+                    if (!actionClip.canCancelLightAttacks)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
+                    }
+                    if (!actionClip.canCancelHeavyAttacks)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack) { return; }
+                    }
+                    if (!actionClip.canCancelAbilities)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                    }
+                }
+                else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                {
+                    if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                 }
             }
 
@@ -76,8 +101,8 @@ namespace Vi.Core
                 if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
                 if (actionClip.agentRageCost > attributes.GetRage()) { return; }
                 attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddStamina(-actionClip.agentDefenseCost);
-                attributes.AddStamina(-actionClip.agentRageCost);
+                attributes.AddDefense(-actionClip.agentDefenseCost);
+                attributes.AddRage(-actionClip.agentRageCost);
             }
 
             // Set the current action clip for the weapon handler
@@ -90,7 +115,6 @@ namespace Vi.Core
             }
             else
             {
-                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
                 animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
             }
 

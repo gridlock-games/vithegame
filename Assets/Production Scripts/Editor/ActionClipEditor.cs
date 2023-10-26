@@ -32,6 +32,9 @@ namespace Vi.Editor
         private SerializedProperty spAilment;
         private SerializedProperty spAilmentDuration;
         private SerializedProperty spDodgeLock;
+        private SerializedProperty spCanCancelLightAttacks;
+        private SerializedProperty spCanCancelHeavyAttacks;
+        private SerializedProperty spCanCancelAbilities;
 
         private void OnEnable()
         {
@@ -55,6 +58,9 @@ namespace Vi.Editor
             spAilment = serializedObject.FindProperty("ailment");
             spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
+            spCanCancelLightAttacks = serializedObject.FindProperty("canCancelLightAttacks");
+            spCanCancelHeavyAttacks = serializedObject.FindProperty("canCancelHeavyAttacks");
+            spCanCancelAbilities = serializedObject.FindProperty("canCancelAbilities");
         }
 
         public override void OnInspectorGUI()
@@ -138,6 +144,9 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
+                EditorGUILayout.PropertyField(spCanCancelLightAttacks);
+                EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
+                EditorGUILayout.PropertyField(spCanCancelAbilities);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
