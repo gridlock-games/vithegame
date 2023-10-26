@@ -130,6 +130,16 @@ namespace Vi.ScriptableObjects
             Ability4
         }
 
+        public List<Sprite> GetAbilitySprites()
+        {
+            List<Sprite> spriteList = new List<Sprite>();
+            spriteList.Add(ability1.abilityImageIcon);
+            spriteList.Add(ability2.abilityImageIcon);
+            spriteList.Add(ability3.abilityImageIcon);
+            spriteList.Add(ability4.abilityImageIcon);
+            return spriteList;
+        }
+
         [SerializeField] private ActionClip ability1;
         [SerializeField] private ActionClip ability2;
         [SerializeField] private ActionClip ability3;

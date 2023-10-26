@@ -36,6 +36,8 @@ namespace Vi.Editor
         private SerializedProperty spCanCancelHeavyAttacks;
         private SerializedProperty spCanCancelAbilities;
 
+        private SerializedProperty spAbilityImageIcon;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -61,6 +63,7 @@ namespace Vi.Editor
             spCanCancelLightAttacks = serializedObject.FindProperty("canCancelLightAttacks");
             spCanCancelHeavyAttacks = serializedObject.FindProperty("canCancelHeavyAttacks");
             spCanCancelAbilities = serializedObject.FindProperty("canCancelAbilities");
+            spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
         }
 
         public override void OnInspectorGUI()
@@ -125,6 +128,8 @@ namespace Vi.Editor
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Ability)
             {
+                EditorGUILayout.PropertyField(spAbilityImageIcon);
+
                 EditorGUILayout.PropertyField(spWeaponBone);
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spAgentDefenseCost);

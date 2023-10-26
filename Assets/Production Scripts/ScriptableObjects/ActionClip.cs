@@ -68,5 +68,7 @@ namespace Vi.ScriptableObjects
         public bool canCancelLightAttacks;
         public bool canCancelHeavyAttacks;
         public bool canCancelAbilities;
+
+        public Sprite abilityImageIcon;
     }
 }
