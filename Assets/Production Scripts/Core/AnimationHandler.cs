@@ -97,6 +97,7 @@ namespace Vi.Core
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
+                if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
                 if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
                 if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
                 if (actionClip.agentRageCost > attributes.GetRage()) { return; }

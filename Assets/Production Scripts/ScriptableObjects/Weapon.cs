@@ -130,20 +130,74 @@ namespace Vi.ScriptableObjects
             Ability4
         }
 
-        public List<Sprite> GetAbilitySprites()
+        public List<ActionClip> GetAbilities()
         {
-            List<Sprite> spriteList = new List<Sprite>();
-            spriteList.Add(ability1.abilityImageIcon);
-            spriteList.Add(ability2.abilityImageIcon);
-            spriteList.Add(ability3.abilityImageIcon);
-            spriteList.Add(ability4.abilityImageIcon);
-            return spriteList;
+            List<ActionClip> abilityList = new List<ActionClip>();
+            abilityList.Add(ability1);
+            abilityList.Add(ability2);
+            abilityList.Add(ability3);
+            abilityList.Add(ability4);
+            return abilityList;
         }
 
         [SerializeField] private ActionClip ability1;
         [SerializeField] private ActionClip ability2;
         [SerializeField] private ActionClip ability3;
         [SerializeField] private ActionClip ability4;
+
+        private float lastAbility1ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility2ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility3ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility4ActivateTime = Mathf.NegativeInfinity;
+
+        public void StartAbilityCooldown(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                lastAbility1ActivateTime = Time.time;
+            }
+            else if (ability == ability2)
+            {
+                lastAbility2ActivateTime = Time.time;
+            }
+            else if (ability == ability3)
+            {
+                lastAbility3ActivateTime = Time.time;
+            }
+            else if (ability == ability4)
+            {
+                lastAbility4ActivateTime = Time.time;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+        }
+
+        public float GetAbilityCooldownProgress(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / ability1.abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability2)
+            {
+                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / ability2.abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability3)
+            {
+                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / ability3.abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability4)
+            {
+                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / ability4.abilityCooldownTime, 0, 1);
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
 
         public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
         {

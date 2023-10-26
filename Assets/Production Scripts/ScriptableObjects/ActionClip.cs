@@ -70,5 +70,6 @@ namespace Vi.ScriptableObjects
         public bool canCancelAbilities;
 
         public Sprite abilityImageIcon;
+        public float abilityCooldownTime = 5;
     }
 }

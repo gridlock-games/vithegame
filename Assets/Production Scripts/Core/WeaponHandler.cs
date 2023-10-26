@@ -102,6 +102,11 @@ namespace Vi.Core
             {
                 weaponInstance.GetComponent<RuntimeWeapon>().ResetHitCounter();
             }
+
+            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+            {
+                weaponInstance.StartAbilityCooldown(CurrentActionClip);
+            }
         }
 
         public bool IsInAnticipation { get; private set; }
