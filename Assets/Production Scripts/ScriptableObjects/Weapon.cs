@@ -8,8 +8,17 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "Weapon", menuName = "Production/Weapon")]
     public class Weapon : ScriptableObject
     {
+        [System.Serializable]
+        private class AttackSoundEffect
+        {
+            public WeaponBone weaponBone = WeaponBone.RightHand;
+            public AudioClip attackSoundEffect;
+        }
+
+        [SerializeField] private List<AttackSoundEffect> attackSoundEffects = new List<AttackSoundEffect>();
+        public AudioClip GetAttackSoundEffect(WeaponBone weaponBone) { return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect; }
+
         public AudioClip drawSoundEffect;
-        public AudioClip attackSoundEffect;
 
         [Header("Recieve Hit Effects")]
         public AudioClip hitAudioClip;

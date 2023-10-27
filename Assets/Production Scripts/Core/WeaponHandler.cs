@@ -140,6 +140,7 @@ namespace Vi.Core
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability };
             if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
+                bool lastIsAttacking = IsAttacking;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
                     float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
@@ -159,6 +160,11 @@ namespace Vi.Core
                     IsInAnticipation = false;
                     IsAttacking = false;
                     IsInRecovery = false;
+                }
+
+                if (IsAttacking & !lastIsAttacking)
+                {
+                    AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(CurrentActionClip.weaponBone), transform.position);
                 }
             }
             else
