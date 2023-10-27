@@ -382,32 +382,38 @@ namespace Vi.Core
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
-
-            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, value, duration, delay);
-            if (statuses.Contains(charStatus))
-            {
-                int index = statuses.IndexOf(charStatus);
-                statuses[index] = charStatus;
-            }
-            else
-            {
-                statuses.Add(charStatus);
-            }
+            statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay));
             return true;
         }
 
-        private bool TryRemoveStatus(ActionClip.Status status)
+        private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
-            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, 0, 0, 0);
-            if (!statuses.Contains(charStatus))
+            if (!statuses.Contains(statusPayload))
             {
                 return false;
             }
             else
             {
-                statuses.Remove(charStatus);
+                int indexToRemoveAt = -1;
+                for (int i = 0; i < statuses.Count; i++)
+                {
+                    if (statuses[i].status == statusPayload.status
+                        & statuses[i].value == statusPayload.value
+                        & statuses[i].duration == statusPayload.duration
+                        & statuses[i].delay == statusPayload.delay)
+                    { indexToRemoveAt = i; break; }
+                }
+
+                if (indexToRemoveAt > -1)
+                {
+                    statuses.RemoveAt(indexToRemoveAt);
+                }
+                else
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -444,38 +450,53 @@ namespace Vi.Core
                     damageMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReductionMultiplier:
                     yield return new WaitForSeconds(statusPayload.delay);
                     damageReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageReductionMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReceivedMultiplier:
                     yield return new WaitForSeconds(statusPayload.delay);
                     damageReceivedMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageReceivedMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healingMultiplier:
                     yield return new WaitForSeconds(statusPayload.delay);
                     healingMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     healingMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.defenseIncreaseMultiplier:
                     yield return new WaitForSeconds(statusPayload.delay);
                     defenseIncreaseMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     defenseIncreaseMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.defenseReductionMultiplier:
                     yield return new WaitForSeconds(statusPayload.delay);
                     defenseReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     defenseReductionMultiplier /= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    float elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration)
+                    {
+                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.poisoned:
                     break;
