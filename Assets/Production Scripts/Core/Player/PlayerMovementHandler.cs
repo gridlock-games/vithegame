@@ -206,7 +206,7 @@ namespace Vi.Player
         private Vector2 lookInput;
         void OnLook(InputValue value)
         {
-            lookInput = value.Get<Vector2>();
+            lookInput = value.Get<Vector2>() * (attributes.IsFeared() ? -1 : 1);
         }
 
         public Vector2 GetMoveInput() { return moveInput; }

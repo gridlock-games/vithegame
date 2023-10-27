@@ -547,7 +547,7 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 default:
-                    Debug.LogError(statusPayload.status + " has not been implemented for status add or value change");
+                    Debug.LogError(statusPayload.status + " has not been implemented!");
                     break;
             }
         }
