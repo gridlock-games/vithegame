@@ -40,7 +40,7 @@ namespace Vi.Player
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPos, attributes.GetAilmentRotation());
             }
 
-            Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
+            Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
             targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
@@ -57,11 +57,11 @@ namespace Vi.Player
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             if (animationHandler.ShouldApplyRootMotion())
             {
-                characterController.Move(rootMotion);
+                characterController.Move(attributes.IsRooted() ? Vector3.zero : rootMotion);
             }
             else
             {
-                characterController.Move(1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection);
+                characterController.Move(attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection);
             }
 
             Vector3 newPosition = transform.position;

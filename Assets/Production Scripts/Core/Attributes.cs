@@ -431,10 +431,10 @@ namespace Vi.Core
         public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
         private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
 
-        private bool rooted;
-        private bool silenced;
-        private bool fear;
-        private bool healing;
+        public bool IsRooted() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.rooted, 0, 0, 0)); }
+        public bool IsSilenced() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.silenced, 0, 0, 0)); }
+        public bool IsFeared() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.fear, 0, 0, 0)); }
+
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
             if (!IsServer) { return; }
@@ -525,10 +525,16 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.rooted:
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.silenced:
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.fear:
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healing:
                     elapsedTime = 0;

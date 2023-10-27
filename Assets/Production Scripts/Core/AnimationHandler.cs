@@ -31,8 +31,12 @@ namespace Vi.Core
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
         {
+            if (attributes.IsRooted()) { return; }
+
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+            
+            if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
