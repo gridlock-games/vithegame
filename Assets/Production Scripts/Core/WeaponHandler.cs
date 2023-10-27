@@ -110,9 +110,12 @@ namespace Vi.Core
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
             }
 
-            foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyOnActivate)
+            if (IsServer)
             {
-                attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
+                foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyOnActivate)
+                {
+                    attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
+                }
             }
         }
 

@@ -50,6 +50,9 @@ namespace Vi.Core
 
         public void AddHP(float amount)
         {
+            if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
+            if (amount > 0) { amount *= healingMultiplier; }
+
             if (HP.Value + amount > maxHP)
                 HP.Value = maxHP;
             else if (HP.Value + amount < 0)
@@ -73,6 +76,9 @@ namespace Vi.Core
 
         public void AddDefense(float amount, bool activateCooldown = true)
         {
+            if (amount < 0) { amount *= defenseReductionMultiplier; }
+            if (amount > 0) { amount *= defenseIncreaseMultiplier; }
+
             if (activateCooldown)
                 defenseDelayCooldown = defenseDelay;
 
@@ -195,12 +201,12 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock();
-                AddHP(-attack.damage * 0.7f);
+                AddHP(-attack.damage * 0.7f * attacker.damageMultiplier);
             }
             else // Not blocking
             {
                 RenderHit();
-                AddHP(-attack.damage);
+                AddHP(-attack.damage * attacker.damageMultiplier);
             }
 
             AddStamina(-attack.staminaDamage);
@@ -406,12 +412,12 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier;
-        private float damageReductionMultiplier;
-        private float damageReceivedMultiplier;
-        private float healingMultiplier;
-        private float defenseIncreaseMultiplier;
-        private float defenseReductionMultiplier;
+        private float damageMultiplier = 1;
+        private float damageReductionMultiplier = 1;
+        private float damageReceivedMultiplier = 1;
+        private float healingMultiplier = 1;
+        private float defenseIncreaseMultiplier = 1;
+        private float defenseReductionMultiplier = 1;
         private bool burning;
         private bool poisoned;
         private bool drain;
@@ -425,42 +431,71 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Value)
             {
-                switch (networkListEvent.Value.status)
-                {
-                    case ActionClip.Status.damageMultiplier:
-                        break;
-                    case ActionClip.Status.damageReductionMultiplier:
-                        break;
-                    case ActionClip.Status.damageReceivedMultiplier:
-                        break;
-                    case ActionClip.Status.healingMultiplier:
-                        break;
-                    case ActionClip.Status.defenseIncreaseMultiplier:
-                        break;
-                    case ActionClip.Status.defenseReductionMultiplier:
-                        break;
-                    case ActionClip.Status.burning:
-                        break;
-                    case ActionClip.Status.poisoned:
-                        break;
-                    case ActionClip.Status.drain:
-                        break;
-                    case ActionClip.Status.movementSpeedDecrease:
-                        break;
-                    case ActionClip.Status.movementSpeedIncrease:
-                        break;
-                    case ActionClip.Status.rooted:
-                        break;
-                    case ActionClip.Status.silenced:
-                        break;
-                    case ActionClip.Status.fear:
-                        break;
-                    case ActionClip.Status.healing:
-                        break;
-                    default:
-                        Debug.Log(networkListEvent.Value.status + " has not been implemented for status add or value change");
-                        break;
-                }
+                StartCoroutine(ProcessStatusChange(networkListEvent.Value));
+            }
+        }
+
+        private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
+        {
+            switch (statusPayload.status)
+            {
+                case ActionClip.Status.damageMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    damageMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    damageMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.damageReductionMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    damageReductionMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    damageReductionMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.damageReceivedMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    damageReceivedMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    damageReceivedMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.healingMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    healingMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    healingMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.defenseIncreaseMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    defenseIncreaseMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    defenseIncreaseMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.defenseReductionMultiplier:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    defenseReductionMultiplier *= statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    defenseReductionMultiplier /= statusPayload.value;
+                    break;
+                case ActionClip.Status.burning:
+                    break;
+                case ActionClip.Status.poisoned:
+                    break;
+                case ActionClip.Status.drain:
+                    break;
+                case ActionClip.Status.movementSpeedDecrease:
+                    break;
+                case ActionClip.Status.movementSpeedIncrease:
+                    break;
+                case ActionClip.Status.rooted:
+                    break;
+                case ActionClip.Status.silenced:
+                    break;
+                case ActionClip.Status.fear:
+                    break;
+                case ActionClip.Status.healing:
+                    break;
+                default:
+                    Debug.LogError(statusPayload.status + " has not been implemented for status add or value change");
+                    break;
             }
         }
     }
