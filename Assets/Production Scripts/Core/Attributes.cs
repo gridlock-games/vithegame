@@ -373,10 +373,50 @@ namespace Vi.Core
 
         private void OnStatusChange(NetworkListEvent<StatusPayload> networkListEvent)
         {
+            if (!IsServer) { return; }
 
+            if (networkListEvent.Type == NetworkListEvent<StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<StatusPayload>.EventType.Value)
+            {
+                switch (networkListEvent.Value.status)
+                {
+                    case ActionClip.Status.damageMultiplier:
+                        break;
+                    case ActionClip.Status.damageReductionMultiplier:
+                        break;
+                    case ActionClip.Status.damageReceivedMultiplier:
+                        break;
+                    case ActionClip.Status.healingMultiplier:
+                        break;
+                    case ActionClip.Status.defenseIncreaseMultiplier:
+                        break;
+                    case ActionClip.Status.defenseReductionMultiplier:
+                        break;
+                    case ActionClip.Status.burning:
+                        break;
+                    case ActionClip.Status.poisoned:
+                        break;
+                    case ActionClip.Status.drain:
+                        break;
+                    case ActionClip.Status.movementSpeedDecrease:
+                        break;
+                    case ActionClip.Status.movementSpeedIncrease:
+                        break;
+                    case ActionClip.Status.rooted:
+                        break;
+                    case ActionClip.Status.silenced:
+                        break;
+                    case ActionClip.Status.fear:
+                        break;
+                    case ActionClip.Status.healing:
+                        break;
+                    default:
+                        Debug.Log(networkListEvent.Value.status + " has not been implemented for status add or value change");
+                        break;
+                }
+            }
         }
 
-        private struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
+        public struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
         {
             public ActionClip.Status status;
             public float value;
@@ -418,12 +458,28 @@ namespace Vi.Core
             return true;
         }
 
-        public List<ActionClip.Status> GetActiveStatuses()
+        private bool TryRemoveStatus(ActionClip.Status status)
         {
-            List<ActionClip.Status> statusList = new List<ActionClip.Status>();
+            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
+
+            StatusPayload charStatus = new StatusPayload(status, 0, 0, 0);
+            if (!statuses.Contains(charStatus))
+            {
+                return false;
+            }
+            else
+            {
+                statuses.Remove(charStatus);
+            }
+            return true;
+        }
+
+        public List<StatusPayload> GetActiveStatuses()
+        {
+            List<StatusPayload> statusList = new List<StatusPayload>();
             foreach (StatusPayload statusPayload in statuses)
             {
-                statusList.Add(statusPayload.status);
+                statusList.Add(statusPayload);
             }
             return statusList;
         }

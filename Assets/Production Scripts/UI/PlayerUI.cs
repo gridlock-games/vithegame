@@ -4,12 +4,12 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
+using UnityEngine.UI;
 
 namespace Vi.UI
 {
     public class PlayerUI : MonoBehaviour
     {
-        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [Header("Ability Cards")]
@@ -17,13 +17,19 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability2;
         [SerializeField] private AbilityCard ability3;
         [SerializeField] private AbilityCard ability4;
+        [Header("Status UI")]
+        [SerializeField] private StatusImageReference statusImageReference;
+        [SerializeField] private Transform statusImageParent;
+        [SerializeField] private StatusIcon statusImagePrefab;
 
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
 
         private void Start()
         {
             playerCard.Initialize(GetComponentInParent<Attributes>());
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = GetComponentInParent<Attributes>();
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {
@@ -43,6 +49,25 @@ namespace Vi.UI
                 {
                     ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
                 }
+            }
+        }
+
+        private void Update()
+        {
+            //UpdateStatusUI();
+        }
+
+        void UpdateStatusUI()
+        {
+            foreach (Transform child in statusImageParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
+            {
+                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
             }
         }
     }

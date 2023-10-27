@@ -24,13 +24,19 @@ namespace Vi.UI
         [Header("Status UI")]
         [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
-        [SerializeField] private GameObject statusImagePrefab;
+        [SerializeField] private StatusIcon statusImagePrefab;
 
         private Attributes attributes;
 
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
+        }
+
+        private PlayerUI playerUI;
+        private void Start()
+        {
+            playerUI = GetComponentInParent<PlayerUI>();
         }
 
         private const float fillSpeed = 4;
@@ -48,20 +54,20 @@ namespace Vi.UI
             interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
-            UpdateStatusUI();
+            //UpdateStatusUI();
         }
 
-        public void UpdateStatusUI()
+        void UpdateStatusUI()
         {
             foreach (Transform child in statusImageParent)
             {
                 Destroy(child.gameObject);
             }
 
-            foreach (ActionClip.Status status in attributes.GetActiveStatuses())
+            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
             {
-                GameObject statusImage = Instantiate(statusImagePrefab, statusImageParent);
-                statusImage.GetComponent<Image>().sprite = statusImageReference.GetStatusIcon(status);
+                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
             }
         }
     }

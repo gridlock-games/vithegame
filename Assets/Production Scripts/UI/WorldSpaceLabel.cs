@@ -23,7 +23,7 @@ namespace Vi.UI
         [Header("Status UI")]
         [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
-        [SerializeField] private GameObject statusImagePrefab;
+        [SerializeField] private StatusIcon statusImagePrefab;
 
         private Attributes attributes;
         private Renderer rendererToFollow;
@@ -88,7 +88,7 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
 
-            UpdateStatusUI();
+            //UpdateStatusUI();
         }
 
         void UpdateStatusUI()
@@ -98,10 +98,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            foreach (ActionClip.Status status in attributes.GetActiveStatuses())
+            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
             {
-                GameObject statusImage = Instantiate(statusImagePrefab, statusImageParent);
-                statusImage.GetComponent<Image>().sprite = statusImageReference.GetStatusIcon(status);
+                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
             }
         }
     }
