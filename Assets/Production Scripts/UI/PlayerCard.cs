@@ -65,11 +65,11 @@ namespace Vi.UI
             interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
-            if (playerUI)
+            if (!playerUI)
             {
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
+                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
                 }
             }
         }

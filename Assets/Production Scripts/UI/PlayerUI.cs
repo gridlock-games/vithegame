@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
-using System.Linq;
+using Unity.Netcode;
 using TMPro;
 
 namespace Vi.UI
@@ -71,12 +71,13 @@ namespace Vi.UI
 
         private void Update()
         {
-            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
-
             foreach (StatusIcon statusIcon in statusIcons)
             {
-                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
+                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
+
+            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
+            pingDisplay.SetText("Ping: " + attributes.GetRoundTripTime().ToString());
         }
 
         private float frameCount;

@@ -149,7 +149,7 @@ namespace Vi.Core
             animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             animator = GetComponentInChildren<Animator>();
-            statuses = new NetworkList<StatusPayload>();
+            statuses = new NetworkList<ActionClip.StatusPayload>();
         }
 
         public bool IsInvincible { get; private set; }
@@ -292,6 +292,10 @@ namespace Vi.Core
 
         [ClientRpc] private void RenderBlockClientRpc() { glowRenderer.RenderBlock(); }
 
+        public ulong GetRoundTripTime() { return roundTripTime.Value; }
+
+        private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
         private void Update()
         {
             glowRenderer.RenderInvincible(IsInvincible);
@@ -310,6 +314,8 @@ namespace Vi.Core
             {
                 TryAddStatus(status, 1, 1, 0);
             }
+
+            roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
         }
 
         private float staminaDelayCooldown;
@@ -369,13 +375,13 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        private NetworkList<StatusPayload> statuses;
+        private NetworkList<ActionClip.StatusPayload> statuses;
 
-        private void OnStatusChange(NetworkListEvent<StatusPayload> networkListEvent)
+        private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
             if (!IsServer) { return; }
 
-            if (networkListEvent.Type == NetworkListEvent<StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<StatusPayload>.EventType.Value)
+            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Value)
             {
                 switch (networkListEvent.Value.status)
                 {
@@ -416,36 +422,11 @@ namespace Vi.Core
             }
         }
 
-        public struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
-        {
-            public ActionClip.Status status;
-            public float value;
-            public float duration;
-            public float delay;
-
-            public StatusPayload(ActionClip.Status status, float value, float duration, float delay)
-            {
-                this.status = status;
-                this.value = value;
-                this.duration = duration;
-                this.delay = delay;
-            }
-
-            public bool Equals(StatusPayload other) { return status == other.status; }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref value);
-                serializer.SerializeValue(ref duration);
-                serializer.SerializeValue(ref delay);
-            }
-        }
-
         private bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
 
-            StatusPayload charStatus = new StatusPayload(status, value, duration, delay);
+            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, value, duration, delay);
             if (statuses.Contains(charStatus))
             {
                 int index = statuses.IndexOf(charStatus);
@@ -462,7 +443,7 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
-            StatusPayload charStatus = new StatusPayload(status, 0, 0, 0);
+            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, 0, 0, 0);
             if (!statuses.Contains(charStatus))
             {
                 return false;
@@ -474,6 +455,6 @@ namespace Vi.Core
             return true;
         }
 
-        public NetworkList<StatusPayload> GetActiveStatuses() { return statuses; }
+        public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
     }
 }

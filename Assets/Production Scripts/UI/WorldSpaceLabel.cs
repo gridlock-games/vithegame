@@ -103,7 +103,7 @@ namespace Vi.UI
 
             foreach (StatusIcon statusIcon in statusIcons)
             {
-                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
+                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
         }
     }

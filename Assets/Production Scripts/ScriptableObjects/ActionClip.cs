@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.ScriptableObjects
 {
@@ -49,6 +50,32 @@ namespace Vi.ScriptableObjects
             silenced,
             fear,
             healing
+        }
+
+        [System.Serializable]
+        public struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
+        {
+            public Status status;
+            public float value;
+            public float duration;
+            public float delay;
+
+            public StatusPayload(Status status, float value, float duration, float delay)
+            {
+                this.status = status;
+                this.value = value;
+                this.duration = duration;
+                this.delay = delay;
+            }
+
+            public bool Equals(StatusPayload other) { return status == other.status; }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref value);
+                serializer.SerializeValue(ref duration);
+                serializer.SerializeValue(ref delay);
+            }
         }
 
         [SerializeField] private ClipType clipType;
