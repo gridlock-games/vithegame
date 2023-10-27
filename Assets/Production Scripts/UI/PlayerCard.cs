@@ -39,7 +39,7 @@ namespace Vi.UI
             playerUI = GetComponentInParent<PlayerUI>();
         }
 
-        private const float fillSpeed = 4;
+        public const float fillSpeed = 4;
         private void Update()
         {
             if (!attributes) { return; }

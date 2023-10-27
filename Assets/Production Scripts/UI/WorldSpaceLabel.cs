@@ -19,6 +19,7 @@ namespace Vi.UI
         [SerializeField] private Text nameDisplay;
         [SerializeField] private Image nameBackground;
         [SerializeField] private Image healthFillImage;
+        [SerializeField] private Image interimHealthFillImage;
 
         [Header("Status UI")]
         [SerializeField] private StatusImageReference statusImageReference;
@@ -87,6 +88,7 @@ namespace Vi.UI
             }
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
 
             //UpdateStatusUI();
         }
