@@ -85,10 +85,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522d8de94b0f84e4188f4482edf2e4d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHUDPrefab: {fileID: 2452549437775322352, guid: e51f855524f85c9408e42ac5a8fc5a7c,
+  playerUIPrefab: {fileID: 2452549437775322352, guid: e51f855524f85c9408e42ac5a8fc5a7c,
     type: 3}
-  scoreboardPrefab: {fileID: 0}
-  inventoryPrefab: {fileID: 0}
   pausePrefab: {fileID: 7309343886950099489, guid: d228d73cb92b5344589d4bdcbcc33e48,
     type: 3}
 --- !u!143 &3945128955595459576
@@ -196,7 +194,6 @@ MonoBehaviour:
   defenseDelay: 1
   maxRage: 100
   rageRecoveryRate: 0
-  knockdownDuration: 2
 --- !u!1 &3945128956082217898
 GameObject:
   m_ObjectHideFlags: 0

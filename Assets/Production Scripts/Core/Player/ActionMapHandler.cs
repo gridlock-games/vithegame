@@ -8,14 +8,14 @@ namespace Vi.Player
 {
     public class ActionMapHandler : MonoBehaviour
     {
-        [SerializeField] private GameObject playerHUDPrefab;
+        [SerializeField] private GameObject playerUIPrefab;
 
-        private GameObject playerHUD;
+        private GameObject playerUIInstance;
         private PlayerInput playerInput;
 
         private void OnEnable()
         {
-            playerHUD = Instantiate(playerHUDPrefab, transform);
+            playerUIInstance = Instantiate(playerUIPrefab, transform);
             playerInput = GetComponent<PlayerInput>();
             if (playerInput.currentActionMap.name == "Base")
                 Cursor.lockState = CursorLockMode.Locked;
@@ -59,13 +59,13 @@ namespace Vi.Player
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 pauseObject.GetComponent<Menu>().DestroyAllMenus();
-                playerHUD.SetActive(true);
+                playerUIInstance.SetActive(true);
                 playerInput.SwitchCurrentActionMap("Base");
             }
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                playerHUD.SetActive(false);
+                playerUIInstance.SetActive(false);
                 pauseObject = Instantiate(pausePrefab, transform);
                 playerInput.SwitchCurrentActionMap("Menu");
             }

@@ -71,7 +71,7 @@ namespace Vi.UI
                 }
 
                 Vector3 pos = rendererToFollow.bounds.center;
-                pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor;
+                pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
                 transform.position = pos;
             }
             else
@@ -88,6 +88,11 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
 
+            UpdateStatusUI();
+        }
+
+        void UpdateStatusUI()
+        {
             foreach (Transform child in statusImageParent)
             {
                 Destroy(child.gameObject);

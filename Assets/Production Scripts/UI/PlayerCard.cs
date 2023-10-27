@@ -48,6 +48,11 @@ namespace Vi.UI
             interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
+            UpdateStatusUI();
+        }
+
+        public void UpdateStatusUI()
+        {
             foreach (Transform child in statusImageParent)
             {
                 Destroy(child.gameObject);

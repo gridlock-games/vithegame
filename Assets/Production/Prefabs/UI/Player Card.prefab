@@ -469,8 +469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c048147a016cf2f47aff91701dbda92a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statusImageReference: {fileID: 11400000, guid: 2f04cb7a850437f4986dd61c0b600f84,
-    type: 2}
   healthFillImage: {fileID: 8825118740436756027}
   staminaFillImage: {fileID: 8777073071513388713}
   defenseFillImage: {fileID: 2717308279120147160}
@@ -479,6 +477,8 @@ MonoBehaviour:
   interimStaminaFillImage: {fileID: 6837854231243790151}
   interimDefenseFillImage: {fileID: 1128668944168095683}
   interimRageFillImage: {fileID: 1679784692164774126}
+  statusImageReference: {fileID: 11400000, guid: 2f04cb7a850437f4986dd61c0b600f84,
+    type: 2}
   statusImageParent: {fileID: 5289129700564882648}
   statusImagePrefab: {fileID: 8514816889173562316, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}
@@ -1764,7 +1764,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 3
+  m_ChildAlignment: 4
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1

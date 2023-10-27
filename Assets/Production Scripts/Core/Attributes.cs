@@ -102,6 +102,7 @@ namespace Vi.Core
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
+            statuses.OnListChanged += OnStatusChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
         }
@@ -112,6 +113,7 @@ namespace Vi.Core
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
+            statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
         }
@@ -303,6 +305,11 @@ namespace Vi.Core
             UpdateStamina();
             UpdateDefense();
             UpdateRage();
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                TryAddStatus(status, 1, 1, 0);
+            }
         }
 
         private float staminaDelayCooldown;
@@ -364,6 +371,11 @@ namespace Vi.Core
 
         private NetworkList<StatusPayload> statuses;
 
+        private void OnStatusChange(NetworkListEvent<StatusPayload> networkListEvent)
+        {
+
+        }
+
         private struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
         {
             public ActionClip.Status status;
@@ -387,6 +399,23 @@ namespace Vi.Core
                 serializer.SerializeValue(ref duration);
                 serializer.SerializeValue(ref delay);
             }
+        }
+
+        private bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
+        {
+            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
+
+            StatusPayload charStatus = new StatusPayload(status, value, duration, delay);
+            if (statuses.Contains(charStatus))
+            {
+                int index = statuses.IndexOf(charStatus);
+                statuses[index] = charStatus;
+            }
+            else
+            {
+                statuses.Add(charStatus);
+            }
+            return true;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()
