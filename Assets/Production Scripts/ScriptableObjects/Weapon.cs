@@ -8,6 +8,18 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "Weapon", menuName = "Production/Weapon")]
     public class Weapon : ScriptableObject
     {
+        public AudioClip drawSoundEffect;
+        public AudioClip attackSoundEffect;
+
+        [Header("Recieve Hit Effects")]
+        public AudioClip hitAudioClip;
+        public AudioClip knockbackHitAudioClip;
+        public GameObject hitVFXPrefab;
+
+        [Header("Block Effects")]
+        public AudioClip blockAudioClip;
+        public GameObject blockVFXPrefab;
+
         public enum WeaponBone
         {
             Root = -1,
@@ -89,28 +101,32 @@ namespace Vi.ScriptableObjects
                 // Block the attack
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
-            else if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
+            
+            if (hitReaction == null)// If attack isn't blockable
             {
-                // Find the start reaction for the attack's ailment
-                hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
-            }
-            else if (currentAilment != ActionClip.Ailment.None)
-            {
-                // Find a hit reaction for an in progress ailment
-                hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
-
-                // If we can't find an in progress reaction, just get a normal reaction
-                if (hitReaction == null)
+                if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
+                    // Find the start reaction for the attack's ailment
+                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                }
+                else if (currentAilment != ActionClip.Ailment.None)
+                {
+                    // Find a hit reaction for an in progress ailment
+                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
+
+                    // If we can't find an in progress reaction, just get a normal reaction
+                    if (hitReaction == null)
+                    {
+                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                    }
+                }
+                else
+                {
+                    // Find a normal hit reaction
                     hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
                 }
             }
-            else
-            {
-                // Find a normal hit reaction
-                hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
-            }
-            
+
             if (hitReaction == null)
             {
                 Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + attackAilment + " blocking: " + isBlocking);
