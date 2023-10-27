@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
     public class PlayerCard : MonoBehaviour
     {
+        [SerializeField] private StatusImageReference statusImageReference;
+
         [Header("True Value Images")]
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image staminaFillImage;

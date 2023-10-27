@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class PlayerUI : MonoBehaviour
     {
+        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [Header("Ability Cards")]

@@ -24,25 +24,6 @@ namespace Vi.Core
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
 
-        public enum Status
-        {
-            damageMultiplier,
-            damageReductionMultiplier,
-            damageReceivedMultiplier,
-            healingMultiplier,
-            defenseIncreaseMultiplier,
-            defenseReductionMultiplier,
-            burning,
-            poisoned,
-            drain,
-            movementSpeedDecrease,
-            movementSpeedIncrease,
-            rooted,
-            silenced,
-            fear,
-            healing
-        }
-
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
         public float GetMaxDefense() { return maxDefense; }
@@ -166,6 +147,7 @@ namespace Vi.Core
             animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             animator = GetComponentInChildren<Animator>();
+            statuses = new NetworkList<StatusPayload>();
         }
 
         public bool IsInvincible { get; private set; }
@@ -378,6 +360,33 @@ namespace Vi.Core
             yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
             yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
+        }
+
+        private NetworkList<StatusPayload> statuses;
+
+        private struct StatusPayload : INetworkSerializable, System.IEquatable<StatusPayload>
+        {
+            public ActionClip.Status status;
+            public float value;
+            public float duration;
+            public float delay;
+
+            public StatusPayload(ActionClip.Status status, float value, float duration, float delay)
+            {
+                this.status = status;
+                this.value = value;
+                this.duration = duration;
+                this.delay = delay;
+            }
+
+            public bool Equals(StatusPayload other) { return status == other.status; }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref value);
+                serializer.SerializeValue(ref duration);
+                serializer.SerializeValue(ref delay);
+            }
         }
     }
 }

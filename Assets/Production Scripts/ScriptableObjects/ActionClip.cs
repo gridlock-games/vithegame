@@ -32,6 +32,25 @@ namespace Vi.ScriptableObjects
             Pull
         }
 
+        public enum Status
+        {
+            damageMultiplier,
+            damageReductionMultiplier,
+            damageReceivedMultiplier,
+            healingMultiplier,
+            defenseIncreaseMultiplier,
+            defenseReductionMultiplier,
+            burning,
+            poisoned,
+            drain,
+            movementSpeedDecrease,
+            movementSpeedIncrease,
+            rooted,
+            silenced,
+            fear,
+            healing
+        }
+
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
 

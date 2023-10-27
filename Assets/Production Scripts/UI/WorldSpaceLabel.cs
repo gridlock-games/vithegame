@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
@@ -18,7 +19,7 @@ namespace Vi.UI
         [SerializeField] private Text nameDisplay;
         [SerializeField] private Image nameBackground;
         [SerializeField] private Image healthFillImage;
-        [SerializeField] private GameObject spectatorHotKeyInstance;
+        [SerializeField] private StatusImageReference statusImageReference;
 
         private Attributes attributes;
         private Renderer rendererToFollow;
