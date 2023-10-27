@@ -499,8 +499,26 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.poisoned:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration)
+                    {
+                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.drain:
+                    yield return new WaitForSeconds(statusPayload.delay);
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration)
+                    {
+                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
                     break;
