@@ -388,5 +388,15 @@ namespace Vi.Core
                 serializer.SerializeValue(ref delay);
             }
         }
+
+        public List<ActionClip.Status> GetActiveStatuses()
+        {
+            List<ActionClip.Status> statusList = new List<ActionClip.Status>();
+            foreach (StatusPayload statusPayload in statuses)
+            {
+                statusList.Add(statusPayload.status);
+            }
+            return statusList;
+        }
     }
 }

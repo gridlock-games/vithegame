@@ -9,8 +9,6 @@ namespace Vi.UI
 {
     public class PlayerCard : MonoBehaviour
     {
-        [SerializeField] private StatusImageReference statusImageReference;
-
         [Header("True Value Images")]
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image staminaFillImage;
@@ -22,6 +20,11 @@ namespace Vi.UI
         [SerializeField] private Image interimStaminaFillImage;
         [SerializeField] private Image interimDefenseFillImage;
         [SerializeField] private Image interimRageFillImage;
+
+        [Header("Status UI")]
+        [SerializeField] private StatusImageReference statusImageReference;
+        [SerializeField] private Transform statusImageParent;
+        [SerializeField] private GameObject statusImagePrefab;
 
         private Attributes attributes;
 
@@ -44,6 +47,17 @@ namespace Vi.UI
             interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
             interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
+
+            foreach (Transform child in statusImageParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (ActionClip.Status status in attributes.GetActiveStatuses())
+            {
+                GameObject statusImage = Instantiate(statusImagePrefab, statusImageParent);
+                statusImage.GetComponent<Image>().sprite = statusImageReference.GetStatusIcon(status);
+            }
         }
     }
 }
