@@ -2,28 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
     public class StatusIcon : MonoBehaviour
     {
+        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Image iconImage;
-        [SerializeField] private Text timerText;
 
-        private float duration;
-        private float delay;
+        public ActionClip.Status Status { get; private set; }
 
-        public void UpdateStatusIcon(Sprite icon, float duration, float delay)
-        {
-            iconImage.sprite = icon;
-            this.duration = duration;
-            this.delay = delay;
-        }
+        public void InitializeStatusIcon(ActionClip.Status status) { Status = status; }
 
         private void Update()
         {
-            // Process duration and delay here
-            timerText.text = duration.ToString();
+            iconImage.sprite = statusImageReference.GetStatusIcon(Status);
         }
     }
 }

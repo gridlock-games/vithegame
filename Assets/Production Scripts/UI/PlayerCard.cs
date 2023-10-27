@@ -22,11 +22,11 @@ namespace Vi.UI
         [SerializeField] private Image interimRageFillImage;
 
         [Header("Status UI")]
-        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
         private Attributes attributes;
+        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         public void Initialize(Attributes attributes)
         {
@@ -37,6 +37,17 @@ namespace Vi.UI
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
+                {
+                    statusIcon.InitializeStatusIcon(status);
+                    statusIconGameObject.SetActive(false);
+                    statusIcons.Add(statusIcon);
+                }
+            }
         }
 
         public const float fillSpeed = 4;
@@ -54,20 +65,12 @@ namespace Vi.UI
             interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
-            //UpdateStatusUI();
-        }
-
-        void UpdateStatusUI()
-        {
-            foreach (Transform child in statusImageParent)
+            if (playerUI)
             {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
-            {
-                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
+                }
             }
         }
     }

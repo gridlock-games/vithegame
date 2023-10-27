@@ -22,12 +22,12 @@ namespace Vi.UI
         [SerializeField] private Image interimHealthFillImage;
 
         [Header("Status UI")]
-        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
         private Attributes attributes;
         private Renderer rendererToFollow;
+        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         private void Start()
         {
@@ -45,6 +45,17 @@ namespace Vi.UI
                 {
                     rendererToFollow = renderer;
                     highestPoint = renderer.bounds.center;
+                }
+            }
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
+                {
+                    statusIcon.InitializeStatusIcon(status);
+                    statusIconGameObject.SetActive(false);
+                    statusIcons.Add(statusIcon);
                 }
             }
         }
@@ -90,20 +101,9 @@ namespace Vi.UI
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
 
-            //UpdateStatusUI();
-        }
-
-        void UpdateStatusUI()
-        {
-            foreach (Transform child in statusImageParent)
+            foreach (StatusIcon statusIcon in statusIcons)
             {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
-            {
-                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
+                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
         }
     }

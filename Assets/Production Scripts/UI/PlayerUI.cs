@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
-using UnityEngine.UI;
+using System.Linq;
 using TMPro;
 
 namespace Vi.UI
@@ -19,7 +19,6 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability3;
         [SerializeField] private AbilityCard ability4;
         [Header("Status UI")]
-        [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
         [Header("Debug Elements")]
@@ -28,6 +27,7 @@ namespace Vi.UI
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         private void Start()
         {
@@ -55,6 +55,17 @@ namespace Vi.UI
                 }
             }
 
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
+                {
+                    statusIcon.InitializeStatusIcon(status);
+                    statusIconGameObject.SetActive(false);
+                    statusIcons.Add(statusIcon);
+                }
+            }
+
             StartCoroutine(FPSCounter());
         }
 
@@ -62,20 +73,9 @@ namespace Vi.UI
         {
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
 
-            //UpdateStatusUI();
-        }
-
-        void UpdateStatusUI()
-        {
-            foreach (Transform child in statusImageParent)
+            foreach (StatusIcon statusIcon in statusIcons)
             {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Attributes.StatusPayload statusPayload in attributes.GetActiveStatuses())
-            {
-                GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
+                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new Attributes.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
         }
 

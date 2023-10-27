@@ -474,14 +474,6 @@ namespace Vi.Core
             return true;
         }
 
-        public List<StatusPayload> GetActiveStatuses()
-        {
-            List<StatusPayload> statusList = new List<StatusPayload>();
-            foreach (StatusPayload statusPayload in statuses)
-            {
-                statusList.Add(statusPayload);
-            }
-            return statusList;
-        }
+        public NetworkList<StatusPayload> GetActiveStatuses() { return statuses; }
     }
 }

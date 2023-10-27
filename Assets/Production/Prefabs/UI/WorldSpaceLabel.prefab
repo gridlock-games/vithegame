@@ -487,7 +487,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7095846274849915326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -525,8 +525,6 @@ MonoBehaviour:
   nameBackground: {fileID: 7095846275019019572}
   healthFillImage: {fileID: 5812772587367031554}
   interimHealthFillImage: {fileID: 7496229367581369695}
-  statusImageReference: {fileID: 11400000, guid: 2f04cb7a850437f4986dd61c0b600f84,
-    type: 2}
   statusImageParent: {fileID: 3952354506870513417}
   statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}

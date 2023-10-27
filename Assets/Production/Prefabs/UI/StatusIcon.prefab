@@ -128,12 +128,12 @@ GameObject:
   - component: {fileID: 7719303888140642190}
   - component: {fileID: 3815674246196931400}
   m_Layer: 0
-  m_Name: Keybind
+  m_Name: TimerText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2092211939793777045
 RectTransform:
   m_ObjectHideFlags: 0
@@ -316,5 +316,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fa22886205d8884bad8428c9298e9d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  statusImageReference: {fileID: 11400000, guid: 2f04cb7a850437f4986dd61c0b600f84,
+    type: 2}
   iconImage: {fileID: 5289229924889923600}
-  timerText: {fileID: 2767710509328944842}
