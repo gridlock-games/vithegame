@@ -531,6 +531,14 @@ namespace Vi.Core
                 case ActionClip.Status.fear:
                     break;
                 case ActionClip.Status.healing:
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration)
+                    {
+                        AddHP(maxHP / GetHP() * 10 * statusPayload.value * Time.deltaTime);
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+                    TryRemoveStatus(statusPayload);
                     break;
                 default:
                     Debug.LogError(statusPayload.status + " has not been implemented for status add or value change");
