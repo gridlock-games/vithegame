@@ -4,7 +4,6 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
-using Unity.Netcode;
 using TMPro;
 
 namespace Vi.UI

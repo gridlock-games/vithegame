@@ -35,11 +35,13 @@ namespace Vi.Core
         }
 
         private Weapon weaponInstance;
+        private Attributes attributes;
 
         private void Start()
         {
             weaponInstance = Instantiate(weapon);
 
+            attributes = GetComponent<Attributes>();
             animator = GetComponentInChildren<Animator>();
             animationHandler = GetComponentInChildren<AnimationHandler>();
             EquipWeapon();
@@ -106,6 +108,11 @@ namespace Vi.Core
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
+            }
+
+            foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyOnActivate)
+            {
+                attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
             }
         }
 

@@ -300,7 +300,7 @@ namespace Vi.Core
         {
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
-
+            
             if (!IsServer) { return; }
 
             isInvincible.Value = Time.time <= invincibilityEndTime;
@@ -309,11 +309,6 @@ namespace Vi.Core
             UpdateStamina();
             UpdateDefense();
             UpdateRage();
-
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                TryAddStatus(status, 1, 1, 0);
-            }
 
             roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
         }
@@ -375,12 +370,59 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
+        public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
         private NetworkList<ActionClip.StatusPayload> statuses;
 
+        public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
+        {
+            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
+
+            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, value, duration, delay);
+            if (statuses.Contains(charStatus))
+            {
+                int index = statuses.IndexOf(charStatus);
+                statuses[index] = charStatus;
+            }
+            else
+            {
+                statuses.Add(charStatus);
+            }
+            return true;
+        }
+
+        private bool TryRemoveStatus(ActionClip.Status status)
+        {
+            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
+
+            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, 0, 0, 0);
+            if (!statuses.Contains(charStatus))
+            {
+                return false;
+            }
+            else
+            {
+                statuses.Remove(charStatus);
+            }
+            return true;
+        }
+
+        private float damageMultiplier;
+        private float damageReductionMultiplier;
+        private float damageReceivedMultiplier;
+        private float healingMultiplier;
+        private float defenseIncreaseMultiplier;
+        private float defenseReductionMultiplier;
+        private bool burning;
+        private bool poisoned;
+        private bool drain;
+        private float movementSpeedDecrease;
+        private float movementSpeedIncrease;
+        private bool rooted;
+        private bool silenced;
+        private bool fear;
+        private bool healing;
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
-            if (!IsServer) { return; }
-
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Value)
             {
                 switch (networkListEvent.Value.status)
@@ -421,40 +463,5 @@ namespace Vi.Core
                 }
             }
         }
-
-        private bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
-        {
-            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
-
-            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, value, duration, delay);
-            if (statuses.Contains(charStatus))
-            {
-                int index = statuses.IndexOf(charStatus);
-                statuses[index] = charStatus;
-            }
-            else
-            {
-                statuses.Add(charStatus);
-            }
-            return true;
-        }
-
-        private bool TryRemoveStatus(ActionClip.Status status)
-        {
-            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
-
-            ActionClip.StatusPayload charStatus = new ActionClip.StatusPayload(status, 0, 0, 0);
-            if (!statuses.Contains(charStatus))
-            {
-                return false;
-            }
-            else
-            {
-                statuses.Remove(charStatus);
-            }
-            return true;
-        }
-
-        public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
     }
 }

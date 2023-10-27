@@ -72,6 +72,7 @@ namespace Vi.ScriptableObjects
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
+                serializer.SerializeValue(ref status);
                 serializer.SerializeValue(ref value);
                 serializer.SerializeValue(ref duration);
                 serializer.SerializeValue(ref delay);
@@ -117,5 +118,7 @@ namespace Vi.ScriptableObjects
 
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
+
+        public List<StatusPayload> statusesToApplyOnActivate = new List<StatusPayload>();
     }
 }

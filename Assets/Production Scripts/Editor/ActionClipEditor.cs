@@ -39,6 +39,8 @@ namespace Vi.Editor
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
 
+        private SerializedProperty spStatusesToApplyOnActivate;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -66,12 +68,15 @@ namespace Vi.Editor
             spCanCancelAbilities = serializedObject.FindProperty("canCancelAbilities");
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
+
+            spStatusesToApplyOnActivate = serializedObject.FindProperty("statusesToApplyOnActivate");
         }
 
         public override void OnInspectorGUI()
         {
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spRootMotionMulitplier);
+            EditorGUILayout.PropertyField(spStatusesToApplyOnActivate);
 
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Dodge)
             {
