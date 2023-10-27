@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Vi.UI
 {
@@ -21,6 +22,9 @@ namespace Vi.UI
         [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
+        [Header("Debug Elements")]
+        [SerializeField] private TextMeshProUGUI fpsDisplay;
+        [SerializeField] private TextMeshProUGUI pingDisplay;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -50,10 +54,14 @@ namespace Vi.UI
                     ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
                 }
             }
+
+            StartCoroutine(FPSCounter());
         }
 
         private void Update()
         {
+            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
+
             //UpdateStatusUI();
         }
 
@@ -68,6 +76,17 @@ namespace Vi.UI
             {
                 GameObject statusImage = Instantiate(statusImagePrefab.gameObject, statusImageParent);
                 statusImage.GetComponent<StatusIcon>().UpdateStatusIcon(statusImageReference.GetStatusIcon(statusPayload.status), statusPayload.duration, statusPayload.delay);
+            }
+        }
+
+        private float frameCount;
+        private IEnumerator FPSCounter()
+        {
+            GUI.depth = 2;
+            while (true)
+            {
+                frameCount = 1f / Time.unscaledDeltaTime;
+                yield return new WaitForSeconds(0.1f);
             }
         }
     }
