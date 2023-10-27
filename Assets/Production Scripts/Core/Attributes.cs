@@ -424,9 +424,6 @@ namespace Vi.Core
         private float healingMultiplier = 1;
         private float defenseIncreaseMultiplier = 1;
         private float defenseReductionMultiplier = 1;
-        private bool burning;
-        private bool poisoned;
-        private bool drain;
         private float movementSpeedDecrease;
         private float movementSpeedIncrease;
         private bool rooted;
@@ -435,14 +432,13 @@ namespace Vi.Core
         private bool healing;
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
-            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add | networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Value)
-            {
-                StartCoroutine(ProcessStatusChange(networkListEvent.Value));
-            }
+            if (!IsServer) { return; }
+            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
         }
 
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
+            Debug.Log(OwnerClientId + " Processing " + statusPayload.status);
             switch (statusPayload.status)
             {
                 case ActionClip.Status.damageMultiplier:

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
-using Vi.ScriptableObjects;
 using Vi.Core;
 
 namespace Vi.Player
@@ -193,6 +192,7 @@ namespace Vi.Player
             }
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
+            if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
