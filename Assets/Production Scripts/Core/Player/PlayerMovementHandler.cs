@@ -43,7 +43,7 @@ namespace Vi.Player
             Vector3 targetDirection = inputPayload.rotation * new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y);
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-            targetDirection *= characterController.isGrounded ? runSpeed : 0;
+            targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
             targetDirection += Physics.gravity;
 
             Vector3 oldPosition = transform.position;
@@ -54,7 +54,7 @@ namespace Vi.Player
             characterController.enabled = true;
 
             // Apply movement to charactercontroller
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion();
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             if (animationHandler.ShouldApplyRootMotion())
             {
                 characterController.Move(rootMotion);
@@ -139,7 +139,7 @@ namespace Vi.Player
 
             Vector3 animDir = targetDirection;
 
-            targetDirection *= characterController.isGrounded ? runSpeed : 0;
+            targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
 
             float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
             //if (localDistance > movementPrediction.playerObjectTeleportThreshold) { targetDirection *= localDistance * (1/movementPrediction.playerObjectTeleportThreshold); }
@@ -151,8 +151,9 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
-            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion();
-
+            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
             {
                 //Debug.Log("Teleporting player: " + OwnerClientId);

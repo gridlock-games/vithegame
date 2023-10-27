@@ -424,8 +424,13 @@ namespace Vi.Core
         private float healingMultiplier = 1;
         private float defenseIncreaseMultiplier = 1;
         private float defenseReductionMultiplier = 1;
-        private float movementSpeedDecrease;
-        private float movementSpeedIncrease;
+        
+        public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
+        private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
+
+        public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
+        private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
+
         private bool rooted;
         private bool silenced;
         private bool fear;
@@ -438,53 +443,46 @@ namespace Vi.Core
 
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
-            Debug.Log(OwnerClientId + " Processing " + statusPayload.status);
+            yield return new WaitForSeconds(statusPayload.delay);
             switch (statusPayload.status)
             {
                 case ActionClip.Status.damageMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     damageMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReductionMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     damageReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReceivedMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     damageReceivedMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     damageReceivedMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healingMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     healingMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     healingMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.defenseIncreaseMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     defenseIncreaseMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     defenseIncreaseMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.defenseReductionMultiplier:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     defenseReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
                     defenseReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     float elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
@@ -495,7 +493,6 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.poisoned:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
@@ -506,7 +503,6 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.drain:
-                    yield return new WaitForSeconds(statusPayload.delay);
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
@@ -517,8 +513,16 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
+                    movementSpeedDecrease.Value += statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    movementSpeedDecrease.Value -= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
+                    movementSpeedIncrease.Value += statusPayload.value;
+                    yield return new WaitForSeconds(statusPayload.duration);
+                    movementSpeedIncrease.Value -= statusPayload.value;
+                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.rooted:
                     break;
