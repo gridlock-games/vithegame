@@ -120,5 +120,7 @@ namespace Vi.ScriptableObjects
         public float abilityCooldownTime = 5;
 
         public List<StatusPayload> statusesToApplyOnActivate = new List<StatusPayload>();
+
+        public List<ActionVFX> actionVFXList = new List<ActionVFX>();
     }
 }

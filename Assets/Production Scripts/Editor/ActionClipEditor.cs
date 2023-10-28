@@ -41,6 +41,8 @@ namespace Vi.Editor
 
         private SerializedProperty spStatusesToApplyOnActivate;
 
+        private SerializedProperty spActionVFXList;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -70,6 +72,8 @@ namespace Vi.Editor
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
 
             spStatusesToApplyOnActivate = serializedObject.FindProperty("statusesToApplyOnActivate");
+
+            spActionVFXList = serializedObject.FindProperty("actionVFXList");
         }
 
         public override void OnInspectorGUI()
@@ -160,6 +164,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanCancelAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
+                EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);

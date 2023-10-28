@@ -304,8 +304,8 @@ namespace Vi.Core
             if (!IsClient)
             {
                 glowRenderer.RenderBlock();
-                Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
-                AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+                Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+                AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
             RenderBlockClientRpc(impactPosition);
@@ -314,8 +314,8 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             glowRenderer.RenderBlock();
-            Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
-            AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+            Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+            AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }

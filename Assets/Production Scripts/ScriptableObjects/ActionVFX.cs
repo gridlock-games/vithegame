@@ -7,6 +7,13 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "ActionVFX", menuName = "Production/ActionVFX")]
     public class ActionVFX : ScriptableObject
     {
-        
+        public enum VFXType
+        {
+            AttachSelf,
+            AttachTarget,
+            DetachedSelf,
+            Projectile,
+            StickToGround
+        }
     }
 }
