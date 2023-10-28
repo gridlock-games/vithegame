@@ -117,6 +117,36 @@ namespace Vi.Core
                     attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
                 }
             }
+
+            foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
+            {
+                if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnExecute) { return; }
+                SpawnActionVFX(actionVFX);
+            }
+        }
+
+        private void SpawnActionVFX(ActionVFX actionVFX)
+        {
+            switch (actionVFX.transformType)
+            {
+                case ActionVFX.TransformType.Stationary:
+                    GameObject vfxInstance = Instantiate(actionVFX.gameObject, transform.position, transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
+                    break;
+                case ActionVFX.TransformType.ParentToOriginator:
+                    vfxInstance = Instantiate(actionVFX.gameObject, transform.position, transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset), transform);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
+                    break;
+                //case ActionVFX.TransformType.OriginatorAndTarget:
+                //    break;
+                //case ActionVFX.TransformType.Projectile:
+                //    break;
+                //case ActionVFX.TransformType.ConformToGround:
+                //    break;
+                default:
+                    Debug.LogError(actionVFX.transformType + " has not been implemented yet!");
+                    break;
+            }
         }
 
         public bool IsInAnticipation { get; private set; }
@@ -140,7 +170,9 @@ namespace Vi.Core
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability };
             if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
+                bool lastIsInAnticipation = IsInAnticipation;
                 bool lastIsAttacking = IsAttacking;
+                bool lastIsInRecovery = IsInRecovery;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
                     float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
