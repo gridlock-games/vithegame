@@ -8,9 +8,7 @@ namespace Vi.ScriptableObjects
     {
         public enum VFXSpawnType
         {
-            OnExecute,
             OnActivate,
-            OnRecovery,
             OnHit
         }
 
@@ -31,7 +29,7 @@ namespace Vi.ScriptableObjects
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
         public Vector3 vfxRotationOffset = new Vector3(0, 0, 0);
 
-        public VFXSpawnType vfxSpawnType = VFXSpawnType.OnExecute;
+        public VFXSpawnType vfxSpawnType = VFXSpawnType.OnActivate;
         public TransformType transformType = TransformType.Stationary;
 
         // Only used for TransformType.ConformToGround

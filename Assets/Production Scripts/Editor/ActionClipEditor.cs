@@ -43,6 +43,8 @@ namespace Vi.Editor
 
         private SerializedProperty spActionVFXList;
 
+        private SerializedProperty spOnActivateVFXSpawnNormalizedTime;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -74,6 +76,8 @@ namespace Vi.Editor
             spStatusesToApplyOnActivate = serializedObject.FindProperty("statusesToApplyOnActivate");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
+
+            spOnActivateVFXSpawnNormalizedTime = serializedObject.FindProperty("onActivateVFXSpawnNormalizedTime");
         }
 
         public override void OnInspectorGUI()
@@ -103,6 +107,10 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
+
+                EditorGUILayout.PropertyField(spActionVFXList);
+                spOnActivateVFXSpawnNormalizedTime.floatValue = EditorGUILayout.Slider("OnActivate VFX Play Time", spOnActivateVFXSpawnNormalizedTime.floatValue, 0, 1);
+
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -127,6 +135,10 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
+
+                EditorGUILayout.PropertyField(spActionVFXList);
+                spOnActivateVFXSpawnNormalizedTime.floatValue = EditorGUILayout.Slider("OnActivate VFX Play Time", spOnActivateVFXSpawnNormalizedTime.floatValue, 0, 1);
+
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -164,7 +176,10 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanCancelAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
+
                 EditorGUILayout.PropertyField(spActionVFXList);
+                spOnActivateVFXSpawnNormalizedTime.floatValue = EditorGUILayout.Slider("OnActivate VFX Play Time", spOnActivateVFXSpawnNormalizedTime.floatValue, 0, 1);
+
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);

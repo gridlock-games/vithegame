@@ -122,5 +122,7 @@ namespace Vi.ScriptableObjects
         public List<StatusPayload> statusesToApplyOnActivate = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
+
+        public float onActivateVFXSpawnNormalizedTime;
     }
 }
