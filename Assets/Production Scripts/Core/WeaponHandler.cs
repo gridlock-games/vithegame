@@ -110,6 +110,8 @@ namespace Vi.Core
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
             }
 
+            actionVFXTracker.Clear();
+
             if (IsServer)
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyOnActivate)
@@ -119,8 +121,11 @@ namespace Vi.Core
             }
         }
 
+        private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
         private void SpawnActionVFX(ActionVFX actionVFX)
         {
+            if (actionVFXTracker.Contains(actionVFX)) { return; }
+
             switch (actionVFX.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
@@ -141,13 +146,13 @@ namespace Vi.Core
                     Debug.LogError(actionVFX.transformType + " has not been implemented yet!");
                     break;
             }
+
+            if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFX); }
         }
 
         public bool IsInAnticipation { get; private set; }
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
-
-        private bool onActivateVFXPlayed;
 
         private void Update()
         {
@@ -174,16 +179,12 @@ namespace Vi.Core
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
 
-                    if (!onActivateVFXPlayed)
+                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
-                        if (normalizedTime >= CurrentActionClip.onActivateVFXSpawnNormalizedTime)
+                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                            {
-                                if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                                SpawnActionVFX(actionVFX);
-                            }
-                            onActivateVFXPlayed = true;
+                            if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                            SpawnActionVFX(actionVFX);
                         }
                     }
                 }
@@ -194,16 +195,12 @@ namespace Vi.Core
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
 
-                    if (!onActivateVFXPlayed)
+                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
-                        if (normalizedTime >= CurrentActionClip.onActivateVFXSpawnNormalizedTime)
+                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                            {
-                                if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                                SpawnActionVFX(actionVFX);
-                            }
-                            onActivateVFXPlayed = true;
+                            if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                            SpawnActionVFX(actionVFX);
                         }
                     }
                 }
@@ -212,7 +209,6 @@ namespace Vi.Core
                     IsInAnticipation = false;
                     IsAttacking = false;
                     IsInRecovery = false;
-                    onActivateVFXPlayed = false;
                 }
 
                 if (IsAttacking & !lastIsAttacking)
@@ -225,7 +221,6 @@ namespace Vi.Core
                 IsInAnticipation = false;
                 IsAttacking = false;
                 IsInRecovery = false;
-                onActivateVFXPlayed = false;
             }
         }
 

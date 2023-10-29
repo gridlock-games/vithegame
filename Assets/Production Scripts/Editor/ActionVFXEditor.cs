@@ -20,6 +20,8 @@ namespace Vi.Editor
         private SerializedProperty spCrossProductDirection;
         private SerializedProperty spLookRotationUpDirection;
 
+        private SerializedProperty spOnActivateVFXSpawnNormalizedTime;
+
         private void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
@@ -31,6 +33,8 @@ namespace Vi.Editor
             spRaycastOffset = serializedObject.FindProperty("raycastOffset");
             spCrossProductDirection = serializedObject.FindProperty("crossProductDirection");
             spLookRotationUpDirection = serializedObject.FindProperty("lookRotationUpDirection");
+
+            spOnActivateVFXSpawnNormalizedTime = serializedObject.FindProperty("onActivateVFXSpawnNormalizedTime");
         }
 
         public override void OnInspectorGUI()
@@ -39,8 +43,12 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spVFXRotationOffset);
 
             EditorGUILayout.PropertyField(spVFXSpawnType);
-            EditorGUILayout.PropertyField(spTransformType);
+            if ((ActionVFX.VFXSpawnType)spVFXSpawnType.enumValueIndex == ActionVFX.VFXSpawnType.OnActivate)
+            {
+                spOnActivateVFXSpawnNormalizedTime.floatValue = EditorGUILayout.Slider("OnActivate VFX Play Time", spOnActivateVFXSpawnNormalizedTime.floatValue, 0, 1);
+            }
 
+            EditorGUILayout.PropertyField(spTransformType);
             if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.ConformToGround)
             {
                 EditorGUILayout.PropertyField(spRaycastOffset);

@@ -32,6 +32,9 @@ namespace Vi.ScriptableObjects
         public VFXSpawnType vfxSpawnType = VFXSpawnType.OnActivate;
         public TransformType transformType = TransformType.Stationary;
 
+        // Only used for VFXSpawnType.OnActivate
+        public float onActivateVFXSpawnNormalizedTime;
+
         // Only used for TransformType.ConformToGround
         public Vector3 raycastOffset = new Vector3(0, 2, 0);
         public Vector3 crossProductDirection = new Vector3(1, 0, 0);
