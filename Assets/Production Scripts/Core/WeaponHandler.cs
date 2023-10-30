@@ -38,13 +38,13 @@ namespace Vi.Core
         private Weapon weaponInstance;
         private Attributes attributes;
 
-        private void Start()
+        private void Awake()
         {
             weaponInstance = Instantiate(weapon);
 
             attributes = GetComponent<Attributes>();
             animator = GetComponentInChildren<Animator>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
+            animationHandler = animator.gameObject.AddComponent<AnimationHandler>();
             EquipWeapon();
         }
 
