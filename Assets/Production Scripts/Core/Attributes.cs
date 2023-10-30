@@ -146,15 +146,17 @@ namespace Vi.Core
         }
 
         private GlowRenderer glowRenderer;
-        private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
         private Animator animator;
-        private void Awake()
+        private void Start()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             animator = GetComponentInChildren<Animator>();
+        }
+
+        private void Awake()
+        {
             statuses = new NetworkList<ActionClip.StatusPayload>();
         }
 
@@ -194,7 +196,7 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            animationHandler.PlayAction(hitReaction);
+            weaponHandler.animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
 

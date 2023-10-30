@@ -11,12 +11,11 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        [SerializeField] private Weapon weapon;
+        public AnimationHandler animationHandler { get; private set; }
 
         private List<GameObject> weaponInstances = new List<GameObject>();
 
         Animator animator;
-        AnimationHandler animationHandler;
         
         public Weapon GetWeapon() { return weaponInstance; }
 
@@ -38,13 +37,17 @@ namespace Vi.Core
         private Weapon weaponInstance;
         private Attributes attributes;
 
+        [SerializeField] private CharacterReference characterReference;
         private void Awake()
         {
-            weaponInstance = Instantiate(weapon);
+            CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[0];
+            GameObject model = Instantiate(playerModelOption.skinOptions[0], transform);
+
+            weaponInstance = Instantiate(playerModelOption.weapon);
 
             attributes = GetComponent<Attributes>();
-            animator = GetComponentInChildren<Animator>();
-            animationHandler = animator.gameObject.AddComponent<AnimationHandler>();
+            animator = model.GetComponent<Animator>();
+            animationHandler = model.AddComponent<AnimationHandler>();
             EquipWeapon();
         }
 
@@ -55,7 +58,7 @@ namespace Vi.Core
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == GetComponentInChildren<LimbReferences>().name)
+                if (data.skinPrefab.name == GetComponentInChildren<LimbReferences>().name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
