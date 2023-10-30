@@ -122,18 +122,18 @@ namespace Vi.Core
         }
 
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
-        private void SpawnActionVFX(ActionVFX actionVFX)
+        public void SpawnActionVFX(ActionVFX actionVFX, Transform attackerTransform, Transform victimTransform = null)
         {
             if (actionVFXTracker.Contains(actionVFX)) { return; }
 
             switch (actionVFX.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
-                    GameObject vfxInstance = Instantiate(actionVFX.gameObject, transform.position, transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset));
+                    GameObject vfxInstance = Instantiate(actionVFX.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset));
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
-                    vfxInstance = Instantiate(actionVFX.gameObject, transform.position, transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset), transform);
+                    vfxInstance = Instantiate(actionVFX.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset), transform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
                     break;
                 //case ActionVFX.TransformType.OriginatorAndTarget:
@@ -181,10 +181,10 @@ namespace Vi.Core
 
                     foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
+                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                            SpawnActionVFX(actionVFX);
+                            SpawnActionVFX(actionVFX, transform);
                         }
                     }
                 }
@@ -197,10 +197,10 @@ namespace Vi.Core
 
                     foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
+                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                            SpawnActionVFX(actionVFX);
+                            SpawnActionVFX(actionVFX, transform);
                         }
                     }
                 }

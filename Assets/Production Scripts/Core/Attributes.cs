@@ -262,6 +262,12 @@ namespace Vi.Core
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
 
+            foreach (ActionVFX actionVFX in attack.actionVFXList)
+            {
+                if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { continue; }
+                weaponHandler.SpawnActionVFX(actionVFX, attacker.transform);
+            }
+
             return true;
         }
 
