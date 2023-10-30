@@ -17,8 +17,26 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            SwitchModel(0, 1);
             isBlocking.OnValueChanged += OnIsBlockingChanged;
+
+            if (IsServer)
+            {
+                SwitchModel(0, 1);
+                StartCoroutine(TestSwitch1());
+                StartCoroutine(TestSwitch2());
+            }
+        }
+
+        private IEnumerator TestSwitch1()
+        {
+            yield return new WaitForSeconds(5);
+            SwitchModel(0, 0);
+        }
+
+        private IEnumerator TestSwitch2()
+        {
+            yield return new WaitForSeconds(10);
+            SwitchModel(0, 2);
         }
 
         public override void OnNetworkDespawn()
@@ -42,64 +60,59 @@ namespace Vi.Core
         private GameObject playerModelObj;
         public void SwitchModel(int playerModelOptionIndex, int skinIndex)
         {
-            if (IsServer)
-            {
-                if (playerModelObj) { playerModelObj.GetComponent<NetworkObject>().Despawn(true); }
+            if (!IsServer) { Debug.LogError("WeaponHandler.SwitchModel() should only be called on the server!"); return; }
 
-                CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
-                playerModelObj = Instantiate(playerModelOption.skinOptions[skinIndex]);
-                playerModelObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-                playerModelObj.transform.parent = transform;
+            if (playerModelObj) { playerModelObj.GetComponent<NetworkObject>().Despawn(true); }
 
-                weaponInstance = Instantiate(playerModelOption.weapon);
+            CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
+            playerModelObj = Instantiate(playerModelOption.skinOptions[skinIndex]);
+            playerModelObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            playerModelObj.transform.parent = transform;
+            playerModelObj.transform.localPosition = Vector3.zero;
+            playerModelObj.transform.localRotation = Quaternion.identity;
 
-                attributes = GetComponent<Attributes>();
-                Animator = GetComponentInChildren<Animator>();
-                AnimationHandler = GetComponentInChildren<AnimationHandler>();
-                EquipWeapon();
+            weaponInstance = Instantiate(playerModelOption.weapon);
 
-                //SwitchModelClientRpc(playerModelOptionIndex, skinIndex);
-            }
-            else
-            {
-                CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
-                weaponInstance = Instantiate(playerModelOption.weapon);
+            attributes = GetComponent<Attributes>();
+            Animator = playerModelObj.GetComponent<Animator>();
+            AnimationHandler = playerModelObj.GetComponent<AnimationHandler>();
+            EquipWeapon(playerModelOption.skinOptions[skinIndex]);
 
-                attributes = GetComponent<Attributes>();
-                StartCoroutine(WaitForModelSpawn());
-            }
+            SwitchModelClientRpc(playerModelOptionIndex, skinIndex);
         }
 
-        private IEnumerator WaitForModelSpawn()
+        [ClientRpc]
+        private void SwitchModelClientRpc(int playerModelOptionIndex, int skinIndex)
+        {
+            if (IsServer) { return; }
+
+            CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
+            weaponInstance = Instantiate(playerModelOption.weapon);
+
+            attributes = GetComponent<Attributes>();
+            StartCoroutine(WaitForModelSpawn(playerModelOption.skinOptions[skinIndex]));
+        }
+
+        private IEnumerator WaitForModelSpawn(GameObject skinPrefab)
         {
             yield return new WaitUntil(() => GetComponentInChildren<Animator>());
             Animator = GetComponentInChildren<Animator>();
             AnimationHandler = GetComponentInChildren<AnimationHandler>();
-            EquipWeapon();
+            Animator.transform.localPosition = Vector3.zero;
+            Animator.transform.localRotation = Quaternion.identity;
+            EquipWeapon(skinPrefab);
         }
 
         public bool IsWaitingForModelChange() { return !AnimationHandler; }
 
-        //[ClientRpc]
-        //private void SwitchModelClientRpc(int playerModelOptionIndex, int skinIndex)
-        //{
-        //    CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
-        //    weaponInstance = Instantiate(playerModelOption.weapon);
-
-        //    attributes = GetComponent<Attributes>();
-        //    Animator = GetComponentInChildren<Animator>();
-        //    AnimationHandler = GetComponentInChildren<AnimationHandler>();
-        //    EquipWeapon();
-        //}
-
-        private void EquipWeapon()
+        private void EquipWeapon(GameObject skinPrefab)
         {
             List<GameObject> instances = new List<GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == GetComponentInChildren<LimbReferences>().name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == skinPrefab.name)
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
