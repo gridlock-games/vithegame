@@ -415,7 +415,8 @@ GameObject:
   - component: {fileID: 1145048901}
   - component: {fileID: 1145048900}
   - component: {fileID: 1145048899}
-  - component: {fileID: 1145048902}
+  - component: {fileID: 1145048903}
+  - component: {fileID: 1145048904}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -472,7 +473,7 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 583301f4049dec04c832348179990c21, type: 2}
     TickRate: 120
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -503,7 +504,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1145048902
+--- !u!114 &1145048903
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -512,11 +513,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1145048898}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99f25be40fbf9e74e9d0495d8a89b3de, type: 3}
+  m_Script: {fileID: 11500000, guid: c18aa3bb6af62e540a46b299c4cc9a8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameMode: 0
-  connectionDataString: 
+--- !u!114 &1145048904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145048898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4523949ac87ed9846a8139d19403099c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1635212591
 GameObject:
   m_ObjectHideFlags: 0
