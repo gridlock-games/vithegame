@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX;
 
 namespace Vi.Core
 {
@@ -122,32 +123,88 @@ namespace Vi.Core
         }
 
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
-        public void SpawnActionVFX(ActionVFX actionVFX, Transform attackerTransform, Transform victimTransform = null)
+        public void SpawnActionVFX(ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
-            if (actionVFXTracker.Contains(actionVFX)) { return; }
-
-            switch (actionVFX.transformType)
+            if (actionVFXTracker.Contains(actionVFXPrefab)) { return; }
+            GameObject vfxInstance = null;
+            switch (actionVFXPrefab.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
-                    GameObject vfxInstance = Instantiate(actionVFX.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset));
-                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
-                    vfxInstance = Instantiate(actionVFX.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset), transform);
-                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFX.vfxPositionOffset;
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), transform);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 //case ActionVFX.TransformType.OriginatorAndTarget:
                 //    break;
                 //case ActionVFX.TransformType.Projectile:
                 //    break;
-                //case ActionVFX.TransformType.ConformToGround:
-                //    break;
+                case ActionVFX.TransformType.ConformToGround:
+                    Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
+                    startPos.y += actionVFXPrefab.raycastOffset.y;
+                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+                    bool bHit = false;
+                    RaycastHit floorHit = new RaycastHit();
+
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        if (hit.transform.GetComponentInParent<Attributes>()) { continue; }
+
+                        bHit = true;
+                        floorHit = hit;
+
+                        break;
+                    }
+
+                    if (bHit)
+                    {
+                        vfxInstance = Instantiate(actionVFXPrefab.gameObject,
+                            floorHit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                        );
+                    }
+                    else
+                    {
+                        vfxInstance = Instantiate(actionVFXPrefab.gameObject,
+                            attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                        );
+                    }
+                    break;
                 default:
-                    Debug.LogError(actionVFX.transformType + " has not been implemented yet!");
+                    Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;
             }
 
-            if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFX); }
+            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
+
+            if (vfxInstance)
+            {
+                StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+            }
+            else
+            {
+                Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
+            }
+        }
+
+        private IEnumerator DestroyVFXWhenFinishedPlaying(GameObject actionVFXInstance)
+        {
+            ParticleSystem particleSystem = actionVFXInstance.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
+
+            AudioSource audioSource = actionVFXInstance.GetComponentInChildren<AudioSource>();
+            if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
+
+            VisualEffect visualEffect = actionVFXInstance.GetComponentInChildren<VisualEffect>();
+            if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
+
+            Destroy(actionVFXInstance);
         }
 
         public bool IsInAnticipation { get; private set; }
