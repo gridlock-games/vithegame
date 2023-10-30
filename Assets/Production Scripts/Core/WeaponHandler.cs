@@ -237,18 +237,18 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator DestroyVFXWhenFinishedPlaying(GameObject actionVFXInstance)
+        public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
-            ParticleSystem particleSystem = actionVFXInstance.GetComponentInChildren<ParticleSystem>();
+            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
 
-            AudioSource audioSource = actionVFXInstance.GetComponentInChildren<AudioSource>();
+            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
             if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
 
-            VisualEffect visualEffect = actionVFXInstance.GetComponentInChildren<VisualEffect>();
+            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
             if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
 
-            Destroy(actionVFXInstance);
+            Destroy(vfxInstance);
         }
 
         public bool IsInAnticipation { get; private set; }

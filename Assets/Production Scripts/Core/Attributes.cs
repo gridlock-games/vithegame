@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using UnityEngine.VFX;
 
 namespace Vi.Core
 {
@@ -293,7 +294,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 glowRenderer.RenderHit();
-                Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
+                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
             }
 
@@ -303,7 +304,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderHitClientRpc(Vector3 impactPosition, bool isKnockdown)
         {
             glowRenderer.RenderHit();
-            Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
+            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
         }
 
@@ -314,7 +315,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 glowRenderer.RenderBlock();
-                Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
@@ -324,7 +325,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             glowRenderer.RenderBlock();
-            Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
