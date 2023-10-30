@@ -48,7 +48,7 @@ namespace Vi.Core
 
                 CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
                 playerModelObj = Instantiate(playerModelOption.skinOptions[skinIndex]);
-                playerModelObj.GetComponent<NetworkObject>().Spawn();
+                playerModelObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
                 playerModelObj.transform.parent = transform;
 
                 weaponInstance = Instantiate(playerModelOption.weapon);
