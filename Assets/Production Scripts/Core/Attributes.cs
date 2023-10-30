@@ -145,14 +145,16 @@ namespace Vi.Core
             }
         }
 
-        private GlowRenderer glowRenderer;
         private WeaponHandler weaponHandler;
-        private Animator animator;
         private void Start()
         {
-            glowRenderer = GetComponentInChildren<GlowRenderer>();
             weaponHandler = GetComponent<WeaponHandler>();
-            animator = GetComponentInChildren<Animator>();
+        }
+
+        private GlowRenderer glowRenderer;
+        private void OnTransformChildrenChanged()
+        {
+            glowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
         private void Awake()
@@ -332,9 +334,11 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (weaponHandler.IsWaitingForModelChange()) { return; }
+
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
-            
+
             if (!IsServer) { return; }
 
             isInvincible.Value = Time.time <= invincibilityEndTime;
@@ -378,7 +382,7 @@ namespace Vi.Core
 
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
-            animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            weaponHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
         }
 
@@ -399,8 +403,8 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays()
         {
-            yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
-            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => !weaponHandler.Animator.GetCurrentAnimatorStateInfo(weaponHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => weaponHandler.Animator.GetCurrentAnimatorStateInfo(weaponHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
         }
 

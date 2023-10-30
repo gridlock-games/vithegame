@@ -40,6 +40,8 @@ namespace Vi.Player
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPos, attributes.GetAilmentRotation());
             }
 
+            if (weaponHandler.IsWaitingForModelChange()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
+
             Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
@@ -105,14 +107,12 @@ namespace Vi.Player
 
         private CharacterController characterController;
         private PlayerNetworkMovementPrediction movementPrediction;
-        private Animator animator;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
-            animator = GetComponentInChildren<Animator>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
 
@@ -124,6 +124,8 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
+            if (weaponHandler.IsWaitingForModelChange()) { return; }
+
             UpdateLocomotion();
         }
 
@@ -151,7 +153,7 @@ namespace Vi.Player
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
             Vector3 rootMotion = weaponHandler.AnimationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            weaponHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
             
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
             {
@@ -193,8 +195,8 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
-            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
+            weaponHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(weaponHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
+            weaponHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(weaponHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
         private Vector2 lookSensitivity;

@@ -10,14 +10,12 @@ namespace Vi.Networking
     {
         void Start()
         {
-            GetComponent<NetworkManager>().StartHost();
-
             //if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             //    NetworkManager.Singleton.StartServer();
             if (Application.isEditor)
-                NetworkManager.Singleton.StartHost();
-            else
                 NetworkManager.Singleton.StartClient();
+            else
+                NetworkManager.Singleton.StartHost();
         }
     }
 }
