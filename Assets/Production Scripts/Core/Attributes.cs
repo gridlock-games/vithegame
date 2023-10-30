@@ -196,7 +196,7 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            weaponHandler.animationHandler.PlayAction(hitReaction);
+            weaponHandler.AnimationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
 

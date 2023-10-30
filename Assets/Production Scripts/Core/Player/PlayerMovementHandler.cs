@@ -29,7 +29,7 @@ namespace Vi.Player
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
 
-                characterController.Move(weaponHandler.animationHandler.ApplyNetworkRootMotion());
+                characterController.Move(weaponHandler.AnimationHandler.ApplyNetworkRootMotion());
                 Vector3 newPos = transform.position;
 
                 // Revert movement change
@@ -54,9 +54,10 @@ namespace Vi.Player
             characterController.enabled = true;
 
             // Apply movement to charactercontroller
-            Vector3 rootMotion = weaponHandler.animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            if (weaponHandler.animationHandler.ShouldApplyRootMotion())
+            Vector3 rootMotion = weaponHandler.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            if (weaponHandler.AnimationHandler.ShouldApplyRootMotion())
             {
+                rootMotion += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate);
                 characterController.Move(attributes.IsRooted() ? Vector3.zero : rootMotion);
             }
             else
@@ -149,7 +150,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
-            Vector3 rootMotion = weaponHandler.animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = weaponHandler.AnimationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
             
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
@@ -159,7 +160,7 @@ namespace Vi.Player
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
             }
-            else if (weaponHandler.animationHandler.ShouldApplyRootMotion()) // is root moving
+            else if (weaponHandler.AnimationHandler.ShouldApplyRootMotion()) // is root moving
             {
                 rootMotion = transform.rotation * rootMotion;
 
@@ -218,7 +219,7 @@ namespace Vi.Player
         void OnDodge()
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
-            weaponHandler.animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+            weaponHandler.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
 }
