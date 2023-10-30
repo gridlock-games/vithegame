@@ -50,15 +50,15 @@
 
 					if (instance == null)
 					{
-						GameObject singleton = new GameObject();
-						instance = singleton.AddComponent<T>();
-						singleton.name = string.Format("{0}(singleton)", typeof(T).ToString());
+						//GameObject singleton = new GameObject();
+						//instance = singleton.AddComponent<T>();
+						//singleton.name = string.Format("{0}(singleton)", typeof(T).ToString());
 
-                        Singleton<T> component = instance.GetComponent<Singleton<T>>();
-                        component.OnCreate();
+      //                  Singleton<T> component = instance.GetComponent<Singleton<T>>();
+      //                  component.OnCreate();
 
-                        if (component.ShouldNotDestroyOnLoad()) DontDestroyOnLoad(singleton);
-						DebugLogFormat("[Singleton] Creating an instance of {0} with DontDestroyOnLoad", typeof(T));
+      //                  if (component.ShouldNotDestroyOnLoad()) DontDestroyOnLoad(singleton);
+						//DebugLogFormat("[Singleton] Creating an instance of {0} with DontDestroyOnLoad", typeof(T));
 					} 
 					else 
 					{

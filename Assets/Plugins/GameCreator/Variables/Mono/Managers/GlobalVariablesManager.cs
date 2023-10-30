@@ -29,6 +29,7 @@
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void InitializeOnLoad()
         {
+            return;
             GlobalVariablesManager.Instance.WakeUp();
         }
 

@@ -72,6 +72,7 @@
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void InitializeOnLoad()
         {
+            return;
             SaveLoadManager.Instance.WakeUp();
         }
 

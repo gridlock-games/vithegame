@@ -1,0 +1,114 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+using System.Linq;
+
+namespace Vi.Core
+{
+    public class ColliderWeapon : RuntimeWeapon
+    {
+        private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
+
+        private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
+        private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
+
+        private void ProcessTriggerEvent(Collider other)
+        {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
+            if (!parentWeaponHandler) { return; }
+            if (!parentWeaponHandler.IsAttacking) { return; }
+            if (parentWeaponHandler.CurrentActionClip.weaponBone != weaponBone) { return; }
+            if (other.TryGetComponent(out Attributes attributes))
+            {
+                if (parentAttributes == attributes) { return; }
+                if (hitCounter.ContainsKey(attributes))
+                {
+                    if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
+                    if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return; }
+                }
+
+                if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
+
+                bool bHit = attributes.ProcessMeleeHit(parentAttributes,
+                    parentWeaponHandler.CurrentActionClip,
+                    this,
+                    other.ClosestPointOnBounds(transform.position),
+                    Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
+                );
+
+                if (bHit) { hitsOnThisPhysicsUpdate.Add(attributes); }
+            }
+        }
+
+        private bool clearListNextUpdate;
+        private void FixedUpdate()
+        {
+            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
+            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!parentWeaponHandler) { return; }
+
+            if (TryGetComponent(out BoxCollider boxCollider))
+            {
+                if (parentWeaponHandler.CurrentActionClip)
+                {
+                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
+                    {
+                        if (parentWeaponHandler.IsInAnticipation)
+                            Gizmos.color = Color.yellow;
+                        else if (parentWeaponHandler.IsAttacking)
+                            Gizmos.color = Color.red;
+                        else if (parentWeaponHandler.IsInRecovery)
+                            Gizmos.color = Color.magenta;
+                        else
+                            Gizmos.color = Color.white;
+                    }
+                    else
+                    {
+                        Gizmos.color = Color.white;
+                    }
+                }
+                else
+                {
+                    Gizmos.color = Color.white;
+                }
+                
+                Matrix4x4 rotationMatrix = Matrix4x4.TRS(boxCollider.transform.position, boxCollider.transform.rotation, boxCollider.transform.lossyScale);
+                Gizmos.matrix = rotationMatrix;
+                Gizmos.DrawWireCube(boxCollider.center, boxCollider.size);
+            }
+            else if (TryGetComponent(out SphereCollider sphereCollider))
+            {
+                if (parentWeaponHandler.CurrentActionClip)
+                {
+                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
+                    {
+                        if (parentWeaponHandler.IsInAnticipation)
+                            Gizmos.color = Color.yellow;
+                        else if (parentWeaponHandler.IsAttacking)
+                            Gizmos.color = Color.red;
+                        else if (parentWeaponHandler.IsInRecovery)
+                            Gizmos.color = Color.magenta;
+                        else
+                            Gizmos.color = Color.white;
+                    }
+                    else
+                    {
+                        Gizmos.color = Color.white;
+                    }
+                }
+                else
+                {
+                    Gizmos.color = Color.white;
+                }
+
+                Gizmos.DrawWireSphere(sphereCollider.center, sphereCollider.radius);
+            }
+        }
+    }
+}
