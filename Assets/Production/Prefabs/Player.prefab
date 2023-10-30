@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 3945128955595459581}
   - component: {fileID: 3945128955595459580}
   - component: {fileID: 3945128955595459583}
-  - component: {fileID: 4073370966156965441}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -170,7 +169,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!114 &3945128955595459583
 MonoBehaviour:
@@ -195,18 +193,6 @@ MonoBehaviour:
   defenseDelay: 1
   maxRage: 100
   rageRecoveryRate: 0
---- !u!114 &4073370966156965441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3945128955595459076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f51c49d899fbe85449d321cca246a3ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0
