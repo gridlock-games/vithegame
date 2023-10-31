@@ -33,6 +33,7 @@ namespace Vi.UI
             playerCard.Initialize(GetComponentInParent<Attributes>());
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {

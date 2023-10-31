@@ -177,7 +177,7 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
 
         // Initialization method to set the references to animator, attributes, and weapon handler
-        private void OnTransformParentChanged()
+        private void Awake()
         {
             animator = GetComponent<Animator>();
             attributes = GetComponentInParent<Attributes>();

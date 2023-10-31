@@ -40,8 +40,6 @@ namespace Vi.Player
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPos, attributes.GetAilmentRotation());
             }
 
-            if (weaponHandler.IsWaitingForModelChange()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, transform.position, transform.rotation); }
-
             Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
 
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
@@ -124,8 +122,6 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
-            if (weaponHandler.IsWaitingForModelChange()) { return; }
-
             UpdateLocomotion();
         }
 

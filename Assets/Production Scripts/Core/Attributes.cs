@@ -335,8 +335,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (weaponHandler.IsWaitingForModelChange()) { return; }
-
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 

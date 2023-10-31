@@ -50,6 +50,7 @@ namespace Vi.UI
         private void RefreshRendererToFollow()
         {
             Renderer[] renderers = attributes.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0) { return; }
             Vector3 highestPoint = renderers[0].bounds.center;
             foreach (Renderer renderer in renderers)
             {
@@ -66,6 +67,7 @@ namespace Vi.UI
         private void LateUpdate()
         {
             if (!rendererToFollow) { RefreshRendererToFollow(); }
+            if (!rendererToFollow) { return; }
 
             nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
 

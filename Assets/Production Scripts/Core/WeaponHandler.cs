@@ -18,25 +18,6 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             isBlocking.OnValueChanged += OnIsBlockingChanged;
-
-            if (IsServer)
-            {
-                SwitchModel(0, 1);
-                StartCoroutine(TestSwitch1());
-                StartCoroutine(TestSwitch2());
-            }
-        }
-
-        private IEnumerator TestSwitch1()
-        {
-            yield return new WaitForSeconds(5);
-            SwitchModel(0, 0);
-        }
-
-        private IEnumerator TestSwitch2()
-        {
-            yield return new WaitForSeconds(10);
-            SwitchModel(0, 2);
         }
 
         public override void OnNetworkDespawn()
@@ -55,55 +36,19 @@ namespace Vi.Core
         private Weapon weaponInstance;
         private Attributes attributes;
 
-        [SerializeField] private CharacterReference characterReference;
-
-        private GameObject playerModelObj;
-        public void SwitchModel(int playerModelOptionIndex, int skinIndex)
+        private void Awake()
         {
-            if (!IsServer) { Debug.LogError("WeaponHandler.SwitchModel() should only be called on the server!"); return; }
-
-            if (playerModelObj) { playerModelObj.GetComponent<NetworkObject>().Despawn(true); }
-
-            CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
-            playerModelObj = Instantiate(playerModelOption.skinOptions[skinIndex]);
-            playerModelObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-            playerModelObj.transform.parent = transform;
-            playerModelObj.transform.localPosition = Vector3.zero;
-            playerModelObj.transform.localRotation = Quaternion.identity;
-
-            weaponInstance = Instantiate(playerModelOption.weapon);
-
-            attributes = GetComponent<Attributes>();
-            Animator = playerModelObj.GetComponent<Animator>();
-            AnimationHandler = playerModelObj.GetComponent<AnimationHandler>();
-            EquipWeapon(playerModelOption.skinOptions[skinIndex]);
-
-            SwitchModelClientRpc(playerModelOptionIndex, skinIndex);
-        }
-
-        [ClientRpc]
-        private void SwitchModelClientRpc(int playerModelOptionIndex, int skinIndex)
-        {
-            if (IsServer) { return; }
-
-            CharacterReference.PlayerModelOption playerModelOption = characterReference.GetPlayerModelOptions()[playerModelOptionIndex];
-            weaponInstance = Instantiate(playerModelOption.weapon);
-
-            attributes = GetComponent<Attributes>();
-            StartCoroutine(WaitForModelSpawn(playerModelOption.skinOptions[skinIndex]));
-        }
-
-        private IEnumerator WaitForModelSpawn(GameObject skinPrefab)
-        {
-            yield return new WaitUntil(() => GetComponentInChildren<Animator>());
-            Animator = GetComponentInChildren<Animator>();
             AnimationHandler = GetComponentInChildren<AnimationHandler>();
-            Animator.transform.localPosition = Vector3.zero;
-            Animator.transform.localRotation = Quaternion.identity;
-            EquipWeapon(skinPrefab);
+            Animator = GetComponentInChildren<Animator>();
+
+            weaponInstance = Instantiate(characterReference.GetPlayerModelOptions()[0].weapon);
+
+            attributes = GetComponent<Attributes>();
+
+            EquipWeapon(characterReference.GetPlayerModelOptions()[0].skinOptions[0]);
         }
 
-        public bool IsWaitingForModelChange() { return !AnimationHandler; }
+        [SerializeField] private CharacterReference characterReference;
 
         private void EquipWeapon(GameObject skinPrefab)
         {
@@ -270,7 +215,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (IsWaitingForModelChange()) { return; }
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
             if ((Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty") & !Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
