@@ -216,14 +216,8 @@ namespace Vi.Core
             characterIndex.OnValueChanged += OnCharacterIndexChange;
             skinIndex.OnValueChanged += OnSkinIndexChange;
 
-            if (IsServer)
-            {
-                //GameLogicManager.PlayerData playerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
-                //characterIndex.Value = playerData.characterIndex;
-                //skinIndex.Value = playerData.skinIndex;
-            }
-
-            GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject);
+            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
+            
             ChangeSkin(characterIndex.Value, skinIndex.Value);
         }
 

@@ -7,6 +7,7 @@ using UnityEngine.VFX;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;

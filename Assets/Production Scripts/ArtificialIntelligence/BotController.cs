@@ -52,6 +52,7 @@ namespace Vi.ArtificialIntelligence
                         animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * 5));
                     }
                 }
+                characterController.Move(Physics.gravity);
             }
             else
             {
