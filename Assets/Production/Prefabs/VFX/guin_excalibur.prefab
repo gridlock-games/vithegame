@@ -95252,7 +95252,7 @@ GameObject:
   - component: {fileID: 8925547412690725148}
   - component: {fileID: 8925547412690725149}
   - component: {fileID: 8925547412690725150}
-  - component: {fileID: 6634633519025792325}
+  - component: {fileID: 8673425928235801585}
   m_Layer: 0
   m_Name: guin_excalibur
   m_TagString: Untagged
@@ -99142,7 +99142,7 @@ ParticleSystem:
     outside: 0
     enter: 2
     exit: 0
-    colliderQueryMode: 0
+    colliderQueryMode: 2
     radiusScale: 1
     primitives: []
   SubModule:
@@ -100191,7 +100191,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6634633519025792325
+--- !u!114 &8673425928235801585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -100200,7 +100200,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8925547412690725151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
+  m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0, y: 0, z: 0}
@@ -100211,3 +100211,4 @@ MonoBehaviour:
   raycastOffset: {x: 0, y: 2, z: 3}
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  colliderLookBoxExtents: {x: 1, y: 1, z: 1}

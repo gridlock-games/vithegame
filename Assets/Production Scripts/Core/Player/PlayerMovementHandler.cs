@@ -57,6 +57,7 @@ namespace Vi.Player
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             if (animationHandler.ShouldApplyRootMotion())
             {
+                rootMotion += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate);
                 characterController.Move(attributes.IsRooted() ? Vector3.zero : rootMotion);
             }
             else
@@ -104,18 +105,16 @@ namespace Vi.Player
 
         private CharacterController characterController;
         private PlayerNetworkMovementPrediction movementPrediction;
-        private Animator animator;
-        private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private AnimationHandler animationHandler;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
-            animator = GetComponentInChildren<Animator>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+            animationHandler = GetComponent<AnimationHandler>();
 
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
@@ -152,7 +151,7 @@ namespace Vi.Player
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
             
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
             {
@@ -194,8 +193,8 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
-            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
         private Vector2 lookSensitivity;

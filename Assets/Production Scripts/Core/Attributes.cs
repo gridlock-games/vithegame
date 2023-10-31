@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using UnityEngine.VFX;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;
@@ -146,16 +148,18 @@ namespace Vi.Core
         }
 
         private GlowRenderer glowRenderer;
-        private AnimationHandler animationHandler;
-        private WeaponHandler weaponHandler;
-        private Animator animator;
-        private void Awake()
+        private void OnTransformChildrenChanged()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
-            weaponHandler = GetComponent<WeaponHandler>();
-            animator = GetComponentInChildren<Animator>();
+        }
+
+        private WeaponHandler weaponHandler;
+        private AnimationHandler animationHandler;
+        private void Awake()
+        {
             statuses = new NetworkList<ActionClip.StatusPayload>();
+            animationHandler = GetComponent<AnimationHandler>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         public bool IsInvincible { get; private set; }
@@ -289,7 +293,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 glowRenderer.RenderHit();
-                Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
+                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
             }
 
@@ -299,7 +303,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderHitClientRpc(Vector3 impactPosition, bool isKnockdown)
         {
             glowRenderer.RenderHit();
-            Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity);
+            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
         }
 
@@ -310,7 +314,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 glowRenderer.RenderBlock();
-                Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
@@ -320,7 +324,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             glowRenderer.RenderBlock();
-            Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity);
+            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -332,7 +336,7 @@ namespace Vi.Core
         {
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
-            
+
             if (!IsServer) { return; }
 
             isInvincible.Value = Time.time <= invincibilityEndTime;
@@ -376,7 +380,7 @@ namespace Vi.Core
 
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
-            animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
         }
 
@@ -397,8 +401,8 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays()
         {
-            yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
-            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
         }
 

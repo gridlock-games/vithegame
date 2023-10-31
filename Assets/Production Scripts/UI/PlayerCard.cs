@@ -48,6 +48,16 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            healthFillImage.fillAmount = 0;
+            staminaFillImage.fillAmount = 0;
+            defenseFillImage.fillAmount = 0;
+            rageFillImage.fillAmount = 0;
+
+            interimHealthFillImage.fillAmount = 0;
+            interimStaminaFillImage.fillAmount = 0;
+            interimDefenseFillImage.fillAmount = 0;
+            interimRageFillImage.fillAmount = 0;
         }
 
         public const float fillSpeed = 4;

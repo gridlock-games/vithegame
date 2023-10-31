@@ -11,13 +11,8 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        [SerializeField] private Weapon weapon;
-
         private List<GameObject> weaponInstances = new List<GameObject>();
 
-        Animator animator;
-        AnimationHandler animationHandler;
-        
         public Weapon GetWeapon() { return weaponInstance; }
 
         public override void OnNetworkSpawn()
@@ -32,30 +27,33 @@ namespace Vi.Core
 
         private void OnIsBlockingChanged(bool prev, bool current)
         {
-            animator.SetBool("Blocking", current);
+            animationHandler.Animator.SetBool("Blocking", current);
         }
 
         private Weapon weaponInstance;
         private Attributes attributes;
+        private AnimationHandler animationHandler;
 
-        private void Start()
+        private void Awake()
         {
-            weaponInstance = Instantiate(weapon);
-
+            animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
-            animator = GetComponentInChildren<Animator>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
-            EquipWeapon();
         }
 
-        private void EquipWeapon()
+        public void SetNewWeapon(Weapon weapon, GameObject skinPrefab)
+        {
+            weaponInstance = Instantiate(weapon);
+            EquipWeapon(skinPrefab);
+        }
+
+        private void EquipWeapon(GameObject skinPrefab)
         {
             List<GameObject> instances = new List<GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == GetComponentInChildren<LimbReferences>().name)
+                if (data.skinPrefab.name == skinPrefab.name)
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -73,7 +71,7 @@ namespace Vi.Core
                                 bone = Camera.main.transform;
                                 break;
                             default:
-                                bone = animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
+                                bone = animationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
                                 break;
                         }
 
@@ -193,18 +191,18 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator DestroyVFXWhenFinishedPlaying(GameObject actionVFXInstance)
+        public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
-            ParticleSystem particleSystem = actionVFXInstance.GetComponentInChildren<ParticleSystem>();
+            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
 
-            AudioSource audioSource = actionVFXInstance.GetComponentInChildren<AudioSource>();
+            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
             if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
 
-            VisualEffect visualEffect = actionVFXInstance.GetComponentInChildren<VisualEffect>();
+            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
             if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
 
-            Destroy(actionVFXInstance);
+            Destroy(vfxInstance);
         }
 
         public bool IsInAnticipation { get; private set; }
@@ -215,7 +213,7 @@ namespace Vi.Core
         {
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
-            if ((animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") & !animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
                 | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 IsBlocking = isBlocking.Value;
@@ -229,9 +227,9 @@ namespace Vi.Core
             if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
-                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+                if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
-                    float normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    float normalizedTime = animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
@@ -245,9 +243,9 @@ namespace Vi.Core
                         }
                     }
                 }
-                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+                else if (animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
-                    float normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    float normalizedTime = animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
@@ -283,42 +281,42 @@ namespace Vi.Core
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability1, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability1, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility2()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability2, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability2, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility3()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability3, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability3, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility4()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }

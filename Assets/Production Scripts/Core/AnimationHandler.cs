@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using System.Linq;
 
-// Define the namespace for the script
 namespace Vi.Core
 {
-    // This script requires an Animator component and extends the NetworkBehaviour class
-    [RequireComponent(typeof(Animator))]
     public class AnimationHandler : NetworkBehaviour
     {
         // This method plays an action based on the provided ActionClip parameter
@@ -35,16 +31,16 @@ namespace Vi.Core
 
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
-            
+
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+                if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
             }
 
             // If we are not at rest and the last clip was a dodge, don't play this clip
-            if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty") | animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            if (!Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
             {
                 if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
 
@@ -84,7 +80,7 @@ namespace Vi.Core
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+                if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
             }
 
             // Check stamina and rage requirements and apply statuses for specific actions
@@ -116,11 +112,11 @@ namespace Vi.Core
             // Play the action clip based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
-                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
+                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
             }
             else
             {
-                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -130,7 +126,7 @@ namespace Vi.Core
         }
 
         // Remote Procedure Call method for playing the action on the server
-        [ServerRpc(RequireOwnership = false)] 
+        [ServerRpc(RequireOwnership = false)]
         private void PlayActionServerRpc(string actionStateName) { PlayActionOnServer(actionStateName); }
 
         // Remote Procedure Call method for playing the action on the client
@@ -145,11 +141,11 @@ namespace Vi.Core
             // Play the action clip on the client side based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
-                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"), 0);
+                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
             }
             else
             {
-                animator.CrossFade(actionStateName, 0.15f, animator.GetLayerIndex("Actions"));
+                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
             }
 
             // Set the current action clip for the weapon handler
@@ -163,64 +159,85 @@ namespace Vi.Core
         private IEnumerator SetInvincibleStatusOnDodge(string actionStateName)
         {
             attributes.SetInviniciblity(5);
-            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(actionStateName));
-            AnimatorClipInfo[] dodgeClips = animator.GetCurrentAnimatorClipInfo(animator.GetLayerIndex("Actions"));
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName));
+            AnimatorClipInfo[] dodgeClips = Animator.GetCurrentAnimatorClipInfo(Animator.GetLayerIndex("Actions"));
             if (dodgeClips.Length > 0)
                 attributes.SetInviniciblity(dodgeClips[0].clip.length * 0.35f);
             else
                 attributes.SetInviniciblity(0);
         }
 
-        // Declare variables for animator, attributes, and weapon handler
-        Animator animator;
+        public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
+        public Vector3 ApplyLocalRootMotion() { return animatorReference.ApplyLocalRootMotion(); }
+        public Vector3 ApplyNetworkRootMotion() { return animatorReference.ApplyNetworkRootMotion(); }
+
+        public Animator Animator { get; private set; }
         Attributes attributes;
         WeaponHandler weaponHandler;
+        AnimatorReference animatorReference;
 
-        // Initialization method to set the references to animator, attributes, and weapon handler
+        private NetworkVariable<int> characterIndex = new NetworkVariable<int>();
+        private NetworkVariable<int> skinIndex = new NetworkVariable<int>();
+
+        private void OnCharacterIndexChange(int prev, int current)
+        {
+            ChangeSkin(current, skinIndex.Value);
+        }
+
+        private void OnSkinIndexChange(int prev, int current)
+        {
+            ChangeSkin(characterIndex.Value, current);
+        }
+
+        private void ChangeSkin(int characterIndex, int skinIndex)
+        {
+            animatorReference = GetComponentInChildren<AnimatorReference>();
+            if (animatorReference)
+            {
+                Destroy(animatorReference.gameObject);
+            }
+
+            CharacterReference.PlayerModelOption modelOption = characterReference.GetPlayerModelOptions()[characterIndex];
+            GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+
+            Animator = modelInstance.GetComponent<Animator>();
+            animatorReference = modelInstance.GetComponent<AnimatorReference>();
+            weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
+        }
+
+        public void SetCharacterSkin(int characterIndex, int skinIndex)
+        {
+            this.characterIndex.Value = characterIndex;
+            this.skinIndex.Value = skinIndex;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            characterIndex.OnValueChanged += OnCharacterIndexChange;
+            skinIndex.OnValueChanged += OnSkinIndexChange;
+
+            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
+            
+            ChangeSkin(characterIndex.Value, skinIndex.Value);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            characterIndex.OnValueChanged -= OnCharacterIndexChange;
+            skinIndex.OnValueChanged -= OnSkinIndexChange;
+        }
+
+        [SerializeField] private CharacterReference characterReference;
+
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            attributes = GetComponentInParent<Attributes>();
-            weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = GetComponent<Attributes>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
-        // Variable to store network root motion
-        private Vector3 networkRootMotion;
-        // Method to apply network root motion
-        public Vector3 ApplyNetworkRootMotion()
+        private void Update()
         {
-            Vector3 _ = networkRootMotion;
-            networkRootMotion = Vector3.zero;
-            return _;
-        }
-
-        // Variable to store local root motion
-        private Vector3 localRootMotion;
-        // Method to apply local root motion
-        public Vector3 ApplyLocalRootMotion()
-        {
-            Vector3 _ = localRootMotion;
-            localRootMotion = Vector3.zero;
-            return _;
-        }
-
-        public bool ShouldApplyRootMotion() { return !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"); }
-
-        // Event handler for animator's movement
-        private void OnAnimatorMove()
-        {
-            // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
-            if (ShouldApplyRootMotion())
-            {
-                networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
-                localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
-            }
-        }
-
-        // Event handler for animator's inverse kinematics
-        private void OnAnimatorIK(int layerIndex)
-        {
-
+            
         }
     }
 }

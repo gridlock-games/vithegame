@@ -22,7 +22,6 @@ namespace Vi.UI
         [SerializeField] private StatusIcon statusImagePrefab;
         [Header("Debug Elements")]
         [SerializeField] private TextMeshProUGUI fpsDisplay;
-        [SerializeField] private TextMeshProUGUI pingDisplay;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -33,6 +32,7 @@ namespace Vi.UI
             playerCard.Initialize(GetComponentInParent<Attributes>());
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {
@@ -76,7 +76,6 @@ namespace Vi.UI
             }
 
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
-            pingDisplay.SetText("Ping: " + attributes.GetRoundTripTime().ToString());
         }
 
         private float frameCount;

@@ -35,19 +35,6 @@ namespace Vi.UI
 
             transform.SetParent(null, true);
 
-            Renderer[] renderers = attributes.GetComponentsInChildren<Renderer>();
-            Vector3 highestPoint = renderers[0].bounds.center;
-            foreach (Renderer renderer in renderers)
-            {
-                if (renderer.GetType() != typeof(SkinnedMeshRenderer)) { continue; }
-
-                if (renderer.bounds.center.y > highestPoint.y)
-                {
-                    rendererToFollow = renderer;
-                    highestPoint = renderer.bounds.center;
-                }
-            }
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
@@ -60,8 +47,28 @@ namespace Vi.UI
             }
         }
 
+        private void RefreshRendererToFollow()
+        {
+            Renderer[] renderers = attributes.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0) { return; }
+            Vector3 highestPoint = renderers[0].bounds.center;
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.GetType() != typeof(SkinnedMeshRenderer)) { continue; }
+
+                if (renderer.bounds.center.y > highestPoint.y)
+                {
+                    rendererToFollow = renderer;
+                    highestPoint = renderer.bounds.center;
+                }
+            }
+        }
+
         private void LateUpdate()
         {
+            if (!rendererToFollow) { RefreshRendererToFollow(); }
+            if (!rendererToFollow) { return; }
+
             nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
 
             Vector3 localScaleTarget = Vector3.zero;
