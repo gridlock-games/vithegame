@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3945128955595459581}
   - component: {fileID: 3945128955595459580}
   - component: {fileID: 3945128955595459583}
+  - component: {fileID: 1486683922734963072}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -194,6 +195,18 @@ MonoBehaviour:
   defenseDelay: 1
   maxRage: 100
   rageRecoveryRate: 0
+--- !u!114 &1486683922734963072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3945128955595459076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0

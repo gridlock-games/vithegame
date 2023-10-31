@@ -146,21 +146,19 @@ namespace Vi.Core
             }
         }
 
-        private WeaponHandler weaponHandler;
-        private void Start()
-        {
-            weaponHandler = GetComponent<WeaponHandler>();
-        }
-
         private GlowRenderer glowRenderer;
         private void OnTransformChildrenChanged()
         {
             glowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
+        private WeaponHandler weaponHandler;
+        private AnimationHandler animationHandler;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
+            animationHandler = GetComponent<AnimationHandler>();
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         public bool IsInvincible { get; private set; }
@@ -199,7 +197,7 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            weaponHandler.AnimationHandler.PlayAction(hitReaction);
+            animationHandler.PlayAction(hitReaction);
 
             runtimeWeapon.AddHit(this);
 
@@ -381,7 +379,7 @@ namespace Vi.Core
 
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
-            weaponHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
         }
 
@@ -402,8 +400,8 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays()
         {
-            yield return new WaitUntil(() => !weaponHandler.Animator.GetCurrentAnimatorStateInfo(weaponHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
-            yield return new WaitUntil(() => weaponHandler.Animator.GetCurrentAnimatorStateInfo(weaponHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
             ailment.Value = ActionClip.Ailment.None;
         }
 

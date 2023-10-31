@@ -29,7 +29,7 @@ namespace Vi.Player
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
 
-                characterController.Move(weaponHandler.AnimationHandler.ApplyNetworkRootMotion());
+                characterController.Move(animationHandler.ApplyNetworkRootMotion());
                 Vector3 newPos = transform.position;
 
                 // Revert movement change
@@ -54,8 +54,8 @@ namespace Vi.Player
             characterController.enabled = true;
 
             // Apply movement to charactercontroller
-            Vector3 rootMotion = weaponHandler.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            if (weaponHandler.AnimationHandler.ShouldApplyRootMotion())
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            if (animationHandler.ShouldApplyRootMotion())
             {
                 rootMotion += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate);
                 characterController.Move(attributes.IsRooted() ? Vector3.zero : rootMotion);
@@ -107,12 +107,14 @@ namespace Vi.Player
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private AnimationHandler animationHandler;
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+            animationHandler = GetComponent<AnimationHandler>();
 
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
@@ -148,8 +150,8 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
-            Vector3 rootMotion = weaponHandler.AnimationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            weaponHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
             
             if (localDistance > movementPrediction.playerObjectTeleportThreshold)
             {
@@ -158,7 +160,7 @@ namespace Vi.Player
                 transform.position = movementPrediction.currentPosition;
                 characterController.enabled = true;
             }
-            else if (weaponHandler.AnimationHandler.ShouldApplyRootMotion()) // is root moving
+            else if (animationHandler.ShouldApplyRootMotion()) // is root moving
             {
                 rootMotion = transform.rotation * rootMotion;
 
@@ -191,8 +193,8 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            weaponHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(weaponHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
-            weaponHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(weaponHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
         }
 
         private Vector2 lookSensitivity;
@@ -217,7 +219,7 @@ namespace Vi.Player
         void OnDodge()
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
-            weaponHandler.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+            animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
 }

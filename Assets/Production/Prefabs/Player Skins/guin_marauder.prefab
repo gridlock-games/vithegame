@@ -34226,7 +34226,6 @@ GameObject:
   - component: {fileID: 8550630191804706862}
   - component: {fileID: 4263975222030074352}
   - component: {fileID: 652874354900672553}
-  - component: {fileID: 4355069530842362132}
   m_Layer: 0
   m_Name: guin_marauder
   m_TagString: Untagged
@@ -34510,26 +34509,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4355069530842362132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7878422891106188551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &7922885537123229128
 GameObject:
   m_ObjectHideFlags: 0

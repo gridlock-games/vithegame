@@ -14,15 +14,13 @@ namespace Vi.ArtificialIntelligence
 
         private CharacterController characterController;
         private AnimationHandler animationHandler;
-        private Animator animator;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
 
         private void Start()
         {
             characterController = GetComponent<CharacterController>();
-            animationHandler = GetComponentInChildren<AnimationHandler>();
-            animator = GetComponentInChildren<Animator>();
+            animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponent<Attributes>();
         }
@@ -50,8 +48,8 @@ namespace Vi.ArtificialIntelligence
                         characterController.Move(5 * Time.deltaTime * dir);
 
                         Vector3 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
-                        animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * 5));
-                        animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * 5));
+                        animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * 5));
+                        animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * 5));
                     }
                 }
             }
