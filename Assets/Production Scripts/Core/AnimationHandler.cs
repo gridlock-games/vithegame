@@ -205,6 +205,12 @@ namespace Vi.Core
             weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
         }
 
+        public void SetCharacterSkin(int characterIndex, int skinIndex)
+        {
+            this.characterIndex.Value = characterIndex;
+            this.skinIndex.Value = skinIndex;
+        }
+
         public override void OnNetworkSpawn()
         {
             characterIndex.OnValueChanged += OnCharacterIndexChange;
@@ -212,11 +218,12 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                GameLogicManager.PlayerData playerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
-                characterIndex.Value = playerData.characterIndex;
-                skinIndex.Value = playerData.skinIndex;
+                //GameLogicManager.PlayerData playerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
+                //characterIndex.Value = playerData.characterIndex;
+                //skinIndex.Value = playerData.skinIndex;
             }
 
+            GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject);
             ChangeSkin(characterIndex.Value, skinIndex.Value);
         }
 

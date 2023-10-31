@@ -24,6 +24,26 @@ namespace Vi.Core
             Blue,
         }
 
+        private Dictionary<ulong, GameObject> localPlayers = new Dictionary<ulong, GameObject>();
+        public void AddPlayerObject(ulong clientId, GameObject playerObject)
+        {
+            localPlayers.Add(clientId, playerObject);
+        }
+
+        public PlayerData GetPlayerData(ulong clientId)
+        {
+            foreach (PlayerData playerData in playerDataList)
+            {
+                if (playerData.clientId == clientId)
+                {
+                    return playerData;
+                }
+            }
+            Debug.LogError("Could not find player data with ID: " + clientId);
+            return new PlayerData();
+        }
+
+
         public static GameLogicManager Singleton { get { return _singleton; } }
         protected static GameLogicManager _singleton;
 
@@ -38,6 +58,24 @@ namespace Vi.Core
         protected void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            playerDataList.OnListChanged += OnPlayerDataListChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            playerDataList.OnListChanged -= OnPlayerDataListChange;
+        }
+
+        protected void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
+        {
+            if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
+            {
+                localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);
+            }
         }
 
         protected NetworkList<PlayerData> playerDataList;
@@ -92,19 +130,6 @@ namespace Vi.Core
         {
             yield return new WaitUntil(() => IsSpawned);
             playerDataList.Add(playerData);
-        }
-
-        public PlayerData GetPlayerData(ulong clientId)
-        {
-            foreach (PlayerData playerData in playerDataList)
-            {
-                if (playerData.clientId == clientId)
-                {
-                    return playerData;
-                }
-            }
-            Debug.LogError("Could not find player data with ID: " + clientId);
-            return new PlayerData();
         }
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
