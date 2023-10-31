@@ -40,13 +40,11 @@ namespace Vi.Core
             attributes = GetComponent<Attributes>();
         }
 
-        private void Start()
+        public void SetNewWeapon(Weapon weapon, GameObject skinPrefab)
         {
-            weaponInstance = Instantiate(characterReference.GetPlayerModelOptions()[0].weapon);
-            EquipWeapon(characterReference.GetPlayerModelOptions()[0].skinOptions[0]);
+            weaponInstance = Instantiate(weapon);
+            EquipWeapon(skinPrefab);
         }
-
-        [SerializeField] private CharacterReference characterReference;
 
         private void EquipWeapon(GameObject skinPrefab)
         {

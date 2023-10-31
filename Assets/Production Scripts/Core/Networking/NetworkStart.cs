@@ -8,8 +8,13 @@ namespace Vi.Networking
 {
     public class NetworkStart : MonoBehaviour
     {
+        [Header("Player Name|CharacterIndex|SkinIndex")]
+        [SerializeField] private string payloadString;
+
         void Start()
         {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(payloadString);
+
             //if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             //    NetworkManager.Singleton.StartServer();
             if (Application.isEditor)

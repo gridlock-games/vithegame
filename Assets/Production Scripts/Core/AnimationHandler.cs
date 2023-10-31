@@ -176,12 +176,67 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
 
+        private NetworkVariable<int> characterIndex = new NetworkVariable<int>();
+        private NetworkVariable<int> skinIndex = new NetworkVariable<int>();
+
+        private void OnCharacterIndexChange(int prev, int current)
+        {
+            ChangeSkin(current, skinIndex.Value);
+        }
+
+        private void OnSkinIndexChange(int prev, int current)
+        {
+            ChangeSkin(characterIndex.Value, current);
+        }
+
+        private void ChangeSkin(int characterIndex, int skinIndex)
+        {
+            animatorReference = GetComponentInChildren<AnimatorReference>();
+            if (animatorReference)
+            {
+                Destroy(animatorReference.gameObject);
+            }
+
+            CharacterReference.PlayerModelOption modelOption = characterReference.GetPlayerModelOptions()[characterIndex];
+            GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+
+            Animator = modelInstance.GetComponent<Animator>();
+            animatorReference = modelInstance.GetComponent<AnimatorReference>();
+            weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            characterIndex.OnValueChanged += OnCharacterIndexChange;
+            skinIndex.OnValueChanged += OnSkinIndexChange;
+
+            if (IsServer)
+            {
+                GameLogicManager.PlayerData playerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
+                characterIndex.Value = playerData.characterIndex;
+                skinIndex.Value = playerData.skinIndex;
+            }
+
+            ChangeSkin(characterIndex.Value, skinIndex.Value);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            characterIndex.OnValueChanged -= OnCharacterIndexChange;
+            skinIndex.OnValueChanged -= OnSkinIndexChange;
+        }
+
+        [SerializeField] private CharacterReference characterReference;
+
         private void Awake()
         {
-            Animator = GetComponentInChildren<Animator>();
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
-            animatorReference = GetComponentInChildren<AnimatorReference>();
+        }
+
+        private void Update()
+        {
+            
         }
     }
 }
