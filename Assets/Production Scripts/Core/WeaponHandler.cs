@@ -113,7 +113,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyOnActivate)
+                foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
                     attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
                 }

@@ -124,7 +124,8 @@ namespace Vi.ScriptableObjects
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
 
-        public List<StatusPayload> statusesToApplyOnActivate = new List<StatusPayload>();
+        public List<StatusPayload> statusesToApplyToSelfOnActivate = new List<StatusPayload>();
+        public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
     }

@@ -43,7 +43,8 @@ namespace Vi.Editor
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
 
-        private SerializedProperty spStatusesToApplyOnActivate;
+        private SerializedProperty spStatusesToApplyToSelfOnActivate;
+        private SerializedProperty spStatusesToApplyToTargetOnHit;
 
         private SerializedProperty spActionVFXList;
 
@@ -79,7 +80,8 @@ namespace Vi.Editor
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
 
-            spStatusesToApplyOnActivate = serializedObject.FindProperty("statusesToApplyOnActivate");
+            spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
+            spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
         }
@@ -95,7 +97,9 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
 
             EditorGUILayout.PropertyField(spTransitionTime);
-            EditorGUILayout.PropertyField(spStatusesToApplyOnActivate);
+            EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
+            EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
             
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {

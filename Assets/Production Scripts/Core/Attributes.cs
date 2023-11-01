@@ -293,7 +293,7 @@ namespace Vi.Core
                     }
                 }
 
-                RenderHit(impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
                 AddHP(-attack.damage * attacker.damageMultiplier);
             }
 
@@ -306,28 +306,35 @@ namespace Vi.Core
                 weaponHandler.SpawnActionVFX(actionVFX, attacker.transform);
             }
 
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                TryAddStatus(status.status, status.value, status.duration, status.delay);
+            }
+
             return true;
         }
 
-        private void RenderHit(Vector3 impactPosition, bool isKnockdown)
+        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
-
+            
             if (!IsClient)
             {
                 glowRenderer.RenderHit();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-                AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+                Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+                AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
 
-            RenderHitClientRpc(impactPosition, isKnockdown);
+            RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc] private void RenderHitClientRpc(Vector3 impactPosition, bool isKnockdown)
+        [ClientRpc] private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             glowRenderer.RenderHit();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+            Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+            AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
 
         private void RenderBlock(Vector3 impactPosition)
