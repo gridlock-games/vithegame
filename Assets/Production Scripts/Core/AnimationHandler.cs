@@ -222,6 +222,9 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private int botCharacterIndex;
+        [SerializeField] private int botSkinIndex;
+
         public override void OnNetworkSpawn()
         {
             characterModelInfo.OnValueChanged += OnCharacterModelInfoChange;
@@ -236,7 +239,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    characterModelInfo.Value = new CharacterModelInfo(0, 0);
+                    characterModelInfo.Value = new CharacterModelInfo(botCharacterIndex, botSkinIndex);
                 }
             }
             else
