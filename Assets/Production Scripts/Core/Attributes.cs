@@ -228,9 +228,11 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
+            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            animationHandler.PlayAction(hitReaction);
+            if (!IsUninterruptable) { animationHandler.PlayAction(hitReaction); }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 

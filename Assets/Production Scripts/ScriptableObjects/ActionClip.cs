@@ -100,6 +100,7 @@ namespace Vi.ScriptableObjects
         public int maxHitLimit = 1;
         public float timeBetweenHits = 1;
         public bool isBlockable = true;
+        public bool isUninterruptable;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
 
