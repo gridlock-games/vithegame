@@ -86,8 +86,8 @@ namespace Vi.Core
             // Check stamina and rage requirements and apply statuses for specific actions
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
+                if (weaponHandler.GetWeapon().dodgeStaminaCost > attributes.GetStamina()) { return; }
+                attributes.AddStamina(-weaponHandler.GetWeapon().dodgeStaminaCost);
                 StartCoroutine(SetInvincibleStatusOnDodge(actionStateName));
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)

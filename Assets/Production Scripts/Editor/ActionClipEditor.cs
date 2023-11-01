@@ -83,12 +83,8 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spRootMotionMulitplier);
             EditorGUILayout.PropertyField(spStatusesToApplyOnActivate);
-
-            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Dodge)
-            {
-                EditorGUILayout.PropertyField(spAgentStaminaCost);
-            }
-            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
+            
+            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
                 EditorGUILayout.PropertyField(spDamage);

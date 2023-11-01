@@ -336,6 +336,7 @@ namespace Vi.ScriptableObjects
         }
 
         [Header("Dodge Assignments")]
+        public float dodgeStaminaCost = 20;
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;

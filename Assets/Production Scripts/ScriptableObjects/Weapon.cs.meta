@@ -3,7 +3,28 @@ guid: 8e7e51f50a0f4cf43b1d636c019f1cb9
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
+  - hitAudioClip: {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
+  - knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
+      type: 3}
+  - hitVFXPrefab: {fileID: 4329036519906242892, guid: 8fa4d75523fd22445abc60e9da3a5790,
+      type: 3}
+  - blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
+  - blockVFXPrefab: {fileID: 4329036519906242892, guid: 583f37b3acf6baf43bfe1b375082eba6,
+      type: 3}
+  - ability1: {instanceID: 0}
+  - ability2: {instanceID: 0}
+  - ability3: {instanceID: 0}
+  - ability4: {instanceID: 0}
+  - dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
+  - dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
+  - dodgeFR: {fileID: 11400000, guid: c0bb9f32a0406bb4fbc7033646e9143f, type: 2}
+  - dodgeB: {fileID: 11400000, guid: 28d1fd5cbe620264f8b454221540227e, type: 2}
+  - dodgeBL: {fileID: 11400000, guid: 55fb95729b0b0ab49a53ebd449350c4b, type: 2}
+  - dodgeBR: {fileID: 11400000, guid: 8e65494966795db4e988629afba64821, type: 2}
+  - dodgeL: {fileID: 11400000, guid: e3582b9581dbb1f4d8c0978182f5c8ba, type: 2}
+  - dodgeR: {fileID: 11400000, guid: 95469fd8448f39a4e9a6e64370077838, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
