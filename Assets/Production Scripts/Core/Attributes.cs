@@ -178,20 +178,51 @@ namespace Vi.Core
         public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
+
+            return ProcessHit(true, attacker, attack, impactPosition, attackAngle, runtimeWeapon);
+        }
+
+        private IEnumerator ResetStaggerBool()
+        {
+            yield return null;
+            wasStaggeredThisFrame = false;
+        }
+
+        public bool ProcessProjectileHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
+
+            return ProcessHit(false, attacker, attack, impactPosition, attackAngle);
+        }
+
+        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle, RuntimeWeapon runtimeWeapon = null)
+        {
+            if (isMeleeHit)
+            {
+                if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
+            }
+            else // is projectile hit
+            {
+                if (runtimeWeapon) { Debug.LogError("When processing a projectile hit, you shouldn't be passing in a runtime weapon!"); return false; }
+            }
+
             if (IsInvincible) { return false; }
-            if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
+            if (isMeleeHit)
+            {
+                if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
+            }
 
             if (!IsUninterruptable)
             {
                 wasStaggeredThisFrame = true;
                 StartCoroutine(ResetStaggerBool());
             }
-            
+
             // Combination ailment logic here
             ActionClip.Ailment attackAilment = attack.ailment;
             if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
-            
+
             if (ailment.Value == ActionClip.Ailment.Stagger & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
@@ -200,7 +231,7 @@ namespace Vi.Core
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             animationHandler.PlayAction(hitReaction);
 
-            runtimeWeapon.AddHit(this);
+            if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
@@ -273,17 +304,6 @@ namespace Vi.Core
             }
 
             return true;
-        }
-
-        private IEnumerator ResetStaggerBool()
-        {
-            yield return null;
-            wasStaggeredThisFrame = false;
-        }
-
-        public void ProcessProjectileHit()
-        {
-
         }
 
         private void RenderHit(Vector3 impactPosition, bool isKnockdown)

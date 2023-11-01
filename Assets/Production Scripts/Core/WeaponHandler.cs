@@ -183,6 +183,11 @@ namespace Vi.Core
 
             if (vfxInstance)
             {
+                if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                {
+                    actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
+                }
+
                 StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
             }
             else

@@ -23,11 +23,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
-                if (hitCounter.ContainsKey(attributes))
-                {
-                    if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
-                    if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return; }
-                }
+                if (!CanHit(attributes)) { return; }
 
                 if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
 
