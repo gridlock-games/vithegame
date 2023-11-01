@@ -210,12 +210,12 @@ namespace Vi.Core
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
-            }
 
-            if (!IsUninterruptable)
-            {
-                wasStaggeredThisFrame = true;
-                StartCoroutine(ResetStaggerBool());
+                if (!IsUninterruptable)
+                {
+                    wasStaggeredThisFrame = true;
+                    StartCoroutine(ResetStaggerBool());
+                }
             }
 
             // Combination ailment logic here
@@ -299,6 +299,7 @@ namespace Vi.Core
 
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
+            attacker.AddRage(2);
 
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
