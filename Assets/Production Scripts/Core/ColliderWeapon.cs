@@ -31,7 +31,7 @@ namespace Vi.Core
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
-                    Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
+                    parentAttributes.transform.position
                 );
 
                 if (bHit) { hitsOnThisPhysicsUpdate.Add(attributes); }

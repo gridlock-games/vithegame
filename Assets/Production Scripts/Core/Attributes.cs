@@ -175,11 +175,11 @@ namespace Vi.Core
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         private bool wasStaggeredThisFrame;
-        public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, float attackAngle)
+        public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(true, attacker, attack, impactPosition, attackAngle, runtimeWeapon);
+            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon);
         }
 
         private IEnumerator ResetStaggerBool()
@@ -188,14 +188,14 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        public bool ProcessProjectileHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle)
+        public bool ProcessProjectileHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(false, attacker, attack, impactPosition, attackAngle);
+            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition);
         }
 
-        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, float attackAngle, RuntimeWeapon runtimeWeapon = null)
+        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
             {
@@ -228,6 +228,7 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
+            float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             animationHandler.PlayAction(hitReaction);
 
@@ -247,7 +248,7 @@ namespace Vi.Core
                     if (attackAilment != ActionClip.Ailment.None)
                     {
                         Vector3 startPos = transform.position;
-                        Vector3 endPos = attacker.transform.position;
+                        Vector3 endPos = hitSourcePosition;
                         startPos.y = 0;
                         endPos.y = 0;
                         ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);

@@ -69,7 +69,7 @@ namespace Vi.Core
 
                         if (canHit)
                         {
-                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(enter[particleIndex].position), 0))
+                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(enter[particleIndex].position), transform.position))
                             {
                                 if (!hitCounter.ContainsKey(attributes))
                                 {
@@ -105,7 +105,7 @@ namespace Vi.Core
 
                         if (canHit)
                         {
-                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(inside[particleIndex].position), 0))
+                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(inside[particleIndex].position), transform.position))
                             {
                                 if (!hitCounter.ContainsKey(attributes))
                                 {
