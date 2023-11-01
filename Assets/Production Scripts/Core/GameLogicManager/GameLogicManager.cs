@@ -96,8 +96,6 @@ namespace Vi.Core
 
         protected void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
-            Debug.Log(networkListEvent.Type + " " + networkListEvent.Value.characterIndex);
-
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
                 //localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);

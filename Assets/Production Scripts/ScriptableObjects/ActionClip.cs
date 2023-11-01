@@ -30,7 +30,8 @@ namespace Vi.ScriptableObjects
             Knockup,
             Stun,
             Stagger,
-            Pull
+            Pull,
+            Death
         }
 
         public enum Status

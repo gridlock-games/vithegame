@@ -130,15 +130,10 @@ namespace Vi.Core
         {
             if (current < prev)
             {
-                //glowRenderer.RenderHit();
-
-                if (prev <= 0 & current > 0)
+                if (current <= 0)
                 {
-                    // Character.CancelDeath();
-                }
-                else
-                {
-                    
+                    // Death
+                    //ailment.Value = ActionClip.Ailment.Death;
                 }
             }
             else if (current > prev)
@@ -232,6 +227,15 @@ namespace Vi.Core
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+
+            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f * attacker.damageMultiplier : -attack.damage * attacker.damageMultiplier;
+
+            if (HP.Value + damage <= 0)
+            {
+                attackAilment = ActionClip.Ailment.Death;
+                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+            }
+
             if (!IsUninterruptable) { animationHandler.PlayAction(hitReaction); }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
@@ -239,7 +243,7 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
-                AddHP(-attack.damage * 0.7f * attacker.damageMultiplier);
+                AddHP(damage);
             }
             else // Not blocking
             {
@@ -286,6 +290,8 @@ namespace Vi.Core
                             case ActionClip.Ailment.Pull:
                                 ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
                                 break;
+                            case ActionClip.Ailment.Death:
+                                break;
                             default:
                                 Debug.LogWarning(attackAilment + " has not been implemented yet!");
                                 break;
@@ -294,7 +300,7 @@ namespace Vi.Core
                 }
 
                 RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
-                AddHP(-attack.damage * attacker.damageMultiplier);
+                AddHP(damage);
             }
 
             AddStamina(-attack.staminaDamage);
@@ -413,6 +419,14 @@ namespace Vi.Core
         {
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+
+            if (current == ActionClip.Ailment.Death)
+            {
+                foreach (Collider c in GetComponentsInChildren<Collider>())
+                {
+                    c.enabled = false;
+                }
+            }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
