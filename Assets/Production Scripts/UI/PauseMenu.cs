@@ -31,6 +31,7 @@ namespace Vi.UI
         public void ChangeMasterVolume()
         {
             AudioListener.volume = volumeSlider.value;
+            PlayerPrefs.SetFloat("masterVolume", AudioListener.volume);
         }
 
         private void Start()

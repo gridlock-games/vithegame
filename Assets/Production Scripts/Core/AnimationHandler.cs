@@ -176,17 +176,11 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
 
-        private NetworkVariable<int> characterIndex = new NetworkVariable<int>();
-        private NetworkVariable<int> skinIndex = new NetworkVariable<int>();
+        private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
 
-        private void OnCharacterIndexChange(int prev, int current)
+        private void OnCharacterModelInfoChange(CharacterModelInfo prev, CharacterModelInfo current)
         {
-            ChangeSkin(current, skinIndex.Value);
-        }
-
-        private void OnSkinIndexChange(int prev, int current)
-        {
-            ChangeSkin(characterIndex.Value, current);
+            ChangeSkin(current.characterIndex, current.skinIndex);
         }
 
         private void ChangeSkin(int characterIndex, int skinIndex)
@@ -207,14 +201,30 @@ namespace Vi.Core
 
         public void SetCharacterSkin(int characterIndex, int skinIndex)
         {
-            this.characterIndex.Value = characterIndex;
-            this.skinIndex.Value = skinIndex;
+            characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
+        }
+
+        private struct CharacterModelInfo : INetworkSerializable
+        {
+            public int characterIndex;
+            public int skinIndex;
+
+            public CharacterModelInfo(int characterIndex, int skinIndex)
+            {
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref characterIndex);
+                serializer.SerializeValue(ref skinIndex);
+            }
         }
 
         public override void OnNetworkSpawn()
         {
-            characterIndex.OnValueChanged += OnCharacterIndexChange;
-            skinIndex.OnValueChanged += OnSkinIndexChange;
+            characterModelInfo.OnValueChanged += OnCharacterModelInfoChange;
 
             if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
             
@@ -222,24 +232,22 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    characterIndex.Value = GameLogicManager.Singleton.GetPlayerData(OwnerClientId).characterIndex;
-                    skinIndex.Value = GameLogicManager.Singleton.GetPlayerData(OwnerClientId).skinIndex;
+                    characterModelInfo.Value = new CharacterModelInfo(GameLogicManager.Singleton.GetPlayerData(OwnerClientId).characterIndex, GameLogicManager.Singleton.GetPlayerData(OwnerClientId).skinIndex);
                 }
                 else
                 {
-                    ChangeSkin(characterIndex.Value, skinIndex.Value);
+                    characterModelInfo.Value = new CharacterModelInfo(0, 0);
                 }
             }
             else
             {
-                ChangeSkin(characterIndex.Value, skinIndex.Value);
+                ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
         }
 
         public override void OnNetworkDespawn()
         {
-            characterIndex.OnValueChanged -= OnCharacterIndexChange;
-            skinIndex.OnValueChanged -= OnSkinIndexChange;
+            characterModelInfo.OnValueChanged -= OnCharacterModelInfoChange;
         }
 
         private void Awake()
