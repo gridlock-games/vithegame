@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
     public class GameLogicManager : NetworkBehaviour
     {
+        [SerializeField] protected CharacterReference characterReference;
+
+        public CharacterReference GetCharacterReference() { return characterReference; }
+
         public enum GameMode
         {
             Duel,
@@ -43,7 +48,6 @@ namespace Vi.Core
             return new PlayerData();
         }
 
-
         public static GameLogicManager Singleton { get { return _singleton; } }
         protected static GameLogicManager _singleton;
 
@@ -57,7 +61,9 @@ namespace Vi.Core
 
         protected void Start()
         {
-            NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
+            NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
+            NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
         public override void OnNetworkSpawn()
@@ -74,8 +80,26 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);
+                //localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);
             }
+        }
+
+        protected void OnClientConnectCallback(ulong clientId)
+        {
+            if (IsServer) { StartCoroutine(SpawnPlayer(clientId)); }
+        }
+
+        private IEnumerator SpawnPlayer(ulong clientId)
+        {
+            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData(clientId)));
+
+            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(clientId).characterIndex].playerPrefab);
+            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(GetPlayerData(clientId).clientId, true);
+        }
+
+        protected void OnClientDisconnectCallback(ulong clientId)
+        {
+
         }
 
         protected NetworkList<PlayerData> playerDataList;
@@ -90,7 +114,7 @@ namespace Vi.Core
 
             // Your approval logic determines the following values
             response.Approved = true;
-            response.CreatePlayerObject = true;
+            response.CreatePlayerObject = false;
 
             // The Prefab hash value of the NetworkPrefab, if null the default NetworkManager player Prefab is used
             response.PlayerPrefabHash = null;
@@ -139,6 +163,14 @@ namespace Vi.Core
             public int characterIndex;
             public int skinIndex;
 
+            public PlayerData(ulong clientId)
+            {
+                this.clientId = clientId;
+                playerName = "Player Name";
+                characterIndex = 0;
+                skinIndex = 0;
+            }
+
             public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex)
             {
                 this.clientId = clientId;
@@ -149,7 +181,7 @@ namespace Vi.Core
 
             public bool Equals(PlayerData other)
             {
-                return clientId == other.clientId & playerName == other.playerName & characterIndex == other.characterIndex & skinIndex == other.skinIndex;
+                return clientId == other.clientId;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

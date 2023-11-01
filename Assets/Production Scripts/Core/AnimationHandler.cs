@@ -197,7 +197,7 @@ namespace Vi.Core
                 Destroy(animatorReference.gameObject);
             }
 
-            CharacterReference.PlayerModelOption modelOption = characterReference.GetPlayerModelOptions()[characterIndex];
+            CharacterReference.PlayerModelOption modelOption = GameLogicManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
             Animator = modelInstance.GetComponent<Animator>();
@@ -218,7 +218,22 @@ namespace Vi.Core
 
             if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
             
-            ChangeSkin(characterIndex.Value, skinIndex.Value);
+            if (IsServer)
+            {
+                if (NetworkObject.IsPlayerObject)
+                {
+                    characterIndex.Value = GameLogicManager.Singleton.GetPlayerData(OwnerClientId).characterIndex;
+                    skinIndex.Value = GameLogicManager.Singleton.GetPlayerData(OwnerClientId).skinIndex;
+                }
+                else
+                {
+                    ChangeSkin(characterIndex.Value, skinIndex.Value);
+                }
+            }
+            else
+            {
+                ChangeSkin(characterIndex.Value, skinIndex.Value);
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -227,17 +242,10 @@ namespace Vi.Core
             skinIndex.OnValueChanged -= OnSkinIndexChange;
         }
 
-        [SerializeField] private CharacterReference characterReference;
-
         private void Awake()
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
-        }
-
-        private void Update()
-        {
-            
         }
     }
 }

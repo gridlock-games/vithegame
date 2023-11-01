@@ -95,7 +95,7 @@ namespace Vi.UI
             }
             else
             {
-                Debug.LogWarning("Can't find a main camera for world space labels!");
+                //Debug.LogWarning("Can't find a main camera for world space labels!");
             }
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
 
