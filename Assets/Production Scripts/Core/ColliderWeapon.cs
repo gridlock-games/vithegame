@@ -23,11 +23,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
-                if (hitCounter.ContainsKey(attributes))
-                {
-                    if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return; }
-                    if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return; }
-                }
+                if (!CanHit(attributes)) { return; }
 
                 if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
 
@@ -35,7 +31,7 @@ namespace Vi.Core
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
-                    Vector3.SignedAngle(attributes.transform.forward, parentAttributes.transform.position - attributes.transform.position, Vector3.up)
+                    parentAttributes.transform.position
                 );
 
                 if (bHit) { hitsOnThisPhysicsUpdate.Add(attributes); }

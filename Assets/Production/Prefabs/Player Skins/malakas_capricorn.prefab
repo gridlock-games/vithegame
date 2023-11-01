@@ -1449,8 +1449,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6717062003272978991}
   - component: {fileID: 853397602851473493}
-  - component: {fileID: 7390735736677145209}
-  - component: {fileID: 4969959299593583203}
+  - component: {fileID: 1823163656373553457}
+  - component: {fileID: 7894708661363582642}
+  - component: {fileID: 2815819564105265544}
   m_Layer: 0
   m_Name: malakas_capricorn
   m_TagString: Untagged
@@ -1486,7 +1487,7 @@ Animator:
   m_GameObject: {fileID: 6231887737971820693}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 47c563879c432f746a7cfe90969f0701, type: 3}
-  m_Controller: {fileID: 9100000, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
+  m_Controller: {fileID: 22100000, guid: 57913356d0e72f74d9e4d2960e45cecd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -1496,7 +1497,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &7390735736677145209
+--- !u!114 &1823163656373553457
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1505,20 +1506,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6231887737971820693}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87974e256899b24e9956d7aa4c98b6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
---- !u!114 &4969959299593583203
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6231887737971820693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b96538843a666564eb7336e61eea4f8a, type: 3}
+  m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rightHand: {fileID: 9156614574690490565}
@@ -1528,6 +1516,31 @@ MonoBehaviour:
   rightHandAimIKOffset: {x: 0, y: 0, z: 0}
   leftHandPosOffset: {x: 0, y: 0, z: 0}
   leftHandRotOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &7894708661363582642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6231887737971820693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
+--- !u!114 &2815819564105265544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6231887737971820693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6386763203102652290
 GameObject:
   m_ObjectHideFlags: 0

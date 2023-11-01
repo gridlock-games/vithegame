@@ -86,8 +86,8 @@ namespace Vi.Core
             // Check stamina and rage requirements and apply statuses for specific actions
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
+                if (weaponHandler.GetWeapon().dodgeStaminaCost > attributes.GetStamina()) { return; }
+                attributes.AddStamina(-weaponHandler.GetWeapon().dodgeStaminaCost);
                 StartCoroutine(SetInvincibleStatusOnDodge(actionStateName));
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
@@ -176,17 +176,11 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
 
-        private NetworkVariable<int> characterIndex = new NetworkVariable<int>();
-        private NetworkVariable<int> skinIndex = new NetworkVariable<int>();
+        private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
 
-        private void OnCharacterIndexChange(int prev, int current)
+        private void OnCharacterModelInfoChange(CharacterModelInfo prev, CharacterModelInfo current)
         {
-            ChangeSkin(current, skinIndex.Value);
-        }
-
-        private void OnSkinIndexChange(int prev, int current)
-        {
-            ChangeSkin(characterIndex.Value, current);
+            ChangeSkin(current.characterIndex, current.skinIndex);
         }
 
         private void ChangeSkin(int characterIndex, int skinIndex)
@@ -197,7 +191,7 @@ namespace Vi.Core
                 Destroy(animatorReference.gameObject);
             }
 
-            CharacterReference.PlayerModelOption modelOption = characterReference.GetPlayerModelOptions()[characterIndex];
+            CharacterReference.PlayerModelOption modelOption = GameLogicManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
             Animator = modelInstance.GetComponent<Animator>();
@@ -207,37 +201,59 @@ namespace Vi.Core
 
         public void SetCharacterSkin(int characterIndex, int skinIndex)
         {
-            this.characterIndex.Value = characterIndex;
-            this.skinIndex.Value = skinIndex;
+            characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
+        }
+
+        private struct CharacterModelInfo : INetworkSerializable
+        {
+            public int characterIndex;
+            public int skinIndex;
+
+            public CharacterModelInfo(int characterIndex, int skinIndex)
+            {
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref characterIndex);
+                serializer.SerializeValue(ref skinIndex);
+            }
         }
 
         public override void OnNetworkSpawn()
         {
-            characterIndex.OnValueChanged += OnCharacterIndexChange;
-            skinIndex.OnValueChanged += OnSkinIndexChange;
+            characterModelInfo.OnValueChanged += OnCharacterModelInfoChange;
 
             if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
             
-            ChangeSkin(characterIndex.Value, skinIndex.Value);
+            if (IsServer)
+            {
+                if (NetworkObject.IsPlayerObject)
+                {
+                    characterModelInfo.Value = new CharacterModelInfo(GameLogicManager.Singleton.GetPlayerData(OwnerClientId).characterIndex, GameLogicManager.Singleton.GetPlayerData(OwnerClientId).skinIndex);
+                }
+                else
+                {
+                    characterModelInfo.Value = new CharacterModelInfo(0, 0);
+                }
+            }
+            else
+            {
+                ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
+            }
         }
 
         public override void OnNetworkDespawn()
         {
-            characterIndex.OnValueChanged -= OnCharacterIndexChange;
-            skinIndex.OnValueChanged -= OnSkinIndexChange;
+            characterModelInfo.OnValueChanged -= OnCharacterModelInfoChange;
         }
-
-        [SerializeField] private CharacterReference characterReference;
 
         private void Awake()
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
-        }
-
-        private void Update()
-        {
-            
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Vi.Player
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float angularSpeed = 540;
         [Header("Animation Settings")]
-        [SerializeField] private float moveAnimSpeed = 5;
+        [SerializeField] private float runAnimationTransitionSpeed = 5;
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
@@ -193,8 +193,8 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * moveAnimSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * moveAnimSpeed));
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
         private Vector2 lookSensitivity;

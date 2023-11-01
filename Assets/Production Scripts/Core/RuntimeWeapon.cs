@@ -7,7 +7,7 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
-        protected struct HitCounterData
+        public struct HitCounterData
         {
             public int hitNumber;
             public float timeOfHit;
@@ -29,13 +29,23 @@ namespace Vi.Core
             }
             else
             {
-                hitCounter[attributes] = new HitCounterData(hitCounter[attributes].hitNumber, Time.time);
+                hitCounter[attributes] = new HitCounterData(hitCounter[attributes].hitNumber+1, Time.time);
             }
         }
 
         public void ResetHitCounter()
         {
             hitCounter.Clear();
+        }
+        
+        public bool CanHit(Attributes attributes)
+        {
+            if (hitCounter.ContainsKey(attributes))
+            {
+                if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
+                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return false; }
+            }
+            return true;
         }
 
         protected Weapon.WeaponBone weaponBone;

@@ -7,7 +7,6 @@ namespace Vi.Core
     public class AudioManager : MonoBehaviour
     {
         public GameObject audioSourcePrefab;
-        public float initialVolume = 1;
 
         private static List<AudioSource> audioSources = new List<AudioSource>();
         private static AudioManager _singleton;
@@ -71,7 +70,7 @@ namespace Vi.Core
             {
                 RegisterAudioSource(audioSouce);
             }
-            AudioListener.volume = initialVolume;
+            AudioListener.volume = PlayerPrefs.HasKey("masterVolume") ? PlayerPrefs.GetFloat("masterVolume") : 1;
 
             // This is for music
             if (TryGetComponent(out AudioSource audioSource))

@@ -183,6 +183,11 @@ namespace Vi.Core
 
             if (vfxInstance)
             {
+                if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                {
+                    actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
+                }
+
                 StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
             }
             else
@@ -212,6 +217,15 @@ namespace Vi.Core
         private void Update()
         {
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
+
+            if (CurrentActionClip.isUninterruptable)
+            {
+                if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
+                    | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+                {
+                    attributes.SetUninterruptable(Time.deltaTime * 2);
+                }
+            }
 
             if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
                 | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
