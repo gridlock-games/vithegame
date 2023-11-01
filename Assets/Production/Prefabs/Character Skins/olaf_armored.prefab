@@ -3086,8 +3086,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1633777320941957333}
   - component: {fileID: -7114838533493212513}
-  - component: {fileID: 3587633093838846494}
-  - component: {fileID: 3719216976750556192}
+  - component: {fileID: 1562123245196559465}
+  - component: {fileID: 7036407879450685529}
+  - component: {fileID: -4084853636213999046}
   m_Layer: 0
   m_Name: olaf_armored
   m_TagString: Untagged
@@ -3165,7 +3166,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &3587633093838846494
+--- !u!114 &1562123245196559465
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3174,13 +3175,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2154839920385321583}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b96538843a666564eb7336e61eea4f8a, type: 3}
+  m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rightHand: {fileID: 4585503156763705236}
   leftHand: {fileID: 7000440992718076157}
-  rightHandAimAxis: 0
---- !u!114 &3719216976750556192
+  rightHandAimForwardDir: {x: 0, y: 0, z: 1}
+  rightHandAimUpDir: {x: 0, y: 1, z: 0}
+  rightHandAimIKOffset: {x: 0, y: 0, z: 0}
+  leftHandPosOffset: {x: 0, y: 0, z: 0}
+  leftHandRotOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &7036407879450685529
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3189,10 +3194,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 2154839920385321583}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87974e256899b24e9956d7aa4c98b6b, type: 3}
+  m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
+--- !u!114 &-4084853636213999046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2154839920385321583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2163599030951712030
 GameObject:
   m_ObjectHideFlags: 0

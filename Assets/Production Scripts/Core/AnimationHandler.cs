@@ -181,6 +181,11 @@ namespace Vi.Core
         private void OnCharacterModelInfoChange(CharacterModelInfo prev, CharacterModelInfo current)
         {
             ChangeSkin(current.characterIndex, current.skinIndex);
+
+            if (IsServer)
+            {
+                //GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData());
+            }
         }
 
         private void ChangeSkin(int characterIndex, int skinIndex)
