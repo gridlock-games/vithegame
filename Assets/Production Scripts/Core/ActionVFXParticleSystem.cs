@@ -58,6 +58,7 @@ namespace Vi.Core
                 {
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
                     Attributes attributes = col.GetComponentInParent<Attributes>();
+                    if (attributes == attacker) { continue; }
                     if (attributes)
                     {
                         bool canHit = true;
@@ -94,6 +95,7 @@ namespace Vi.Core
                 {
                     Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
                     Attributes attributes = col.GetComponentInParent<Attributes>();
+                    if (attributes == attacker) { continue; }
                     if (attributes)
                     {
                         bool canHit = true;
