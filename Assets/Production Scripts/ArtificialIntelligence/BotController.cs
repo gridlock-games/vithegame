@@ -56,7 +56,7 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                characterController.Move(animationHandler.ApplyLocalRootMotion());
+                if (attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death) { characterController.Move(animationHandler.ApplyLocalRootMotion()); }
             }
 
             if (attributes.ShouldApplyAilmentRotation())

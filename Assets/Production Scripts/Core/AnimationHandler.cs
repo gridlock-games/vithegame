@@ -112,11 +112,11 @@ namespace Vi.Core
             // Play the action clip based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
+                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
             }
             else
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
+                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -181,6 +181,11 @@ namespace Vi.Core
         private void OnCharacterModelInfoChange(CharacterModelInfo prev, CharacterModelInfo current)
         {
             ChangeSkin(current.characterIndex, current.skinIndex);
+
+            if (IsServer)
+            {
+                //GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData());
+            }
         }
 
         private void ChangeSkin(int characterIndex, int skinIndex)
@@ -222,6 +227,9 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private int botCharacterIndex;
+        [SerializeField] private int botSkinIndex;
+
         public override void OnNetworkSpawn()
         {
             characterModelInfo.OnValueChanged += OnCharacterModelInfoChange;
@@ -236,7 +244,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    characterModelInfo.Value = new CharacterModelInfo(0, 0);
+                    characterModelInfo.Value = new CharacterModelInfo(botCharacterIndex, botSkinIndex);
                 }
             }
             else

@@ -52,10 +52,10 @@ namespace Vi.UI
             Renderer[] renderers = attributes.GetComponentsInChildren<Renderer>();
             if (renderers.Length == 0) { return; }
             Vector3 highestPoint = renderers[0].bounds.center;
+            rendererToFollow = renderers[0];
             foreach (Renderer renderer in renderers)
             {
                 if (renderer.GetType() != typeof(SkinnedMeshRenderer)) { continue; }
-
                 if (renderer.bounds.center.y > highestPoint.y)
                 {
                     rendererToFollow = renderer;
@@ -67,7 +67,7 @@ namespace Vi.UI
         private void LateUpdate()
         {
             if (!rendererToFollow) { RefreshRendererToFollow(); }
-            if (!rendererToFollow) { return; }
+            if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
             nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
 
@@ -90,7 +90,8 @@ namespace Vi.UI
                 }
 
                 Vector3 pos = rendererToFollow.bounds.center;
-                pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
+                pos.y += rendererToFollow.bounds.extents.y;
+                //pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
                 transform.position = pos;
             }
             else

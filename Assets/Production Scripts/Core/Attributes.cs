@@ -130,15 +130,10 @@ namespace Vi.Core
         {
             if (current < prev)
             {
-                //glowRenderer.RenderHit();
-
-                if (prev <= 0 & current > 0)
+                if (current <= 0)
                 {
-                    // Character.CancelDeath();
-                }
-                else
-                {
-                    
+                    // Death
+                    //ailment.Value = ActionClip.Ailment.Death;
                 }
             }
             else if (current > prev)
@@ -210,12 +205,12 @@ namespace Vi.Core
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
-            }
 
-            if (!IsUninterruptable)
-            {
-                wasStaggeredThisFrame = true;
-                StartCoroutine(ResetStaggerBool());
+                if (!IsUninterruptable)
+                {
+                    wasStaggeredThisFrame = true;
+                    StartCoroutine(ResetStaggerBool());
+                }
             }
 
             // Combination ailment logic here
@@ -232,6 +227,15 @@ namespace Vi.Core
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+
+            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f * attacker.damageMultiplier : -attack.damage * attacker.damageMultiplier;
+
+            if (HP.Value + damage <= 0)
+            {
+                attackAilment = ActionClip.Ailment.Death;
+                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+            }
+
             if (!IsUninterruptable) { animationHandler.PlayAction(hitReaction); }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
@@ -239,7 +243,7 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
-                AddHP(-attack.damage * 0.7f * attacker.damageMultiplier);
+                AddHP(damage);
             }
             else // Not blocking
             {
@@ -286,6 +290,8 @@ namespace Vi.Core
                             case ActionClip.Ailment.Pull:
                                 ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
                                 break;
+                            case ActionClip.Ailment.Death:
+                                break;
                             default:
                                 Debug.LogWarning(attackAilment + " has not been implemented yet!");
                                 break;
@@ -293,12 +299,13 @@ namespace Vi.Core
                     }
                 }
 
-                RenderHit(impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
-                AddHP(-attack.damage * attacker.damageMultiplier);
+                RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                AddHP(damage);
             }
 
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
+            attacker.AddRage(2);
 
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
@@ -306,28 +313,35 @@ namespace Vi.Core
                 weaponHandler.SpawnActionVFX(actionVFX, attacker.transform);
             }
 
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                TryAddStatus(status.status, status.value, status.duration, status.delay);
+            }
+
             return true;
         }
 
-        private void RenderHit(Vector3 impactPosition, bool isKnockdown)
+        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
-
+            
             if (!IsClient)
             {
                 glowRenderer.RenderHit();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-                AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+                Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+                AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
 
-            RenderHitClientRpc(impactPosition, isKnockdown);
+            RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc] private void RenderHitClientRpc(Vector3 impactPosition, bool isKnockdown)
+        [ClientRpc] private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             glowRenderer.RenderHit();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weaponHandler.GetWeapon().knockbackHitAudioClip : weaponHandler.GetWeapon().hitAudioClip, impactPosition);
+            Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+            AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
 
         private void RenderBlock(Vector3 impactPosition)
@@ -405,6 +419,16 @@ namespace Vi.Core
         {
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+
+            if (current == ActionClip.Ailment.Death)
+            {
+                foreach (Collider c in GetComponentsInChildren<Collider>())
+                {
+                    c.enabled = false;
+                }
+
+                worldSpaceLabelInstance.SetActive(false);
+            }
         }
 
         public ActionClip.Ailment GetAilment() { return ailment.Value; }

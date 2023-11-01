@@ -48,6 +48,23 @@ namespace Vi.Core
             return new PlayerData();
         }
 
+        public void SetPlayerData(PlayerData playerData)
+        {
+            if (IsServer)
+            {
+                int index = playerDataList.IndexOf(playerData);
+                if (index == -1) { return; }
+                playerDataList[index] = playerData;
+            }
+            else
+            {
+                SetPlayerDataServerRpc(playerData);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
+
         public static GameLogicManager Singleton { get { return _singleton; } }
         protected static GameLogicManager _singleton;
 
@@ -56,6 +73,7 @@ namespace Vi.Core
         protected void Awake()
         {
             _singleton = this;
+            DontDestroyOnLoad(gameObject);
             playerDataList = new NetworkList<PlayerData>();
         }
 

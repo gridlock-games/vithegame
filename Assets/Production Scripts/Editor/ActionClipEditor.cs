@@ -18,7 +18,10 @@ namespace Vi.Editor
         private SerializedProperty spAgentDefenseCost;
         private SerializedProperty spAgentRageCost;
 
-        private SerializedProperty spRootMotionMulitplier;
+        private SerializedProperty spRootMotionForwardMultiplier;
+        private SerializedProperty spRootMotionSidesMultiplier;
+        private SerializedProperty spRootMotionVerticalMultiplier;
+        private SerializedProperty spTransitionTime;
 
         private SerializedProperty spWeaponBone;
         private SerializedProperty spAttackingNormalizedTime;
@@ -40,7 +43,8 @@ namespace Vi.Editor
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
 
-        private SerializedProperty spStatusesToApplyOnActivate;
+        private SerializedProperty spStatusesToApplyToSelfOnActivate;
+        private SerializedProperty spStatusesToApplyToTargetOnHit;
 
         private SerializedProperty spActionVFXList;
 
@@ -48,7 +52,10 @@ namespace Vi.Editor
         {
             spClipType = serializedObject.FindProperty("clipType");
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
-            spRootMotionMulitplier = serializedObject.FindProperty("rootMotionMulitplier");
+            spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
+            spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
+            spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
+            spTransitionTime = serializedObject.FindProperty("transitionTime");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
@@ -73,7 +80,8 @@ namespace Vi.Editor
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
 
-            spStatusesToApplyOnActivate = serializedObject.FindProperty("statusesToApplyOnActivate");
+            spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
+            spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
         }
@@ -81,8 +89,17 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             EditorGUILayout.PropertyField(spClipType);
-            EditorGUILayout.PropertyField(spRootMotionMulitplier);
-            EditorGUILayout.PropertyField(spStatusesToApplyOnActivate);
+
+            EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);
+            EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
+            EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
+            EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
+
+            EditorGUILayout.PropertyField(spTransitionTime);
+            EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
+            EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
             
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
