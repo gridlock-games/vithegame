@@ -19,6 +19,7 @@ namespace Vi.ScriptableObjects
         public AudioClip GetAttackSoundEffect(WeaponBone weaponBone) { return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect; }
 
         public AudioClip drawSoundEffect;
+        public AudioClip sheatheSoundEffect;
 
         [Header("Recieve Hit Effects")]
         public AudioClip hitAudioClip;
