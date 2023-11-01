@@ -112,11 +112,11 @@ namespace Vi.Core
             // Play the action clip based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
+                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
             }
             else
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
+                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side

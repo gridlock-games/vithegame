@@ -43,10 +43,28 @@ namespace Vi.Core
         private void OnAnimatorMove()
         {
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
-            if ( ShouldApplyRootMotion())
+            if (ShouldApplyRootMotion())
             {
-                networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
-                localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
+                //networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
+                //localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
+                float normalizedTime = 0;
+                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
+                {
+                    normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                }
+                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
+                {
+                    normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                }
+
+                Vector3 worldSpaceRootMotion = transform.TransformDirection(animator.deltaPosition);
+                worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime);
+                worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime);
+                worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime);
+                Vector3 curveAdjustedLocalRootMotion = transform.InverseTransformDirection(worldSpaceRootMotion);
+                
+                networkRootMotion += curveAdjustedLocalRootMotion;
+                localRootMotion += curveAdjustedLocalRootMotion;
             }
         }
 
