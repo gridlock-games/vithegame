@@ -223,7 +223,7 @@ namespace Vi.Core
                 if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
                 {
-                    attributes.SetUninterruptable(Time.deltaTime);
+                    attributes.SetUninterruptable(Time.deltaTime * 2);
                 }
             }
 
