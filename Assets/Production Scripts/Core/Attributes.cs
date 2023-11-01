@@ -426,6 +426,8 @@ namespace Vi.Core
                 {
                     c.enabled = false;
                 }
+
+                worldSpaceLabelInstance.SetActive(false);
             }
         }
 
