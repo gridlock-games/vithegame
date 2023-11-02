@@ -105,6 +105,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Aim",
+                    "type": "Value",
+                    "id": "3479bc64-1411-40e3-b880-35abd648ed5d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Reload",
                     "type": "Button",
                     "id": "69fa2700-3608-4b5a-a217-c058f4b1c188",
@@ -328,6 +337,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "TimeScaleChange",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4d8ad174-0da9-4dbe-9449-6f41ce023ec1",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

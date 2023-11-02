@@ -342,6 +342,31 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
+        private bool toggleAim;
+
+        bool aiming;
+        void OnAim(InputValue value)
+        {
+            if (toggleAim)
+            {
+                if (value.isPressed) { aiming = !aiming; }
+            }
+            else
+            {
+                aiming = value.isPressed;
+            }
+
+            animationHandler.Animator.GetComponent<LimbReferences>().AimHand(LimbReferences.Hand.RightHand, aiming);
+
+            //foreach (GameObject instance in weaponInstances)
+            //{
+            //    if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+            //    {
+            //        shooterWeapon.Aim(value.isPressed);
+            //    }
+            //}
+        }
+
         void OnReload()
         {
 
