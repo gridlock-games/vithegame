@@ -79,7 +79,14 @@ namespace Vi.Core
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        instance.GetComponent<RuntimeWeapon>().SetWeaponBone(modelData.weaponBone);
+                        if (instance.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                        {
+                            runtimeWeapon.SetWeaponBone(modelData.weaponBone);
+                        }
+                        else
+                        {
+                            Debug.LogWarning(instance + " does not have a runtime weapon component!");
+                        }
                     }
                     broken = true;
                     break;
