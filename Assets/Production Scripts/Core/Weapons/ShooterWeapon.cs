@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Vi.Core
 {
-    public class ShooterWeapon : MonoBehaviour
+    public class ShooterWeapon : RuntimeWeapon
     {
         public void Aim(bool shouldAim)
         {
