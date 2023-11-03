@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(LimbReferences))]
+    [RequireComponent(typeof(GlowRenderer))]
     public class AnimatorReference : MonoBehaviour
     {
         // Variable to store network root motion

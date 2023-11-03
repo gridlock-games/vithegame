@@ -87,6 +87,8 @@ namespace Vi.Core
                         {
                             Debug.LogWarning(instance + " does not have a runtime weapon component!");
                         }
+
+                        if (instance.GetComponent<ShooterWeapon>()) { canAim = true; }
                     }
                     broken = true;
                     break;
@@ -342,11 +344,14 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
+        private bool canAim;
         private bool toggleAim;
 
         bool aiming;
         void OnAim(InputValue value)
         {
+            if (!canAim) { return; }
+
             if (toggleAim)
             {
                 if (value.isPressed) { aiming = !aiming; }

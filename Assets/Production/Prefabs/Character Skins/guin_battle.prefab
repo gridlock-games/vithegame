@@ -12400,9 +12400,9 @@ GameObject:
   - component: {fileID: 1441622728665718620}
   - component: {fileID: 1408242701769554095}
   - component: {fileID: 1408242701769554100}
+  - component: {fileID: 1877049964203028004}
   - component: {fileID: 6298391591962176138}
   - component: {fileID: 6888080238929031895}
-  - component: {fileID: 1877049964203028004}
   m_Layer: 0
   m_Name: guin_battle
   m_TagString: Untagged
@@ -12642,6 +12642,18 @@ MonoBehaviour:
   m_DistantDisable: 0
   m_ReferenceObject: {fileID: 0}
   m_DistanceToObject: 20
+--- !u!114 &1877049964203028004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2254751552651625958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6298391591962176138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12656,6 +12668,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightHand: {fileID: 7211126797128615789}
   leftHand: {fileID: 7200003263580952538}
+  rightHandAimRig: {fileID: 0}
   rightHandAimForwardDir: {x: 0, y: 0, z: 1}
   rightHandAimUpDir: {x: 0, y: 1, z: 0}
   rightHandAimIKOffset: {x: 0, y: 0, z: 0}
@@ -12674,18 +12687,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
---- !u!114 &1877049964203028004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2254751552651625958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2300219130893067561
 GameObject:
   m_ObjectHideFlags: 0
