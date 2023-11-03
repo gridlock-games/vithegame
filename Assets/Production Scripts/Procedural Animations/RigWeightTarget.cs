@@ -9,9 +9,10 @@ namespace Vi.ProceduralAnimations
     public class RigWeightTarget : MonoBehaviour
     {
         public float weight = 1;
-        private const float weightSpeed = 5;
         public bool instantWeight;
-        
+
+        private const float weightSpeed = 3;
+
         private Rig rig;
         private Animator animator;
 
@@ -28,14 +29,16 @@ namespace Vi.ProceduralAnimations
             if (rig.weight == weight) { return; }
             if (instantWeight) { rig.weight = weight; return; }
 
-            if (Mathf.Abs(weight - rig.weight) > 0.2)
-            {
-                rig.weight = Mathf.Lerp(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
-            }
-            else
-            {
-                rig.weight = Mathf.MoveTowards(rig.weight, weight, Time.deltaTime * animator.speed);
-            }
+            rig.weight = Mathf.MoveTowards(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
+
+            //if (Mathf.Abs(weight - rig.weight) > 0.1)
+            //{
+            //    rig.weight = Mathf.Lerp(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
+            //}
+            //else
+            //{
+            //    rig.weight = Mathf.MoveTowards(rig.weight, weight, Time.deltaTime * animator.speed);
+            //}
         }
     }
 }

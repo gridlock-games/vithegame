@@ -6,11 +6,12 @@ namespace Vi.ProceduralAnimations
 {
     public class FollowTarget : MonoBehaviour
     {
-        public Transform target;
         [SerializeField] private bool move = true;
         [SerializeField] private bool rotate = true;
         [SerializeField] private bool lerp;
         [SerializeField] private float lerpSpeed = 5;
+
+        [HideInInspector] public Transform target;
 
         private void LateUpdate()
         {
