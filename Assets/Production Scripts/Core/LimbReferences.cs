@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {
@@ -16,9 +17,31 @@ namespace Vi.Core
         public void AimHand(Hand hand, bool isAiming)
         {
             float weight = isAiming ? 1 : 0;
-            rightHandAimRig.weight = weight;
+            if (hand == Hand.RightHand)
+            {
+                rightHandAimRig.weight = weight;
+            }
+            else if (hand == Hand.LeftHand)
+            {
+                leftHandAimRig.weight = weight;
+            }
             animator.SetBool("Aiming", isAiming);
             animator.SetLayerWeight(animator.GetLayerIndex("Aiming"), weight);
+        }
+
+        public void ReachHand(Hand hand, Transform reachTarget, bool isReaching)
+        {
+            float weight = isReaching ? 1 : 0;
+            if (hand == Hand.RightHand)
+            {
+                rightHandReachRig.weight = weight;
+                rightHandReachRig.GetComponentInChildren<FollowTarget>().target = reachTarget;
+            }
+            else if (hand == Hand.LeftHand)
+            {
+                leftHandReachRig.weight = weight;
+                leftHandReachRig.GetComponentInChildren<FollowTarget>().target = reachTarget;
+            }
         }
 
         private Animator animator;
@@ -31,7 +54,10 @@ namespace Vi.Core
         [SerializeField] private GameObject leftHand;
 
         [Header("IK Settings")]
-        public Rig rightHandAimRig;
+        [SerializeField] private RigWeightTarget rightHandAimRig;
+        [SerializeField] private RigWeightTarget leftHandAimRig;
+        [SerializeField] private RigWeightTarget rightHandReachRig;
+        [SerializeField] private RigWeightTarget leftHandReachRig;
 
         [Header("Hand IK Settings")]
         public Vector3 rightHandAimForwardDir = new Vector3(0, 0, 1);

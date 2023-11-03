@@ -77,7 +77,14 @@ namespace Vi.Player
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
-                newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                if (animationHandler.Animator.GetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming")) == 1)
+                {
+                    newRotation = Quaternion.LookRotation(camDirection);
+                }
+                else
+                {
+                    newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                }
             }
             else
             {
@@ -148,7 +155,16 @@ namespace Vi.Player
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
             else
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
+            {
+                if (animationHandler.Animator.GetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming")) == 1)
+                {
+                    transform.rotation = movementPrediction.currentRotation;
+                }
+                else
+                {
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
+                }
+            }
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;

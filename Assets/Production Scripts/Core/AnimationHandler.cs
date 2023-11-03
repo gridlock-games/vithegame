@@ -172,6 +172,7 @@ namespace Vi.Core
         public Vector3 ApplyNetworkRootMotion() { return animatorReference.ApplyNetworkRootMotion(); }
 
         public Animator Animator { get; private set; }
+        public LimbReferences LimbReferences { get; private set; }
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
@@ -200,6 +201,7 @@ namespace Vi.Core
             GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
             Animator = modelInstance.GetComponent<Animator>();
+            LimbReferences = modelInstance.GetComponent<LimbReferences>();
             animatorReference = modelInstance.GetComponent<AnimatorReference>();
             weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
         }

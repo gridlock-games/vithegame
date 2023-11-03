@@ -87,8 +87,6 @@ namespace Vi.Core
                         {
                             Debug.LogWarning(instance + " does not have a runtime weapon component!");
                         }
-
-                        if (instance.GetComponent<ShooterWeapon>()) { canAim = true; }
                     }
                     broken = true;
                     break;
@@ -344,14 +342,11 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
-        private bool canAim;
-        private bool toggleAim;
+        private bool toggleAim = true;
 
         bool aiming;
         void OnAim(InputValue value)
         {
-            if (!canAim) { return; }
-
             if (toggleAim)
             {
                 if (value.isPressed) { aiming = !aiming; }
@@ -361,15 +356,15 @@ namespace Vi.Core
                 aiming = value.isPressed;
             }
 
-            animationHandler.Animator.GetComponent<LimbReferences>().AimHand(LimbReferences.Hand.RightHand, aiming);
-
-            //foreach (GameObject instance in weaponInstances)
-            //{
-            //    if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
-            //    {
-            //        shooterWeapon.Aim(value.isPressed);
-            //    }
-            //}
+            foreach (GameObject instance in weaponInstances)
+            {
+                if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), aiming);
+                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming);
+                }
+            }
         }
 
         void OnReload()
