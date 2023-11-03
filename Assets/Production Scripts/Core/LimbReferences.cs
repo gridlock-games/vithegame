@@ -51,12 +51,13 @@ namespace Vi.Core
         private void Start()
         {
             animator = GetComponent<Animator>();
-            RightHandFollowTarget = rightHandReachRig.GetComponentInChildren<FollowTarget>();
-            LeftHandFollowTarget = leftHandReachRig.GetComponentInChildren<FollowTarget>();
+
+            if (rightHandReachRig) { RightHandFollowTarget = rightHandReachRig.GetComponentInChildren<FollowTarget>(); }
+            if (leftHandReachRig) { LeftHandFollowTarget = leftHandReachRig.GetComponentInChildren<FollowTarget>(); }
         }
 
-        public Rig GetRightHandReachRig() { return rightHandReachRig.GetRig(); }
-        public Rig GetLeftHandReachRig() { return leftHandReachRig.GetRig(); }
+        public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
+        public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
         [SerializeField] private GameObject rightHand;
         [SerializeField] private GameObject leftHand;

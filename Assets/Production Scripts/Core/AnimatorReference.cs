@@ -72,18 +72,22 @@ namespace Vi.Core
 
         private void OnAnimatorIK(int layerIndex)
         {
-            if (limbReferences.RightHandFollowTarget.target)
+            if (limbReferences.RightHandFollowTarget)
             {
-                animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
-                animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
-                animator.SetIKRotationWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
+                if (limbReferences.RightHandFollowTarget.target)
+                {
+                    animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
+                    animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
+                }
             }
 
-            if (limbReferences.LeftHandFollowTarget.target)
+            if (limbReferences.LeftHandFollowTarget)
             {
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
-                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
-                animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
+                if (limbReferences.LeftHandFollowTarget.target)
+                {
+                    animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
+                    animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
+                }
             }
         }
     }

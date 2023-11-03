@@ -28,7 +28,7 @@ namespace Vi.ProceduralAnimations
             if (rig.weight == weight) { return; }
             if (instantWeight) { rig.weight = weight; return; }
 
-            if (Mathf.Abs(weight - rig.weight) > 0.1)
+            if (Mathf.Abs(weight - rig.weight) > 0.2)
             {
                 rig.weight = Mathf.Lerp(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
             }
