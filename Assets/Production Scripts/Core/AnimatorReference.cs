@@ -31,16 +31,17 @@ namespace Vi.Core
 
         Animator animator;
         WeaponHandler weaponHandler;
+        LimbReferences limbReferences;
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            limbReferences = GetComponent<LimbReferences>();
         }
 
         public bool ShouldApplyRootMotion() { return !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"); }
 
-        // Event handler for animator's movement
         private void OnAnimatorMove()
         {
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
@@ -69,10 +70,21 @@ namespace Vi.Core
             }
         }
 
-        // Event handler for animator's inverse kinematics
         private void OnAnimatorIK(int layerIndex)
         {
+            if (limbReferences.RightHandFollowTarget.target)
+            {
+                animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
+                animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
+                animator.SetIKRotationWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
+            }
 
+            if (limbReferences.LeftHandFollowTarget.target)
+            {
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
+                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
+                animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
+            }
         }
     }
 }

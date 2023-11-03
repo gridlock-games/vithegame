@@ -35,20 +35,28 @@ namespace Vi.Core
             if (hand == Hand.RightHand)
             {
                 rightHandReachRig.weight = weight;
-                rightHandReachRig.GetComponentInChildren<FollowTarget>().target = reachTarget;
+                RightHandFollowTarget.target = reachTarget;
             }
             else if (hand == Hand.LeftHand)
             {
                 leftHandReachRig.weight = weight;
-                leftHandReachRig.GetComponentInChildren<FollowTarget>().target = reachTarget;
+                LeftHandFollowTarget.target = reachTarget;
             }
         }
 
         private Animator animator;
+        public FollowTarget RightHandFollowTarget { get; private set; }
+        public FollowTarget LeftHandFollowTarget { get; private set; }
+
         private void Start()
         {
             animator = GetComponent<Animator>();
+            RightHandFollowTarget = rightHandReachRig.GetComponentInChildren<FollowTarget>();
+            LeftHandFollowTarget = leftHandReachRig.GetComponentInChildren<FollowTarget>();
         }
+
+        public Rig GetRightHandReachRig() { return rightHandReachRig.GetRig(); }
+        public Rig GetLeftHandReachRig() { return leftHandReachRig.GetRig(); }
 
         [SerializeField] private GameObject rightHand;
         [SerializeField] private GameObject leftHand;
