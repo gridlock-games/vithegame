@@ -60,5 +60,15 @@ namespace Vi.Core
             parentAttributes = transform.root.GetComponent<Attributes>();
             parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
         }
+
+        //private void OnEnable()
+        //{
+        //    AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().drawSoundEffect, transform.position, 0.5f);
+        //}
+
+        //private void OnDisable()
+        //{
+        //    AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().sheatheSoundEffect, transform.position, 0.5f);
+        //}
     }
 }

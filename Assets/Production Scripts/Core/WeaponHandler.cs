@@ -79,7 +79,14 @@ namespace Vi.Core
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        instance.GetComponent<RuntimeWeapon>().SetWeaponBone(modelData.weaponBone);
+                        if (instance.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                        {
+                            runtimeWeapon.SetWeaponBone(modelData.weaponBone);
+                        }
+                        else
+                        {
+                            Debug.LogWarning(instance + " does not have a runtime weapon component!");
+                        }
                     }
                     broken = true;
                     break;
@@ -333,6 +340,31 @@ namespace Vi.Core
             ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
+        }
+
+        private bool toggleAim;
+
+        bool aiming;
+        void OnAim(InputValue value)
+        {
+            if (toggleAim)
+            {
+                if (value.isPressed) { aiming = !aiming; }
+            }
+            else
+            {
+                aiming = value.isPressed;
+            }
+
+            animationHandler.Animator.GetComponent<LimbReferences>().AimHand(LimbReferences.Hand.RightHand, aiming);
+
+            //foreach (GameObject instance in weaponInstances)
+            //{
+            //    if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+            //    {
+            //        shooterWeapon.Aim(value.isPressed);
+            //    }
+            //}
         }
 
         void OnReload()
