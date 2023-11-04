@@ -33,7 +33,7 @@ namespace Vi.Core
             }
         }
 
-        public void ResetHitCounter()
+        public virtual void ResetHitCounter()
         {
             hitCounter.Clear();
         }

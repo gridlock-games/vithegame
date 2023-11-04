@@ -1,0 +1,85 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Vi.ScriptableObjects;
+using Unity.Netcode;
+
+namespace Vi.Core
+{
+    public class Projectile : NetworkBehaviour
+    {
+        [Header("Projectile Settings")]
+        [SerializeField] private int killDistance = 500;
+
+        private Attributes attacker;
+        private ActionClip attack;
+        private Vector3 projectileForce;
+        private bool initialized;
+
+        public void Initialize(Attributes attacker, ActionClip attack, Vector3 projectileForce)
+        {
+            if (!IsServer) { Debug.LogError("Projectile.Initialize() should only be called on the server!"); return; }
+            if (initialized) { Debug.LogError("Projectile.Initialize() already called, why are you calling it again idiot?"); return; }
+
+            this.attacker = attacker;
+            this.attack = attack;
+            this.projectileForce = projectileForce;
+            initialized = true;
+
+            GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce);
+        }
+
+        private Vector3 startPosition;
+        private void Start()
+        {
+            startPosition = transform.position;
+        }
+
+        private void Update()
+        {
+            if (!IsServer) { return; }
+
+            if (Vector3.Distance(transform.position, startPosition) > killDistance)
+            {
+                if (IsSpawned)
+                {
+                    NetworkObject.Despawn(true);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!initialized) { return; }
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            // Dont despawn projectiles that come from the same attacker
+            Projectile otherProjectile = other.GetComponentInParent<Projectile>();
+            if (otherProjectile)
+            {
+                if (otherProjectile.attacker == attacker) { return; }
+            }
+
+            Attributes victimAttributes = other.GetComponentInParent<Attributes>();
+            if (victimAttributes == attacker) { return; }
+
+            if (victimAttributes)
+            {
+                victimAttributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position);
+            }
+            NetworkObject.Despawn(true);
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(transform.position, new Vector3(0.5f, 0.5f, 0.5f));
+            Gizmos.DrawLine(transform.position, transform.position + transform.rotation * projectileForce);
+        }
+    }
+}
