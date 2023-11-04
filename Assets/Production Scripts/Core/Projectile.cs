@@ -70,7 +70,7 @@ namespace Vi.Core
 
             if (victimAttributes)
             {
-                victimAttributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position);
+                victimAttributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
             NetworkObject.Despawn(true);
         }

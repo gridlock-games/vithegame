@@ -89,6 +89,7 @@ namespace Vi.Core
                         {
                             Debug.LogWarning(instance + " does not have a runtime weapon component!");
                         }
+                        canAim = instance.GetComponent<ShooterWeapon>() | canAim;
                     }
                     broken = true;
                     break;
@@ -373,10 +374,13 @@ namespace Vi.Core
         }
 
         private bool toggleAim = true;
+        private bool canAim;
 
-        private NetworkVariable<bool> aiming = new NetworkVariable<bool>();
+        private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnAim(InputValue value)
         {
+            if (!canAim) { return; }
+
             if (toggleAim)
             {
                 if (value.isPressed) { aiming.Value = !aiming.Value; }
