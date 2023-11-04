@@ -62,6 +62,8 @@ namespace Vi.Core
         [SerializeField] private GameObject rightHand;
         [SerializeField] private GameObject leftHand;
 
+        public Camera ADSCamera;
+
         [Header("IK Settings")]
         [SerializeField] private RigWeightTarget rightHandAimRig;
         [SerializeField] private RigWeightTarget leftHandAimRig;

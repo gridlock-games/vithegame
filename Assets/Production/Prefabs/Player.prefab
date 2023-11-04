@@ -143,7 +143,7 @@ MonoBehaviour:
   cameraInstance: {fileID: 3945128956232022068}
   runSpeed: 5
   angularSpeed: 540
-  moveAnimSpeed: 5
+  runAnimationTransitionSpeed: 5
 --- !u!114 &3945128955595459581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
+  ADSCamera: {fileID: 0}
 --- !u!114 &3945128955595459583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
+  botCharacterIndex: 0
+  botSkinIndex: 0
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0

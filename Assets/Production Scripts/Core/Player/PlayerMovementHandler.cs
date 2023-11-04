@@ -77,7 +77,7 @@ namespace Vi.Player
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
-                if (animationHandler.Animator.GetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming")) == 1)
+                if (weaponHandler.aiming)
                 {
                     newRotation = Quaternion.LookRotation(camDirection);
                 }
@@ -156,7 +156,7 @@ namespace Vi.Player
                 transform.rotation = attributes.GetAilmentRotation();
             else
             {
-                if (animationHandler.Animator.GetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming")) == 1)
+                if (weaponHandler.aiming)
                 {
                     transform.rotation = movementPrediction.currentRotation;
                 }
@@ -236,6 +236,11 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
+
+        void OnAim()
+        {
+            cameraInstance.enabled = !weaponHandler.aiming;
         }
     }
 }

@@ -8,11 +8,17 @@ namespace Vi.ProceduralAnimations
     {
         [SerializeField] private Vector3 offset = new Vector3(0, 0, 10);
 
+        private Transform mainCameraTransform;
+
+        private void Start()
+        {
+            mainCameraTransform = Camera.main.transform;
+        }
+
         private void Update()
         {
-            if (!Camera.main) { return; }
-
-            transform.position = Camera.main.transform.position + Camera.main.transform.rotation * offset;
+            if (!mainCameraTransform) { return; }
+            transform.position = mainCameraTransform.position + mainCameraTransform.rotation * offset;
         }
     }
 }

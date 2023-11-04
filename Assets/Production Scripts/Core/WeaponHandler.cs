@@ -344,7 +344,7 @@ namespace Vi.Core
 
         private bool toggleAim = true;
 
-        bool aiming;
+        public bool aiming { get; private set; }
         void OnAim(InputValue value)
         {
             if (toggleAim)
@@ -365,6 +365,7 @@ namespace Vi.Core
                     animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming);
                 }
             }
+            animationHandler.LimbReferences.ADSCamera.enabled = aiming;
         }
 
         void OnReload()
