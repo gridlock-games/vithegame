@@ -36,8 +36,7 @@ namespace Vi.Core
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
-
-            Gizmos.DrawRay(transform.position, transform.forward * 10);
+            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * Vector3.forward * 10);
         }
     }
 }

@@ -14,11 +14,5 @@ namespace Vi.ProceduralAnimations
 
             transform.position = Camera.main.transform.position + Camera.main.transform.rotation * offset;
         }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(transform.position, 0.25f);
-        }
     }
 }

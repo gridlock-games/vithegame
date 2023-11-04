@@ -32,6 +32,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2127419818153764200, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Weight
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3991640240029771182, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
       propertyPath: m_IsActive
@@ -41,6 +46,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4207197399468715804, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Name
+      value: BodyAim
       objectReference: {fileID: 0}
     - target: {fileID: 4542361580066961161, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
@@ -77,9 +87,19 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5241480194999663593, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Weight
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5770943897392098929, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5999455699107926675, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Weight
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6090957132319816510, guid: 54646c19f73b70c46a4ed076703abc3e,
@@ -162,6 +182,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7200961854840486748, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Data.m_Offset.y
+      value: 1.26
+      objectReference: {fileID: 0}
+    - target: {fileID: 7200961854840486748, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: m_Data.m_Offset.z
+      value: 1.57
+      objectReference: {fileID: 0}
     - target: {fileID: 7779228344808601436, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
       propertyPath: m_IsActive
@@ -242,5 +272,78 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5241480194999663593, guid: 54646c19f73b70c46a4ed076703abc3e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 54646c19f73b70c46a4ed076703abc3e, type: 3}
+--- !u!4 &4142148650271233436 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4744890004742364407, guid: 54646c19f73b70c46a4ed076703abc3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8692758795647945067}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4809868247622493815 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4207197399468715804, guid: 54646c19f73b70c46a4ed076703abc3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8692758795647945067}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6950604509337246548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4809868247622493815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Data:
+    m_ConstrainedObject: {fileID: 4142148650271233436}
+    m_SourceObjects:
+      m_Length: 1
+      m_Item0:
+        transform: {fileID: 8626857514794963791}
+        weight: 1
+      m_Item1:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item2:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item3:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item4:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item5:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item6:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item7:
+        transform: {fileID: 0}
+        weight: 0
+    m_Offset: {x: -51.94, y: 11.5, z: -2.19}
+    m_MinLimit: -180
+    m_MaxLimit: 180
+    m_AimAxis: 3
+    m_UpAxis: 1
+    m_WorldUpType: 0
+    m_WorldUpObject: {fileID: 0}
+    m_WorldUpAxis: 2
+    m_MaintainOffset: 0
+    m_ConstrainedAxes:
+      x: 1
+      y: 1
+      z: 1
+--- !u!4 &8626857514794963791 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1088220890610326052, guid: 54646c19f73b70c46a4ed076703abc3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8692758795647945067}
+  m_PrefabAsset: {fileID: 0}
