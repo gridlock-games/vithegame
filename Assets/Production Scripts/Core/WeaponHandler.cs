@@ -17,15 +17,17 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            isBlocking.OnValueChanged += OnIsBlockingChanged;
+            isBlocking.OnValueChanged += OnIsBlockingChange;
+            aiming.OnValueChanged += OnAimingChange;
         }
 
         public override void OnNetworkDespawn()
         {
-            isBlocking.OnValueChanged -= OnIsBlockingChanged;
+            isBlocking.OnValueChanged -= OnIsBlockingChange;
+            aiming.OnValueChanged -= OnAimingChange;
         }
 
-        private void OnIsBlockingChanged(bool prev, bool current)
+        private void OnIsBlockingChange(bool prev, bool current)
         {
             animationHandler.Animator.SetBool("Blocking", current);
         }
@@ -342,28 +344,36 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
-        private bool toggleAim = true;
+        public bool IsAiming() { return aiming.Value; }
 
-        public bool Aiming { get; private set; }
-        void OnAim(InputValue value)
+        private void OnAimingChange(bool prev, bool current)
         {
-            if (toggleAim)
-            {
-                if (value.isPressed) { Aiming = !Aiming; }
-            }
-            else
-            {
-                Aiming = value.isPressed;
-            }
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), current ? 1 : 0);
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), current ? 0 : 1);
 
             foreach (GameObject instance in weaponInstances)
             {
                 if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), Aiming);
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), aiming.Value);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, Aiming);
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming.Value);
                 }
+            }
+        }
+
+        private bool toggleAim = true;
+
+        private NetworkVariable<bool> aiming = new NetworkVariable<bool>();
+        void OnAim(InputValue value)
+        {
+            if (toggleAim)
+            {
+                if (value.isPressed) { aiming.Value = !aiming.Value; }
+            }
+            else
+            {
+                aiming.Value = value.isPressed;
             }
         }
 

@@ -77,7 +77,7 @@ namespace Vi.Player
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
-                if (weaponHandler.Aiming)
+                if (weaponHandler.IsAiming())
                 {
                     newRotation = Quaternion.LookRotation(camDirection);
                 }
@@ -154,17 +154,10 @@ namespace Vi.Player
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
+            else if (weaponHandler.IsAiming())
+                transform.rotation = movementPrediction.currentRotation;
             else
-            {
-                if (weaponHandler.Aiming)
-                {
-                    transform.rotation = movementPrediction.currentRotation;
-                }
-                else
-                {
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
-                }
-            }
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 
             Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;

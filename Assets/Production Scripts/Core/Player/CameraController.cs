@@ -42,7 +42,7 @@ namespace Vi.Player
 
             Quaternion targetRotation = Quaternion.Euler(targetRotationY, targetRotationX, 0);
 
-            if (weaponHandler.Aiming)
+            if (weaponHandler.IsAiming())
             {
                 cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
                 cameraInterp.transform.rotation = targetRotation;
@@ -62,7 +62,7 @@ namespace Vi.Player
             }
             
             // Update camera transform itself
-            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * (weaponHandler.Aiming ? aimingPositionOffset : positionOffset);
+            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * (weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset);
             transform.LookAt(cameraInterp.transform);
         }
     }
