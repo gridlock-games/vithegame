@@ -97,7 +97,7 @@ namespace Vi.ScriptableObjects
         public float agentDefenseCost = 0;
         public float agentRageCost = 50;
 
-        public Weapon.WeaponBone weaponBone;
+        public Weapon.WeaponBone[] effectedWeaponBones;
         public bool mustBeAiming;
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;

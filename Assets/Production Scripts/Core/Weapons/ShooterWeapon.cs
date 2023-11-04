@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -51,7 +52,7 @@ namespace Vi.Core
 
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
-            if (parentWeaponHandler.CurrentActionClip.weaponBone != weaponBone) { return; }
+            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
 
             if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)
             {

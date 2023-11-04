@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipType: 4
   hitReactionType: 0
+  shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -90,7 +91,8 @@ MonoBehaviour:
   agentStaminaCost: 30
   agentDefenseCost: 0
   agentRageCost: 0
-  weaponBone: 15
+  effectedWeaponBones: 0f000000
+  mustBeAiming: 0
   attackingNormalizedTime: 0.35
   recoveryNormalizedTime: 0.5
   damage: 20

@@ -292,7 +292,10 @@ namespace Vi.Core
 
                 if (IsAttacking & !lastIsAttacking)
                 {
-                    AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(CurrentActionClip.weaponBone), transform.position);
+                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    {
+                        AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                    }
                 }
             }
             else

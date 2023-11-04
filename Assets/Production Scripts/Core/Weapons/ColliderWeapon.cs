@@ -19,7 +19,7 @@ namespace Vi.Core
 
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
-            if (parentWeaponHandler.CurrentActionClip.weaponBone != weaponBone) { return; }
+            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
             if (other.TryGetComponent(out Attributes attributes))
             {
                 if (parentAttributes == attributes) { return; }
@@ -53,7 +53,7 @@ namespace Vi.Core
             {
                 if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
                     {
                         if (parentWeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;
@@ -82,7 +82,7 @@ namespace Vi.Core
             {
                 if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.weaponBone == weaponBone)
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
                     {
                         if (parentWeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;
