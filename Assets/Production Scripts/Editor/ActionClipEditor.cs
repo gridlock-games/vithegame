@@ -25,6 +25,7 @@ namespace Vi.Editor
         private SerializedProperty spTransitionTime;
 
         private SerializedProperty spWeaponBone;
+        private SerializedProperty spMustBeAiming;
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spDamage;
@@ -64,6 +65,7 @@ namespace Vi.Editor
             spAgentRageCost = serializedObject.FindProperty("agentRageCost");
 
             spWeaponBone = serializedObject.FindProperty("weaponBone");
+            spMustBeAiming = serializedObject.FindProperty("mustBeAiming");
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spDamage = serializedObject.FindProperty("damage");
@@ -93,23 +95,26 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
 
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
-            EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);
+            EditorGUILayout.PropertyField(spTransitionTime);
             if (spShouldApplyRootMotion.boolValue)
             {
+                EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);
                 EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
                 EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
                 EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
             }
-            
-            EditorGUILayout.PropertyField(spTransitionTime);
+            EditorGUILayout.Space();
+
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
             EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
+            EditorGUILayout.Space();
             
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
@@ -126,6 +131,7 @@ namespace Vi.Editor
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -134,6 +140,7 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
+                EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -152,6 +159,7 @@ namespace Vi.Editor
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
@@ -191,6 +199,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanCancelAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
                 EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);

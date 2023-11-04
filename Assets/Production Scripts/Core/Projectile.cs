@@ -26,7 +26,7 @@ namespace Vi.Core
             this.projectileForce = projectileForce;
             initialized = true;
 
-            GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce);
+            GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
         }
 
         private Vector3 startPosition;
@@ -77,6 +77,7 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
+            if (!Application.isPlaying) { return; }
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position, new Vector3(0.5f, 0.5f, 0.5f));
             Gizmos.DrawLine(transform.position, transform.position + transform.rotation * projectileForce);

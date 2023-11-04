@@ -12,6 +12,7 @@ namespace Vi.ProceduralAnimations
 
         private void Start()
         {
+            if (!Camera.main) { return; }
             mainCameraTransform = Camera.main.transform;
         }
 

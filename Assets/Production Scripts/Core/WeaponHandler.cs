@@ -346,10 +346,12 @@ namespace Vi.Core
 
         public bool IsAiming() { return aiming.Value; }
 
+        private Coroutine changeAimWeightsCoroutine;
         private void OnAimingChange(bool prev, bool current)
         {
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), current ? 1 : 0);
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), current ? 0 : 1);
+            if (changeAimWeightsCoroutine != null)
+                StopCoroutine(changeAimWeightsCoroutine);
+            changeAimWeightsCoroutine = StartCoroutine(ChangeAimWeights());
 
             foreach (GameObject instance in weaponInstances)
             {
@@ -360,6 +362,14 @@ namespace Vi.Core
                     animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming.Value);
                 }
             }
+        }
+
+        private IEnumerator ChangeAimWeights()
+        {
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Aiming Actions")).IsName("Empty")
+            & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Aiming Actions")));
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), aiming.Value ? 1 : 0);
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), aiming.Value ? 0 : 1);
         }
 
         private bool toggleAim = true;
