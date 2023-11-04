@@ -7,12 +7,14 @@ namespace Vi.Player
 {
     public class CameraController : MonoBehaviour
     {
-        [Header("Camera Transform Settings")]
+        [Header("Camera Settings")]
         [SerializeField] private Transform cameraPivot;
         [SerializeField] private float orbitSpeed = 8;
         [SerializeField] private float smoothTime = 0.1f;
         [SerializeField] private float maxPitch = 40;
         [SerializeField] private Vector3 positionOffset = new Vector3(0, 0, 3);
+        [Header("Aiming Settings")]
+        [SerializeField] private float aimingTransitionSpeed = 8;
         [SerializeField] private Vector3 aimingPositionOffset = new Vector3(0, 0, 1);
 
         private float targetRotationX;
@@ -21,12 +23,15 @@ namespace Vi.Player
         private PlayerMovementHandler movementHandler;
         private WeaponHandler weaponHandler;
         private GameObject cameraInterp;
+        private Vector3 currentPositionOffset;
+
         private void Start()
         {
             movementHandler = GetComponentInParent<PlayerMovementHandler>();
             weaponHandler = movementHandler.GetComponent<WeaponHandler>();
             transform.SetParent(null, true);
             cameraInterp = new GameObject("Camera Interp");
+            currentPositionOffset = positionOffset;
         }
 
         private void Update()
@@ -60,9 +65,11 @@ namespace Vi.Player
                 eulers.z = 0;
                 cameraInterp.transform.eulerAngles = eulers;
             }
-            
+
+            currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
+
             // Update camera transform itself
-            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * (weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset);
+            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             transform.LookAt(cameraInterp.transform);
         }
     }
