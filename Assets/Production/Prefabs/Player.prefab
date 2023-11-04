@@ -143,7 +143,7 @@ MonoBehaviour:
   cameraInstance: {fileID: 3945128956232022068}
   runSpeed: 5
   angularSpeed: 540
-  moveAnimSpeed: 5
+  runAnimationTransitionSpeed: 5
 --- !u!114 &3945128955595459581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,7 +171,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!114 &3945128955595459583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
+  botCharacterIndex: 0
+  botSkinIndex: 0
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +236,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3945128956232022066}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.24, y: 1.73, z: -2.49}
+  m_LocalPosition: {x: 0.34, y: 1.73, z: -2.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -368,7 +368,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3945128957587517371}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.24, y: 1.73, z: 0}
+  m_LocalPosition: {x: 0.34, y: 1.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

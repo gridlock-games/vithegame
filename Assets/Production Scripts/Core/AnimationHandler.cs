@@ -32,6 +32,7 @@ namespace Vi.Core
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
@@ -172,6 +173,7 @@ namespace Vi.Core
         public Vector3 ApplyNetworkRootMotion() { return animatorReference.ApplyNetworkRootMotion(); }
 
         public Animator Animator { get; private set; }
+        public LimbReferences LimbReferences { get; private set; }
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
@@ -200,6 +202,7 @@ namespace Vi.Core
             GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
             Animator = modelInstance.GetComponent<Animator>();
+            LimbReferences = modelInstance.GetComponent<LimbReferences>();
             animatorReference = modelInstance.GetComponent<AnimatorReference>();
             weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
         }

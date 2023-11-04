@@ -17,15 +17,17 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            isBlocking.OnValueChanged += OnIsBlockingChanged;
+            isBlocking.OnValueChanged += OnIsBlockingChange;
+            aiming.OnValueChanged += OnAimingChange;
         }
 
         public override void OnNetworkDespawn()
         {
-            isBlocking.OnValueChanged -= OnIsBlockingChanged;
+            isBlocking.OnValueChanged -= OnIsBlockingChange;
+            aiming.OnValueChanged -= OnAimingChange;
         }
 
-        private void OnIsBlockingChanged(bool prev, bool current)
+        private void OnIsBlockingChange(bool prev, bool current)
         {
             animationHandler.Animator.SetBool("Blocking", current);
         }
@@ -79,7 +81,15 @@ namespace Vi.Core
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        instance.GetComponent<RuntimeWeapon>().SetWeaponBone(modelData.weaponBone);
+                        if (instance.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                        {
+                            runtimeWeapon.SetWeaponBone(modelData.weaponBone);
+                        }
+                        else
+                        {
+                            Debug.LogWarning(instance + " does not have a runtime weapon component!");
+                        }
+                        canAim = instance.GetComponent<ShooterWeapon>() | canAim;
                     }
                     broken = true;
                     break;
@@ -218,13 +228,11 @@ namespace Vi.Core
         {
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
-            if (CurrentActionClip.isUninterruptable)
-            {
-                if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
+            if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
-                {
-                    attributes.SetUninterruptable(Time.deltaTime * 2);
-                }
+            {
+                if (CurrentActionClip.isUninterruptable) { attributes.SetUninterruptable(Time.deltaTime * 2); }
+                if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
             }
 
             if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
@@ -282,7 +290,10 @@ namespace Vi.Core
 
                 if (IsAttacking & !lastIsAttacking)
                 {
-                    AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(CurrentActionClip.weaponBone), transform.position);
+                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    {
+                        AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                    }
                 }
             }
             else
@@ -333,6 +344,52 @@ namespace Vi.Core
             ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animationHandler.Animator);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
+        }
+
+        public bool IsAiming() { return aiming.Value; }
+
+        private Coroutine changeAimWeightsCoroutine;
+        private void OnAimingChange(bool prev, bool current)
+        {
+            if (changeAimWeightsCoroutine != null)
+                StopCoroutine(changeAimWeightsCoroutine);
+            changeAimWeightsCoroutine = StartCoroutine(ChangeAimWeights());
+
+            foreach (GameObject instance in weaponInstances)
+            {
+                if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), aiming.Value);
+                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming.Value);
+                }
+            }
+        }
+
+        private IEnumerator ChangeAimWeights()
+        {
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Aiming Actions")).IsName("Empty")
+            & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Aiming Actions")));
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), aiming.Value ? 1 : 0);
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), aiming.Value ? 0 : 1);
+        }
+
+        private bool toggleAim = true;
+        private bool canAim;
+
+        private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        void OnAim(InputValue value)
+        {
+            if (!canAim) { return; }
+
+            if (toggleAim)
+            {
+                if (value.isPressed) { aiming.Value = !aiming.Value; }
+            }
+            else
+            {
+                aiming.Value = value.isPressed;
+            }
         }
 
         void OnReload()

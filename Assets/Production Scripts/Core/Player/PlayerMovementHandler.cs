@@ -77,7 +77,14 @@ namespace Vi.Player
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
-                newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                if (weaponHandler.IsAiming())
+                {
+                    newRotation = Quaternion.LookRotation(camDirection);
+                }
+                else
+                {
+                    newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                }
             }
             else
             {
@@ -147,6 +154,8 @@ namespace Vi.Player
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
+            else if (weaponHandler.IsAiming())
+                transform.rotation = movementPrediction.currentRotation;
             else
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
 

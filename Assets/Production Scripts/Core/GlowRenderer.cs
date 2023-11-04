@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -52,8 +53,15 @@ namespace Vi.Core
 
         private void Start()
         {
+            NetworkObject netObj = GetComponentInParent<NetworkObject>();
+
             foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
+                if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                {
+                    skinnedMeshRenderer.updateWhenOffscreen = netObj.IsLocalPlayer;
+                }
+
                 List<Material> materialList = new List<Material>();
 
                 foreach (Material m in renderer.materials)

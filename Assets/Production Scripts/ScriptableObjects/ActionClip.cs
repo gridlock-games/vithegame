@@ -86,6 +86,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 
+        public bool shouldApplyRootMotion = true;
         public AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
@@ -96,7 +97,8 @@ namespace Vi.ScriptableObjects
         public float agentDefenseCost = 0;
         public float agentRageCost = 50;
 
-        public Weapon.WeaponBone weaponBone;
+        public Weapon.WeaponBone[] effectedWeaponBones;
+        public bool mustBeAiming;
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;
@@ -106,6 +108,7 @@ namespace Vi.ScriptableObjects
         public float timeBetweenHits = 1;
         public bool isBlockable = true;
         public bool isUninterruptable;
+        public bool isInvincible;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
 
