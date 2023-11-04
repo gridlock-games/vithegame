@@ -108,6 +108,7 @@ namespace Vi.ScriptableObjects
         public float timeBetweenHits = 1;
         public bool isBlockable = true;
         public bool isUninterruptable;
+        public bool isInvincible;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
 
