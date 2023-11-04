@@ -344,28 +344,27 @@ namespace Vi.Core
 
         private bool toggleAim = true;
 
-        public bool aiming { get; private set; }
+        public bool Aiming { get; private set; }
         void OnAim(InputValue value)
         {
             if (toggleAim)
             {
-                if (value.isPressed) { aiming = !aiming; }
+                if (value.isPressed) { Aiming = !Aiming; }
             }
             else
             {
-                aiming = value.isPressed;
+                Aiming = value.isPressed;
             }
 
             foreach (GameObject instance in weaponInstances)
             {
                 if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), aiming);
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), Aiming);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming);
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, Aiming);
                 }
             }
-            animationHandler.LimbReferences.ADSCamera.enabled = aiming;
         }
 
         void OnReload()

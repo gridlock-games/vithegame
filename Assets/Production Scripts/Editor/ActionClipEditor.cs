@@ -18,6 +18,7 @@ namespace Vi.Editor
         private SerializedProperty spAgentDefenseCost;
         private SerializedProperty spAgentRageCost;
 
+        private SerializedProperty spShouldApplyRootMotion;
         private SerializedProperty spRootMotionForwardMultiplier;
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
@@ -52,6 +53,7 @@ namespace Vi.Editor
         {
             spClipType = serializedObject.FindProperty("clipType");
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
+            spShouldApplyRootMotion = serializedObject.FindProperty("shouldApplyRootMotion");
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
@@ -92,10 +94,14 @@ namespace Vi.Editor
 
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);
-            EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
-            EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
-            EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
-
+            EditorGUILayout.PropertyField(spShouldApplyRootMotion);
+            if (spShouldApplyRootMotion.boolValue)
+            {
+                EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
+                EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
+                EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
+            }
+            
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);

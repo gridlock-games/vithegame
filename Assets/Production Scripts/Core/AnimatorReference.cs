@@ -40,7 +40,11 @@ namespace Vi.Core
             limbReferences = GetComponent<LimbReferences>();
         }
 
-        public bool ShouldApplyRootMotion() { return !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"); }
+        public bool ShouldApplyRootMotion()
+        {
+            if (!weaponHandler.CurrentActionClip) { return false; }
+            return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+        }
 
         private void OnAnimatorMove()
         {

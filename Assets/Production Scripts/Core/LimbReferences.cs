@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 using Vi.ProceduralAnimations;
 
 namespace Vi.Core
@@ -61,8 +60,6 @@ namespace Vi.Core
 
         [SerializeField] private GameObject rightHand;
         [SerializeField] private GameObject leftHand;
-
-        public Camera ADSCamera;
 
         [Header("IK Settings")]
         [SerializeField] private RigWeightTarget rightHandAimRig;

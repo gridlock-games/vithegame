@@ -86,6 +86,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 
+        public bool shouldApplyRootMotion = true;
         public AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
