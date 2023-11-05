@@ -95,15 +95,17 @@ MonoBehaviour:
   mustBeAiming: 0
   attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 0.4
-  damage: 20
+  damage: 3
   staminaDamage: 0
-  defenseDamage: 0
+  defenseDamage: 1
   maxHitLimit: 1
   timeBetweenHits: 1
   isBlockable: 1
   isUninterruptable: 0
+  isInvincible: 0
   ailment: 0
   ailmentDuration: 2
+  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
@@ -112,4 +114,8 @@ MonoBehaviour:
   abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 7369619493490930291, guid: b600ca06c379db0449e6b2289c9147df, type: 3}
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
