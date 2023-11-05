@@ -64,6 +64,8 @@ namespace Vi.Core
                     projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, parentWeaponHandler.CurrentActionClip, projectileForce);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
+
+                    AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().GetAttackSoundEffect(weaponBone), transform.position);
                 }
             }
         }

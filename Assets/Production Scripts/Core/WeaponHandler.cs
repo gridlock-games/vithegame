@@ -11,7 +11,7 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        private List<GameObject> weaponInstances = new List<GameObject>();
+        private Dictionary<Weapon.WeaponBone, GameObject> weaponInstances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
         public Weapon GetWeapon() { return weaponInstance; }
 
@@ -50,7 +50,7 @@ namespace Vi.Core
 
         private void EquipWeapon(GameObject skinPrefab)
         {
-            List<GameObject> instances = new List<GameObject>();
+            Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -60,7 +60,7 @@ namespace Vi.Core
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
                         GameObject instance = Instantiate(modelData.weaponPrefab);
-                        instances.Add(instance);
+                        instances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
                         Transform bone = null;
@@ -109,9 +109,9 @@ namespace Vi.Core
         public void SetActionClip(ActionClip actionClip)
         {
             CurrentActionClip = actionClip;
-            foreach (GameObject weaponInstance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
             {
-                weaponInstance.GetComponent<RuntimeWeapon>().ResetHitCounter();
+                weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
             }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -292,7 +292,10 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                        if (weaponInstances[weaponBone].GetComponent<ColliderWeapon>())
+                        {
+                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                        }
                     }
                 }
             }
@@ -385,9 +388,9 @@ namespace Vi.Core
 
         private void Aim(bool isAiming, bool instantAim)
         {
-            foreach (GameObject instance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
-                if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
                     animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
