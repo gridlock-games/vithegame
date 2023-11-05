@@ -91,7 +91,7 @@ MonoBehaviour:
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
-  effectedWeaponBones: 12000000
+  effectedWeaponBones: 06000000
   mustBeAiming: 0
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.5
@@ -102,8 +102,10 @@ MonoBehaviour:
   timeBetweenHits: 1
   isBlockable: 1
   isUninterruptable: 0
+  isInvincible: 0
   ailment: 0
   ailmentDuration: 2
+  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -113,3 +115,6 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
