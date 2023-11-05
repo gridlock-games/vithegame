@@ -53,16 +53,23 @@ namespace Vi.Core
             {
                 if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.IsInAnticipation)
-                            Gizmos.color = Color.yellow;
-                        else if (parentWeaponHandler.IsAttacking)
-                            Gizmos.color = Color.red;
-                        else if (parentWeaponHandler.IsInRecovery)
-                            Gizmos.color = Color.magenta;
+                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                        {
+                            if (parentWeaponHandler.IsInAnticipation)
+                                Gizmos.color = Color.yellow;
+                            else if (parentWeaponHandler.IsAttacking)
+                                Gizmos.color = Color.red;
+                            else if (parentWeaponHandler.IsInRecovery)
+                                Gizmos.color = Color.magenta;
+                            else
+                                Gizmos.color = Color.white;
+                        }
                         else
+                        {
                             Gizmos.color = Color.white;
+                        }
                     }
                     else
                     {
@@ -82,16 +89,23 @@ namespace Vi.Core
             {
                 if (parentWeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.IsInAnticipation)
-                            Gizmos.color = Color.yellow;
-                        else if (parentWeaponHandler.IsAttacking)
-                            Gizmos.color = Color.red;
-                        else if (parentWeaponHandler.IsInRecovery)
-                            Gizmos.color = Color.magenta;
+                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                        {
+                            if (parentWeaponHandler.IsInAnticipation)
+                                Gizmos.color = Color.yellow;
+                            else if (parentWeaponHandler.IsAttacking)
+                                Gizmos.color = Color.red;
+                            else if (parentWeaponHandler.IsInRecovery)
+                                Gizmos.color = Color.magenta;
+                            else
+                                Gizmos.color = Color.white;
+                        }
                         else
+                        {
                             Gizmos.color = Color.white;
+                        }
                     }
                     else
                     {

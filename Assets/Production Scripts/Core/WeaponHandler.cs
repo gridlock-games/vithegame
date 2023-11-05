@@ -302,6 +302,23 @@ namespace Vi.Core
                 IsAttacking = false;
                 IsInRecovery = false;
             }
+
+            if (IsInAnticipation)
+            {
+                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : aiming.Value, true);
+            }
+            else if (IsAttacking)
+            {
+                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : aiming.Value, true);
+            }
+            else if (IsInRecovery)
+            {
+                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : aiming.Value, true);
+            }
+            else
+            {
+                Aim(aiming.Value, false);
+            }
         }
 
         void OnLightAttack()
@@ -346,32 +363,37 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
+        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
+
         public bool IsAiming() { return aiming.Value; }
 
         private Coroutine changeAimWeightsCoroutine;
         private void OnAimingChange(bool prev, bool current)
         {
-            if (changeAimWeightsCoroutine != null)
-                StopCoroutine(changeAimWeightsCoroutine);
-            changeAimWeightsCoroutine = StartCoroutine(ChangeAimWeights());
+            changeAimWeightsCoroutine = StartCoroutine(ChangeAimWeights(current));
+            Aim(current, false);
+        }
 
+        private IEnumerator ChangeAimWeights(bool isAiming)
+        {
+            if (changeAimWeightsCoroutine != null) { StopCoroutine(changeAimWeightsCoroutine); }
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Aiming Actions")).IsName("Empty")
+            & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Aiming Actions")));
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), isAiming ? 1 : 0);
+            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), isAiming ? 0 : 1);
+        }
+
+        private void Aim(bool isAiming, bool instantAim)
+        {
             foreach (GameObject instance in weaponInstances)
             {
                 if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), aiming.Value);
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, aiming.Value);
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, isAiming, instantAim);
                 }
             }
-        }
-
-        private IEnumerator ChangeAimWeights()
-        {
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Aiming Actions")).IsName("Empty")
-            & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Aiming Actions")));
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), aiming.Value ? 1 : 0);
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), aiming.Value ? 0 : 1);
         }
 
         private bool toggleAim = true;

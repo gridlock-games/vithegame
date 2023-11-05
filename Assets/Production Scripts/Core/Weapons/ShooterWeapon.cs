@@ -51,6 +51,7 @@ namespace Vi.Core
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentWeaponHandler) { return; }
+            if (!parentWeaponHandler.IsAiming(aimHand)) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
 
@@ -69,7 +70,38 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.yellow;
+            if (!parentWeaponHandler) { return; }
+
+            if (parentWeaponHandler.CurrentActionClip)
+            {
+                if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                {
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                    {
+                        if (parentWeaponHandler.IsInAnticipation)
+                            Gizmos.color = Color.yellow;
+                        else if (parentWeaponHandler.IsAttacking)
+                            Gizmos.color = Color.red;
+                        else if (parentWeaponHandler.IsInRecovery)
+                            Gizmos.color = Color.magenta;
+                        else
+                            Gizmos.color = Color.white;
+                    }
+                    else
+                    {
+                        Gizmos.color = Color.white;
+                    }
+                }
+                else
+                {
+                    Gizmos.color = Color.white;
+                }
+            }
+            else
+            {
+                Gizmos.color = Color.white;
+            }
+
             Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * Vector3.forward * 10);
         }
     }
