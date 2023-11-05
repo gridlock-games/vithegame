@@ -15,6 +15,7 @@ namespace Vi.Core
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
         [SerializeField] private Transform offHandGrip;
 
+        public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
         public OffHandInfo GetOffHandInfo()
         {

@@ -147,8 +147,20 @@ namespace Vi.Core
                     break;
                 //case ActionVFX.TransformType.OriginatorAndTarget:
                 //    break;
-                //case ActionVFX.TransformType.Projectile:
-                //    break;
+                case ActionVFX.TransformType.Projectile:
+                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    {
+                        if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
+                        {
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        }
+                        else
+                        {
+                            Debug.LogError(actionVFXPrefab + " has attachment type set to " + actionVFXPrefab.transformType + " but can't find a ShooterComponent to base off of");
+                        }
+                    }
+                    break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
                     startPos.y += actionVFXPrefab.raycastOffset.y;

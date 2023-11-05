@@ -27,6 +27,8 @@ namespace Vi.ArtificialIntelligence
 
         private void Update()
         {
+            if (!characterController.enabled) { return; }
+
             weaponHandler.SetIsBlocking(isBlocking);
 
             if (!animationHandler.ShouldApplyRootMotion())
