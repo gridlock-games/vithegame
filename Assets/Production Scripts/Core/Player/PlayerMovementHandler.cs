@@ -193,6 +193,12 @@ namespace Vi.Player
                 //rootMotion = rootMotion.normalized * localDistance;
                 if (localDistance > movementPrediction.rootMotionDistanceScaleThreshold) { rootMotion *= localDistance * (1/movementPrediction.rootMotionDistanceScaleThreshold); }
 
+                float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + rootMotion);
+                if (localDistance < afterMoveDistance)
+                {
+                    rootMotion = movementPrediction.currentPosition - transform.position;
+                }
+
                 characterController.Move(rootMotion);
             }
             else
