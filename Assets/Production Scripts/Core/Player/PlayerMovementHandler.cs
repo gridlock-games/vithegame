@@ -8,7 +8,7 @@ using Vi.Core;
 namespace Vi.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerMovementHandler : NetworkBehaviour
+    public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private Camera cameraInstance;
 
@@ -221,14 +221,6 @@ namespace Vi.Player
         void OnLook(InputValue value)
         {
             lookInput = value.Get<Vector2>() * (attributes.IsFeared() ? -1 : 1);
-        }
-
-        public Vector2 GetMoveInput() { return moveInput; }
-
-        private Vector2 moveInput;
-        void OnMove(InputValue value)
-        {
-            moveInput = value.Get<Vector2>();
         }
 
         void OnDodge()

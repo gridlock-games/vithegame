@@ -112,7 +112,7 @@ namespace Vi.ScriptableObjects
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
             
-            if (hitReaction == null)// If attack isn't blockable
+            if (hitReaction == null) // If attack isn't blockable
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
@@ -225,15 +225,15 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator)
+        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator, Vector2 moveInput)
         {
             if (inputAttackType == InputAttackType.LightAttack)
             {
-                return GetLightAttack(animator);
+                return GetLightAttack(animator, moveInput);
             }
             else if (inputAttackType == InputAttackType.HeavyAttack)
             {
-                return GetHeavyAttack(animator);
+                return GetHeavyAttack(animator, moveInput);
             }
             else if (inputAttackType == InputAttackType.Ability1)
             {
@@ -258,38 +258,47 @@ namespace Vi.ScriptableObjects
             return null;
         }
 
+        private enum ComboCondition
+        {
+            None,
+            //OnAir,
+            //AfterBlock,
+            //AfterPerfectBlock,
+            //RunningForward,
+            //RunningBackwards,
+            InputForward,
+            InputBackwards,
+            InputLeft,
+            InputRight
+            //IsDashing,
+            //InputWKeyTwice
+        }
+
+        [System.Serializable]
+        private struct Combo
+        {
+            public ComboCondition comboCondition;
+            public ActionClip attackClip;
+        }
+
+        [SerializeField] private List<Combo> lightAttackCombo = new List<Combo>();
         [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
         private int lightAttackIndex;
-        private ActionClip GetLightAttack(Animator animator)
+        private ActionClip GetLightAttack(Animator animator, Vector2 moveInput)
         {
-            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
-            {
-                return null;
-            }
-            else if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
-            {
-                if (lightAttackIndex < lightAttacks.Count)
-                {
-                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].recoveryNormalizedTime)
-                    {
-                        lightAttackIndex++;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
+            if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
                 lightAttackIndex = 0;
             }
-
-            if (lightAttackIndex >= lightAttacks.Count) { return null; }
+            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].recoveryNormalizedTime)
+            {
+                lightAttackIndex++;
+                if (lightAttackIndex >= lightAttacks.Count) { lightAttackIndex = 0; }
+            }
+            else
+            {
+                return null;
+            }
 
             ActionClip actionClip = lightAttacks[lightAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for index: " + lightAttackIndex + " on weapon: " + this); }
@@ -299,36 +308,21 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
         private int heavyAttackIndex;
-        private ActionClip GetHeavyAttack(Animator animator)
+        private ActionClip GetHeavyAttack(Animator animator, Vector2 moveInput)
         {
-            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
-            {
-                return null;
-            }
-            else if (!animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
-            {
-                if (heavyAttackIndex < heavyAttacks.Count)
-                {
-                    if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].recoveryNormalizedTime)
-                    {
-                        heavyAttackIndex++;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
+            if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
             {
                 heavyAttackIndex = 0;
             }
-
-            if (heavyAttackIndex >= heavyAttacks.Count) { return null; }
+            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].recoveryNormalizedTime)
+            {
+                heavyAttackIndex++;
+                if (heavyAttackIndex >= heavyAttacks.Count) { heavyAttackIndex = 0; }
+            }
+            else
+            {
+                return null;
+            }
 
             ActionClip actionClip = heavyAttacks[heavyAttackIndex];
             if (actionClip == null) { Debug.LogError("No action clip found for index: " + heavyAttackIndex + " on weapon: " + this); }
