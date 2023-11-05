@@ -31,7 +31,8 @@ namespace Vi.ScriptableObjects
             Stun,
             Stagger,
             Pull,
-            Death
+            Death,
+            Grab
         }
 
         public enum Status
@@ -111,6 +112,7 @@ namespace Vi.ScriptableObjects
         public bool isInvincible;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
+        public float grabDistance = 3;
 
         public enum DodgeLock
         {
@@ -132,5 +134,9 @@ namespace Vi.ScriptableObjects
         public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
+
+        public bool aimDuringAnticipation;
+        public bool aimDuringAttack;
+        public bool aimDuringRecovery;
     }
 }

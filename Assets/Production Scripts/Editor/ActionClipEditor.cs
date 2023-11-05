@@ -38,6 +38,7 @@ namespace Vi.Editor
         private SerializedProperty spIsInvincible;
         private SerializedProperty spAilment;
         private SerializedProperty spAilmentDuration;
+        private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
         private SerializedProperty spCanCancelLightAttacks;
         private SerializedProperty spCanCancelHeavyAttacks;
@@ -50,6 +51,10 @@ namespace Vi.Editor
         private SerializedProperty spStatusesToApplyToTargetOnHit;
 
         private SerializedProperty spActionVFXList;
+
+        private SerializedProperty spAimDuringAnticipation;
+        private SerializedProperty spAimDuringAttack;
+        private SerializedProperty spAimDuringRecovery;
 
         private void OnEnable()
         {
@@ -79,6 +84,7 @@ namespace Vi.Editor
             spIsInvincible = serializedObject.FindProperty("isInvincible");
             spAilment = serializedObject.FindProperty("ailment");
             spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
+            spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
             spCanCancelLightAttacks = serializedObject.FindProperty("canCancelLightAttacks");
             spCanCancelHeavyAttacks = serializedObject.FindProperty("canCancelHeavyAttacks");
@@ -90,6 +96,10 @@ namespace Vi.Editor
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
+
+            spAimDuringAnticipation = serializedObject.FindProperty("aimDuringAnticipation");
+            spAimDuringAttack = serializedObject.FindProperty("aimDuringAttack");
+            spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
         }
 
         public override void OnInspectorGUI()
@@ -132,6 +142,11 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
+                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDistance);
+                }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
@@ -139,6 +154,15 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+                if (!spMustBeAiming.boolValue)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spAimDuringAnticipation);
+                    EditorGUILayout.PropertyField(spAimDuringAttack);
+                    EditorGUILayout.PropertyField(spAimDuringRecovery);
+                }
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
@@ -161,6 +185,11 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
+                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDistance);
+                }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
@@ -168,6 +197,15 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+                if (!spMustBeAiming.boolValue)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spAimDuringAnticipation);
+                    EditorGUILayout.PropertyField(spAimDuringAttack);
+                    EditorGUILayout.PropertyField(spAimDuringRecovery);
+                }
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HitReaction)
             {
@@ -198,6 +236,11 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.PropertyField(spAilmentDuration);
                 }
+                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDistance);
+                }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
                 EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
@@ -209,6 +252,16 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+
+                if (!spMustBeAiming.boolValue)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spAimDuringAnticipation);
+                    EditorGUILayout.PropertyField(spAimDuringAttack);
+                    EditorGUILayout.PropertyField(spAimDuringRecovery);
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -27,11 +27,10 @@ namespace Vi.Core
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
         {
-            if (attributes.IsRooted()) { return; }
-
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
@@ -76,6 +75,31 @@ namespace Vi.Core
                 {
                     if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                 }
+            }
+
+            if (actionClip.ailment == ActionClip.Ailment.Grab)
+            {
+                float raycastDistance = actionClip.grabDistance;
+                bool bHit = false;
+                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
+                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+                foreach (RaycastHit hit in allHits)
+                {
+                    if (hit.transform == transform) { continue; }
+                    Attributes targetAttributes = hit.transform.GetComponentInParent<Attributes>();
+                    if (!targetAttributes) { return; }
+                    if (targetAttributes == attributes) { return; }
+
+                    bHit = true;
+
+                    targetAttributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
+                    break;
+                }
+
+                // Make sure that there is a detected target
+                if (!bHit) { return; }
             }
 
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck

@@ -88,28 +88,33 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   transitionTime: 0.15
-  agentStaminaCost: 30
+  agentStaminaCost: 15
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: 0f000000
+  effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.35
-  recoveryNormalizedTime: 0.5
-  damage: 20
+  attackingNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.4
+  damage: 2
   staminaDamage: 0
-  defenseDamage: 0
-  maxHitLimit: 1
-  timeBetweenHits: 1
+  defenseDamage: 3
+  maxHitLimit: 2
+  timeBetweenHits: 0.25
   isBlockable: 1
   isUninterruptable: 0
-  ailment: 4
+  isInvincible: 0
+  ailment: 7
   ailmentDuration: 2
+  grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
-  abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
+  abilityImageIcon: {fileID: 21300000, guid: 1498fbdae44f5ff4bbd566721a388977, type: 3}
   abilityCooldownTime: 10
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  aimDuringAnticipation: 0
+  aimDuringAttack: 1
+  aimDuringRecovery: 0
