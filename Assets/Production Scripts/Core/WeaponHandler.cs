@@ -147,8 +147,10 @@ namespace Vi.Core
                     vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), transform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
-                //case ActionVFX.TransformType.OriginatorAndTarget:
-                //    break;
+                case ActionVFX.TransformType.SpawnAtWeaponPoint:
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
                 case ActionVFX.TransformType.Projectile:
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
@@ -198,6 +200,8 @@ namespace Vi.Core
                         );
                     }
                     break;
+                //case ActionVFX.TransformType.OriginatorAndTarget:
+                //    break;
                 default:
                     Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;

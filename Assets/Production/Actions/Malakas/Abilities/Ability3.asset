@@ -102,14 +102,19 @@ MonoBehaviour:
   timeBetweenHits: 0.5
   isBlockable: 1
   isUninterruptable: 0
+  isInvincible: 0
   ailment: 0
   ailmentDuration: 2
+  grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
-  abilityImageIcon: {fileID: 21300000, guid: 3daf3a15cfd146543942e4b6524260ad, type: 3}
+  abilityImageIcon: {fileID: 21300000, guid: 8d66af1a6b6a87a44a2f93154aa9ca38, type: 3}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
