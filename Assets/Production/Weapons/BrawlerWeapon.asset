@@ -137,14 +137,35 @@ MonoBehaviour:
   ability2: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
   ability3: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
   ability4: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
-  lightAttacks:
-  - {fileID: 11400000, guid: ea9a41cfab322534e88d232184459c8c, type: 2}
-  - {fileID: 11400000, guid: 23dbfed4b5eefa14689453a7b02d1159, type: 2}
-  - {fileID: 11400000, guid: d2685f7596e5ecf48a4a54ade519ab77, type: 2}
-  - {fileID: 11400000, guid: 8ca4088e1f798ed4db316e9970371d35, type: 2}
-  heavyAttacks:
-  - {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
-  - {fileID: 11400000, guid: c3ee966b76e1695448b68582c5ef2d0e, type: 2}
+  attackList:
+  - inputIndex: 0
+    InputAttackType: 0
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: ea9a41cfab322534e88d232184459c8c, type: 2}
+  - inputIndex: 1
+    InputAttackType: 0
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 23dbfed4b5eefa14689453a7b02d1159, type: 2}
+  - inputIndex: 2
+    InputAttackType: 0
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: d2685f7596e5ecf48a4a54ade519ab77, type: 2}
+  - inputIndex: 3
+    InputAttackType: 0
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 8ca4088e1f798ed4db316e9970371d35, type: 2}
+  - inputIndex: 0
+    InputAttackType: 1
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
+  - inputIndex: 1
+    InputAttackType: 1
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: c3ee966b76e1695448b68582c5ef2d0e, type: 2}
+  - inputIndex: 2
+    InputAttackType: 1
+    comboCondition: 2
+    attackClip: {fileID: 11400000, guid: 9c2945988dc26f6429300db2e7342824, type: 2}
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
