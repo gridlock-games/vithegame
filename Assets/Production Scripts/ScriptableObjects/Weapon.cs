@@ -102,8 +102,7 @@ namespace Vi.ScriptableObjects
             }
 
             // Reset combo system
-            lightAttackIndex = 0;
-            heavyAttackIndex = 0;
+            attackIndex = 0;
 
             HitReaction hitReaction = null;
             if (isBlocking & attack.isBlockable)
@@ -150,10 +149,6 @@ namespace Vi.ScriptableObjects
         {
             LightAttack,
             HeavyAttack,
-            Ability1,
-            Ability2,
-            Ability3,
-            Ability4
         }
 
         public List<ActionClip> GetAbilities()
@@ -165,6 +160,11 @@ namespace Vi.ScriptableObjects
             abilityList.Add(ability4);
             return abilityList;
         }
+
+        public ActionClip GetAbility1() { return ability1; }
+        public ActionClip GetAbility2() { return ability2; }
+        public ActionClip GetAbility3() { return ability3; }
+        public ActionClip GetAbility4() { return ability4; }
 
         [SerializeField] private ActionClip ability1;
         [SerializeField] private ActionClip ability2;
@@ -225,109 +225,104 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator, Vector2 moveInput)
+        [SerializeField] private List<Attack> attackList = new List<Attack>();
+        private int attackIndex;
+
+        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator, Vector2 moveInput, bool isInRecovery)
         {
-            if (inputAttackType == InputAttackType.LightAttack)
+            // If we are in recovery, and not transitioning to a different action
+            if (isInRecovery & !animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
-                return GetLightAttack(animator, moveInput);
+                attackIndex++;
+
+                Attack attack = SelectAttack(inputAttackType, moveInput);
+                if (attack == null) { return null; }
+                return attack.attackClip;
             }
-            else if (inputAttackType == InputAttackType.HeavyAttack)
+            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) // If we are at rest
             {
-                return GetHeavyAttack(animator, moveInput);
+                attackIndex = 0;
+
+                Attack attack = SelectAttack(inputAttackType, moveInput);
+                if (attack == null) { return null; }
+                return attack.attackClip;
             }
-            else if (inputAttackType == InputAttackType.Ability1)
+            else // If we are not at rest and not recovering
             {
-                return ability1;
+                return null;
             }
-            else if (inputAttackType == InputAttackType.Ability2)
-            {
-                return ability2;
-            }
-            else if (inputAttackType == InputAttackType.Ability3)
-            {
-                return ability3;
-            }
-            else if (inputAttackType == InputAttackType.Ability4)
-            {
-                return ability4;
-            }
-            else
-            {
-                Debug.LogError("Trying to get an attack for an inputAttackType that hasn't been implemented! " + inputAttackType);
-            }
-            return null;
         }
 
         private enum ComboCondition
         {
             None,
-            //OnAir,
-            //AfterBlock,
-            //AfterPerfectBlock,
-            //RunningForward,
-            //RunningBackwards,
             InputForward,
             InputBackwards,
             InputLeft,
             InputRight
-            //IsDashing,
-            //InputWKeyTwice
         }
 
         [System.Serializable]
-        private struct Combo
+        private class Attack
         {
-            public ComboCondition comboCondition;
+            public int inputIndex;
+            public InputAttackType InputAttackType = InputAttackType.LightAttack;
+            public ComboCondition comboCondition = ComboCondition.None;
             public ActionClip attackClip;
         }
 
-        [SerializeField] private List<Combo> lightAttackCombo = new List<Combo>();
-        [SerializeField] private List<ActionClip> lightAttacks = new List<ActionClip>();
-        private int lightAttackIndex;
-        private ActionClip GetLightAttack(Animator animator, Vector2 moveInput)
+        private int maxAttackIndex;
+        private void Awake()
         {
-            if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            foreach (Attack attack in attackList)
             {
-                lightAttackIndex = 0;
+                if (attack.inputIndex > maxAttackIndex) { maxAttackIndex = attack.inputIndex; }
             }
-            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= lightAttacks[lightAttackIndex].recoveryNormalizedTime)
+            
+            if (Application.isEditor)
             {
-                lightAttackIndex++;
-                if (lightAttackIndex >= lightAttacks.Count) { lightAttackIndex = 0; }
+                for (int i = 0; i < maxAttackIndex; i++)
+                {
+                    if (attackList.Find(item => item.inputIndex == i) == null) { Debug.LogError(this + " does not have an attack for index: " + i); }
+                }
             }
-            else
-            {
-                return null;
-            }
-
-            ActionClip actionClip = lightAttacks[lightAttackIndex];
-            if (actionClip == null) { Debug.LogError("No action clip found for index: " + lightAttackIndex + " on weapon: " + this); }
-
-            return actionClip;
         }
 
-        [SerializeField] private List<ActionClip> heavyAttacks = new List<ActionClip>();
-        private int heavyAttackIndex;
-        private ActionClip GetHeavyAttack(Animator animator, Vector2 moveInput)
+        private Attack SelectAttack(InputAttackType inputAttackType, Vector2 moveInput)
         {
-            if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty"))
+            List<Attack> potentialAttacks = attackList.FindAll(item => item.inputIndex == attackIndex & item.InputAttackType == inputAttackType);
+            Attack selectedAttack = potentialAttacks.Find(item => item.inputIndex == attackIndex & item.comboCondition == ComboCondition.None);
+            foreach (Attack attack in potentialAttacks)
             {
-                heavyAttackIndex = 0;
-            }
-            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime >= heavyAttacks[heavyAttackIndex].recoveryNormalizedTime)
-            {
-                heavyAttackIndex++;
-                if (heavyAttackIndex >= heavyAttacks.Count) { heavyAttackIndex = 0; }
-            }
-            else
-            {
-                return null;
-            }
+                bool conditionMet = false;
+                switch (attack.comboCondition)
+                {
+                    case ComboCondition.None:
+                        break;
+                    case ComboCondition.InputForward:
+                        conditionMet = moveInput.y == 1;
+                        break;
+                    case ComboCondition.InputBackwards:
+                        conditionMet = moveInput.y == -1;
+                        break;
+                    case ComboCondition.InputLeft:
+                        conditionMet = moveInput.x == -1;
+                        break;
+                    case ComboCondition.InputRight:
+                        conditionMet = moveInput.x == 1;
+                        break;
+                    default:
+                        Debug.Log(attack.comboCondition + " has not been implemented yet!");
+                        break;
+                }
 
-            ActionClip actionClip = heavyAttacks[heavyAttackIndex];
-            if (actionClip == null) { Debug.LogError("No action clip found for index: " + heavyAttackIndex + " on weapon: " + this); }
-
-            return actionClip;
+                if (conditionMet)
+                {
+                    selectedAttack = attack;
+                    break;
+                }
+            }
+            return selectedAttack;
         }
 
         [Header("Dodge Assignments")]
@@ -378,8 +373,7 @@ namespace Vi.ScriptableObjects
             }
 
             // Reset combo system
-            lightAttackIndex = 0;
-            heavyAttackIndex = 0;
+            attackIndex = 0;
 
             return dodgeClip;
         }
@@ -425,9 +419,22 @@ namespace Vi.ScriptableObjects
                         }
                     }
                 }
+                else if (propertyInfo.FieldType == typeof(List<Attack>))
+                {
+                    var AttackListObject = propertyInfo.GetValue(this);
+                    List<Attack> attacks = (List<Attack>)AttackListObject;
+
+                    foreach (Attack attack in attacks)
+                    {
+                        if (attack.attackClip)
+                        {
+                            if (attack.attackClip.name == clipName) { return attack.attackClip; }
+                        }
+                    }
+                }
             }
 
-            Debug.LogError("Melee clip Not Found: " + clipName);
+            Debug.LogError("Action clip Not Found: " + clipName);
             return null;
         }
     }

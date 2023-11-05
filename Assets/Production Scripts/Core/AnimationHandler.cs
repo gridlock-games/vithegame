@@ -133,7 +133,7 @@ namespace Vi.Core
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip);
-
+            
             // Play the action clip based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {

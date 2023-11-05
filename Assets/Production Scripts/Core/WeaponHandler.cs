@@ -340,42 +340,42 @@ namespace Vi.Core
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability1, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAbility1();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility2()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability2, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAbility2();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility3()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability3, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAbility3();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility4()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animationHandler.Animator, movementHandler.GetMoveInput());
+            ActionClip actionClip = weaponInstance.GetAbility4();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
