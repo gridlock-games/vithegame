@@ -39,7 +39,7 @@ namespace Vi.Core
             {
                 return Color.clear;
             }
-            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(OwnerClientId).team))
+            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team))
             {
                 return Color.red;
             }
