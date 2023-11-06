@@ -237,8 +237,8 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    GameLogicManager.PlayerData currentPlayerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
-                    GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(OwnerClientId, currentPlayerData.playerName.ToString(), current.characterIndex, current.skinIndex, attributes.GetTeam()));
+                    GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
+                    GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(OwnerClientId, prevPlayerData.playerName.ToString(), current.characterIndex, current.skinIndex, attributes.GetTeam()));
                 }
                 else
                 {

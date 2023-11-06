@@ -12,6 +12,43 @@ namespace Vi.Core
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 
+        public int GetPlayerDataId() { return animationHandler.GetPlayerDataId(); }
+        public GameLogicManager.Team GetTeam() { return team.Value; }
+        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Competitor);
+
+        private void OnTeamChange(GameLogicManager.Team prev, GameLogicManager.Team current)
+        {
+            //UpdateTeamColor();
+
+            //if (IsServer)
+            //{
+            //    GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId());
+            //    GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(GetPlayerDataId(), prevPlayerData.playerName.ToString(), prevPlayerData.characterIndex, prevPlayerData.skinIndex, current));
+            //}
+        }
+
+        public Color GetRelativeTeamColor()
+        {
+            //if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.clear; }
+
+            if (IsLocalPlayer)
+            {
+                return Color.white;
+            }
+            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(OwnerClientId).team))
+            {
+                return Color.red;
+            }
+            else
+            {
+                return Color.cyan;
+            }
+        }
+
+        [SerializeField] private GameObject teamIndicatorPrefab;
+        //[SerializeField] private Vector3 indicatorLocalPosition;
+        //[SerializeField] private float glowAmount = 1;
+
         [Header("Health")]
         [SerializeField] private float maxHP = 100;
         [Header("Stamina")]
@@ -102,13 +139,10 @@ namespace Vi.Core
                 rage.Value += amount;
         }
 
-        public int GetPlayerDataId() { return animationHandler.GetPlayerDataId(); }
-        public GameLogicManager.Team GetTeam() { return team.Value; }
-        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Competitor);
-
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            team.OnValueChanged += OnTeamChange;
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
@@ -133,6 +167,7 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
+            team.OnValueChanged -= OnTeamChange;
             HP.OnValueChanged -= OnHPChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
@@ -171,6 +206,12 @@ namespace Vi.Core
             statuses = new NetworkList<ActionClip.StatusPayload>();
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
+        }
+
+        private GameObject teamIndicatorInstance;
+        private void Start()
+        {
+            teamIndicatorInstance = Instantiate(teamIndicatorPrefab, transform);
         }
 
         public bool IsInvincible { get; private set; }

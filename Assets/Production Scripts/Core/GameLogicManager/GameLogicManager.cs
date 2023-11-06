@@ -13,6 +13,34 @@ namespace Vi.Core
 
         public CharacterReference GetCharacterReference() { return characterReference; }
 
+        private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
+        public GameMode GetGameMode() { return gameMode.Value; }
+
+        public static bool CanHit(Team attackerTeam, Team victimTeam)
+        {
+            if (attackerTeam != Team.Competitor & victimTeam != Team.Competitor)
+            {
+                if (attackerTeam == victimTeam) { return false; }
+            }
+            return true;
+        }
+
+        public static Color GetTeamColor(Team team)
+        {
+            if (team == Team.Red)
+            {
+                return Color.red;
+            }
+            else if (team == Team.Blue)
+            {
+                return Color.blue;
+            }
+            else
+            {
+                return Color.black;
+            }
+        }
+
         public enum GameMode
         {
             Duel,
