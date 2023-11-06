@@ -12,6 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
+        [SerializeField] private PlayerCard[] teammatePlayerCards;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -81,7 +82,6 @@ namespace Vi.UI
         private float frameCount;
         private IEnumerator FPSCounter()
         {
-            GUI.depth = 2;
             while (true)
             {
                 frameCount = 1f / Time.unscaledDeltaTime;

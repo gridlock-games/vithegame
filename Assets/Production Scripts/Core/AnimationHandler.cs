@@ -242,7 +242,15 @@ namespace Vi.Core
                 }
                 else
                 {
-                    botPlayerDataId.Value = GameLogicManager.Singleton.AddBotData(current.characterIndex, current.skinIndex, GameLogicManager.Team.Environment);
+                    if (botPlayerDataId.Value == default)
+                    {
+                        botPlayerDataId.Value = GameLogicManager.Singleton.AddBotData(current.characterIndex, current.skinIndex, attributes.GetTeam());
+                    }
+                    else
+                    {
+                        GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(botPlayerDataId.Value);
+                        GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(prevPlayerData.clientId, prevPlayerData.playerName.ToString(), current.characterIndex, current.skinIndex, attributes.GetTeam()));
+                    }
                 }
             }
         }

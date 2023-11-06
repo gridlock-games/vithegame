@@ -132,6 +132,11 @@ namespace Vi.Core
             }
         }
 
+        public void RemovePlayerData(int clientId)
+        {
+            playerDataList.Remove(new PlayerData(clientId));
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
@@ -187,7 +192,7 @@ namespace Vi.Core
 
         protected void OnClientDisconnectCallback(ulong clientId)
         {
-
+            RemovePlayerData((int)clientId);
         }
 
         protected NetworkList<PlayerData> playerDataList;

@@ -14,7 +14,7 @@ namespace Vi.Core
 
         public int GetPlayerDataId() { return animationHandler.GetPlayerDataId(); }
         public GameLogicManager.Team GetTeam() { return team.Value; }
-        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Competitor);
+        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Red);
 
         private void OnTeamChange(GameLogicManager.Team prev, GameLogicManager.Team current)
         {
@@ -155,18 +155,6 @@ namespace Vi.Core
             statuses.OnListChanged += OnStatusChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
-
-            if (IsServer)
-            {
-                if (NetworkObject.IsPlayerObject)
-                {
-                    team.Value = GameLogicManager.Singleton.GetPlayerData(OwnerClientId).team;
-                }
-                else
-                {
-                    team.Value = GameLogicManager.Team.Environment;
-                }
-            }
         }
 
         public override void OnNetworkDespawn()
