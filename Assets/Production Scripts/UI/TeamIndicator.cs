@@ -19,8 +19,6 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (!GameLogicManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
-
             foreach (Renderer r in renderers)
             {
                 foreach (Material mat in r.materials)

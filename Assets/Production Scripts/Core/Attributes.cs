@@ -35,6 +35,10 @@ namespace Vi.Core
             {
                 return Color.white;
             }
+            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId()))
+            {
+                return Color.clear;
+            }
             else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(OwnerClientId).team))
             {
                 return Color.red;
