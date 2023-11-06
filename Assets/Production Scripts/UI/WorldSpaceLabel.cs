@@ -71,8 +71,10 @@ namespace Vi.UI
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
             //nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
-            //nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
-            nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).team + " " + attributes.GetTeam();
+            nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
+            //nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).team + " " + attributes.GetTeam();
+            nameBackground.color = attributes.GetRelativeTeamColor();
+            healthFillImage.color = attributes.GetRelativeTeamColor();
 
             Vector3 localScaleTarget = Vector3.zero;
             if (Camera.main)

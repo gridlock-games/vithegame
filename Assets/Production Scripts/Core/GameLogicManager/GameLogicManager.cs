@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -56,8 +57,8 @@ namespace Vi.Core
             Blue,
         }
 
-        private Dictionary<ulong, GameObject> localPlayers = new Dictionary<ulong, GameObject>();
-        public void AddPlayerObject(ulong clientId, GameObject playerObject)
+        private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
+        public void AddPlayerObject(int clientId, Attributes playerObject)
         {
             localPlayers.Add(clientId, playerObject);
 
@@ -68,10 +69,20 @@ namespace Vi.Core
             //}
         }
 
+        public List<Attributes> GetPlayersOnTeam(Team team)
+        {
+            List<Attributes> attributesList = new List<Attributes>();
+            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
+            {
+                attributesList.Add(kvp.Value);
+            }
+            return attributesList;
+        }
+
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public int AddBotData(int characterIndex, int skinIndex, Team team)
+        public int AddBotData(Attributes botPlayerObject, int characterIndex, int skinIndex, Team team)
         {
             if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
 
@@ -83,6 +94,7 @@ namespace Vi.Core
             else
                 StartCoroutine(WaitForSpawnToAddPlayerData(botData));
 
+            localPlayers.Add(botClientId, botPlayerObject);
             return botClientId;
         }
 

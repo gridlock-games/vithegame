@@ -244,7 +244,7 @@ namespace Vi.Core
                 {
                     if (botPlayerDataId.Value == default)
                     {
-                        botPlayerDataId.Value = GameLogicManager.Singleton.AddBotData(current.characterIndex, current.skinIndex, attributes.GetTeam());
+                        botPlayerDataId.Value = GameLogicManager.Singleton.AddBotData(attributes, current.characterIndex, current.skinIndex, attributes.GetTeam());
                     }
                     else
                     {
@@ -302,8 +302,6 @@ namespace Vi.Core
         {
             characterModelInfo.OnValueChanged += OnCharacterModelInfoChange;
 
-            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject(OwnerClientId, gameObject); }
-            
             if (IsServer)
             {
                 if (NetworkObject.IsPlayerObject)

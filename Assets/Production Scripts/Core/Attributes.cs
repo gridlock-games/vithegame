@@ -35,7 +35,7 @@ namespace Vi.Core
             {
                 return Color.white;
             }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId()))
+            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId()) | !GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
                 return Color.clear;
             }
@@ -155,6 +155,7 @@ namespace Vi.Core
             statuses.OnListChanged += OnStatusChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
+            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject((int)OwnerClientId, this); }
         }
 
         public override void OnNetworkDespawn()
