@@ -87,6 +87,11 @@ PrefabInstance:
       propertyPath: ADSCamera
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5281553221658414348, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: aimTargetIKSolver
+      value: 
+      objectReference: {fileID: 2889527843885192604}
     - target: {fileID: 5770943897392098929, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
       propertyPath: m_IsActive
@@ -259,3 +264,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54646c19f73b70c46a4ed076703abc3e, type: 3}
+--- !u!114 &2889527843885192604 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5817322861708123383, guid: 54646c19f73b70c46a4ed076703abc3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8692758795647945067}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83d423b5689b0e247a9d72a4533657e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

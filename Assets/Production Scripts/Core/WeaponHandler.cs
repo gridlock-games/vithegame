@@ -18,13 +18,11 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             isBlocking.OnValueChanged += OnIsBlockingChange;
-            aiming.OnValueChanged += OnAimingChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlocking.OnValueChanged -= OnIsBlockingChange;
-            aiming.OnValueChanged -= OnAimingChange;
         }
 
         private void OnIsBlockingChange(bool prev, bool current)
@@ -338,7 +336,7 @@ namespace Vi.Core
             }
             else
             {
-                Aim(aiming.Value, false);
+                Aim(aiming.Value, IsServer);
             }
         }
 
@@ -387,22 +385,6 @@ namespace Vi.Core
         public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
 
         public bool IsAiming() { return aiming.Value; }
-
-        private Coroutine changeAimWeightsCoroutine;
-        private void OnAimingChange(bool prev, bool current)
-        {
-            changeAimWeightsCoroutine = StartCoroutine(ChangeAimWeights(current));
-            Aim(current, false);
-        }
-
-        private IEnumerator ChangeAimWeights(bool isAiming)
-        {
-            if (changeAimWeightsCoroutine != null) { StopCoroutine(changeAimWeightsCoroutine); }
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Aiming Actions")).IsName("Empty")
-            & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Aiming Actions")));
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Aiming Actions"), isAiming ? 1 : 0);
-            animationHandler.Animator.SetLayerWeight(animationHandler.Animator.GetLayerIndex("Actions"), isAiming ? 0 : 1);
-        }
 
         private void Aim(bool isAiming, bool instantAim)
         {

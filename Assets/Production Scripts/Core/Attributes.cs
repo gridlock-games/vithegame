@@ -236,7 +236,7 @@ namespace Vi.Core
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
-            if (!IsUninterruptable) { animationHandler.PlayAction(hitReaction); }
+            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
@@ -427,7 +427,7 @@ namespace Vi.Core
                     c.enabled = false;
                 }
 
-                worldSpaceLabelInstance.SetActive(false);
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
             }
         }
 

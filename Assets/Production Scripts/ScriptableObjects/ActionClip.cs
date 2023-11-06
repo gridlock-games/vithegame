@@ -35,6 +35,12 @@ namespace Vi.ScriptableObjects
             Grab
         }
 
+        public enum AvatarLayer
+        {
+            FullBody,
+            Aiming
+        }
+
         public enum Status
         {
             damageMultiplier,
@@ -92,6 +98,7 @@ namespace Vi.ScriptableObjects
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
 
         public float agentStaminaCost = 20;

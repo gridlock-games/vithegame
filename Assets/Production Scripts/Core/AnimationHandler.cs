@@ -58,6 +58,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
                 {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
@@ -73,6 +74,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                 }
             }
@@ -133,7 +135,8 @@ namespace Vi.Core
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip);
-            
+            UpdateAnimationLayerWeights(actionClip.avatarLayer);
+
             // Play the action clip based on its type
             if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
@@ -148,6 +151,24 @@ namespace Vi.Core
             PlayActionClientRpc(actionStateName);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
+        }
+
+        private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)
+        {
+            switch (avatarLayer)
+            {
+                case ActionClip.AvatarLayer.FullBody:
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Actions"), 1);
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 0);
+                    break;
+                case ActionClip.AvatarLayer.Aiming:
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Actions"), 0);
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 1);
+                    break;
+                default:
+                    Debug.LogError(avatarLayer + " has not been implemented yet!");
+                    break;
+            }
         }
 
         // Remote Procedure Call method for playing the action on the server
@@ -175,6 +196,7 @@ namespace Vi.Core
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip);
+            UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
@@ -289,6 +311,35 @@ namespace Vi.Core
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+        }
+
+        private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        private void Update()
+        {
+            if (!LimbReferences.aimTargetIKSolver) { return; }
+
+            if (IsLocalPlayer)
+            {
+                bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                if (bHit)
+                {
+                    if (hit.transform.root != transform.root)
+                    {
+                        aimPoint.Value = hit.point;
+                    }
+                    else
+                    {
+                        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    }
+                }
+                else
+                {
+                    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                }
+            }
+
+            LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }
 }

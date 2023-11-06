@@ -87,6 +87,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  avatarLayer: 1
   transitionTime: 0.05
   agentStaminaCost: 20
   agentDefenseCost: 0
@@ -105,6 +106,7 @@ MonoBehaviour:
   isInvincible: 0
   ailment: 0
   ailmentDuration: 2
+  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -114,3 +116,6 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
