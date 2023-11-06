@@ -16,8 +16,7 @@ namespace Vi.Core
         public enum GameMode
         {
             Duel,
-            TeamElimination,
-            TeamDeathmatch
+            TeamElimination
         }
 
         public enum Team
@@ -33,13 +32,56 @@ namespace Vi.Core
         public void AddPlayerObject(ulong clientId, GameObject playerObject)
         {
             localPlayers.Add(clientId, playerObject);
+
+            //// Remove empty player object references from local player object references
+            //foreach (var item in localPlayers.Where(kvp => kvp.Value == null).ToList())
+            //{
+            //    localPlayers.Remove(item.Key);
+            //}
+        }
+
+        public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
+
+        private int botClientId = 0;
+        public int AddBotData(int characterIndex, int skinIndex, Team team)
+        {
+            if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
+
+            botClientId--;
+            PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId*-1).ToString(), characterIndex, skinIndex, team);
+
+            if (IsSpawned)
+                playerDataList.Add(botData);
+            else
+                StartCoroutine(WaitForSpawnToAddPlayerData(botData));
+
+            return botClientId;
+        }
+
+        private IEnumerator WaitForSpawnToAddPlayerData(PlayerData playerData)
+        {
+            yield return new WaitUntil(() => IsSpawned);
+            playerDataList.Add(playerData);
+        }
+
+        public PlayerData GetPlayerData(int clientId)
+        {
+            foreach (PlayerData playerData in playerDataList)
+            {
+                if (playerData.clientId == clientId)
+                {
+                    return playerData;
+                }
+            }
+            Debug.LogError("Could not find player data with ID: " + clientId);
+            return new PlayerData();
         }
 
         public PlayerData GetPlayerData(ulong clientId)
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == clientId)
+                if (playerData.clientId == (int)clientId)
                 {
                     return playerData;
                 }
@@ -109,10 +151,10 @@ namespace Vi.Core
 
         private IEnumerator SpawnPlayer(ulong clientId)
         {
-            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData(clientId)));
+            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData((int)clientId)));
 
-            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(clientId).characterIndex].playerPrefab);
-            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(GetPlayerData(clientId).clientId, true);
+            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
         }
 
         protected void OnClientDisconnectCallback(ulong clientId)
@@ -163,9 +205,9 @@ namespace Vi.Core
             if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
             if (clientId != NetworkManager.ServerClientId)
-                playerDataList.Add(new PlayerData(clientId, playerName, characterIndex, skinIndex));
+                playerDataList.Add(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor));
             else
-                StartCoroutine(OnHostConnect(new PlayerData(clientId, playerName, characterIndex, skinIndex)));
+                StartCoroutine(OnHostConnect(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor)));
         }
 
         protected IEnumerator OnHostConnect(PlayerData playerData)
@@ -176,25 +218,37 @@ namespace Vi.Core
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
-            public ulong clientId;
+            public int clientId;
             public FixedString32Bytes playerName;
             public int characterIndex;
             public int skinIndex;
+            public Team team;
 
-            public PlayerData(ulong clientId)
+            public PlayerData(int clientId)
             {
                 this.clientId = clientId;
                 playerName = "Player Name";
                 characterIndex = 0;
                 skinIndex = 0;
+                team = Team.Environment;
             }
 
-            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex)
+            public PlayerData(int clientId, string playerName, int characterIndex, int skinIndex, Team team)
             {
                 this.clientId = clientId;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
+                this.team = team;
+            }
+
+            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
+            {
+                this.clientId = (int)clientId;
+                this.playerName = playerName;
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+                this.team = team;
             }
 
             public bool Equals(PlayerData other)

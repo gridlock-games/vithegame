@@ -225,6 +225,9 @@ namespace Vi.Core
         AnimatorReference animatorReference;
 
         private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
+        private NetworkVariable<int> botPlayerDataId = new NetworkVariable<int>();
+
+        public int GetPlayerDataId() { return NetworkObject.IsPlayerObject ? (int)OwnerClientId : botPlayerDataId.Value; }
 
         private void OnCharacterModelInfoChange(CharacterModelInfo prev, CharacterModelInfo current)
         {
@@ -232,7 +235,15 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                //GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData());
+                if (NetworkObject.IsPlayerObject)
+                {
+                    GameLogicManager.PlayerData currentPlayerData = GameLogicManager.Singleton.GetPlayerData(OwnerClientId);
+                    GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(OwnerClientId, currentPlayerData.playerName.ToString(), current.characterIndex, current.skinIndex, attributes.GetTeam()));
+                }
+                else
+                {
+                    botPlayerDataId.Value = GameLogicManager.Singleton.AddBotData(current.characterIndex, current.skinIndex, GameLogicManager.Team.Environment);
+                }
             }
         }
 
