@@ -26,6 +26,8 @@ namespace Vi.Core
             return true;
         }
 
+        public bool CanHit(Attributes attacker, Attributes victim) { return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team); }
+
         public static Color GetTeamColor(Team team)
         {
             if (team == Team.Red)
@@ -69,11 +71,12 @@ namespace Vi.Core
             //}
         }
 
-        public List<Attributes> GetPlayersOnTeam(Team team)
+        public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude)
         {
             List<Attributes> attributesList = new List<Attributes>();
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
+                if (kvp.Value == attributesToExclude) { continue; }
                 attributesList.Add(kvp.Value);
             }
             return attributesList;
@@ -307,6 +310,7 @@ namespace Vi.Core
                 serializer.SerializeValue(ref playerName);
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
+                serializer.SerializeValue(ref team);
             }
         }
     }

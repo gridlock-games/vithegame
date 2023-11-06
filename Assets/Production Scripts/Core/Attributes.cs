@@ -10,43 +10,37 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
+        [SerializeField] private GameLogicManager.Team defaultTeam;
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 
         public int GetPlayerDataId() { return animationHandler.GetPlayerDataId(); }
         public GameLogicManager.Team GetTeam() { return team.Value; }
-        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Red);
+        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Competitor);
 
         private void OnTeamChange(GameLogicManager.Team prev, GameLogicManager.Team current)
         {
-            //UpdateTeamColor();
+            if (IsServer) { StartCoroutine(ChangeTeamStruct()); }
+        }
 
-            //if (IsServer)
-            //{
-            //    GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId());
-            //    GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(GetPlayerDataId(), prevPlayerData.playerName.ToString(), prevPlayerData.characterIndex, prevPlayerData.skinIndex, current));
-            //}
+        private IEnumerator ChangeTeamStruct()
+        {
+            yield return new WaitUntil(() => GameLogicManager.Singleton.ContainsId(GetPlayerDataId()));
+
+            GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId());
+            GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(GetPlayerDataId(), prevPlayerData.playerName.ToString(), prevPlayerData.characterIndex, prevPlayerData.skinIndex, team.Value));
         }
 
         public Color GetRelativeTeamColor()
         {
             //if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.clear; }
 
-            if (IsLocalPlayer)
-            {
-                return Color.white;
-            }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId()) | !GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
-            {
-                return Color.clear;
-            }
-            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team))
-            {
-                return Color.red;
-            }
-            else
-            {
-                return Color.cyan;
-            }
+            if (!IsClient) { return GameLogicManager.GetTeamColor(team.Value); }
+            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.clear; }
+            else if (GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == GameLogicManager.Team.Spectator) { return GameLogicManager.GetTeamColor(team.Value); }
+            else if (IsLocalPlayer) { return Color.white; }
+            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.clear; }
+            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
+            else { return Color.cyan; }
         }
 
         [SerializeField] private GameObject teamIndicatorPrefab;
@@ -156,6 +150,7 @@ namespace Vi.Core
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
             if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject((int)OwnerClientId, this); }
+            team.Value = defaultTeam;
         }
 
         public override void OnNetworkDespawn()
@@ -242,6 +237,8 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
+            if (!GameLogicManager.Singleton.CanHit(attacker, this)) { return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }

@@ -78,19 +78,18 @@ namespace Vi.UI
 
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
 
-            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam());
-
+            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes);
             for (int i = 0; i < teammatePlayerCards.Length; i++)
             {
-                if (teammateAttributes.Count < i)
-                {
-                    teammatePlayerCards[i].Initialize(null);
-                    teammatePlayerCards[i].gameObject.SetActive(false);
-                }
-                else
+                if (i < teammateAttributes.Count)
                 {
                     teammatePlayerCards[i].Initialize(teammateAttributes[i]);
                     teammatePlayerCards[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    teammatePlayerCards[i].Initialize(null);
+                    teammatePlayerCards[i].gameObject.SetActive(false);
                 }
             }
         }
