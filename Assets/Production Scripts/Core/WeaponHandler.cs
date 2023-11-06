@@ -11,7 +11,7 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        private List<GameObject> weaponInstances = new List<GameObject>();
+        private Dictionary<Weapon.WeaponBone, GameObject> weaponInstances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
         public Weapon GetWeapon() { return weaponInstance; }
 
@@ -35,11 +35,13 @@ namespace Vi.Core
         private Weapon weaponInstance;
         private Attributes attributes;
         private AnimationHandler animationHandler;
+        private MovementHandler movementHandler;
 
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
+            movementHandler = GetComponent<MovementHandler>();
         }
 
         public void SetNewWeapon(Weapon weapon, GameObject skinPrefab)
@@ -50,7 +52,7 @@ namespace Vi.Core
 
         private void EquipWeapon(GameObject skinPrefab)
         {
-            List<GameObject> instances = new List<GameObject>();
+            Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -60,7 +62,7 @@ namespace Vi.Core
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
                         GameObject instance = Instantiate(modelData.weaponPrefab);
-                        instances.Add(instance);
+                        instances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
                         Transform bone = null;
@@ -109,9 +111,9 @@ namespace Vi.Core
         public void SetActionClip(ActionClip actionClip)
         {
             CurrentActionClip = actionClip;
-            foreach (GameObject weaponInstance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
             {
-                weaponInstance.GetComponent<RuntimeWeapon>().ResetHitCounter();
+                weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
             }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -145,10 +147,24 @@ namespace Vi.Core
                     vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), transform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
-                //case ActionVFX.TransformType.OriginatorAndTarget:
-                //    break;
-                //case ActionVFX.TransformType.Projectile:
-                //    break;
+                case ActionVFX.TransformType.SpawnAtWeaponPoint:
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
+                case ActionVFX.TransformType.Projectile:
+                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    {
+                        if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
+                        {
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        }
+                        else
+                        {
+                            Debug.LogError(actionVFXPrefab + " has attachment type set to " + actionVFXPrefab.transformType + " but can't find a ShooterComponent to base off of");
+                        }
+                    }
+                    break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
                     startPos.y += actionVFXPrefab.raycastOffset.y;
@@ -184,6 +200,8 @@ namespace Vi.Core
                         );
                     }
                     break;
+                //case ActionVFX.TransformType.OriginatorAndTarget:
+                //    break;
                 default:
                     Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;
@@ -292,7 +310,10 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                        if (weaponInstances[weaponBone].GetComponent<ColliderWeapon>())
+                        {
+                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                        }
                     }
                 }
             }
@@ -323,42 +344,42 @@ namespace Vi.Core
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability1, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAbility1();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility2()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability2, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAbility2();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility3()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability3, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAbility3();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility4()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.Ability4, animationHandler.Animator);
+            ActionClip actionClip = weaponInstance.GetAbility4();
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
@@ -385,9 +406,9 @@ namespace Vi.Core
 
         private void Aim(bool isAiming, bool instantAim)
         {
-            foreach (GameObject instance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
-                if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
                     animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();

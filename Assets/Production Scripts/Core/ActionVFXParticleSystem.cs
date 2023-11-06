@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 namespace Vi.Core
 {
     [RequireComponent(typeof(ParticleSystem))]
+    [RequireComponent(typeof(Rigidbody))]
     public class ActionVFXParticleSystem : ActionVFX
     {
         private Attributes attacker;
@@ -21,34 +22,36 @@ namespace Vi.Core
         private void Start()
         {
             ps = GetComponent<ParticleSystem>();
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
+            foreach (Collider col in colliders)
+            {
+                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
+            }
         }
 
-        [SerializeField] private Vector3 colliderLookBoxExtents = Vector3.one;
+        private void OnTriggerEnter(Collider other)
+        {
+            bool skip = false;
+            for (int i = 0; i < ps.trigger.colliderCount; i++)
+            {
+                if (ps.trigger.GetCollider(i) == other)
+                {
+                    skip = true;
+                    break;
+                }
+            }
+
+            if (!skip)
+            {
+                ps.trigger.AddCollider(other);
+            }
+        }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
         private void OnParticleTrigger()
         {
-            Collider[] collidersInRange = Physics.OverlapBox(transform.position, colliderLookBoxExtents, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-
-            foreach (Collider col in collidersInRange)
-            {
-                bool skip = false;
-                for (int i = 0; i < ps.trigger.colliderCount; i++)
-                {
-                    if (ps.trigger.GetCollider(i) == col)
-                    {
-                        skip = true;
-                        break;
-                    }
-                }
-
-                if (!skip)
-                {
-                    ps.trigger.AddCollider(col);
-                }
-            }
-
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
 

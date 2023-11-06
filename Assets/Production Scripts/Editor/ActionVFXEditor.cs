@@ -22,6 +22,8 @@ namespace Vi.Editor
 
         private SerializedProperty spOnActivateVFXSpawnNormalizedTime;
 
+        private SerializedProperty spWeaponBone;
+
         private void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
@@ -35,6 +37,8 @@ namespace Vi.Editor
             spLookRotationUpDirection = serializedObject.FindProperty("lookRotationUpDirection");
 
             spOnActivateVFXSpawnNormalizedTime = serializedObject.FindProperty("onActivateVFXSpawnNormalizedTime");
+
+            spWeaponBone = serializedObject.FindProperty("weaponBone");
         }
 
         public override void OnInspectorGUI()
@@ -54,6 +58,11 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spRaycastOffset);
                 EditorGUILayout.PropertyField(spCrossProductDirection);
                 EditorGUILayout.PropertyField(spLookRotationUpDirection);
+            }
+
+            if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.SpawnAtWeaponPoint)
+            {
+                EditorGUILayout.PropertyField(spWeaponBone);
             }
 
             serializedObject.ApplyModifiedProperties();

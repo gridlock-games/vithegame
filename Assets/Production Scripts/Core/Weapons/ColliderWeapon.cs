@@ -117,6 +117,8 @@ namespace Vi.Core
                     Gizmos.color = Color.white;
                 }
 
+                Matrix4x4 rotationMatrix = Matrix4x4.TRS(sphereCollider.transform.position, sphereCollider.transform.rotation, sphereCollider.transform.lossyScale);
+                Gizmos.matrix = rotationMatrix;
                 Gizmos.DrawWireSphere(sphereCollider.center, sphereCollider.radius);
             }
         }

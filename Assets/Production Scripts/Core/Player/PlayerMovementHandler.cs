@@ -8,7 +8,7 @@ using Vi.Core;
 namespace Vi.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerMovementHandler : NetworkBehaviour
+    public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private Camera cameraInstance;
 
@@ -193,6 +193,12 @@ namespace Vi.Player
                 //rootMotion = rootMotion.normalized * localDistance;
                 if (localDistance > movementPrediction.rootMotionDistanceScaleThreshold) { rootMotion *= localDistance * (1/movementPrediction.rootMotionDistanceScaleThreshold); }
 
+                float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + rootMotion);
+                if (localDistance < afterMoveDistance)
+                {
+                    rootMotion = movementPrediction.currentPosition - transform.position;
+                }
+
                 characterController.Move(rootMotion);
             }
             else
@@ -215,14 +221,6 @@ namespace Vi.Player
         void OnLook(InputValue value)
         {
             lookInput = value.Get<Vector2>() * (attributes.IsFeared() ? -1 : 1);
-        }
-
-        public Vector2 GetMoveInput() { return moveInput; }
-
-        private Vector2 moveInput;
-        void OnMove(InputValue value)
-        {
-            moveInput = value.Get<Vector2>();
         }
 
         void OnDodge()

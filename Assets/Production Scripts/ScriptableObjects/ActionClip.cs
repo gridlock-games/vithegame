@@ -111,7 +111,7 @@ namespace Vi.ScriptableObjects
         public bool isUninterruptable;
         public bool isInvincible;
         public Ailment ailment = Ailment.None;
-        public float ailmentDuration = 2;
+        public float ailmentDuration = 5;
         public float grabDistance = 3;
 
         public enum DodgeLock
