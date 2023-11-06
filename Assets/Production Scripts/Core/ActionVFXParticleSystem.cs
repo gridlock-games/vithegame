@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -32,6 +33,8 @@ namespace Vi.Core
 
         private void OnTriggerEnter(Collider other)
         {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
             bool skip = false;
             for (int i = 0; i < ps.trigger.colliderCount; i++)
             {
@@ -52,6 +55,8 @@ namespace Vi.Core
 
         private void OnParticleTrigger()
         {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
 

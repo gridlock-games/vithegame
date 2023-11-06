@@ -58,6 +58,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
                 {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
@@ -73,6 +74,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                 }
             }
