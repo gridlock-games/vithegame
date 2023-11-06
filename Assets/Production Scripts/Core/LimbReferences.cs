@@ -21,13 +21,13 @@ namespace Vi.Core
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
-                if (rightHandAimRig.GetRig()) { return; }
+                if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
                 if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
-                if (leftHandAimRig.GetRig()) { return; }
+                if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
