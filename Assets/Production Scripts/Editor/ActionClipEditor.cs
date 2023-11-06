@@ -22,6 +22,7 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionForwardMultiplier;
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
+        private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
 
         private SerializedProperty spEffectedWeaponBones;
@@ -64,6 +65,7 @@ namespace Vi.Editor
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
+            spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
@@ -109,6 +111,7 @@ namespace Vi.Editor
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);
             EditorGUILayout.PropertyField(spTransitionTime);
+            EditorGUILayout.PropertyField(spAvatarLayer);
             if (spShouldApplyRootMotion.boolValue)
             {
                 EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);

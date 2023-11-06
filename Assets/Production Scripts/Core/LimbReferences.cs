@@ -76,6 +76,7 @@ namespace Vi.Core
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
         [Header("IK Settings")]
+        public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
         [SerializeField] private RigWeightTarget leftHandAimRig;
         [SerializeField] private RigWeightTarget rightHandReachRig;
