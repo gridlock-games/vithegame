@@ -240,9 +240,10 @@ namespace Vi.Core
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
+            if (!IsSpawned) { return; }
 
             if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
