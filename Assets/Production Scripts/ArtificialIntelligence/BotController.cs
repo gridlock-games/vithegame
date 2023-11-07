@@ -27,6 +27,7 @@ namespace Vi.ArtificialIntelligence
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
             if (!characterController.enabled) { return; }
 
             if (animationHandler.ShouldApplyRootMotion())
@@ -80,6 +81,14 @@ namespace Vi.ArtificialIntelligence
             {
                 transform.rotation = attributes.GetAilmentRotation();
             }*/
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (Application.isPlaying) { return; }
+
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(transform.position, 0.5f);
         }
     }
 }

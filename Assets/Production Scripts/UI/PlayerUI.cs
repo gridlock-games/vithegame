@@ -79,18 +79,17 @@ namespace Vi.UI
 
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
 
+            // Order player cards by distance
             List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
             for (int i = 0; i < teammatePlayerCards.Length; i++)
             {
                 if (i < teammateAttributes.Count)
                 {
                     teammatePlayerCards[i].Initialize(teammateAttributes[i]);
-                    teammatePlayerCards[i].gameObject.SetActive(true);
                 }
                 else
                 {
                     teammatePlayerCards[i].Initialize(null);
-                    teammatePlayerCards[i].gameObject.SetActive(false);
                 }
             }
         }

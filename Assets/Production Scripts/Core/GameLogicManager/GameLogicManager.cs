@@ -11,9 +11,22 @@ namespace Vi.Core
     public class GameLogicManager : NetworkBehaviour
     {
         [SerializeField] private GameMode gameModeValue;
+        [SerializeField] private GameObject spectatorPrefab;
         [SerializeField] private CharacterReference characterReference;
 
+        [SerializeField] private List<GameModeInfo> gameModeInfos;
+
+        [System.Serializable]
+        public struct GameModeInfo
+        {
+            public GameMode gameMode;
+            public Team[] possibleTeams;
+            //public string[] possibleMaps;
+        }
+
         public CharacterReference GetCharacterReference() { return characterReference; }
+
+        public GameModeInfo GetGameModeInfo() { return gameModeInfos.Find(item => item.gameMode == gameMode.Value); }
 
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }
@@ -72,7 +85,12 @@ namespace Vi.Core
             //}
         }
 
-        public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude)
+        public void RemovePlayerObject(int clientId)
+        {
+            localPlayers.Remove(clientId);
+        }
+
+        public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
@@ -98,7 +116,7 @@ namespace Vi.Core
             else
                 StartCoroutine(WaitForSpawnToAddPlayerData(botData));
 
-            localPlayers.Add(botClientId, botPlayerObject);
+            AddPlayerObject(botClientId, botPlayerObject);
             return botClientId;
         }
 
@@ -203,7 +221,16 @@ namespace Vi.Core
         {
             yield return new WaitUntil(() => playerDataList.Contains(new PlayerData((int)clientId)));
 
-            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+            GameObject playerObject;
+            if (GetPlayerData(clientId).team == Team.Spectator)
+            {
+                playerObject = Instantiate(spectatorPrefab);
+            }
+            else
+            {
+                playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+            }
+
             playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
         }
 

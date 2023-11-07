@@ -33,6 +33,7 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
+            gameObject.SetActive(true);
         }
 
         private PlayerUI playerUI;
@@ -65,7 +66,7 @@ namespace Vi.UI
         public const float fillSpeed = 4;
         private void Update()
         {
-            if (!attributes) { return; }
+            if (!attributes) { gameObject.SetActive(false); return; }
 
             nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
 

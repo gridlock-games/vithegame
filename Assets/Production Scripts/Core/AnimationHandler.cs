@@ -334,6 +334,7 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
             if (IsLocalPlayer)

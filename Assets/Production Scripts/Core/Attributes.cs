@@ -163,6 +163,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
         private void OnHPChanged(float prev, float current)
@@ -418,6 +419,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 
