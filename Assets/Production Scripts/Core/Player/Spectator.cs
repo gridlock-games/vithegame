@@ -57,8 +57,8 @@ namespace Vi.Player
             if (!IsLocalPlayer) { return; }
 
             float verticalSpeed = 0;
-            if (isAscending) { verticalSpeed = moveSpeed / 4; }
-            if (isDescending) { verticalSpeed = -moveSpeed / 4; }
+            if (isAscending) { verticalSpeed = 1; }
+            if (isDescending) { verticalSpeed = -1; }
 
             transform.Translate((isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
 
