@@ -33,7 +33,7 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
-            gameObject.SetActive(true);
+            gameObject.SetActive(attributes != null);
         }
 
         private PlayerUI playerUI;

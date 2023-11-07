@@ -8,6 +8,21 @@ namespace Vi.Core
 {
     public class MovementHandler : NetworkBehaviour
     {
+        protected void Start()
+        {
+            if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
+            if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
+            lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
+        }
+
+        protected Vector2 lookInput;
+        public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
+        public Vector2 GetRawLookInput() { return lookInput; }
+        public Vector2 GetLookSensitivity() { return lookSensitivity; }
+        public void SetLookSensitivity(Vector2 newLookSensitivity) { lookSensitivity = newLookSensitivity; }
+
+        protected Vector2 lookSensitivity;
+
         public Vector2 GetMoveInput() { return moveInput; }
 
         protected Vector2 moveInput;

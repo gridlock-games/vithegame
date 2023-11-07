@@ -203,6 +203,16 @@ namespace Vi.Core
             teamIndicatorInstance = Instantiate(teamIndicatorPrefab, transform);
         }
 
+        private void OnEnable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+        }
+
+        private void OnDisable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+        }
+
         public bool IsInvincible { get; private set; }
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private void OnIsInvincibleChange(bool prev, bool current) { IsInvincible = current; }

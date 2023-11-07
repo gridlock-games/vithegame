@@ -9,16 +9,29 @@ namespace Vi.Player
     public class ActionMapHandler : MonoBehaviour
     {
         [SerializeField] private GameObject playerUIPrefab;
+        [SerializeField] private GameObject spectatorUIPrefab;
 
         private GameObject playerUIInstance;
+        private GameObject spectatorUIInstance;
         private PlayerInput playerInput;
 
         private void OnEnable()
         {
-            playerUIInstance = Instantiate(playerUIPrefab, transform);
             playerInput = GetComponent<PlayerInput>();
-            if (playerInput.currentActionMap.name == "Base")
+            if (playerInput.defaultActionMap == "Base")
+            {
+                playerUIInstance = Instantiate(playerUIPrefab, transform);
                 Cursor.lockState = CursorLockMode.Locked;
+            }
+            else if (playerInput.defaultActionMap == "Spectator")
+            {
+                spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Debug.LogError("Not sure how to handle action map: " + playerInput.defaultActionMap);
+            }
         }
 
         //[SerializeField] private GameObject scoreboardPrefab;
@@ -59,13 +72,19 @@ namespace Vi.Player
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 pauseObject.GetComponent<Menu>().DestroyAllMenus();
-                playerUIInstance.SetActive(true);
-                playerInput.SwitchCurrentActionMap("Base");
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(true);
+                if (spectatorUIInstance)
+                    spectatorUIInstance.SetActive(true);
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
             }
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                playerUIInstance.SetActive(false);
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(false);
+                if (spectatorUIInstance)
+                    spectatorUIInstance.SetActive(false);
                 pauseObject = Instantiate(pausePrefab, transform);
                 playerInput.SwitchCurrentActionMap("Menu");
             }
