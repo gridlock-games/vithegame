@@ -101,9 +101,6 @@ namespace Vi.ScriptableObjects
                 hitLocation = HitLocation.Back;
             }
 
-            // Reset combo system
-            attackIndex = 0;
-
             HitReaction hitReaction = null;
             if (isBlocking & attack.isBlockable)
             {
@@ -149,6 +146,10 @@ namespace Vi.ScriptableObjects
         {
             LightAttack,
             HeavyAttack,
+            Ability1,
+            Ability2,
+            Ability3,
+            Ability4
         }
 
         public List<ActionClip> GetAbilities()
@@ -225,35 +226,10 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public List<Attack> GetAttackList() { return attackList; }
         [SerializeField] private List<Attack> attackList = new List<Attack>();
-        private int attackIndex;
 
-        public ActionClip GetAttack(InputAttackType inputAttackType, Animator animator, Vector2 moveInput, bool isInRecovery)
-        {
-            // If we are in recovery, and not transitioning to a different action
-            if (isInRecovery & !animator.IsInTransition(animator.GetLayerIndex("Actions")))
-            {
-                attackIndex++;
-
-                Attack attack = SelectAttack(inputAttackType, moveInput);
-                if (attack == null) { return null; }
-                return attack.attackClip;
-            }
-            else if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty")) // If we are at rest
-            {
-                attackIndex = 0;
-
-                Attack attack = SelectAttack(inputAttackType, moveInput);
-                if (attack == null) { return null; }
-                return attack.attackClip;
-            }
-            else // If we are not at rest and not recovering
-            {
-                return null;
-            }
-        }
-
-        private enum ComboCondition
+        public enum ComboCondition
         {
             None,
             InputForward,
@@ -263,7 +239,7 @@ namespace Vi.ScriptableObjects
         }
 
         [System.Serializable]
-        private class Attack
+        public class Attack
         {
             public int inputIndex;
             public InputAttackType InputAttackType = InputAttackType.LightAttack;
@@ -286,43 +262,6 @@ namespace Vi.ScriptableObjects
                     if (attackList.Find(item => item.inputIndex == i) == null) { Debug.LogError(this + " does not have an attack for index: " + i); }
                 }
             }
-        }
-
-        private Attack SelectAttack(InputAttackType inputAttackType, Vector2 moveInput)
-        {
-            List<Attack> potentialAttacks = attackList.FindAll(item => item.inputIndex == attackIndex & item.InputAttackType == inputAttackType);
-            Attack selectedAttack = potentialAttacks.Find(item => item.inputIndex == attackIndex & item.comboCondition == ComboCondition.None);
-            foreach (Attack attack in potentialAttacks)
-            {
-                bool conditionMet = false;
-                switch (attack.comboCondition)
-                {
-                    case ComboCondition.None:
-                        break;
-                    case ComboCondition.InputForward:
-                        conditionMet = moveInput.y == 1;
-                        break;
-                    case ComboCondition.InputBackwards:
-                        conditionMet = moveInput.y == -1;
-                        break;
-                    case ComboCondition.InputLeft:
-                        conditionMet = moveInput.x == -1;
-                        break;
-                    case ComboCondition.InputRight:
-                        conditionMet = moveInput.x == 1;
-                        break;
-                    default:
-                        Debug.Log(attack.comboCondition + " has not been implemented yet!");
-                        break;
-                }
-
-                if (conditionMet)
-                {
-                    selectedAttack = attack;
-                    break;
-                }
-            }
-            return selectedAttack;
         }
 
         [Header("Dodge Assignments")]
@@ -371,9 +310,6 @@ namespace Vi.ScriptableObjects
             {
                 dodgeClip = dodgeB;
             }
-
-            // Reset combo system
-            attackIndex = 0;
 
             return dodgeClip;
         }
