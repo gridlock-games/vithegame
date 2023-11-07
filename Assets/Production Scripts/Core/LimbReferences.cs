@@ -21,11 +21,13 @@ namespace Vi.Core
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
+                if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
                 if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
+                if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
@@ -45,12 +47,14 @@ namespace Vi.Core
             float weight = isReaching ? 1 : 0;
             if (hand == Hand.RightHand)
             {
+                if (!rightHandReachRig.GetRig()) { return; }
                 rightHandReachRig.weight = weight;
                 RightHandFollowTarget.target = reachTarget;
                 if (instantReach) { rightHandReachRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
+                if (!leftHandReachRig.GetRig()) { return; }
                 leftHandReachRig.weight = weight;
                 LeftHandFollowTarget.target = reachTarget;
                 if (instantReach) { leftHandReachRig.GetRig().weight = weight; }

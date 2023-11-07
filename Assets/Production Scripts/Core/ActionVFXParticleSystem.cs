@@ -20,7 +20,7 @@ namespace Vi.Core
         }
 
         private ParticleSystem ps;
-        private void Start()
+        private void Awake()
         {
             ps = GetComponent<ParticleSystem>();
             Collider[] colliders = GetComponentsInChildren<Collider>();

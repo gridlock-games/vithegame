@@ -9,6 +9,8 @@ namespace Vi.UI
 {
     public class PlayerCard : MonoBehaviour
     {
+        [SerializeField] private Text nameDisplay;
+
         [Header("True Value Images")]
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image staminaFillImage;
@@ -64,6 +66,8 @@ namespace Vi.UI
         private void Update()
         {
             if (!attributes) { return; }
+
+            nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();

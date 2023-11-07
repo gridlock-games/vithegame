@@ -29,6 +29,21 @@ namespace Vi.ArtificialIntelligence
         {
             if (!characterController.enabled) { return; }
 
+            if (animationHandler.ShouldApplyRootMotion())
+            {
+                characterController.Move(animationHandler.ApplyLocalRootMotion());
+            }
+            else
+            {
+                characterController.Move(Physics.gravity);
+            }
+
+            if (attributes.ShouldApplyAilmentRotation())
+            {
+                transform.rotation = attributes.GetAilmentRotation();
+            }
+
+            /*
             weaponHandler.SetIsBlocking(isBlocking);
 
             if (!animationHandler.ShouldApplyRootMotion())
@@ -64,7 +79,7 @@ namespace Vi.ArtificialIntelligence
             if (attributes.ShouldApplyAilmentRotation())
             {
                 transform.rotation = attributes.GetAilmentRotation();
-            }
+            }*/
         }
     }
 }

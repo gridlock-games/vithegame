@@ -98,6 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 7095846274849915327, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
+  teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
+    type: 3}
   maxHP: 100
   maxStamina: 100
   staminaRecoveryRate: 5
@@ -137,4 +139,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
+  botCharacterIndex: 0
+  botSkinIndex: 0

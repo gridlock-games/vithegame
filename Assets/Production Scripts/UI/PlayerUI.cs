@@ -12,6 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
+        [SerializeField] private PlayerCard[] teammatePlayerCards;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -76,12 +77,26 @@ namespace Vi.UI
             }
 
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
+
+            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes);
+            for (int i = 0; i < teammatePlayerCards.Length; i++)
+            {
+                if (i < teammateAttributes.Count)
+                {
+                    teammatePlayerCards[i].Initialize(teammateAttributes[i]);
+                    teammatePlayerCards[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    teammatePlayerCards[i].Initialize(null);
+                    teammatePlayerCards[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         private float frameCount;
         private IEnumerator FPSCounter()
         {
-            GUI.depth = 2;
             while (true)
             {
                 frameCount = 1f / Time.unscaledDeltaTime;

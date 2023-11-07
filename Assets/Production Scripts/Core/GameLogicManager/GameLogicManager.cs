@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -13,11 +14,40 @@ namespace Vi.Core
 
         public CharacterReference GetCharacterReference() { return characterReference; }
 
+        private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
+        public GameMode GetGameMode() { return gameMode.Value; }
+
+        public static bool CanHit(Team attackerTeam, Team victimTeam)
+        {
+            if (attackerTeam != Team.Competitor & victimTeam != Team.Competitor)
+            {
+                if (attackerTeam == victimTeam) { return false; }
+            }
+            return true;
+        }
+
+        public bool CanHit(Attributes attacker, Attributes victim) { return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team); }
+
+        public static Color GetTeamColor(Team team)
+        {
+            if (team == Team.Red)
+            {
+                return Color.red;
+            }
+            else if (team == Team.Blue)
+            {
+                return Color.blue;
+            }
+            else
+            {
+                return Color.black;
+            }
+        }
+
         public enum GameMode
         {
             Duel,
-            TeamElimination,
-            TeamDeathmatch
+            TeamElimination
         }
 
         public enum Team
@@ -29,17 +59,72 @@ namespace Vi.Core
             Blue,
         }
 
-        private Dictionary<ulong, GameObject> localPlayers = new Dictionary<ulong, GameObject>();
-        public void AddPlayerObject(ulong clientId, GameObject playerObject)
+        private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
+        public void AddPlayerObject(int clientId, Attributes playerObject)
         {
             localPlayers.Add(clientId, playerObject);
+
+            //// Remove empty player object references from local player object references
+            //foreach (var item in localPlayers.Where(kvp => kvp.Value == null).ToList())
+            //{
+            //    localPlayers.Remove(item.Key);
+            //}
+        }
+
+        public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude)
+        {
+            List<Attributes> attributesList = new List<Attributes>();
+            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
+            {
+                if (kvp.Value == attributesToExclude) { continue; }
+                attributesList.Add(kvp.Value);
+            }
+            return attributesList;
+        }
+
+        public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
+
+        private int botClientId = 0;
+        public int AddBotData(Attributes botPlayerObject, int characterIndex, int skinIndex, Team team)
+        {
+            if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
+
+            botClientId--;
+            PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId*-1).ToString(), characterIndex, skinIndex, team);
+
+            if (IsSpawned)
+                playerDataList.Add(botData);
+            else
+                StartCoroutine(WaitForSpawnToAddPlayerData(botData));
+
+            localPlayers.Add(botClientId, botPlayerObject);
+            return botClientId;
+        }
+
+        private IEnumerator WaitForSpawnToAddPlayerData(PlayerData playerData)
+        {
+            yield return new WaitUntil(() => IsSpawned);
+            playerDataList.Add(playerData);
+        }
+
+        public PlayerData GetPlayerData(int clientId)
+        {
+            foreach (PlayerData playerData in playerDataList)
+            {
+                if (playerData.clientId == clientId)
+                {
+                    return playerData;
+                }
+            }
+            Debug.LogError("Could not find player data with ID: " + clientId);
+            return new PlayerData();
         }
 
         public PlayerData GetPlayerData(ulong clientId)
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == clientId)
+                if (playerData.clientId == (int)clientId)
                 {
                     return playerData;
                 }
@@ -60,6 +145,11 @@ namespace Vi.Core
             {
                 SetPlayerDataServerRpc(playerData);
             }
+        }
+
+        public void RemovePlayerData(int clientId)
+        {
+            playerDataList.Remove(new PlayerData(clientId));
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -109,15 +199,15 @@ namespace Vi.Core
 
         private IEnumerator SpawnPlayer(ulong clientId)
         {
-            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData(clientId)));
+            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData((int)clientId)));
 
-            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(clientId).characterIndex].playerPrefab);
-            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(GetPlayerData(clientId).clientId, true);
+            GameObject playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
         }
 
         protected void OnClientDisconnectCallback(ulong clientId)
         {
-
+            RemovePlayerData((int)clientId);
         }
 
         protected NetworkList<PlayerData> playerDataList;
@@ -163,9 +253,9 @@ namespace Vi.Core
             if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
             if (clientId != NetworkManager.ServerClientId)
-                playerDataList.Add(new PlayerData(clientId, playerName, characterIndex, skinIndex));
+                playerDataList.Add(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor));
             else
-                StartCoroutine(OnHostConnect(new PlayerData(clientId, playerName, characterIndex, skinIndex)));
+                StartCoroutine(OnHostConnect(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor)));
         }
 
         protected IEnumerator OnHostConnect(PlayerData playerData)
@@ -176,25 +266,37 @@ namespace Vi.Core
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
-            public ulong clientId;
+            public int clientId;
             public FixedString32Bytes playerName;
             public int characterIndex;
             public int skinIndex;
+            public Team team;
 
-            public PlayerData(ulong clientId)
+            public PlayerData(int clientId)
             {
                 this.clientId = clientId;
                 playerName = "Player Name";
                 characterIndex = 0;
                 skinIndex = 0;
+                team = Team.Environment;
             }
 
-            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex)
+            public PlayerData(int clientId, string playerName, int characterIndex, int skinIndex, Team team)
             {
                 this.clientId = clientId;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
+                this.team = team;
+            }
+
+            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
+            {
+                this.clientId = (int)clientId;
+                this.playerName = playerName;
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+                this.team = team;
             }
 
             public bool Equals(PlayerData other)
@@ -208,6 +310,7 @@ namespace Vi.Core
                 serializer.SerializeValue(ref playerName);
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
+                serializer.SerializeValue(ref team);
             }
         }
     }
