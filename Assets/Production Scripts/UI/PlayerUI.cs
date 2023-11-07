@@ -22,8 +22,6 @@ namespace Vi.UI
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
-        [Header("Debug Elements")]
-        [SerializeField] private TextMeshProUGUI fpsDisplay;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -66,8 +64,6 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
-
-            StartCoroutine(FPSCounter());
         }
 
         private void Update()
@@ -76,8 +72,6 @@ namespace Vi.UI
             {
                 statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
-
-            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
 
             // Order player cards by distance
             List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
@@ -91,16 +85,6 @@ namespace Vi.UI
                 {
                     teammatePlayerCards[i].Initialize(null);
                 }
-            }
-        }
-
-        private float frameCount;
-        private IEnumerator FPSCounter()
-        {
-            while (true)
-            {
-                frameCount = 1f / Time.unscaledDeltaTime;
-                yield return new WaitForSeconds(0.1f);
             }
         }
     }

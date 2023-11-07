@@ -10,13 +10,6 @@ namespace Vi.UI
     {
         [SerializeField] private PlayerCard[] leftPlayerCards;
         [SerializeField] private PlayerCard[] rightPlayerCards;
-        [Header("Debug Elements")]
-        [SerializeField] private TextMeshProUGUI fpsDisplay;
-
-        private void Start()
-        {
-            StartCoroutine(FPSCounter());
-        }
 
         private void Update()
         {
@@ -59,18 +52,7 @@ namespace Vi.UI
             {
                 Debug.LogError("Haven't implemented spectator UI when there are " + gameModeInfo.possibleTeams.Length + " possible teams");
             }
-
-            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
         }
 
-        private float frameCount;
-        private IEnumerator FPSCounter()
-        {
-            while (true)
-            {
-                frameCount = 1f / Time.unscaledDeltaTime;
-                yield return new WaitForSeconds(0.1f);
-            }
-        }
     }
 }
