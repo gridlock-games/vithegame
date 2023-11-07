@@ -116,7 +116,6 @@ namespace Vi.Core
             else
                 StartCoroutine(WaitForSpawnToAddPlayerData(botData));
 
-            AddPlayerObject(botClientId, botPlayerObject);
             return botClientId;
         }
 

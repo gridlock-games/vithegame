@@ -149,8 +149,14 @@ namespace Vi.Core
             statuses.OnListChanged += OnStatusChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
-            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject((int)OwnerClientId, this); }
+            StartCoroutine(AddPlayerObjectToGameLogicManager());
             team.Value = defaultTeam;
+        }
+
+        private IEnumerator AddPlayerObjectToGameLogicManager()
+        {
+            if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
+            GameLogicManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
 
         public override void OnNetworkDespawn()
