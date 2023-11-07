@@ -11,6 +11,12 @@ namespace Vi.Player
     {
         [SerializeField] private float moveSpeed = 7;
 
+        private List<Attributes> playerList = new List<Attributes>();
+        public void SetPlayerList(List<Attributes> playerList)
+        {
+            this.playerList = playerList;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (IsLocalPlayer)
@@ -43,6 +49,7 @@ namespace Vi.Player
         private bool isAscending;
         void OnAscend(InputValue value)
         {
+            followTarget = null;
             isAscending = value.isPressed;
         }
 
@@ -52,17 +59,61 @@ namespace Vi.Player
             isDescending = value.isPressed;
         }
 
+        void OnFollowPlayer1() { followTarget = playerList[0]; }
+        void OnFollowPlayer2() { followTarget = playerList[1]; }
+        void OnFollowPlayer3() { followTarget = playerList[2]; }
+        void OnFollowPlayer4() { followTarget = playerList[3]; }
+        void OnFollowPlayer5() { followTarget = playerList[4]; }
+        void OnFollowPlayer6() { followTarget = playerList[5]; }
+        void OnFollowPlayer7() { followTarget = playerList[6]; }
+        void OnFollowPlayer8() { followTarget = playerList[7]; }
+        void OnFollowPlayer9() { followTarget = playerList[8]; }
+        void OnFollowPlayer10() { followTarget = playerList[9]; }
+
+        private Vector3 targetPosition;
+        protected new void Start()
+        {
+            base.Start();
+            targetPosition = transform.position;
+        }
+
+        private Attributes followTarget;
         private void Update()
         {
             if (!IsLocalPlayer) { return; }
 
-            float verticalSpeed = 0;
-            if (isAscending) { verticalSpeed = 1; }
-            if (isDescending) { verticalSpeed = -1; }
+            if (moveInput != Vector2.zero) { followTarget = null; }
 
-            transform.Translate((isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
+            if (followTarget)
+            {
+                transform.position = followTarget.transform.position + followTarget.transform.rotation * new Vector3(0, 3, -3);
+                transform.LookAt(followTarget.transform);
 
-            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x - GetLookInput().y, transform.localEulerAngles.y + GetLookInput().x, transform.localEulerAngles.z);
+                targetPosition = transform.position;
+            }
+            else
+            {
+                float verticalSpeed = 0;
+                if (isAscending) { verticalSpeed = 1; }
+                if (isDescending) { verticalSpeed = -1; }
+
+                targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
+
+                float xAngle = transform.eulerAngles.x - GetLookInput().y;
+                if (xAngle > 85 & xAngle < 275)
+                {
+                    if (Mathf.Abs(xAngle - 85) > Mathf.Abs(xAngle - 275))
+                    {
+                        xAngle = 275;
+                    }
+                    else
+                    {
+                        xAngle = 85;
+                    }
+                }
+                transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + GetLookInput().x, 0);
+            }
         }
     }
 }
