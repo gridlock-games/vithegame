@@ -59,16 +59,65 @@ namespace Vi.Player
             isDescending = value.isPressed;
         }
 
-        void OnFollowPlayer1() { followTarget = playerList[0]; }
-        void OnFollowPlayer2() { followTarget = playerList[1]; }
-        void OnFollowPlayer3() { followTarget = playerList[2]; }
-        void OnFollowPlayer4() { followTarget = playerList[3]; }
-        void OnFollowPlayer5() { followTarget = playerList[4]; }
-        void OnFollowPlayer6() { followTarget = playerList[5]; }
-        void OnFollowPlayer7() { followTarget = playerList[6]; }
-        void OnFollowPlayer8() { followTarget = playerList[7]; }
-        void OnFollowPlayer9() { followTarget = playerList[8]; }
-        void OnFollowPlayer10() { followTarget = playerList[9]; }
+        void OnFollowPlayer1()
+        {
+            if (0 >= playerList.Count) { return; }
+            followTarget = playerList[0];
+        }
+
+        void OnFollowPlayer2()
+        {
+            if (1 >= playerList.Count) { return; }
+            followTarget = playerList[1];
+        }
+
+        void OnFollowPlayer3()
+        {
+            if (2 >= playerList.Count) { return; }
+            followTarget = playerList[2];
+        }
+
+        void OnFollowPlayer4()
+        {
+            if (3 >= playerList.Count) { return; }
+            followTarget = playerList[3];
+        }
+
+        void OnFollowPlayer5()
+        {
+            if (4 >= playerList.Count) { return; }
+            followTarget = playerList[4];
+        }
+
+        void OnFollowPlayer6()
+        {
+            if (5 >= playerList.Count) { return; }
+            followTarget = playerList[5];
+        }
+
+        void OnFollowPlayer7()
+        {
+            if (6 >= playerList.Count) { return; }
+            followTarget = playerList[6];
+        }
+
+        void OnFollowPlayer8()
+        {
+            if (7 >= playerList.Count) { return; }
+            followTarget = playerList[7];
+        }
+
+        void OnFollowPlayer9()
+        {
+            if (8 >= playerList.Count) { return; }
+            followTarget = playerList[8];
+        }
+
+        void OnFollowPlayer10()
+        {
+            if (9 >= playerList.Count) { return; }
+            followTarget = playerList[9];
+        }
 
         private Vector3 targetPosition;
         protected new void Start()
