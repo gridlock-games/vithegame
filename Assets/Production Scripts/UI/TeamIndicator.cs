@@ -27,7 +27,7 @@ namespace Vi.UI
                     {
                         mat.color = attributes.GetRelativeTeamColor();
                         mat.SetFloat("_Glow", glowAmount);
-                        mat.SetFloat("_Transparency", mat.color == Color.clear ? 0 : 1);
+                        mat.SetFloat("_Transparency", mat.color == Color.black ? 0 : 1);
                     }
                 }
             }

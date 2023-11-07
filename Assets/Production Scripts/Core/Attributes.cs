@@ -32,13 +32,13 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor()
         {
-            //if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.clear; }
+            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.black; }
 
             if (!IsClient) { return GameLogicManager.GetTeamColor(team.Value); }
-            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.clear; }
+            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == GameLogicManager.Team.Spectator) { return GameLogicManager.GetTeamColor(team.Value); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.clear; }
+            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
             else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }
