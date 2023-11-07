@@ -10,7 +10,8 @@ namespace Vi.Core
 {
     public class GameLogicManager : NetworkBehaviour
     {
-        [SerializeField] protected CharacterReference characterReference;
+        [SerializeField] private GameMode gameModeValue;
+        [SerializeField] private CharacterReference characterReference;
 
         public CharacterReference GetCharacterReference() { return characterReference; }
 
@@ -30,15 +31,11 @@ namespace Vi.Core
 
         public static Color GetTeamColor(Team team)
         {
-            if (team == Team.Red)
+            try
             {
-                return Color.red;
+                return (Color)typeof(Color).GetProperty(team.ToString().ToLowerInvariant()).GetValue(null, null);
             }
-            else if (team == Team.Blue)
-            {
-                return Color.blue;
-            }
-            else
+            catch
             {
                 return Color.black;
             }
@@ -56,7 +53,11 @@ namespace Vi.Core
             Spectator,
             Competitor,
             Red,
+            Orange,
+            Yellow,
+            Green,
             Blue,
+            Purple
         }
 
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
@@ -156,18 +157,18 @@ namespace Vi.Core
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
         public static GameLogicManager Singleton { get { return _singleton; } }
-        protected static GameLogicManager _singleton;
+        private static GameLogicManager _singleton;
 
         public const char payloadParseString = '|';
 
-        protected void Awake()
+        private void Awake()
         {
             _singleton = this;
             DontDestroyOnLoad(gameObject);
             playerDataList = new NetworkList<PlayerData>();
         }
 
-        protected void Start()
+        private void Start()
         {
             NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
@@ -177,6 +178,7 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
+            if (IsServer) { gameMode.Value = gameModeValue; }
         }
 
         public override void OnNetworkDespawn()
@@ -184,7 +186,7 @@ namespace Vi.Core
             playerDataList.OnListChanged -= OnPlayerDataListChange;
         }
 
-        protected void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
+        private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
@@ -192,7 +194,7 @@ namespace Vi.Core
             }
         }
 
-        protected void OnClientConnectCallback(ulong clientId)
+        private void OnClientConnectCallback(ulong clientId)
         {
             if (IsServer) { StartCoroutine(SpawnPlayer(clientId)); }
         }
@@ -205,14 +207,23 @@ namespace Vi.Core
             playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
         }
 
-        protected void OnClientDisconnectCallback(ulong clientId)
+        private void OnClientDisconnectCallback(ulong clientId)
         {
             RemovePlayerData((int)clientId);
         }
 
-        protected NetworkList<PlayerData> playerDataList;
+        private NetworkList<PlayerData> playerDataList;
 
-        protected void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        [System.Serializable]
+        private struct TeamDefinition
+        {
+            public Team team;
+            public ulong clientId;
+        }
+
+        [SerializeField] private TeamDefinition[] teamDefinitions;
+
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             // The client identifier to be authenticated
             var clientId = request.ClientNetworkId;
@@ -252,13 +263,20 @@ namespace Vi.Core
             if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
             if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
+            Team clientTeam = Team.Competitor;
+
+            foreach (TeamDefinition teamDefinition in teamDefinitions)
+            {
+                if (clientId == teamDefinition.clientId) { clientTeam = teamDefinition.team; }
+            }
+
             if (clientId != NetworkManager.ServerClientId)
-                playerDataList.Add(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor));
+                playerDataList.Add(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam));
             else
-                StartCoroutine(OnHostConnect(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, Team.Competitor)));
+                StartCoroutine(OnHostConnect(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam)));
         }
 
-        protected IEnumerator OnHostConnect(PlayerData playerData)
+        private IEnumerator OnHostConnect(PlayerData playerData)
         {
             yield return new WaitUntil(() => IsSpawned);
             playerDataList.Add(playerData);

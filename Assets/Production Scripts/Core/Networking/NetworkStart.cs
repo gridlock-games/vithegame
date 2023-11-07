@@ -9,7 +9,6 @@ namespace Vi.Networking
 {
     public class NetworkStart : MonoBehaviour
     {
-        [SerializeField] private GameLogicManager.GameMode gameMode;
         [Header("Player Name|CharacterIndex|SkinIndex")]
         [SerializeField] private string payloadString;
 

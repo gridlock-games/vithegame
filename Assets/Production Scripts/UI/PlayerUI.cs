@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
 using TMPro;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -78,7 +79,7 @@ namespace Vi.UI
 
             fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
 
-            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes);
+            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
             for (int i = 0; i < teammatePlayerCards.Length; i++)
             {
                 if (i < teammateAttributes.Count)
