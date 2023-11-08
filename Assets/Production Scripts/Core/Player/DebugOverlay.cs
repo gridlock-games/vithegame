@@ -56,7 +56,7 @@ namespace Vi.Player
         void OnGUI()
         {
             if (!enableDisplay) { return; }
-            GUI.TextArea(new Rect(10, 10, Screen.width / 4 - 10, Screen.height / 4 - 10), myLog);
+            GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.yellow;
             GUI.Label(new Rect(0, Screen.height - 15, 100, 10), "FPS: " + Mathf.RoundToInt(frameCount).ToString(), style);

@@ -169,7 +169,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
-            GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId());
+            if (IsServer) { GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
         }
 
         private void OnHPChanged(float prev, float current)
