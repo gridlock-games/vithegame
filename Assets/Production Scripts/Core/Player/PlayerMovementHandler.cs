@@ -115,17 +115,14 @@ namespace Vi.Player
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private AnimationHandler animationHandler;
-        private void Start()
+        protected new void Start()
         {
+            base.Start();
             characterController = GetComponent<CharacterController>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
-
-            if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
-            if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
-            lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -212,12 +209,6 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        private Vector2 lookSensitivity;
-        public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
-        public Vector2 GetLookSensitivity() { return lookSensitivity; }
-        public void SetLookSensitivity(Vector2 newLookSensitivity) { lookSensitivity = newLookSensitivity; }
-
-        private Vector2 lookInput;
         void OnLook(InputValue value)
         {
             lookInput = value.Get<Vector2>() * (attributes.IsFeared() ? -1 : 1);

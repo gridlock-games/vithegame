@@ -8,6 +8,8 @@ namespace Vi.Core
 {
     public class AnimationHandler : NetworkBehaviour
     {
+        public bool WaitingForActionToPlay { get; private set; }
+
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip)
         {
@@ -17,6 +19,7 @@ namespace Vi.Core
             }
             else
             {
+                WaitingForActionToPlay = true;
                 PlayActionServerRpc(actionClip.name);
             }
         }
@@ -27,6 +30,7 @@ namespace Vi.Core
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
         {
+            WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
@@ -172,8 +176,12 @@ namespace Vi.Core
         }
 
         // Remote Procedure Call method for playing the action on the server
-        [ServerRpc(RequireOwnership = false)]
-        private void PlayActionServerRpc(string actionStateName) { PlayActionOnServer(actionStateName); }
+        [ServerRpc]
+        private void PlayActionServerRpc(string actionStateName)
+        {
+            PlayActionOnServer(actionStateName);
+            ResetActionClientRpc();
+        }
 
         // Remote Procedure Call method for playing the action on the client
         [ClientRpc]
@@ -201,6 +209,8 @@ namespace Vi.Core
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
         }
+
+        [ClientRpc] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
 
         // Coroutine for setting invincibility status during a dodge
         private IEnumerator SetInvincibleStatusOnDodge(string actionStateName)
@@ -334,6 +344,7 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
             if (IsLocalPlayer)

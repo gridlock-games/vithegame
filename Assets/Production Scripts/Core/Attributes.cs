@@ -32,13 +32,13 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor()
         {
-            //if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.clear; }
+            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.black; }
 
             if (!IsClient) { return GameLogicManager.GetTeamColor(team.Value); }
-            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.clear; }
+            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == GameLogicManager.Team.Spectator) { return GameLogicManager.GetTeamColor(team.Value); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.clear; }
+            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
             else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }
@@ -149,8 +149,14 @@ namespace Vi.Core
             statuses.OnListChanged += OnStatusChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
-            if (NetworkObject.IsPlayerObject) { GameLogicManager.Singleton.AddPlayerObject((int)OwnerClientId, this); }
+            StartCoroutine(AddPlayerObjectToGameLogicManager());
             team.Value = defaultTeam;
+        }
+
+        private IEnumerator AddPlayerObjectToGameLogicManager()
+        {
+            if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
+            GameLogicManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
 
         public override void OnNetworkDespawn()
@@ -163,6 +169,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            if (IsServer) { GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
         }
 
         private void OnHPChanged(float prev, float current)
@@ -200,6 +207,16 @@ namespace Vi.Core
         private void Start()
         {
             teamIndicatorInstance = Instantiate(teamIndicatorPrefab, transform);
+        }
+
+        private void OnEnable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+        }
+
+        private void OnDisable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
         }
 
         public bool IsInvincible { get; private set; }
@@ -418,6 +435,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
             glowRenderer.RenderInvincible(IsInvincible);
             glowRenderer.RenderUninterruptable(IsUninterruptable);
 

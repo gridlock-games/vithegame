@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
 using TMPro;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -21,8 +22,6 @@ namespace Vi.UI
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
-        [Header("Debug Elements")]
-        [SerializeField] private TextMeshProUGUI fpsDisplay;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -65,8 +64,6 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
-
-            StartCoroutine(FPSCounter());
         }
 
         private void Update()
@@ -76,31 +73,18 @@ namespace Vi.UI
                 statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
             }
 
-            fpsDisplay.SetText("FPS: " + Mathf.RoundToInt(frameCount).ToString());
-
-            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes);
+            // Order player cards by distance
+            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
             for (int i = 0; i < teammatePlayerCards.Length; i++)
             {
                 if (i < teammateAttributes.Count)
                 {
                     teammatePlayerCards[i].Initialize(teammateAttributes[i]);
-                    teammatePlayerCards[i].gameObject.SetActive(true);
                 }
                 else
                 {
                     teammatePlayerCards[i].Initialize(null);
-                    teammatePlayerCards[i].gameObject.SetActive(false);
                 }
-            }
-        }
-
-        private float frameCount;
-        private IEnumerator FPSCounter()
-        {
-            while (true)
-            {
-                frameCount = 1f / Time.unscaledDeltaTime;
-                yield return new WaitForSeconds(0.1f);
             }
         }
     }

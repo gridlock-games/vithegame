@@ -121,6 +121,38 @@ namespace Vi.Core
 
             actionVFXTracker.Clear();
 
+            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            {
+                ResetComboSystem();
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.LightAttack)
+            {
+                inputHistory.Add(Weapon.InputAttackType.LightAttack);
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                inputHistory.Add(Weapon.InputAttackType.HeavyAttack);
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+            {
+                if (CurrentActionClip == weaponInstance.GetAbility1())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability1);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility2())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability2);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility3())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability3);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility4())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability4);
+                }
+            }
+
             if (IsServer)
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
@@ -343,42 +375,42 @@ namespace Vi.Core
 
         void OnLightAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.LightAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnHeavyAttack()
         {
-            ActionClip actionClip = weaponInstance.GetAttack(Weapon.InputAttackType.HeavyAttack, animationHandler.Animator, movementHandler.GetMoveInput(), IsInRecovery);
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility1()
         {
-            ActionClip actionClip = weaponInstance.GetAbility1();
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility2()
         {
-            ActionClip actionClip = weaponInstance.GetAbility2();
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility3()
         {
-            ActionClip actionClip = weaponInstance.GetAbility3();
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
         void OnAbility4()
         {
-            ActionClip actionClip = weaponInstance.GetAbility4();
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
@@ -448,5 +480,84 @@ namespace Vi.Core
                 Time.timeScale = 1;
             }
         }
+
+        private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
+        private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
+        {
+            if (animationHandler.WaitingForActionToPlay) { return null; }
+            // If we are in recovery, and not transitioning to a different action
+            if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+            {
+                return SelectAttack(inputAttackType);
+            }
+            else if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))) // If we are at rest
+            {
+                ResetComboSystem();
+                return SelectAttack(inputAttackType);
+            }
+            else // If we are not at rest and not recovering
+            {
+                return null;
+            }
+        }
+
+        private void ResetComboSystem()
+        {
+            inputHistory.Clear();
+        }
+
+        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType)
+        {
+            switch (inputAttackType)
+            {
+                case Weapon.InputAttackType.Ability1:
+                    return weaponInstance.GetAbility1();
+                case Weapon.InputAttackType.Ability2:
+                    return weaponInstance.GetAbility2();
+                case Weapon.InputAttackType.Ability3:
+                    return weaponInstance.GetAbility3();
+                case Weapon.InputAttackType.Ability4:
+                    return weaponInstance.GetAbility4();
+            }
+
+            List<Weapon.InputAttackType> cachedInputHistory = new List<Weapon.InputAttackType>(inputHistory);
+            cachedInputHistory.Add(inputAttackType);
+
+            List<Weapon.Attack> potentialAttacks = weaponInstance.GetAttackList().FindAll(item => item.inputs.SequenceEqual(cachedInputHistory));
+            Weapon.Attack selectedAttack = potentialAttacks.Find(item => item.inputs.SequenceEqual(cachedInputHistory) & item.comboCondition == Weapon.ComboCondition.None);
+            foreach (Weapon.Attack attack in potentialAttacks)
+            {
+                bool conditionMet = false;
+                switch (attack.comboCondition)
+                {
+                    case Weapon.ComboCondition.None:
+                        break;
+                    case Weapon.ComboCondition.InputForward:
+                        conditionMet = movementHandler.GetMoveInput().y == 1;
+                        break;
+                    case Weapon.ComboCondition.InputBackwards:
+                        conditionMet = movementHandler.GetMoveInput().y == -1;
+                        break;
+                    case Weapon.ComboCondition.InputLeft:
+                        conditionMet = movementHandler.GetMoveInput().x == -1;
+                        break;
+                    case Weapon.ComboCondition.InputRight:
+                        conditionMet = movementHandler.GetMoveInput().x == 1;
+                        break;
+                    default:
+                        Debug.Log(attack.comboCondition + " has not been implemented yet!");
+                        break;
+                }
+
+                if (conditionMet)
+                {
+                    selectedAttack = attack;
+                    break;
+                }
+            }
+            if (selectedAttack == null) { return null; }
+            return selectedAttack.attackClip;
+        }
+
     }
 }

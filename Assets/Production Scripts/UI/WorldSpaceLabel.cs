@@ -73,8 +73,10 @@ namespace Vi.UI
             //nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
             nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
             //nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).team + " " + attributes.GetTeam();
-            nameBackground.color = attributes.GetRelativeTeamColor();
-            healthFillImage.color = attributes.GetRelativeTeamColor();
+            Color relativeTeamColor = attributes.GetRelativeTeamColor();
+            nameBackground.color = relativeTeamColor;
+            nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
+            healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
 
             Vector3 localScaleTarget = Vector3.zero;
             if (Camera.main)
