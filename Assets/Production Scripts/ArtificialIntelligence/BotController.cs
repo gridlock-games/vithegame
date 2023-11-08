@@ -25,23 +25,36 @@ namespace Vi.ArtificialIntelligence
             attributes = GetComponent<Attributes>();
         }
 
+        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
+        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
         private void Update()
         {
             if (!IsSpawned) { return; }
             if (!characterController.enabled) { return; }
 
-            if (animationHandler.ShouldApplyRootMotion())
+            if (IsServer)
             {
-                characterController.Move(animationHandler.ApplyLocalRootMotion());
+                if (animationHandler.ShouldApplyRootMotion())
+                {
+                    characterController.Move(animationHandler.ApplyLocalRootMotion());
+                }
+                else
+                {
+                    characterController.Move(Physics.gravity);
+                }
+
+                if (attributes.ShouldApplyAilmentRotation())
+                {
+                    transform.rotation = attributes.GetAilmentRotation();
+                }
+
+                currentPosition.Value = transform.position;
+                currentRotation.Value = transform.rotation;
             }
             else
             {
-                characterController.Move(Physics.gravity);
-            }
-
-            if (attributes.ShouldApplyAilmentRotation())
-            {
-                transform.rotation = attributes.GetAilmentRotation();
+                characterController.Move(currentPosition.Value - transform.position);
+                transform.rotation = currentRotation.Value;
             }
 
             /*
