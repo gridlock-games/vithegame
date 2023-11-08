@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Collections;
 using Vi.ScriptableObjects;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
@@ -44,14 +45,8 @@ namespace Vi.Core
 
         public static Color GetTeamColor(Team team)
         {
-            try
-            {
-                return (Color)typeof(Color).GetProperty(team.ToString().ToLowerInvariant()).GetValue(null, null);
-            }
-            catch
-            {
-                return Color.black;
-            }
+            ColorUtility.TryParseHtmlString(team.ToString(), out Color color);
+            return color;
         }
 
         public enum GameMode
@@ -183,6 +178,22 @@ namespace Vi.Core
             _singleton = this;
             DontDestroyOnLoad(gameObject);
             playerDataList = new NetworkList<PlayerData>();
+            SceneManager.sceneLoaded += OnSceneLoad;
+            SceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private PlayerSpawnPoints playerSpawnPoints;
+        void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        {
+            foreach (GameObject g in scene.GetRootGameObjects())
+            {
+                if (g.TryGetComponent(out playerSpawnPoints)) { break; }
+            }
+        }
+
+        void OnSceneUnload(Scene scene)
+        {
+            playerSpawnPoints = null;
         }
 
         private void Start()
@@ -205,32 +216,47 @@ namespace Vi.Core
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
+            if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                //localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);
+                StartCoroutine(SpawnPlayer(networkListEvent.Value));
             }
         }
 
         private void OnClientConnectCallback(ulong clientId)
         {
-            if (IsServer) { StartCoroutine(SpawnPlayer(clientId)); }
+
         }
 
-        private IEnumerator SpawnPlayer(ulong clientId)
+        private IEnumerator SpawnPlayer(PlayerData playerData)
         {
-            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData((int)clientId)));
+            if (playerData.clientId >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.clientId)); }
+            if (localPlayers.ContainsKey(playerData.clientId)) { yield break; }
+
+            Vector3 spawnPosition = Vector3.zero;
+            Quaternion spawnRotation = Quaternion.identity;
+
+            if (playerSpawnPoints)
+            {
+                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                spawnPosition = transformData.position;
+                spawnRotation = transformData.rotation;
+            }
 
             GameObject playerObject;
-            if (GetPlayerData(clientId).team == Team.Spectator)
+            if (GetPlayerData(playerData.clientId).team == Team.Spectator)
             {
-                playerObject = Instantiate(spectatorPrefab);
+                playerObject = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
             else
             {
-                playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+                playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.clientId).characterIndex].playerPrefab, spawnPosition, spawnRotation);
             }
 
-            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
+            if (playerData.clientId >= 0)
+                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.clientId).clientId, true);
+            else
+                playerObject.GetComponent<NetworkObject>().Spawn(true);
         }
 
         private void OnClientDisconnectCallback(ulong clientId)
