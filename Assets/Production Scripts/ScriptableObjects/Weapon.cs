@@ -241,27 +241,9 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class Attack
         {
-            public int inputIndex;
-            public InputAttackType InputAttackType = InputAttackType.LightAttack;
+            public List<InputAttackType> inputs;
             public ComboCondition comboCondition = ComboCondition.None;
             public ActionClip attackClip;
-        }
-
-        private int maxAttackIndex;
-        private void Awake()
-        {
-            foreach (Attack attack in attackList)
-            {
-                if (attack.inputIndex > maxAttackIndex) { maxAttackIndex = attack.inputIndex; }
-            }
-            
-            if (Application.isEditor)
-            {
-                for (int i = 0; i < maxAttackIndex; i++)
-                {
-                    if (attackList.Find(item => item.inputIndex == i) == null) { Debug.LogError(this + " does not have an attack for index: " + i); }
-                }
-            }
         }
 
         [Header("Dodge Assignments")]

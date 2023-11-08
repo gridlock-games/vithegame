@@ -125,6 +125,33 @@ namespace Vi.Core
             {
                 ResetComboSystem();
             }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.LightAttack)
+            {
+                inputHistory.Add(Weapon.InputAttackType.LightAttack);
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                inputHistory.Add(Weapon.InputAttackType.HeavyAttack);
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+            {
+                if (CurrentActionClip == weaponInstance.GetAbility1())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability1);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility2())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability2);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility3())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability3);
+                }
+                else if (CurrentActionClip == weaponInstance.GetAbility4())
+                {
+                    inputHistory.Add(Weapon.InputAttackType.Ability4);
+                }
+            }
 
             if (IsServer)
             {
@@ -454,13 +481,12 @@ namespace Vi.Core
             }
         }
 
-        private int attackIndex;
+        private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
-                attackIndex++;
                 return SelectAttack(inputAttackType);
             }
             else if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty")) // If we are at rest
@@ -476,7 +502,7 @@ namespace Vi.Core
 
         private void ResetComboSystem()
         {
-            attackIndex = 0;
+            inputHistory.Clear();
         }
 
         private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType)
@@ -493,8 +519,11 @@ namespace Vi.Core
                     return weaponInstance.GetAbility4();
             }
 
-            List<Weapon.Attack> potentialAttacks = weaponInstance.GetAttackList().FindAll(item => item.inputIndex == attackIndex & item.InputAttackType == inputAttackType);
-            Weapon.Attack selectedAttack = potentialAttacks.Find(item => item.inputIndex == attackIndex & item.comboCondition == Weapon.ComboCondition.None);
+            List<Weapon.InputAttackType> cachedInputHistory = new List<Weapon.InputAttackType>(inputHistory);
+            cachedInputHistory.Add(inputAttackType);
+
+            List<Weapon.Attack> potentialAttacks = weaponInstance.GetAttackList().FindAll(item => item.inputs.SequenceEqual(cachedInputHistory));
+            Weapon.Attack selectedAttack = potentialAttacks.Find(item => item.inputs.SequenceEqual(cachedInputHistory) & item.comboCondition == Weapon.ComboCondition.None);
             foreach (Weapon.Attack attack in potentialAttacks)
             {
                 bool conditionMet = false;
