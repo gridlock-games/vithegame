@@ -19,7 +19,7 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor()
         {
-            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.black; }
+            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.FreeForAll) { return Color.black; }
 
             if (!IsClient) { return GameLogicManager.GetTeamColor(GetTeam()); }
             else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }

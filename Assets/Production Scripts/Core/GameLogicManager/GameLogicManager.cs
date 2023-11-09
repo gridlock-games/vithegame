@@ -51,8 +51,11 @@ namespace Vi.Core
 
         public enum GameMode
         {
-            Duel,
-            TeamElimination
+            None,
+            FreeForAll,
+            TeamElimination,
+            EssenceWar,
+            OutputRush
         }
 
         public enum Team
