@@ -374,16 +374,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf98c2b17b3b5e041958e916eccd4123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  botDefinitions:
-  - characterIndex: 1
-    skinIndex: 1
-    team: 3
-  - characterIndex: 0
-    skinIndex: 2
-    team: 7
-  - characterIndex: 2
-    skinIndex: 1
-    team: 7
+  botDefinitions: []
 --- !u!1 &1014662595
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,10 +606,10 @@ MonoBehaviour:
     - {x: 0, y: -3, z: 10}
     - {x: 0, y: -3, z: -10}
     spawnRotations:
-    - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
-    - {x: 0, y: 180, z: 0}
-    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 270, z: 0}
 --- !u!1 &1635212591
 GameObject:
   m_ObjectHideFlags: 0
