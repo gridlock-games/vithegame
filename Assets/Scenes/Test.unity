@@ -295,6 +295,7 @@ GameObject:
   - component: {fileID: 728445160}
   - component: {fileID: 728445158}
   - component: {fileID: 728445161}
+  - component: {fileID: 728445162}
   m_Layer: 0
   m_Name: GameLogicManager
   m_TagString: Untagged
@@ -335,7 +336,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &728445161
 MonoBehaviour:
@@ -361,95 +362,25 @@ MonoBehaviour:
   teamDefinitions:
   - team: 3
     clientId: 0
---- !u!1001 &967183870
-PrefabInstance:
+--- !u!114 &728445162
+MonoBehaviour:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1564116883212529235, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: defaultTeam
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529237, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: botCharacterIndex
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529238, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 1851256879
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529239, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_Name
-      value: Bot
-      objectReference: {fileID: 0}
-    - target: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a25285dc08b71a24686e351903742cce, type: 3}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728445157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf98c2b17b3b5e041958e916eccd4123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  botDefinitions:
+  - characterIndex: 1
+    skinIndex: 1
+    team: 3
+  - characterIndex: 0
+    skinIndex: 2
+    team: 7
 --- !u!1 &1014662595
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,7 +544,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1145048904
 MonoBehaviour:
@@ -658,7 +589,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1629360244
 MonoBehaviour:
@@ -676,11 +607,15 @@ MonoBehaviour:
   - gameModes: 0000000001000000
     teams: 020000000300000007000000
     spawnPositions:
-    - {x: -10, y: 0, z: 0}
-    - {x: 10, y: 0, z: 0}
+    - {x: -10, y: -3, z: 0}
+    - {x: 10, y: -3, z: 0}
+    - {x: 0, y: -3, z: 10}
+    - {x: 0, y: -3, z: -10}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 0, z: 0}
 --- !u!1 &1635212591
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,6 +45,8 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            transform.localScale = Vector3.zero;
         }
 
         private void RefreshRendererToFollow()

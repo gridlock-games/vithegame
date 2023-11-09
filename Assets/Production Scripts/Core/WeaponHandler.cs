@@ -274,8 +274,8 @@ namespace Vi.Core
 
         private void FixedUpdate()
         {
+            if (!animationHandler.Animator) { return; }
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
-            if (!IsSpawned) { return; }
 
             if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))

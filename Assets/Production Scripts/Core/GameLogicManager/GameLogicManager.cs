@@ -88,6 +88,7 @@ namespace Vi.Core
         public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
+            if (team == Team.Competitor) { return attributesList; }
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
                 if (kvp.Value == attributesToExclude) { continue; }
@@ -99,7 +100,7 @@ namespace Vi.Core
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public int AddBotData(Attributes botPlayerObject, int characterIndex, int skinIndex, Team team)
+        public int AddBotData(int characterIndex, int skinIndex, Team team)
         {
             if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
 
@@ -124,7 +125,7 @@ namespace Vi.Core
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == clientId)
+                if (playerData.id == clientId)
                 {
                     return playerData;
                 }
@@ -137,7 +138,7 @@ namespace Vi.Core
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == (int)clientId)
+                if (playerData.id == (int)clientId)
                 {
                     return playerData;
                 }
@@ -230,8 +231,8 @@ namespace Vi.Core
 
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
-            if (playerData.clientId >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.clientId)); }
-            if (localPlayers.ContainsKey(playerData.clientId)) { yield break; }
+            if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
+            if (localPlayers.ContainsKey(playerData.id)) { yield break; }
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
@@ -244,17 +245,23 @@ namespace Vi.Core
             }
 
             GameObject playerObject;
-            if (GetPlayerData(playerData.clientId).team == Team.Spectator)
+            if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
                 playerObject = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
             else
             {
-                playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.clientId).characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                if (playerData.id >= 0)
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                else
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            if (playerData.clientId >= 0)
-                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.clientId).clientId, true);
+            playerObject.GetComponent<AnimationHandler>().SetCharacterSkin(playerData.characterIndex, playerData.skinIndex);
+            playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+
+            if (playerData.id >= 0)
+                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
             else
                 playerObject.GetComponent<NetworkObject>().Spawn(true);
         }
@@ -336,24 +343,24 @@ namespace Vi.Core
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
-            public int clientId;
+            public int id;
             public FixedString32Bytes playerName;
             public int characterIndex;
             public int skinIndex;
             public Team team;
 
-            public PlayerData(int clientId)
+            public PlayerData(int id)
             {
-                this.clientId = clientId;
+                this.id = id;
                 playerName = "Player Name";
                 characterIndex = 0;
                 skinIndex = 0;
                 team = Team.Environment;
             }
 
-            public PlayerData(int clientId, string playerName, int characterIndex, int skinIndex, Team team)
+            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team)
             {
-                this.clientId = clientId;
+                this.id = id;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
@@ -362,7 +369,7 @@ namespace Vi.Core
 
             public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
             {
-                this.clientId = (int)clientId;
+                id = (int)clientId;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
@@ -371,12 +378,12 @@ namespace Vi.Core
 
             public bool Equals(PlayerData other)
             {
-                return clientId == other.clientId;
+                return id == other.id;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
-                serializer.SerializeValue(ref clientId);
+                serializer.SerializeValue(ref id);
                 serializer.SerializeValue(ref playerName);
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);

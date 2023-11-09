@@ -69,6 +69,12 @@ namespace Vi.Player
 
         private PlayerMovementHandler movementHandler;
 
+        private void Awake()
+        {
+            currentPosition = transform.position;
+            currentRotation = transform.rotation;
+        }
+
         private void Start()
         {
             movementHandler = GetComponent<PlayerMovementHandler>();
@@ -79,8 +85,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
-            currentPosition = transform.position;
-            currentRotation = transform.rotation;
+            latestServerState = new StatePayload(0, currentPosition, currentRotation);
 
             if (IsServer)
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
