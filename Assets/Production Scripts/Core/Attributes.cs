@@ -14,7 +14,7 @@ namespace Vi.Core
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
-        public void SetPlayerDataId(int id) { playerDataId.Value = id; }
+        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = GameLogicManager.Singleton.GetPlayerData(id).playerName.ToString(); }
         public GameLogicManager.Team GetTeam() { return GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
         public Color GetRelativeTeamColor()
@@ -31,8 +31,6 @@ namespace Vi.Core
         }
 
         [SerializeField] private GameObject teamIndicatorPrefab;
-        //[SerializeField] private Vector3 indicatorLocalPosition;
-        //[SerializeField] private float glowAmount = 1;
 
         [Header("Health")]
         [SerializeField] private float maxHP = 100;

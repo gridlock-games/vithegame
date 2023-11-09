@@ -21,10 +21,24 @@ namespace Vi.Core
             }
         }
 
+        public void ResetSpawnTracker()
+        {
+            spawnIndexTracker.Clear();
+        }
+
+        private List<int> spawnIndexTracker = new List<int>();
         public TransformData GetSpawnOrientation(GameLogicManager.GameMode gameMode, GameLogicManager.Team team)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
-            TransformData spawnPoint = possibleSpawnPoints[Random.Range(0, possibleSpawnPoints.Count)];
+            foreach (int index in spawnIndexTracker)
+            {
+                possibleSpawnPoints.RemoveAt(index);
+            }
+            int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
+            spawnIndexTracker.Add(randomIndex);
+            TransformData spawnPoint = new TransformData();
+            if (possibleSpawnPoints.Count != 0)
+                spawnPoint = possibleSpawnPoints[randomIndex];
             return spawnPoint;
         }
 

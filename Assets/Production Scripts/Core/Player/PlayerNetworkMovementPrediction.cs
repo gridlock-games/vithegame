@@ -128,12 +128,6 @@ namespace Vi.Player
 
                 InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
 
-                //// If we are in the middle of root motion, do not take an input vector
-                //if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
-                //{
-                //    inputPayload.inputVector = Vector2.zero;
-                //}
-
                 SendInputServerRpc(inputPayload);
 
                 if (!IsHost)
