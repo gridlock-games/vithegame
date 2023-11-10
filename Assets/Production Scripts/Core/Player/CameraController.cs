@@ -25,6 +25,12 @@ namespace Vi.Player
         private GameObject cameraInterp;
         private Vector3 currentPositionOffset;
 
+        public void SetRotation(float targetRotationX, float targetRotationY)
+        {
+            this.targetRotationX = targetRotationX;
+            this.targetRotationY = targetRotationY - 180;
+        }
+
         private void Start()
         {
             targetRotationX = 0;

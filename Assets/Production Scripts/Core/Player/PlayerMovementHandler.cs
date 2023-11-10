@@ -18,7 +18,11 @@ namespace Vi.Player
         [Header("Animation Settings")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
 
-        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation) { movementPrediction.SetOrientation(newPosition, newRotation); }
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            cameraInstance.GetComponent<CameraController>().SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
+            movementPrediction.SetOrientation(newPosition, newRotation);
+        }
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
