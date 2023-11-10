@@ -14,7 +14,7 @@ namespace Vi.ArtificialIntelligence
         {
             foreach (BotDefinition botDefinition in botDefinitions)
             {
-                GameLogicManager.Singleton.AddBotData(botDefinition.characterIndex, botDefinition.skinIndex, botDefinition.team);
+                PlayerDataManager.Singleton.AddBotData(botDefinition.characterIndex, botDefinition.skinIndex, botDefinition.team);
             }
         }
 
@@ -23,7 +23,7 @@ namespace Vi.ArtificialIntelligence
         {
             public int characterIndex;
             public int skinIndex;
-            public GameLogicManager.Team team;
+            public PlayerDataManager.Team team;
         }
     }
 }

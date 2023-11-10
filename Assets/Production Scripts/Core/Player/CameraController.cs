@@ -27,7 +27,7 @@ namespace Vi.Player
 
         private void Start()
         {
-            targetRotationX = 10;
+            targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
             movementHandler = GetComponentInParent<PlayerMovementHandler>();

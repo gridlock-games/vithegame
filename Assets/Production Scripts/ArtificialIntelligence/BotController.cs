@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class BotController : NetworkBehaviour
+    public class BotController : MovementHandler
     {
         [SerializeField] private bool lightAttack;
         [SerializeField] private bool isBlocking;
@@ -17,7 +17,7 @@ namespace Vi.ArtificialIntelligence
         private WeaponHandler weaponHandler;
         private Attributes attributes;
 
-        private void Start()
+        private new void Start()
         {
             characterController = GetComponent<CharacterController>();
             animationHandler = GetComponent<AnimationHandler>();

@@ -68,7 +68,7 @@ namespace Vi.UI
         {
             if (!attributes) { gameObject.SetActive(false); return; }
 
-            nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();

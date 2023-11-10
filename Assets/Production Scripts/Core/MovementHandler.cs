@@ -8,6 +8,12 @@ namespace Vi.Core
 {
     public class MovementHandler : NetworkBehaviour
     {
+        public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            transform.position = newPosition;
+            transform.rotation = newRotation;
+        }
+
         protected void Start()
         {
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }

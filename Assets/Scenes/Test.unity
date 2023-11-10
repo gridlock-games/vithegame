@@ -294,8 +294,9 @@ GameObject:
   m_Component:
   - component: {fileID: 728445160}
   - component: {fileID: 728445158}
-  - component: {fileID: 728445161}
+  - component: {fileID: 728445163}
   - component: {fileID: 728445162}
+  - component: {fileID: 728445164}
   m_Layer: 0
   m_Name: GameLogicManager
   m_TagString: Untagged
@@ -338,30 +339,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &728445161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 728445157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79650a6ddce665c4d8f711d158673405, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameModeValue: 1
-  spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
-    type: 3}
-  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
-  gameModeInfos:
-  - gameMode: 1
-    possibleTeams: 02000000
-  - gameMode: 2
-    possibleTeams: 0300000007000000
-  teamDefinitions:
-  - team: 3
-    clientId: 0
 --- !u!114 &728445162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,9 +361,41 @@ MonoBehaviour:
   - characterIndex: 2
     skinIndex: 0
     team: 3
-  - characterIndex: 0
-    skinIndex: 1
-    team: 3
+--- !u!114 &728445163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728445157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c097031af7b0ce49a8cdaec48a92a09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameModeValue: 0
+  spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
+    type: 3}
+  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
+  gameModeInfos: []
+  teamDefinitions:
+  - team: 3
+    clientId: 0
+--- !u!114 &728445164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728445157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0b40ba8fc425248bd546eee2be0c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
+    type: 3}
+  roundDuration: 10
 --- !u!1 &1014662595
 GameObject:
   m_ObjectHideFlags: 0

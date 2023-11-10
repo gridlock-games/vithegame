@@ -18,6 +18,8 @@ namespace Vi.Player
         [Header("Animation Settings")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
 
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation) { movementPrediction.SetOrientation(newPosition, newRotation); }
+
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (attributes.ShouldApplyAilmentRotation())

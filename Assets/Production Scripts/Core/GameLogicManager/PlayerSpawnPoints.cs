@@ -27,7 +27,7 @@ namespace Vi.Core
         }
 
         private List<int> spawnIndexTracker = new List<int>();
-        public TransformData GetSpawnOrientation(GameLogicManager.GameMode gameMode, GameLogicManager.Team team)
+        public TransformData GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
             foreach (int index in spawnIndexTracker)
@@ -42,7 +42,7 @@ namespace Vi.Core
             return spawnPoint;
         }
 
-        private List<TransformData> GetPossibleSpawnOrientations(GameLogicManager.GameMode gameMode, GameLogicManager.Team team)
+        private List<TransformData> GetPossibleSpawnOrientations(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
             List<TransformData> returnedSpawnPoints = new List<TransformData>();
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)
@@ -62,7 +62,7 @@ namespace Vi.Core
         {
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)
             {
-                Gizmos.color = GameLogicManager.GetTeamColor(spawnPoint.teams[0]);
+                Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
                 for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                 {
                     Vector3 spawnPosition = spawnPoint.spawnPositions[i];
@@ -77,8 +77,8 @@ namespace Vi.Core
         [System.Serializable]
         public class SpawnPointDefinition
         {
-            public GameLogicManager.GameMode[] gameModes;
-            public GameLogicManager.Team[] teams;
+            public PlayerDataManager.GameMode[] gameModes;
+            public PlayerDataManager.Team[] teams;
             public Vector3[] spawnPositions;
             public Vector3[] spawnRotations;
         }

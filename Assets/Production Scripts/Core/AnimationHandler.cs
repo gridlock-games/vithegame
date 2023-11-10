@@ -242,7 +242,7 @@ namespace Vi.Core
                 Destroy(animatorReference.gameObject);
             }
 
-            CharacterReference.PlayerModelOption modelOption = GameLogicManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+            CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
             Animator = modelInstance.GetComponent<Animator>();

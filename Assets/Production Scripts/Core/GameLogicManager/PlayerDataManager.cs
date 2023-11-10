@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
-    public class GameLogicManager : NetworkBehaviour
+    public class PlayerDataManager : NetworkBehaviour
     {
         [SerializeField] private GameMode gameModeValue;
         [SerializeField] private GameObject spectatorPrefab;
@@ -172,8 +172,8 @@ namespace Vi.Core
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
-        public static GameLogicManager Singleton { get { return _singleton; } }
-        private static GameLogicManager _singleton;
+        public static PlayerDataManager Singleton { get { return _singleton; } }
+        private static PlayerDataManager _singleton;
 
         public const char payloadParseString = '|';
 
@@ -230,6 +230,19 @@ namespace Vi.Core
         private void OnClientConnectCallback(ulong clientId)
         {
 
+        }
+
+        public void RespawnPlayers()
+        {
+            playerSpawnPoints.ResetSpawnTracker();
+            foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
+            {
+                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, kvp.Value.GetTeam());
+                Vector3 spawnPosition = transformData.position;
+                Quaternion spawnRotation = transformData.rotation;
+
+                kvp.Value.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+            }
         }
 
         private IEnumerator SpawnPlayer(PlayerData playerData)

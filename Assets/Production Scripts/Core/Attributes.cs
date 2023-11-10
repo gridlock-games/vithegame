@@ -14,19 +14,17 @@ namespace Vi.Core
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
-        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = GameLogicManager.Singleton.GetPlayerData(id).playerName.ToString(); }
-        public GameLogicManager.Team GetTeam() { return GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
+        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).playerName.ToString(); }
+        public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
         public Color GetRelativeTeamColor()
         {
-            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.FreeForAll) { return Color.black; }
-
-            if (!IsClient) { return GameLogicManager.GetTeamColor(GetTeam()); }
-            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == GameLogicManager.Team.Spectator) { return GameLogicManager.GetTeamColor(GetTeam()); }
+            if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
+            else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
+            else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
-            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
+            else if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }
 
@@ -139,7 +137,7 @@ namespace Vi.Core
         private IEnumerator AddPlayerObjectToGameLogicManager()
         {
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
-            GameLogicManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
+            PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
 
         public override void OnNetworkDespawn()
@@ -151,7 +149,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
-            if (IsServer) { GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
+            if (IsServer) { PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
         }
 
         private void OnHPChanged(float prev, float current)
@@ -236,7 +234,7 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (!GameLogicManager.Singleton.CanHit(attacker, this)) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
 
             if (isMeleeHit)
             {
