@@ -66,6 +66,7 @@ namespace Vi.Player
         [ClientRpc]
         private void SetRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams = default)
         {
+            movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
             overrideRotation = newRotation;
             applyOverrideRotation = true;
         }

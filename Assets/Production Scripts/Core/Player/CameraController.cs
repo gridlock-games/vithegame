@@ -29,6 +29,9 @@ namespace Vi.Player
         {
             this.targetRotationX = targetRotationX;
             this.targetRotationY = targetRotationY - 180;
+
+            cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+            cameraInterp.transform.rotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
         }
 
         private void Start()

@@ -20,8 +20,12 @@ namespace Vi.Player
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            cameraInstance.GetComponent<CameraController>().SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
             movementPrediction.SetOrientation(newPosition, newRotation);
+        }
+
+        public void SetCameraRotation(float rotationX, float rotationY)
+        {
+            cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
