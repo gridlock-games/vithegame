@@ -351,7 +351,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf98c2b17b3b5e041958e916eccd4123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  botDefinitions: []
+  botDefinitions:
+  - characterIndex: 0
+    skinIndex: 0
+    team: 3
 --- !u!114 &728445163
 MonoBehaviour:
   m_ObjectHideFlags: 0

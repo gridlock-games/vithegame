@@ -17,6 +17,13 @@ namespace Vi.ArtificialIntelligence
         private WeaponHandler weaponHandler;
         private Attributes attributes;
 
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            currentPosition.Value = newPosition;
+            currentRotation.Value = newRotation;
+            base.SetOrientation(newPosition, newRotation);
+        }
+
         private new void Start()
         {
             characterController = GetComponent<CharacterController>();

@@ -10,8 +10,18 @@ namespace Vi.Core
     {
         public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            transform.position = newPosition;
-            transform.rotation = newRotation;
+            if (TryGetComponent(out CharacterController characterController))
+            {
+                characterController.enabled = false;
+                transform.position = newPosition;
+                transform.rotation = newRotation;
+                characterController.enabled = true;
+            }
+            else
+            {
+                transform.position = newPosition;
+                transform.rotation = newRotation;
+            }
         }
 
         protected void Start()
