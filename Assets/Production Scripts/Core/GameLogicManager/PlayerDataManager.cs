@@ -241,6 +241,7 @@ namespace Vi.Core
                 Vector3 spawnPosition = transformData.position;
                 Quaternion spawnRotation = transformData.rotation;
 
+                kvp.Value.ResetStats(false);
                 kvp.Value.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
             }
         }
