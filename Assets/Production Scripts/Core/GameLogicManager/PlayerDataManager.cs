@@ -242,6 +242,7 @@ namespace Vi.Core
                 Quaternion spawnRotation = transformData.rotation;
 
                 kvp.Value.ResetStats(false);
+                kvp.Value.GetComponent<AnimationHandler>().CancelAllActions();
                 kvp.Value.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
             }
         }

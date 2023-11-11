@@ -21,6 +21,7 @@ namespace Vi.Player
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             movementPrediction.SetOrientation(newPosition, newRotation);
+            base.SetOrientation(newPosition, newRotation);
         }
 
         public void SetCameraRotation(float rotationX, float rotationY)

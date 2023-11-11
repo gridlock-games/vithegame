@@ -354,13 +354,13 @@ MonoBehaviour:
   botDefinitions:
   - characterIndex: 0
     skinIndex: 0
-    team: 3
+    team: 2
   - characterIndex: 2
     skinIndex: 0
-    team: 7
+    team: 2
   - characterIndex: 1
     skinIndex: 1
-    team: 7
+    team: 2
 --- !u!114 &728445163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,7 +379,7 @@ MonoBehaviour:
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
   gameModeInfos: []
   teamDefinitions:
-  - team: 3
+  - team: 2
     clientId: 0
 --- !u!114 &728445164
 MonoBehaviour:
@@ -390,7 +390,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 728445157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e0b40ba8fc425248bd546eee2be0c12, type: 3}
+  m_Script: {fileID: 11500000, guid: 50f7a50a6fc2eb741930d8e071d5c916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,

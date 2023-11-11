@@ -24,6 +24,14 @@ namespace Vi.Core
             }
         }
 
+        public void CancelAllActions()
+        {
+            Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
+            attributes.SetInviniciblity(0);
+            attributes.SetUninterruptable(0);
+            weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+        }
+
         // Stores the type of the last action clip played
         private ActionClip lastClipPlayed;
 

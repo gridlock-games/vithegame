@@ -177,6 +177,14 @@ namespace Vi.ScriptableObjects
         private float lastAbility3ActivateTime = Mathf.NegativeInfinity;
         private float lastAbility4ActivateTime = Mathf.NegativeInfinity;
 
+        public void ResetAllAbilityCooldowns()
+        {
+            lastAbility1ActivateTime = Mathf.NegativeInfinity;
+            lastAbility2ActivateTime = Mathf.NegativeInfinity;
+            lastAbility3ActivateTime = Mathf.NegativeInfinity;
+            lastAbility4ActivateTime = Mathf.NegativeInfinity;
+        }
+
         public void StartAbilityCooldown(ActionClip ability)
         {
             if (ability == ability1)

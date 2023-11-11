@@ -6,6 +6,6 @@ namespace Vi.Core
 {
     public class FreeForAllManager : GameModeManager
     {
-
+        [SerializeField] private int scoreToWin = 2;
     }
 }
