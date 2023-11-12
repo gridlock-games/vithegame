@@ -132,6 +132,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Scoreboard",
+                    "type": "Value",
+                    "id": "104e51ef-c538-4eb4-b833-6b1c7d35e494",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "TimeScaleChange",
                     "type": "Button",
                     "id": "278c55b5-e282-4818-8540-62980d72c28e",
@@ -348,6 +357,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "99649447-1404-4535-8f72-fd456056e984",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scoreboard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

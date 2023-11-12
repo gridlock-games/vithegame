@@ -99,6 +99,8 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
+
         public override void OnNetworkDespawn()
         {
             if (IsServer)
@@ -187,7 +189,7 @@ namespace Vi.Core.GameModeManagers
                 roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
         }
 
-        protected struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>
+        public struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>
         {
             public int id;
             public int kills;
