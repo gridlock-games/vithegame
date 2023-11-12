@@ -181,12 +181,11 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
-            if (gameOver) { return; }
             if (!IsServer) { return; }
 
             if (nextGameActionTimer.Value > 0)
                 nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
-            else
+            else if (!gameOver)
                 roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
         }
 
