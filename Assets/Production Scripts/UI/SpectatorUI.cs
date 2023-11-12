@@ -19,12 +19,12 @@ namespace Vi.UI
 
         private void Update()
         {
-            GameLogicManager.GameModeInfo gameModeInfo = GameLogicManager.Singleton.GetGameModeInfo();
+            PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
             List<Attributes> initializedAttributesList = new List<Attributes>();
 
             if (gameModeInfo.possibleTeams.Length == 1)
             {
-                List<Attributes> attributesList = GameLogicManager.Singleton.GetPlayersOnTeam(gameModeInfo.possibleTeams[0]);
+                List<Attributes> attributesList = PlayerDataManager.Singleton.GetPlayersOnTeam(gameModeInfo.possibleTeams[0]);
                 for (int i = 0; i < attributesList.Count; i++)
                 {
                     if (i % 2 == 0)
@@ -49,7 +49,7 @@ namespace Vi.UI
             {
                 for (int teamIndex = 0; teamIndex < gameModeInfo.possibleTeams.Length; teamIndex++)
                 {
-                    List<Attributes> attributesList = GameLogicManager.Singleton.GetPlayersOnTeam(gameModeInfo.possibleTeams[teamIndex]);
+                    List<Attributes> attributesList = PlayerDataManager.Singleton.GetPlayersOnTeam(gameModeInfo.possibleTeams[teamIndex]);
                     for (int i = 0; i < attributesList.Count; i++)
                     {
                         if (teamIndex == 0)

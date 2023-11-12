@@ -74,7 +74,7 @@ namespace Vi.UI
             }
 
             // Order player cards by distance
-            List<Attributes> teammateAttributes = GameLogicManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+            List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
             for (int i = 0; i < teammatePlayerCards.Length; i++)
             {
                 if (i < teammateAttributes.Count)

@@ -18,8 +18,21 @@ namespace Vi.Player
         [Header("Animation Settings")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
 
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            movementPrediction.SetOrientation(newPosition, newRotation);
+            base.SetOrientation(newPosition, newRotation);
+        }
+
+        public void SetCameraRotation(float rotationX, float rotationY)
+        {
+            cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
+        }
+
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
+            if (CanMove()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation); }
+
             if (attributes.ShouldApplyAilmentRotation())
             {
                 Vector3 oldPos = transform.position;

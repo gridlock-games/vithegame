@@ -17,16 +17,28 @@ namespace Vi.Player
         [SerializeField] private float aimingTransitionSpeed = 8;
         [SerializeField] private Vector3 aimingPositionOffset = new Vector3(0, 0, 1);
 
-        private float targetRotationX;
         private float targetRotationY;
+        private float targetRotationX;
         private Vector3 _velocityPosition;
         private PlayerMovementHandler movementHandler;
         private WeaponHandler weaponHandler;
         private GameObject cameraInterp;
         private Vector3 currentPositionOffset;
 
+        public void SetRotation(float targetRotationX, float targetRotationY)
+        {
+            this.targetRotationX = targetRotationX;
+            this.targetRotationY = targetRotationY - 180;
+
+            cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+            cameraInterp.transform.rotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
+        }
+
         private void Start()
         {
+            targetRotationX = 0;
+            targetRotationY = transform.parent.eulerAngles.y - 180;
+
             movementHandler = GetComponentInParent<PlayerMovementHandler>();
             weaponHandler = movementHandler.GetComponent<WeaponHandler>();
             transform.SetParent(null, true);
@@ -37,15 +49,15 @@ namespace Vi.Player
         private void Update()
         {
             // Update camera interp transform
-            targetRotationX += movementHandler.GetLookInput().x;
-            targetRotationY += movementHandler.GetLookInput().y;
+            targetRotationX += movementHandler.GetLookInput().y;
+            targetRotationY += movementHandler.GetLookInput().x;
 
             targetRotationX %= 360f;
             targetRotationY %= 360f;
 
-            targetRotationY = Mathf.Clamp(targetRotationY, -maxPitch / 2.0f, maxPitch / 2.0f);
+            targetRotationX = Mathf.Clamp(targetRotationX, -maxPitch / 2.0f, maxPitch / 2.0f);
 
-            Quaternion targetRotation = Quaternion.Euler(targetRotationY, targetRotationX, 0);
+            Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
             if (weaponHandler.IsAiming())
             {

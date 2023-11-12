@@ -45,6 +45,8 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            transform.localScale = Vector3.zero;
         }
 
         private void RefreshRendererToFollow()
@@ -66,12 +68,12 @@ namespace Vi.UI
 
         private void LateUpdate()
         {
-            if (!GameLogicManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
             //nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
-            nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
             //nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).team + " " + attributes.GetTeam();
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameBackground.color = relativeTeamColor;
@@ -106,12 +108,6 @@ namespace Vi.UI
                 //Debug.LogWarning("Can't find a main camera for world space labels!");
             }
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
-
-            // Scale size of name background by size of text
-            if (nameBackground.TryGetComponent(out RectTransform rectTransform))
-            {
-                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, nameDisplay.preferredWidth * nameDisplay.transform.localScale.x + 10);
-            }
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);

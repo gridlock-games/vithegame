@@ -50,6 +50,27 @@ namespace Vi.Player
             }
         }
 
+        private bool applyOverridePosition;
+        private Vector3 overridePosition;
+        public void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            if (!IsServer) { Debug.LogError("PlayerNetworkMovementPrediction.SetOrientation() should only be called on the server!"); return; }
+            //SetRotationClientRpc(newRotation, new ClientRpcParams() { Send = { TargetClientIds = { l } } });
+            overridePosition = newPosition;
+            applyOverridePosition = true;
+            SetRotationClientRpc(newRotation, new ClientRpcParams() { Send = new ClientRpcSendParams() { TargetClientIds = new ulong[] { OwnerClientId } } });
+        }
+
+        private bool applyOverrideRotation;
+        private Quaternion overrideRotation;
+        [ClientRpc]
+        private void SetRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams = default)
+        {
+            movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
+            overrideRotation = newRotation;
+            applyOverrideRotation = true;
+        }
+
         public float playerObjectTeleportThreshold = 2;
         public float locomotionDistanceScaleThreshold = 0.25f;
         public float rootMotionDistanceScaleThreshold = 0.2f;
@@ -69,6 +90,12 @@ namespace Vi.Player
 
         private PlayerMovementHandler movementHandler;
 
+        private void Awake()
+        {
+            currentPosition = transform.position;
+            currentRotation = transform.rotation;
+        }
+
         private void Start()
         {
             movementHandler = GetComponent<PlayerMovementHandler>();
@@ -79,8 +106,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
-            currentPosition = transform.position;
-            currentRotation = transform.rotation;
+            latestServerState = new StatePayload(0, currentPosition, currentRotation);
 
             if (IsServer)
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
@@ -122,12 +148,6 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
-
-                //// If we are in the middle of root motion, do not take an input vector
-                //if (playerCharacter.characterLocomotion.currentLocomotionSystem.isRootMoving)
-                //{
-                //    inputPayload.inputVector = Vector2.zero;
-                //}
 
                 SendInputServerRpc(inputPayload);
 
@@ -217,10 +237,10 @@ namespace Vi.Player
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
-
+            if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
+            if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
             return statePayload;
         }
-
 
         private void OnDrawGizmos()
         {

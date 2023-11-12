@@ -8,6 +8,22 @@ namespace Vi.Core
 {
     public class MovementHandler : NetworkBehaviour
     {
+        public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            if (TryGetComponent(out CharacterController characterController))
+            {
+                characterController.enabled = false;
+                transform.position = newPosition;
+                transform.rotation = newRotation;
+                characterController.enabled = true;
+            }
+            else
+            {
+                transform.position = newPosition;
+                transform.rotation = newRotation;
+            }
+        }
+
         protected void Start()
         {
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
@@ -29,6 +45,16 @@ namespace Vi.Core
         void OnMove(InputValue value)
         {
             moveInput = value.Get<Vector2>();
+        }
+
+        private NetworkVariable<bool> canMove = new NetworkVariable<bool>();
+
+        public bool CanMove() { return canMove.Value; }
+
+        public void SetCanMove(bool canMove)
+        {
+            if (!IsServer) { Debug.LogError("MovementHandler.SetCanMove() should only be called on the server!"); return; }
+            this.canMove.Value = canMove;
         }
     }
 }

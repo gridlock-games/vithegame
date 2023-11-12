@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class BotController : NetworkBehaviour
+    public class BotController : MovementHandler
     {
         [SerializeField] private bool lightAttack;
         [SerializeField] private bool isBlocking;
@@ -17,7 +17,14 @@ namespace Vi.ArtificialIntelligence
         private WeaponHandler weaponHandler;
         private Attributes attributes;
 
-        private void Start()
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            currentPosition.Value = newPosition;
+            currentRotation.Value = newRotation;
+            base.SetOrientation(newPosition, newRotation);
+        }
+
+        private new void Start()
         {
             characterController = GetComponent<CharacterController>();
             animationHandler = GetComponent<AnimationHandler>();
@@ -34,6 +41,26 @@ namespace Vi.ArtificialIntelligence
 
             if (IsServer)
             {
+                Vector3 animDir = Vector3.zero;
+                if (!NetworkManager.LocalClient.PlayerObject) { return; }
+
+                if (attackPlayer)
+                {
+                    Vector3 dir = (NetworkManager.LocalClient.PlayerObject.transform.position - transform.position).normalized;
+                    dir.Scale(new Vector3(1, 0, 1));
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
+
+                    if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f)
+                    {
+                        SendMessage("OnLightAttack");
+                    }
+                    else
+                    {
+                        characterController.Move(5 * Time.deltaTime * dir);
+                        animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
+                    }
+                }
+
                 if (animationHandler.ShouldApplyRootMotion())
                 {
                     characterController.Move(animationHandler.ApplyLocalRootMotion());
@@ -50,11 +77,19 @@ namespace Vi.ArtificialIntelligence
 
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
+
+                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * 5));
+                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * 5));
             }
             else
             {
-                characterController.Move(currentPosition.Value - transform.position);
+                Vector3 dir = currentPosition.Value - transform.position;
+                Vector3 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
+                characterController.Move(dir);
                 transform.rotation = currentRotation.Value;
+
+                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * 5));
+                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * 5));
             }
 
             /*

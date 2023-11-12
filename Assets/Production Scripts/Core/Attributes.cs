@@ -10,42 +10,28 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
-        [SerializeField] private GameLogicManager.Team defaultTeam;
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 
-        public int GetPlayerDataId() { return animationHandler.GetPlayerDataId(); }
-        public GameLogicManager.Team GetTeam() { return team.Value; }
-        private NetworkVariable<GameLogicManager.Team> team = new NetworkVariable<GameLogicManager.Team>(GameLogicManager.Team.Competitor);
+        private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
+        public int GetPlayerDataId() { return playerDataId.Value; }
+        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).playerName.ToString(); }
+        public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
-        private void OnTeamChange(GameLogicManager.Team prev, GameLogicManager.Team current)
-        {
-            if (IsServer) { StartCoroutine(ChangeTeamStruct()); }
-        }
-
-        private IEnumerator ChangeTeamStruct()
-        {
-            yield return new WaitUntil(() => GameLogicManager.Singleton.ContainsId(GetPlayerDataId()));
-
-            GameLogicManager.PlayerData prevPlayerData = GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId());
-            GameLogicManager.Singleton.SetPlayerData(new GameLogicManager.PlayerData(GetPlayerDataId(), prevPlayerData.playerName.ToString(), prevPlayerData.characterIndex, prevPlayerData.skinIndex, team.Value));
-        }
+        private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
         public Color GetRelativeTeamColor()
         {
-            if (GameLogicManager.Singleton.GetGameMode() == GameLogicManager.GameMode.Duel) { return Color.black; }
-
-            if (!IsClient) { return GameLogicManager.GetTeamColor(team.Value); }
-            else if (!GameLogicManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == GameLogicManager.Team.Spectator) { return GameLogicManager.GetTeamColor(team.Value); }
+            if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
+            else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
+            else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!GameLogicManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
-            else if (GameLogicManager.CanHit(GameLogicManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, GameLogicManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
+            else if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }
 
         [SerializeField] private GameObject teamIndicatorPrefab;
-        //[SerializeField] private Vector3 indicatorLocalPosition;
-        //[SerializeField] private float glowAmount = 1;
 
         [Header("Health")]
         [SerializeField] private float maxHP = 100;
@@ -140,7 +126,6 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            team.OnValueChanged += OnTeamChange;
             HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
@@ -150,18 +135,18 @@ namespace Vi.Core
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
-            team.Value = defaultTeam;
+
+            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
         {
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
-            GameLogicManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
+            PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
 
         public override void OnNetworkDespawn()
         {
-            team.OnValueChanged -= OnTeamChange;
             HP.OnValueChanged -= OnHPChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
@@ -169,7 +154,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
-            if (IsServer) { GameLogicManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
+            if (IsServer) { PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
         }
 
         private void OnHPChanged(float prev, float current)
@@ -254,7 +239,7 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (!GameLogicManager.Singleton.CanHit(attacker, this)) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
 
             if (isMeleeHit)
             {
@@ -298,6 +283,7 @@ namespace Vi.Core
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+                GameModeManagers.GameModeManager.Singleton.OnPlayerKill(attacker, this);
             }
 
             if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }

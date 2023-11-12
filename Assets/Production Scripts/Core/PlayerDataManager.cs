@@ -5,10 +5,11 @@ using Unity.Netcode;
 using Unity.Collections;
 using Vi.ScriptableObjects;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
-    public class GameLogicManager : NetworkBehaviour
+    public class PlayerDataManager : NetworkBehaviour
     {
         [SerializeField] private GameMode gameModeValue;
         [SerializeField] private GameObject spectatorPrefab;
@@ -44,20 +45,17 @@ namespace Vi.Core
 
         public static Color GetTeamColor(Team team)
         {
-            try
-            {
-                return (Color)typeof(Color).GetProperty(team.ToString().ToLowerInvariant()).GetValue(null, null);
-            }
-            catch
-            {
-                return Color.black;
-            }
+            ColorUtility.TryParseHtmlString(team.ToString(), out Color color);
+            return color;
         }
 
         public enum GameMode
         {
-            Duel,
-            TeamElimination
+            None,
+            FreeForAll,
+            TeamElimination,
+            EssenceWar,
+            OutputRush
         }
 
         public enum Team
@@ -93,6 +91,7 @@ namespace Vi.Core
         public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
+            if (team == Team.Competitor) { return attributesList; }
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
                 if (kvp.Value == attributesToExclude) { continue; }
@@ -101,10 +100,26 @@ namespace Vi.Core
             return attributesList;
         }
 
+        public List<Attributes> GetActivePlayers(Attributes attributesToExclude = null)
+        {
+            List<Attributes> attributesList = new List<Attributes>();
+            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator))
+            {
+                if (kvp.Value == attributesToExclude) { continue; }
+                attributesList.Add(kvp.Value);
+            }
+            return attributesList;
+        }
+
+        public KeyValuePair<int, Attributes> GetLocalPlayer()
+        {
+            return localPlayers.First(kvp => kvp.Value.IsLocalPlayer);
+        }
+
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public int AddBotData(Attributes botPlayerObject, int characterIndex, int skinIndex, Team team)
+        public int AddBotData(int characterIndex, int skinIndex, Team team)
         {
             if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
 
@@ -129,7 +144,7 @@ namespace Vi.Core
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == clientId)
+                if (playerData.id == clientId)
                 {
                     return playerData;
                 }
@@ -142,7 +157,7 @@ namespace Vi.Core
         {
             foreach (PlayerData playerData in playerDataList)
             {
-                if (playerData.clientId == (int)clientId)
+                if (playerData.id == (int)clientId)
                 {
                     return playerData;
                 }
@@ -173,8 +188,8 @@ namespace Vi.Core
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
-        public static GameLogicManager Singleton { get { return _singleton; } }
-        private static GameLogicManager _singleton;
+        public static PlayerDataManager Singleton { get { return _singleton; } }
+        private static PlayerDataManager _singleton;
 
         public const char payloadParseString = '|';
 
@@ -183,6 +198,22 @@ namespace Vi.Core
             _singleton = this;
             DontDestroyOnLoad(gameObject);
             playerDataList = new NetworkList<PlayerData>();
+            SceneManager.sceneLoaded += OnSceneLoad;
+            SceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private PlayerSpawnPoints playerSpawnPoints;
+        void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        {
+            foreach (GameObject g in scene.GetRootGameObjects())
+            {
+                if (g.TryGetComponent(out playerSpawnPoints)) { break; }
+            }
+        }
+
+        void OnSceneUnload(Scene scene)
+        {
+            playerSpawnPoints = null;
         }
 
         private void Start()
@@ -205,32 +236,76 @@ namespace Vi.Core
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
+            if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                //localPlayers[networkListEvent.Value.clientId].GetComponent<AnimationHandler>().SetCharacterSkin(networkListEvent.Value.characterIndex, networkListEvent.Value.skinIndex);
+                StartCoroutine(SpawnPlayer(networkListEvent.Value));
             }
         }
 
         private void OnClientConnectCallback(ulong clientId)
         {
-            if (IsServer) { StartCoroutine(SpawnPlayer(clientId)); }
+
         }
 
-        private IEnumerator SpawnPlayer(ulong clientId)
+        public void RespawnPlayers()
         {
-            yield return new WaitUntil(() => playerDataList.Contains(new PlayerData((int)clientId)));
+            playerSpawnPoints.ResetSpawnTracker();
+            foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
+            {
+                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, kvp.Value.GetTeam());
+                Vector3 spawnPosition = transformData.position;
+                Quaternion spawnRotation = transformData.rotation;
+
+                kvp.Value.ResetStats(false);
+                kvp.Value.GetComponent<AnimationHandler>().CancelAllActions();
+                kvp.Value.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+            }
+        }
+
+        public void SetAllPlayersMobility(bool canMove)
+        {
+            foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
+            {
+                kvp.Value.GetComponent<MovementHandler>().SetCanMove(canMove);
+            }
+        }
+
+        private IEnumerator SpawnPlayer(PlayerData playerData)
+        {
+            if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
+            if (localPlayers.ContainsKey(playerData.id)) { yield break; }
+
+            Vector3 spawnPosition = Vector3.zero;
+            Quaternion spawnRotation = Quaternion.identity;
+
+            if (playerSpawnPoints)
+            {
+                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                spawnPosition = transformData.position;
+                spawnRotation = transformData.rotation;
+            }
 
             GameObject playerObject;
-            if (GetPlayerData(clientId).team == Team.Spectator)
+            if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
-                playerObject = Instantiate(spectatorPrefab);
+                playerObject = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
             else
             {
-                playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData((int)clientId).characterIndex].playerPrefab);
+                if (playerData.id >= 0)
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                else
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData((int)clientId).clientId, true);
+            playerObject.GetComponent<AnimationHandler>().SetCharacterSkin(playerData.characterIndex, playerData.skinIndex);
+            playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+
+            if (playerData.id >= 0)
+                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+            else
+                playerObject.GetComponent<NetworkObject>().Spawn(true);
         }
 
         private void OnClientDisconnectCallback(ulong clientId)
@@ -238,7 +313,7 @@ namespace Vi.Core
             RemovePlayerData((int)clientId);
         }
 
-        private NetworkList<PlayerData> playerDataList;
+        public NetworkList<PlayerData> playerDataList;
 
         [System.Serializable]
         private struct TeamDefinition
@@ -310,24 +385,24 @@ namespace Vi.Core
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
-            public int clientId;
+            public int id;
             public FixedString32Bytes playerName;
             public int characterIndex;
             public int skinIndex;
             public Team team;
 
-            public PlayerData(int clientId)
+            public PlayerData(int id)
             {
-                this.clientId = clientId;
+                this.id = id;
                 playerName = "Player Name";
                 characterIndex = 0;
                 skinIndex = 0;
                 team = Team.Environment;
             }
 
-            public PlayerData(int clientId, string playerName, int characterIndex, int skinIndex, Team team)
+            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team)
             {
-                this.clientId = clientId;
+                this.id = id;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
@@ -336,7 +411,7 @@ namespace Vi.Core
 
             public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
             {
-                this.clientId = (int)clientId;
+                id = (int)clientId;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
@@ -345,12 +420,12 @@ namespace Vi.Core
 
             public bool Equals(PlayerData other)
             {
-                return clientId == other.clientId;
+                return id == other.id;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
-                serializer.SerializeValue(ref clientId);
+                serializer.SerializeValue(ref id);
                 serializer.SerializeValue(ref playerName);
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
