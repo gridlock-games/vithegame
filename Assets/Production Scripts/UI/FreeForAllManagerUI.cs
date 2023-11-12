@@ -29,9 +29,12 @@ namespace Vi.UI
 
         protected void Update()
         {
-            roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
+            if (freeForAllManager.ShouldUpdateRoundTimerDisplay()) { roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString(); }
             leftScoreText.text = freeForAllManager.GetLeftScoreString();
             rightScoreText.text = freeForAllManager.GetRightScoreString();
+
+            nextGameActionText.enabled = freeForAllManager.ShouldDisplayNextGameAction();
+            nextGameActionText.text = freeForAllManager.GetNextGameActionTimerDisplayString();
         }
     }
 }

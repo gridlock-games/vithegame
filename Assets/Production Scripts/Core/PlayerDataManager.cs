@@ -263,6 +263,14 @@ namespace Vi.Core
             }
         }
 
+        public void SetAllPlayersMobility(bool canMove)
+        {
+            foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
+            {
+                kvp.Value.GetComponent<MovementHandler>().SetCanMove(canMove);
+            }
+        }
+
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }

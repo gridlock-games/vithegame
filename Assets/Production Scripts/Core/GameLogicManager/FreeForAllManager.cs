@@ -10,6 +10,15 @@ namespace Vi.Core.GameModeManagers
     {
         [SerializeField] private int killsToWin = 2;
 
+        public override void OnPlayerKill(Attributes killer, Attributes victim)
+        {
+            base.OnPlayerKill(killer, victim);
+            if (scoreList[scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()))].kills >= killsToWin)
+            {
+                OnGameEnd();
+            }
+        }
+
         public string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }

@@ -46,5 +46,15 @@ namespace Vi.Core
         {
             moveInput = value.Get<Vector2>();
         }
+
+        private NetworkVariable<bool> canMove = new NetworkVariable<bool>();
+
+        public bool CanMove() { return canMove.Value; }
+
+        public void SetCanMove(bool canMove)
+        {
+            if (!IsServer) { Debug.LogError("MovementHandler.SetCanMove() should only be called on the server!"); return; }
+            this.canMove.Value = canMove;
+        }
     }
 }

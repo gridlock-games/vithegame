@@ -10,12 +10,14 @@ namespace Vi.Core.GameModeManagers
 
         [SerializeField] private GameObject UIPrefab;
         [SerializeField] private float roundDuration = 30;
+        [SerializeField] private float nextGameActionDuration = 5;
 
         private NetworkVariable<float> roundTimer = new NetworkVariable<float>();
+        private NetworkVariable<float> nextGameActionTimer = new NetworkVariable<float>();
 
         protected NetworkList<PlayerScore> scoreList;
 
-        public void OnPlayerKill(Attributes killer, Attributes victim)
+        public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
             PlayerScore killerScore = scoreList[killerIndex];
@@ -28,8 +30,12 @@ namespace Vi.Core.GameModeManagers
             scoreList[victimIndex] = victimScore;
         }
 
-        public float GetRoundTimerValue() { return roundTimer.Value; }
+        protected virtual void OnGameEnd()
+        {
+            roundTimer.Value = 0;
+        }
 
+        public bool ShouldUpdateRoundTimerDisplay() { return nextGameActionTimer.Value <= 0; }
         public string GetRoundTimerDisplayString()
         {
             int minutes = (int)roundTimer.Value / 60;
@@ -37,17 +43,17 @@ namespace Vi.Core.GameModeManagers
             return minutes.ToString() + ":" + seconds.ToString("F2");
         }
 
+        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public string GetNextGameActionTimerDisplayString() { return ((int)Mathf.Ceil(nextGameActionTimer.Value)).ToString(); }
+
         public override void OnNetworkSpawn()
         {
             roundTimer.Value = roundDuration;
             if (IsServer)
             {
                 PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
-                //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayers())
-                //{
-                //    scoreList.Add(new PlayerScore(attributes.GetPlayerDataId()));
-                //}
-                roundTimer.OnValueChanged += OnRoundTimerEndChange;
+                roundTimer.OnValueChanged += OnRoundTimerChange;
+                nextGameActionTimer.OnValueChanged += OnNextGameTimerChange;
             }
         }
 
@@ -73,15 +79,27 @@ namespace Vi.Core.GameModeManagers
             if (IsServer)
             {
                 PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
-                roundTimer.OnValueChanged -= OnRoundTimerEndChange;
+                roundTimer.OnValueChanged -= OnRoundTimerChange;
+                nextGameActionTimer.OnValueChanged -= OnNextGameTimerChange;
             }
         }
 
-        private void OnRoundTimerEndChange(float prev, float current)
+        private void OnRoundTimerChange(float prev, float current)
         {
+            PlayerDataManager.Singleton.SetAllPlayersMobility(current <= 0);
+
             if (current == 0 & prev > 0)
             {
                 Debug.Log("Round over");
+                nextGameActionTimer.Value = nextGameActionDuration;
+            }
+        }
+
+        private void OnNextGameTimerChange(float prev, float current)
+        {
+            if (current == 0 & prev > 0)
+            {
+                Debug.Log("Next Game Action Timer over");
                 PlayerDataManager.Singleton.RespawnPlayers();
                 roundTimer.Value = roundDuration;
             }
@@ -104,6 +122,7 @@ namespace Vi.Core.GameModeManagers
             if (!IsServer) { return; }
 
             roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+            nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
         }
 
         protected struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>
