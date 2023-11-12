@@ -29,6 +29,7 @@ namespace Vi.UI
         protected void Update()
         {
             roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
+            roundTimerText.color = freeForAllManager.Overtime ? Color.red : Color.white;
             leftScoreText.text = freeForAllManager.GetLeftScoreString();
             rightScoreText.text = freeForAllManager.GetRightScoreString();
 

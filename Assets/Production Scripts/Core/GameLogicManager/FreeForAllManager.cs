@@ -49,6 +49,25 @@ namespace Vi.Core.GameModeManagers
             roundResultMessage.Value = message;
         }
 
+        protected override void OnRoundTimerEnd()
+        {
+            List<int> highestKillIdList = new List<int>();
+            foreach (PlayerScore playerScore in GetHighestKillPlayers())
+            {
+                highestKillIdList.Add(playerScore.id);
+            }
+
+            if (highestKillIdList.Count == 1)
+            {
+                OnRoundEnd(highestKillIdList.ToArray());
+            }
+            else
+            {
+                roundTimer.Value = 30;
+                Overtime = true;
+            }
+        }
+
         public string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }

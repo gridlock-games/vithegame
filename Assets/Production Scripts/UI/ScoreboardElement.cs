@@ -20,18 +20,24 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
+            UpdateUI();
             gameObject.SetActive(attributes);
         }
 
         private void Update()
         {
             if (!attributes) { gameObject.SetActive(false); return; }
+            UpdateUI();
+        }
+
+        void UpdateUI()
+        {
             GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(attributes.GetPlayerDataId());
             playerNameText.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
             roundWinsText.text = playerScore.roundWins.ToString();
             killsText.text = playerScore.kills.ToString();
             deathsText.text = playerScore.deaths.ToString();
-            kdRatioText.text = (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+            kdRatioText.text = playerScore.deaths == 0 ? "0.00" : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
         }
     }
 }

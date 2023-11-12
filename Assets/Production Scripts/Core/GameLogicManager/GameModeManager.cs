@@ -12,14 +12,16 @@ namespace Vi.Core.GameModeManagers
 
         [SerializeField] private GameObject UIPrefab;
         [SerializeField] private int numberOfRoundsWinsToWinGame = 2;
-        [SerializeField] private float roundDuration = 30;
+        [SerializeField] protected float roundDuration = 30;
         [SerializeField] private float nextGameActionDuration = 5;
 
-        private NetworkVariable<float> roundTimer = new NetworkVariable<float>();
+        protected NetworkVariable<float> roundTimer = new NetworkVariable<float>();
         private NetworkVariable<float> nextGameActionTimer = new NetworkVariable<float>();
 
         protected NetworkVariable<FixedString64Bytes> roundResultMessage = new NetworkVariable<FixedString64Bytes>();
         protected NetworkVariable<FixedString64Bytes> gameEndMessage = new NetworkVariable<FixedString64Bytes>();
+
+        public bool Overtime { get; protected set; }
 
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
@@ -50,6 +52,7 @@ namespace Vi.Core.GameModeManagers
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
+            Overtime = false;
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {
@@ -115,12 +118,34 @@ namespace Vi.Core.GameModeManagers
         {
             if (current <= 0 & prev > 0)
             {
-                List<int> highestKillIdList = new List<int>();
-                foreach (PlayerScore playerScore in GetHighestKillPlayers())
+                OnRoundTimerEnd();
+            }
+        }
+
+        protected virtual void OnRoundTimerEnd()
+        {
+            List<int> highestKillIdList = new List<int>();
+            foreach (PlayerScore playerScore in GetHighestKillPlayers())
+            {
+                highestKillIdList.Add(playerScore.id);
+            }
+            OnRoundEnd(highestKillIdList.ToArray());
+        }
+
+        private void OnNextGameActionTimerChange(float prev, float current)
+        {
+            PlayerDataManager.Singleton.SetAllPlayersMobility(current <= 0);
+            if (current == 0 & prev > 0)
+            {
+                if (gameOver)
                 {
-                    highestKillIdList.Add(playerScore.id);
+                    NetworkManager.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
                 }
-                OnRoundEnd(highestKillIdList.ToArray());
+                else
+                {
+                    PlayerDataManager.Singleton.RespawnPlayers();
+                    roundTimer.Value = roundDuration;
+                }
             }
         }
 
@@ -147,24 +172,6 @@ namespace Vi.Core.GameModeManagers
                 }
             }
             return highestKillPlayerScores;
-        }
-
-        private void OnNextGameActionTimerChange(float prev, float current)
-        {
-            PlayerDataManager.Singleton.SetAllPlayersMobility(current <= 0);
-
-            if (current == 0 & prev > 0)
-            {
-                if (gameOver)
-                {
-                    NetworkManager.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
-                }
-                else
-                {
-                    PlayerDataManager.Singleton.RespawnPlayers();
-                    roundTimer.Value = roundDuration;
-                }
-            }
         }
 
         protected void Awake()
