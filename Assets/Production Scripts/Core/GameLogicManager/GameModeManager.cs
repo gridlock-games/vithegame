@@ -64,6 +64,12 @@ namespace Vi.Core.GameModeManagers
                 if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
             }
 
+            for (int i = 0; i < scoreList.Count; i++)
+            {
+                PlayerScore playerScore = scoreList[i];
+                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
+            }
+
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
@@ -209,6 +215,14 @@ namespace Vi.Core.GameModeManagers
                 kills = 0;
                 deaths = 0;
                 roundWins = 0;
+            }
+
+            public PlayerScore(int id, int roundWins)
+            {
+                this.id = id;
+                kills = 0;
+                deaths = 0;
+                this.roundWins = roundWins;
             }
 
             public bool Equals(PlayerScore other)

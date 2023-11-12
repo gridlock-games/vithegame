@@ -294,7 +294,6 @@ GameObject:
   m_Component:
   - component: {fileID: 728445160}
   - component: {fileID: 728445158}
-  - component: {fileID: 728445164}
   - component: {fileID: 728445163}
   - component: {fileID: 728445162}
   m_Layer: 0
@@ -391,24 +390,6 @@ MonoBehaviour:
   teamDefinitions:
   - team: 2
     clientId: 0
---- !u!114 &728445164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 728445157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50f7a50a6fc2eb741930d8e071d5c916, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
-    type: 3}
-  numberOfRoundsWinsToWinGame: 1
-  roundDuration: 10
-  nextGameActionDuration: 5
-  killsToWinRound: 2
 --- !u!1 &730000690
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +440,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f7a50a6fc2eb741930d8e071d5c916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UIPrefab: {fileID: 0}
+  UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
+    type: 3}
   numberOfRoundsWinsToWinGame: 2
   roundDuration: 30
   nextGameActionDuration: 5
