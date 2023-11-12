@@ -12,7 +12,6 @@ namespace Vi.Core.GameModeManagers
 
         [SerializeField] private GameObject UIPrefab;
         [SerializeField] private int numberOfRoundsWinsToWinGame = 2;
-        [SerializeField] private int numberOfRounds = 2;
         [SerializeField] private float roundDuration = 30;
         [SerializeField] private float nextGameActionDuration = 5;
 
@@ -49,7 +48,6 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Returning to lobby!";
         }
 
-        protected int roundCount;
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
             bool shouldEndGame = false;
