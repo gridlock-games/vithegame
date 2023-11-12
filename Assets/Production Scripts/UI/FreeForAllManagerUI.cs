@@ -11,7 +11,7 @@ namespace Vi.UI
         [SerializeField] protected Text leftScoreText;
         [SerializeField] protected Text rightScoreText;
         [SerializeField] protected Text roundTimerText;
-        [SerializeField] protected Text nextGameActionText;
+        [SerializeField] protected Text gameEndText;
         [SerializeField] protected Text roundResultText;
 
         protected FreeForAllManager freeForAllManager;
@@ -20,7 +20,6 @@ namespace Vi.UI
         {
             freeForAllManager = GetComponentInParent<FreeForAllManager>();
 
-            nextGameActionText.enabled = false;
             roundResultText.enabled = false;
 
             leftScoreText.text = "Your Team: ";
@@ -29,12 +28,14 @@ namespace Vi.UI
 
         protected void Update()
         {
-            if (freeForAllManager.ShouldUpdateRoundTimerDisplay()) { roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString(); }
+            roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
             leftScoreText.text = freeForAllManager.GetLeftScoreString();
             rightScoreText.text = freeForAllManager.GetRightScoreString();
 
-            nextGameActionText.enabled = freeForAllManager.ShouldDisplayNextGameAction();
-            nextGameActionText.text = freeForAllManager.GetNextGameActionTimerDisplayString();
+            roundResultText.enabled = freeForAllManager.ShouldDisplayNextGameAction();
+            roundResultText.text = freeForAllManager.GetRoundResultMessage() + freeForAllManager.GetNextGameActionTimerDisplayString();
+
+            gameEndText.text = freeForAllManager.GetGameEndMessage();
         }
     }
 }

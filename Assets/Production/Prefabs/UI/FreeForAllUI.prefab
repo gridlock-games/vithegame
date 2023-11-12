@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 8968936229286705305}
   - component: {fileID: 142572404864897860}
   m_Layer: 0
-  m_Name: Next Game Action Text Background
+  m_Name: Game End Text Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114,7 +114,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 804.7807, y: 99.6288}
+  m_SizeDelta: {x: 474.2623, y: 99.5082}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4097134337240977548
 CanvasRenderer:
@@ -318,7 +318,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 145}
-  m_SizeDelta: {x: 474.34198, y: 99.6288}
+  m_SizeDelta: {x: 803.7705, y: 99.5082}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5694737114806260832
 CanvasRenderer:
@@ -909,7 +909,7 @@ GameObject:
   - component: {fileID: 1680025896115781662}
   - component: {fileID: 7511053481140976657}
   m_Layer: 5
-  m_Name: Next Game Action Text
+  m_Name: Game End Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -976,7 +976,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: NEXT ROUND IN 5!
+  m_Text: GAME END
 --- !u!114 &1680025896115781662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1420,7 +1420,7 @@ MonoBehaviour:
   leftScoreText: {fileID: 2294628410116897582}
   rightScoreText: {fileID: 2390153396020369329}
   roundTimerText: {fileID: 7100053581447861232}
-  nextGameActionText: {fileID: 6287037704251600050}
+  gameEndText: {fileID: 6287037704251600050}
   roundResultText: {fileID: 5669168531654275004}
 --- !u!1 &7837106804767106401
 GameObject:
@@ -1807,7 +1807,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GAME END
+  m_Text: NEXT ROUND IN 5!
 --- !u!114 &52586394218298062
 MonoBehaviour:
   m_ObjectHideFlags: 0

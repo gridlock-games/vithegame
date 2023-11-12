@@ -31,7 +31,7 @@ namespace Vi.Player
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (CanMove()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation); }
+            if (!CanMove()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation); }
 
             if (attributes.ShouldApplyAilmentRotation())
             {
