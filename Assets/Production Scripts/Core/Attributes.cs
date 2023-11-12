@@ -17,6 +17,9 @@ namespace Vi.Core
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).playerName.ToString(); }
         public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
+        private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
+
         public Color GetRelativeTeamColor()
         {
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
@@ -132,6 +135,8 @@ namespace Vi.Core
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
+
+            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
@@ -278,6 +283,7 @@ namespace Vi.Core
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+                GameModeManagers.GameModeManager.Singleton.OnPlayerKill(attacker, this);
             }
 
             if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }

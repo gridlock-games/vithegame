@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Vi.Core;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    public class GameModeManagerUI : MonoBehaviour
+    public class FreeForAllManagerUI : MonoBehaviour
     {
         [SerializeField] protected Text leftScoreText;
         [SerializeField] protected Text rightScoreText;
@@ -14,11 +14,11 @@ namespace Vi.UI
         [SerializeField] protected Text nextGameActionText;
         [SerializeField] protected Text roundResultText;
 
-        protected GameModeManager gameModeManager;
+        protected FreeForAllManager freeForAllManager;
 
         protected void Start()
         {
-            gameModeManager = GetComponentInParent<GameModeManager>();
+            freeForAllManager = GetComponentInParent<FreeForAllManager>();
 
             nextGameActionText.enabled = false;
             roundResultText.enabled = false;
@@ -29,7 +29,9 @@ namespace Vi.UI
 
         protected void Update()
         {
-            roundTimerText.text = gameModeManager.GetRoundTimerDisplayString();
+            roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
+            leftScoreText.text = freeForAllManager.GetLeftScoreString();
+            rightScoreText.text = freeForAllManager.GetRightScoreString();
         }
     }
 }

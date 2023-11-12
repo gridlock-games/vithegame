@@ -294,9 +294,9 @@ GameObject:
   m_Component:
   - component: {fileID: 728445160}
   - component: {fileID: 728445158}
+  - component: {fileID: 728445164}
   - component: {fileID: 728445163}
   - component: {fileID: 728445162}
-  - component: {fileID: 728445164}
   m_Layer: 0
   m_Name: GameLogicManager
   m_TagString: Untagged
@@ -377,7 +377,17 @@ MonoBehaviour:
   spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
     type: 3}
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
-  gameModeInfos: []
+  gameModeInfos:
+  - gameMode: 0
+    possibleTeams: 02000000
+  - gameMode: 1
+    possibleTeams: 02000000
+  - gameMode: 2
+    possibleTeams: 0300000007000000
+  - gameMode: 3
+    possibleTeams: 0300000007000000
+  - gameMode: 4
+    possibleTeams: 0300000007000000
   teamDefinitions:
   - team: 2
     clientId: 0
@@ -395,7 +405,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
     type: 3}
-  roundDuration: 10
+  roundDuration: 60
+  killsToWin: 2
 --- !u!1 &1014662595
 GameObject:
   m_ObjectHideFlags: 0

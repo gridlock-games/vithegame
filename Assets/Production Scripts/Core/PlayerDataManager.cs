@@ -100,6 +100,22 @@ namespace Vi.Core
             return attributesList;
         }
 
+        public List<Attributes> GetActivePlayers(Attributes attributesToExclude = null)
+        {
+            List<Attributes> attributesList = new List<Attributes>();
+            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator))
+            {
+                if (kvp.Value == attributesToExclude) { continue; }
+                attributesList.Add(kvp.Value);
+            }
+            return attributesList;
+        }
+
+        public KeyValuePair<int, Attributes> GetLocalPlayer()
+        {
+            return localPlayers.First(kvp => kvp.Value.IsLocalPlayer);
+        }
+
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
@@ -289,7 +305,7 @@ namespace Vi.Core
             RemovePlayerData((int)clientId);
         }
 
-        private NetworkList<PlayerData> playerDataList;
+        public NetworkList<PlayerData> playerDataList;
 
         [System.Serializable]
         private struct TeamDefinition
