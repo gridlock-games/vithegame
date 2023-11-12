@@ -22,14 +22,22 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayer().Key));
-
-            foreach (PlayerScore playerScore in scoreList)
+            List<PlayerScore> scoreList = new List<PlayerScore>();
+            PlayerScore localPlayerScore;
+            foreach (PlayerScore playerScore in this.scoreList)
             {
-                if (playerScore.kills > scoreList[localIndex].kills) { return PlayerDataManager.Singleton.GetPlayerData(playerScore.id).playerName + ": " + playerScore.kills.ToString(); }
+                if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayer().Key)
+                {
+                    localPlayerScore = playerScore;
+                }
+                else
+                {
+                    scoreList.Add(playerScore);
+                }
             }
-
-            return "";
+            // Find player score with highest kills
+            scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+            return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).playerName + ": " + scoreList[0].kills.ToString();
         }
     }
 }
