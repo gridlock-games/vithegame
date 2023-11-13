@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Player
 {
@@ -34,44 +35,41 @@ namespace Vi.Player
             }
         }
 
-        //[SerializeField] private GameObject scoreboardPrefab;
-        //void OnScoreboardToggle()
-        //{
-            
-        //}
-
-        //[SerializeField] private GameObject inventoryPrefab;
-        //GameObject inventoryObject;
-        //bool inventoryEnabled;
-        //void OnInventoryToggle()
-        //{
-        //    //if (pauseEnabled) { return; }
-
-        //    inventoryEnabled = !inventoryEnabled;
-        //    if (inventoryEnabled)
-        //    {
-        //        Cursor.lockState = CursorLockMode.None;
-        //        playerHUD.SetActive(false);
-        //        inventoryObject = Instantiate(inventoryPrefab, transform);
-        //        playerInput.SwitchCurrentActionMap("Inventory");
-        //    }
-        //    else
-        //    {
-        //        Cursor.lockState = CursorLockMode.Locked;
-        //        playerHUD.SetActive(true);
-        //        Destroy(inventoryObject);
-        //        playerInput.SwitchCurrentActionMap("Base");
-        //    }
-        //}
-
-        [SerializeField] private GameObject pausePrefab;
-        GameObject pauseObject;
-        void OnPause()
+        [SerializeField] private GameObject scoreboardPrefab;
+        GameObject scoreboardInstance;
+        void OnScoreboard(InputValue value)
         {
-            if (pauseObject)
+            if (!GameModeManager.Singleton) { return; }
+            if (pauseInstance) { return; }
+            if (value.isPressed)
+            {
+                scoreboardInstance = Instantiate(scoreboardPrefab);
+            }
+            else
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                pauseObject.GetComponent<Menu>().DestroyAllMenus();
+                Destroy(scoreboardInstance);
+            }
+            if (playerUIInstance)
+                playerUIInstance.SetActive(!value.isPressed);
+            if (spectatorUIInstance)
+                spectatorUIInstance.SetActive(!value.isPressed);
+        }
+
+        void OnHeavyAttack()
+        {
+            if (scoreboardInstance) { Cursor.lockState = CursorLockMode.None; }
+        }
+
+        [SerializeField] private GameObject pausePrefab;
+        GameObject pauseInstance;
+        void OnPause()
+        {
+            if (scoreboardInstance) { return; }
+            if (pauseInstance)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
                 if (spectatorUIInstance)
@@ -85,7 +83,7 @@ namespace Vi.Player
                     playerUIInstance.SetActive(false);
                 if (spectatorUIInstance)
                     spectatorUIInstance.SetActive(false);
-                pauseObject = Instantiate(pausePrefab, transform);
+                pauseInstance = Instantiate(pausePrefab, transform);
                 playerInput.SwitchCurrentActionMap("Menu");
             }
         }

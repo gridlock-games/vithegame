@@ -8,14 +8,63 @@ namespace Vi.Core.GameModeManagers
 {
     public class FreeForAllManager : GameModeManager
     {
-        [SerializeField] private int killsToWin = 2;
+        [SerializeField] private int killsToWinRound = 2;
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            roundResultMessage.Value = "Free for all starting! ";
+        }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
-            if (scoreList[scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()))].kills >= killsToWin)
+            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
+            if (scoreList[killerIndex].kills >= killsToWinRound)
             {
-                OnGameEnd();
+                OnRoundEnd(new int[] { killer.GetPlayerDataId() });
+            }
+        }
+
+        protected override void OnGameEnd(int[] winningPlayersDataIds)
+        {
+            base.OnGameEnd(winningPlayersDataIds);
+            roundResultMessage.Value = "Game over! ";
+            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).playerName + " wins the free for all!";
+        }
+
+        protected override void OnRoundEnd(int[] winningPlayersDataIds)
+        {
+            base.OnRoundEnd(winningPlayersDataIds);
+            if (gameOver) { return; }
+            string message;
+            if (winningPlayersDataIds.Length > 1)
+            {
+                message = winningPlayersDataIds.Length.ToString() + " players are tied for first place! ";
+            }
+            else
+            {
+                message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).playerName + " has won the round! ";
+            }
+            roundResultMessage.Value = message;
+        }
+
+        protected override void OnRoundTimerEnd()
+        {
+            List<int> highestKillIdList = new List<int>();
+            foreach (PlayerScore playerScore in GetHighestKillPlayers())
+            {
+                highestKillIdList.Add(playerScore.id);
+            }
+
+            if (highestKillIdList.Count == 1)
+            {
+                OnRoundEnd(highestKillIdList.ToArray());
+            }
+            else
+            {
+                roundTimer.Value = 30;
+                Overtime = true;
             }
         }
 
