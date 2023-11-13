@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Unity.Collections;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -86,9 +87,10 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
+            scoreList.OnListChanged += OnScoreListChange;
             if (IsServer)
             {
-                PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
+                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
             }
@@ -96,29 +98,54 @@ namespace Vi.Core.GameModeManagers
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
-        public void OnPlayerDataListChange(NetworkListEvent<PlayerDataManager.PlayerData> networkListEvent)
-        {
-            if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Add)
-            {
-                scoreList.Add(new PlayerScore(networkListEvent.Value.id));
-            }
-            else if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Remove)
-            {
-                scoreList.Remove(new PlayerScore(networkListEvent.Value.id));
-            }
-        }
-
-        public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
-
         public override void OnNetworkDespawn()
         {
+            scoreList.OnListChanged -= OnScoreListChange;
             if (IsServer)
             {
-                PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
+                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
         }
+
+        //public void OnPlayerDataListChange(NetworkListEvent<PlayerDataManager.PlayerData> networkListEvent)
+        //{
+        //    if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Add)
+        //    {
+        //        scoreList.Add(new PlayerScore(networkListEvent.Value.id));
+        //    }
+        //    else if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Remove)
+        //    {
+        //        scoreList.Remove(new PlayerScore(networkListEvent.Value.id));
+        //    }
+        //}
+
+        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
+        {
+            //Debug.Log(networkListEvent.Type + " " + networkListEvent.Value.id);
+        }
+
+        public void AddPlayerScore(int id)
+        {
+            if (!IsSpawned)
+            {
+                StartCoroutine(WaitForSpawnToAddPlayerData(id));
+            }
+            else
+            {
+                if (scoreList.Contains(new PlayerScore(id))) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
+                scoreList.Add(new PlayerScore(id));
+            }
+        }
+
+        private IEnumerator WaitForSpawnToAddPlayerData(int id)
+        {
+            yield return new WaitUntil(() => IsSpawned);
+            AddPlayerScore(id);
+        }
+
+        public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
 
         private void OnRoundTimerChange(float prev, float current)
         {

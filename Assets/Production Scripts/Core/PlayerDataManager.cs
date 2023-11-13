@@ -122,22 +122,29 @@ namespace Vi.Core
         public int AddBotData(int characterIndex, int skinIndex, Team team)
         {
             if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
-
             botClientId--;
             PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId*-1).ToString(), characterIndex, skinIndex, team);
-
-            if (IsSpawned)
-                playerDataList.Add(botData);
-            else
-                StartCoroutine(WaitForSpawnToAddPlayerData(botData));
-
+            AddPlayerData(botData);
             return botClientId;
+        }
+
+        private void AddPlayerData(PlayerData playerData)
+        {
+            if (!IsSpawned)
+            {
+                StartCoroutine(WaitForSpawnToAddPlayerData(playerData));
+            }
+            else
+            {
+                playerDataList.Add(playerData);
+                GameModeManagers.GameModeManager.Singleton.AddPlayerScore(playerData.id);
+            }
         }
 
         private IEnumerator WaitForSpawnToAddPlayerData(PlayerData playerData)
         {
             yield return new WaitUntil(() => IsSpawned);
-            playerDataList.Add(playerData);
+            AddPlayerData(playerData);
         }
 
         public PlayerData GetPlayerData(int clientId)
@@ -371,16 +378,7 @@ namespace Vi.Core
                 if (clientId == teamDefinition.clientId) { clientTeam = teamDefinition.team; }
             }
 
-            if (clientId != NetworkManager.ServerClientId)
-                playerDataList.Add(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam));
-            else
-                StartCoroutine(OnHostConnect(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam)));
-        }
-
-        private IEnumerator OnHostConnect(PlayerData playerData)
-        {
-            yield return new WaitUntil(() => IsSpawned);
-            playerDataList.Add(playerData);
+            AddPlayerData(new PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam));
         }
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
