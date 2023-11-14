@@ -38,7 +38,7 @@ namespace Vi.Player
             {
                 moveForwardTarget = 0;
                 moveSidesTarget = 0;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation);
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
             }
 
             if (attributes.ShouldApplyAilmentRotation())
@@ -47,7 +47,7 @@ namespace Vi.Player
 
                 // Set position to current position
                 characterController.enabled = false;
-                transform.position = movementPrediction.currentPosition;
+                transform.position = movementPrediction.CurrentPosition;
                 characterController.enabled = true;
 
                 characterController.Move(animationHandler.ApplyNetworkRootMotion());
@@ -65,7 +65,7 @@ namespace Vi.Player
 
             // Set position to current position
             characterController.enabled = false;
-            transform.position = movementPrediction.currentPosition;
+            transform.position = movementPrediction.CurrentPosition;
             characterController.enabled = true;
 
             Vector3 animDir = Vector3.zero;
@@ -105,7 +105,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                    newRotation = Quaternion.RotateTowards(inputPayload.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
                 }
             }
             else
@@ -154,85 +154,34 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
-            UpdateLocomotion2();
+            UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        private void UpdateLocomotion2()
-        {
-
-        }
-
         private void UpdateLocomotion()
         {
-            float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
+            //if (localDistance > movementPrediction.playerObjectTeleportThreshold)
+            //{
+            //    //Debug.Log("Teleporting player: " + OwnerClientId);
+            //    characterController.enabled = false;
+            //    transform.position = movementPrediction.CurrentPosition;
+            //    characterController.enabled = true;
+            //}
+
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+
+            Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
+            characterController.enabled = false;
+            transform.position += movement;
+            characterController.enabled = true;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
             else if (weaponHandler.IsAiming())
-                transform.rotation = movementPrediction.currentRotation;
+                transform.rotation = movementPrediction.CurrentRotation;
             else
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.currentRotation, Time.deltaTime * angularSpeed);
-
-            Vector3 rootMotion = animationHandler.ApplyLocalRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
-            
-            if (localDistance > movementPrediction.playerObjectTeleportThreshold)
-            {
-                //Debug.Log("Teleporting player: " + OwnerClientId);
-                characterController.enabled = false;
-                transform.position = movementPrediction.currentPosition;
-                characterController.enabled = true;
-            }
-            else if (animationHandler.ShouldApplyRootMotion()) // is root moving
-            {
-                rootMotion = transform.rotation * rootMotion;
-
-                // Calculate rotation to look at the current network position
-                Quaternion relativeRotation = Quaternion.identity;
-                if ((movementPrediction.currentPosition - transform.position).normalized != Vector3.zero) { relativeRotation = Quaternion.LookRotation((movementPrediction.currentPosition - transform.position).normalized, transform.up); }
-
-                // Calculate rotation to look in the direction of our movement
-                Quaternion movementRotation = Quaternion.identity;
-                if (rootMotion.normalized != Vector3.zero) { movementRotation = Quaternion.LookRotation(rootMotion.normalized, transform.up); }
-
-                // Apply the direction of movement to the direction to move towards the current network position
-                Quaternion finalRotation = relativeRotation * movementRotation;
-
-                // Invert movement along the local x axis, idk why I need to do this
-                rootMotion.x *= -1;
-                // Apply rotation to movement vector
-                rootMotion = finalRotation * rootMotion;
-
-                // Scale movement vector according to distance between network position and local position
-                //rootMotion = rootMotion.normalized * localDistance;
-                if (localDistance > movementPrediction.rootMotionDistanceScaleThreshold) { rootMotion *= localDistance * (1/movementPrediction.rootMotionDistanceScaleThreshold); }
-
-                float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + rootMotion);
-                if (localDistance < afterMoveDistance)
-                {
-                    rootMotion = (movementPrediction.currentPosition - transform.position) * Time.deltaTime;
-                }
-
-                characterController.Move(rootMotion);
-            }
-            else
-            {
-                Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
-                //Debug.Log(targetDirection + " " + targetDirection.magnitude + " " + localDistance);
-                //if (targetDirection.magnitude > 0.1f)
-                //{
-                //    Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
-                //    targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
-                //}
-                //targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                //targetDirection *= Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount();
-                //targetDirection *= runSpeed;
-                //targetDirection *= localDistance > 1 ? localDistance : 1 + localDistance;
-                //targetDirection += Physics.gravity;
-                characterController.Move(targetDirection);
-            }
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * angularSpeed);
         }
 
         void OnLook(InputValue value)
