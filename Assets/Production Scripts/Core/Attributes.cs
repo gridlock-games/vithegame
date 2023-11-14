@@ -283,7 +283,7 @@ namespace Vi.Core
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-                GameModeManagers.GameModeManager.Singleton.OnPlayerKill(attacker, this);
+                if (GameModeManagers.GameModeManager.Singleton) { GameModeManagers.GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
             if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }

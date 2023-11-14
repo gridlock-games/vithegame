@@ -47,7 +47,7 @@ namespace Vi.Core
             moveInput = value.Get<Vector2>();
         }
 
-        private NetworkVariable<bool> canMove = new NetworkVariable<bool>();
+        private NetworkVariable<bool> canMove = new NetworkVariable<bool>(true);
 
         public bool CanMove() { return canMove.Value; }
 

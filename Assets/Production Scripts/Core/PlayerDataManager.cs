@@ -137,7 +137,7 @@ namespace Vi.Core
             else
             {
                 playerDataList.Add(playerData);
-                GameModeManagers.GameModeManager.Singleton.AddPlayerScore(playerData.id);
+                if (GameModeManagers.GameModeManager.Singleton) { GameModeManagers.GameModeManager.Singleton.AddPlayerScore(playerData.id); }
             }
         }
 
