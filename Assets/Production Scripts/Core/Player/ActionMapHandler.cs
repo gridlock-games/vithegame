@@ -22,7 +22,7 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
-                //Cursor.lockState = CursorLockMode.Locked;
+                Cursor.lockState = CursorLockMode.Locked;
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
