@@ -29,13 +29,15 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
+        private float moveForwardTarget;
+        private float moveSidesTarget;
         private bool isGrounded;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (!CanMove())
             {
-                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), 0, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
-                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), 0, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
+                moveForwardTarget = 0;
+                moveSidesTarget = 0;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation);
             }
 
@@ -113,10 +115,8 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             //if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
-
+            moveForwardTarget = animDir.z;
+            moveSidesTarget = animDir.x;
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
@@ -154,7 +154,14 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
-            UpdateLocomotion();
+            UpdateLocomotion2();
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget, Time.deltaTime * runAnimationTransitionSpeed));
+        }
+
+        private void UpdateLocomotion2()
+        {
+
         }
 
         private void UpdateLocomotion()

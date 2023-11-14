@@ -351,15 +351,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botDefinitions:
-  - enabled: 1
+  - enabled: 0
     characterIndex: 0
     skinIndex: 0
     team: 2
-  - enabled: 1
+  - enabled: 0
     characterIndex: 2
     skinIndex: 0
     team: 2
-  - enabled: 1
+  - enabled: 0
     characterIndex: 1
     skinIndex: 1
     team: 2
@@ -596,7 +596,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 583301f4049dec04c832348179990c21, type: 2}
-    TickRate: 120
+    TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1
     ConnectionData: 
