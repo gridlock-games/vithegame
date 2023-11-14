@@ -14,13 +14,15 @@ namespace Vi.ArtificialIntelligence
         {
             foreach (BotDefinition botDefinition in botDefinitions)
             {
+                if (!botDefinition.enabled) { continue; }
                 PlayerDataManager.Singleton.AddBotData(botDefinition.characterIndex, botDefinition.skinIndex, botDefinition.team);
             }
         }
 
         [System.Serializable]
-        private struct BotDefinition
+        private class BotDefinition
         {
+            public bool enabled = true;
             public int characterIndex;
             public int skinIndex;
             public PlayerDataManager.Team team;

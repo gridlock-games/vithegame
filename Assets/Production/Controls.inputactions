@@ -164,11 +164,11 @@
                 },
                 {
                     "name": "",
-                    "id": "db4dbbf7-46b8-470e-8686-0d8c5ce594f7",
-                    "path": "<Touchscreen>/primaryTouch/delta",
+                    "id": "5679ec3b-e81b-42e2-aa4c-9fa6b3bec338",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Mobile",
+                    "groups": "Keyboard & Mouse",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -227,6 +227,17 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b90efffb-cc63-44ed-a24a-6efb6205fa47",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "",
@@ -798,23 +809,17 @@
             "devices": [
                 {
                     "devicePath": "<Keyboard>",
-                    "isOptional": false,
+                    "isOptional": true,
                     "isOR": false
                 },
                 {
                     "devicePath": "<Mouse>",
-                    "isOptional": false,
+                    "isOptional": true,
                     "isOR": false
-                }
-            ]
-        },
-        {
-            "name": "Mobile",
-            "bindingGroup": "Mobile",
-            "devices": [
+                },
                 {
-                    "devicePath": "<Touchscreen>",
-                    "isOptional": false,
+                    "devicePath": "<Gamepad>",
+                    "isOptional": true,
                     "isOR": false
                 }
             ]

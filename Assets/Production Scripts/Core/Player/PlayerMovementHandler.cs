@@ -29,9 +29,15 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
+        private bool isGrounded;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (!CanMove()) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation); }
+            if (!CanMove())
+            {
+                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), 0, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
+                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), 0, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.currentPosition, movementPrediction.currentRotation);
+            }
 
             if (attributes.ShouldApplyAilmentRotation())
             {
@@ -53,12 +59,6 @@ namespace Vi.Player
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPos, attributes.GetAilmentRotation());
             }
 
-            Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
-
-            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-            targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-            targetDirection += Physics.gravity;
-
             Vector3 oldPosition = transform.position;
 
             // Set position to current position
@@ -66,6 +66,7 @@ namespace Vi.Player
             transform.position = movementPrediction.currentPosition;
             characterController.enabled = true;
 
+            Vector3 animDir = Vector3.zero;
             // Apply movement to charactercontroller
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             if (animationHandler.ShouldApplyRootMotion())
@@ -75,8 +76,14 @@ namespace Vi.Player
             }
             else
             {
+                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
+                targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
+                targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                targetDirection += Physics.gravity;
                 characterController.Move(attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection);
+                animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
+            isGrounded = characterController.isGrounded;
 
             Vector3 newPosition = transform.position;
 
@@ -103,6 +110,12 @@ namespace Vi.Player
             {
                 newRotation = inputPayload.rotation;
             }
+
+            animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
+            //if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
+
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x, 1f / NetworkManager.NetworkTickSystem.TickRate * runAnimationTransitionSpeed));
 
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
@@ -146,21 +159,7 @@ namespace Vi.Player
 
         private void UpdateLocomotion()
         {
-            Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
-            if (targetDirection.magnitude > 0.1f)
-            {
-                Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
-                targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
-            }
-
-            Vector3 animDir = targetDirection;
-
-            targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-
             float localDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position);
-            //if (localDistance > movementPrediction.playerObjectTeleportThreshold) { targetDirection *= localDistance * (1/movementPrediction.playerObjectTeleportThreshold); }
-            
-            targetDirection += Physics.gravity;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
@@ -206,20 +205,27 @@ namespace Vi.Player
                 float afterMoveDistance = Vector3.Distance(movementPrediction.currentPosition, transform.position + rootMotion);
                 if (localDistance < afterMoveDistance)
                 {
-                    rootMotion = movementPrediction.currentPosition - transform.position;
+                    rootMotion = (movementPrediction.currentPosition - transform.position) * Time.deltaTime;
                 }
 
                 characterController.Move(rootMotion);
             }
             else
             {
-                characterController.Move(targetDirection * Time.deltaTime);
+                Vector3 targetDirection = movementPrediction.currentPosition - transform.position;
+                //Debug.Log(targetDirection + " " + targetDirection.magnitude + " " + localDistance);
+                //if (targetDirection.magnitude > 0.1f)
+                //{
+                //    Vector2 normalizedHorizontalMovement = new Vector2(targetDirection.x, targetDirection.z).normalized;
+                //    targetDirection = new Vector3(normalizedHorizontalMovement.x, targetDirection.y, normalizedHorizontalMovement.y);
+                //}
+                //targetDirection *= characterController.isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                //targetDirection *= Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount();
+                //targetDirection *= runSpeed;
+                //targetDirection *= localDistance > 1 ? localDistance : 1 + localDistance;
+                //targetDirection += Physics.gravity;
+                characterController.Move(targetDirection);
             }
-
-            animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x > 0.9f ? Mathf.RoundToInt(animDir.x) : animDir.x, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
         void OnLook(InputValue value)
