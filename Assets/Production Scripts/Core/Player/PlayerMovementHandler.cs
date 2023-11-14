@@ -161,27 +161,29 @@ namespace Vi.Player
 
         private void UpdateLocomotion()
         {
-            //if (localDistance > movementPrediction.playerObjectTeleportThreshold)
-            //{
-            //    //Debug.Log("Teleporting player: " + OwnerClientId);
-            //    characterController.enabled = false;
-            //    transform.position = movementPrediction.CurrentPosition;
-            //    characterController.enabled = true;
-            //}
+            if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
+            {
+                //Debug.Log("Teleporting player: " + OwnerClientId);
+                characterController.enabled = false;
+                transform.position = movementPrediction.CurrentPosition;
+                characterController.enabled = true;
+            }
+            else
+            {
+                Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
+                characterController.enabled = false;
+                transform.position += movement;
+                characterController.enabled = true;
+            }
 
             animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
-
-            Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
-            characterController.enabled = false;
-            transform.position += movement;
-            characterController.enabled = true;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
             else if (weaponHandler.IsAiming())
-                transform.rotation = movementPrediction.CurrentRotation;
+                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
             else
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * angularSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
         }
 
         void OnLook(InputValue value)

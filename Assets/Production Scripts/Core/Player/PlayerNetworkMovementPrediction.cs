@@ -72,11 +72,8 @@ namespace Vi.Player
         }
 
         public float playerObjectTeleportThreshold = 2;
-        public float locomotionDistanceScaleThreshold = 0.25f;
-        public float rootMotionDistanceScaleThreshold = 0.2f;
 
         private const int BUFFER_SIZE = 1024;
-
 
         private int currentTick;
         private StatePayload[] stateBuffer;
