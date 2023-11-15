@@ -29,15 +29,18 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
-        private float moveForwardTarget;
-        private float moveSidesTarget;
+        private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (!CanMove())
             {
-                moveForwardTarget = 0;
-                moveSidesTarget = 0;
+                if (IsOwner)
+                {
+                    moveForwardTarget.Value = 0;
+                    moveSidesTarget.Value = 0;
+                }
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
             }
 
@@ -115,8 +118,11 @@ namespace Vi.Player
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             //if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
-            moveForwardTarget = animDir.z;
-            moveSidesTarget = animDir.x;
+            if (IsOwner)
+            {
+                moveForwardTarget.Value = animDir.z;
+                moveSidesTarget.Value = animDir.x;
+            }
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
@@ -155,8 +161,8 @@ namespace Vi.Player
         private void Update()
         {
             UpdateLocomotion();
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget, Time.deltaTime * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
         private void UpdateLocomotion()
