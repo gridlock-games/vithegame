@@ -282,7 +282,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &728445157
 GameObject:
@@ -351,13 +351,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botDefinitions:
-  - characterIndex: 0
+  - enabled: 0
+    characterIndex: 0
     skinIndex: 0
     team: 2
-  - characterIndex: 2
+  - enabled: 0
+    characterIndex: 2
     skinIndex: 0
     team: 2
-  - characterIndex: 1
+  - enabled: 0
+    characterIndex: 1
     skinIndex: 1
     team: 2
 --- !u!114 &728445163
@@ -407,7 +410,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &730000691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,7 +495,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1014662597
 MonoBehaviour:
@@ -593,7 +596,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 583301f4049dec04c832348179990c21, type: 2}
-    TickRate: 120
+    TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1
     ConnectionData: 
@@ -791,7 +794,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: -24.79, y: 0, z: 0}
 --- !u!1 &1686335000
 GameObject:

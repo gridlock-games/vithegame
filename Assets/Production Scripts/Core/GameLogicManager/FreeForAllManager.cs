@@ -95,7 +95,10 @@ namespace Vi.Core.GameModeManagers
             }
             // Find player score with highest kills
             scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
-            return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).playerName + ": " + scoreList[0].kills.ToString();
+            if (scoreList.Count > 0)
+                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).playerName + ": " + scoreList[0].kills.ToString();
+            else
+                return string.Empty;
         }
     }
 }

@@ -59,7 +59,8 @@ namespace Vi.Player
             GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.yellow;
-            GUI.Label(new Rect(0, Screen.height - 15, 100, 10), "FPS: " + Mathf.RoundToInt(frameCount).ToString(), style);
+            style.fontSize = 24;
+            GUI.Label(new Rect(0, Screen.height - 25, 100, 10), "FPS: " + Mathf.RoundToInt(frameCount).ToString(), style);
             GUI.UnfocusWindow();
         }
 

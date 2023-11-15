@@ -72,11 +72,8 @@ namespace Vi.Player
         }
 
         public float playerObjectTeleportThreshold = 2;
-        public float locomotionDistanceScaleThreshold = 0.25f;
-        public float rootMotionDistanceScaleThreshold = 0.2f;
 
         private const int BUFFER_SIZE = 1024;
-
 
         private int currentTick;
         private StatePayload[] stateBuffer;
@@ -85,15 +82,15 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
 
-        public Vector3 currentPosition { get; private set; }
-        public Quaternion currentRotation { get; private set; }
+        public Vector3 CurrentPosition { get; private set; }
+        public Quaternion CurrentRotation { get; private set; }
 
         private PlayerMovementHandler movementHandler;
 
         private void Awake()
         {
-            currentPosition = transform.position;
-            currentRotation = transform.rotation;
+            CurrentPosition = transform.position;
+            CurrentRotation = transform.rotation;
         }
 
         private void Start()
@@ -106,7 +103,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
-            latestServerState = new StatePayload(0, currentPosition, currentRotation);
+            latestServerState = new StatePayload(0, CurrentPosition, CurrentRotation);
 
             if (IsServer)
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
@@ -159,8 +156,8 @@ namespace Vi.Player
             }
             else // If we are not the owner of this object
             {
-                currentPosition = latestServerState.position;
-                currentRotation = latestServerState.rotation;
+                CurrentPosition = latestServerState.position;
+                CurrentRotation = latestServerState.rotation;
             }
 
             // If we are the host, this is also called in the HandleServerTick() method
@@ -179,8 +176,8 @@ namespace Vi.Player
                 inputBuffer[bufferIndex] = inputPayload;
 
                 StatePayload statePayload = ProcessInput(inputPayload);
-                currentPosition = statePayload.position;
-                currentRotation = statePayload.rotation;
+                CurrentPosition = statePayload.position;
+                CurrentRotation = statePayload.rotation;
 
                 stateBuffer[bufferIndex] = statePayload;
             }
@@ -199,8 +196,8 @@ namespace Vi.Player
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
-                currentPosition = latestServerState.position;
-                currentRotation = latestServerState.rotation;
+                CurrentPosition = latestServerState.position;
+                CurrentRotation = latestServerState.rotation;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
@@ -225,8 +222,8 @@ namespace Vi.Player
                     tickToProcess++;
                 }
 
-                currentPosition = currentPositionCached;
-                currentRotation = currentRotationCached;
+                CurrentPosition = currentPositionCached;
+                CurrentRotation = currentRotationCached;
             }
         }
 
@@ -253,7 +250,7 @@ namespace Vi.Player
             else
                 Gizmos.color = Color.black;
 
-            Gizmos.DrawSphere(currentPosition, 0.25f);
+            Gizmos.DrawSphere(CurrentPosition, 0.25f);
         }
     }
 }
