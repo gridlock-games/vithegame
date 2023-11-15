@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
-using TMPro;
+using UnityEngine.UI;
 using System.Linq;
 
 namespace Vi.UI
@@ -22,6 +22,10 @@ namespace Vi.UI
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
+        [Header("Death UI")]
+        [SerializeField] private PlayerCard killerCard;
+        [SerializeField] private GameObject deathUIParent;
+        [SerializeField] private GameObject aliveUIParent;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -66,26 +70,40 @@ namespace Vi.UI
             }
         }
 
+        private void UpdateActiveUIElements()
+        {
+            aliveUIParent.SetActive(attributes.GetAilment() != ActionClip.Ailment.Death);
+            deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
+        }
+
         private void Update()
         {
-            foreach (StatusIcon statusIcon in statusIcons)
+            if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
-            }
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
+                }
 
-            // Order player cards by distance
-            List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
-            for (int i = 0; i < teammatePlayerCards.Length; i++)
-            {
-                if (i < teammateAttributes.Count)
+                // Order player cards by distance
+                List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                for (int i = 0; i < teammatePlayerCards.Length; i++)
                 {
-                    teammatePlayerCards[i].Initialize(teammateAttributes[i]);
-                }
-                else
-                {
-                    teammatePlayerCards[i].Initialize(null);
+                    if (i < teammateAttributes.Count)
+                    {
+                        teammatePlayerCards[i].Initialize(teammateAttributes[i]);
+                    }
+                    else
+                    {
+                        teammatePlayerCards[i].Initialize(null);
+                    }
                 }
             }
+            else
+            {
+                killerCard.Initialize(attributes.GetKiller());
+            }
+            UpdateActiveUIElements();
         }
     }
 }

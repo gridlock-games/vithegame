@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightAttack: 0
   isBlocking: 0
-  attackPlayer: 0
+  attackPlayer: 1
 --- !u!114 &1564116883212529238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,5 +139,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  botCharacterIndex: 0
-  botSkinIndex: 0

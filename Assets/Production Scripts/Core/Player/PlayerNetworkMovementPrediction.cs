@@ -229,7 +229,6 @@ namespace Vi.Player
 
         [ServerRpc] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
-
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
