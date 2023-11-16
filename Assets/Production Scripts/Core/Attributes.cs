@@ -250,6 +250,7 @@ namespace Vi.Core
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
+            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             if (isMeleeHit)
             {
@@ -487,10 +488,21 @@ namespace Vi.Core
             {
                 foreach (Collider c in GetComponentsInChildren<Collider>())
                 {
+                    if (c.GetType() == typeof(CharacterController)) { continue; }
                     c.enabled = false;
                 }
 
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+            }
+            else if (prev == ActionClip.Ailment.Death)
+            {
+                foreach (Collider c in GetComponentsInChildren<Collider>())
+                {
+                    if (c.GetType() == typeof(CharacterController)) { continue; }
+                    c.enabled = true;
+                }
+
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
         }
 

@@ -44,31 +44,33 @@ namespace Vi.ArtificialIntelligence
                 Vector3 animDir = Vector3.zero;
                 if (!NetworkManager.LocalClient.PlayerObject) { return; }
 
-                if (attackPlayer)
+                if (attackPlayer & attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
                 {
                     Vector3 dir = (NetworkManager.LocalClient.PlayerObject.transform.position - transform.position).normalized;
                     dir.Scale(new Vector3(1, 0, 1));
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
 
-                    if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f)
+                    if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f
+                        & NetworkManager.LocalClient.PlayerObject.GetComponent<Attributes>().GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
                     {
                         SendMessage("OnLightAttack");
                     }
                     else
                     {
-                        characterController.Move(5 * Time.deltaTime * dir);
+                        if (!animationHandler.ShouldApplyRootMotion())
+                        {
+                            characterController.Move(5 * Time.deltaTime * dir);
+                        }
                         animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
                     }
                 }
-
+                
                 if (animationHandler.ShouldApplyRootMotion())
                 {
                     characterController.Move(animationHandler.ApplyLocalRootMotion());
                 }
-                else
-                {
-                    characterController.Move(Physics.gravity);
-                }
+
+                characterController.Move(Physics.gravity);
 
                 if (attributes.ShouldApplyAilmentRotation())
                 {

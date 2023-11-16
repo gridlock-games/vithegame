@@ -29,6 +29,7 @@ namespace Vi.Core
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
+            attributes.ResetAilment();
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 
