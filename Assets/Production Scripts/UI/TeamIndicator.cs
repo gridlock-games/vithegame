@@ -9,12 +9,14 @@ namespace Vi.UI
     {
         private const float glowAmount = 2.46f;
 
+        private CharacterController characterController;
         private Attributes attributes;
         private Renderer[] renderers;
         private void Start()
         {
             attributes = GetComponentInParent<Attributes>();
             renderers = GetComponentsInChildren<Renderer>();
+            characterController = attributes.GetComponent<CharacterController>();
         }
 
         private void Update()
@@ -30,6 +32,7 @@ namespace Vi.UI
                         mat.SetFloat("_Transparency", mat.color == Color.black ? 0 : 1);
                     }
                 }
+                r.enabled = characterController.enabled;
             }
         }
     }

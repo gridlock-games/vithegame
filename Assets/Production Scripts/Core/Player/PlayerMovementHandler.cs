@@ -34,6 +34,7 @@ namespace Vi.Player
         private bool isGrounded;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
+            if (!characterController.enabled) { return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation); }
             if (!CanMove())
             {
                 if (IsOwner)
@@ -167,6 +168,8 @@ namespace Vi.Player
 
         private void UpdateLocomotion()
         {
+            if (!characterController.enabled) { return; }
+
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
             {
                 //Debug.Log("Teleporting player: " + OwnerClientId);

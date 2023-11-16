@@ -486,22 +486,14 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
-                foreach (Collider c in GetComponentsInChildren<Collider>())
-                {
-                    if (c.GetType() == typeof(CharacterController)) { continue; }
-                    c.enabled = false;
-                }
-
+                animationHandler.Animator.enabled = false;
+                if (TryGetComponent(out CharacterController characterController)) { characterController.enabled = false; }
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                foreach (Collider c in GetComponentsInChildren<Collider>())
-                {
-                    if (c.GetType() == typeof(CharacterController)) { continue; }
-                    c.enabled = true;
-                }
-
+                animationHandler.Animator.enabled = true;
+                if (TryGetComponent(out CharacterController characterController)) { characterController.enabled = false; }
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
         }

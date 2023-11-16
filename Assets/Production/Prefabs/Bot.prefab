@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightAttack: 0
   isBlocking: 0
-  attackPlayer: 1
+  attackPlayer: 0
 --- !u!114 &1564116883212529238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,7 +126,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &1564116883212529237
 MonoBehaviour:
   m_ObjectHideFlags: 0
