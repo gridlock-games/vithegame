@@ -43,49 +43,14 @@ namespace Vi.Player
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
             }
 
-            Vector3 animDir = Vector3.zero;
-            // Apply movement to charactercontroller
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
-            Vector3 movement;
-            if (animationHandler.ShouldApplyRootMotion())
-            {
-                //rootMotion += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate);
-                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
-            }
-            else
-            {
-                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
-                targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                //targetDirection += Physics.gravity;
-                movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
-                animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
-            }
-
-            RaycastHit[] allHits = Physics.CapsuleCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                                          movementPrediction.CurrentPosition + transform.up * animationHandler.LimbReferences.characterHeight,
-                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            bool bHit = false;
-            foreach (RaycastHit hit in allHits)
-            {
-                if (hit.transform.root == transform) { continue; }
-
-                bHit = true;
-                break;
-            }
-
-            Vector3 newPosition = movementPrediction.CurrentPosition;
-            if (!bHit) { newPosition += movement; }
-            isGrounded = true;
-
-            Quaternion newRotation;
+            Quaternion newRotation = movementPrediction.CurrentRotation;
             if (IsOwner)
             {
                 Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
-                    transform.rotation = attributes.GetAilmentRotation();
+                    newRotation = attributes.GetAilmentRotation();
                 if (weaponHandler.IsAiming())
                     newRotation = Quaternion.LookRotation(camDirection);
                 else
@@ -96,8 +61,58 @@ namespace Vi.Player
                 newRotation = inputPayload.rotation;
             }
 
+            Vector3 animDir = Vector3.zero;
+            // Apply movement to charactercontroller
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            Vector3 movement;
+            if (animationHandler.ShouldApplyRootMotion())
+            {
+                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+            }
+            else
+            {
+                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
+                targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
+                targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
+            }
+
+            RaycastHit[] allHits = Physics.CapsuleCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                                          movementPrediction.CurrentPosition + transform.up * animationHandler.LimbReferences.characterHeight,
+                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            Vector3 newPosition = movementPrediction.CurrentPosition;
+            bool bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                bHit = true;
+                break;
+            }
+
+            if (!bHit) { newPosition += movement; }
+
+            // Handle gravity
+            allHits = Physics.SphereCastAll(newPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                newPosition += (1f / NetworkManager.NetworkTickSystem.TickRate) * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                bHit = true;
+                break;
+            }
+            
+            if (!bHit) { newPosition += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate); }
+
+            isGrounded = true;
+
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            //if (animDir.magnitude < 0.1f) { animDir = Vector3.zero; }
             if (IsOwner)
             {
                 moveForwardTarget.Value = animDir.z;
