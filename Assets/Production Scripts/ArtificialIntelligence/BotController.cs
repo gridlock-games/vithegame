@@ -8,9 +8,8 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotController : MovementHandler
     {
-        [SerializeField] private bool lightAttack;
-        [SerializeField] private bool isBlocking;
-        [SerializeField] private bool attackPlayer;
+        [SerializeField] private bool moveToPlayer;
+        [SerializeField] private bool canLightAttack;
 
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
@@ -80,7 +79,7 @@ namespace Vi.ArtificialIntelligence
                 Vector3 animDir = Vector3.zero;
                 if (!NetworkManager.LocalClient.PlayerObject) { return; }
 
-                if (attackPlayer & attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
+                if (moveToPlayer & attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
                 {
                     Vector3 dir = (NetworkManager.LocalClient.PlayerObject.transform.position - transform.position).normalized;
                     dir.Scale(new Vector3(1, 0, 1));
@@ -90,7 +89,8 @@ namespace Vi.ArtificialIntelligence
                         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
 
                     if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f
-                        & NetworkManager.LocalClient.PlayerObject.GetComponent<Attributes>().GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
+                        & NetworkManager.LocalClient.PlayerObject.GetComponent<Attributes>().GetAilment() != ScriptableObjects.ActionClip.Ailment.Death
+                        & canLightAttack)
                     {
                         SendMessage("OnLightAttack");
                     }
