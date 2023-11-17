@@ -33,6 +33,7 @@ namespace Vi.Player
             
         }
 
+        [SerializeField] private Rigidbody movementPredictionRigidbody;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded;
@@ -85,7 +86,7 @@ namespace Vi.Player
 
             RaycastHit[] allHits = Physics.CapsuleCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
                                                           movementPrediction.CurrentPosition + transform.up * animationHandler.LimbReferences.characterHeight,
-                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction"}), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
             Vector3 newPosition = movementPrediction.CurrentPosition;
@@ -101,7 +102,7 @@ namespace Vi.Player
 
             // Handle gravity
             allHits = Physics.SphereCastAll(newPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             
             bHit = false;
@@ -142,6 +143,11 @@ namespace Vi.Player
             }
         }
 
+        private void Awake()
+        {
+            movementPredictionRigidbody.transform.SetParent(null, true);
+        }
+
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -161,6 +167,25 @@ namespace Vi.Player
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+        }
+
+        [Range(0f, 1f)] public float positionStrength = 1f;
+        //[Range(0f, 1f)] public float rotationStrength = 1f;
+        void FixedUpdate()
+        {
+            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
+            movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+
+            //Quaternion deltaRot = movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation);
+
+            //float angle;
+            //Vector3 axis;
+
+            //deltaRot.ToAngleAxis(out angle, out axis);
+
+            //if (angle > 180.0f) angle -= 360.0f;
+
+            //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
         }
 
         private void UpdateLocomotion()
