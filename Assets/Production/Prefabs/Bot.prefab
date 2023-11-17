@@ -48,9 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba99df51c81a4b42a5c6f1011b84da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightAttack: 0
-  isBlocking: 0
-  attackPlayer: 0
+  moveToPlayer: 1
+  canLightAttack: 0
 --- !u!114 &1564116883212529238
 MonoBehaviour:
   m_ObjectHideFlags: 0

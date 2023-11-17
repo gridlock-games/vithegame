@@ -40,8 +40,8 @@ namespace Vi.ArtificialIntelligence
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
+                if (hit.distance == 0) { continue; }
                 if (hit.transform.root == transform) { continue; }
-                Debug.Log(Time.time + " " + hit.transform);
                 bHit = true;
                 break;
             }
@@ -56,6 +56,7 @@ namespace Vi.ArtificialIntelligence
             bHit = false;
             foreach (RaycastHit hit in allHits)
             {
+                if (hit.distance == 0) { continue; }
                 if (hit.transform.root == transform) { continue; }
                 newPosition += Time.deltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
@@ -176,12 +177,12 @@ namespace Vi.ArtificialIntelligence
             if (Application.isPlaying)
             {
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawSphere(currentPosition.Value, 0.5f);
+                Gizmos.DrawWireSphere(currentPosition.Value, 0.25f);
             }
             else
             {
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawSphere(transform.position, 0.5f);
+                Gizmos.DrawWireSphere(transform.position, 0.25f);
             }
         }
     }
