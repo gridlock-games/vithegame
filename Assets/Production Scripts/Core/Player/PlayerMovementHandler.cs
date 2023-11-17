@@ -28,6 +28,11 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+
+        }
+
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded;
@@ -87,7 +92,7 @@ namespace Vi.Player
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
-                if (hit.transform.root == transform) { continue; }
+                if (hit.rigidbody) { continue; }
                 bHit = true;
                 break;
             }
@@ -98,12 +103,12 @@ namespace Vi.Player
             allHits = Physics.SphereCastAll(newPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
                                             animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
+            
             bHit = false;
             foreach (RaycastHit hit in allHits)
             {
                 if (hit.transform.root == transform) { continue; }
-                newPosition += (1f / NetworkManager.NetworkTickSystem.TickRate) * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                newPosition += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }

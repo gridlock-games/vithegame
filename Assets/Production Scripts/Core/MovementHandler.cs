@@ -31,6 +31,8 @@ namespace Vi.Core
             lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
         }
 
+        public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
+
         //protected void OnControllerColliderHit(ControllerColliderHit hit)
         //{
         //    Attributes attributes = hit.transform.GetComponentInParent<Attributes>();

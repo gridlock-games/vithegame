@@ -79,6 +79,11 @@ namespace Vi.Core
 
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
+
+            foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+            {
+                rb.gameObject.AddComponent<CollisionListener>();
+            }
         }
 
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
