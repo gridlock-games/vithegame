@@ -32,7 +32,6 @@ namespace Vi.UI
                         mat.SetFloat("_Transparency", mat.color == Color.black ? 0 : 1);
                     }
                 }
-                r.enabled = characterController.enabled;
             }
         }
     }

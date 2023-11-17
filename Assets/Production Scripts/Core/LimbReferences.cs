@@ -7,6 +7,11 @@ namespace Vi.Core
 {
     public class LimbReferences : MonoBehaviour
     {
+        [Header("Character Bound Settings")]
+        public float characterHeight = 1.5f;
+        public float characterRadius = 0.5f;
+        public Vector3 bottomPointOfCapsuleOffset = new Vector3(0, 0.5f, 0);
+
         public enum Hand
         {
             RightHand,
