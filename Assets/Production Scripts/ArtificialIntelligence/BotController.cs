@@ -12,7 +12,6 @@ namespace Vi.ArtificialIntelligence
         [SerializeField] private bool isBlocking;
         [SerializeField] private bool attackPlayer;
 
-        private CharacterController characterController;
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -26,10 +25,47 @@ namespace Vi.ArtificialIntelligence
 
         private new void Start()
         {
-            characterController = GetComponent<CharacterController>();
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponent<Attributes>();
+        }
+
+        private void TryMove(Vector3 movement)
+        {
+            RaycastHit[] allHits = Physics.CapsuleCastAll(transform.position + transform.rotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                                          transform.position + transform.up * animationHandler.LimbReferences.characterHeight,
+                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            Vector3 newPosition = transform.position;
+            bool bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                Debug.Log(Time.time + " " + hit.transform);
+                bHit = true;
+                break;
+            }
+
+            if (!bHit) { newPosition += movement; }
+
+            // Handle gravity
+            allHits = Physics.SphereCastAll(newPosition + transform.rotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+            bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                newPosition += Time.deltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                bHit = true;
+                break;
+            }
+
+            if (!bHit) { newPosition += Physics.gravity * Time.deltaTime; }
+
+            transform.position = newPosition;
         }
 
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
@@ -37,10 +73,10 @@ namespace Vi.ArtificialIntelligence
         private void Update()
         {
             if (!IsSpawned) { return; }
-            if (!characterController.enabled) { return; }
 
             if (IsServer)
             {
+                Vector3 movement = Vector3.zero;
                 Vector3 animDir = Vector3.zero;
                 if (!NetworkManager.LocalClient.PlayerObject) { return; }
 
@@ -48,7 +84,10 @@ namespace Vi.ArtificialIntelligence
                 {
                     Vector3 dir = (NetworkManager.LocalClient.PlayerObject.transform.position - transform.position).normalized;
                     dir.Scale(new Vector3(1, 0, 1));
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
+                    if (dir == Vector3.zero)
+                        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.identity, Time.deltaTime * 540);
+                    else
+                        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
 
                     if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f
                         & NetworkManager.LocalClient.PlayerObject.GetComponent<Attributes>().GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
@@ -59,7 +98,7 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (!animationHandler.ShouldApplyRootMotion())
                         {
-                            characterController.Move(5 * Time.deltaTime * dir);
+                            movement = 5 * Time.deltaTime * dir;
                         }
                         animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
                     }
@@ -67,16 +106,15 @@ namespace Vi.ArtificialIntelligence
                 
                 if (animationHandler.ShouldApplyRootMotion())
                 {
-                    characterController.Move(animationHandler.ApplyLocalRootMotion());
+                    movement = animationHandler.ApplyLocalRootMotion();
                 }
-
-                characterController.Move(Physics.gravity);
 
                 if (attributes.ShouldApplyAilmentRotation())
                 {
                     transform.rotation = attributes.GetAilmentRotation();
                 }
 
+                TryMove(movement);
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
 
@@ -87,7 +125,7 @@ namespace Vi.ArtificialIntelligence
             {
                 Vector3 dir = currentPosition.Value - transform.position;
                 Vector3 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(dir, 1));
-                characterController.Move(dir);
+                TryMove(dir);
                 transform.rotation = currentRotation.Value;
 
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z > 0.9f ? Mathf.RoundToInt(animDir.z) : animDir.z, Time.deltaTime * 5));
@@ -135,10 +173,16 @@ namespace Vi.ArtificialIntelligence
 
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying) { return; }
-
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(transform.position, 0.5f);
+            if (Application.isPlaying)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawSphere(currentPosition.Value, 0.5f);
+            }
+            else
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawSphere(transform.position, 0.5f);
+            }
         }
     }
 }
