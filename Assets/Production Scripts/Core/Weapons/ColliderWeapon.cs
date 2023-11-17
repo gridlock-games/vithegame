@@ -20,7 +20,8 @@ namespace Vi.Core
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
-            if (other.TryGetComponent(out Attributes attributes))
+            Attributes attributes = other.GetComponentInParent<Attributes>();
+            if (attributes)
             {
                 if (parentAttributes == attributes) { return; }
                 if (!CanHit(attributes)) { return; }

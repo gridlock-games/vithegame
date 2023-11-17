@@ -30,7 +30,7 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-
+            
         }
 
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -92,7 +92,7 @@ namespace Vi.Player
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
-                if (hit.rigidbody) { continue; }
+                if (hit.transform.root == transform) { continue; }
                 bHit = true;
                 break;
             }
