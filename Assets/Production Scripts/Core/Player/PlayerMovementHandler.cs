@@ -142,7 +142,6 @@ namespace Vi.Player
             }
         }
 
-        private Rigidbody rb;
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -150,7 +149,6 @@ namespace Vi.Player
         protected new void Start()
         {
             base.Start();
-            rb = GetComponent<Rigidbody>();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
