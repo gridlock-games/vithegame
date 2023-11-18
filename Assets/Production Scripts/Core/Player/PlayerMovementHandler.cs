@@ -31,13 +31,13 @@ namespace Vi.Player
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             Debug.Log(Time.time + " enter: " + collision.collider);
-            targetPosition = movementPredictionRigidbody.position;
+            targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             Debug.Log(Time.time + " stay: " + collision.collider);
-            targetPosition = movementPredictionRigidbody.position;
+            targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
         [SerializeField] private Rigidbody movementPredictionRigidbody;
@@ -90,7 +90,7 @@ namespace Vi.Player
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
-            targetPosition += movement;
+            targetMovementPredictionRigidbodyPosition += movement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
@@ -139,22 +139,16 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        [SerializeField] private Vector3 targetPosition;
-        private float positionStrength = 1f;
+        private Vector3 targetMovementPredictionRigidbodyPosition;
+        private float positionStrength = 1;
+        //private float rotationStrength = 1;
         void FixedUpdate()
         {
-            Vector3 deltaPos = targetPosition - movementPredictionRigidbody.position;
+            Vector3 deltaPos = targetMovementPredictionRigidbodyPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
-            //Quaternion deltaRot = movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation);
-
-            //float angle;
-            //Vector3 axis;
-
-            //deltaRot.ToAngleAxis(out angle, out axis);
-
+            //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
             //if (angle > 180.0f) angle -= 360.0f;
-
             //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
         }
 
@@ -197,7 +191,7 @@ namespace Vi.Player
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(movementPredictionRigidbody.transform.position, 0.25f);
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(targetPosition, 0.25f);
+            Gizmos.DrawWireSphere(targetMovementPredictionRigidbodyPosition, 0.25f);
         }
     }
 }
