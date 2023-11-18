@@ -7,7 +7,7 @@ namespace Vi.Core
     public class CollisionListener : MonoBehaviour
     {
         private MovementHandler movementHandler;
-        private void Start()
+        private void Awake()
         {
             movementHandler = GetComponentInParent<MovementHandler>();
         }

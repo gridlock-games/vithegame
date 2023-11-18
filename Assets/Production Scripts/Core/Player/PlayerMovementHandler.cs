@@ -30,11 +30,13 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
+            Debug.Log(Time.time + " enter: " + collision.collider);
             targetPosition = movementPredictionRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
+            Debug.Log(Time.time + " stay: " + collision.collider);
             targetPosition = movementPredictionRigidbody.position;
         }
 
@@ -115,11 +117,6 @@ namespace Vi.Player
             }
         }
 
-        private void Awake()
-        {
-            movementPredictionRigidbody.transform.SetParent(null, true);
-        }
-
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -127,6 +124,7 @@ namespace Vi.Player
         protected new void Start()
         {
             base.Start();
+            movementPredictionRigidbody.transform.SetParent(null, true);
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();

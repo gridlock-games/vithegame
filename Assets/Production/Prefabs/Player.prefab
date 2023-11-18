@@ -374,6 +374,7 @@ GameObject:
   - component: {fileID: 2687468814373766751}
   - component: {fileID: 3111202478790198839}
   - component: {fileID: 6750394594016454577}
+  - component: {fileID: 92972833588077725}
   m_Layer: 6
   m_Name: Prediction
   m_TagString: Untagged
@@ -426,6 +427,18 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &92972833588077725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758667554989270931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 664bc6ed4af86e64f8574f38134c8a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8060453032727797339
 PrefabInstance:
   m_ObjectHideFlags: 0
