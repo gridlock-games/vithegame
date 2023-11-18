@@ -32,6 +32,8 @@ namespace Vi.Core
         }
 
         public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
+        public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
+        public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
         //protected void OnControllerColliderHit(ControllerColliderHit hit)
         //{

@@ -240,16 +240,16 @@ namespace Vi.Player
 
         private void OnDrawGizmos()
         {
-            if (OwnerClientId == 0)
-                Gizmos.color = Color.red;
-            else if (OwnerClientId == 1)
-                Gizmos.color = Color.blue;
-            else if (OwnerClientId == 2)
-                Gizmos.color = Color.green;
-            else
-                Gizmos.color = Color.black;
+            //if (OwnerClientId == 0)
+            //    Gizmos.color = Color.red;
+            //else if (OwnerClientId == 1)
+            //    Gizmos.color = Color.blue;
+            //else if (OwnerClientId == 2)
+            //    Gizmos.color = Color.green;
+            //else
+            //    Gizmos.color = Color.black;
 
-            Gizmos.DrawSphere(CurrentPosition, 0.25f);
+            //Gizmos.DrawSphere(CurrentPosition, 0.25f);
         }
     }
 }

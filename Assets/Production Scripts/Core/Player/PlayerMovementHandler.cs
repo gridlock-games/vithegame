@@ -30,13 +30,18 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            
+            targetPosition = movementPredictionRigidbody.position;
+        }
+
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            targetPosition = movementPredictionRigidbody.position;
         }
 
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private bool isGrounded;
+        private bool isGrounded = true;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (!CanMove())
@@ -83,40 +88,7 @@ namespace Vi.Player
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
-
-            RaycastHit[] allHits = Physics.CapsuleCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                                          movementPrediction.CurrentPosition + transform.up * animationHandler.LimbReferences.characterHeight,
-                                                          animationHandler.LimbReferences.characterRadius, movement, movement.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction"}), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-            Vector3 newPosition = movementPrediction.CurrentPosition;
-            bool bHit = false;
-            foreach (RaycastHit hit in allHits)
-            {
-                if (hit.transform.root == transform) { continue; }
-                bHit = true;
-                break;
-            }
-
-            if (!bHit) { newPosition += movement; }
-
-            // Handle gravity
-            allHits = Physics.SphereCastAll(newPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-            
-            bHit = false;
-            foreach (RaycastHit hit in allHits)
-            {
-                if (hit.transform.root == transform) { continue; }
-                newPosition += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
-                bHit = true;
-                break;
-            }
-            
-            if (!bHit) { newPosition += Physics.gravity * (1f / NetworkManager.NetworkTickSystem.TickRate); }
-
-            isGrounded = true;
+            targetPosition += movement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
@@ -124,7 +96,7 @@ namespace Vi.Player
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPredictionRigidbody.position, newRotation);
         }
 
         public override void OnNetworkSpawn()
@@ -169,11 +141,11 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        [Range(0f, 1f)] public float positionStrength = 1f;
-        //[Range(0f, 1f)] public float rotationStrength = 1f;
+        [SerializeField] private Vector3 targetPosition;
+        private float positionStrength = 1f;
         void FixedUpdate()
         {
-            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
+            Vector3 deltaPos = targetPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
             //Quaternion deltaRot = movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation);
@@ -220,6 +192,14 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(movementPredictionRigidbody.transform.position, 0.25f);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(targetPosition, 0.25f);
         }
     }
 }

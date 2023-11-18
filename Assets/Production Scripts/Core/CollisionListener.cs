@@ -17,5 +17,17 @@ namespace Vi.Core
             if (collision.transform.root == transform.root) { return; }
             movementHandler.ReceiveOnCollisionEnterMessage(collision);
         }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            if (collision.transform.root == transform.root) { return; }
+            movementHandler.ReceiveOnCollisionStayMessage(collision);
+        }
+
+        private void OnCollisionExit(Collision collision)
+        {
+            if (collision.transform.root == transform.root) { return; }
+            movementHandler.ReceiveOnCollisionExitMessage(collision);
+        }
     }
 }
