@@ -39,7 +39,10 @@ namespace Vi.Player
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
+        [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
+        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private float gravitySphereCastRadius = 0.75f;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded = true;
@@ -74,8 +77,8 @@ namespace Vi.Player
             }
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * new Vector3(0, 0.5f, 0),
-                                            0.75f, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+                                            gravitySphereCastRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;
@@ -199,6 +202,12 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
         }
     }
 }
