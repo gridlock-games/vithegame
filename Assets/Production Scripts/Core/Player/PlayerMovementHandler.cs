@@ -112,16 +112,23 @@ namespace Vi.Player
             }
 
             Debug.DrawRay(movementPrediction.CurrentPosition, movement.normalized * 1, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * 1, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            // If we hit an object in the direction we are moving, we need to check if it is a stair/climbable
             if (Physics.Raycast(movementPrediction.CurrentPosition, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
             {
-                if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                // Check if we are walking up a ramp
+                if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                 {
-                    //Debug.Log(Time.time + " " + rampHit.collider + " " + rampHit.distance + " " + lowerHit.distance);
-                    if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                    // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
+                    Debug.Log(Mathf.Approximately(rampHit.distance, lowerHit.distance) + " " + rampHit.distance + " " + lowerHit.distance);
+                    if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
                     {
-                        movement.y += stairHeight / 2;
+                        Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        {
+                            //Debug.Log(Time.time + " climbing stairs");
+                            movement.y += stairHeight / 2;
+                        }
                     }
                 }
             }
