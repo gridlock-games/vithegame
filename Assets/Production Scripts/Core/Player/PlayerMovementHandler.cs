@@ -30,13 +30,11 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            Debug.Log(Time.time + " enter: " + collision.collider);
             targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            Debug.Log(Time.time + " stay: " + collision.collider);
             targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
@@ -90,6 +88,7 @@ namespace Vi.Player
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
+            
             targetMovementPredictionRigidbodyPosition += movement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
@@ -144,6 +143,22 @@ namespace Vi.Player
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
+            // Handle gravity
+            RaycastHit[] allHits = Physics.SphereCastAll(targetMovementPredictionRigidbodyPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            Vector3 gravity = Vector3.zero;
+            bool bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                gravity += Time.fixedDeltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                bHit = true;
+                break;
+            }
+            if (!bHit) { gravity += Physics.gravity * Time.fixedDeltaTime; }
+            isGrounded = bHit;
+            targetMovementPredictionRigidbodyPosition += gravity;
             Vector3 deltaPos = targetMovementPredictionRigidbodyPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
