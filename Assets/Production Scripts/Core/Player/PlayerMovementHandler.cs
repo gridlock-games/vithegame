@@ -31,12 +31,12 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
+            //targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
+            //targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
         }
 
         [SerializeField] private Rigidbody movementPredictionRigidbody;
@@ -73,6 +73,22 @@ namespace Vi.Player
                 newRotation = inputPayload.rotation;
             }
 
+            // Handle gravity
+            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
+                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            Vector3 gravity = Vector3.zero;
+            bool bHit = false;
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root == transform) { continue; }
+                gravity += Time.fixedDeltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                bHit = true;
+                break;
+            }
+            if (!bHit) { gravity += Physics.gravity * Time.fixedDeltaTime; }
+            isGrounded = bHit;
+
             Vector3 animDir = Vector3.zero;
             // Apply movement to charactercontroller
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
@@ -90,7 +106,7 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
-            Vector3 newPosition = targetMovementPredictionRigidbodyPosition + movement;
+            Vector3 newPosition = movementPrediction.CurrentPosition + movement + gravity;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
@@ -129,7 +145,6 @@ namespace Vi.Player
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
-            targetMovementPredictionRigidbodyPosition = transform.position;
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -140,35 +155,13 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        public void SetTargetMovePosition(Vector3 newPosition)
-        {
-            targetMovementPredictionRigidbodyPosition = newPosition;
-        }
-
-        private Vector3 targetMovementPredictionRigidbodyPosition;
         private float positionStrength = 1;
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
             if (attributes.GetAilment() == ActionClip.Ailment.Death) { movementPredictionRigidbody.velocity = Vector3.zero; return; }
-
-            // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(targetMovementPredictionRigidbodyPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-            Vector3 gravity = Vector3.zero;
-            bool bHit = false;
-            foreach (RaycastHit hit in allHits)
-            {
-                if (hit.transform.root == transform) { continue; }
-                gravity += Time.fixedDeltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
-                bHit = true;
-                break;
-            }
-            if (!bHit) { gravity += Physics.gravity * Time.fixedDeltaTime; }
-            isGrounded = bHit;
-            targetMovementPredictionRigidbodyPosition += gravity;
-            Vector3 deltaPos = targetMovementPredictionRigidbodyPosition - movementPredictionRigidbody.position;
+            
+            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
             //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
@@ -215,7 +208,7 @@ namespace Vi.Player
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(movementPredictionRigidbody.transform.position, 0.25f);
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(targetMovementPredictionRigidbodyPosition, 0.25f);
+            Gizmos.DrawWireSphere(movementPrediction.CurrentPosition, 0.25f);
         }
     }
 }

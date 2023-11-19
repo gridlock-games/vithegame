@@ -235,7 +235,7 @@ namespace Vi.Player
             StatePayload statePayload = movementHandler.ProcessMovement(input);
             if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
             if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
-            movementHandler.SetTargetMovePosition(statePayload.position);
+            
             return statePayload;
         }
 
