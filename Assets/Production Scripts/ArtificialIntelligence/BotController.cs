@@ -61,7 +61,7 @@ namespace Vi.ArtificialIntelligence
                     Vector3 target = new Vector3(NetworkManager.LocalClient.PlayerObject.transform.position.x, transform.position.y, NetworkManager.LocalClient.PlayerObject.transform.position.z);
                     Vector3 dir = Vector3.ClampMagnitude(target - transform.position, 1);
                     movement = isGrounded ? runSpeed * Time.fixedDeltaTime * dir : Vector3.zero;
-                    Vector3 animDir = transform.rotation * dir;
+                    Vector3 animDir = transform.rotation * new Vector3(-dir.x, dir.y, dir.z);
 
                     if (dir == Vector3.zero)
                         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.identity, Time.deltaTime * 540);

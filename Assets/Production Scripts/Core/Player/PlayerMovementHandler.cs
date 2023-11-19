@@ -90,7 +90,7 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
-            targetMovementPredictionRigidbodyPosition += movement;
+            Vector3 newPosition = targetMovementPredictionRigidbodyPosition + movement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
@@ -98,7 +98,7 @@ namespace Vi.Player
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, targetMovementPredictionRigidbodyPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
         public override void OnNetworkSpawn()
@@ -129,6 +129,7 @@ namespace Vi.Player
             weaponHandler = GetComponent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
+            targetMovementPredictionRigidbodyPosition = transform.position;
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -142,7 +143,6 @@ namespace Vi.Player
         public void SetTargetMovePosition(Vector3 newPosition)
         {
             targetMovementPredictionRigidbodyPosition = newPosition;
-            movementPredictionRigidbody.position = newPosition;
         }
 
         private Vector3 targetMovementPredictionRigidbodyPosition;

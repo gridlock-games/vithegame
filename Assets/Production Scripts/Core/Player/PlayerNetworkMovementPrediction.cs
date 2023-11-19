@@ -194,11 +194,11 @@ namespace Vi.Player
 
             if (positionError > 0.001f)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 CurrentPosition = latestServerState.position;
                 CurrentRotation = latestServerState.rotation;
-                movementHandler.SetTargetMovePosition(CurrentPosition);
+
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
 
@@ -235,6 +235,7 @@ namespace Vi.Player
             StatePayload statePayload = movementHandler.ProcessMovement(input);
             if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
             if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
+            movementHandler.SetTargetMovePosition(statePayload.position);
             return statePayload;
         }
 
