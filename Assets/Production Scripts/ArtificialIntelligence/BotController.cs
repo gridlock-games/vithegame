@@ -63,11 +63,14 @@ namespace Vi.ArtificialIntelligence
                     movement = isGrounded ? runSpeed * Time.fixedDeltaTime * dir : Vector3.zero;
                     Vector3 animDir = transform.rotation * new Vector3(-dir.x, dir.y, dir.z);
 
-                    if (dir == Vector3.zero)
-                        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.identity, Time.deltaTime * 540);
-                    else
-                        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
-
+                    if (attributes.GetAilment() != ActionClip.Ailment.Death)
+                    {
+                        if (dir == Vector3.zero)
+                            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.identity, Time.deltaTime * 540);
+                        else
+                            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 540);
+                    }
+                    
                     animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), animDir.z, Time.deltaTime * runAnimationTransitionSpeed));
                     animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), animDir.x, Time.deltaTime * runAnimationTransitionSpeed));
                 }

@@ -1194,6 +1194,8 @@ GameObject:
   - component: {fileID: 8531781055696673504}
   - component: {fileID: 8244051979739109180}
   - component: {fileID: 242786981252330984}
+  - component: {fileID: 414130271842337094}
+  - component: {fileID: 1175869400347067713}
   m_Layer: 7
   m_Name: mixamorig:RightLeg
   m_TagString: Untagged
@@ -1293,6 +1295,36 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &414130271842337094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3505168609526509636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a07a06dd3ff6b040a7ed92ddbb674ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footStepSounds:
+  - {fileID: 8300000, guid: 33688137bb5c14618b7d7d0d585e359f, type: 3}
+  - {fileID: 8300000, guid: 0048a87cbf958472e8b135695af78cd1, type: 3}
+  volume: 0.5
+--- !u!136 &1175869400347067713
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3505168609526509636}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.25399753
+  m_Height: 0.75
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.84, z: 0.12}
 --- !u!1 &3673996017232511155
 GameObject:
   m_ObjectHideFlags: 0
@@ -2269,6 +2301,8 @@ GameObject:
   - component: {fileID: 7026104801727096023}
   - component: {fileID: 23770009874955766}
   - component: {fileID: 6801006877936462399}
+  - component: {fileID: 2968635826991349792}
+  - component: {fileID: 600191937899839149}
   m_Layer: 7
   m_Name: mixamorig:LeftLeg
   m_TagString: Untagged
@@ -2368,6 +2402,36 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &2968635826991349792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423953301851971340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a07a06dd3ff6b040a7ed92ddbb674ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footStepSounds:
+  - {fileID: 8300000, guid: 33688137bb5c14618b7d7d0d585e359f, type: 3}
+  - {fileID: 8300000, guid: 0048a87cbf958472e8b135695af78cd1, type: 3}
+  volume: 0.5
+--- !u!136 &600191937899839149
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423953301851971340}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.25399753
+  m_Height: 0.75
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.84, z: 0.12}
 --- !u!1 &6427162948407961854
 GameObject:
   m_ObjectHideFlags: 0
@@ -3297,9 +3361,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterHeight: 1.5
-  characterRadius: 0.5
-  bottomPointOfCapsuleOffset: {x: 0, y: 0.5, z: 0}
   aimTargetIKSolver: {fileID: 0}
   rightHandAimRig: {fileID: 0}
   leftHandAimRig: {fileID: 0}

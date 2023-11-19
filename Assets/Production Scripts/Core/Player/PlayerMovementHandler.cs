@@ -120,7 +120,6 @@ namespace Vi.Player
                 if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                 {
                     // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
-                    Debug.Log(Mathf.Approximately(rampHit.distance, lowerHit.distance) + " " + rampHit.distance + " " + lowerHit.distance);
                     if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
                     {
                         Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
