@@ -198,7 +198,7 @@ namespace Vi.Player
 
                 CurrentPosition = latestServerState.position;
                 CurrentRotation = latestServerState.rotation;
-
+                movementHandler.SetTargetMovePosition(CurrentPosition);
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState;
 

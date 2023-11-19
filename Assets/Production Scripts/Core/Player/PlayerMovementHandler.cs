@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
@@ -97,7 +98,7 @@ namespace Vi.Player
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPredictionRigidbody.position, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, targetMovementPredictionRigidbodyPosition, newRotation);
         }
 
         public override void OnNetworkSpawn()
@@ -138,11 +139,19 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
+        public void SetTargetMovePosition(Vector3 newPosition)
+        {
+            targetMovementPredictionRigidbodyPosition = newPosition;
+            movementPredictionRigidbody.position = newPosition;
+        }
+
         private Vector3 targetMovementPredictionRigidbodyPosition;
         private float positionStrength = 1;
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
+            if (attributes.GetAilment() == ActionClip.Ailment.Death) { movementPredictionRigidbody.velocity = Vector3.zero; return; }
+
             // Handle gravity
             RaycastHit[] allHits = Physics.SphereCastAll(targetMovementPredictionRigidbodyPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
                                             animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);

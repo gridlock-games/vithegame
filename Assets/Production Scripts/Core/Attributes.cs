@@ -487,13 +487,11 @@ namespace Vi.Core
             if (current == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = false;
-                if (TryGetComponent(out CharacterController characterController)) { characterController.enabled = false; }
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = true;
-                if (TryGetComponent(out CharacterController characterController)) { characterController.enabled = false; }
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
         }

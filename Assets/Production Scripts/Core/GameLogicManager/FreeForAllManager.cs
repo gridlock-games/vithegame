@@ -64,7 +64,7 @@ namespace Vi.Core.GameModeManagers
             else
             {
                 roundTimer.Value = 30;
-                Overtime = true;
+                overtime.Value = true;
             }
         }
 
