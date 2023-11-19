@@ -9,11 +9,6 @@ namespace Vi.Core
         [SerializeField] private AudioClip[] footStepSounds;
         [SerializeField] private float volume = 1;
 
-        private void Awake()
-        {
-            
-        }
-
         Vector3 lastFootstepPosition;
         private void OnCollisionEnter(Collision collision)
         {
