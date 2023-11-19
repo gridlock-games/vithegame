@@ -16,7 +16,6 @@ namespace Vi.Core
             if (collision.relativeVelocity.magnitude < 1) { return; }
             if (Vector3.Distance(collision.GetContact(0).point, lastFootstepPosition) < 1) { return; }
 
-            Debug.Log(Time.time + " " + collision.collider);
             AudioManager.Singleton.PlayClipAtPoint(footStepSounds[Random.Range(0, footStepSounds.Length)], collision.GetContact(0).point, volume);
             lastFootstepPosition = collision.GetContact(0).point;
         }
