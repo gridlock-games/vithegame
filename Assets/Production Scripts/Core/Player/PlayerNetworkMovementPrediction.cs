@@ -239,18 +239,23 @@ namespace Vi.Player
             return statePayload;
         }
 
+        public void ProcessCollisionEvent(Collision collision, Vector3 newPosition)
+        {
+            CurrentPosition = newPosition;
+        }
+
         private void OnDrawGizmos()
         {
-            //if (OwnerClientId == 0)
-            //    Gizmos.color = Color.red;
-            //else if (OwnerClientId == 1)
-            //    Gizmos.color = Color.blue;
-            //else if (OwnerClientId == 2)
-            //    Gizmos.color = Color.green;
-            //else
-            //    Gizmos.color = Color.black;
+            if (OwnerClientId == 0)
+                Gizmos.color = Color.red;
+            else if (OwnerClientId == 1)
+                Gizmos.color = Color.blue;
+            else if (OwnerClientId == 2)
+                Gizmos.color = Color.green;
+            else
+                Gizmos.color = Color.black;
 
-            //Gizmos.DrawSphere(CurrentPosition, 0.25f);
+            Gizmos.DrawWireSphere(CurrentPosition, 0.25f);
         }
     }
 }

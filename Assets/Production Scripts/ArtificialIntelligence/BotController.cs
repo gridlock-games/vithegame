@@ -92,8 +92,8 @@ namespace Vi.ArtificialIntelligence
             }
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(targetMovementPredictionRigidbodyPosition + transform.rotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.SphereCastAll(targetMovementPredictionRigidbodyPosition + transform.rotation * new Vector3(0, 0.5f, 0),
+                                            0.5f, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;

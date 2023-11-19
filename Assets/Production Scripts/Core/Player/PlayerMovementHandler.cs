@@ -31,12 +31,12 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            //targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
+            movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            //targetMovementPredictionRigidbodyPosition = movementPredictionRigidbody.position;
+            movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
         [SerializeField] private Rigidbody movementPredictionRigidbody;
@@ -74,8 +74,8 @@ namespace Vi.Player
             }
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * animationHandler.LimbReferences.bottomPointOfCapsuleOffset,
-                                            animationHandler.LimbReferences.characterRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * new Vector3(0, 0.5f, 0),
+                                            0.75f, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;
@@ -201,14 +201,6 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(movementPredictionRigidbody.transform.position, 0.25f);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(movementPrediction.CurrentPosition, 0.25f);
         }
     }
 }
