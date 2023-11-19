@@ -394,7 +394,7 @@ GameObject:
   - component: {fileID: 728445163}
   - component: {fileID: 728445162}
   m_Layer: 0
-  m_Name: GameLogicManager
+  m_Name: PlayerDataManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -448,7 +448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botDefinitions:
-  - enabled: 0
+  - enabled: 1
     characterIndex: 0
     skinIndex: 1
     team: 2

@@ -19,7 +19,7 @@ namespace Vi.Networking
             //if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             //    NetworkManager.Singleton.StartServer();
             if (Application.isEditor)
-                NetworkManager.Singleton.StartServer();
+                NetworkManager.Singleton.StartHost();
             else
                 NetworkManager.Singleton.StartClient();
         }
