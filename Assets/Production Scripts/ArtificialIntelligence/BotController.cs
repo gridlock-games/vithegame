@@ -48,15 +48,15 @@ namespace Vi.ArtificialIntelligence
         private float runSpeed = 5;
         private bool isGrounded = true;
         private float runAnimationTransitionSpeed = 5;
+        private float positionThreshold = 2;
         private void FixedUpdate()
         {
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { movementPredictionRigidbody.velocity = Vector3.zero; return; }
             if (!CanMove()) { return; }
 
             Vector3 movement = Vector3.zero;
             if (moveToPlayer)
             {
-                if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) > 1.5f)
+                if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) > positionThreshold)
                 {
                     Vector3 target = new Vector3(NetworkManager.LocalClient.PlayerObject.transform.position.x, transform.position.y, NetworkManager.LocalClient.PlayerObject.transform.position.z);
                     Vector3 dir = Vector3.ClampMagnitude(target - transform.position, 1);
@@ -85,7 +85,7 @@ namespace Vi.ArtificialIntelligence
 
             if (canLightAttack)
             {
-                if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < 1.5f)
+                if (Vector3.Distance(NetworkManager.LocalClient.PlayerObject.transform.position, transform.position) < positionThreshold)
                 {
                     SendMessage("OnLightAttack");
                 }
@@ -106,8 +106,11 @@ namespace Vi.ArtificialIntelligence
             }
             if (!bHit) { gravity += Physics.gravity * Time.fixedDeltaTime; }
             isGrounded = bHit;
-            targetMovementPredictionRigidbodyPosition += gravity;
-            targetMovementPredictionRigidbodyPosition += movement;
+            if (attributes.GetAilment() != ActionClip.Ailment.Death)
+            {
+                targetMovementPredictionRigidbodyPosition += gravity;
+                targetMovementPredictionRigidbodyPosition += movement;
+            }
             Vector3 deltaPos = targetMovementPredictionRigidbodyPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
         }

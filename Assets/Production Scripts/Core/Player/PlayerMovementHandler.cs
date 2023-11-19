@@ -160,8 +160,6 @@ namespace Vi.Player
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { movementPredictionRigidbody.velocity = Vector3.zero; return; }
-            
             Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
@@ -206,6 +204,7 @@ namespace Vi.Player
 
         private void OnDrawGizmos()
         {
+            if (!Application.isPlaying) { return; }
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
         }
