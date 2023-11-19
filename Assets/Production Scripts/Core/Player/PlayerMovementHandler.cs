@@ -82,11 +82,11 @@ namespace Vi.Player
             foreach (RaycastHit hit in allHits)
             {
                 if (hit.transform.root == transform) { continue; }
-                gravity += Time.fixedDeltaTime * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }
-            if (!bHit) { gravity += Physics.gravity * Time.fixedDeltaTime; }
+            if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
             isGrounded = bHit;
 
             Vector3 animDir = Vector3.zero;
@@ -106,15 +106,13 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
-            Vector3 newPosition = movementPrediction.CurrentPosition + movement + gravity;
-
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition + movement + gravity, newRotation);
         }
 
         public override void OnNetworkSpawn()
