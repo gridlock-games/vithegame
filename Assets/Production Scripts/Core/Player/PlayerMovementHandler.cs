@@ -43,6 +43,8 @@ namespace Vi.Player
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.5f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
+        [SerializeField] private float stairHeight = 0.5f;
+        [SerializeField] private float rampCheckHeight = 0.1f;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded = true;
@@ -108,7 +110,22 @@ namespace Vi.Player
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
-            
+
+            Debug.DrawRay(movementPrediction.CurrentPosition, movement.normalized * 1, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * 1, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            if (Physics.Raycast(movementPrediction.CurrentPosition, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+            {
+                if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                {
+                    //Debug.Log(Time.time + " " + rampHit.collider + " " + rampHit.distance + " " + lowerHit.distance);
+                    if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                    {
+                        movement.y += stairHeight / 2;
+                    }
+                }
+            }
+
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
