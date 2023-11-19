@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1051286908996704271}
   - component: {fileID: 7819042586905223686}
   - component: {fileID: 1883567723578590163}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SM_sword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 9120665817193852630}
   - component: {fileID: 49900188096381849}
   - component: {fileID: 8779360038714121954}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Greatsword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,6 +224,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SK_LongSword
+      objectReference: {fileID: 0}
+    - target: {fileID: 638463148937297459, guid: 91a3f27c50b1442469da4da0162150d9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4190374205607740258, guid: 91a3f27c50b1442469da4da0162150d9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6460757621151718560, guid: 91a3f27c50b1442469da4da0162150d9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8361753037488055030, guid: 91a3f27c50b1442469da4da0162150d9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91a3f27c50b1442469da4da0162150d9, type: 3}

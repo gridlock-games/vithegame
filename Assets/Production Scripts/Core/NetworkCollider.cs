@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace Vi.Core
 {
-    public class CollisionListener : MonoBehaviour
+    public class NetworkCollider : MonoBehaviour
     {
+        public Attributes Attributes { get; private set; }
         private MovementHandler movementHandler;
         private void Awake()
         {
             movementHandler = GetComponentInParent<MovementHandler>();
+            Attributes = GetComponentInParent<Attributes>();
         }
 
         private void OnCollisionEnter(Collision collision)
