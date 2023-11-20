@@ -24,6 +24,9 @@ namespace Vi.UI
         [SerializeField] private StatusIcon statusImagePrefab;
         [Header("Death UI")]
         [SerializeField] private PlayerCard killerCard;
+        [SerializeField] private Text respawnTimerText;
+        [SerializeField] private Image fadeToBlackImage;
+        [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
 
@@ -98,10 +101,17 @@ namespace Vi.UI
                         teammatePlayerCards[i].Initialize(null);
                     }
                 }
+                
+                fadeToBlackImage.color = Color.clear;
+                fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
             }
             else
             {
                 killerCard.Initialize(attributes.GetKiller());
+                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
+
+                fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
+                fadeToWhiteImage.color = fadeToBlackImage.color;
             }
             UpdateActiveUIElements();
         }

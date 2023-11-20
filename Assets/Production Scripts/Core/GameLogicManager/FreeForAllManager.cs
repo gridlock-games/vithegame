@@ -8,6 +8,7 @@ namespace Vi.Core.GameModeManagers
 {
     public class FreeForAllManager : GameModeManager
     {
+        [Header("Free for all specific")]
         [SerializeField] private int killsToWinRound = 2;
 
         public override void OnNetworkSpawn()

@@ -15,6 +15,10 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         [SerializeField] private float nextGameActionDuration = 5;
+        [Header("Leave respawn time as 0 to disable respawns")]
+        [SerializeField] private float respawnTime = 5;
+
+        public float GetRespawnTime() { return respawnTime; }
 
         protected NetworkVariable<float> roundTimer = new NetworkVariable<float>();
         private NetworkVariable<float> nextGameActionTimer = new NetworkVariable<float>();
@@ -181,7 +185,7 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    PlayerDataManager.Singleton.RespawnPlayers();
+                    PlayerDataManager.Singleton.RespawnAllPlayers();
                     roundTimer.Value = roundDuration;
                 }
             }

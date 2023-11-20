@@ -185,6 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1889ecb04a6ddb048bf510d6c3f0302c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 7
 --- !u!114 &8229825891610268455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,7 +193,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6625860223617135220}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 522d8de94b0f84e4188f4482edf2e4d4, type: 3}
   m_Name: 
@@ -200,6 +201,8 @@ MonoBehaviour:
   playerUIPrefab: {fileID: 2452549437775322352, guid: e51f855524f85c9408e42ac5a8fc5a7c,
     type: 3}
   spectatorUIPrefab: {fileID: 6114019404356350461, guid: 228d5375b3185f84fab7decb751c8d1e,
+    type: 3}
+  scoreboardPrefab: {fileID: 2744231288618173052, guid: 2d20ba707312adb43b33eddb385e7911,
     type: 3}
   pausePrefab: {fileID: 7309343886950099489, guid: d228d73cb92b5344589d4bdcbcc33e48,
     type: 3}

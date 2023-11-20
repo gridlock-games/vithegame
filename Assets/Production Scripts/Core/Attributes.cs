@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using UnityEngine.VFX;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -244,7 +244,11 @@ namespace Vi.Core
         public Attributes GetKiller()
         {
             if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
-            return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
+                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+            else
+                return null;
         }
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
@@ -488,12 +492,28 @@ namespace Vi.Core
             {
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+                StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
+        }
+
+        public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
+        public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
+
+        public bool IsRespawning { get; private set; }
+        private float respawnSelfCalledTime;
+        private IEnumerator RespawnSelf()
+        {
+            if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
+            IsRespawning = true;
+            respawnSelfCalledTime = Time.time;
+            yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
+            PlayerDataManager.Singleton.RespawnPlayer(this);
+            IsRespawning = false;
         }
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }

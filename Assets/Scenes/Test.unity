@@ -2723,14 +2723,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botDefinitions:
   - enabled: 1
-    characterIndex: 2
+    characterIndex: 0
     skinIndex: 0
     team: 2
-  - enabled: 1
-    characterIndex: 2
+  - enabled: 0
+    characterIndex: 0
     skinIndex: 1
     team: 2
-  - enabled: 1
+  - enabled: 0
     characterIndex: 0
     skinIndex: 2
     team: 2
@@ -2746,7 +2746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c097031af7b0ce49a8cdaec48a92a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameModeValue: 0
+  gameModeValue: 1
   spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
     type: 3}
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
@@ -2819,6 +2819,7 @@ MonoBehaviour:
   numberOfRoundsWinsToWinGame: 2
   roundDuration: 30
   nextGameActionDuration: 5
+  respawnTime: 0
   killsToWinRound: 2
 --- !u!4 &730000693
 Transform:
@@ -2841,7 +2842,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-934434
+  m_Name: pb_Mesh313198
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11041,7 +11042,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-927654
+  m_Name: pb_Mesh313276
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11391,7 +11392,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-654578
+  m_Name: pb_Mesh313318
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

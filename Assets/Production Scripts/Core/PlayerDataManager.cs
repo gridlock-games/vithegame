@@ -255,18 +255,23 @@ namespace Vi.Core
 
         }
 
-        public void RespawnPlayers()
+        public void RespawnPlayer(Attributes attributesToRespawn)
+        {
+            PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            Vector3 spawnPosition = transformData.position;
+            Quaternion spawnRotation = transformData.rotation;
+
+            attributesToRespawn.ResetStats(false);
+            attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions();
+            attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+        }
+
+        public void RespawnAllPlayers()
         {
             playerSpawnPoints.ResetSpawnTracker();
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, kvp.Value.GetTeam());
-                Vector3 spawnPosition = transformData.position;
-                Quaternion spawnRotation = transformData.rotation;
-
-                kvp.Value.ResetStats(false);
-                kvp.Value.GetComponent<AnimationHandler>().CancelAllActions();
-                kvp.Value.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+                RespawnPlayer(kvp.Value);
             }
         }
 
