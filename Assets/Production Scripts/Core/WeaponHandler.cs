@@ -284,7 +284,7 @@ namespace Vi.Core
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
 
-            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
+            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
         }
 
         public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
