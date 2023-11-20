@@ -198,7 +198,7 @@ namespace Vi.Core
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
                     startPos.y += actionVFXPrefab.raycastOffset.y;
-                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
@@ -207,8 +207,6 @@ namespace Vi.Core
 
                     foreach (RaycastHit hit in allHits)
                     {
-                        if (hit.transform.GetComponentInParent<Attributes>()) { continue; }
-
                         bHit = true;
                         floorHit = hit;
 

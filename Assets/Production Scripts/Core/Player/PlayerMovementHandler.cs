@@ -167,7 +167,7 @@ namespace Vi.Player
             movementPredictionRigidbody.transform.SetParent(null, true);
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();
-            attributes = GetComponentInParent<Attributes>();
+            attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
         }
 

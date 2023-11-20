@@ -36,20 +36,6 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
-        //protected void OnControllerColliderHit(ControllerColliderHit hit)
-        //{
-        //    Attributes attributes = hit.transform.GetComponentInParent<Attributes>();
-        //    if (!attributes) { return; }
-        //    if (attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death) { return; }
-
-        //    CharacterController controller = hit.transform.GetComponentInParent<CharacterController>();
-        //    if (controller)
-        //    {
-        //        Vector3 dir = controller.transform.position - transform.position;
-        //        controller.Move(hit.moveLength * dir);
-        //    }
-        //}
-
         protected Vector2 lookInput;
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }
         public Vector2 GetRawLookInput() { return lookInput; }

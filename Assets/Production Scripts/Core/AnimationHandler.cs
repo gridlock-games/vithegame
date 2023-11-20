@@ -96,20 +96,20 @@ namespace Vi.Core
             {
                 float raycastDistance = actionClip.grabDistance;
                 bool bHit = false;
-                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
                 Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                 foreach (RaycastHit hit in allHits)
                 {
                     if (hit.transform == transform) { continue; }
-                    Attributes targetAttributes = hit.transform.GetComponentInParent<Attributes>();
-                    if (!targetAttributes) { return; }
-                    if (targetAttributes == attributes) { return; }
+                    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                    {
+                        if (networkCollider.Attributes == attributes) { return; }
 
+                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
+                    }
                     bHit = true;
-
-                    targetAttributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
                     break;
                 }
 

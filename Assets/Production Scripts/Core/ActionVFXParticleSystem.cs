@@ -65,28 +65,30 @@ namespace Vi.Core
                 for (int colliderIndex = 0; colliderIndex < enterColliderData.GetColliderCount(particleIndex); colliderIndex++)
                 {
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
-                    Attributes attributes = col.GetComponentInParent<Attributes>();
-                    if (attributes == attacker) { continue; }
-                    if (attributes)
+                    if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        bool canHit = true;
-                        if (hitCounter.ContainsKey(attributes))
+                        if (networkCollider.Attributes == attacker) { continue; }
+                        if (networkCollider.Attributes)
                         {
-                            if (hitCounter[attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                            if (Time.time - hitCounter[attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
-                        }
-
-                        if (canHit)
-                        {
-                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(enter[particleIndex].position), transform.position))
+                            bool canHit = true;
+                            if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (!hitCounter.ContainsKey(attributes))
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
+                            }
+
+                            if (canHit)
+                            {
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(enter[particleIndex].position), transform.position))
                                 {
-                                    hitCounter.Add(attributes, new(1, Time.time));
-                                }
-                                else
-                                {
-                                    hitCounter[attributes] = new(hitCounter[attributes].hitNumber, Time.time);
+                                    if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                    {
+                                        hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                    }
+                                    else
+                                    {
+                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber, Time.time);
+                                    }
                                 }
                             }
                         }
@@ -102,28 +104,30 @@ namespace Vi.Core
                 for (int colliderIndex = 0; colliderIndex < insideColliderData.GetColliderCount(particleIndex); colliderIndex++)
                 {
                     Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
-                    Attributes attributes = col.GetComponentInParent<Attributes>();
-                    if (attributes == attacker) { continue; }
-                    if (attributes)
+                    if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        bool canHit = true;
-                        if (hitCounter.ContainsKey(attributes))
+                        if (networkCollider.Attributes == attacker) { continue; }
+                        if (networkCollider.Attributes)
                         {
-                            if (hitCounter[attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                            if (Time.time - hitCounter[attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
-                        }
-
-                        if (canHit)
-                        {
-                            if (attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(inside[particleIndex].position), transform.position))
+                            bool canHit = true;
+                            if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (!hitCounter.ContainsKey(attributes))
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
+                            }
+
+                            if (canHit)
+                            {
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, attack, col.ClosestPointOnBounds(inside[particleIndex].position), transform.position))
                                 {
-                                    hitCounter.Add(attributes, new(1, Time.time));
-                                }
-                                else
-                                {
-                                    hitCounter[attributes] = new(hitCounter[attributes].hitNumber+1, Time.time);
+                                    if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                    {
+                                        hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                    }
+                                    else
+                                    {
+                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                    }
                                 }
                             }
                         }
