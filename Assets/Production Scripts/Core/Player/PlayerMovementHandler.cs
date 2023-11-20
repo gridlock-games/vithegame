@@ -11,6 +11,7 @@ namespace Vi.Player
     public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private Camera cameraInstance;
+        [SerializeField] private Camera minimapCameraInstance;
 
         [Header("Locomotion Settings")]
         [SerializeField] private float runSpeed = 5;
@@ -151,12 +152,14 @@ namespace Vi.Player
             {
                 cameraInstance.GetComponent<AudioListener>().enabled = true;
                 cameraInstance.enabled = true;
+                minimapCameraInstance.enabled = true;
                 GetComponent<PlayerInput>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
             }
             else
             {
                 Destroy(cameraInstance.gameObject);
+                Destroy(minimapCameraInstance.gameObject);
                 GetComponent<PlayerInput>().enabled = false;
             }
         }

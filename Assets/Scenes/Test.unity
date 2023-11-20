@@ -2781,7 +2781,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &730000691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2816,11 +2816,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
     type: 3}
-  numberOfRoundsWinsToWinGame: 2
+  numberOfRoundsWinsToWinGame: 1
   roundDuration: 30
   nextGameActionDuration: 5
   respawnTime: 5
-  killsToWinRound: 2
+  killsToWinRound: 1
 --- !u!4 &730000693
 Transform:
   m_ObjectHideFlags: 0
@@ -2842,7 +2842,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh313198
+  m_Name: pb_Mesh119164
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11042,7 +11042,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh313276
+  m_Name: pb_Mesh119242
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11392,7 +11392,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh313318
+  m_Name: pb_Mesh119284
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
