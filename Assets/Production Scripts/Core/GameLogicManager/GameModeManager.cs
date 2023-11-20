@@ -181,7 +181,7 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    PlayerDataManager.Singleton.RespawnPlayers();
+                    PlayerDataManager.Singleton.RespawnAllPlayers();
                     roundTimer.Value = roundDuration;
                 }
             }

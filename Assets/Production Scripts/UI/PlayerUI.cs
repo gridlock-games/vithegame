@@ -24,6 +24,7 @@ namespace Vi.UI
         [SerializeField] private StatusIcon statusImagePrefab;
         [Header("Death UI")]
         [SerializeField] private PlayerCard killerCard;
+        [SerializeField] private Text respawnTimerText;
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
 
@@ -102,6 +103,7 @@ namespace Vi.UI
             else
             {
                 killerCard.Initialize(attributes.GetKiller());
+                respawnTimerText.text = "Respawning in " + attributes.GetRespawnTime().ToString("F4");
             }
             UpdateActiveUIElements();
         }

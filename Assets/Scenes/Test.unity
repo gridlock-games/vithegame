@@ -2722,12 +2722,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botDefinitions:
-  - enabled: 0
-    characterIndex: 2
+  - enabled: 1
+    characterIndex: 0
     skinIndex: 0
     team: 2
   - enabled: 0
-    characterIndex: 2
+    characterIndex: 0
     skinIndex: 1
     team: 2
   - enabled: 0
@@ -2746,21 +2746,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c097031af7b0ce49a8cdaec48a92a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameModeValue: 0
+  gameModeValue: 1
   spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
     type: 3}
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
   gameModeInfos:
   - gameMode: 0
     possibleTeams: 02000000
+    respawnTime: 0
   - gameMode: 1
     possibleTeams: 02000000
+    respawnTime: 5
   - gameMode: 2
     possibleTeams: 0300000007000000
+    respawnTime: 0
   - gameMode: 3
     possibleTeams: 0300000007000000
+    respawnTime: 0
   - gameMode: 4
     possibleTeams: 0300000007000000
+    respawnTime: 0
   teamDefinitions:
   - team: 2
     clientId: 0
@@ -2781,7 +2786,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &730000691
 MonoBehaviour:
   m_ObjectHideFlags: 0

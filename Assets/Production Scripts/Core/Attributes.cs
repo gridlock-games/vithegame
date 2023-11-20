@@ -492,12 +492,25 @@ namespace Vi.Core
             {
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+                StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
+        }
+
+        public float GetRespawnTime() { return Mathf.Clamp(PlayerDataManager.Singleton.GetGameModeInfo().respawnTime - (Time.time - respawnSelfCalledTime), 0, PlayerDataManager.Singleton.GetGameModeInfo().respawnTime); }
+
+        private float respawnSelfCalledTime;
+        private IEnumerator RespawnSelf()
+        {
+            PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
+            if (gameModeInfo.respawnTime <= 0) { yield break; }
+            respawnSelfCalledTime = Time.time;
+            yield return new WaitForSeconds(gameModeInfo.respawnTime);
+            PlayerDataManager.Singleton.RespawnPlayer(this);
         }
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
