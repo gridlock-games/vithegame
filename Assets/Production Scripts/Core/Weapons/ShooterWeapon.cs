@@ -47,7 +47,7 @@ namespace Vi.Core
         private float lastProjectileSpawnTime = Mathf.NegativeInfinity;
         private float projectileSpawnCount;
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 

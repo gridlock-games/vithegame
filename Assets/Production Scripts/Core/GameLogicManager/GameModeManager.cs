@@ -22,7 +22,8 @@ namespace Vi.Core.GameModeManagers
         protected NetworkVariable<FixedString64Bytes> roundResultMessage = new NetworkVariable<FixedString64Bytes>();
         protected NetworkVariable<FixedString64Bytes> gameEndMessage = new NetworkVariable<FixedString64Bytes>();
 
-        public bool Overtime { get; protected set; }
+        public bool IsInOvertime() { return overtime.Value; }
+        protected NetworkVariable<bool> overtime = new NetworkVariable<bool>();
 
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
@@ -53,7 +54,7 @@ namespace Vi.Core.GameModeManagers
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
-            Overtime = false;
+            overtime.Value = false;
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {
@@ -79,7 +80,11 @@ namespace Vi.Core.GameModeManagers
         {
             int minutes = (int)roundTimer.Value / 60;
             float seconds = roundTimer.Value - (minutes * 60);
-            return minutes.ToString() + ":" + seconds.ToString("F2");
+
+            if (overtime.Value)
+                return "+" + minutes.ToString() + ":" + seconds.ToString("F2");
+            else
+                return minutes.ToString() + ":" + seconds.ToString("F2");
         }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }

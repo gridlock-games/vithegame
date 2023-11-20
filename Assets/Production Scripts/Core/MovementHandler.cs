@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -30,6 +31,10 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
         }
+
+        public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
+        public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
+        public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
         protected Vector2 lookInput;
         public Vector2 GetLookInput() { return lookInput * lookSensitivity; }

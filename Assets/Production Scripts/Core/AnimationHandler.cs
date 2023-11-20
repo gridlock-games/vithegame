@@ -29,6 +29,7 @@ namespace Vi.Core
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
+            attributes.ResetAilment();
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 
@@ -95,20 +96,20 @@ namespace Vi.Core
             {
                 float raycastDistance = actionClip.grabDistance;
                 bool bHit = false;
-                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
                 Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                 foreach (RaycastHit hit in allHits)
                 {
                     if (hit.transform == transform) { continue; }
-                    Attributes targetAttributes = hit.transform.GetComponentInParent<Attributes>();
-                    if (!targetAttributes) { return; }
-                    if (targetAttributes == attributes) { return; }
+                    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                    {
+                        if (networkCollider.Attributes == attributes) { return; }
 
+                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
+                    }
                     bHit = true;
-
-                    targetAttributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
                     break;
                 }
 
@@ -304,22 +305,27 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-                if (bHit)
-                {
-                    if (hit.transform.root != transform.root)
-                    {
-                        aimPoint.Value = hit.point;
-                    }
-                    else
-                    {
-                        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                    }
-                }
-                else
-                {
-                    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                }
+                //bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+                //if (bHit)
+                //{
+                //    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                //    {
+                //        aimPoint.Value = hit.point;
+                //    }
+                //    else if (hit.transform.root != transform.root)
+                //    {
+                //        aimPoint.Value = hit.point;
+                //    }
+                //    else
+                //    {
+                //        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                //    }
+                //}
+                //else
+                //{
+                //    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                //}
+                aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
             }
 
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;

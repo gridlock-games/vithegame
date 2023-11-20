@@ -194,7 +194,7 @@ namespace Vi.Player
 
             if (positionError > 0.001f)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 CurrentPosition = latestServerState.position;
                 CurrentRotation = latestServerState.rotation;
@@ -229,14 +229,19 @@ namespace Vi.Player
 
         [ServerRpc] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
-
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
             if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
             if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
+            
             return statePayload;
+        }
+
+        public void ProcessCollisionEvent(Collision collision, Vector3 newPosition)
+        {
+            CurrentPosition = newPosition;
         }
 
         private void OnDrawGizmos()
@@ -250,7 +255,7 @@ namespace Vi.Player
             else
                 Gizmos.color = Color.black;
 
-            Gizmos.DrawSphere(CurrentPosition, 0.25f);
+            Gizmos.DrawWireSphere(CurrentPosition, 0.25f);
         }
     }
 }

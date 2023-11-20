@@ -17,24 +17,26 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
+            if (other.isTrigger) { return; }
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
-            if (other.TryGetComponent(out Attributes attributes))
+            
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (parentAttributes == attributes) { return; }
-                if (!CanHit(attributes)) { return; }
+                if (parentAttributes == networkCollider.Attributes) { return; }
+                if (!CanHit(networkCollider.Attributes)) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(attributes)) { return; }
+                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.Attributes)) { return; }
 
-                bool bHit = attributes.ProcessMeleeHit(parentAttributes,
+                bool bHit = networkCollider.Attributes.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     parentAttributes.transform.position
                 );
 
-                if (bHit) { hitsOnThisPhysicsUpdate.Add(attributes); }
+                if (bHit) { hitsOnThisPhysicsUpdate.Add(networkCollider.Attributes); }
             }
         }
 

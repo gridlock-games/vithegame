@@ -237,9 +237,20 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition);
         }
 
+        private NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
+
+        private void SetKiller(Attributes killer) { killerNetObjId.Value = killer.NetworkObjectId; }
+
+        public Attributes GetKiller()
+        {
+            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
+            return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+        }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
+            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             if (isMeleeHit)
             {
@@ -311,6 +322,7 @@ namespace Vi.Core
 
                         ailmentChangedOnThisAttack = ailment.Value != attackAilment;
                         ailment.Value = attackAilment;
+                        if (ailment.Value == ActionClip.Ailment.Death) { SetKiller(attacker); }
                     }
                     else // If this attack's ailment is none
                     {
@@ -474,15 +486,17 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
-                foreach (Collider c in GetComponentsInChildren<Collider>())
-                {
-                    c.enabled = false;
-                }
-
+                animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+            }
+            else if (prev == ActionClip.Ailment.Death)
+            {
+                animationHandler.Animator.enabled = true;
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
             }
         }
 
+        public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
