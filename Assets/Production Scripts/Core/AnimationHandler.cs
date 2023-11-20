@@ -305,22 +305,27 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-                if (bHit)
-                {
-                    if (hit.transform.root != transform.root)
-                    {
-                        aimPoint.Value = hit.point;
-                    }
-                    else
-                    {
-                        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                    }
-                }
-                else
-                {
-                    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                }
+                //bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+                //if (bHit)
+                //{
+                //    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                //    {
+                //        aimPoint.Value = hit.point;
+                //    }
+                //    else if (hit.transform.root != transform.root)
+                //    {
+                //        aimPoint.Value = hit.point;
+                //    }
+                //    else
+                //    {
+                //        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                //    }
+                //}
+                //else
+                //{
+                //    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                //}
+                aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
             }
 
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;

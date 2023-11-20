@@ -24,7 +24,7 @@ namespace Vi.ProceduralAnimations
 
         Vector3 rootPosition;
         Vector3 tipPosition;
-        private void Update()
+        private void LateUpdate()
         {
             rootPosition = root.position;
             switch (rootAxis)
