@@ -80,7 +80,11 @@ namespace Vi.Core.GameModeManagers
         {
             int minutes = (int)roundTimer.Value / 60;
             float seconds = roundTimer.Value - (minutes * 60);
-            return minutes.ToString() + ":" + seconds.ToString("F2");
+
+            if (overtime.Value)
+                return "+" + minutes.ToString() + ":" + seconds.ToString("F2");
+            else
+                return minutes.ToString() + ":" + seconds.ToString("F2");
         }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
