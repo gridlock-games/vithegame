@@ -2723,11 +2723,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botDefinitions:
   - enabled: 1
-    characterIndex: 0
+    characterIndex: 1
     skinIndex: 0
     team: 2
   - enabled: 1
-    characterIndex: 0
+    characterIndex: 1
     skinIndex: 1
     team: 2
   - enabled: 1
@@ -8643,7 +8643,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4523949ac87ed9846a8139d19403099c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  payloadString: Dev|0|2
+  payloadString: Dev|1|0
 --- !u!1 &1303542158
 GameObject:
   m_ObjectHideFlags: 0
@@ -10929,10 +10929,10 @@ MonoBehaviour:
   - gameModes: 0000000001000000
     teams: 020000000300000007000000
     spawnPositions:
-    - {x: -10, y: 15, z: 0}
-    - {x: 10, y: 15, z: 0}
-    - {x: 0, y: 15, z: 10}
-    - {x: 0, y: 15, z: -10}
+    - {x: -5, y: -3, z: 0}
+    - {x: 5, y: -3, z: 0}
+    - {x: 0, y: -3, z: 5}
+    - {x: 0, y: -3, z: -5}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
