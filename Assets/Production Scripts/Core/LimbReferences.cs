@@ -65,7 +65,7 @@ namespace Vi.Core
         public FollowTarget RightHandFollowTarget { get; private set; }
         public FollowTarget LeftHandFollowTarget { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
             animator = GetComponent<Animator>();
 

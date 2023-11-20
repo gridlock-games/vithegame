@@ -58,19 +58,19 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
-            // Dont despawn projectiles that come from the same attacker
-            Projectile otherProjectile = other.GetComponentInParent<Projectile>();
-            if (otherProjectile)
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (otherProjectile.attacker == attacker) { return; }
+                if (networkCollider.Attributes == attacker) { return; }
+                networkCollider.Attributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
-
-            Attributes victimAttributes = other.GetComponentInParent<Attributes>();
-            if (victimAttributes == attacker) { return; }
-
-            if (victimAttributes)
+            else
             {
-                victimAttributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                // Dont despawn projectiles that come from the same attacker
+                Projectile otherProjectile = other.GetComponentInParent<Projectile>();
+                if (otherProjectile)
+                {
+                    if (otherProjectile.attacker == attacker) { return; }
+                }
             }
             NetworkObject.Despawn(true);
         }
