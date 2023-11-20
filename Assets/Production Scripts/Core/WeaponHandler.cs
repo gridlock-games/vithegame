@@ -417,11 +417,52 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
-        void OnHeavyAttack()
+        private bool toggleAim = true;
+        private bool canAim;
+
+        private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        void OnAim(InputValue value)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
+            if (!canAim) { return; }
+
+            if (toggleAim)
+            {
+                if (value.isPressed) { aiming.Value = !aiming.Value; }
+            }
+            else
+            {
+                aiming.Value = value.isPressed;
+            }
+        }
+
+        void OnHeavyAttack(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                if (actionVFXPreviewInstance)
+                {
+                    Destroy(actionVFXPreviewInstance.gameObject);
+                    return;
+                }
+            }
+
+            if (canAim)
+            {
+                if (toggleAim)
+                {
+                    if (value.isPressed) { aiming.Value = !aiming.Value; }
+                }
+                else
+                {
+                    aiming.Value = value.isPressed;
+                }
+            }
+            else if (value.isPressed)
+            {
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
+            }
         }
 
         void OnAbility1(InputValue value)
@@ -546,24 +587,6 @@ namespace Vi.Core
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                     animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
                 }
-            }
-        }
-
-        private bool toggleAim = true;
-        private bool canAim;
-
-        private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        void OnAim(InputValue value)
-        {
-            if (!canAim) { return; }
-
-            if (toggleAim)
-            {
-                if (value.isPressed) { aiming.Value = !aiming.Value; }
-            }
-            else
-            {
-                aiming.Value = value.isPressed;
             }
         }
 

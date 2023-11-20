@@ -33,15 +33,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Aim",
-                    "type": "Value",
-                    "id": "9db82f64-daae-4a84-872d-41950c599a0a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Dodge",
                     "type": "Button",
                     "id": "d4373a15-c790-4dd1-9d2f-3b30a67e8736",
@@ -70,12 +61,12 @@
                 },
                 {
                     "name": "HeavyAttack",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "020ea129-7f33-4dae-bf36-6d4c69f3c8bd",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Ability1",
@@ -346,17 +337,6 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bdf680a1-2c44-439e-94c0-b83347e42977",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
