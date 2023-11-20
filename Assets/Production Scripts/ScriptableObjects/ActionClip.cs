@@ -143,8 +143,11 @@ namespace Vi.ScriptableObjects
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
 
+        // Only for shooter characters
         public bool aimDuringAnticipation;
         public bool aimDuringAttack;
         public bool aimDuringRecovery;
+        public bool shouldAimBody = true;
+        public bool shouldAimOffHand = true;
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ProceduralAnimations;
+using UnityEngine.Animations.Rigging;
 
 namespace Vi.Core
 {
@@ -16,19 +17,21 @@ namespace Vi.Core
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, bool isAiming, bool instantAim)
+        public void AimHand(Hand hand, bool isAiming, bool instantAim, bool shouldAimBody)
         {
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
+                if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
                 if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
                 if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
+                if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
             animator.SetBool("Aiming", isAiming);
@@ -82,7 +85,9 @@ namespace Vi.Core
         [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
+        [SerializeField] private MultiAimConstraint rightHandAimBodyConstraint;
         [SerializeField] private RigWeightTarget leftHandAimRig;
+        [SerializeField] private MultiAimConstraint leftHandAimBodyConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
     }

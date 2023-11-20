@@ -54,6 +54,8 @@ namespace Vi.Editor
         private SerializedProperty spActionVFXList;
         private SerializedProperty spPreviewActionVFX;
 
+        private SerializedProperty spShouldAimBody;
+        private SerializedProperty spShouldAimOffHand;
         private SerializedProperty spAimDuringAnticipation;
         private SerializedProperty spAimDuringAttack;
         private SerializedProperty spAimDuringRecovery;
@@ -101,6 +103,8 @@ namespace Vi.Editor
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
 
+            spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
+            spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
             spAimDuringAnticipation = serializedObject.FindProperty("aimDuringAnticipation");
             spAimDuringAttack = serializedObject.FindProperty("aimDuringAttack");
             spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
@@ -164,6 +168,8 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
@@ -207,6 +213,8 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
@@ -259,11 +267,12 @@ namespace Vi.Editor
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
-
                 if (!spMustBeAiming.boolValue)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);

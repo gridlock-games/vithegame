@@ -390,19 +390,23 @@ namespace Vi.Core
 
             if (IsInAnticipation)
             {
-                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
             }
             else if (IsAttacking)
             {
-                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
             }
             else if (IsInRecovery)
             {
-                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+            }
+            else if (animationHandler.IsAtRest())
+            {
+                Aim(aiming.Value, IsServer);
             }
             else
             {
-                Aim(aiming.Value, IsServer);
+                Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
         }
 
@@ -433,7 +437,11 @@ namespace Vi.Core
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance) { animationHandler.PlayAction(actionClip); }
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
                     }
                 }
                 else // If there is no preview VFX
@@ -456,7 +464,11 @@ namespace Vi.Core
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance) { animationHandler.PlayAction(actionClip); }
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
                     }
                 }
                 else // If there is no preview VFX
@@ -479,7 +491,11 @@ namespace Vi.Core
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance) { animationHandler.PlayAction(actionClip); }
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
                     }
                 }
                 else // If there is no preview VFX
@@ -502,7 +518,11 @@ namespace Vi.Core
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance) { animationHandler.PlayAction(actionClip); }
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
                     }
                 }
                 else // If there is no preview VFX
@@ -522,9 +542,9 @@ namespace Vi.Core
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim);
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody);
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, isAiming, instantAim);
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
                 }
             }
         }
