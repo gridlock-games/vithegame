@@ -141,6 +141,7 @@ namespace Vi.ScriptableObjects
         public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
+        public ActionVFX previewActionVFX;
 
         public bool aimDuringAnticipation;
         public bool aimDuringAttack;

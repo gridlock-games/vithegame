@@ -162,23 +162,40 @@ namespace Vi.Core
             }
         }
 
+        public void SpawnPreviewVFX(ActionVFX referenceVFXPrefab, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        {
+            actionPreviewVFXPrefab.vfxPositionOffset = referenceVFXPrefab.vfxPositionOffset;
+            actionPreviewVFXPrefab.vfxRotationOffset = referenceVFXPrefab.vfxRotationOffset;
+            actionPreviewVFXPrefab.vfxSpawnType = referenceVFXPrefab.vfxSpawnType;
+            actionPreviewVFXPrefab.transformType = referenceVFXPrefab.transformType;
+            actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = referenceVFXPrefab.onActivateVFXSpawnNormalizedTime;
+            actionPreviewVFXPrefab.raycastOffset = referenceVFXPrefab.raycastOffset;
+            actionPreviewVFXPrefab.crossProductDirection = referenceVFXPrefab.crossProductDirection;
+            actionPreviewVFXPrefab.lookRotationUpDirection = referenceVFXPrefab.lookRotationUpDirection;
+            actionPreviewVFXPrefab.weaponBone = referenceVFXPrefab.weaponBone;
+
+            SpawnActionVFX(actionPreviewVFXPrefab, attackerTransform, victimTransform);
+        }
+
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
         public void SpawnActionVFX(ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
+            bool isPreviewVFX = actionVFXPrefab.GetComponent<ActionVFXPreview>();
+
             if (actionVFXTracker.Contains(actionVFXPrefab)) { return; }
             GameObject vfxInstance = null;
             switch (actionVFXPrefab.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), transform);
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.Projectile:
@@ -186,7 +203,7 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                         {
-                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
                             vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                         else
@@ -217,14 +234,16 @@ namespace Vi.Core
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             floorHit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            isPreviewVFX ? attackerTransform : null
                         );
                     }
                     else
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            isPreviewVFX ? attackerTransform : null
                         );
                     }
                     break;
@@ -385,32 +404,48 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
-        void OnAbility1()
+        void OnAbility1(InputValue value)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
-        void OnAbility2()
+        void OnAbility2(InputValue value)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
-        void OnAbility3()
+        void OnAbility3(InputValue value)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
         }
 
-        void OnAbility4()
+        void OnAbility4(InputValue value)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
             if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
+            {
+                if (actionClip.previewActionVFX)
+                {
+                    if (value.isPressed) // If we are holding down the key
+                    {
+                        SpawnPreviewVFX(actionClip.actionVFXList[0], actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                    }
+                    else // If we have released the key
+                    {
+                        animationHandler.PlayAction(actionClip);
+                    }
+                }
+                else // If there is no preview VFX
+                {
+                    animationHandler.PlayAction(actionClip);
+                }
+            }
         }
 
         public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
