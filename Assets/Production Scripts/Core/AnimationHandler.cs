@@ -296,6 +296,7 @@ namespace Vi.Core
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
+        public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void Update()

@@ -9,33 +9,38 @@ namespace Vi.Core
     {
         private void LateUpdate()
         {
-            if (transformType != TransformType.ConformToGround) { return; }
-
-            Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
-            startPos.y += raycastOffset.y;
-            RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-            Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-            bool bHit = false;
-            RaycastHit floorHit = new RaycastHit();
-
-            foreach (RaycastHit hit in allHits)
+            if (transformType == TransformType.Projectile)
             {
-                bHit = true;
-                floorHit = hit;
-
-                break;
+                transform.LookAt(transform.parent.GetComponent<AnimationHandler>().GetAimPoint());
             }
+            else if (transformType == TransformType.ConformToGround)
+            {
+                Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
+                startPos.y += raycastOffset.y;
+                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
-            if (bHit)
-            {
-                transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                transform.rotation = Quaternion.LookRotation(Vector3.Cross(floorHit.normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
-            }
-            else
-            {
-                transform.position = transform.parent.position + transform.parent.rotation * vfxPositionOffset;
+                bool bHit = false;
+                RaycastHit floorHit = new RaycastHit();
+
+                foreach (RaycastHit hit in allHits)
+                {
+                    bHit = true;
+                    floorHit = hit;
+
+                    break;
+                }
+
+                if (bHit)
+                {
+                    transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
+                    transform.rotation = Quaternion.LookRotation(Vector3.Cross(floorHit.normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                }
+                else
+                {
+                    transform.position = transform.parent.position + transform.parent.rotation * vfxPositionOffset;
+                }
             }
         }
     }
