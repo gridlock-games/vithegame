@@ -325,7 +325,7 @@ namespace Vi.Core
             RemovePlayerData((int)clientId);
         }
 
-        public NetworkList<PlayerData> playerDataList;
+        private NetworkList<PlayerData> playerDataList;
 
         [System.Serializable]
         private struct TeamDefinition
