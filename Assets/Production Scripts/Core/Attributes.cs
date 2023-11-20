@@ -244,7 +244,11 @@ namespace Vi.Core
         public Attributes GetKiller()
         {
             if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
-            return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
+                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+            else
+                return null;
         }
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
