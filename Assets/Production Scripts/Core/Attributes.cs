@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using UnityEngine.VFX;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -501,15 +501,15 @@ namespace Vi.Core
             }
         }
 
-        public float GetRespawnTime() { return Mathf.Clamp(PlayerDataManager.Singleton.GetGameModeInfo().respawnTime - (Time.time - respawnSelfCalledTime), 0, PlayerDataManager.Singleton.GetGameModeInfo().respawnTime); }
+        public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
+        public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {
-            PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
-            if (gameModeInfo.respawnTime <= 0) { yield break; }
+            if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
             respawnSelfCalledTime = Time.time;
-            yield return new WaitForSeconds(gameModeInfo.respawnTime);
+            yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
             PlayerDataManager.Singleton.RespawnPlayer(this);
         }
 

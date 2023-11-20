@@ -15,7 +15,6 @@ namespace Vi.Core
         [SerializeField] private GameObject spectatorPrefab;
         [SerializeField] private CharacterReference characterReference;
 
-        [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private List<GameModeInfo> gameModeInfos;
 
         [System.Serializable]
@@ -23,7 +22,6 @@ namespace Vi.Core
         {
             public GameMode gameMode;
             public Team[] possibleTeams;
-            public float respawnTime;
             //public string[] possibleMaps;
         }
 
