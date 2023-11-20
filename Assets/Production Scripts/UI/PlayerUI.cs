@@ -108,7 +108,7 @@ namespace Vi.UI
             else
             {
                 killerCard.Initialize(attributes.GetKiller());
-                respawnTimerText.text = "Respawning in " + attributes.GetRespawnTime().ToString("F4");
+                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
 
                 fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
                 fadeToWhiteImage.color = fadeToBlackImage.color;

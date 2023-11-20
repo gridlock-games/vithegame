@@ -504,13 +504,16 @@ namespace Vi.Core
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
         public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
+        public bool IsRespawning { get; private set; }
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {
             if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
+            IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
             PlayerDataManager.Singleton.RespawnPlayer(this);
+            IsRespawning = false;
         }
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }

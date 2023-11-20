@@ -2753,19 +2753,14 @@ MonoBehaviour:
   gameModeInfos:
   - gameMode: 0
     possibleTeams: 02000000
-    respawnTime: 0
   - gameMode: 1
     possibleTeams: 02000000
-    respawnTime: 5
   - gameMode: 2
     possibleTeams: 0300000007000000
-    respawnTime: 0
   - gameMode: 3
     possibleTeams: 0300000007000000
-    respawnTime: 0
   - gameMode: 4
     possibleTeams: 0300000007000000
-    respawnTime: 0
   teamDefinitions:
   - team: 2
     clientId: 0
@@ -2824,6 +2819,7 @@ MonoBehaviour:
   numberOfRoundsWinsToWinGame: 2
   roundDuration: 30
   nextGameActionDuration: 5
+  respawnTime: 0
   killsToWinRound: 2
 --- !u!4 &730000693
 Transform:
@@ -2846,7 +2842,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-934434
+  m_Name: pb_Mesh313198
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11046,7 +11042,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-927654
+  m_Name: pb_Mesh313276
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11396,7 +11392,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-654578
+  m_Name: pb_Mesh313318
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
