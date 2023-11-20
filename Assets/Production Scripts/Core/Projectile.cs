@@ -57,6 +57,7 @@ namespace Vi.Core
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (other.isTrigger) { return; }
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
