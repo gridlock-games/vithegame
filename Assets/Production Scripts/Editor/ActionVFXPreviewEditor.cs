@@ -10,6 +10,9 @@ namespace Vi.Editor
     [CanEditMultipleObjects]
     public class ActionVFXPreviewEditor : ActionVFXEditor
     {
+        public override void OnInspectorGUI()
+        {
 
+        }
     }
 }

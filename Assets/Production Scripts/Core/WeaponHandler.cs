@@ -177,6 +177,7 @@ namespace Vi.Core
             SpawnActionVFX(actionPreviewVFXPrefab, attackerTransform, victimTransform);
         }
 
+        private ActionVFXPreview actionVFXPreviewInstance;
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
         public void SpawnActionVFX(ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
@@ -254,21 +255,28 @@ namespace Vi.Core
                     break;
             }
 
-            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
-
             if (vfxInstance)
             {
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
+                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
                 }
-
-                StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                else if (vfxInstance.TryGetComponent(out ActionVFXPreview actionVFXPreview))
+                {
+                    actionVFXPreviewInstance = actionVFXPreview;
+                }
+                else
+                {
+                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                }
             }
             else
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
+
+            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
         }
 
         public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
@@ -438,6 +446,7 @@ namespace Vi.Core
                     }
                     else // If we have released the key
                     {
+                        if (actionVFXPreviewInstance) { Destroy(actionVFXPreviewInstance.gameObject); }
                         animationHandler.PlayAction(actionClip);
                     }
                 }
