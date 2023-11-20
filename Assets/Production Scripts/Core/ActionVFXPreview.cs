@@ -9,6 +9,8 @@ namespace Vi.Core
     {
         private void LateUpdate()
         {
+            if (transformType != TransformType.ConformToGround) { return; }
+
             Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
             startPos.y += raycastOffset.y;
             RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
