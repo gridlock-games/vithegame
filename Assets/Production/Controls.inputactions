@@ -33,15 +33,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Aim",
-                    "type": "Value",
-                    "id": "9db82f64-daae-4a84-872d-41950c599a0a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Dodge",
                     "type": "Button",
                     "id": "d4373a15-c790-4dd1-9d2f-3b30a67e8736",
@@ -70,48 +61,48 @@
                 },
                 {
                     "name": "HeavyAttack",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "020ea129-7f33-4dae-bf36-6d4c69f3c8bd",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Ability1",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "70ef5d0b-59ff-4f78-9fdf-ed0267580554",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Ability2",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "6f524f15-6bd4-482f-b988-f4a9fa43a383",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Ability3",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "ec96c199-aeba-430f-b05b-5ee935931565",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Ability4",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "b5ec45a3-9d42-4b1e-89ea-8027e7ee6eb2",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Reload",
@@ -346,17 +337,6 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bdf680a1-2c44-439e-94c0-b83347e42977",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -52,7 +52,10 @@ namespace Vi.Editor
         private SerializedProperty spStatusesToApplyToTargetOnHit;
 
         private SerializedProperty spActionVFXList;
+        private SerializedProperty spPreviewActionVFX;
 
+        private SerializedProperty spShouldAimBody;
+        private SerializedProperty spShouldAimOffHand;
         private SerializedProperty spAimDuringAnticipation;
         private SerializedProperty spAimDuringAttack;
         private SerializedProperty spAimDuringRecovery;
@@ -98,7 +101,10 @@ namespace Vi.Editor
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
+            spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
 
+            spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
+            spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
             spAimDuringAnticipation = serializedObject.FindProperty("aimDuringAnticipation");
             spAimDuringAttack = serializedObject.FindProperty("aimDuringAttack");
             spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
@@ -162,6 +168,8 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
@@ -205,6 +213,8 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
@@ -250,17 +260,19 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanCancelAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
                 EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.PropertyField(spPreviewActionVFX);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
-
                 if (!spMustBeAiming.boolValue)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);

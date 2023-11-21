@@ -24,6 +24,18 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAtRest()
+        {
+            if (Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
+            {
+                return Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+            else
+            {
+                return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
@@ -296,6 +308,7 @@ namespace Vi.Core
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
+        public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void Update()

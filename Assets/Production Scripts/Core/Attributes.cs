@@ -376,7 +376,7 @@ namespace Vi.Core
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
                 if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { continue; }
-                weaponHandler.SpawnActionVFX(actionVFX, attacker.transform);
+                weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform);
             }
 
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
@@ -492,12 +492,13 @@ namespace Vi.Core
             {
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
-                StartCoroutine(RespawnSelf());
+                respawnCoroutine = StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+                if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
         }
 
@@ -505,6 +506,7 @@ namespace Vi.Core
         public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
         public bool IsRespawning { get; private set; }
+        private Coroutine respawnCoroutine;
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {

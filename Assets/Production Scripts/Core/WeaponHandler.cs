@@ -120,6 +120,7 @@ namespace Vi.Core
             }
 
             actionVFXTracker.Clear();
+            if (actionVFXPreviewInstance) { Destroy(actionVFXPreviewInstance.gameObject); }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
@@ -162,31 +163,56 @@ namespace Vi.Core
             }
         }
 
-        private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
-        public void SpawnActionVFX(ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        public void SpawnPreviewVFX(ActionClip actionClip, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
+            actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset;
+            actionPreviewVFXPrefab.vfxRotationOffset = actionClip.actionVFXList[0].vfxRotationOffset;
+            actionPreviewVFXPrefab.vfxSpawnType = actionClip.actionVFXList[0].vfxSpawnType;
+            actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
+            actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
+            actionPreviewVFXPrefab.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+            actionPreviewVFXPrefab.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
+            actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
+            actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
+
+            SpawnActionVFX(actionClip, actionPreviewVFXPrefab, attackerTransform, victimTransform);
+        }
+
+        private ActionVFXPreview actionVFXPreviewInstance;
+        private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
+        public void SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        {
+            bool isPreviewVFX = actionVFXPrefab.GetComponent<ActionVFXPreview>();
+
             if (actionVFXTracker.Contains(actionVFXPrefab)) { return; }
             GameObject vfxInstance = null;
             switch (actionVFXPrefab.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), transform);
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.Projectile:
-                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    if (isPreviewVFX)
+                    {
+                        vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
+                        vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        break;
+                    }
+
+                    foreach (Weapon.WeaponBone weaponBone in actionClip.effectedWeaponBones)
                     {
                         if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                         {
-                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
                             vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                         else
@@ -217,14 +243,16 @@ namespace Vi.Core
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             floorHit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            isPreviewVFX ? attackerTransform : null
                         );
                     }
                     else
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)
+                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            isPreviewVFX ? attackerTransform : null
                         );
                     }
                     break;
@@ -235,21 +263,28 @@ namespace Vi.Core
                     break;
             }
 
-            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
-
             if (vfxInstance)
             {
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
+                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
                 }
-
-                StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                else if (vfxInstance.TryGetComponent(out ActionVFXPreview actionVFXPreview))
+                {
+                    actionVFXPreviewInstance = actionVFXPreview;
+                }
+                else
+                {
+                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                }
             }
             else
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
+
+            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
         }
 
         public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
@@ -308,7 +343,7 @@ namespace Vi.Core
                         if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            SpawnActionVFX(actionVFX, transform);
+                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
                         }
                     }
                 }
@@ -324,7 +359,7 @@ namespace Vi.Core
                         if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
-                            SpawnActionVFX(actionVFX, transform);
+                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
                         }
                     }
                 }
@@ -355,19 +390,23 @@ namespace Vi.Core
 
             if (IsInAnticipation)
             {
-                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
             }
             else if (IsAttacking)
             {
-                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
             }
             else if (IsInRecovery)
             {
-                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : aiming.Value, true);
+                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+            }
+            else if (animationHandler.IsAtRest())
+            {
+                Aim(aiming.Value, IsServer);
             }
             else
             {
-                Aim(aiming.Value, IsServer);
+                Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
         }
 
@@ -376,58 +415,6 @@ namespace Vi.Core
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
-        }
-
-        void OnHeavyAttack()
-        {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
-        }
-
-        void OnAbility1()
-        {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
-        }
-
-        void OnAbility2()
-        {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
-        }
-
-        void OnAbility3()
-        {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
-        }
-
-        void OnAbility4()
-        {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
-        }
-
-        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
-
-        public bool IsAiming() { return aiming.Value; }
-
-        private void Aim(bool isAiming, bool instantAim)
-        {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
-            {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim);
-                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, isAiming, instantAim);
-                }
-            }
         }
 
         private bool toggleAim = true;
@@ -445,6 +432,161 @@ namespace Vi.Core
             else
             {
                 aiming.Value = value.isPressed;
+            }
+        }
+
+        void OnHeavyAttack(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                if (actionVFXPreviewInstance)
+                {
+                    Destroy(actionVFXPreviewInstance.gameObject);
+                    return;
+                }
+            }
+
+            if (canAim)
+            {
+                if (toggleAim)
+                {
+                    if (value.isPressed) { aiming.Value = !aiming.Value; }
+                }
+                else
+                {
+                    aiming.Value = value.isPressed;
+                }
+            }
+            else if (value.isPressed)
+            {
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
+            }
+        }
+
+        void OnAbility1(InputValue value)
+        {
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
+            if (actionClip != null)
+            {
+                if (actionClip.previewActionVFX)
+                {
+                    if (value.isPressed) // If we are holding down the key
+                    {
+                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                    }
+                    else // If we have released the key
+                    {
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
+                    }
+                }
+                else // If there is no preview VFX
+                {
+                    animationHandler.PlayAction(actionClip);
+                }
+            }
+        }
+
+        void OnAbility2(InputValue value)
+        {
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
+            if (actionClip != null)
+            {
+                if (actionClip.previewActionVFX)
+                {
+                    if (value.isPressed) // If we are holding down the key
+                    {
+                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                    }
+                    else // If we have released the key
+                    {
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
+                    }
+                }
+                else // If there is no preview VFX
+                {
+                    animationHandler.PlayAction(actionClip);
+                }
+            }
+        }
+
+        void OnAbility3(InputValue value)
+        {
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
+            if (actionClip != null)
+            {
+                if (actionClip.previewActionVFX)
+                {
+                    if (value.isPressed) // If we are holding down the key
+                    {
+                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                    }
+                    else // If we have released the key
+                    {
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
+                    }
+                }
+                else // If there is no preview VFX
+                {
+                    animationHandler.PlayAction(actionClip);
+                }
+            }
+        }
+
+        void OnAbility4(InputValue value)
+        {
+            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
+            if (actionClip != null)
+            {
+                if (actionClip.previewActionVFX)
+                {
+                    if (value.isPressed) // If we are holding down the key
+                    {
+                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                    }
+                    else // If we have released the key
+                    {
+                        if (actionVFXPreviewInstance)
+                        {
+                            animationHandler.PlayAction(actionClip);
+                            Destroy(actionVFXPreviewInstance.gameObject);
+                        }
+                    }
+                }
+                else // If there is no preview VFX
+                {
+                    animationHandler.PlayAction(actionClip);
+                }
+            }
+        }
+
+        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
+
+        public bool IsAiming() { return aiming.Value; }
+
+        private void Aim(bool isAiming, bool instantAim)
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody);
+                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
+                }
             }
         }
 

@@ -22,11 +22,6 @@ namespace Vi.ScriptableObjects
             OriginatorAndTarget
         }
 
-        public void SetOriginatorAndTarget(Transform originator, Transform target)
-        {
-
-        }
-
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
         public Vector3 vfxRotationOffset = new Vector3(0, 0, 0);
 
