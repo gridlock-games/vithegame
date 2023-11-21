@@ -235,6 +235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6566535e964945d4c837a3835797c2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canShrink: 1
   shrinkSpeed: 5
   healthDeductionRate: 3
 --- !u!114 &139592048
@@ -2950,8 +2951,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UIPrefab: {fileID: 7757707048149690173, guid: 95e19619872c25d44b4fcdad9d164f7b,
     type: 3}
-  numberOfRoundsWinsToWinGame: 1
-  roundDuration: 30
+  numberOfRoundsWinsToWinGame: 10
+  roundDuration: 1000
   nextGameActionDuration: 5
   respawnTime: 5
   killsToWinRound: 1000
