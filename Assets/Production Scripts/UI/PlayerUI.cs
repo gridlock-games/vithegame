@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using System.Linq;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -25,6 +26,7 @@ namespace Vi.UI
         [Header("Death UI")]
         [SerializeField] private PlayerCard killerCard;
         [SerializeField] private Text respawnTimerText;
+        [SerializeField] private Text killedByText;
         [SerializeField] private Image fadeToBlackImage;
         [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
@@ -107,7 +109,20 @@ namespace Vi.UI
             }
             else
             {
-                killerCard.Initialize(attributes.GetKiller());
+                NetworkObject killerNetObj = attributes.GetKiller();
+                Attributes killerAttributes = killerNetObj.GetComponent<Attributes>();
+
+                if (killerAttributes)
+                {
+                    killerCard.Initialize(killerAttributes);
+                    killedByText.text = "Killed by";
+                }
+                else
+                {
+                    killerCard.Initialize(null);
+                    killedByText.text = "Killed by " + killerNetObj.name;
+                }
+
                 respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
 
                 fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());

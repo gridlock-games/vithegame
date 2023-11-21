@@ -71,7 +71,7 @@ namespace Vi.Core
                 rage.Value = 0;
         }
 
-        public void AddHP(float amount)
+        private void AddHP(float amount)
         {
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
@@ -237,16 +237,32 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition);
         }
 
+        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
+            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            {
+                ailment.Value = ActionClip.Ailment.Death;
+                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+            }
+            RenderHitGlowOnly();
+            AddHP(damage);
+            return true;
+        }
+
         private NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
 
         private void SetKiller(Attributes killer) { killerNetObjId.Value = killer.NetworkObjectId; }
 
-        public Attributes GetKiller()
+        public NetworkObject GetKiller()
         {
             if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
-                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
             else
                 return null;
         }
@@ -298,7 +314,7 @@ namespace Vi.Core
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-                if (GameModeManagers.GameModeManager.Singleton) { GameModeManagers.GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
             if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
@@ -402,12 +418,31 @@ namespace Vi.Core
             RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc] private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        [ClientRpc]
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             glowRenderer.RenderHit();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+        }
+
+        private void RenderHitGlowOnly()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
+
+            if (!IsClient)
+            {
+                glowRenderer.RenderHit();
+            }
+
+            RenderHitGlowOnlyClientRpc();
+        }
+
+        [ClientRpc]
+        private void RenderHitGlowOnlyClientRpc()
+        {
+            glowRenderer.RenderHit();
         }
 
         private void RenderBlock(Vector3 impactPosition)

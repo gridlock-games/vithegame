@@ -81,6 +81,8 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
+        public ActionClip GetDeathReaction() { return hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip; }
+
         public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
             HitLocation hitLocation;
