@@ -132,6 +132,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Minimap",
+                    "type": "Value",
+                    "id": "c9db039e-09b7-45e9-a5d8-12b324c8a7a6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "TimeScaleChange",
                     "type": "Button",
                     "id": "278c55b5-e282-4818-8540-62980d72c28e",
@@ -365,11 +374,22 @@
                 {
                     "name": "",
                     "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
-                    "path": "<Keyboard>/h",
+                    "path": "<Keyboard>/g",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "TimeScaleChange",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2eb95d8a-94cf-40f7-a52b-d7199c6009d7",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Minimap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -402,12 +422,6 @@
                     "isPartOfComposite": false
                 }
             ]
-        },
-        {
-            "name": "Mount",
-            "id": "0918b5dd-c676-468b-acac-4786ba5b8592",
-            "actions": [],
-            "bindings": []
         },
         {
             "name": "Spectator",

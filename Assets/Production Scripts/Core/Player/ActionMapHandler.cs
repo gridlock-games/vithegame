@@ -40,6 +40,7 @@ namespace Vi.Player
         void OnScoreboard(InputValue value)
         {
             if (!GameModeManager.Singleton) { return; }
+            if (minimapInstance) { return; }
             if (pauseInstance) { return; }
             if (value.isPressed)
             {
@@ -65,6 +66,7 @@ namespace Vi.Player
         GameObject pauseInstance;
         void OnPause()
         {
+            if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance)
             {
@@ -85,6 +87,23 @@ namespace Vi.Player
                     spectatorUIInstance.SetActive(false);
                 pauseInstance = Instantiate(pausePrefab, transform);
                 playerInput.SwitchCurrentActionMap("Menu");
+            }
+        }
+
+        [SerializeField] private GameObject minimapPrefab;
+        GameObject minimapInstance;
+        void OnMinimap(InputValue value)
+        {
+            if (scoreboardInstance) { return; }
+            if (pauseInstance) { return; }
+            if (value.isPressed)
+            {
+                minimapInstance = Instantiate(minimapPrefab);
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Destroy(minimapInstance);
             }
         }
     }
