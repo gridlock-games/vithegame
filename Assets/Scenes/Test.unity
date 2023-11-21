@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 139592047}
   - component: {fileID: 139592048}
   m_Layer: 6
-  m_Name: DamageCircle
+  m_Name: Damage Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2954,7 +2954,7 @@ MonoBehaviour:
   roundDuration: 30
   nextGameActionDuration: 5
   respawnTime: 5
-  killsToWinRound: 1
+  killsToWinRound: 1000
 --- !u!4 &730000693
 Transform:
   m_ObjectHideFlags: 0

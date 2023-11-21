@@ -30,10 +30,26 @@ namespace Vi.Core
         public TransformData GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
+            bool shouldResetSpawnTracker = false;
             foreach (int index in spawnIndexTracker)
             {
-                possibleSpawnPoints.RemoveAt(index);
+                try
+                {
+                    possibleSpawnPoints.RemoveAt(index);
+                }
+                catch
+                {
+                    shouldResetSpawnTracker = true;
+                    break;
+                }
             }
+
+            if (shouldResetSpawnTracker)
+            {
+                ResetSpawnTracker();
+                possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
+            }
+
             int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
             spawnIndexTracker.Add(randomIndex);
             TransformData spawnPoint = new TransformData();

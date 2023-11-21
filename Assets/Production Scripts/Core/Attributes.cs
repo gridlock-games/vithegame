@@ -257,12 +257,12 @@ namespace Vi.Core
 
         private void SetKiller(Attributes killer) { killerNetObjId.Value = killer.NetworkObjectId; }
 
-        public Attributes GetKiller()
+        public NetworkObject GetKiller()
         {
             if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
-                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value].GetComponent<Attributes>();
+                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
             else
                 return null;
         }

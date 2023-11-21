@@ -7,6 +7,7 @@ namespace Vi.Core
 {
     public class DamageCircle : NetworkBehaviour
     {
+        public bool canShrink = true;
         public float shrinkSpeed = 5;
         public float healthDeductionRate = 3;
 
@@ -15,8 +16,9 @@ namespace Vi.Core
         private void Update()
         {
             if (!IsServer) { return; }
-            transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(5, transform.localScale.y, 5), Time.deltaTime * shrinkSpeed);
 
+            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(5, transform.localScale.y, 5), Time.deltaTime * shrinkSpeed); }
+            
             foreach (Attributes attributes in attributesToDamage)
             {
                 attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject);
