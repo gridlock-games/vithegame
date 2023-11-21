@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+
+namespace Vi.Core
+{
+    public class DamageCircle : NetworkBehaviour
+    {
+        public float shrinkSpeed = 5;
+        public float healthDeductionRate = 3;
+
+        private List<Attributes> attributesToDamage = new List<Attributes>();
+
+        private void Update()
+        {
+            if (!IsServer) { return; }
+            transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(5, transform.localScale.y, 5), Time.deltaTime * shrinkSpeed);
+
+            foreach (Attributes attributes in attributesToDamage)
+            {
+                attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject);
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!IsServer) { return; }
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                int index = attributesToDamage.IndexOf(networkCollider.Attributes);
+                if (index >= 0) { attributesToDamage.RemoveAt(index); }
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (!IsServer) { return; }
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                int index = attributesToDamage.IndexOf(networkCollider.Attributes);
+                if (index == -1) { attributesToDamage.Add(networkCollider.Attributes); }
+            }
+        }
+    }
+}
