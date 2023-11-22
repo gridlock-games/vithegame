@@ -10,32 +10,67 @@ namespace Vi.Core
     {
         [SerializeField] private float distanceThreshold = 30;
 
-        private void Awake()
-        {
-            if (NetworkManager.Singleton.IsServer) { SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive); }
-        }
-
-        private AsyncOperation loadingOperation;
+        private Dictionary<Attributes, AsyncOperation> loadingOperations = new Dictionary<Attributes, AsyncOperation>();
         private void Update()
         {
-            //if (NetworkManager.Singleton.IsServer) { return; }
-            if (!NetworkManager.Singleton.LocalClient.PlayerObject) { return; }
-            if (loadingOperation != null) { if (!loadingOperation.isDone) { return; } }
-
-            if (SceneManager.GetSceneByName(name).isLoaded)
+            List<Attributes> attributesToCheck = new List<Attributes>();
+            if (NetworkManager.Singleton.IsServer)
             {
-                if (Vector3.Distance(NetworkManager.Singleton.LocalClient.PlayerObject.transform.position, transform.position) > distanceThreshold)
-                {
-                    loadingOperation = SceneManager.UnloadSceneAsync(name, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-                }
+                attributesToCheck = PlayerDataManager.Singleton.GetActivePlayers();
+            }
+            else if (NetworkManager.Singleton.IsClient)
+            {
+                attributesToCheck.Add(PlayerDataManager.Singleton.GetLocalPlayer().Value);
             }
             else
             {
-                if (Vector3.Distance(NetworkManager.Singleton.LocalClient.PlayerObject.transform.position, transform.position) < distanceThreshold)
+                return;
+            }
+
+            foreach (Attributes attributes in attributesToCheck)
+            {
+                if (!attributes) { continue; }
+                if (loadingOperations.ContainsKey(attributes))
                 {
-                    loadingOperation = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
+                    if (!CheckIfAsyncOperationIsCompleted(loadingOperations[attributes])) { continue; }
+                }
+
+                if (SceneManager.GetSceneByName(name).isLoaded)
+                {
+                    if (Vector3.Distance(attributes.transform.position, transform.position) > distanceThreshold)
+                    {
+                        if (loadingOperations.ContainsKey(attributes))
+                        {
+                            loadingOperations[attributes] = SceneManager.UnloadSceneAsync(name, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                        }
+                        else
+                        {
+                            loadingOperations.Add(attributes, SceneManager.UnloadSceneAsync(name, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects));
+                        }
+                    }
+                }
+                else
+                {
+                    if (Vector3.Distance(attributes.transform.position, transform.position) < distanceThreshold)
+                    {
+                        if (loadingOperations.ContainsKey(attributes))
+                        {
+                            loadingOperations[attributes] = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
+                        }
+                        else
+                        {
+                            loadingOperations.Add(attributes, SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive));
+                        }
+                    }
                 }
             }
+        }
+
+        private bool CheckIfAsyncOperationIsCompleted(AsyncOperation asyncOperation)
+        {
+            if (asyncOperation == null) { return true; }
+            if (asyncOperation.isDone) { return true; }
+            return false;
         }
 
         private void OnDrawGizmos()
