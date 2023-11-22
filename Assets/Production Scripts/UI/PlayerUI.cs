@@ -83,6 +83,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
                 foreach (StatusIcon statusIcon in statusIcons)

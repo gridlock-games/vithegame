@@ -28,6 +28,8 @@ namespace Vi.Networking
             //    NetworkManager.Singleton.StartServer();
             if (Application.isEditor)
             {
+                //NetworkManager.Singleton.StartClient();
+
                 if (startServerInsteadOfHost)
                     NetworkManager.Singleton.StartServer();
                 else
@@ -36,6 +38,7 @@ namespace Vi.Networking
             else
             {
                 NetworkManager.Singleton.StartClient();
+                //NetworkManager.Singleton.StartServer();
             }
         }
     }

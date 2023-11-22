@@ -47,13 +47,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scenePayloads:
   - sceneType: 2
-    scenes:
-    - {fileID: 102900000, guid: faff241e072052e41bc665038297769f, type: 3}
-    - {fileID: 102900000, guid: 9bc51b973eb787a4f9c62e8fba833815, type: 3}
-    - {fileID: 102900000, guid: 930a5a7264da31d41812b51bdb32e33d, type: 3}
-    - {fileID: 102900000, guid: 343929626c74de04485bc062c9f08804, type: 3}
-    - {fileID: 102900000, guid: 1daaeb44d9971c448836fde2a42aa266, type: 3}
-    - {fileID: 102900000, guid: 7884797ba5500954e822efb068f52338, type: 3}
+    sceneNames:
+    - Environment1
+    - Environment1Chunk0
+    - Environment1Chunk1
+    - Environment1Chunk2
+    - Environment1Chunk3
+    - Environment1Chunk4
 --- !u!114 &1352388870817673871
 MonoBehaviour:
   m_ObjectHideFlags: 0

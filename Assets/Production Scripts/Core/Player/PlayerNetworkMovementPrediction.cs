@@ -194,7 +194,7 @@ namespace Vi.Player
 
             if (positionError > 0.001f)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 CurrentPosition = latestServerState.position;
                 CurrentRotation = latestServerState.rotation;

@@ -29,6 +29,11 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             activeSceneGroupIndicies.OnListChanged += OnActiveSceneGroupIndiciesChange;
+
+            for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
+            {
+                OnActiveSceneGroupIndiciesChange(new NetworkListEvent<int>() { Index = i, PreviousValue = -1, Type = NetworkListEvent<int>.EventType.Add, Value = activeSceneGroupIndicies[i] });
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -51,7 +56,7 @@ namespace Vi.Core
                 {
                     if (IsServer)
                     {
-                        SceneManager.LoadSceneAsync(scenePayloads[networkListEvent.Index].scenes[0].name, LoadSceneMode.Additive);
+                        SceneManager.LoadSceneAsync(scenePayloads[networkListEvent.Index].sceneNames[0], LoadSceneMode.Additive);
                         //foreach (UnityEditor.SceneAsset scene in scenePayloads[networkListEvent.Index].scenes)
                         //{
                         //    SceneManager.LoadSceneAsync(scene.name, LoadSceneMode.Additive);
@@ -59,14 +64,14 @@ namespace Vi.Core
                     }
                     else
                     {
-                        SceneManager.LoadSceneAsync(scenePayloads[networkListEvent.Index].scenes[0].name, LoadSceneMode.Additive);
+                        SceneManager.LoadSceneAsync(scenePayloads[networkListEvent.Index].sceneNames[0], LoadSceneMode.Additive);
                     }
                 }
                 else
                 {
-                    foreach (UnityEditor.SceneAsset scene in scenePayloads[networkListEvent.Index].scenes)
+                    foreach (string sceneName in scenePayloads[networkListEvent.Index].sceneNames)
                     {
-                        SceneManager.LoadSceneAsync(scene.name, LoadSceneMode.Additive);
+                        SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
                     }
                 }
             }
@@ -83,7 +88,7 @@ namespace Vi.Core
         public struct InspectorScenePayload
         {
             public SceneType sceneType;
-            public UnityEditor.SceneAsset[] scenes;
+            public string[] sceneNames;
 
             //public ScenePayload ConvertToScenePayload()
             //{

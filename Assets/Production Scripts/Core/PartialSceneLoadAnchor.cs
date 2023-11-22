@@ -10,10 +10,10 @@ namespace Vi.Core
     {
         [SerializeField] private float distanceThreshold = 30;
 
-        //private void Awake()
-        //{
-        //    if (NetworkManager.Singleton.IsServer) { SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive); }
-        //}
+        private void Awake()
+        {
+            if (NetworkManager.Singleton.IsServer) { SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive); }
+        }
 
         private AsyncOperation loadingOperation;
         private void Update()
