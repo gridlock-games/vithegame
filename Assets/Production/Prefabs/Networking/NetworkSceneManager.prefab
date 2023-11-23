@@ -46,17 +46,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scenePayloads:
-  - sceneType: 2
+  - name: Main Menu
+    sceneType: 0
+    sceneNames:
+    - Main Menu
+  - name: Character Select
+    sceneType: 0
+    sceneNames:
+    - Character Select
+  - name: Player Hub
+    sceneType: 1
+    sceneNames:
+    - Player Hub
+  - name: Arena Map A
+    sceneType: 2
     sceneNames:
     - Arena Map A
-  - sceneType: 2
-    sceneNames:
-    - Environment1
-    - Environment1Chunk0
-    - Environment1Chunk1
-    - Environment1Chunk2
-    - Environment1Chunk3
-    - Environment1Chunk4
 --- !u!114 &1352388870817673871
 MonoBehaviour:
   m_ObjectHideFlags: 0

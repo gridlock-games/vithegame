@@ -33,6 +33,8 @@ namespace Vi.Core
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
+            if (attackerTeam == Team.Peaceful) { return false; }
+
             if (attackerTeam != Team.Competitor & victimTeam != Team.Competitor)
             {
                 if (attackerTeam == victimTeam) { return false; }

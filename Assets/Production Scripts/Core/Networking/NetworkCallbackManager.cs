@@ -11,10 +11,15 @@ namespace Vi.Core.SceneManagement
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetworkSceneManager networkSceneManagerPrefab;
 
+        private void Awake()
+        {
+            SceneManager.LoadSceneAsync("Main Menu", LoadSceneMode.Additive);
+        }
+
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            NetworkManager.Singleton.OnServerStarted += CreatePlayerDataManager;
+            NetworkManager.Singleton.OnServerStarted += OnServerStart;
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -69,13 +74,14 @@ namespace Vi.Core.SceneManagement
             PlayerDataManager.Singleton.AddPlayerData(playerData);
         }
 
-        private void CreatePlayerDataManager()
+        private void OnServerStart()
         {
             if (NetworkManager.Singleton.IsServer)
             {
+                SceneManager.UnloadSceneAsync("Main Menu", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 Instantiate(playerDataManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
                 Instantiate(networkSceneManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
-                NetworkSceneManager.Singleton.LoadScene();
+                NetworkSceneManager.Singleton.LoadScene("Player Hub");
             }
         }
     }
