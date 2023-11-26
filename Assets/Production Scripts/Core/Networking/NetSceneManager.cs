@@ -139,6 +139,11 @@ namespace Vi.Core
             activeSceneGroupIndicies = new NetworkList<int>();
         }
 
+        private void Update()
+        {
+            LoadingOperations.RemoveAll(item => item.asyncOperation.isDone);
+        }
+
         private new void OnDestroy()
         {
             base.OnDestroy();
@@ -154,27 +159,11 @@ namespace Vi.Core
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
-            //try
-            //{
-            //    LoadingOperations.RemoveAt(LoadingOperations.FindIndex(item => item.sceneName == scene.name));
-            //}
-            //catch
-            //{
-
-            //}
             Debug.Log("Loaded " + scene.name);
         }
 
         private void OnSceneUnload(Scene scene)
         {
-            //try
-            //{
-            //    LoadingOperations.RemoveAt(LoadingOperations.FindIndex(item => item.sceneName == scene.name));
-            //}
-            //catch
-            //{
-
-            //}
             Debug.Log("Unloaded " + scene.name);
         }
 

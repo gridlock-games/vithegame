@@ -93,7 +93,7 @@ namespace Vi.Core
         public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
-            if (team == Team.Competitor) { return attributesList; }
+            if (team == Team.Competitor | team == Team.Peaceful) { return attributesList; }
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
                 if (kvp.Value == attributesToExclude) { continue; }
