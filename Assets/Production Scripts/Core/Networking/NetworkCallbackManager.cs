@@ -11,12 +11,11 @@ namespace Vi.Core.SceneManagement
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
 
-        private GameObject networkSceneManagerInstance;
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += OnServerStart;
-            networkSceneManagerInstance = Instantiate(networkSceneManagerPrefab.gameObject);
+            Instantiate(networkSceneManagerPrefab.gameObject);
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
@@ -60,7 +59,7 @@ namespace Vi.Core.SceneManagement
             if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
             if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
-            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Peaceful;
+            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
 
             StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam)));
         }
@@ -77,8 +76,6 @@ namespace Vi.Core.SceneManagement
             if (NetworkManager.Singleton.IsServer)
             {
                 Instantiate(playerDataManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
-                //networkSceneManagerInstance.GetComponent<NetworkObject>().Spawn();
-                NetSceneManager.Singleton.LoadScene("Player Hub");
             }
         }
     }

@@ -11,6 +11,7 @@ namespace Vi.UI
         public void StartServer()
         {
             NetworkManager.Singleton.StartServer();
+            NetSceneManager.Singleton.LoadScene("Player Hub");
         }
 
         public void GoToCharacterSelect()

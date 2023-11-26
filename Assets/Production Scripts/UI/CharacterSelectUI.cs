@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -10,6 +11,12 @@ namespace Vi.UI
         public void StartClient()
         {
             NetworkManager.Singleton.StartClient();
+        }
+
+        public void GoToTrainingRoom()
+        {
+            NetworkManager.Singleton.StartHost();
+            NetSceneManager.Singleton.LoadScene("Training Room");
         }
     }
 }
