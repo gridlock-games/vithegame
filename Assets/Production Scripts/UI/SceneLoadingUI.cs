@@ -14,16 +14,16 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (!NetworkSceneManager.Singleton) { progressBarParent.SetActive(false); return; }
-            progressBarParent.SetActive(NetworkSceneManager.Singleton.loadingOperations.Count > 0);
+            if (!NetSceneManager.Singleton) { progressBarParent.SetActive(false); return; }
+            progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
 
-            for (int i = 0; i < NetworkSceneManager.Singleton.loadingOperations.Count; i++)
+            for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
             {
-                AsyncOperation asyncOperation = NetworkSceneManager.Singleton.loadingOperations[i].asyncOperation;
+                AsyncOperation asyncOperation = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation;
                 if (asyncOperation == null) { continue; }
                 if (asyncOperation.isDone) { continue; }
 
-                progressBarText.text = "Loading: " + NetworkSceneManager.Singleton.loadingOperations[i].sceneName + " " + (NetworkSceneManager.Singleton.loadingOperations.Count-i) + " scenes left";
+                progressBarText.text = "Loading: " + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + " scenes left";
                 progressBarImage.fillAmount = asyncOperation.progress;
             }
         }

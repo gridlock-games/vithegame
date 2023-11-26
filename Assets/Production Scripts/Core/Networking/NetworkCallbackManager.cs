@@ -9,17 +9,15 @@ namespace Vi.Core.SceneManagement
     public class NetworkCallbackManager : MonoBehaviour
     {
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
-        [SerializeField] private NetworkSceneManager networkSceneManagerPrefab;
+        [SerializeField] private NetSceneManager networkSceneManagerPrefab;
 
-        private void Awake()
-        {
-            SceneManager.LoadSceneAsync("Main Menu", LoadSceneMode.Additive);
-        }
-
+        private GameObject networkSceneManagerInstance;
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += OnServerStart;
+            networkSceneManagerInstance = Instantiate(networkSceneManagerPrefab.gameObject);
+            NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -62,7 +60,7 @@ namespace Vi.Core.SceneManagement
             if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
             if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
-            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
+            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Peaceful;
 
             StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam)));
         }
@@ -78,10 +76,9 @@ namespace Vi.Core.SceneManagement
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                SceneManager.UnloadSceneAsync("Main Menu", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 Instantiate(playerDataManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
-                Instantiate(networkSceneManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
-                NetworkSceneManager.Singleton.LoadScene("Player Hub");
+                //networkSceneManagerInstance.GetComponent<NetworkObject>().Spawn();
+                NetSceneManager.Singleton.LoadScene("Player Hub");
             }
         }
     }
