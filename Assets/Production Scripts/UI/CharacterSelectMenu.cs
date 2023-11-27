@@ -20,7 +20,7 @@ namespace Vi.UI
             for (int i = 0; i < playerModelOptions.Length; i++)
             {
                 GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
-                g.GetComponent<CharacterSelectElement>().Initialize(playerModelOptions[i]);
+                g.GetComponent<CharacterSelectElement>().Initialize(playerModelOptions[i].characterImage, i, 0);
                 g.transform.localPosition = new Vector3(i * 200, 0, 0);
 
                 g.GetComponent<Button>().interactable = localPlayerData.characterIndex != i;

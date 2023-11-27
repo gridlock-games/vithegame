@@ -36,12 +36,32 @@ namespace Vi.UI
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
+        private void Awake()
+        {
+            weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = GetComponentInParent<Attributes>();
+        }
+
         private void Start()
         {
             playerCard.Initialize(GetComponentInParent<Attributes>());
-            weaponHandler = GetComponentInParent<WeaponHandler>();
-            attributes = GetComponentInParent<Attributes>();
 
+            UpdateWeapon();
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
+                {
+                    statusIcon.InitializeStatusIcon(status);
+                    statusIconGameObject.SetActive(false);
+                    statusIcons.Add(statusIcon);
+                }
+            }
+        }
+
+        private void UpdateWeapon()
+        {
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {
@@ -62,17 +82,6 @@ namespace Vi.UI
                     ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
                 }
             }
-
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
-                {
-                    statusIcon.InitializeStatusIcon(status);
-                    statusIconGameObject.SetActive(false);
-                    statusIcons.Add(statusIcon);
-                }
-            }
         }
 
         private void UpdateActiveUIElements()
@@ -83,6 +92,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            UpdateWeapon();
+
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)

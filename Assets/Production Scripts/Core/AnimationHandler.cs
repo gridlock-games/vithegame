@@ -289,10 +289,13 @@ namespace Vi.Core
         }
 
         private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
-        public void SetCharacterSkin(int characterIndex, int skinIndex)
+        public void SetCharacter(int characterIndex, int skinIndex)
         {
-            if (IsSpawned) { Debug.LogError("AnimationHandler.SetCharacterSkin() should be called before spawning the object!"); return; }
             characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
+            if (IsSpawned)
+            {
+                ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
+            }
         }
 
         public override void OnNetworkSpawn()
