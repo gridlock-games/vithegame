@@ -141,6 +141,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "CharacterSelect",
+                    "type": "Button",
+                    "id": "c07c435d-e801-4366-9364-5045a12db895",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "TimeScaleChange",
                     "type": "Button",
                     "id": "278c55b5-e282-4818-8540-62980d72c28e",
@@ -374,7 +383,7 @@
                 {
                     "name": "",
                     "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
-                    "path": "<Keyboard>/g",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
@@ -390,6 +399,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Minimap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b530ce06-09f9-491f-9ea6-391312c5ba2b",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "CharacterSelect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

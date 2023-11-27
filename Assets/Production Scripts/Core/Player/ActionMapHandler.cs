@@ -68,6 +68,7 @@ namespace Vi.Player
         {
             if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }
+
             if (pauseInstance)
             {
                 Cursor.lockState = CursorLockMode.Locked;
