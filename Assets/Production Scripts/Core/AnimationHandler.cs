@@ -163,13 +163,12 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // Play the action clip based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -214,13 +213,12 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
             // Play the action clip on the client side based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Set the current action clip for the weapon handler
