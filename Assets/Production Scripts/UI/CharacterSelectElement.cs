@@ -12,10 +12,12 @@ namespace Vi.UI
         [SerializeField] private Image characterIconImage;
         [SerializeField] private Button button;
 
+        private CharacterSelectMenu characterSelectMenu;
         private int characterIndex;
         private int skinIndex;
-        public void Initialize(Sprite characterImage, int characterIndex, int skinIndex)
+        public void Initialize(CharacterSelectMenu characterSelectMenu, Sprite characterImage, int characterIndex, int skinIndex)
         {
+            this.characterSelectMenu = characterSelectMenu;
             characterIconImage.sprite = characterImage;
             this.characterIndex = characterIndex;
             this.skinIndex = skinIndex;
@@ -24,6 +26,7 @@ namespace Vi.UI
         public void ChangeCharacter()
         {
             PlayerDataManager.Singleton.GetLocalPlayer().Value.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            characterSelectMenu.ResetSkinIndex();
         }
 
         private void Update()
