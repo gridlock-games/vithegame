@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using UnityEngine.UI;
 
 namespace Vi.UI
 {
@@ -14,42 +15,16 @@ namespace Vi.UI
 
         private void Awake()
         {
+            PlayerDataManager.PlayerData localPlayerData = PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayer().Key);
             CharacterReference.PlayerModelOption[] playerModelOptions = characterReference.GetPlayerModelOptions();
             for (int i = 0; i < playerModelOptions.Length; i++)
             {
                 GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
                 g.GetComponent<CharacterSelectElement>().Initialize(playerModelOptions[i]);
+                g.transform.localPosition = new Vector3(i * 200, 0, 0);
+
+                g.GetComponent<Button>().interactable = localPlayerData.characterIndex != i;
             }
         }
-
-        //private float WIDTH = 200;
-        //private float HEIGHT = 200;
-        //private float X_OFFSET = 0;
-        //private void CreateGrid()
-        //{
-        //    var incrementX = 0;
-        //    var amoutToSpawn = WIDTH;
-
-        //    for (int y = 0; y < HEIGHT; y++)
-        //    {
-        //        for (int x = 0; x < amoutToSpawn; x++)
-        //        {
-        //            var xPos = (x + incrementX) * X_OFFSET;
-
-        //            if (y % 2 == 1)
-        //                xPos += X_OFFSET / 2;
-
-        //            CreateHex(xPos, x + incrementX, y);
-
-        //            if (y > 0)
-        //                CreateHex(xPos, x + incrementX, -y);
-        //        }
-
-        //        if (y % 2 == 1)
-        //            incrementX++;
-
-        //        amoutToSpawn--;
-        //    }
-        //}
     }
 }
