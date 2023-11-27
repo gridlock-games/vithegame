@@ -22,6 +22,7 @@ namespace Vi.UI
         private void Update()
         {
             if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
+            else if (Camera.main) { cam.enabled = false; }
             else { cam.enabled = UICameras[^1] == this; }
         }
 

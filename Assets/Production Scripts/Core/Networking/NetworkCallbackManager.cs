@@ -14,8 +14,8 @@ namespace Vi.Core.SceneManagement
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            NetworkManager.Singleton.OnServerStarted += OnServerStart;
             Instantiate(networkSceneManagerPrefab.gameObject);
+            Instantiate(playerDataManagerPrefab.gameObject);
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
@@ -68,14 +68,6 @@ namespace Vi.Core.SceneManagement
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             PlayerDataManager.Singleton.AddPlayerData(playerData);
-        }
-
-        private void OnServerStart()
-        {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                Instantiate(playerDataManagerPrefab.gameObject).GetComponent<NetworkObject>().Spawn();
-            }
         }
     }
 }

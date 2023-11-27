@@ -115,7 +115,14 @@ namespace Vi.Core
 
         public KeyValuePair<int, Attributes> GetLocalPlayer()
         {
-            return localPlayers.First(kvp => kvp.Value.IsLocalPlayer);
+            try
+            {
+                return localPlayers.First(kvp => kvp.Value.IsLocalPlayer);
+            }
+            catch
+            {
+                return new KeyValuePair<int, Attributes>();
+            }
         }
 
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }

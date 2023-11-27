@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 namespace Vi.UI
 {
     public class MainMenuUI : MonoBehaviour
     {
+        [SerializeField] private InputField usernameInputField;
+
         public void StartServer()
         {
             NetworkManager.Singleton.StartServer();
@@ -23,6 +26,11 @@ namespace Vi.UI
         {
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
+        }
+
+        public void OnUsernameChange()
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(usernameInputField.text + "|0|0");
         }
     }
 }

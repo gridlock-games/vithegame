@@ -12,8 +12,6 @@ namespace Vi.Core
     {
         [SerializeField] private ScenePayload[] scenePayloads;
 
-        //public ScenePayload[] SceneDefinitions { get; private set; }
-
         public static NetSceneManager Singleton { get { return _singleton; } }
         private static NetSceneManager _singleton;
 

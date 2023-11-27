@@ -12,8 +12,8 @@ namespace Vi.UI
         [SerializeField] private Transform characterSelectParent;
         [SerializeField] private CharacterSelectElement characterSelectElement;
 
-        private float size = 200;
-        private int height = 2;
+        private readonly float size = 200;
+        private readonly int height = 2;
 
         private void Awake()
         {
@@ -38,7 +38,7 @@ namespace Vi.UI
 
         public void ResetSkinIndex() { skinIndex = 0; }
 
-        private int skinIndex = 0;
+        private int skinIndex;
         public void ChangeSkin()
         {
             KeyValuePair<int, Attributes> localKvp = PlayerDataManager.Singleton.GetLocalPlayer();

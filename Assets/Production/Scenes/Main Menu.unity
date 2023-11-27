@@ -442,6 +442,41 @@ PrefabInstance:
       propertyPath: m_CharacterLimit
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2014850920}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnUsernameChange
+      objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Vi.UI.MainMenuUI, Vi.UI
+      objectReference: {fileID: 0}
+    - target: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 224490779682924790, guid: 6db24e4df50936a44880ca7f7f3654c6,
         type: 3}
       propertyPath: m_Pivot.x
@@ -565,6 +600,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 249775864}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &553771782 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114220598801556858, guid: 6db24e4df50936a44880ca7f7f3654c6,
+    type: 3}
+  m_PrefabInstance: {fileID: 249775864}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &593332742
 GameObject:
   m_ObjectHideFlags: 0
@@ -922,6 +969,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Google Sign In Button
       objectReference: {fileID: 0}
+    - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114286057846976786, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -1015,7 +1066,7 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -1025,7 +1076,7 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -1090,12 +1141,12 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -63.75
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -1596,6 +1647,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39b7ed0a0b69ad842bfeabf899d2d819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  usernameInputField: {fileID: 553771782}
 --- !u!1001 &2019563762
 PrefabInstance:
   m_ObjectHideFlags: 0
