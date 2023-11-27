@@ -294,6 +294,10 @@ namespace Vi.Core
             characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
             if (IsSpawned)
             {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                playerData.characterIndex = characterIndex;
+                playerData.skinIndex = skinIndex;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
                 ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
         }

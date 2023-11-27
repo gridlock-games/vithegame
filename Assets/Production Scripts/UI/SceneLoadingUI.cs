@@ -25,7 +25,7 @@ namespace Vi.UI
 
             for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
             {
-                progressBarText.text = "Loading " + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 0 ? " Scenes" : " Scene") + " Left";
+                progressBarText.text = "Loading " + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
                 progressBarImage.fillAmount = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.progress;
             }
         }

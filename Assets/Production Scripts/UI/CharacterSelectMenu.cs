@@ -13,17 +13,27 @@ namespace Vi.UI
         [SerializeField] private CharacterSelectElement characterSelectElement;
         [SerializeField] private CharacterReference characterReference;
 
+        private float size = 200;
+        private int height = 2;
+
         private void Awake()
         {
-            PlayerDataManager.PlayerData localPlayerData = PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayer().Key);
             CharacterReference.PlayerModelOption[] playerModelOptions = characterReference.GetPlayerModelOptions();
-            for (int i = 0; i < playerModelOptions.Length; i++)
-            {
-                GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
-                g.GetComponent<CharacterSelectElement>().Initialize(playerModelOptions[i].characterImage, i, 0);
-                g.transform.localPosition = new Vector3(i * 200, 0, 0);
 
-                g.GetComponent<Button>().interactable = localPlayerData.characterIndex != i;
+            Quaternion rotation = Quaternion.Euler(0, 0, -45);
+            int characterIndex = 0;
+            for (int x = 0; x < playerModelOptions.Length; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (characterIndex >= playerModelOptions.Length) { return; }
+
+                    Vector3 pos = new Vector3(x * size, y * size, 0);
+                    GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
+                    g.transform.localPosition = rotation * pos;
+                    g.GetComponent<CharacterSelectElement>().Initialize(playerModelOptions[characterIndex].characterImage, characterIndex, 0);
+                    characterIndex++;
+                }
             }
         }
     }

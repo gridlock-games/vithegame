@@ -10,6 +10,7 @@ namespace Vi.UI
     public class CharacterSelectElement : MonoBehaviour
     {
         [SerializeField] private Image characterIconImage;
+        [SerializeField] private Button button;
 
         private int characterIndex;
         private int skinIndex;
@@ -23,6 +24,11 @@ namespace Vi.UI
         public void ChangeCharacter()
         {
             PlayerDataManager.Singleton.GetLocalPlayer().Value.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+        }
+
+        private void Update()
+        {
+            button.interactable = PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayer().Key).characterIndex != characterIndex;
         }
     }
 }
