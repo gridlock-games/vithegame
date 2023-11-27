@@ -12,11 +12,5 @@ namespace Vi.UI
         {
             NetworkManager.Singleton.StartClient();
         }
-
-        public void GoToTrainingRoom()
-        {
-            NetworkManager.Singleton.StartHost();
-            NetSceneManager.Singleton.LoadScene("Training Room");
-        }
     }
 }

@@ -18,6 +18,12 @@ namespace Vi.UI
         {
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
+
+        public void GoToTrainingRoom()
+        {
+            NetworkManager.Singleton.StartHost();
+            NetSceneManager.Singleton.LoadScene("Training Room");
+        }
     }
 }
 

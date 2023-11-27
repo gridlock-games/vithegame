@@ -67,7 +67,6 @@ namespace Vi.Core.SceneManagement
         private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
-            yield return new WaitForSeconds(1);
             PlayerDataManager.Singleton.AddPlayerData(playerData);
         }
 
