@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -12,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private CharacterSelectMenu characterSelectMenu;
         [SerializeField] private Slider volumeSlider;
+        [SerializeField] private Button characterSelectButton;
 
         public void OpenDisplayMenu()
         {
@@ -46,6 +48,7 @@ namespace Vi.UI
         private void Start()
         {
             volumeSlider.value = AudioListener.volume;
+            characterSelectButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
         }
     }
 }
