@@ -46,6 +46,11 @@ namespace Vi.Player
             currentPositionOffset = positionOffset;
         }
 
+        private void OnDestroy()
+        {
+            Destroy(cameraInterp);
+        }
+
         private void Update()
         {
             // Update camera interp transform

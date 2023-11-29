@@ -14,6 +14,8 @@ namespace Vi.UI
         [SerializeField] private Transform characterSelectParent;
         [SerializeField] private Text characterNameText;
         [SerializeField] private Text characterRoleText;
+        [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
+        [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
         private readonly float size = 200;
         private readonly int height = 2;
@@ -44,14 +46,14 @@ namespace Vi.UI
             NetworkManager.Singleton.StartClient();
         }
 
-        private int skinIndex;
-
+        private GameObject previewObject;
         public void UpdateCharacterPreview(int characterIndex, int skinIndex)
         {
-            Debug.Log(characterIndex + " " + skinIndex);
-        }
+            if (previewObject) { Destroy(previewObject); }
 
-        public void ResetSkinIndex() { skinIndex = 0; }
+            previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+        }
 
         public void ChangeSkin()
         {

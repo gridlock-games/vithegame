@@ -22,11 +22,12 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor()
         {
+            if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
+
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
             else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }

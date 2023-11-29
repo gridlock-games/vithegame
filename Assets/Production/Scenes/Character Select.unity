@@ -281,6 +281,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 513af718acc4ff143a1cf8a75d5b73b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layerMask:
+  - UI
+  - Character
+  - NetworkPrediction
 --- !u!1001 &363333587
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -8,6 +8,8 @@ namespace Vi.UI
     [RequireComponent(typeof(Camera))]
     public class UICamera : MonoBehaviour
     {
+        [SerializeField] private string[] layerMask = new string[] { "UI" };
+
         private static List<UICamera> UICameras = new List<UICamera>();
 
         private Camera cam;
@@ -15,7 +17,7 @@ namespace Vi.UI
         {
             UICameras.Add(this);
             cam = GetComponent<Camera>();
-            cam.cullingMask = LayerMask.GetMask(new string[] { "UI" });
+            cam.cullingMask = LayerMask.GetMask(layerMask);
             cam.depth = -1;
         }
 

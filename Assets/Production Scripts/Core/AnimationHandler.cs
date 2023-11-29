@@ -300,6 +300,10 @@ namespace Vi.Core
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
                 ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
+            else if (!NetworkManager.IsListening)
+            {
+                ChangeSkin(characterIndex, skinIndex);
+            }
         }
 
         public override void OnNetworkSpawn()

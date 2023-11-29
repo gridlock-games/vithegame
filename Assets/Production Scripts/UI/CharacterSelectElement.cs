@@ -52,7 +52,7 @@ namespace Vi.UI
             }
 
             if (characterSelectMenu) { characterSelectMenu.ResetSkinIndex(); }
-            if (characterSelectUI) { characterSelectUI.ResetSkinIndex(); characterSelectUI.UpdateCharacterPreview(characterIndex, skinIndex); }
+            if (characterSelectUI) { characterSelectUI.UpdateCharacterPreview(characterIndex, skinIndex); }
         }
 
         private void Update()
