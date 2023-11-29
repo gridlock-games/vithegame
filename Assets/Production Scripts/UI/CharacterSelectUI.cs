@@ -32,7 +32,7 @@ namespace Vi.UI
                 {
                     if (characterIndex >= playerModelOptions.Length) { return; }
 
-                    Vector3 pos = new Vector3(x * size, y * size, 0);
+                    Vector3 pos = new Vector3(x * size - size, y * size, 0);
                     GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
                     g.transform.localPosition = rotation * pos;
                     g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
@@ -56,8 +56,12 @@ namespace Vi.UI
         {
             if (previewObject) { Destroy(previewObject); }
 
-            previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
             previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            characterNameText.text = playerModelOption.name;
+            characterRoleText.text = playerModelOption.role;
+            //playerModelOption.weapon.ability
         }
 
         public void ChangeSkin()
@@ -79,6 +83,12 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName + PlayerDataManager.payloadParseString + characterIndex + PlayerDataManager.payloadParseString + skinIndex);
 
             UpdateCharacterPreview(characterIndex, skinIndex);
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(previewCharacterPosition, 0.5f);
         }
     }
 }

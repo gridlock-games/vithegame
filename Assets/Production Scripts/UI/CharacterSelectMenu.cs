@@ -27,7 +27,7 @@ namespace Vi.UI
                 {
                     if (characterIndex >= playerModelOptions.Length) { return; }
 
-                    Vector3 pos = new Vector3(x * size, y * size, 0);
+                    Vector3 pos = new Vector3(x * size - size, y * size, 0);
                     GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
                     g.transform.localPosition = rotation * pos;
                     g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
