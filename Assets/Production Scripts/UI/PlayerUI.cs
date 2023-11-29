@@ -123,7 +123,8 @@ namespace Vi.UI
             else
             {
                 NetworkObject killerNetObj = attributes.GetKiller();
-                Attributes killerAttributes = killerNetObj.GetComponent<Attributes>();
+                Attributes killerAttributes = null;
+                if (killerNetObj) { killerAttributes = killerNetObj.GetComponent<Attributes>(); }
 
                 if (killerAttributes)
                 {
@@ -133,13 +134,16 @@ namespace Vi.UI
                 else
                 {
                     killerCard.Initialize(null);
-                    killedByText.text = "Killed by " + killerNetObj.name;
+                    killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name : "Unknown");
                 }
 
                 respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
 
-                fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
-                fadeToWhiteImage.color = fadeToBlackImage.color;
+                if (attributes.IsRespawning)
+                {
+                    fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
+                    fadeToWhiteImage.color = fadeToBlackImage.color;
+                }
             }
             UpdateActiveUIElements();
         }

@@ -167,7 +167,7 @@ namespace Vi.Player
         private new void OnDestroy()
         {
             base.OnDestroy();
-            Destroy(cameraInstance.gameObject);
+            if (cameraInstance) { Destroy(cameraInstance.gameObject); }
             Destroy(movementPredictionRigidbody.gameObject);
         }
 
