@@ -48,11 +48,11 @@ namespace Vi.UI
 
                 if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
 
-                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName + "|" + characterIndex + "|" + skinIndex);
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName + PlayerDataManager.payloadParseString + characterIndex + PlayerDataManager.payloadParseString + skinIndex);
             }
 
             if (characterSelectMenu) { characterSelectMenu.ResetSkinIndex(); }
-            if (characterSelectUI) { characterSelectUI.ResetSkinIndex(); }
+            if (characterSelectUI) { characterSelectUI.ResetSkinIndex(); characterSelectUI.UpdateCharacterPreview(characterIndex, skinIndex); }
         }
 
         private void Update()
