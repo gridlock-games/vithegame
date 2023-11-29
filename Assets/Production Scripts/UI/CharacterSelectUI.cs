@@ -41,6 +41,11 @@ namespace Vi.UI
             }
         }
 
+        private void Start()
+        {
+            UpdateCharacterPreview(0, 0);
+        }
+
         public void StartClient()
         {
             NetworkManager.Singleton.StartClient();
