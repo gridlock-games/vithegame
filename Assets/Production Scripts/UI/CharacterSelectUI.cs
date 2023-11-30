@@ -5,13 +5,18 @@ using Unity.Netcode;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
         [SerializeField] private CharacterSelectElement characterSelectElement;
-        [SerializeField] private Transform characterSelectParent;
+        [SerializeField] private Transform characterSelectGridParent;
+        [SerializeField] private GameObject characterSelectParent;
+        [SerializeField] private ServerListElement serverListElement;
+        [SerializeField] private Transform serverListElementParent;
+        [SerializeField] private GameObject serverListParent;
         [SerializeField] private Text characterNameText;
         [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
@@ -22,8 +27,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            CloseServerBrowser();
             CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-
             Quaternion rotation = Quaternion.Euler(0, 0, -45);
             int characterIndex = 0;
             for (int x = 0; x < playerModelOptions.Length; x++)
@@ -33,7 +38,7 @@ namespace Vi.UI
                     if (characterIndex >= playerModelOptions.Length) { return; }
 
                     Vector3 pos = new Vector3(x * size - size, y * size, 0);
-                    GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectParent);
+                    GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
                     g.transform.localPosition = rotation * pos;
                     g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
                     characterIndex++;
@@ -44,6 +49,34 @@ namespace Vi.UI
         private void Start()
         {
             UpdateCharacterPreview(0, 0);
+            StartCoroutine(WebRequestManager.GetRequest());
+        }
+
+        List<ServerListElement> serverListElementList = new List<ServerListElement>();
+        private void Update()
+        {
+            foreach (WebRequestManager.Server server in WebRequestManager.Servers)
+            {
+                if (!serverListElementList.Find(item => item.server._id == server._id))
+                {
+                    ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                    serverListElementInstance.Initialize(this, server);
+                    Debug.Log(serverListElement);
+                    serverListElementList.Add(serverListElementInstance);
+                }
+            }
+        }
+
+        public void OpenServerBrowser()
+        {
+            characterSelectParent.SetActive(false);
+            serverListParent.SetActive(true);
+        }
+
+        public void CloseServerBrowser()
+        {
+            characterSelectParent.SetActive(true);
+            serverListParent.SetActive(false);
         }
 
         public void StartClient()
@@ -61,7 +94,6 @@ namespace Vi.UI
             previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             characterNameText.text = playerModelOption.name;
             characterRoleText.text = playerModelOption.role;
-            //playerModelOption.weapon.ability
         }
 
         public void ChangeSkin()
