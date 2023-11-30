@@ -21,6 +21,9 @@ namespace Vi.UI
         [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
+        [SerializeField] private Button connectButton;
+        [SerializeField] private Button closeServersMenuButton;
+        [SerializeField] private Button refreshServersButton;
 
         private readonly float size = 200;
         private readonly int height = 2;
@@ -55,15 +58,24 @@ namespace Vi.UI
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private void Update()
         {
-            foreach (WebRequestManager.Server server in WebRequestManager.Servers)
+            if (!WebRequestManager.IsRefreshingServers)
             {
-                if (!serverListElementList.Find(item => item.server._id == server._id))
+                foreach (WebRequestManager.Server server in WebRequestManager.Servers)
                 {
-                    ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
-                    serverListElementInstance.Initialize(this, server);
-                    Debug.Log(serverListElement);
-                    serverListElementList.Add(serverListElementInstance);
+                    if (!serverListElementList.Find(item => item.Server._id == server._id))
+                    {
+                        ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                        serverListElementInstance.Initialize(this, server);
+                        serverListElementList.Add(serverListElementInstance);
+                    }
                 }
+            }
+
+            serverListElementList = serverListElementList.OrderBy(item => item.pingTime).ToList();
+            for (int i = 0; i < serverListElementList.Count; i++)
+            {
+                serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime >= 0);
+                serverListElementList[i].transform.SetSiblingIndex(i);
             }
         }
 
@@ -71,6 +83,7 @@ namespace Vi.UI
         {
             characterSelectParent.SetActive(false);
             serverListParent.SetActive(true);
+            RefreshServerBrowser();
         }
 
         public void CloseServerBrowser()
@@ -79,8 +92,21 @@ namespace Vi.UI
             serverListParent.SetActive(false);
         }
 
+        public void RefreshServerBrowser()
+        {
+            StartCoroutine(WebRequestManager.GetRequest());
+            foreach (ServerListElement serverListElement in serverListElementList)
+            {
+                Destroy(serverListElement.gameObject);
+            }
+            serverListElementList.Clear();
+        }
+
         public void StartClient()
         {
+            connectButton.interactable = false;
+            closeServersMenuButton.interactable = false;
+            refreshServersButton.interactable = false;
             NetworkManager.Singleton.StartClient();
         }
 

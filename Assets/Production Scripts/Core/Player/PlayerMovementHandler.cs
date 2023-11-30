@@ -168,7 +168,7 @@ namespace Vi.Player
         {
             base.OnDestroy();
             if (cameraInstance) { Destroy(cameraInstance.gameObject); }
-            Destroy(movementPredictionRigidbody.gameObject);
+            if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;

@@ -11,11 +11,11 @@ namespace Vi.Core
 
         public static List<Server> Servers { get; private set; } = new List<Server>();
 
-        private static bool getRequestRunning;
+        public static bool IsRefreshingServers { get; private set; }
         public static IEnumerator GetRequest()
         {
-            if (getRequestRunning) { yield break; }
-            getRequestRunning = true;
+            if (IsRefreshingServers) { yield break; }
+            IsRefreshingServers = true;
             UnityWebRequest getRequest = UnityWebRequest.Get(serverAPIURL);
             yield return getRequest.SendWebRequest();
 
@@ -42,7 +42,7 @@ namespace Vi.Core
                 }
             }
             getRequest.Dispose();
-            getRequestRunning = false;
+            IsRefreshingServers = false;
         }
 
         public static IEnumerator PutRequest(ServerPutPayload payload)
