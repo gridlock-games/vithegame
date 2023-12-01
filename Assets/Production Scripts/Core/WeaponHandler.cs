@@ -50,6 +50,8 @@ namespace Vi.Core
 
         private void EquipWeapon(GameObject skinPrefab)
         {
+            if (IsServer) { aiming.Value = false; }
+            canAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
@@ -421,19 +423,6 @@ namespace Vi.Core
         private bool canAim;
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        void OnAim(InputValue value)
-        {
-            if (!canAim) { return; }
-
-            if (toggleAim)
-            {
-                if (value.isPressed) { aiming.Value = !aiming.Value; }
-            }
-            else
-            {
-                aiming.Value = value.isPressed;
-            }
-        }
 
         void OnHeavyAttack(InputValue value)
         {

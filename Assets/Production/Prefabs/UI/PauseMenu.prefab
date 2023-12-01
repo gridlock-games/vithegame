@@ -2933,7 +2933,10 @@ MonoBehaviour:
     type: 3}
   controlSettingsMenu: {fileID: 760765561020720752, guid: d3756acb23f05ab4283c45280d8624b3,
     type: 3}
+  characterSelectMenu: {fileID: 7311874236876554467, guid: 876dbb4733c9a4d4bb414e424e21ec1e,
+    type: 3}
   volumeSlider: {fileID: 7309343886541365622}
+  characterSelectButton: {fileID: 7270966902430247110}
 --- !u!1 &7309343887203894616
 GameObject:
   m_ObjectHideFlags: 0
@@ -3377,7 +3380,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1361706856374316, guid: f9fa21dca98874c4196e015010414446, type: 3}
       propertyPath: m_Name
-      value: Return Button
+      value: Character Select Button
       objectReference: {fileID: 0}
     - target: {fileID: 1522089196768506, guid: f9fa21dca98874c4196e015010414446, type: 3}
       propertyPath: m_IsActive
@@ -3390,7 +3393,7 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3401,7 +3404,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 7309343886950099502}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -3410,12 +3413,12 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: QuitGame
+      value: OpenCharacterSelectMenu
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: LightPat.Core.Menu, Assembly-CSharp-firstpass
+      value: Vi.UI.PauseMenu, Vi.UI
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3425,7 +3428,7 @@ PrefabInstance:
     - target: {fileID: 114902987647824782, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_Text
-      value: RETURN TO CHARACTER SELECT
+      value: CHANGE CHARACTER
       objectReference: {fileID: 0}
     - target: {fileID: 224172569267278494, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3605,6 +3608,18 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114687725385229732, guid: f9fa21dca98874c4196e015010414446, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f9fa21dca98874c4196e015010414446, type: 3}
+--- !u!114 &7270966902430247110 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
+    type: 3}
+  m_PrefabInstance: {fileID: 7309343885775628688}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7380838860105046076 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,

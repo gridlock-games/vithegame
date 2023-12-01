@@ -163,13 +163,12 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // Play the action clip based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -214,13 +213,12 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
             // Play the action clip on the client side based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Set the current action clip for the weapon handler
@@ -291,10 +289,21 @@ namespace Vi.Core
         }
 
         private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
-        public void SetCharacterSkin(int characterIndex, int skinIndex)
+        public void SetCharacter(int characterIndex, int skinIndex)
         {
-            if (IsSpawned) { Debug.LogError("AnimationHandler.SetCharacterSkin() should be called before spawning the object!"); return; }
             characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
+            if (IsSpawned)
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                playerData.characterIndex = characterIndex;
+                playerData.skinIndex = skinIndex;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+                ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
+            }
+            else if (!NetworkManager.IsListening)
+            {
+                ChangeSkin(characterIndex, skinIndex);
+            }
         }
 
         public override void OnNetworkSpawn()

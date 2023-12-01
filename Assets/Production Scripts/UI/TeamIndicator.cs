@@ -9,20 +9,20 @@ namespace Vi.UI
     {
         private const float glowAmount = 2.46f;
 
-        private CharacterController characterController;
         private Attributes attributes;
         private Renderer[] renderers;
         private void Start()
         {
             attributes = GetComponentInParent<Attributes>();
             renderers = GetComponentsInChildren<Renderer>();
-            characterController = attributes.GetComponent<CharacterController>();
         }
 
         private void Update()
         {
             foreach (Renderer r in renderers)
             {
+                r.enabled = attributes.IsSpawned;
+
                 foreach (Material mat in r.materials)
                 {
                     if (mat.HasProperty("_Glow"))

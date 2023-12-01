@@ -81,6 +81,11 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
+            if (attributes.ShouldApplyAilmentRotation())
+            {
+                transform.rotation = attributes.GetAilmentRotation();
+            }
+
             if (animationHandler.ShouldApplyRootMotion())
             {
                 movement = animationHandler.ApplyLocalRootMotion();

@@ -164,6 +164,13 @@ namespace Vi.Player
             }
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (cameraInstance) { Destroy(cameraInstance.gameObject); }
+            if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
+        }
+
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -181,6 +188,8 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));

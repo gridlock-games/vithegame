@@ -10,11 +10,10 @@ namespace Vi.ArtificialIntelligence
     {
         [SerializeField] private BotDefinition[] botDefinitions;
 
-        public override void OnNetworkSpawn()
+        private void Start()
         {
             foreach (BotDefinition botDefinition in botDefinitions)
             {
-                if (!botDefinition.enabled) { continue; }
                 PlayerDataManager.Singleton.AddBotData(botDefinition.characterIndex, botDefinition.skinIndex, botDefinition.team);
             }
         }
@@ -22,7 +21,6 @@ namespace Vi.ArtificialIntelligence
         [System.Serializable]
         private class BotDefinition
         {
-            public bool enabled = true;
             public int characterIndex;
             public int skinIndex;
             public PlayerDataManager.Team team;
