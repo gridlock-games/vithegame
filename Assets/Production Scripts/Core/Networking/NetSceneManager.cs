@@ -166,6 +166,26 @@ namespace Vi.Core
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             Debug.Log("Loaded " + scene.name);
+            if (IsServer)
+            {
+                foreach (GameObject g in scene.GetRootGameObjects())
+                {
+                    if (g.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (!networkObject.IsSpawned) { networkObject.Spawn(true); }
+                    }
+                }
+            }
+            else
+            {
+                foreach (GameObject g in scene.GetRootGameObjects())
+                {
+                    if (g.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (!networkObject.IsSpawned) { Destroy(g); }
+                    }
+                }
+            }
         }
 
         private void OnSceneUnload(Scene scene)

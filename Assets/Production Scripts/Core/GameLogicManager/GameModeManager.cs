@@ -35,6 +35,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
+            Debug.Log(killer + " " + victim);
             if (nextGameActionTimer.Value <= 0)
             {
                 int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
@@ -102,6 +103,10 @@ namespace Vi.Core.GameModeManagers
                 //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                {
+                    AddPlayerScore(playerData.id);
+                }
             }
             //roundTimer.Value = roundDuration;
             nextGameActionTimer.Value = nextGameActionDuration;

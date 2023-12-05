@@ -5,10 +5,11 @@ using Vi.ScriptableObjects;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.UI
 {
-    public class LobbyUI : MonoBehaviour
+    public class LobbyUI : NetworkBehaviour
     {
         [SerializeField] private CharacterSelectElement characterSelectElement;
         [SerializeField] private Transform characterSelectGridParent;
@@ -17,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
         [SerializeField] private Button lockCharacterButton;
+        [SerializeField] private Text characterLockTimeText;
         [SerializeField] private AccountCard playerAccountCardPrefab;
         [SerializeField] private Transform upperLeftTeamParent;
         [SerializeField] private Transform upperRightTeamParent;
@@ -25,6 +27,9 @@ namespace Vi.UI
 
         private readonly float size = 200;
         private readonly int height = 2;
+
+        private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
+        private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
 
         private void Awake()
         {
@@ -46,6 +51,37 @@ namespace Vi.UI
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
+            startGameTimer.OnValueChanged += OnStartGameTimerChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            characterLockTimer.OnValueChanged -= OnCharacterLockTimerChange;
+            startGameTimer.OnValueChanged -= OnStartGameTimerChange;
+        }
+
+        private void OnCharacterLockTimerChange(float prev, float current)
+        {
+            if (prev > 0 & current <= 0)
+            {
+                LockCharacter();
+            }
+        }
+
+        private void OnStartGameTimerChange(float prev, float current)
+        {
+            if (IsServer)
+            {
+                if (prev > 0 & current <= 0)
+                {
+                    NetSceneManager.Singleton.LoadScene("Free For All");
+                }
+            }
+        }
+
         private void Start()
         {
             UpdateCharacterPreview(0, 0);
@@ -53,6 +89,23 @@ namespace Vi.UI
 
         private void Update()
         {
+            List<ulong> entireClientList = new List<ulong>();
+            foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+            {
+                if (playerData.id >= 0) { entireClientList.Add((ulong)playerData.id); }
+            }
+            bool startingGame = lockedCharacters.SequenceEqual(entireClientList);
+
+            if (IsServer)
+            {
+                if (PlayerDataManager.Singleton.GetPlayerDataList().Count > 0)
+                {
+                    if (startingGame) { startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
+                    else { characterLockTimer.Value = Mathf.Clamp(characterLockTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
+                }
+            }
+            characterLockTimeText.text = startingGame ? startGameTimer.Value.ToString("F0") : characterLockTimer.Value.ToString("F0");
+
             Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
             PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
             for (int i = 0; i < possibleTeams.Length; i++)
@@ -87,16 +140,29 @@ namespace Vi.UI
         private GameObject previewObject;
         public void UpdateCharacterPreview(int characterIndex, int skinIndex)
         {
-            if (previewObject) { Destroy(previewObject); }
+            //if (previewObject) { Destroy(previewObject); }
 
-            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-            characterNameText.text = playerModelOption.name;
-            characterRoleText.text = playerModelOption.role;
+            //CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+            //previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            //previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            //characterNameText.text = playerModelOption.name;
+            //characterRoleText.text = playerModelOption.role;
         }
 
         public void LockCharacter()
+        {
+            if (IsServer)
+            {
+                //LockCharacterClientRpc(NetworkManager.LocalClientId);
+            }
+            else
+            {
+                LockCharacterServerRpc(NetworkManager.LocalClientId);
+            }
+            //LockCharacterLocal();
+        }
+
+        private void LockCharacterLocal()
         {
             lockCharacterButton.interactable = false;
             foreach (Transform child in characterSelectGridParent)
@@ -106,6 +172,22 @@ namespace Vi.UI
                     characterSelectElement.SetButtonInteractability(false);
                 }
             }
+        }
+
+        private List<ulong> lockedCharacters = new List<ulong>();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void LockCharacterServerRpc(ulong clientId)
+        {
+            lockedCharacters.Add(clientId);
+            LockCharacterClientRpc(clientId);
+        }
+
+        [ClientRpc]
+        private void LockCharacterClientRpc(ulong clientId)
+        {
+            if (!IsServer) { lockedCharacters.Add(clientId); }
+            if (clientId == NetworkManager.LocalClientId) { LockCharacterLocal(); }
         }
     }
 }

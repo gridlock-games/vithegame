@@ -370,7 +370,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            RemovePlayerData((int)clientId);
+            if (IsServer) { RemovePlayerData((int)clientId); }
         }
 
         public List<PlayerData> GetPlayerDataList()
