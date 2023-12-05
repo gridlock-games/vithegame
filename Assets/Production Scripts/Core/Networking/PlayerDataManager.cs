@@ -207,7 +207,42 @@ namespace Vi.Core
         public static PlayerDataManager Singleton { get { return _singleton; } }
         private static PlayerDataManager _singleton;
 
-        public const char payloadParseString = '|';
+        private const char payloadParseString = '|';
+
+        public struct ParsedConnectionData
+        {
+            public string playerName;
+            public int characterIndex;
+            public int skinIndex;
+
+            public ParsedConnectionData(string playerName, int characterIndex, int skinIndex)
+            {
+                this.playerName = playerName;
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+            }
+        }
+
+        public static ParsedConnectionData ParseConnectionData(byte[] connectionData)
+        {
+            string payload = System.Text.Encoding.ASCII.GetString(connectionData);
+            string[] payloadOptions = payload.Split(payloadParseString);
+
+            string playerName = "Player Name";
+            int characterIndex = 0;
+            int skinIndex = 0;
+
+            if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
+            if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
+            if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
+
+            return new ParsedConnectionData(playerName, characterIndex, skinIndex);
+        }
+
+        public static void SetConnectionData(ParsedConnectionData connectionData)
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData.playerName + payloadParseString + connectionData.characterIndex + payloadParseString + connectionData.skinIndex);
+        }
 
         private void Awake()
         {

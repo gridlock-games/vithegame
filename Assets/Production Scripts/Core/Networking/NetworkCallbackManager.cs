@@ -48,20 +48,13 @@ namespace Vi.Core.SceneManagement
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
 
+            PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(connectionData);
+
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
-            string[] payloadOptions = payload.Split(PlayerDataManager.payloadParseString);
-
-            string playerName = "Player Name";
-            int characterIndex = 0;
-            int skinIndex = 0;
-
-            if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
-            if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
-            if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
 
             PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName, characterIndex, skinIndex, clientTeam)));
+            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, parsedConnectionData.playerName, parsedConnectionData.characterIndex, parsedConnectionData.skinIndex, clientTeam)));
         }
 
         private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)
