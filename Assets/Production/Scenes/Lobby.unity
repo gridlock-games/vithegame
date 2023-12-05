@@ -342,6 +342,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 21561662}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &21561664 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114286057846976786, guid: 4abbb9b2178b0d74a945436a1669b6e7,
+    type: 3}
+  m_PrefabInstance: {fileID: 21561662}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &84984211
 GameObject:
   m_ObjectHideFlags: 0
@@ -547,6 +559,7 @@ GameObject:
   - component: {fileID: 715240116}
   - component: {fileID: 715240115}
   - component: {fileID: 715240119}
+  - component: {fileID: 715240120}
   m_Layer: 5
   m_Name: LobbyUI
   m_TagString: Untagged
@@ -662,6 +675,33 @@ MonoBehaviour:
   characterRoleText: {fileID: 593513247}
   previewCharacterPosition: {x: 0, y: 0, z: 0}
   previewCharacterRotation: {x: 0, y: 180, z: 0}
+  lockCharacterButton: {fileID: 21561664}
+  playerAccountCardPrefab: {fileID: 2749571081389448015, guid: 23825be57ce1b9d429d4b6109f2b3b98,
+    type: 3}
+  upperLeftTeamParent: {fileID: 1371771929}
+  upperRightTeamParent: {fileID: 1525144253}
+  lowerLeftTeamParent: {fileID: 744456348}
+  lowerRightTeamParent: {fileID: 2098620748}
+--- !u!114 &715240120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 715240114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3141118641
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &744456347
 GameObject:
   m_ObjectHideFlags: 0

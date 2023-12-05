@@ -73,8 +73,8 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayer().Key));
-            return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayer().Key).playerName + ": " + scoreList[localIndex].kills;
+            int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayerObject().Key));
+            return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayerObject().Key).playerName + ": " + scoreList[localIndex].kills;
         }
 
         public string GetRightScoreString()
@@ -85,7 +85,7 @@ namespace Vi.Core.GameModeManagers
             PlayerScore localPlayerScore;
             foreach (PlayerScore playerScore in this.scoreList)
             {
-                if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayer().Key)
+                if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
                 {
                     localPlayerScore = playerScore;
                 }

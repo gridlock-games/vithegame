@@ -41,7 +41,7 @@ namespace Vi.UI
         private int skinIndex;
         public void ChangeSkin()
         {
-            KeyValuePair<int, Attributes> localKvp = PlayerDataManager.Singleton.GetLocalPlayer();
+            KeyValuePair<int, Attributes> localKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             PlayerDataManager.PlayerData localPlayerData = PlayerDataManager.Singleton.GetPlayerData(localKvp.Key);
             skinIndex += 1;
             if (skinIndex > PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[localPlayerData.characterIndex].skinOptions.Length - 1) { skinIndex = 0; }

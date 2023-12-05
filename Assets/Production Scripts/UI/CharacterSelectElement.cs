@@ -44,7 +44,7 @@ namespace Vi.UI
 
         public void ChangeCharacter()
         {
-            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayer();
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
             {
                 localPlayerKvp.Value.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
@@ -62,7 +62,7 @@ namespace Vi.UI
             if (lobbyUI) { lobbyUI.UpdateCharacterPreview(characterIndex, skinIndex); }
         }
 
-        bool isInteractable;
+        bool isInteractable = true;
         public void SetButtonInteractability(bool isInteractable)
         {
             this.isInteractable = isInteractable;
@@ -72,7 +72,7 @@ namespace Vi.UI
         {
             if (!isInteractable) { button.interactable = false; return; }
 
-            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayer();
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
             {
                 button.interactable = PlayerDataManager.Singleton.GetPlayerData(localPlayerKvp.Key).characterIndex != characterIndex;

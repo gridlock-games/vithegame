@@ -16,6 +16,12 @@ namespace Vi.UI
         [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
+        [SerializeField] private Button lockCharacterButton;
+        [SerializeField] private AccountCard playerAccountCardPrefab;
+        [SerializeField] private Transform upperLeftTeamParent;
+        [SerializeField] private Transform upperRightTeamParent;
+        [SerializeField] private Transform lowerLeftTeamParent;
+        [SerializeField] private Transform lowerRightTeamParent;
 
         private readonly float size = 200;
         private readonly int height = 2;
@@ -45,6 +51,39 @@ namespace Vi.UI
             UpdateCharacterPreview(0, 0);
         }
 
+        private void Update()
+        {
+            Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
+            PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
+            for (int i = 0; i < possibleTeams.Length; i++)
+            {
+                if (i == 0)
+                    teamParentDict.Add(possibleTeams[i], upperLeftTeamParent);
+                else if (i == 1)
+                    teamParentDict.Add(possibleTeams[i], upperRightTeamParent);
+                else if (i == 2)
+                    teamParentDict.Add(possibleTeams[i], lowerLeftTeamParent);
+                else if (i == 3)
+                    teamParentDict.Add(possibleTeams[i], lowerRightTeamParent);
+                else
+                    Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
+            }
+
+            foreach (Transform parent in teamParentDict.Values)
+            {
+                foreach (Transform child in parent)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+            {
+                AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                accountCard.Initialize(playerData.id);
+            }
+        }
+
         private GameObject previewObject;
         public void UpdateCharacterPreview(int characterIndex, int skinIndex)
         {
@@ -59,6 +98,7 @@ namespace Vi.UI
 
         public void LockCharacter()
         {
+            lockCharacterButton.interactable = false;
             foreach (Transform child in characterSelectGridParent)
             {
                 if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))

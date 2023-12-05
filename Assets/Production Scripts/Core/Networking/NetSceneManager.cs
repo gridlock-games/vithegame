@@ -23,9 +23,10 @@ namespace Vi.Core
 
             switch (scenePayloads[sceneGroupIndex].sceneType)
             {
-                case SceneType.UI:
+                case SceneType.LocalUI:
                     LoadScenePayload(scenePayloads[sceneGroupIndex]);
                     break;
+                case SceneType.SynchronizedUI:
                 case SceneType.Gameplay:
                     if (!IsServer) { Debug.LogError("Should only call load scene with scene type " + SceneType.Gameplay + " on the server!"); return; }
                     activeSceneGroupIndicies.Add(sceneGroupIndex);
@@ -70,17 +71,19 @@ namespace Vi.Core
         {
             switch (scenePayload.sceneType)
             {
-                case SceneType.UI:
+                case SceneType.LocalUI:
                     // Unload UI scenes
-                    UnloadAllScenePayloadsOfType(SceneType.UI);
+                    UnloadAllScenePayloadsOfType(SceneType.LocalUI);
                     foreach (string sceneName in scenePayload.sceneNames)
                     {
                         LoadingOperations.Add(new AsyncOperationUI(sceneName, SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive), AsyncOperationUI.LoadingType.Loading));
                     }
                     break;
+                case SceneType.SynchronizedUI:
                 case SceneType.Gameplay:
                     // Unload UI scenes
-                    UnloadAllScenePayloadsOfType(SceneType.UI);
+                    UnloadAllScenePayloadsOfType(SceneType.LocalUI);
+                    UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
                     UnloadAllScenePayloadsOfType(SceneType.Gameplay);
                     UnloadAllScenePayloadsOfType(SceneType.Environment);
                     foreach (string sceneName in scenePayload.sceneNames)
@@ -154,6 +157,11 @@ namespace Vi.Core
             }
         }
 
+        public bool ShouldSpawnPlayer()
+        {
+            return currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay).Count > 0;
+        }
+
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
@@ -175,7 +183,8 @@ namespace Vi.Core
 
         public enum SceneType
         {
-            UI,
+            LocalUI,
+            SynchronizedUI,
             Gameplay,
             Environment
         }
