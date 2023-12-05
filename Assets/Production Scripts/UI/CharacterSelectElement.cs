@@ -14,8 +14,10 @@ namespace Vi.UI
 
         private CharacterSelectMenu characterSelectMenu;
         private CharacterSelectUI characterSelectUI;
+        private LobbyUI lobbyUI;
         private int characterIndex;
         private int skinIndex;
+
         public void Initialize(CharacterSelectMenu characterSelectMenu, Sprite characterImage, int characterIndex, int skinIndex)
         {
             this.characterSelectMenu = characterSelectMenu;
@@ -32,46 +34,53 @@ namespace Vi.UI
             this.skinIndex = skinIndex;
         }
 
+        public void Initialize(LobbyUI lobbyUI, Sprite characterImage, int characterIndex, int skinIndex)
+        {
+            this.lobbyUI = lobbyUI;
+            characterIconImage.sprite = characterImage;
+            this.characterIndex = characterIndex;
+            this.skinIndex = skinIndex;
+        }
+
         public void ChangeCharacter()
         {
-            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayer();
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
             {
                 localPlayerKvp.Value.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             }
             else
             {
-                string payload = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-                string[] payloadOptions = payload.Split(PlayerDataManager.payloadParseString);
-
-                string playerName = "Player Name";
-
-                if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
-
-                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName + PlayerDataManager.payloadParseString + characterIndex + PlayerDataManager.payloadParseString + skinIndex);
+                PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+                parsedConnectionData.characterIndex = characterIndex;
+                parsedConnectionData.skinIndex = skinIndex;
+                PlayerDataManager.SetConnectionData(parsedConnectionData);
             }
 
             if (characterSelectMenu) { characterSelectMenu.ResetSkinIndex(); }
             if (characterSelectUI) { characterSelectUI.UpdateCharacterPreview(characterIndex, skinIndex); }
+            if (lobbyUI) { lobbyUI.UpdateCharacterPreview(characterIndex, skinIndex); }
+        }
+
+        bool isInteractable = true;
+        public void SetButtonInteractability(bool isInteractable)
+        {
+            this.isInteractable = isInteractable;
         }
 
         private void Update()
         {
-            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayer();
+            if (!isInteractable) { button.interactable = false; return; }
+
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
             {
                 button.interactable = PlayerDataManager.Singleton.GetPlayerData(localPlayerKvp.Key).characterIndex != characterIndex;
             }
             else
             {
-                string payload = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-                string[] payloadOptions = payload.Split(PlayerDataManager.payloadParseString);
-
-                int characterIndex = 0;
-
-                if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
-
-                button.interactable = this.characterIndex != characterIndex;
+                PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+                button.interactable = characterIndex != parsedConnectionData.characterIndex;
             }
         }
     }

@@ -46,8 +46,14 @@ namespace Vi.Core
 
         public static Color GetTeamColor(Team team)
         {
-            ColorUtility.TryParseHtmlString(team.ToString(), out Color color);
-            return color;
+            if (ColorUtility.TryParseHtmlString(team.ToString(), out Color color))
+            {
+                return color;
+            }
+            else
+            {
+                return Color.black;
+            }
         }
 
         public enum GameMode
@@ -90,7 +96,7 @@ namespace Vi.Core
             localPlayers.Remove(clientId);
         }
 
-        public List<Attributes> GetPlayersOnTeam(Team team, Attributes attributesToExclude = null)
+        public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
             if (team == Team.Competitor | team == Team.Peaceful) { return attributesList; }
@@ -102,7 +108,7 @@ namespace Vi.Core
             return attributesList;
         }
 
-        public List<Attributes> GetActivePlayers(Attributes attributesToExclude = null)
+        public List<Attributes> GetActivePlayerObjects(Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator))
@@ -113,7 +119,7 @@ namespace Vi.Core
             return attributesList;
         }
 
-        public KeyValuePair<int, Attributes> GetLocalPlayer()
+        public KeyValuePair<int, Attributes> GetLocalPlayerObject()
         {
             try
             {
@@ -207,7 +213,42 @@ namespace Vi.Core
         public static PlayerDataManager Singleton { get { return _singleton; } }
         private static PlayerDataManager _singleton;
 
-        public const char payloadParseString = '|';
+        private const char payloadParseString = '|';
+
+        public struct ParsedConnectionData
+        {
+            public string playerName;
+            public int characterIndex;
+            public int skinIndex;
+
+            public ParsedConnectionData(string playerName, int characterIndex, int skinIndex)
+            {
+                this.playerName = playerName;
+                this.characterIndex = characterIndex;
+                this.skinIndex = skinIndex;
+            }
+        }
+
+        public static ParsedConnectionData ParseConnectionData(byte[] connectionData)
+        {
+            string payload = System.Text.Encoding.ASCII.GetString(connectionData);
+            string[] payloadOptions = payload.Split(payloadParseString);
+
+            string playerName = "Player Name";
+            int characterIndex = 0;
+            int skinIndex = 0;
+
+            if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
+            if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
+            if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
+
+            return new ParsedConnectionData(playerName, characterIndex, skinIndex);
+        }
+
+        public static void SetConnectionData(ParsedConnectionData connectionData)
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData.playerName + payloadParseString + connectionData.characterIndex + payloadParseString + connectionData.skinIndex);
+        }
 
         private void Awake()
         {
@@ -293,6 +334,7 @@ namespace Vi.Core
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
             if (localPlayers.ContainsKey(playerData.id)) { yield break; }
+            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer());
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
@@ -328,7 +370,17 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            RemovePlayerData((int)clientId);
+            if (IsServer) { RemovePlayerData((int)clientId); }
+        }
+
+        public List<PlayerData> GetPlayerDataList()
+        {
+            List<PlayerData> playerDatas = new List<PlayerData>();
+            foreach (PlayerData playerData in playerDataList)
+            {
+                playerDatas.Add(playerData);
+            }
+            return playerDatas;
         }
 
         private NetworkList<PlayerData> playerDataList;

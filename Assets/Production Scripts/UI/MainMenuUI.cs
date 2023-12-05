@@ -17,10 +17,16 @@ namespace Vi.UI
             playGameButton.interactable = usernameInputField.text.Length > 0;
         }
 
-        public void StartServer()
+        public void StartHubServer()
         {
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
+        }
+
+        public void StartLobbyServer()
+        {
+            NetworkManager.Singleton.StartServer();
+            NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
         public void GoToCharacterSelect()

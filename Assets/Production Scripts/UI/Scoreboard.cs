@@ -13,7 +13,7 @@ namespace Vi.UI
 
         private void Start()
         {
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayers())
+            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
             {
                 GameObject instance = Instantiate(scoreboardElementPrefab.gameObject, scoreboardElementParent);
 

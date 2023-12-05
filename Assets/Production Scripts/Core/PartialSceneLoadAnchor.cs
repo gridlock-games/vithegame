@@ -16,11 +16,11 @@ namespace Vi.Core
             List<Attributes> attributesToCheck = new List<Attributes>();
             if (NetworkManager.Singleton.IsServer)
             {
-                attributesToCheck = PlayerDataManager.Singleton.GetActivePlayers();
+                attributesToCheck = PlayerDataManager.Singleton.GetActivePlayerObjects();
             }
             else if (NetworkManager.Singleton.IsClient)
             {
-                attributesToCheck.Add(PlayerDataManager.Singleton.GetLocalPlayer().Value);
+                attributesToCheck.Add(PlayerDataManager.Singleton.GetLocalPlayerObject().Value);
             }
             else
             {

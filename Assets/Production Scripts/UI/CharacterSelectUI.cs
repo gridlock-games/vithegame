@@ -124,23 +124,14 @@ namespace Vi.UI
 
         public void ChangeSkin()
         {
-            string payload = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-            string[] payloadOptions = payload.Split(PlayerDataManager.payloadParseString);
+            PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(NetworkManager.Singleton.NetworkConfig.ConnectionData);
 
-            string playerName = "Player Name";
-            int characterIndex = 0;
-            int skinIndex = 0;
+            parsedConnectionData.skinIndex += 1;
+            if (parsedConnectionData.skinIndex > PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[parsedConnectionData.characterIndex].skinOptions.Length - 1) { parsedConnectionData.skinIndex = 0; }
 
-            if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
-            if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
-            if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
+            PlayerDataManager.SetConnectionData(parsedConnectionData);
 
-            skinIndex += 1;
-            if (skinIndex > PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex].skinOptions.Length - 1) { skinIndex = 0; }
-
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName + PlayerDataManager.payloadParseString + characterIndex + PlayerDataManager.payloadParseString + skinIndex);
-
-            UpdateCharacterPreview(characterIndex, skinIndex);
+            UpdateCharacterPreview(parsedConnectionData.characterIndex, parsedConnectionData.skinIndex);
         }
 
         private void OnDrawGizmos()

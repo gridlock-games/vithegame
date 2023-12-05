@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.Rendering;
 
 namespace Vi.UI
 {
@@ -23,7 +24,8 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
+            //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
             else if (Camera.main) { cam.enabled = false; }
             else { cam.enabled = UICameras[^1] == this; }
         }
