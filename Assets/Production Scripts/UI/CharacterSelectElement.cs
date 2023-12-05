@@ -17,6 +17,7 @@ namespace Vi.UI
         private LobbyUI lobbyUI;
         private int characterIndex;
         private int skinIndex;
+
         public void Initialize(CharacterSelectMenu characterSelectMenu, Sprite characterImage, int characterIndex, int skinIndex)
         {
             this.characterSelectMenu = characterSelectMenu;
@@ -61,8 +62,16 @@ namespace Vi.UI
             if (lobbyUI) { lobbyUI.UpdateCharacterPreview(characterIndex, skinIndex); }
         }
 
+        bool isInteractable;
+        public void SetButtonInteractability(bool isInteractable)
+        {
+            this.isInteractable = isInteractable;
+        }
+
         private void Update()
         {
+            if (!isInteractable) { button.interactable = false; return; }
+
             KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayer();
             if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
             {
@@ -71,7 +80,7 @@ namespace Vi.UI
             else
             {
                 PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-                button.interactable = this.characterIndex != parsedConnectionData.characterIndex;
+                button.interactable = characterIndex != parsedConnectionData.characterIndex;
             }
         }
     }

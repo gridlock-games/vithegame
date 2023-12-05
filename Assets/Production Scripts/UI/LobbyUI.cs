@@ -59,7 +59,13 @@ namespace Vi.UI
 
         public void LockCharacter()
         {
-
+            foreach (Transform child in characterSelectGridParent)
+            {
+                if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))
+                {
+                    characterSelectElement.SetButtonInteractability(false);
+                }
+            }
         }
     }
 }
