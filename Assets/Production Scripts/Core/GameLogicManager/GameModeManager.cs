@@ -186,7 +186,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (gameOver)
                 {
-                    NetworkManager.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
+                    NetSceneManager.Singleton.LoadScene("Lobby");
                 }
                 else
                 {

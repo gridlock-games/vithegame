@@ -90,7 +90,8 @@ namespace Vi.UI
         private void Update()
         {
             List<ulong> entireClientList = new List<ulong>();
-            foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+            var playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
+            foreach (var playerData in playerDataList)
             {
                 if (playerData.id >= 0) { entireClientList.Add((ulong)playerData.id); }
             }
@@ -98,7 +99,7 @@ namespace Vi.UI
 
             if (IsServer)
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataList().Count > 0)
+                if (playerDataList.Count > 0 & playerDataList.Count % 2 == 0)
                 {
                     if (startingGame) { startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
                     else { characterLockTimer.Value = Mathf.Clamp(characterLockTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
@@ -151,15 +152,21 @@ namespace Vi.UI
 
         public void LockCharacter()
         {
-            if (IsServer)
-            {
-                //LockCharacterClientRpc(NetworkManager.LocalClientId);
-            }
-            else
+            if (IsClient)
             {
                 LockCharacterServerRpc(NetworkManager.LocalClientId);
             }
-            //LockCharacterLocal();
+            else
+            {
+                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                {
+                    if (playerData.id >= 0)
+                    {
+                        lockedCharacters.Add((ulong)playerData.id);
+                        LockCharacterClientRpc((ulong)playerData.id);
+                    }
+                }
+            }
         }
 
         private void LockCharacterLocal()
