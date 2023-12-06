@@ -186,6 +186,7 @@ namespace Vi.UI
         [ServerRpc(RequireOwnership = false)]
         private void LockCharacterServerRpc(ulong clientId)
         {
+            Debug.Log("Locked " + clientId);
             lockedCharacters.Add(clientId);
             LockCharacterClientRpc(clientId);
         }
@@ -195,6 +196,7 @@ namespace Vi.UI
         {
             if (!IsServer) { lockedCharacters.Add(clientId); }
             if (clientId == NetworkManager.LocalClientId) { LockCharacterLocal(); }
+            Debug.Log("Locked " + clientId);
         }
     }
 }

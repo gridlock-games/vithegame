@@ -97,6 +97,7 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
+            _singleton = this;
             scoreList.OnListChanged += OnScoreListChange;
             if (IsServer)
             {
@@ -223,7 +224,6 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
-            _singleton = this;
             scoreList = new NetworkList<PlayerScore>();
         }
 

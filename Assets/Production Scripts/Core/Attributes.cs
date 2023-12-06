@@ -546,6 +546,7 @@ namespace Vi.Core
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {
+            Debug.Log(GameModeManager.Singleton);
             if (!GameModeManager.Singleton) { yield break; }
             if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
             IsRespawning = true;
