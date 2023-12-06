@@ -55,12 +55,20 @@ namespace Vi.UI
         {
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
+            StartCoroutine(WaitForPlayerDataToUpdatePreview());
         }
 
         public override void OnNetworkDespawn()
         {
             characterLockTimer.OnValueChanged -= OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged -= OnStartGameTimerChange;
+        }
+
+        private IEnumerator WaitForPlayerDataToUpdatePreview()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            UpdateCharacterPreview(playerData.characterIndex, playerData.skinIndex);
         }
 
         private void OnCharacterLockTimerChange(float prev, float current)
@@ -82,11 +90,6 @@ namespace Vi.UI
             }
         }
 
-        private void Start()
-        {
-            UpdateCharacterPreview(0, 0);
-        }
-
         private void Update()
         {
             List<ulong> entireClientList = new List<ulong>();
@@ -105,6 +108,11 @@ namespace Vi.UI
                 {
                     if (startingGame) { startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
                     else { characterLockTimer.Value = Mathf.Clamp(characterLockTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
+                }
+                else
+                {
+                    characterLockTimer.Value = 60;
+                    startGameTimer.Value = 5;
                 }
             }
             characterLockTimeText.text = startingGame ? startGameTimer.Value.ToString("F0") : characterLockTimer.Value.ToString("F0");
@@ -143,13 +151,13 @@ namespace Vi.UI
         private GameObject previewObject;
         public void UpdateCharacterPreview(int characterIndex, int skinIndex)
         {
-            //if (previewObject) { Destroy(previewObject); }
+            if (previewObject) { Destroy(previewObject); }
 
-            //CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            //previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            //previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-            //characterNameText.text = playerModelOption.name;
-            //characterRoleText.text = playerModelOption.role;
+            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            characterNameText.text = playerModelOption.name;
+            characterRoleText.text = playerModelOption.role;
         }
 
         public void LockCharacter()

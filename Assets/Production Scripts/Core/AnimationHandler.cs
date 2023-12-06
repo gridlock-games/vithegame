@@ -300,7 +300,7 @@ namespace Vi.Core
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
                 ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
-            else if (!NetworkManager.IsListening)
+            else if (!NetworkManager.IsServer) // This code block is for preview characters
             {
                 ChangeSkin(characterIndex, skinIndex);
             }
