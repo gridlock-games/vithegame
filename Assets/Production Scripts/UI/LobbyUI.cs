@@ -53,7 +53,10 @@ namespace Vi.UI
                 gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
             }
             gameModeDropdown.AddOptions(gameModeOptions);
-            if (!gameModeList.Contains(PlayerDataManager.Singleton.GetGameMode())) { gameModeDropdown.value = 0; }
+
+            int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
+            gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
+            ChangeGameMode();
 
             //mapDropdown.ClearOptions();
             //List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
@@ -210,6 +213,12 @@ namespace Vi.UI
             characterRoleText.text = playerModelOption.role;
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (previewObject) { Destroy(previewObject); }
+        }
+
         public void OpenRoomSettings()
         {
             roomSettingsParent.SetActive(true);
@@ -263,7 +272,6 @@ namespace Vi.UI
         [ServerRpc(RequireOwnership = false)]
         private void LockCharacterServerRpc(ulong clientId)
         {
-            Debug.Log("Locked " + clientId);
             lockedCharacters.Add(clientId);
             LockCharacterClientRpc(clientId);
         }
@@ -273,7 +281,6 @@ namespace Vi.UI
         {
             if (!IsServer) { lockedCharacters.Add(clientId); }
             if (clientId == NetworkManager.LocalClientId) { LockCharacterLocal(); }
-            Debug.Log("Locked " + clientId);
         }
     }
 }
