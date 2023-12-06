@@ -37,7 +37,7 @@ namespace Vi.UI
             roundWinsText.text = playerScore.roundWins.ToString();
             killsText.text = playerScore.kills.ToString();
             deathsText.text = playerScore.deaths.ToString();
-            kdRatioText.text = playerScore.deaths == 0 ? "0.00" : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+            kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
         }
     }
 }

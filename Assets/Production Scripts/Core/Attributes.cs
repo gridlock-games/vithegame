@@ -546,13 +546,12 @@ namespace Vi.Core
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {
-            Debug.Log(GameModeManager.Singleton);
             if (!GameModeManager.Singleton) { yield break; }
             if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            PlayerDataManager.Singleton.RespawnPlayer(this);
+            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this); }
             IsRespawning = false;
         }
 

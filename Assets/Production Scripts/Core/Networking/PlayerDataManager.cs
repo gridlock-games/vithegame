@@ -265,11 +265,33 @@ namespace Vi.Core
             {
                 if (g.TryGetComponent(out playerSpawnPoints)) { break; }
             }
+
+            if (IsServer)
+            {
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    foreach (PlayerData playerData in playerDataList)
+                    {
+                        StartCoroutine(SpawnPlayer(playerData));
+                    }
+                }
+            }
         }
 
         void OnSceneUnload(Scene scene)
         {
             playerSpawnPoints = null;
+
+            if (IsServer)
+            {
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    foreach (Attributes attributes in GetActivePlayerObjects())
+                    {
+                        attributes.NetworkObject.Despawn(true);
+                    }
+                }
+            }
         }
 
         private void Start()
@@ -290,11 +312,11 @@ namespace Vi.Core
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
-            if (!IsServer) { return; }
-            if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
-            {
-                StartCoroutine(SpawnPlayer(networkListEvent.Value));
-            }
+            //if (!IsServer) { return; }
+            //if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
+            //{
+                
+            //}
         }
 
         private void OnClientConnectCallback(ulong clientId)
@@ -334,7 +356,6 @@ namespace Vi.Core
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
             if (localPlayers.ContainsKey(playerData.id)) { yield break; }
-            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer());
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;

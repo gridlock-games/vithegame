@@ -74,6 +74,7 @@ namespace Vi.Core.GameModeManagers
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
             int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayerObject().Key));
+            if (localIndex == -1) { return string.Empty; }
             return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayerObject().Key).playerName + ": " + scoreList[localIndex].kills;
         }
 

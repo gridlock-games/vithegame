@@ -95,6 +95,8 @@ namespace Vi.UI
             {
                 if (playerData.id >= 0) { entireClientList.Add((ulong)playerData.id); }
             }
+            lockedCharacters.Sort();
+            entireClientList.Sort();
             bool startingGame = lockedCharacters.SequenceEqual(entireClientList);
 
             if (IsServer)
