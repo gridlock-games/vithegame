@@ -229,7 +229,7 @@ namespace Vi.Core.GameModeManagers
         private GameObject UIInstance;
         protected void Start()
         {
-            if (UIInstance) { UIInstance = Instantiate(UIPrefab, transform); }
+            if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
         protected void Update()

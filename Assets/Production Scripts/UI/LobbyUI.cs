@@ -6,11 +6,16 @@ using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
 using System.Linq;
+using TMPro;
+using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
     public class LobbyUI : NetworkBehaviour
     {
+        [SerializeField] private GameObject roomSettingsParent;
+        [SerializeField] private GameObject lobbyUIParent;
+        [Header("Lobby UI Assignments")]
         [SerializeField] private CharacterSelectElement characterSelectElement;
         [SerializeField] private Transform characterSelectGridParent;
         [SerializeField] private Text characterNameText;
@@ -24,6 +29,11 @@ namespace Vi.UI
         [SerializeField] private Transform upperRightTeamParent;
         [SerializeField] private Transform lowerLeftTeamParent;
         [SerializeField] private Transform lowerRightTeamParent;
+        [SerializeField] private Text gameModeText;
+        [SerializeField] private Text mapText;
+        [Header("Room Settings Assignments")]
+        [SerializeField] private TMP_Dropdown gameModeDropdown;
+        [SerializeField] private TMP_Dropdown mapDropdown;
 
         private readonly float size = 200;
         private readonly int height = 2;
@@ -33,6 +43,31 @@ namespace Vi.UI
 
         private void Awake()
         {
+            gameModeDropdown.ClearOptions();
+            List<TMP_Dropdown.OptionData> gameModeOptions = new List<TMP_Dropdown.OptionData>();
+            List<PlayerDataManager.GameMode> gameModeList = new List<PlayerDataManager.GameMode>();
+            foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
+            {
+                if (gameMode == PlayerDataManager.GameMode.None) { continue; }
+                gameModeList.Add(gameMode);
+                gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
+            }
+            gameModeDropdown.AddOptions(gameModeOptions);
+            if (!gameModeList.Contains(PlayerDataManager.Singleton.GetGameMode())) { gameModeDropdown.value = 0; }
+
+            //mapDropdown.ClearOptions();
+            //List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
+            //NetSceneManager.Singleton.GetScenePayloadsOfType();
+            //List<PlayerDataManager.map> mapList = new List<PlayerDataManager.map>();
+            //foreach (PlayerDataManager.map map in System.Enum.GetValues(typeof(PlayerDataManager.map)))
+            //{
+            //    if (map == PlayerDataManager.map.None) { continue; }
+            //    mapList.Add(map);
+            //    mapOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(map.ToString())));
+            //}
+            //mapDropdown.AddOptions(mapOptions);
+            //if (!mapList.Contains(PlayerDataManager.Singleton.Getmap())) { mapDropdown.value = 0; }
+
             CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             Quaternion rotation = Quaternion.Euler(0, 0, -45);
             int characterIndex = 0;
@@ -51,14 +86,26 @@ namespace Vi.UI
             }
         }
 
+        public static string FromCamelCase(string inputString)
+        {
+            string returnValue = inputString;
+
+            //Strip leading "_" character
+            returnValue = Regex.Replace(returnValue, "^_", "").Trim();
+            //Add a space between each lower case character and upper case character
+            returnValue = Regex.Replace(returnValue, "([a-z])([A-Z])", "$1 $2").Trim();
+            //Add a space between 2 upper case characters when the second one is followed by a lower space character
+            returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
+
+            return returnValue;
+        }
+
         public override void OnNetworkSpawn()
         {
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
 
             if (IsClient) { StartCoroutine(WaitForPlayerDataToUpdatePreview()); }
-
-            Debug.Log(PlayerDataManager.Singleton.GetGameModeInfo().gameMode);
         }
 
         public override void OnNetworkDespawn()
@@ -161,6 +208,23 @@ namespace Vi.UI
             previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             characterNameText.text = playerModelOption.name;
             characterRoleText.text = playerModelOption.role;
+        }
+
+        public void OpenRoomSettings()
+        {
+            roomSettingsParent.SetActive(true);
+            lobbyUIParent.SetActive(false);
+        }
+
+        public void CloseRoomSettings()
+        {
+            roomSettingsParent.SetActive(false);
+            lobbyUIParent.SetActive(true);
+        }
+
+        public void ChangeGameMode()
+        {
+            PlayerDataManager.Singleton.SetGameMode(System.Enum.Parse<PlayerDataManager.GameMode>(gameModeDropdown.options[gameModeDropdown.value].text.Replace(" ", "")));
         }
 
         public void LockCharacter()
