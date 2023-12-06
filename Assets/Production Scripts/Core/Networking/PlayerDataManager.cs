@@ -31,6 +31,24 @@ namespace Vi.Core
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }
 
+        public void SetGameMode(GameMode newGameMode)
+        {
+            if (IsServer)
+            {
+                gameMode.Value = newGameMode;
+            }
+            else
+            {
+                SetGameModeServerRpc(newGameMode);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetGameModeServerRpc(GameMode newGameMode)
+        {
+            SetGameMode(newGameMode);
+        }
+
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
             if (attackerTeam == Team.Peaceful) { return false; }
@@ -312,11 +330,14 @@ namespace Vi.Core
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
-            //if (!IsServer) { return; }
-            //if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
-            //{
-                
-            //}
+            if (!IsServer) { return; }
+            if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
+            {
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                }
+            }
         }
 
         private void OnClientConnectCallback(ulong clientId)

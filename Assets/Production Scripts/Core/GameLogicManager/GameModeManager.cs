@@ -35,7 +35,6 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
-            Debug.Log(killer + " " + victim);
             if (nextGameActionTimer.Value <= 0)
             {
                 int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
@@ -230,12 +229,13 @@ namespace Vi.Core.GameModeManagers
         private GameObject UIInstance;
         protected void Start()
         {
-            UIInstance = Instantiate(UIPrefab, transform);
+            if (UIInstance) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
         protected void Update()
         {
             if (!IsServer) { return; }
+            if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None) { return; }
 
             if (nextGameActionTimer.Value > 0)
                 nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);

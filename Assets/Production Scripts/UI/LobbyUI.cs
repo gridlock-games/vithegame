@@ -55,7 +55,10 @@ namespace Vi.UI
         {
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
-            StartCoroutine(WaitForPlayerDataToUpdatePreview());
+
+            if (IsClient) { StartCoroutine(WaitForPlayerDataToUpdatePreview()); }
+
+            Debug.Log(PlayerDataManager.Singleton.GetGameModeInfo().gameMode);
         }
 
         public override void OnNetworkDespawn()

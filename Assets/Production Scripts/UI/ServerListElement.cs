@@ -55,7 +55,7 @@ namespace Vi.UI
         private void Update()
         {
             // If network manager connection info matches this button
-            button.interactable = networkTransport.ConnectionData.Address != Server.ip & networkTransport.ConnectionData.Port != ushort.Parse(Server.port);
+            button.interactable = networkTransport.ConnectionData.Address != Server.ip | networkTransport.ConnectionData.Port != ushort.Parse(Server.port);
         }
     }
 }
