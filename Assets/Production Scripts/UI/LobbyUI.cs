@@ -43,6 +43,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            CloseRoomSettings();
+
             gameModeDropdown.ClearOptions();
             List<TMP_Dropdown.OptionData> gameModeOptions = new List<TMP_Dropdown.OptionData>();
             List<PlayerDataManager.GameMode> gameModeList = new List<PlayerDataManager.GameMode>();
@@ -145,6 +147,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
+
             List<ulong> entireClientList = new List<ulong>();
             var playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
             foreach (var playerData in playerDataList)
