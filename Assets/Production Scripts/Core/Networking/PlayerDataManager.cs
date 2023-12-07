@@ -21,7 +21,7 @@ namespace Vi.Core
         {
             public GameMode gameMode;
             public Team[] possibleTeams;
-            //public string[] possibleMaps;
+            public string[] possibleMapSceneGroupNames;
         }
 
         public CharacterReference GetCharacterReference() { return characterReference; }
@@ -47,6 +47,35 @@ namespace Vi.Core
         private void SetGameModeServerRpc(GameMode newGameMode)
         {
             SetGameMode(newGameMode);
+        }
+
+        private void OnGameModeChange(GameMode prev, GameMode current)
+        {
+            mapIndex.Value = 0;
+        }
+
+        private NetworkVariable<int> mapIndex = new NetworkVariable<int>();
+        public string GetMapName()
+        {
+            return GetGameModeInfo().possibleMapSceneGroupNames[mapIndex.Value];
+        }
+
+        public void SetMap(string map)
+        {
+            if (IsServer)
+            {
+                mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().possibleMapSceneGroupNames, map);
+            }
+            else
+            {
+                SetMapServerRpc(map);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetMapServerRpc(string map)
+        {
+            SetMap(map);
         }
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
@@ -321,11 +350,13 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
+            gameMode.OnValueChanged += OnGameModeChange;
         }
 
         public override void OnNetworkDespawn()
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
+            gameMode.OnValueChanged -= OnGameModeChange;
         }
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)

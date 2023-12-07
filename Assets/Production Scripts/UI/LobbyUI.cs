@@ -34,6 +34,7 @@ namespace Vi.UI
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
+        [SerializeField] private TMP_Dropdown teamDropdown;
 
         private readonly float size = 200;
         private readonly int height = 2;
@@ -45,6 +46,7 @@ namespace Vi.UI
         {
             CloseRoomSettings();
 
+            // Game modes
             gameModeDropdown.ClearOptions();
             List<TMP_Dropdown.OptionData> gameModeOptions = new List<TMP_Dropdown.OptionData>();
             List<PlayerDataManager.GameMode> gameModeList = new List<PlayerDataManager.GameMode>();
@@ -55,24 +57,11 @@ namespace Vi.UI
                 gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
             }
             gameModeDropdown.AddOptions(gameModeOptions);
-
             int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
             gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
             ChangeGameMode();
 
-            //mapDropdown.ClearOptions();
-            //List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
-            //NetSceneManager.Singleton.GetScenePayloadsOfType();
-            //List<PlayerDataManager.map> mapList = new List<PlayerDataManager.map>();
-            //foreach (PlayerDataManager.map map in System.Enum.GetValues(typeof(PlayerDataManager.map)))
-            //{
-            //    if (map == PlayerDataManager.map.None) { continue; }
-            //    mapList.Add(map);
-            //    mapOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(map.ToString())));
-            //}
-            //mapDropdown.AddOptions(mapOptions);
-            //if (!mapList.Contains(PlayerDataManager.Singleton.Getmap())) { mapDropdown.value = 0; }
-
+            // Player models
             CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             Quaternion rotation = Quaternion.Euler(0, 0, -45);
             int characterIndex = 0;
@@ -145,10 +134,12 @@ namespace Vi.UI
             }
         }
 
+        private PlayerDataManager.GameMode lastGameMode;
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
 
+            // Timer logic
             List<ulong> entireClientList = new List<ulong>();
             var playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
             foreach (var playerData in playerDataList)
@@ -174,6 +165,7 @@ namespace Vi.UI
             }
             characterLockTimeText.text = startingGame ? startGameTimer.Value.ToString("F0") : characterLockTimer.Value.ToString("F0");
 
+            // Player account card display logic
             Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
             PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
             for (int i = 0; i < possibleTeams.Length; i++)
@@ -190,19 +182,73 @@ namespace Vi.UI
                     Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
             }
 
-            foreach (Transform parent in teamParentDict.Values)
+            foreach (Transform child in upperLeftTeamParent)
             {
-                foreach (Transform child in parent)
-                {
-                    Destroy(child.gameObject);
-                }
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in upperRightTeamParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in lowerRightTeamParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in lowerLeftTeamParent)
+            {
+                Destroy(child.gameObject);
             }
 
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
             {
-                AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                accountCard.Initialize(playerData.id);
+                if (teamParentDict.ContainsKey(playerData.team))
+                {
+                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                    accountCard.Initialize(playerData.id);
+                }
             }
+
+            if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
+            {
+                // Maps
+                mapDropdown.ClearOptions();
+                List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
+                List<string> mapList = new List<string>();
+                foreach (string map in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
+                {
+                    mapList.Add(map);
+                    mapOptions.Add(new TMP_Dropdown.OptionData(map));
+                }
+                mapDropdown.AddOptions(mapOptions);
+                int mapIndex = mapList.IndexOf(mapDropdown.options[mapDropdown.value].text);
+                mapDropdown.SetValueWithoutNotify(mapIndex != -1 ? mapIndex : 0);
+                ChangeMap();
+
+                // Teams
+                teamDropdown.ClearOptions();
+                List<TMP_Dropdown.OptionData> teamOptions = new List<TMP_Dropdown.OptionData>();
+                List<PlayerDataManager.Team> teamList = new List<PlayerDataManager.Team>();
+                foreach (PlayerDataManager.Team team in PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams)
+                {
+                    teamList.Add(team);
+                    teamOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(team.ToString())));
+                }
+                teamDropdown.AddOptions(teamOptions);
+                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
+                {
+                    int teamIndex = teamList.IndexOf(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team);
+                    teamDropdown.SetValueWithoutNotify(teamIndex != -1 ? teamIndex : 0);
+                    ChangeTeam();
+                }
+            }
+
+            gameModeText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
+            mapText.text = PlayerDataManager.Singleton.GetMapName();
+
+            lastGameMode = PlayerDataManager.Singleton.GetGameMode();
         }
 
         private GameObject previewObject;
@@ -238,6 +284,21 @@ namespace Vi.UI
         public void ChangeGameMode()
         {
             PlayerDataManager.Singleton.SetGameMode(System.Enum.Parse<PlayerDataManager.GameMode>(gameModeDropdown.options[gameModeDropdown.value].text.Replace(" ", "")));
+        }
+
+        public void ChangeMap()
+        {
+            PlayerDataManager.Singleton.SetMap(mapDropdown.options[mapDropdown.value].text);
+        }
+
+        public void ChangeTeam()
+        {
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+                playerData.team = System.Enum.Parse<PlayerDataManager.Team>(teamDropdown.options[teamDropdown.value].text.Replace(" ", ""));
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
         }
 
         public void LockCharacter()
