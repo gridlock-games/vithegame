@@ -99,6 +99,7 @@ namespace Vi.UI
         {
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
+            lockedClients.OnListChanged += OnLockedClientListChange;
 
             if (IsClient) { StartCoroutine(WaitForPlayerDataToUpdatePreview()); }
         }
@@ -107,6 +108,7 @@ namespace Vi.UI
         {
             characterLockTimer.OnValueChanged -= OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged -= OnStartGameTimerChange;
+            lockedClients.OnListChanged -= OnLockedClientListChange;
         }
 
         private IEnumerator WaitForPlayerDataToUpdatePreview()
@@ -143,19 +145,24 @@ namespace Vi.UI
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader());
 
             // Timer logic
-            List<ulong> entireClientList = new List<ulong>();
-            var playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
-            foreach (var playerData in playerDataList)
+            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
+            bool startingGame = playerDataList.Count != 0;
+            foreach (PlayerDataManager.PlayerData playerData in playerDataList)
             {
-                if (playerData.id >= 0) { entireClientList.Add((ulong)playerData.id); }
+                if (playerData.id >= 0)
+                {
+                    if (!lockedClients.Contains((ulong)playerData.id))
+                    {
+                        startingGame = false;
+                        break;
+                    }
+                }
             }
-            lockedCharacters.Sort();
-            entireClientList.Sort();
-            bool startingGame = lockedCharacters.SequenceEqual(entireClientList);
 
+            bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
             if (IsServer)
             {
-                if (playerDataList.Count > 0 & playerDataList.Count % 2 == 0)
+                if (canCountDown)
                 {
                     if (startingGame) { startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
                     else { characterLockTimer.Value = Mathf.Clamp(characterLockTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
@@ -166,7 +173,7 @@ namespace Vi.UI
                     startGameTimer.Value = 5;
                 }
             }
-            characterLockTimeText.text = startingGame ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+            characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
 
             // Player account card display logic
             Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -316,8 +323,7 @@ namespace Vi.UI
                 {
                     if (playerData.id >= 0)
                     {
-                        lockedCharacters.Add((ulong)playerData.id);
-                        LockCharacterClientRpc((ulong)playerData.id);
+                        lockedClients.Add((ulong)playerData.id);
                     }
                 }
             }
@@ -335,20 +341,16 @@ namespace Vi.UI
             }
         }
 
-        private List<ulong> lockedCharacters = new List<ulong>();
+        private NetworkList<ulong> lockedClients = new NetworkList<ulong>();
 
-        [ServerRpc(RequireOwnership = false)]
-        private void LockCharacterServerRpc(ulong clientId)
-        {
-            lockedCharacters.Add(clientId);
-            LockCharacterClientRpc(clientId);
-        }
+        [ServerRpc(RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
 
-        [ClientRpc]
-        private void LockCharacterClientRpc(ulong clientId)
+        private void OnLockedClientListChange(NetworkListEvent<ulong> networkListEvent)
         {
-            if (!IsServer) { lockedCharacters.Add(clientId); }
-            if (clientId == NetworkManager.LocalClientId) { LockCharacterLocal(); }
+            if (networkListEvent.Type == NetworkListEvent<ulong>.EventType.Add)
+            {
+                if (networkListEvent.Value == NetworkManager.LocalClientId) { LockCharacterLocal(); }
+            }
         }
     }
 }
