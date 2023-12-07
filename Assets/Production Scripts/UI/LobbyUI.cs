@@ -31,6 +31,7 @@ namespace Vi.UI
         [SerializeField] private Transform lowerRightTeamParent;
         [SerializeField] private Text gameModeText;
         [SerializeField] private Text mapText;
+        [SerializeField] private Button roomSettingsButton;
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
@@ -138,6 +139,8 @@ namespace Vi.UI
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
+
+            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader());
 
             // Timer logic
             List<ulong> entireClientList = new List<ulong>();

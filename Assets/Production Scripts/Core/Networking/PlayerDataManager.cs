@@ -78,6 +78,20 @@ namespace Vi.Core
             SetMap(map);
         }
 
+        public bool IsLobbyLeader()
+        {
+            if (IsServer) { return true; }
+
+            List<PlayerData> playerDataList = GetPlayerDataList();
+            playerDataList.RemoveAll(item => item.id < 0);
+            playerDataList = playerDataList.OrderBy(item => item.id).ToList();
+
+            if (playerDataList.Count > 0)
+                return playerDataList[0].id == (int)NetworkManager.LocalClientId;
+            else
+                return false;
+        }
+
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
             if (attackerTeam == Team.Peaceful) { return false; }
