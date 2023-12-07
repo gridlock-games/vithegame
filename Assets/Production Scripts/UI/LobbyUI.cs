@@ -166,7 +166,7 @@ namespace Vi.UI
                     startGameTimer.Value = 5;
                 }
             }
-            characterLockTimeText.text = startingGame ? startGameTimer.Value.ToString("F0") : characterLockTimer.Value.ToString("F0");
+            characterLockTimeText.text = startingGame ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
 
             // Player account card display logic
             Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
