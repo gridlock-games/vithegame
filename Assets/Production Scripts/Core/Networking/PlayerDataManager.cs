@@ -6,6 +6,7 @@ using Unity.Collections;
 using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -266,6 +267,7 @@ namespace Vi.Core
         public void RemovePlayerData(int clientId)
         {
             playerDataList.Remove(new PlayerData(clientId));
+            if (GameModeManager.Singleton) { GameModeManager.Singleton.RemovePlayerScore(clientId); }
         }
 
         [ServerRpc(RequireOwnership = false)]
