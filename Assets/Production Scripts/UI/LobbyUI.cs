@@ -45,6 +45,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            lockedClients = new NetworkList<ulong>();
+
             CloseRoomSettings();
 
             // Game modes
@@ -120,9 +122,9 @@ namespace Vi.UI
 
         private void OnCharacterLockTimerChange(float prev, float current)
         {
-            if (prev > 0 & current <= 0)
+            if (IsServer)
             {
-                LockCharacter();
+                if (prev > 0 & current <= 0) { LockCharacter(); }
             }
         }
 
@@ -141,8 +143,6 @@ namespace Vi.UI
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
-
-            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader());
 
             // Timer logic
             List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
@@ -174,6 +174,9 @@ namespace Vi.UI
                 }
             }
             characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+
+            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !startingGame);
+            if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
 
             // Player account card display logic
             Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -341,7 +344,7 @@ namespace Vi.UI
             }
         }
 
-        private NetworkList<ulong> lockedClients = new NetworkList<ulong>();
+        private NetworkList<ulong> lockedClients;
 
         [ServerRpc(RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
 
