@@ -25,10 +25,8 @@ namespace Vi.UI
         [SerializeField] private Button lockCharacterButton;
         [SerializeField] private Text characterLockTimeText;
         [SerializeField] private AccountCard playerAccountCardPrefab;
-        [SerializeField] private Transform upperLeftTeamParent;
-        [SerializeField] private Transform upperRightTeamParent;
-        [SerializeField] private Transform lowerLeftTeamParent;
-        [SerializeField] private Transform lowerRightTeamParent;
+        [SerializeField] private AccountCardParent leftTeamParent;
+        [SerializeField] private AccountCardParent rightTeamParent;
         [SerializeField] private Text gameModeText;
         [SerializeField] private Text mapText;
         [SerializeField] private Button roomSettingsButton;
@@ -42,6 +40,21 @@ namespace Vi.UI
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
+
+        [System.Serializable]
+        private class AccountCardParent
+        {
+            public Text teamTitleText;
+            public Transform transformParent;
+            public Button addBotButton;
+
+            public void SetActive(bool isActive)
+            {
+                teamTitleText.gameObject.SetActive(isActive);
+                transformParent.gameObject.SetActive(isActive);
+                addBotButton.gameObject.SetActive(isActive);
+            }
+        }
 
         private void Awake()
         {
@@ -140,6 +153,7 @@ namespace Vi.UI
         }
 
         private PlayerDataManager.GameMode lastGameMode;
+        private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
@@ -178,39 +192,12 @@ namespace Vi.UI
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !startingGame);
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
 
-            // Player account card display logic
-            Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
-            PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
-            for (int i = 0; i < possibleTeams.Length; i++)
-            {
-                if (i == 0)
-                    teamParentDict.Add(possibleTeams[i], upperLeftTeamParent);
-                else if (i == 1)
-                    teamParentDict.Add(possibleTeams[i], upperRightTeamParent);
-                else if (i == 2)
-                    teamParentDict.Add(possibleTeams[i], lowerLeftTeamParent);
-                else if (i == 3)
-                    teamParentDict.Add(possibleTeams[i], lowerRightTeamParent);
-                else
-                    Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
-            }
-
-            foreach (Transform child in upperLeftTeamParent)
+            foreach (Transform child in leftTeamParent.transformParent)
             {
                 Destroy(child.gameObject);
             }
 
-            foreach (Transform child in upperRightTeamParent)
-            {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Transform child in lowerRightTeamParent)
-            {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Transform child in lowerLeftTeamParent)
+            foreach (Transform child in rightTeamParent.transformParent)
             {
                 Destroy(child.gameObject);
             }
@@ -226,6 +213,47 @@ namespace Vi.UI
 
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
+                // Player account card display logic
+                teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
+                PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
+                // Put the local team into the first index
+                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
+                {
+                    PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                    int teamIndex = System.Array.IndexOf(possibleTeams, localTeam);
+                    if (teamIndex != -1)
+                    {
+                        possibleTeams[teamIndex] = possibleTeams[0];
+                        possibleTeams[0] = localTeam;
+                    }
+                }
+                for (int i = 0; i < possibleTeams.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        leftTeamParent.teamTitleText.text = possibleTeams[i].ToString();
+                        teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
+                        PlayerDataManager.Team teamValue = possibleTeams[i];
+                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                    }
+                    else if (i == 1)
+                    {
+                        rightTeamParent.teamTitleText.text = possibleTeams[i].ToString();
+                        teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
+                        PlayerDataManager.Team teamValue = possibleTeams[i];
+                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
+                    }
+                }
+
+                leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
+                rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
+
                 // Maps
                 mapDropdown.ClearOptions();
                 List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
@@ -292,6 +320,14 @@ namespace Vi.UI
         {
             roomSettingsParent.SetActive(false);
             lobbyUIParent.SetActive(true);
+        }
+
+        public void AddBot(PlayerDataManager.Team team)
+        {
+            int characterIndex = 0;
+            int skinIndex = 0;
+            Debug.Log("Adding bot " + team);
+            PlayerDataManager.Singleton.AddBotData(characterIndex, skinIndex, team);
         }
 
         public void ChangeGameMode()

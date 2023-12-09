@@ -196,14 +196,21 @@ namespace Vi.Core
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public int AddBotData(int characterIndex, int skinIndex, Team team)
+        public void AddBotData(int characterIndex, int skinIndex, Team team)
         {
-            if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
-            botClientId--;
-            PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId*-1).ToString(), characterIndex, skinIndex, team);
-            AddPlayerData(botData);
-            return botClientId;
+            if (IsServer)
+            {
+                botClientId--;
+                PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId * -1).ToString(), characterIndex, skinIndex, team);
+                AddPlayerData(botData);
+            }
+            else
+            {
+                AddBotDataServerRpc(characterIndex, skinIndex, team);
+            }
         }
+
+        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(int characterIndex, int skinIndex, Team team) { AddBotData(characterIndex, skinIndex, team); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -214,7 +221,7 @@ namespace Vi.Core
             else
             {
                 playerDataList.Add(playerData);
-                if (GameModeManagers.GameModeManager.Singleton) { GameModeManagers.GameModeManager.Singleton.AddPlayerScore(playerData.id); }
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.AddPlayerScore(playerData.id); }
             }
         }
 
