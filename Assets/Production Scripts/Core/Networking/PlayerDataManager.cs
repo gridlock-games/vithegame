@@ -203,7 +203,7 @@ namespace Vi.Core
             }
             catch
             {
-                return new KeyValuePair<int, Attributes>();
+                return new KeyValuePair<int, Attributes>((int)NetworkManager.LocalClientId, null);
             }
         }
 
