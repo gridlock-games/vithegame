@@ -51,6 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveToPlayer: 0
   canLightAttack: 0
+  gravitySphereCastPositionOffset: {x: 0, y: 0.75, z: 0}
+  gravitySphereCastRadius: 0.75
+  runAnimationTransitionSpeed: 5
   movementPredictionRigidbody: {fileID: 1932007755210931332}
 --- !u!114 &1564116883212529238
 MonoBehaviour:

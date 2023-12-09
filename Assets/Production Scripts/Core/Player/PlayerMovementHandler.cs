@@ -46,7 +46,7 @@ namespace Vi.Player
 
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
-        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         [SerializeField] private float stairHeight = 0.5f;
         [SerializeField] private float rampCheckHeight = 0.1f;
