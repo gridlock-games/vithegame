@@ -118,6 +118,20 @@ namespace Vi.Core
             }
         }
 
+        public static string GetTeamText(Team team)
+        {
+            switch (team)
+            {
+                case Team.Environment:
+                case Team.Peaceful:
+                    return team.ToString();
+                case Team.Competitor:
+                    return "Competitors";
+                default:
+                    return team.ToString() + " Team";
+            }
+        }
+
         public enum GameMode
         {
             None,

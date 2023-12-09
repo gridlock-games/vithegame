@@ -5,7 +5,6 @@ using Vi.ScriptableObjects;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
-using System.Linq;
 using TMPro;
 using System.Text.RegularExpressions;
 
@@ -189,7 +188,7 @@ namespace Vi.UI
             }
             characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
 
-            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !startingGame);
+            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
 
             foreach (Transform child in leftTeamParent.transformParent)
@@ -231,7 +230,7 @@ namespace Vi.UI
                 {
                     if (i == 0)
                     {
-                        leftTeamParent.teamTitleText.text = possibleTeams[i].ToString();
+                        leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         leftTeamParent.addBotButton.onClick.RemoveAllListeners();
@@ -239,7 +238,7 @@ namespace Vi.UI
                     }
                     else if (i == 1)
                     {
-                        rightTeamParent.teamTitleText.text = possibleTeams[i].ToString();
+                        rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         leftTeamParent.addBotButton.onClick.RemoveAllListeners();
@@ -326,7 +325,6 @@ namespace Vi.UI
         {
             int characterIndex = 0;
             int skinIndex = 0;
-            Debug.Log("Adding bot " + team);
             PlayerDataManager.Singleton.AddBotData(characterIndex, skinIndex, team);
         }
 
