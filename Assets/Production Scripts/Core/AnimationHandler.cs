@@ -255,6 +255,7 @@ namespace Vi.Core
 
         private void ChangeSkin(int characterIndex, int skinIndex)
         {
+            Debug.Log(name + " " + characterIndex + " " + skinIndex);
             animatorReference = GetComponentInChildren<AnimatorReference>();
             if (animatorReference)
             {

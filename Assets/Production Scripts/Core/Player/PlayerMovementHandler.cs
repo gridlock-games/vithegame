@@ -55,7 +55,7 @@ namespace Vi.Player
         private bool isGrounded = true;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (!CanMove())
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (IsOwner)
                 {

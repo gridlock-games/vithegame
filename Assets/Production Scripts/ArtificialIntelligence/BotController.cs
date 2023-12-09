@@ -52,6 +52,13 @@ namespace Vi.ArtificialIntelligence
         {
             if (!IsServer) { return; }
 
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                moveForwardTarget.Value = 0;
+                moveSidesTarget.Value = 0;
+                return;
+            }
+
             Attributes targetAttributes = null;
             Collider[] colliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask(new string[] { "Character" }));
             foreach (Collider c in colliders)
@@ -121,6 +128,10 @@ namespace Vi.ArtificialIntelligence
                                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
                                 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
                             }
+                            else
+                            {
+                                weaponHandler.SendMessage("OnLightAttack");
+                            }
                         }
                         break;
                     case PlayerDataManager.GameMode.FreeForAll:
@@ -138,7 +149,6 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (!CanMove()) { movement = Vector3.zero; }
             currentPosition.Value += movement + gravity;
 
             moveForwardTarget.Value = animDir.z;
