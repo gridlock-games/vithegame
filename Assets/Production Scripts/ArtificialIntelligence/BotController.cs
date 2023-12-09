@@ -45,11 +45,36 @@ namespace Vi.ArtificialIntelligence
             if (IsServer) { NetworkManager.NetworkTickSystem.Tick -= ProcessMovement; }
         }
 
+        [SerializeField] private float angularSpeed = 540;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         private void ProcessMovement()
         {
             if (!IsServer) { return; }
+
+            Attributes targetAttributes = null;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask(new string[] { "Character" }));
+            foreach (Collider c in colliders)
+            {
+                if (c.transform.root.TryGetComponent(out Attributes attributes))
+                {
+                    if (!PlayerDataManager.Singleton.CanHit(this.attributes, attributes)) { continue; }
+                    targetAttributes = attributes;
+                    break;
+                }
+            }
+            Vector3 targetPosition = targetAttributes ? targetAttributes.transform.position : currentPosition.Value;
+
+            Vector3 lookDirection = targetPosition - currentPosition.Value;
+            lookDirection.Scale(HORIZONTAL_PLANE);
+            if (lookDirection == Vector3.zero) { lookDirection = transform.forward; }
+
+            if (attributes.ShouldApplyAilmentRotation())
+                currentRotation.Value = attributes.GetAilmentRotation();
+            if (weaponHandler.IsAiming())
+                currentRotation.Value = Quaternion.LookRotation(lookDirection);
+            else
+                currentRotation.Value = Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
 
             Vector3 movement = Vector3.zero;
             Vector3 animDir = Vector3.zero;
@@ -70,20 +95,23 @@ namespace Vi.ArtificialIntelligence
             if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
             isGrounded = bHit;
 
-            switch (PlayerDataManager.Singleton.GetGameMode())
+            // Apply movement
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            if (animationHandler.ShouldApplyRootMotion())
             {
-                case PlayerDataManager.GameMode.None:
-                    // Roam until a player gets close, then attack them
-                    Collider[] colliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask(new string[] { "Character" }));
-                    foreach (Collider c in colliders)
-                    {
-                        if (c.transform.root.TryGetComponent(out Attributes attributes))
+                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+            }
+            else
+            {
+                switch (PlayerDataManager.Singleton.GetGameMode())
+                {
+                    case PlayerDataManager.GameMode.None:
+                        // Roam until a player gets close, then attack them
+                        if (targetAttributes)
                         {
-                            if (attributes == this.attributes) { continue; }
-
-                            if (Vector3.Distance(currentPosition.Value, attributes.transform.position) > 3)
+                            if (Vector3.Distance(currentPosition.Value, targetAttributes.transform.position) > 3)
                             {
-                                Vector3 dir = attributes.transform.position - currentPosition.Value;
+                                Vector3 dir = targetPosition - currentPosition.Value;
                                 Vector3 targetDirection = new Vector3(dir.x, 0, dir.z) * (attributes.IsFeared() ? -1 : 1);
                                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                                 targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
@@ -93,22 +121,21 @@ namespace Vi.ArtificialIntelligence
                                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
                                 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
                             }
-                            break;
                         }
-                    }
-                    break;
-                case PlayerDataManager.GameMode.FreeForAll:
-                    // Path find to the nearest player and fight them
-                    break;
-                case PlayerDataManager.GameMode.TeamElimination:
-                    break;
-                case PlayerDataManager.GameMode.EssenceWar:
-                    break;
-                case PlayerDataManager.GameMode.OutputRush:
-                    break;
-                default:
-                    Debug.LogError("Game Mode: " + PlayerDataManager.Singleton.GetGameMode() + " is not implemented for BotController");
-                    break;
+                        break;
+                    case PlayerDataManager.GameMode.FreeForAll:
+                        // Path find to the nearest player and fight them
+                        break;
+                    case PlayerDataManager.GameMode.TeamElimination:
+                        break;
+                    case PlayerDataManager.GameMode.EssenceWar:
+                        break;
+                    case PlayerDataManager.GameMode.OutputRush:
+                        break;
+                    default:
+                        Debug.LogError("Game Mode: " + PlayerDataManager.Singleton.GetGameMode() + " is not implemented for BotController");
+                        break;
+                }
             }
 
             if (!CanMove()) { movement = Vector3.zero; }

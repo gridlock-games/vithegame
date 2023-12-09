@@ -100,7 +100,7 @@ namespace Vi.Player
             isGrounded = bHit;
 
             Vector3 animDir = Vector3.zero;
-            // Apply movement to charactercontroller
+            // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())
