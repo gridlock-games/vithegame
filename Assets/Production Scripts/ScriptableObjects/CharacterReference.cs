@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 
 namespace Vi.ScriptableObjects
 {
@@ -9,6 +8,7 @@ namespace Vi.ScriptableObjects
     public class CharacterReference : ScriptableObject
     {
         [SerializeField] private PlayerModelOption[] playerModelOptions;
+        [SerializeField] private WeaponOption[] weaponOptions;
 
         [System.Serializable]
         public class PlayerModelOption
@@ -23,6 +23,15 @@ namespace Vi.ScriptableObjects
             public GameObject[] skinOptions;
         }
 
+        [System.Serializable]
+        public class WeaponOption
+        {
+            public RuntimeAnimatorController animationController;
+            public Weapon weapon;
+        }
+
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
+
+        public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
     }
 }
