@@ -8,7 +8,7 @@ namespace Vi.ProceduralAnimations
     [RequireComponent(typeof(Rig))]
     public class RigWeightTarget : MonoBehaviour
     {
-        public float weight = 1;
+        public float weight;
         public bool instantWeight;
 
         private const float weightSpeed = 3;

@@ -59,7 +59,7 @@ namespace Vi.Core.SceneManagement
                 parsedConnectionData.skinIndex,
                 clientTeam,
                 0,
-                1)));
+                2)));
         }
 
         private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)
