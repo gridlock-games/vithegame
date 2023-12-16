@@ -13,6 +13,17 @@ MonoBehaviour:
   m_Name: CharacterReference
   m_EditorClassIdentifier: 
   playerModelOptions:
+  - name: Guinevere
+    weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
+    role: Greatsword
+    characterDescription: 
+    characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
+    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
+      type: 3}
+    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
+      type: 3}
+    skinOptions:
+    - {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137, type: 3}
   - name: Helsing
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
     role: Crossbow
