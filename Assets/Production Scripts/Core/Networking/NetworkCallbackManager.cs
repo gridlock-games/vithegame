@@ -54,7 +54,12 @@ namespace Vi.Core.SceneManagement
 
             PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, parsedConnectionData.playerName, parsedConnectionData.characterIndex, parsedConnectionData.skinIndex, clientTeam)));
+            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, parsedConnectionData.playerName,
+                parsedConnectionData.characterIndex,
+                parsedConnectionData.skinIndex,
+                clientTeam,
+                2,
+                0)));
         }
 
         private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)

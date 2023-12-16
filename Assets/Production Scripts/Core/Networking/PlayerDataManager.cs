@@ -215,7 +215,13 @@ namespace Vi.Core
             if (IsServer)
             {
                 botClientId--;
-                PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId * -1).ToString(), characterIndex, skinIndex, team);
+                PlayerData botData = new PlayerData(botClientId,
+                    "Bot " + (botClientId * -1).ToString(),
+                    characterIndex,
+                    skinIndex,
+                    team,
+                    0,
+                    0);
                 AddPlayerData(botData);
             }
             else
@@ -509,6 +515,8 @@ namespace Vi.Core
             public int characterIndex;
             public int skinIndex;
             public Team team;
+            public int primaryWeaponIndex;
+            public int secondaryWeaponIndex;
 
             public PlayerData(int id)
             {
@@ -517,24 +525,19 @@ namespace Vi.Core
                 characterIndex = 0;
                 skinIndex = 0;
                 team = Team.Environment;
+                primaryWeaponIndex = 0;
+                secondaryWeaponIndex = 0;
             }
 
-            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team)
+            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
             {
                 this.id = id;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
                 this.team = team;
-            }
-
-            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
-            {
-                id = (int)clientId;
-                this.playerName = playerName;
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
-                this.team = team;
+                this.primaryWeaponIndex = primaryWeaponIndex;
+                this.secondaryWeaponIndex = secondaryWeaponIndex;
             }
 
             public bool Equals(PlayerData other)
@@ -549,6 +552,8 @@ namespace Vi.Core
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
                 serializer.SerializeValue(ref team);
+                serializer.SerializeValue(ref primaryWeaponIndex);
+                serializer.SerializeValue(ref secondaryWeaponIndex);
             }
         }
     }

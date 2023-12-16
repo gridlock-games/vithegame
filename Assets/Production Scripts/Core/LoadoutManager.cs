@@ -11,21 +11,22 @@ namespace Vi.Core
     {
         private CharacterReference.WeaponOption primaryWeapon;
         private CharacterReference.WeaponOption secondaryWeapon;
-        private CharacterReference.WeaponOption tertiaryWeapon;
 
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
         private void Awake()
         {
+            attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            primaryWeapon = weaponOptions[0];
-            secondaryWeapon = weaponOptions[1];
-            tertiaryWeapon = weaponOptions[2];
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            primaryWeapon = weaponOptions[playerData.primaryWeaponIndex];
+            secondaryWeapon = weaponOptions[playerData.secondaryWeaponIndex];
         }
 
         public void RefreshCurrentWeapon()
         {
-            weaponHandler.SetNewWeapon(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions()[0]);
+            weaponHandler.SetNewWeapon(primaryWeapon);
         }
 
         void OnWeapon1()
@@ -36,11 +37,6 @@ namespace Vi.Core
         void OnWeapon2()
         {
             weaponHandler.SetNewWeapon(secondaryWeapon);
-        }
-
-        void OnWeapon3()
-        {
-            weaponHandler.SetNewWeapon(tertiaryWeapon);
         }
     }
 }
