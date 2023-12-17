@@ -140,9 +140,9 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
-        public List<WearableEquipmentOption> GetWearableEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => item.raceAndGender == raceAndGender); }
+        public List<WearableEquipmentOption> GetWearableEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
-        public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender); }
+        public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
