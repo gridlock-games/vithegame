@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -9,6 +10,26 @@ namespace Vi.Core
     [RequireComponent(typeof(GlowRenderer))]
     public class AnimatorReference : MonoBehaviour
     {
+        [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
+        [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
+
+        public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
+        {
+            MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation & raceAndGender == characterMaterial.raceAndGender);
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
+            }
+        }
+
+        [System.Serializable]
+        private class MaterialReplacementDefintion
+        {
+            public CharacterReference.MaterialApplicationLocation characterMaterialType;
+            public SkinnedMeshRenderer[] skinnedMeshRenderers;
+        }
+
+
         // Variable to store network root motion
         private Vector3 networkRootMotion;
         // Method to apply network root motion
