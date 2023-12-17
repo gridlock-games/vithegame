@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
-using Unity.Collections;
-using System.Linq;
 
 namespace Vi.Core
 {
@@ -98,13 +96,13 @@ namespace Vi.Core
                     Debug.LogError("SceneType: " + scenePayload.sceneType + "has not been implemented yet!");
                     break;
             }
-            Debug.Log("Loading " + scenePayload.name);
+            //Debug.Log("Loading " + scenePayload.name);
             currentlyLoadedScenePayloads.Add(scenePayload);
         }
 
         private void UnloadAllScenePayloadsOfType(SceneType sceneType)
         {
-            Debug.Log("Unloading all " + sceneType + " Count: " + currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType).Count);
+            //Debug.Log("Unloading all " + sceneType + " Count: " + currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType).Count);
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
             {
                 foreach (string sceneName in scenePayload.sceneNames)
@@ -165,7 +163,7 @@ namespace Vi.Core
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
-            Debug.Log("Loaded " + scene.name);
+            //Debug.Log("Loaded " + scene.name);
             if (IsServer)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
@@ -190,7 +188,7 @@ namespace Vi.Core
 
         private void OnSceneUnload(Scene scene)
         {
-            Debug.Log("Unloaded " + scene.name);
+            //Debug.Log("Unloaded " + scene.name);
         }
 
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)

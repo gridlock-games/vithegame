@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
+using Unity.Netcode;
 
 namespace Vi.Player
 {
@@ -32,6 +33,14 @@ namespace Vi.Player
             else
             {
                 Debug.LogError("Not sure how to handle action map: " + playerInput.defaultActionMap);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsLocalPlayer) { Cursor.lockState = CursorLockMode.None; }
             }
         }
 

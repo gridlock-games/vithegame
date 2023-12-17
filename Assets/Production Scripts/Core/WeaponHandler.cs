@@ -42,22 +42,30 @@ namespace Vi.Core
             movementHandler = GetComponent<MovementHandler>();
         }
 
-        public void SetNewWeapon(Weapon weapon, GameObject skinPrefab)
+        public void SetNewWeapon(CharacterReference.WeaponOption weaponOption)
         {
-            weaponInstance = Instantiate(weapon);
-            EquipWeapon(skinPrefab);
+            weaponInstance = Instantiate(weaponOption.weapon);
+            animationHandler.Animator.runtimeAnimatorController = weaponOption.animationController;
+            EquipWeapon();
         }
 
-        private void EquipWeapon(GameObject skinPrefab)
+        private void EquipWeapon()
         {
             if (IsServer) { aiming.Value = false; }
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                Destroy(kvp.Value);
+            }
+            weaponInstances.Clear();
+
             canAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == skinPrefab.name)
+                if (data.skinPrefab.name == animationHandler.LimbReferences.name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {

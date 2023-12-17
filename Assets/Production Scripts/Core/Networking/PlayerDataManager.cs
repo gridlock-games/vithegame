@@ -6,6 +6,7 @@ using Unity.Collections;
 using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -21,7 +22,7 @@ namespace Vi.Core
         {
             public GameMode gameMode;
             public Team[] possibleTeams;
-            //public string[] possibleMaps;
+            public string[] possibleMapSceneGroupNames;
         }
 
         public CharacterReference GetCharacterReference() { return characterReference; }
@@ -30,6 +31,67 @@ namespace Vi.Core
 
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }
+
+        public void SetGameMode(GameMode newGameMode)
+        {
+            if (IsServer)
+            {
+                gameMode.Value = newGameMode;
+            }
+            else
+            {
+                SetGameModeServerRpc(newGameMode);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetGameModeServerRpc(GameMode newGameMode)
+        {
+            SetGameMode(newGameMode);
+        }
+
+        private void OnGameModeChange(GameMode prev, GameMode current)
+        {
+            mapIndex.Value = 0;
+        }
+
+        private NetworkVariable<int> mapIndex = new NetworkVariable<int>();
+        public string GetMapName()
+        {
+            return GetGameModeInfo().possibleMapSceneGroupNames[mapIndex.Value];
+        }
+
+        public void SetMap(string map)
+        {
+            if (IsServer)
+            {
+                mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().possibleMapSceneGroupNames, map);
+            }
+            else
+            {
+                SetMapServerRpc(map);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetMapServerRpc(string map)
+        {
+            SetMap(map);
+        }
+
+        public bool IsLobbyLeader()
+        {
+            if (IsServer) { return true; }
+
+            List<PlayerData> playerDataList = GetPlayerDataList();
+            playerDataList.RemoveAll(item => item.id < 0);
+            playerDataList = playerDataList.OrderBy(item => item.id).ToList();
+
+            if (playerDataList.Count > 0)
+                return playerDataList[0].id == (int)NetworkManager.LocalClientId;
+            else
+                return false;
+        }
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
@@ -53,6 +115,20 @@ namespace Vi.Core
             else
             {
                 return Color.black;
+            }
+        }
+
+        public static string GetTeamText(Team team)
+        {
+            switch (team)
+            {
+                case Team.Environment:
+                case Team.Peaceful:
+                    return team.ToString();
+                case Team.Competitor:
+                    return "Competitors";
+                default:
+                    return team.ToString() + " Team";
             }
         }
 
@@ -127,21 +203,34 @@ namespace Vi.Core
             }
             catch
             {
-                return new KeyValuePair<int, Attributes>();
+                return new KeyValuePair<int, Attributes>((int)NetworkManager.LocalClientId, null);
             }
         }
 
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public int AddBotData(int characterIndex, int skinIndex, Team team)
+        public void AddBotData(int characterIndex, int skinIndex, Team team)
         {
-            if (IsSpawned) { if (!IsServer) { Debug.LogError("GameLogicManager.AddBotData() should only be called on the server!"); return 0; } }
-            botClientId--;
-            PlayerData botData = new PlayerData(botClientId, "Bot " + (botClientId*-1).ToString(), characterIndex, skinIndex, team);
-            AddPlayerData(botData);
-            return botClientId;
+            if (IsServer)
+            {
+                botClientId--;
+                PlayerData botData = new PlayerData(botClientId,
+                    "Bot " + (botClientId * -1).ToString(),
+                    characterIndex,
+                    skinIndex,
+                    team,
+                    0,
+                    0);
+                AddPlayerData(botData);
+            }
+            else
+            {
+                AddBotDataServerRpc(characterIndex, skinIndex, team);
+            }
         }
+
+        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(int characterIndex, int skinIndex, Team team) { AddBotData(characterIndex, skinIndex, team); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -152,7 +241,7 @@ namespace Vi.Core
             else
             {
                 playerDataList.Add(playerData);
-                if (GameModeManagers.GameModeManager.Singleton) { GameModeManagers.GameModeManager.Singleton.AddPlayerScore(playerData.id); }
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.AddPlayerScore(playerData.id); }
             }
         }
 
@@ -205,6 +294,7 @@ namespace Vi.Core
         public void RemovePlayerData(int clientId)
         {
             playerDataList.Remove(new PlayerData(clientId));
+            if (GameModeManager.Singleton) { GameModeManager.Singleton.RemovePlayerScore(clientId); }
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -265,11 +355,33 @@ namespace Vi.Core
             {
                 if (g.TryGetComponent(out playerSpawnPoints)) { break; }
             }
+
+            if (IsServer)
+            {
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    foreach (PlayerData playerData in playerDataList)
+                    {
+                        StartCoroutine(SpawnPlayer(playerData));
+                    }
+                }
+            }
         }
 
         void OnSceneUnload(Scene scene)
         {
             playerSpawnPoints = null;
+
+            if (IsServer)
+            {
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    foreach (Attributes attributes in GetActivePlayerObjects())
+                    {
+                        attributes.NetworkObject.Despawn(true);
+                    }
+                }
+            }
         }
 
         private void Start()
@@ -281,11 +393,13 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
+            gameMode.OnValueChanged += OnGameModeChange;
         }
 
         public override void OnNetworkDespawn()
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
+            gameMode.OnValueChanged -= OnGameModeChange;
         }
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
@@ -293,7 +407,10 @@ namespace Vi.Core
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                {
+                    StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                }
             }
         }
 
@@ -334,7 +451,6 @@ namespace Vi.Core
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
             if (localPlayers.ContainsKey(playerData.id)) { yield break; }
-            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer());
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
@@ -399,6 +515,8 @@ namespace Vi.Core
             public int characterIndex;
             public int skinIndex;
             public Team team;
+            public int primaryWeaponIndex;
+            public int secondaryWeaponIndex;
 
             public PlayerData(int id)
             {
@@ -407,24 +525,19 @@ namespace Vi.Core
                 characterIndex = 0;
                 skinIndex = 0;
                 team = Team.Environment;
+                primaryWeaponIndex = 0;
+                secondaryWeaponIndex = 0;
             }
 
-            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team)
+            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
             {
                 this.id = id;
                 this.playerName = playerName;
                 this.characterIndex = characterIndex;
                 this.skinIndex = skinIndex;
                 this.team = team;
-            }
-
-            public PlayerData(ulong clientId, string playerName, int characterIndex, int skinIndex, Team team)
-            {
-                id = (int)clientId;
-                this.playerName = playerName;
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
-                this.team = team;
+                this.primaryWeaponIndex = primaryWeaponIndex;
+                this.secondaryWeaponIndex = secondaryWeaponIndex;
             }
 
             public bool Equals(PlayerData other)
@@ -439,6 +552,8 @@ namespace Vi.Core
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
                 serializer.SerializeValue(ref team);
+                serializer.SerializeValue(ref primaryWeaponIndex);
+                serializer.SerializeValue(ref secondaryWeaponIndex);
             }
         }
     }

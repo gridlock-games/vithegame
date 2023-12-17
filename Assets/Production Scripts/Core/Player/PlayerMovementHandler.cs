@@ -46,7 +46,7 @@ namespace Vi.Player
 
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
-        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         [SerializeField] private float stairHeight = 0.5f;
         [SerializeField] private float rampCheckHeight = 0.1f;
@@ -55,7 +55,7 @@ namespace Vi.Player
         private bool isGrounded = true;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (!CanMove())
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (IsOwner)
                 {
@@ -100,7 +100,7 @@ namespace Vi.Player
             isGrounded = bHit;
 
             Vector3 animDir = Vector3.zero;
-            // Apply movement to charactercontroller
+            // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())

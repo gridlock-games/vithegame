@@ -267,7 +267,8 @@ namespace Vi.Core
             Animator = modelInstance.GetComponent<Animator>();
             LimbReferences = modelInstance.GetComponent<LimbReferences>();
             animatorReference = modelInstance.GetComponent<AnimatorReference>();
-            weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
+
+            GetComponent<LoadoutManager>().RefreshCurrentWeapon();
         }
 
         private struct CharacterModelInfo : INetworkSerializable
@@ -300,7 +301,7 @@ namespace Vi.Core
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
                 ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
-            else if (!NetworkManager.IsListening)
+            else if (!NetworkManager.IsServer) // This code block is for preview characters
             {
                 ChangeSkin(characterIndex, skinIndex);
             }

@@ -35,7 +35,6 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
-            Debug.Log(killer + " " + victim);
             if (nextGameActionTimer.Value <= 0)
             {
                 int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
@@ -97,10 +96,9 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
-            scoreList.OnListChanged += OnScoreListChange;
+            _singleton = this;
             if (IsServer)
             {
-                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
@@ -114,30 +112,11 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkDespawn()
         {
-            scoreList.OnListChanged -= OnScoreListChange;
             if (IsServer)
             {
-                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
-        }
-
-        //public void OnPlayerDataListChange(NetworkListEvent<PlayerDataManager.PlayerData> networkListEvent)
-        //{
-        //    if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Add)
-        //    {
-        //        scoreList.Add(new PlayerScore(networkListEvent.Value.id));
-        //    }
-        //    else if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Remove)
-        //    {
-        //        scoreList.Remove(new PlayerScore(networkListEvent.Value.id));
-        //    }
-        //}
-
-        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
-        {
-            //Debug.Log(networkListEvent.Type + " " + networkListEvent.Value.id);
         }
 
         public void AddPlayerScore(int id)
@@ -160,6 +139,11 @@ namespace Vi.Core.GameModeManagers
         }
 
         public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
+
+        public void RemovePlayerScore(int id)
+        {
+            scoreList.Remove(new PlayerScore(id));
+        }
 
         private void OnRoundTimerChange(float prev, float current)
         {
@@ -223,19 +207,19 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
-            _singleton = this;
             scoreList = new NetworkList<PlayerScore>();
         }
 
         private GameObject UIInstance;
         protected void Start()
         {
-            UIInstance = Instantiate(UIPrefab, transform);
+            if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
         protected void Update()
         {
             if (!IsServer) { return; }
+            if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None) { return; }
 
             if (nextGameActionTimer.Value > 0)
                 nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);

@@ -26,6 +26,14 @@ MonoBehaviour:
   blockVFXPrefab: {fileID: 4329036519906242892, guid: 583f37b3acf6baf43bfe1b375082eba6,
     type: 3}
   weaponModelData:
+  - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 3178962258874356211, guid: 5719c2a3be9bd474d98734c2e57af0d1,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0.0792, y: -0.0382, z: 0.0282}
+      weaponRotationOffset: {x: -83.354, y: 10.667, z: 143.981}
   - skinPrefab: {fileID: 8232781601153318563, guid: 0cf368fca1eebcd48852c56208dcc6f3,
       type: 3}
     data:
@@ -110,9 +118,7 @@ MonoBehaviour:
   ability3: {fileID: 11400000, guid: f1c1b67f565a34e419bb2a2ec7c0edf3, type: 2}
   ability4: {fileID: 11400000, guid: c2945cd0e342c2b4aaa613881ce6e365, type: 2}
   attackList:
-  - inputIndex: 0
-    inputs: 00000000
-    InputAttackType: 0
+  - inputs: 00000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 40124d3d5f9771d428c1704064e50d62, type: 2}
   dodgeStaminaCost: 20

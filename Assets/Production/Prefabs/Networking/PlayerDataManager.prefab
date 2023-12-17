@@ -65,21 +65,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c097031af7b0ce49a8cdaec48a92a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameModeValue: 1
   spectatorPrefab: {fileID: 6625860223617135220, guid: edb39ff1c86836c4c8a2d9a1dc4d0c73,
     type: 3}
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
   gameModeInfos:
   - gameMode: 0
     possibleTeams: 02000000
+    possibleMapSceneGroupNames: []
   - gameMode: 1
     possibleTeams: 02000000
+    possibleMapSceneGroupNames:
+    - Arena Map A
+    - Arena Map B
   - gameMode: 2
     possibleTeams: 0300000007000000
+    possibleMapSceneGroupNames:
+    - Arena Map A
+    - Arena Map B
   - gameMode: 3
     possibleTeams: 0300000007000000
+    possibleMapSceneGroupNames:
+    - Arena Map A
+    - Arena Map B
   - gameMode: 4
     possibleTeams: 0300000007000000
-  teamDefinitions:
-  - team: 2
-    clientId: 0
+    possibleMapSceneGroupNames:
+    - Arena Map A
+    - Arena Map B

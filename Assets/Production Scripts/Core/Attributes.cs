@@ -155,7 +155,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
-            if (IsServer) { PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
+            PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
         private void OnHPChanged(float prev, float current)
@@ -551,7 +551,7 @@ namespace Vi.Core
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            PlayerDataManager.Singleton.RespawnPlayer(this);
+            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this); }
             IsRespawning = false;
         }
 

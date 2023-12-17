@@ -45,9 +45,16 @@ namespace Vi.UI
         public void ChangeCharacter()
         {
             KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-            if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
+            if (localPlayerKvp.Value)
             {
                 localPlayerKvp.Value.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            }
+            else if (PlayerDataManager.Singleton.ContainsId(localPlayerKvp.Key))
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(localPlayerKvp.Key);
+                playerData.characterIndex = characterIndex;
+                playerData.skinIndex = skinIndex;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
             else
             {
