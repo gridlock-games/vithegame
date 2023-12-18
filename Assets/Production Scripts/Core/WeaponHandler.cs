@@ -42,17 +42,17 @@ namespace Vi.Core
             movementHandler = GetComponent<MovementHandler>();
         }
 
-        public void SetNewWeapon(CharacterReference.WeaponOption weaponOption)
+        public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
         {
-            weaponInstance = Instantiate(weaponOption.weapon);
-            animationHandler.Animator.runtimeAnimatorController = weaponOption.animationController;
+            if (IsOwner & aiming.Value) { aiming.Value = false; return; }
+
+            weaponInstance = weapon;
+            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
             EquipWeapon();
         }
 
         private void EquipWeapon()
         {
-            if (IsServer) { aiming.Value = false; }
-
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
             {
                 Destroy(kvp.Value);

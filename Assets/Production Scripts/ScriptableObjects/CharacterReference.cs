@@ -144,6 +144,7 @@ namespace Vi.ScriptableObjects
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
+        # if UNITY_EDITOR
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
@@ -166,5 +167,6 @@ namespace Vi.ScriptableObjects
                 characterMaterialOptions.Add(new CharacterMaterial(filepath, material));
             }
         }
+        # endif
     }
 }

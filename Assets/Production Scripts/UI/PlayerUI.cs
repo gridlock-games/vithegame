@@ -60,8 +60,16 @@ namespace Vi.UI
             }
         }
 
+        private Weapon lastWeapon;
         private void UpdateWeapon()
         {
+            if (lastWeapon == weaponHandler.GetWeapon())
+            {
+                lastWeapon = weaponHandler.GetWeapon();
+                return;
+            }
+
+            lastWeapon = weaponHandler.GetWeapon();
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {
@@ -92,8 +100,6 @@ namespace Vi.UI
 
         private void Update()
         {
-            UpdateWeapon();
-
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
@@ -146,6 +152,7 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
+            UpdateWeapon();
         }
     }
 }

@@ -9,34 +9,40 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class LoadoutManager : NetworkBehaviour
     {
-        private CharacterReference.WeaponOption primaryWeapon;
-        private CharacterReference.WeaponOption secondaryWeapon;
+        private Weapon primaryWeapon;
+        private RuntimeAnimatorController primaryRuntimeAnimatorController;
+        private Weapon secondaryWeapon;
+        private RuntimeAnimatorController secondaryRuntimeAnimatorController;
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private AnimationHandler animationHandler;
         private void Awake()
         {
+            animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            primaryWeapon = weaponOptions[playerData.primaryWeaponIndex];
-            secondaryWeapon = weaponOptions[playerData.secondaryWeaponIndex];
+            primaryWeapon = Instantiate(weaponOptions[playerData.primaryWeaponIndex].weapon);
+            secondaryWeapon = Instantiate(weaponOptions[playerData.secondaryWeaponIndex].weapon);
+            primaryRuntimeAnimatorController = weaponOptions[playerData.primaryWeaponIndex].animationController;
+            secondaryRuntimeAnimatorController = weaponOptions[playerData.secondaryWeaponIndex].animationController;
         }
 
-        public void RefreshCurrentWeapon()
+        public void EquipPrimaryWeapon()
         {
-            weaponHandler.SetNewWeapon(primaryWeapon);
+            weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
         }
 
         void OnWeapon1()
         {
-            weaponHandler.SetNewWeapon(primaryWeapon);
+            if (animationHandler.IsAtRest()) { weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController); }
         }
 
         void OnWeapon2()
         {
-            weaponHandler.SetNewWeapon(secondaryWeapon);
+            if (animationHandler.IsAtRest()) { weaponHandler.SetNewWeapon(secondaryWeapon, secondaryRuntimeAnimatorController); }
         }
     }
 }
