@@ -267,8 +267,6 @@ namespace Vi.Core
             Animator = modelInstance.GetComponent<Animator>();
             LimbReferences = modelInstance.GetComponent<LimbReferences>();
             animatorReference = modelInstance.GetComponent<AnimatorReference>();
-
-            GetComponent<LoadoutManager>().EquipPrimaryWeapon();
         }
 
         private struct CharacterModelInfo : INetworkSerializable

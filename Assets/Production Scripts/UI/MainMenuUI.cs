@@ -9,22 +9,16 @@ namespace Vi.UI
 {
     public class MainMenuUI : MonoBehaviour
     {
-        [SerializeField] private InputField usernameInputField;
-        [SerializeField] private Button playGameButton;
-
-        private void Awake()
-        {
-            playGameButton.interactable = usernameInputField.text.Length > 0;
-        }
-
         public void StartHubServer()
         {
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
         }
 
         public void StartLobbyServer()
         {
+            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7776;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
@@ -38,12 +32,6 @@ namespace Vi.UI
         {
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
-        }
-
-        public void OnUsernameChange()
-        {
-            playGameButton.interactable = usernameInputField.text.Length > 0;
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(usernameInputField.text + "|0|0");
         }
     }
 }

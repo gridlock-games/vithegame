@@ -27,20 +27,28 @@ namespace Vi.Core
                 yield break;
             }
             string json = getRequest.downloadHandler.text;
-            if (json != "[]")
+            try
             {
-                foreach (string jsonSplit in json.Split("},"))
+                if (json != "[]")
                 {
-                    string finalJsonElement = jsonSplit;
-                    if (finalJsonElement[0] == '[')
-                        finalJsonElement = finalJsonElement.Remove(0, 1);
-                    if (finalJsonElement[^1] == ']')
-                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                    if (finalJsonElement[^1] != '}')
-                        finalJsonElement += "}";
-                    Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    foreach (string jsonSplit in json.Split("},"))
+                    {
+                        string finalJsonElement = jsonSplit;
+                        if (finalJsonElement[0] == '[')
+                            finalJsonElement = finalJsonElement.Remove(0, 1);
+                        if (finalJsonElement[^1] == ']')
+                            finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                        if (finalJsonElement[^1] != '}')
+                            finalJsonElement += "}";
+                        Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    }
                 }
             }
+            catch
+            {
+                Servers = new List<Server>() { new Server("", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+            }
+            
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
@@ -91,6 +99,18 @@ namespace Vi.Core
             public string label;
             public string __v;
             public string port;
+
+            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port)
+            {
+                this._id = _id;
+                this.type = type;
+                this.population = population;
+                this.progress = progress;
+                this.ip = ip;
+                this.label = label;
+                this.__v = __v;
+                this.port = port;
+            }
         }
 
         public struct ServerPostPayload

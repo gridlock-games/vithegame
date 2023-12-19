@@ -22,17 +22,35 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+        }
+
+        private void Start()
+        {
+            if (!IsSpawned) { EquipPrimaryWeapon(); }
+        }
+
+        public override void OnNetworkSpawn()
+        {
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
             primaryWeapon = Instantiate(weaponOptions[playerData.primaryWeaponIndex].weapon);
             secondaryWeapon = Instantiate(weaponOptions[playerData.secondaryWeaponIndex].weapon);
             primaryRuntimeAnimatorController = weaponOptions[playerData.primaryWeaponIndex].animationController;
             secondaryRuntimeAnimatorController = weaponOptions[playerData.secondaryWeaponIndex].animationController;
+            EquipPrimaryWeapon();
         }
 
-        public void EquipPrimaryWeapon()
+        private void EquipPrimaryWeapon()
         {
-            weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
+            if (primaryWeapon)
+            {
+                weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
+            }
+            else
+            {
+                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions()[0];
+                weaponHandler.SetNewWeapon(Instantiate(weaponOption.weapon), weaponOption.animationController);
+            }
         }
 
         void OnWeapon1()

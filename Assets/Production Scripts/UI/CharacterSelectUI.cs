@@ -11,42 +11,22 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
-        [SerializeField] private CharacterSelectElement characterSelectElement;
-        [SerializeField] private Transform characterSelectGridParent;
+        [SerializeField] private InputField usernameInputField;
+        [SerializeField] private Button createCharacterButton;
         [SerializeField] private GameObject characterSelectParent;
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
         [SerializeField] private GameObject serverListParent;
-        [SerializeField] private Text characterNameText;
-        [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
         [SerializeField] private Button connectButton;
         [SerializeField] private Button closeServersMenuButton;
         [SerializeField] private Button refreshServersButton;
 
-        private readonly float size = 200;
-        private readonly int height = 2;
-
         private void Awake()
         {
             CloseServerBrowser();
-            CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            Quaternion rotation = Quaternion.Euler(0, 0, -45);
-            int characterIndex = 0;
-            for (int x = 0; x < playerModelOptions.Length; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (characterIndex >= playerModelOptions.Length) { return; }
-
-                    Vector3 pos = new Vector3(x * size - size, y * size, 0);
-                    GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
-                    g.transform.localPosition = rotation * pos;
-                    g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
-                    characterIndex++;
-                }
-            }
+            createCharacterButton.interactable = usernameInputField.text.Length > 0;
         }
 
         private void Start()
@@ -77,6 +57,12 @@ namespace Vi.UI
                 serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime >= 0);
                 serverListElementList[i].transform.SetSiblingIndex(i);
             }
+        }
+
+        public void OnUsernameChange()
+        {
+            createCharacterButton.interactable = usernameInputField.text.Length > 0;
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(usernameInputField.text + "|0|0");
         }
 
         public void OpenServerBrowser()
@@ -118,8 +104,6 @@ namespace Vi.UI
             CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
             previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-            characterNameText.text = playerModelOption.name;
-            characterRoleText.text = playerModelOption.role;
         }
 
         public void ChangeSkin()
