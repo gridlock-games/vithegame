@@ -23,10 +23,157 @@ namespace Vi.UI
         [SerializeField] private Button closeServersMenuButton;
         [SerializeField] private Button refreshServersButton;
 
+        [SerializeField] private GameObject coloredButtonPrefab;
+        [SerializeField] private Transform headColorButtonParent;
+        [SerializeField] private Transform eyeColorButtonParent;
+        [SerializeField] private Transform bodyColorButtonParent;
+        [SerializeField] private Transform beltParent;
+        [SerializeField] private Transform bootsParent;
+        [SerializeField] private Transform capeParent;
+        [SerializeField] private Transform chestParent;
+        [SerializeField] private Transform glovesParent;
+        [SerializeField] private Transform helmParent;
+        [SerializeField] private Transform pantsParent;
+        [SerializeField] private Transform robeParent;
+        [SerializeField] private Transform shouldersParent;
+        [SerializeField] private Transform beardParent;
+        [SerializeField] private Transform browsParent;
+        [SerializeField] private Transform hairParent;
+        private CharacterReference.RaceAndGender raceAndGender = CharacterReference.RaceAndGender.HumanMale;
+
         private void Awake()
         {
+            List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
+            foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
+            {
+                Transform parent = null;
+                if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
+                    parent = bodyColorButtonParent;
+                else if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head)
+                    parent = headColorButtonParent;
+                else if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes)
+                    parent = eyeColorButtonParent;
+
+                Texture2D texture2D = (Texture2D)characterMaterial.material.GetTexture("_BaseMap");
+                Color textureAverageColor = Color.black;
+
+                switch (characterMaterial.material.name[^3..])
+                {
+                    case "_Bl":
+                        textureAverageColor = Color.blue;
+                        break;
+                    case "_Br":
+                        textureAverageColor = new Color(255 / 255, 248 / 255, 220 / 255, 1);
+                        break;
+                    case "_Gn":
+                        textureAverageColor = Color.green;
+                        break;
+                    case "_Pe":
+                        textureAverageColor = Color.magenta;
+                        break;
+                    default:
+                        textureAverageColor = AverageColorFromTexture(texture2D);
+                        break;
+                }
+
+                Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
+                image.color = textureAverageColor;
+                materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
+
+                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
+                /*
+                var kvp = materialColorList.Find(item => item.Key == characterMaterial.materialApplicationLocation & Vector4.Distance(item.Value, textureAverageColor) > 1);
+                if (kvp.Key == default & kvp.Value == default)
+                {
+                    Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
+                    image.color = textureAverageColor;
+                    materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
+
+                    image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
+                }*/
+            }
+
+            List<KeyValuePair<CharacterReference.EquipmentType, Color>> equipmentColorList = new List<KeyValuePair<CharacterReference.EquipmentType, Color>>();
+            foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender))
+            {
+                Transform parent = null;
+                if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Belt)
+                    parent = beltParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Boots)
+                    parent = bootsParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Cape)
+                    parent = capeParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Chest)
+                    parent = chestParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Gloves)
+                    parent = glovesParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Helm)
+                    parent = helmParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Pants)
+                    parent = pantsParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Robe)
+                    parent = robeParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Shoulders)
+                    parent = shouldersParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Beard)
+                    parent = beardParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Brows)
+                    parent = browsParent;
+                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Hair)
+                    parent = hairParent;
+
+                Texture2D texture2D = (Texture2D)equipmentOption.wearableEquipmentPrefab.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                Color textureAverageColor = AverageColorFromTexture(texture2D);
+
+                var kvp = equipmentColorList.Find(item => item.Key == equipmentOption.equipmentType & Vector4.Distance(item.Value, textureAverageColor) > 1);
+                if (kvp.Key == default & kvp.Value == default)
+                {
+                    Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
+                    image.color = textureAverageColor;
+                    equipmentColorList.Add(new KeyValuePair<CharacterReference.EquipmentType, Color>(equipmentOption.equipmentType, textureAverageColor));
+
+                    image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption); });
+                }
+            }
+
             CloseServerBrowser();
             createCharacterButton.interactable = usernameInputField.text.Length > 0;
+        }
+
+        public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
+        {
+            previewObject.GetComponent<AnimationHandler>().ApplyCharacterMaterial(characterMaterial);
+        }
+
+        public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        {
+            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption);
+        }
+
+        private Color32 AverageColorFromTexture(Texture2D tex)
+        {
+            Color32[] texColors = tex.GetPixels32();
+
+            int total = texColors.Length;
+
+            float r = 0;
+            float g = 0;
+            float b = 0;
+            float a = 0;
+
+            for (int i = 0; i < total; i++)
+            {
+
+                r += texColors[i].r;
+
+                g += texColors[i].g;
+
+                b += texColors[i].b;
+
+                a += texColors[i].a;
+            }
+
+            return new Color32((byte)(r / total), (byte)(g / total), (byte)(b / total), (byte)(a / total));
         }
 
         private void Start()

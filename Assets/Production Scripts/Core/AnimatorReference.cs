@@ -15,10 +15,27 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation & raceAndGender == characterMaterial.raceAndGender);
+            MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
             {
                 skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
+            }
+        }
+
+        private Dictionary<CharacterReference.EquipmentType, GameObject> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, GameObject>();
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        {
+            if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
+            {
+                if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType])
+                {
+                    Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
+                }
+                wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform);
+            }
+            else
+            {
+                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform));
             }
         }
 
@@ -28,7 +45,6 @@ namespace Vi.Core
             public CharacterReference.MaterialApplicationLocation characterMaterialType;
             public SkinnedMeshRenderer[] skinnedMeshRenderers;
         }
-
 
         // Variable to store network root motion
         private Vector3 networkRootMotion;

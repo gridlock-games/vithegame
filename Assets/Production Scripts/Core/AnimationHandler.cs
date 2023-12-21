@@ -253,6 +253,16 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
 
+        public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
+        {
+            animatorReference.ApplyCharacterMaterial(characterMaterial);
+        }
+
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        {
+            animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
+        }
+
         private void ChangeSkin(int characterIndex, int skinIndex)
         {
             animatorReference = GetComponentInChildren<AnimatorReference>();
