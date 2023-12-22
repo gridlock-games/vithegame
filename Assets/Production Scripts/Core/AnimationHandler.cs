@@ -255,11 +255,13 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
+            if (characterMaterial == null) { return; }
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
         {
+            if (wearableEquipmentOption == null) { return; }
             animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
         }
 

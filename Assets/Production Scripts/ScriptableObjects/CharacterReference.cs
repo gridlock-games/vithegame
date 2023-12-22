@@ -17,6 +17,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class PlayerModelOption
         {
+            public RaceAndGender raceAndGender;
             public string name;
             public Weapon weapon;
             public string role;

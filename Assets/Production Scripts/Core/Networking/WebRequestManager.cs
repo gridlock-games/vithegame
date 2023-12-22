@@ -48,7 +48,7 @@ namespace Vi.Core
             {
                 Servers = new List<Server>() { new Server("", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
-            
+
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
@@ -151,5 +151,32 @@ namespace Vi.Core
             }
         }
 
+        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Character A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None"), new Character("Human_Male", "Character B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None") };
+
+        public struct Character
+        {
+            public string characterModelName;
+            public string characterName;
+            public int characterLevel;
+            public string bodyColorName;
+            public string headColorName;
+            public string eyeColorName;
+            public string beardName;
+            public string browsName;
+            public string hairName;
+
+            public Character(string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
+            {
+                this.characterModelName = characterModelName;
+                this.characterName = characterName;
+                this.characterLevel = characterLevel;
+                this.bodyColorName = bodyColorName;
+                this.headColorName = headColorName;
+                this.eyeColorName = eyeColorName;
+                this.beardName = beardName;
+                this.browsName = browsName;
+                this.hairName = hairName;
+            }
+        }
     }
 }
