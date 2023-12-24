@@ -11,9 +11,32 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
+        [Header("Character Select")]
+        [SerializeField] private GameObject characterSelectParent;
         [SerializeField] private CharacterCard characterCardPrefab;
         [SerializeField] private Transform characterCardParent;
-        [SerializeField] private GameObject characterSelectParent;
+
+        [Header("Character Customization")]
+        [SerializeField] private GameObject characterCustomizationParent;
+        [SerializeField] private GameObject characterCustomizationRowPrefab;
+        [SerializeField] private GameObject characterCustomizationButtonPrefab;
+
+        private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
+        private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
+
+        [System.Serializable]
+        private struct EquipmentCustomizationParent
+        {
+            public CharacterReference.EquipmentType equipmentType;
+            public Transform parent;
+        }
+
+        [System.Serializable]
+        private struct MaterialCustomizationParent
+        {
+            public CharacterReference.MaterialApplicationLocation applicationLocation;
+            public Transform parent;
+        }
 
         [Header("Server Browser")]
         [SerializeField] private ServerListElement serverListElement;
@@ -29,8 +52,6 @@ namespace Vi.UI
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
-        private CharacterReference.RaceAndGender raceAndGender = CharacterReference.RaceAndGender.HumanMale;
-
         private void Awake()
         {
             foreach (WebRequestManager.Character character in WebRequestManager.Characters)
@@ -38,21 +59,20 @@ namespace Vi.UI
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateCharacterPreview(character); });
+                characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
             }
 
-            
-            //characterCard.editButton.onClick.AddListener(delegate { });
-            /*
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
-            foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
+            foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(CharacterReference.RaceAndGender.HumanMale))
             {
-                Transform parent = null;
-                if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
-                    parent = bodyColorButtonParent;
-                else if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head)
-                    parent = headColorButtonParent;
-                else if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes)
-                    parent = eyeColorButtonParent;
+                Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
+                if (!buttonParent)
+                {
+                    buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+                    characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
+                }
+                buttonParent.GetComponentInChildren<Text>().text = characterMaterial.materialApplicationLocation.ToString();
+                buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
                 Texture2D texture2D = (Texture2D)characterMaterial.material.GetTexture("_BaseMap");
                 Color textureAverageColor = Color.black;
@@ -76,51 +96,24 @@ namespace Vi.UI
                         break;
                 }
 
-                Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
+                Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                 image.color = textureAverageColor;
                 materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
 
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
-                
-                //var kvp = materialColorList.Find(item => item.Key == characterMaterial.materialApplicationLocation & Vector4.Distance(item.Value, textureAverageColor) > 1);
-                //if (kvp.Key == default & kvp.Value == default)
-                //{
-                //    Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
-                //    image.color = textureAverageColor;
-                //    materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
-
-                //    image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
-                //}
             }
 
             List<KeyValuePair<CharacterReference.EquipmentType, Color>> equipmentColorList = new List<KeyValuePair<CharacterReference.EquipmentType, Color>>();
-            foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender))
+            foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale))
             {
-                Transform parent = null;
-                if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Belt)
-                    parent = beltParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Boots)
-                    parent = bootsParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Cape)
-                    parent = capeParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Chest)
-                    parent = chestParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Gloves)
-                    parent = glovesParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Helm)
-                    parent = helmParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Pants)
-                    parent = pantsParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Robe)
-                    parent = robeParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Shoulders)
-                    parent = shouldersParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Beard)
-                    parent = beardParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Brows)
-                    parent = browsParent;
-                else if (equipmentOption.equipmentType == CharacterReference.EquipmentType.Hair)
-                    parent = hairParent;
+                Transform buttonParent = characterEquipmentParents.Find(item => item.equipmentType == equipmentOption.equipmentType).parent;
+                if (!buttonParent)
+                {
+                    buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+                    characterEquipmentParents.Add(new EquipmentCustomizationParent() { equipmentType = equipmentOption.equipmentType, parent = buttonParent });
+                }
+                buttonParent.GetComponentInChildren<Text>().text = equipmentOption.equipmentType.ToString();
+                buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
                 Texture2D texture2D = (Texture2D)equipmentOption.wearableEquipmentPrefab.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
                 Color textureAverageColor = AverageColorFromTexture(texture2D);
@@ -128,15 +121,14 @@ namespace Vi.UI
                 var kvp = equipmentColorList.Find(item => item.Key == equipmentOption.equipmentType & Vector4.Distance(item.Value, textureAverageColor) > 1);
                 if (kvp.Key == default & kvp.Value == default)
                 {
-                    Image image = Instantiate(coloredButtonPrefab, parent).GetComponent<Image>();
+                    Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                     image.color = textureAverageColor;
                     equipmentColorList.Add(new KeyValuePair<CharacterReference.EquipmentType, Color>(equipmentOption.equipmentType, textureAverageColor));
 
                     image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption); });
                 }
-            }*/
+            }
 
-            CloseServerBrowser();
             createCharacterButton.interactable = usernameInputField.text.Length > 0;
         }
 
@@ -210,6 +202,17 @@ namespace Vi.UI
         {
             createCharacterButton.interactable = usernameInputField.text.Length > 0;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(usernameInputField.text + "|0|0");
+        }
+
+        public void ReturnToMainMenu()
+        {
+            NetSceneManager.Singleton.LoadScene("Main Menu");
+        }
+
+        public void OpenCharacterCustomization(WebRequestManager.Character character)
+        {
+            characterSelectParent.SetActive(false);
+            characterCustomizationParent.SetActive(true);
         }
 
         public void OpenServerBrowser()
