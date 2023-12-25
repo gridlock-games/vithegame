@@ -11,6 +11,8 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
+        [SerializeField] private Button returnButton;
+
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
         [SerializeField] private CharacterCard characterCardPrefab;
@@ -21,6 +23,8 @@ namespace Vi.UI
         [SerializeField] private GameObject characterCustomizationRowPrefab;
         [SerializeField] private GameObject characterCustomizationButtonPrefab;
         [SerializeField] private GameObject removeEquipmentButtonPrefab;
+        [SerializeField] private InputField characterNameInputField;
+        [SerializeField] private Button createCharacterButton;
 
         private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
         private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
@@ -46,8 +50,6 @@ namespace Vi.UI
         [SerializeField] private Button refreshServersButton;
 
         [Header("Old")]
-        [SerializeField] private InputField usernameInputField;
-        [SerializeField] private Button createCharacterButton;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
@@ -68,6 +70,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            OpenCharacterSelect();
+
             foreach (WebRequestManager.Character character in WebRequestManager.Characters)
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
@@ -177,7 +181,7 @@ namespace Vi.UI
                 }
             }
 
-            createCharacterButton.interactable = usernameInputField.text.Length > 0;
+            createCharacterButton.interactable = characterNameInputField.text.Length > 0;
         }
 
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
@@ -248,8 +252,8 @@ namespace Vi.UI
 
         public void OnUsernameChange()
         {
-            createCharacterButton.interactable = usernameInputField.text.Length > 0;
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(usernameInputField.text + "|0|0");
+            createCharacterButton.interactable = characterNameInputField.text.Length > 0;
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(characterNameInputField.text + "|0|0");
         }
 
         public void ReturnToMainMenu()
@@ -261,6 +265,9 @@ namespace Vi.UI
         {
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
+
+            returnButton.onClick.RemoveAllListeners();
+            returnButton.onClick.AddListener(OpenCharacterSelect);
         }
 
         public void OpenServerBrowser()
@@ -270,10 +277,14 @@ namespace Vi.UI
             RefreshServerBrowser();
         }
 
-        public void CloseServerBrowser()
+        public void OpenCharacterSelect()
         {
             characterSelectParent.SetActive(true);
+            characterCustomizationParent.SetActive(false);
             serverListParent.SetActive(false);
+
+            returnButton.onClick.RemoveAllListeners();
+            returnButton.onClick.AddListener(ReturnToMainMenu);
         }
 
         public void RefreshServerBrowser()

@@ -15,7 +15,7 @@ namespace Vi.UI
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
-        [SerializeField] private CharacterSelectElement characterSelectElement;
+        //[SerializeField] private CharacterSelectElement characterSelectElement;
         [SerializeField] private Transform characterSelectGridParent;
         [SerializeField] private Text characterNameText;
         [SerializeField] private Text characterRoleText;
@@ -87,9 +87,9 @@ namespace Vi.UI
                     if (characterIndex >= playerModelOptions.Length) { return; }
 
                     Vector3 pos = new Vector3(x * size - size, y * size, 0);
-                    GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
-                    g.transform.localPosition = rotation * pos;
-                    g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
+                    //GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
+                    //g.transform.localPosition = rotation * pos;
+                    //g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
                     characterIndex++;
                 }
             }
@@ -371,10 +371,10 @@ namespace Vi.UI
             lockCharacterButton.interactable = false;
             foreach (Transform child in characterSelectGridParent)
             {
-                if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))
-                {
-                    characterSelectElement.SetButtonInteractability(false);
-                }
+                //if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))
+                //{
+                //    characterSelectElement.SetButtonInteractability(false);
+                //}
             }
         }
 

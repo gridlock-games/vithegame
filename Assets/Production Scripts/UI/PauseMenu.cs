@@ -11,7 +11,6 @@ namespace Vi.UI
     {
         [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
-        [SerializeField] private CharacterSelectMenu characterSelectMenu;
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private Button characterSelectButton;
 
@@ -28,14 +27,6 @@ namespace Vi.UI
             GameObject _settings = Instantiate(controlSettingsMenu.gameObject);
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
-            gameObject.SetActive(false);
-        }
-
-        public void OpenCharacterSelectMenu()
-        {
-            GameObject _characterSelect = Instantiate(characterSelectMenu.gameObject);
-            _characterSelect.GetComponent<Menu>().SetLastMenu(gameObject);
-            childMenu = _characterSelect;
             gameObject.SetActive(false);
         }
 
