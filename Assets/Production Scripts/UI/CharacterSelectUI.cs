@@ -60,11 +60,11 @@ namespace Vi.UI
             CharacterReference.EquipmentType.Brows,
         };
 
-        private int leftStartOffset = 400;
-        private int rightStartOffset = 550;
-        private int leftSpacing;
-        private int rightSpacing;
-        private int spacing = -105;
+        private readonly int leftStartOffset = 400;
+        private readonly int rightStartOffset = 550;
+        private int leftYLocalPosition;
+        private int rightYLocalPosition;
+        private readonly int spacing = -105;
         private int leftQueuedSpacing;
         private int rightQueuedSpacing;
 
@@ -80,8 +80,8 @@ namespace Vi.UI
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
             }
 
-            leftSpacing = leftStartOffset;
-            rightSpacing = rightStartOffset;
+            leftYLocalPosition = leftStartOffset;
+            rightYLocalPosition = rightStartOffset;
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(CharacterReference.RaceAndGender.HumanMale))
             {
@@ -92,8 +92,8 @@ namespace Vi.UI
 
                     bool isOnLeftSide = true;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(CharacterReference.RaceAndGender.HumanMale).FindAll(item => item.materialApplicationLocation == characterMaterial.materialApplicationLocation).Count;
-                    if (isOnLeftSide) { leftSpacing += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightSpacing += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
-                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftSpacing : rightSpacing, 0);
+                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = GridLayoutGroup.Corner.UpperRight;
                     buttonParent.GetComponentInChildren<Text>().text = characterMaterial.materialApplicationLocation.ToString();
@@ -140,8 +140,8 @@ namespace Vi.UI
                     
                     bool isOnLeftSide = equipmentTypesOnLeftSide.Contains(equipmentOption.equipmentType);
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale).FindAll(item => item.equipmentType == equipmentOption.equipmentType).Count;
-                    if (isOnLeftSide) { leftSpacing += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightSpacing += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
-                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftSpacing : rightSpacing, 0);
+                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     buttonParent.GetComponentInChildren<GridLayoutGroup>().childAlignment = childAlignment;
