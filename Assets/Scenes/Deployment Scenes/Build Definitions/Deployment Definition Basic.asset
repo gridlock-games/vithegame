@@ -1,3 +1,49 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a13a86d908d7b285be7e749d38e01c189236612f830fc83d21f48ef4d1f85d95
-size 2237
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdffcf735780c734db99c90624447202, type: 3}
+  m_Name: Deployment Definition Basic
+  m_EditorClassIdentifier: 
+  buildList:
+  - scenesInBuild:
+    - {fileID: 102900000, guid: ec8d31ae88495cc418fc0fa28b40d898, type: 3}
+    - {fileID: 102900000, guid: eb5cc9bb73ac0534a84620fe9bc5facf, type: 3}
+    - {fileID: 102900000, guid: ec2019d84537c3c4399803d6e833581a, type: 3}
+    locationPathName: C:\Users\patse\Desktop\Vi_Headless_Hub
+    options: 0
+    target: 24
+    subtarget: 1
+  - scenesInBuild:
+    - {fileID: 102900000, guid: ec8d31ae88495cc418fc0fa28b40d898, type: 3}
+    - {fileID: 102900000, guid: c8f90575a3e439e49bb86a6c21958b44, type: 3}
+    - {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+    - {fileID: 102900000, guid: b753cf640297bcc478f0806e5c40f40f, type: 3}
+    - {fileID: 102900000, guid: f9b495b353e36d344a613341a7753f13, type: 3}
+    - {fileID: 102900000, guid: e8bd06e10486e8b498c58c99deeeb5a7, type: 3}
+    locationPathName: C:\Users\patse\Desktop\Vi_Headless_Lobby
+    options: 0
+    target: 24
+    subtarget: 1
+  - scenesInBuild:
+    - {fileID: 102900000, guid: ec8d31ae88495cc418fc0fa28b40d898, type: 3}
+    - {fileID: 102900000, guid: a18290290c45eca42b187d7ac093c65f, type: 3}
+    - {fileID: 102900000, guid: 6390de0d25e9a30409a1e31f2295d080, type: 3}
+    - {fileID: 102900000, guid: eb5cc9bb73ac0534a84620fe9bc5facf, type: 3}
+    - {fileID: 102900000, guid: c8f90575a3e439e49bb86a6c21958b44, type: 3}
+    - {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+    - {fileID: 102900000, guid: b753cf640297bcc478f0806e5c40f40f, type: 3}
+    - {fileID: 102900000, guid: f9b495b353e36d344a613341a7753f13, type: 3}
+    - {fileID: 102900000, guid: ec2019d84537c3c4399803d6e833581a, type: 3}
+    - {fileID: 102900000, guid: e8bd06e10486e8b498c58c99deeeb5a7, type: 3}
+    locationPathName: C:\Users\patse\Desktop\Vi_Player_Build
+    options: 0
+    target: 19
+    subtarget: 0

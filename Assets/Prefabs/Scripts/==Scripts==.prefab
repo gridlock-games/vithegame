@@ -1,3 +1,102 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a914cd0ccd5fd0c49ed03753da650610890e48f9fc8d8c4b4ca36b9d22317f76
-size 2976
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &546872228970751708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 546872228970751707}
+  m_Layer: 0
+  m_Name: ==Scripts==
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &546872228970751707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546872228970751708}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 546872229817145016}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &546872229817145017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 546872229817145016}
+  - component: {fileID: 546872229817144999}
+  m_Layer: 0
+  m_Name: Shop Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &546872229817145016
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546872229817145017}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 546872228970751707}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &546872229817144999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546872229817145017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0933791fcabd0fd4d90d52d8da6f10f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelManager:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  characterModel:
+  - id: 1
+    characterName: Guinevere
+    characterDescription: 
+    characterImage: {fileID: 21300000, guid: f959054a8a5dc554d974d3492607833c, type: 3}
+    characterObject: {fileID: 0}
+  - id: 2
+    characterName: Lubu
+    characterDescription: 
+    characterImage: {fileID: 21300000, guid: f9029ac7ad3a06249ae61c8a44d49919, type: 3}
+    characterObject: {fileID: 0}
+  - id: 3
+    characterName: Malakas
+    characterDescription: 
+    characterImage: {fileID: 21300000, guid: 75f4734f86be6db448946791d318c8ab, type: 3}
+    characterObject: {fileID: 0}
+  characterNameTMP: {fileID: 0}
+  characterDescTMP: {fileID: 0}
+  characterImage: {fileID: 0}
+  spawnLoc: {fileID: 0}

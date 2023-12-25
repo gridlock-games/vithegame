@@ -1,3 +1,49 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e95a5efee59238ed21c33b3bf0c8e1a9888bfab24a2f5c8f768249ca53eeca12
-size 1286
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4cbd861b156b4342bb925cd2f07da25, type: 3}
+  m_Name: com.ninjutsugames.module.photon-melee
+  m_EditorClassIdentifier: 
+  module:
+    moduleID: com.ninjutsugames.module.photon-melee
+    version:
+      major: 0
+      minor: 1
+      patch: 2
+    displayName: Photon Melee
+    description: Integration of Photon Module with GC's Melee module
+    category: Module
+    dependencies:
+    - moduleID: com.ninjutsugames.module.photon
+      version:
+        major: 0
+        minor: 3
+        patch: 5
+    - moduleID: com.gamecreator.module.melee
+      version:
+        major: 0
+        minor: 1
+        patch: 5
+    tags:
+    - module
+    - photon
+    - multiplayer
+    - online
+    - melee
+    authorName: Hjupter Cerrud
+    authorMail: hjupter@ninjutsugames.com
+    authorSite: https://njg.gitbook.io/gc-modules/photon-network/photon-network
+    includesData: 0
+    codePaths:
+    - Assets/Ninjutsu Games/GameCreator Modules/PhotonMelee/
+    dataPaths: []
+  adminLogin: 1
+  adminOpen: 1

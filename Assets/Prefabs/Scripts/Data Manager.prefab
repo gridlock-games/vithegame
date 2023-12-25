@@ -1,3 +1,50 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:39eabcf77809242fb428bd1dcad23553c161c3405c131b605aa9302eac3e0dab
-size 1622
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8693898264515453932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8693898264515453930}
+  - component: {fileID: 8693898264515453933}
+  m_Layer: 0
+  m_Name: Data Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8693898264515453930
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693898264515453932}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8693898264515453933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693898264515453932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4045264331fa33e4f9a76f77e5100da1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clientId: 775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com
+  secretId: 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
+  firebaseURL: https://vithegame-default-rtdb.asia-southeast1.firebasedatabase.app/
+  UserData: {fileID: 11400000, guid: 7ce09b670c360874487a694cfbe2a989, type: 2}
