@@ -17,6 +17,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class PlayerModelOption
         {
+            public RaceAndGender raceAndGender;
             public string name;
             public Weapon weapon;
             public string role;
@@ -91,6 +92,7 @@ namespace Vi.ScriptableObjects
         public class WearableEquipmentOption
         {
             public RaceAndGender raceAndGender;
+            public EquipmentType equipmentType;
             public WearableEquipment wearableEquipmentPrefab;
 
             public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab)
@@ -116,6 +118,23 @@ namespace Vi.ScriptableObjects
                     raceAndGender = RaceAndGender.HumanMale;
                     Debug.LogError("Unknown race and gender! " + wearableEquipmentPrefab.name);
                 }
+
+                bool broken = false;
+                foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
+                {
+                    if (wearableEquipmentPrefab.name.Contains(type.ToString()))
+                    {
+                        equipmentType = type;
+                        broken = true;
+                        break;
+                    }
+                }
+
+                if (!broken)
+                {
+                    Debug.LogError("Unknown equipment type!" + wearableEquipmentPrefab.name);
+                }
+
                 this.wearableEquipmentPrefab = wearableEquipmentPrefab;
             }
         }
@@ -136,6 +155,22 @@ namespace Vi.ScriptableObjects
             Eyes
         }
 
+        public enum EquipmentType
+        {
+            Belt,
+            Boots,
+            Cape,
+            Chest,
+            Gloves,
+            Helm,
+            Pants,
+            Robe,
+            Shoulders,
+            Beard,
+            Brows,
+            Hair
+        }
+
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
@@ -154,6 +189,20 @@ namespace Vi.ScriptableObjects
             {
                 if (AssetDatabase.LoadAssetAtPath<GameObject>(filepath).TryGetComponent(out WearableEquipment wearableEquipment))
                 {
+                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                    if (!importer.isReadable)
+                    {
+                        importer.isReadable = true;
+                        importer.SaveAndReimport();
+                    }
+
+                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = LayerMask.NameToLayer("Character");
+                    }
+
                     equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment));
                 }
             }
@@ -163,7 +212,16 @@ namespace Vi.ScriptableObjects
             foreach (string filepath in filepaths)
             {
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(filepath);
-                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("_Facials_")) { continue; }
+                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("_Facials_") | material.name.Contains("Body_Cloth")) { continue; }
+
+                Texture2D texture2D = (Texture2D)material.GetTexture("_BaseMap");
+                TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                if (!importer.isReadable)
+                {
+                    importer.isReadable = true;
+                    importer.SaveAndReimport();
+                }
+                
                 characterMaterialOptions.Add(new CharacterMaterial(filepath, material));
             }
         }
