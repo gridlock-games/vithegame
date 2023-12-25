@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private GameObject characterCustomizationParent;
         [SerializeField] private GameObject characterCustomizationRowPrefab;
         [SerializeField] private GameObject characterCustomizationButtonPrefab;
+        [SerializeField] private GameObject removeEquipmentButtonPrefab;
 
         private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
         private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
@@ -50,6 +51,21 @@ namespace Vi.UI
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
+        private List<CharacterReference.EquipmentType> equipmentTypesOnLeftSide = new List<CharacterReference.EquipmentType>()
+        {
+            CharacterReference.EquipmentType.Hair,
+            CharacterReference.EquipmentType.Beard,
+            CharacterReference.EquipmentType.Brows,
+        };
+
+        private int leftStartOffset = 400;
+        private int rightStartOffset = 550;
+        private int leftSpacing;
+        private int rightSpacing;
+        private int spacing = -105;
+        private int leftQueuedSpacing;
+        private int rightQueuedSpacing;
+
         private void Awake()
         {
             foreach (WebRequestManager.Character character in WebRequestManager.Characters)
@@ -60,6 +76,8 @@ namespace Vi.UI
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
             }
 
+            leftSpacing = leftStartOffset;
+            rightSpacing = rightStartOffset;
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(CharacterReference.RaceAndGender.HumanMale))
             {
@@ -67,9 +85,16 @@ namespace Vi.UI
                 if (!buttonParent)
                 {
                     buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+
+                    bool isOnLeftSide = true;
+                    int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(CharacterReference.RaceAndGender.HumanMale).FindAll(item => item.materialApplicationLocation == characterMaterial.materialApplicationLocation).Count;
+                    if (isOnLeftSide) { leftSpacing += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightSpacing += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftSpacing : rightSpacing, 0);
+
+                    buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = GridLayoutGroup.Corner.UpperRight;
+                    buttonParent.GetComponentInChildren<Text>().text = characterMaterial.materialApplicationLocation.ToString();
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
                 }
-                buttonParent.GetComponentInChildren<Text>().text = characterMaterial.materialApplicationLocation.ToString();
                 buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
                 Texture2D texture2D = (Texture2D)characterMaterial.material.GetTexture("_BaseMap");
@@ -108,14 +133,39 @@ namespace Vi.UI
                 if (!buttonParent)
                 {
                     buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+                    
+                    bool isOnLeftSide = equipmentTypesOnLeftSide.Contains(equipmentOption.equipmentType);
+                    int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale).FindAll(item => item.equipmentType == equipmentOption.equipmentType).Count;
+                    if (isOnLeftSide) { leftSpacing += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightSpacing += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftSpacing : rightSpacing, 0);
+
+                    TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
+                    buttonParent.GetComponentInChildren<GridLayoutGroup>().childAlignment = childAlignment;
+                    GridLayoutGroup.Corner startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperRight : GridLayoutGroup.Corner.UpperLeft;
+                    buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = startCorner;
+                    Text headerText = buttonParent.GetComponentInChildren<Text>();
+                    headerText.text = equipmentOption.equipmentType.ToString();
+                    if (!isOnLeftSide)
+                    {
+                        headerText.transform.localPosition -= new Vector3(300, 0, 0);
+                        headerText.alignment = TextAnchor.MiddleLeft;
+                    }
                     characterEquipmentParents.Add(new EquipmentCustomizationParent() { equipmentType = equipmentOption.equipmentType, parent = buttonParent });
+
+                    buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+                    Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
+                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType)); });
                 }
-                buttonParent.GetComponentInChildren<Text>().text = equipmentOption.equipmentType.ToString();
-                buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+                else
+                {
+                    buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+                }
 
                 Texture2D texture2D = (Texture2D)equipmentOption.wearableEquipmentPrefab.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
                 Color textureAverageColor = AverageColorFromTexture(texture2D);
 
+                //Debug.Log(equipmentOption.wearableEquipmentPrefab.name[^3..] + " - " + equipmentOption.wearableEquipmentPrefab.name);
+                
                 var kvp = equipmentColorList.Find(item => item.Key == equipmentOption.equipmentType & Vector4.Distance(item.Value, textureAverageColor) > 1);
                 if (kvp.Key == default & kvp.Value == default)
                 {

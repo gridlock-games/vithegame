@@ -137,6 +137,13 @@ namespace Vi.ScriptableObjects
 
                 this.wearableEquipmentPrefab = wearableEquipmentPrefab;
             }
+
+            public WearableEquipmentOption(EquipmentType equipmentType)
+            {
+                this.equipmentType = equipmentType;
+                raceAndGender = RaceAndGender.HumanMale;
+                wearableEquipmentPrefab = null;
+            }
         }
 
         public enum RaceAndGender

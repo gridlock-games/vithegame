@@ -31,9 +31,11 @@ namespace Vi.Core
                 {
                     Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
                 }
-                wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform);
+
+                if (wearableEquipmentOption.wearableEquipmentPrefab)
+                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform);
             }
-            else
+            else if (wearableEquipmentOption.wearableEquipmentPrefab)
             {
                 wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform));
             }
