@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace Vi.UI
 {
@@ -17,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private GameObject characterSelectParent;
         [SerializeField] private CharacterCard characterCardPrefab;
         [SerializeField] private Transform characterCardParent;
+        [SerializeField] private Button selectCharacterButton;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -76,7 +78,8 @@ namespace Vi.UI
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
-                characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateCharacterPreview(character); });
+                characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
+                characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
             }
 
@@ -304,13 +307,19 @@ namespace Vi.UI
             NetworkManager.Singleton.StartClient();
         }
 
+        private WebRequestManager.Character selectedCharacter;
         private GameObject previewObject;
-        public void UpdateCharacterPreview(WebRequestManager.Character character)
+        public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
+            Debug.Log(JsonUtility.ToJson(character));
+            selectCharacterButton.interactable = true;
+            selectedCharacter = character;
+            characterNameInputField.text = character.characterName;
             if (previewObject) { Destroy(previewObject); }
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
             int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
             AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
             animationHandler.SetCharacter(characterIndex, skinIndex);

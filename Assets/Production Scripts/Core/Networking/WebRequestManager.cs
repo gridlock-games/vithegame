@@ -151,7 +151,7 @@ namespace Vi.Core
             }
         }
 
-        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Character A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None"), new Character("Human_Male", "Character B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None") };
+        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None"), new Character("Human_Male", "Char B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "None", "None", "None") };
 
         public struct Character
         {
