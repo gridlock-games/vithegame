@@ -12,7 +12,6 @@ namespace Vi.UI
         [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private Slider volumeSlider;
-        [SerializeField] private Button characterSelectButton;
 
         public void OpenDisplayMenu()
         {
@@ -39,7 +38,6 @@ namespace Vi.UI
         private void Start()
         {
             volumeSlider.value = AudioListener.volume;
-            characterSelectButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
         }
     }
 }

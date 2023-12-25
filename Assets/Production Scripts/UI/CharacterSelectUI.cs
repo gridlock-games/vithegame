@@ -222,7 +222,6 @@ namespace Vi.UI
 
         private void Start()
         {
-            UpdateCharacterPreview(0, 0);
             StartCoroutine(WebRequestManager.GetRequest());
         }
 
@@ -306,15 +305,6 @@ namespace Vi.UI
         }
 
         private GameObject previewObject;
-        public void UpdateCharacterPreview(int characterIndex, int skinIndex)
-        {
-            if (previewObject) { Destroy(previewObject); }
-
-            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-        }
-
         public void UpdateCharacterPreview(WebRequestManager.Character character)
         {
             if (previewObject) { Destroy(previewObject); }
@@ -336,18 +326,6 @@ namespace Vi.UI
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beardName));
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
-        }
-
-        public void ChangeSkin()
-        {
-            PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-
-            parsedConnectionData.skinIndex += 1;
-            if (parsedConnectionData.skinIndex > PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[parsedConnectionData.characterIndex].skinOptions.Length - 1) { parsedConnectionData.skinIndex = 0; }
-
-            PlayerDataManager.SetConnectionData(parsedConnectionData);
-
-            UpdateCharacterPreview(parsedConnectionData.characterIndex, parsedConnectionData.skinIndex);
         }
 
         private void OnDrawGizmos()
