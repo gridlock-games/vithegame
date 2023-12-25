@@ -24,14 +24,12 @@ namespace Vi.UI
         private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
         private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
 
-        [System.Serializable]
         private struct EquipmentCustomizationParent
         {
             public CharacterReference.EquipmentType equipmentType;
             public Transform parent;
         }
 
-        [System.Serializable]
         private struct MaterialCustomizationParent
         {
             public CharacterReference.MaterialApplicationLocation applicationLocation;
