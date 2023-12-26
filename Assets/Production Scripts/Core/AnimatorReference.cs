@@ -10,7 +10,6 @@ namespace Vi.Core
     [RequireComponent(typeof(GlowRenderer))]
     public class AnimatorReference : MonoBehaviour
     {
-        [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)

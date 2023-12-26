@@ -41,8 +41,9 @@ namespace Vi.ScriptableObjects
             public MaterialApplicationLocation materialApplicationLocation;
             public RaceAndGender raceAndGender;
             public Material material;
+            public Color averageTextureColor;
 
-            public CharacterMaterial(string filePath, Material material)
+            public CharacterMaterial(string filePath, Material material, Color averageTextureColor)
             {
                 if (material.name.Contains("Eye"))
                 {
@@ -85,6 +86,7 @@ namespace Vi.ScriptableObjects
                 }
 
                 this.material = material;
+                this.averageTextureColor = averageTextureColor;
             }
         }
 
@@ -94,8 +96,9 @@ namespace Vi.ScriptableObjects
             public RaceAndGender raceAndGender;
             public EquipmentType equipmentType;
             public WearableEquipment wearableEquipmentPrefab;
+            public Color averageTextureColor;
 
-            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab)
+            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab, Color averageTextureColor)
             {
                 if (wearableEquipmentPrefab.name.Contains("Hu_M_"))
                 {
@@ -136,13 +139,15 @@ namespace Vi.ScriptableObjects
                 }
 
                 this.wearableEquipmentPrefab = wearableEquipmentPrefab;
+                this.averageTextureColor = averageTextureColor;
             }
 
-            public WearableEquipmentOption(EquipmentType equipmentType)
+            public WearableEquipmentOption(EquipmentType equipmentType, Color averageTextureColor)
             {
                 this.equipmentType = equipmentType;
                 raceAndGender = RaceAndGender.HumanMale;
                 wearableEquipmentPrefab = null;
+                this.averageTextureColor = averageTextureColor;
             }
         }
 
@@ -210,7 +215,7 @@ namespace Vi.ScriptableObjects
                         child.gameObject.layer = LayerMask.NameToLayer("Character");
                     }
 
-                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment));
+                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D)));
                 }
             }
 
@@ -228,10 +233,48 @@ namespace Vi.ScriptableObjects
                     importer.isReadable = true;
                     importer.SaveAndReimport();
                 }
-                
-                characterMaterialOptions.Add(new CharacterMaterial(filepath, material));
+
+                Color color = Color.clear;
+                switch (material.name[^3..])
+                {
+                    case "_Bl":
+                        color = Color.blue;
+                        break;
+                    case "_Br":
+                        color = new Color(140 / 255f, 70 / 255f, 20 / 255f, 1);
+                        break;
+                    case "_Gn":
+                        color = Color.green;
+                        break;
+                    case "_Pe":
+                        color = new Color(145 / 255f, 25 / 255f, 145 / 255f, 1);
+                        break;
+                }
+
+                characterMaterialOptions.Add(new CharacterMaterial(filepath, material, color == Color.clear ? AverageColorFromTexture(texture2D) : color));
             }
         }
-        # endif
+
+        private Color32 AverageColorFromTexture(Texture2D tex)
+        {
+            Color32[] texColors = tex.GetPixels32();
+            int total = texColors.Length;
+
+            float r = 0;
+            float g = 0;
+            float b = 0;
+            float a = 0;
+
+            for (int i = 0; i < total; i++)
+            {
+                r += texColors[i].r;
+                g += texColors[i].g;
+                b += texColors[i].b;
+                a += texColors[i].a;
+            }
+
+            return new Color32((byte)(r / total), (byte)(g / total), (byte)(b / total), (byte)(a / total));
+        }
+        #endif
     }
 }
