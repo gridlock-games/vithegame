@@ -165,7 +165,7 @@ namespace Vi.Core.GameModeManagers
 
         private void OnNextGameActionTimerChange(float prev, float current)
         {
-            PlayerDataManager.Singleton.SetAllPlayersMobility(current <= 0);
+            PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
                 if (gameOver)
@@ -219,12 +219,17 @@ namespace Vi.Core.GameModeManagers
         protected void Update()
         {
             if (!IsServer) { return; }
-            if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None) { return; }
-
-            if (nextGameActionTimer.Value > 0)
-                nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
-            else if (!gameOver)
-                roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+            if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
+            {
+                nextGameActionTimer.Value = 0;
+            }
+            else
+            {
+                if (nextGameActionTimer.Value > 0)
+                    nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
+                else if (!gameOver)
+                    roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+            }
         }
 
         public struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>

@@ -39,6 +39,14 @@ namespace Vi.UI
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
+            public MoveUIDefinition[] objectsToMove;
+        }
+
+        [System.Serializable]
+        private struct MoveUIDefinition
+        {
+            public GameObject gameObjectToMove;
+            public Vector2 newAnchoredPosition;
         }
 
         private WeaponHandler weaponHandler;
@@ -59,6 +67,14 @@ namespace Vi.UI
                 foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
                 {
                     g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
                 }
             }
 
