@@ -58,7 +58,7 @@ namespace Vi.Core.SceneManagement
                 parsedConnectionData.characterIndex,
                 parsedConnectionData.skinIndex,
                 clientTeam,
-                1,
+                0,
                 2)));
         }
 
