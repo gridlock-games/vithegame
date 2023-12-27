@@ -59,8 +59,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -480,6 +480,10 @@ MonoBehaviour:
   fadeToWhiteImage: {fileID: 6233606336427964854}
   deathUIParent: {fileID: 1261820042609325003}
   aliveUIParent: {fileID: 8571122044361422770}
+  platformUIDefinitions:
+  - platforms: 080000000b000000
+    gameObjectsToEnable:
+    - {fileID: 3289547961240334779}
 --- !u!1 &2539763201719894588
 GameObject:
   m_ObjectHideFlags: 0
@@ -780,7 +784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8369445866491870090
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1110,7 +1114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

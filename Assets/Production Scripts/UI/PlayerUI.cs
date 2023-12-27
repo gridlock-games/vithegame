@@ -32,6 +32,15 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
 
+        [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
+
+        [System.Serializable]
+        private struct PlatformUIDefinition
+        {
+            public RuntimePlatform[] platforms;
+            public GameObject[] gameObjectsToEnable;
+        }
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
@@ -44,6 +53,15 @@ namespace Vi.UI
 
         private void Start()
         {
+            fadeToWhiteImage.color = Color.black;
+            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+            }
+
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
             UpdateWeapon();
