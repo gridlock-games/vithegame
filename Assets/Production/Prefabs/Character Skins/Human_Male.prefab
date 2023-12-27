@@ -137,7 +137,7 @@ MonoBehaviour:
   tipAxis: 0
   tipMultiplier: 1
   offset: {x: 0, y: 0, z: 0}
-  debugLines: 1
+  debugLines: 0
 --- !u!1 &1053886462783487955
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,7 +956,7 @@ MonoBehaviour:
   tipAxis: 0
   tipMultiplier: -1
   offset: {x: 0, y: 0, z: 0}
-  debugLines: 1
+  debugLines: 0
 --- !u!1001 &9038563066095030440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3112,7 +3112,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raceAndGender: 0
   materialReplacementDefintions:
   - characterMaterialType: 0
     skinnedMeshRenderers:
@@ -3129,6 +3128,8 @@ MonoBehaviour:
   - characterMaterialType: 2
     skinnedMeshRenderers:
     - {fileID: 1614450552736105592}
+  - characterMaterialType: 3
+    skinnedMeshRenderers: []
 --- !u!114 &3445035062283173229
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -88,15 +88,15 @@ namespace Vi.UI
         private int leftQueuedSpacing;
         private int rightQueuedSpacing;
 
-        private List<ButtonInfo> buttonReference = new List<ButtonInfo>();
+        private List<CustomizationButtonInfo> buttonReference = new List<CustomizationButtonInfo>();
 
-        private struct ButtonInfo
+        private struct CustomizationButtonInfo
         {
             public Button button;
             public string key;
             public string value;
 
-            public ButtonInfo(Button button, string key, string value)
+            public CustomizationButtonInfo(Button button, string key, string value)
             {
                 this.button = button;
                 this.key = key;
@@ -118,7 +118,7 @@ namespace Vi.UI
             }
             characterEquipmentParents.Clear();
 
-            foreach (ButtonInfo buttonInfo in buttonReference)
+            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
             {
                 Destroy(buttonInfo.button.gameObject);
             }
@@ -165,7 +165,7 @@ namespace Vi.UI
                 materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
 
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
-                buttonReference.Add(new ButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
+                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
             }
 
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender))
@@ -199,7 +199,7 @@ namespace Vi.UI
                     buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
                     Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
                     removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType, Color.white)); });
-                    buttonReference.Add(new ButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
+                    buttonReference.Add(new CustomizationButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
                 }
                 else
                 {
@@ -211,7 +211,7 @@ namespace Vi.UI
                 Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                 image.color = textureAverageColor;
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption); });
-                buttonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.wearableEquipmentPrefab.name));
+                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.wearableEquipmentPrefab.name));
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
@@ -240,7 +240,7 @@ namespace Vi.UI
                 }
 
                 //image.GetComponent<Button>().onClick.AddListener();
-                buttonReference.Add(new ButtonInfo(image.GetComponent<Button>(), "Race", race));
+                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), "Race", race));
             }
 
             Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
@@ -254,11 +254,11 @@ namespace Vi.UI
             Image boyButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
             boyButtonImage.color = Color.blue;
             boyButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            buttonReference.Add(new ButtonInfo(boyButtonImage.GetComponent<Button>(), "Gender", "Male"));
+            buttonReference.Add(new CustomizationButtonInfo(boyButtonImage.GetComponent<Button>(), "Gender", "Male"));
             Image girlButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
             girlButtonImage.color = Color.magenta;
             girlButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            buttonReference.Add(new ButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
+            buttonReference.Add(new CustomizationButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
         }
 
         private string selectedRace = "Human";
@@ -277,6 +277,13 @@ namespace Vi.UI
             selectedCharacter.characterModelName = option.skinOptions[0].name;
             RefreshMaterialsAndEquipmentOptions(raceAndGender);
             UpdateSelectedCharacter(selectedCharacter);
+
+            Debug.Log(JsonUtility.ToJson(selectedCharacter));
+
+            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            {
+
+            }
         }
 
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
@@ -300,6 +307,11 @@ namespace Vi.UI
             }
 
             Debug.Log(JsonUtility.ToJson(selectedCharacter));
+
+            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            {
+
+            }
         }
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
@@ -323,6 +335,11 @@ namespace Vi.UI
             }
 
             Debug.Log(JsonUtility.ToJson(selectedCharacter));
+
+            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            {
+
+            }
         }
 
         private void Start()

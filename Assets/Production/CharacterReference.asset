@@ -25,6 +25,18 @@ MonoBehaviour:
       type: 3}
     skinOptions:
     - {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137, type: 3}
+  - raceAndGender: 1
+    name: Human Female
+    weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
+    role: Greatsword
+    characterDescription: 
+    characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
+    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
+      type: 3}
+    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
+      type: 3}
+    skinOptions:
+    - {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43, type: 3}
   - raceAndGender: 0
     name: Helsing
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
@@ -77,6 +89,21 @@ MonoBehaviour:
       type: 2}
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
   equipmentOptions:
+  - raceAndGender: 1
+    equipmentType: 0
+    wearableEquipmentPrefab: {fileID: -5924840142466750804, guid: 4d748b112a7f42319084635061fbde9b,
+      type: 3}
+    averageTextureColor: {r: 0.17254902, g: 0.17254902, b: 0.23529412, a: 1}
+  - raceAndGender: 1
+    equipmentType: 0
+    wearableEquipmentPrefab: {fileID: -8371380482286179747, guid: 2ccff5b71e8e49819206f8489d680f05,
+      type: 3}
+    averageTextureColor: {r: 0.21568628, g: 0.1764706, b: 0.18039216, a: 1}
+  - raceAndGender: 1
+    equipmentType: 0
+    wearableEquipmentPrefab: {fileID: 1112907056910196040, guid: bad4492156724826988d24e08378a991,
+      type: 3}
+    averageTextureColor: {r: 0.21960784, g: 0.16470589, b: 0.1882353, a: 1}
   - raceAndGender: 1
     equipmentType: 0
     wearableEquipmentPrefab: {fileID: 2871964296528968987, guid: 782bbd106f2ef1d49abccaaad5f00b3a,
@@ -154,6 +181,21 @@ MonoBehaviour:
     averageTextureColor: {r: 0.22745098, g: 0.09803922, b: 0.09803922, a: 1}
   - raceAndGender: 1
     equipmentType: 1
+    wearableEquipmentPrefab: {fileID: -1671057876207607788, guid: 3cd7736c14ce4ec1971af234c888eb06,
+      type: 3}
+    averageTextureColor: {r: 0.21568628, g: 0.18039216, b: 0.22352941, a: 1}
+  - raceAndGender: 1
+    equipmentType: 1
+    wearableEquipmentPrefab: {fileID: -3332472845563623107, guid: 916ee07619b648f4ac6f5c78edb17f84,
+      type: 3}
+    averageTextureColor: {r: 0.2509804, g: 0.19607843, b: 0.16862746, a: 1}
+  - raceAndGender: 1
+    equipmentType: 1
+    wearableEquipmentPrefab: {fileID: 3387575879798318761, guid: cea4d4bfe6ed4a67aeb261c59a429900,
+      type: 3}
+    averageTextureColor: {r: 0.24705882, g: 0.19607843, b: 0.17254902, a: 1}
+  - raceAndGender: 1
+    equipmentType: 1
     wearableEquipmentPrefab: {fileID: -5330471560044365254, guid: 89313222676552d408d9aa34271e0476,
       type: 3}
     averageTextureColor: {r: 0.24313726, g: 0.2, b: 0.1764706, a: 1}
@@ -227,6 +269,21 @@ MonoBehaviour:
     wearableEquipmentPrefab: {fileID: 7842878797875768814, guid: 50b1a45219dee334c8a974b921e22fb1,
       type: 3}
     averageTextureColor: {r: 0.26666668, g: 0.14901961, b: 0.11372549, a: 1}
+  - raceAndGender: 1
+    equipmentType: 2
+    wearableEquipmentPrefab: {fileID: -6934662882347136280, guid: 1451fe5a614c43d6a391f140cf2cbbe8,
+      type: 3}
+    averageTextureColor: {r: 0.043137256, g: 0.03529412, b: 0.06666667, a: 0.28627452}
+  - raceAndGender: 1
+    equipmentType: 2
+    wearableEquipmentPrefab: {fileID: 5500032467321528877, guid: 031b836dd20a44c790013abf4f2de88a,
+      type: 3}
+    averageTextureColor: {r: 0.07058824, g: 0.047058824, b: 0.043137256, a: 0.28627452}
+  - raceAndGender: 1
+    equipmentType: 2
+    wearableEquipmentPrefab: {fileID: -5250464858778115832, guid: 778ed13a5d4f4c7680fa726fe2b17f3c,
+      type: 3}
+    averageTextureColor: {r: 0.07450981, g: 0.039215688, b: 0.047058824, a: 0.28627452}
   - raceAndGender: 0
     equipmentType: 2
     wearableEquipmentPrefab: {fileID: 5775328300781254719, guid: 3a919d158c964345aeeecd72c2b8135b,
@@ -240,6 +297,51 @@ MonoBehaviour:
   - raceAndGender: 0
     equipmentType: 2
     wearableEquipmentPrefab: {fileID: -4996091331259648617, guid: 098ce466d503476a97469fe93892739d,
+      type: 3}
+    averageTextureColor: {r: 0.24705882, g: 0.19607843, b: 0.17254902, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -4056260782760736334, guid: 247c88ae27db4d558c83baf8c1777fe7,
+      type: 3}
+    averageTextureColor: {r: 0.21568628, g: 0.18039216, b: 0.22352941, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: 3359114256219912322, guid: 70ccc4332b0c400cb32a73337c06d513,
+      type: 3}
+    averageTextureColor: {r: 0.2509804, g: 0.19607843, b: 0.16862746, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: 2152481954196792419, guid: 7cdebcf953484b449cfb30e0a1d0815f,
+      type: 3}
+    averageTextureColor: {r: 0.24705882, g: 0.19607843, b: 0.17254902, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -490816190125726249, guid: 33c24fbe173a4e8cbfa2074642db187b,
+      type: 3}
+    averageTextureColor: {r: 0.21568628, g: 0.18039216, b: 0.22352941, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: 4492701649224003396, guid: 40238cdd624f432099b28c606ae27c98,
+      type: 3}
+    averageTextureColor: {r: 0.2509804, g: 0.19607843, b: 0.16862746, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -529908013568994961, guid: 69be5dc4461c4a9b9eb0d948a2606313,
+      type: 3}
+    averageTextureColor: {r: 0.24705882, g: 0.19607843, b: 0.17254902, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -2140125755127047591, guid: a6db634be35d62844b21bbb3b3fd1619,
+      type: 3}
+    averageTextureColor: {r: 0.21568628, g: 0.18039216, b: 0.22352941, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -6071246864018133947, guid: 426fdbaa006fba441b28c4c5eb541230,
+      type: 3}
+    averageTextureColor: {r: 0.2509804, g: 0.19607843, b: 0.16862746, a: 1}
+  - raceAndGender: 1
+    equipmentType: 3
+    wearableEquipmentPrefab: {fileID: -1179576905905470229, guid: e5e344351b2f56e46ac40cb47c78820a,
       type: 3}
     averageTextureColor: {r: 0.24705882, g: 0.19607843, b: 0.17254902, a: 1}
   - raceAndGender: 1
@@ -407,6 +509,21 @@ MonoBehaviour:
     wearableEquipmentPrefab: {fileID: -6992059566038452624, guid: fdfd72fdf4ac0284a9f6c9b93af1ed63,
       type: 3}
     averageTextureColor: {r: 0.26666668, g: 0.14901961, b: 0.11372549, a: 1}
+  - raceAndGender: 1
+    equipmentType: 5
+    wearableEquipmentPrefab: {fileID: -3292023996072192037, guid: 041d803a051e4a8abd30e779b9c70785,
+      type: 3}
+    averageTextureColor: {r: 0.22352941, g: 0.18431373, b: 0.19607843, a: 1}
+  - raceAndGender: 1
+    equipmentType: 5
+    wearableEquipmentPrefab: {fileID: -1730669075136071230, guid: cbd09b990eae478082b7b035053572f4,
+      type: 3}
+    averageTextureColor: {r: 0.27058825, g: 0.23137255, b: 0.19607843, a: 1}
+  - raceAndGender: 1
+    equipmentType: 5
+    wearableEquipmentPrefab: {fileID: 1014699923518804480, guid: 285f239a0d374d8a950406f083b3d85c,
+      type: 3}
+    averageTextureColor: {r: 0.25490198, g: 0.23529412, b: 0.19215687, a: 1}
   - raceAndGender: 1
     equipmentType: 5
     wearableEquipmentPrefab: {fileID: -8553529578000135324, guid: 9af4f6f4ceb10464e900f8acd3b0eb9b,
@@ -742,6 +859,146 @@ MonoBehaviour:
     wearableEquipmentPrefab: {fileID: 2771678640388219282, guid: 0393cbe4bb4870641b29e6bae7bf9f34,
       type: 3}
     averageTextureColor: {r: 0.25882354, g: 0.15686275, b: 0.12941177, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 5869965899661263188, guid: deaad56b574648b89b9e12953a710861,
+      type: 3}
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -7720850439873767091, guid: 07584faaa25e4bc0a0699077b3c9100d,
+      type: 3}
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 244283571885222288, guid: 6cf0966d96ad4deb9d6c9f6a28e1eeb4,
+      type: 3}
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 7735763701937378114, guid: c0352374f8d14a6ca9dc432a35f12d96,
+      type: 3}
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 7903019630996887176, guid: 454c3289eafd472db611c407be0813bd,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -907065522178557708, guid: 51b42b15eef84ea98cd28cabfecbaf7c,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 2233438778512910630, guid: deaa31dcdfcd4dfa96c02f4298f4871d,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -3716980749669651908, guid: 3dd80c7126ee4441a8eec339e7f808aa,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 3810871500585940145, guid: 2d53fdbe177a4895a113a38ac8860823,
+      type: 3}
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -5535223592989882282, guid: 47e55faf667844dc88c04ec394ecf983,
+      type: 3}
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 3182932111351785436, guid: f0ccd54e72d64b41aa539ac2d4426f2f,
+      type: 3}
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -6702610495530140977, guid: ad2b2b774a1e40468e685686b81c80f6,
+      type: 3}
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 4382534371446498005, guid: 2ce862f8ea7748eda8e8a45e9552a385,
+      type: 3}
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 7344309413585022600, guid: 0ed53ef90d01443383a00395d0a0d74c,
+      type: 3}
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 7748947058293245732, guid: 875326c7cfda4eb4acf2435fa328dffc,
+      type: 3}
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -3353275369365335811, guid: 372b64f04cd84b6f923be4a9cb86e2c9,
+      type: 3}
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -5629758638415616678, guid: 7d87c81f4b3e4934a2593d28d3dea0cd,
+      type: 3}
+    averageTextureColor: {r: 0.45490196, g: 0.27058825, b: 0.12941177, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 8179852982758664135, guid: ec0ba81b637a47989da823c2e7549eae,
+      type: 3}
+    averageTextureColor: {r: 0.05882353, g: 0.05490196, b: 0.078431375, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 7648992139056211286, guid: f986598c06a941879f22d8cd120b7056,
+      type: 3}
+    averageTextureColor: {r: 0.23529412, g: 0.10980392, b: 0.07450981, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -8309751969657567007, guid: 7704fd91cf3140289fc32608b82aa196,
+      type: 3}
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -393178591035500860, guid: cd7d785ebaea45d4b663061be020b0f2,
+      type: 3}
+    averageTextureColor: {r: 0.45490196, g: 0.27058825, b: 0.12941177, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -7043871984130975970, guid: 3f8ad70247d94f49bddf124cd7df24bd,
+      type: 3}
+    averageTextureColor: {r: 0.05882353, g: 0.05490196, b: 0.078431375, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 671798139333675944, guid: a6d0db39c44d47038ee4b392c4dac50d,
+      type: 3}
+    averageTextureColor: {r: 0.23529412, g: 0.10980392, b: 0.07450981, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 8327294203453912898, guid: 98d45242dab44c8c9cebcc5b4ee2174b,
+      type: 3}
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: -3518486708593589007, guid: 5410c3e62737425e8e6a1c08002cfe75,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 8621000062056055127, guid: c47d7aa4fbe942d0951ce872bf9aa87d,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 2256795819537584368, guid: cd117d67b3314abaa482dc742cbac147,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+  - raceAndGender: 1
+    equipmentType: 11
+    wearableEquipmentPrefab: {fileID: 4257146903066133804, guid: 616b388b426c48ee838fa980b014c9fb,
+      type: 3}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
   - raceAndGender: 0
     equipmentType: 9
     wearableEquipmentPrefab: {fileID: 5827835650571572997, guid: 11f61890a9da4f2f8040da79f0e756c9,
@@ -1046,19 +1303,19 @@ MonoBehaviour:
   - materialApplicationLocation: 2
     raceAndGender: 4
     material: {fileID: 2100000, guid: 0845abed288c40a8a8ad15199052c715, type: 2}
-    averageTextureColor: {r: 0.34509805, g: 0.21960784, b: 0.1882353, a: 1}
+    averageTextureColor: {r: 0, g: 0, b: 1, a: 1}
   - materialApplicationLocation: 2
     raceAndGender: 4
     material: {fileID: 2100000, guid: 308b82eadd6a4b08bdd755d643a4d746, type: 2}
-    averageTextureColor: {r: 0.34901962, g: 0.21960784, b: 0.18431373, a: 1}
+    averageTextureColor: {r: 0.54901963, g: 0.27450982, b: 0.078431375, a: 1}
   - materialApplicationLocation: 2
     raceAndGender: 4
     material: {fileID: 2100000, guid: 5a1b98f2b83846ac9feae91c0feb5e8b, type: 2}
-    averageTextureColor: {r: 0.34509805, g: 0.21960784, b: 0.18431373, a: 1}
+    averageTextureColor: {r: 0, g: 1, b: 0, a: 1}
   - materialApplicationLocation: 2
     raceAndGender: 4
     material: {fileID: 2100000, guid: 96f73f587316491683d93b8d52e272fc, type: 2}
-    averageTextureColor: {r: 0.34509805, g: 0.21960784, b: 0.1882353, a: 1}
+    averageTextureColor: {r: 0.5686275, g: 0.09803922, b: 0.5686275, a: 1}
   - materialApplicationLocation: 0
     raceAndGender: 1
     material: {fileID: 2100000, guid: 403839688d044b1582ff71118aa3c5b6, type: 2}
@@ -1083,6 +1340,22 @@ MonoBehaviour:
     raceAndGender: 1
     material: {fileID: 2100000, guid: 0f851ac353c3433eaf5320b4bdc89dc4, type: 2}
     averageTextureColor: {r: 0.2784314, g: 0.2901961, b: 0.3019608, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 1
+    material: {fileID: 2100000, guid: 517e408b2ebc430b865ad5f7820277cf, type: 2}
+    averageTextureColor: {r: 0.36862746, g: 0.21568628, b: 0.10980392, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 1
+    material: {fileID: 2100000, guid: a0f6abe183a54af0a7726dc476d642ff, type: 2}
+    averageTextureColor: {r: 0.05490196, g: 0.05882353, b: 0.07058824, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 1
+    material: {fileID: 2100000, guid: b933d5acf6c643c2b7b24995e1d34e96, type: 2}
+    averageTextureColor: {r: 0.54901963, g: 0.27450982, b: 0.078431375, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 1
+    material: {fileID: 2100000, guid: 00eb4d4f1e3a408a97ea4511faecb72b, type: 2}
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.28235295, a: 1}
   - materialApplicationLocation: 1
     raceAndGender: 1
     material: {fileID: 2100000, guid: 76e122a357314367bfd75010e18e8ac6, type: 2}
@@ -1131,6 +1404,22 @@ MonoBehaviour:
     raceAndGender: 0
     material: {fileID: 2100000, guid: 2960a142167d49daa3fd0331806fb00b, type: 2}
     averageTextureColor: {r: 0.26666668, g: 0.27450982, b: 0.28627452, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 0
+    material: {fileID: 2100000, guid: 008d049291974134b5666d6e5fd6c5a5, type: 2}
+    averageTextureColor: {r: 0.43137255, g: 0.2627451, b: 0.1254902, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 0
+    material: {fileID: 2100000, guid: 06a36a82d97a4d7a8581e0e55456ffa2, type: 2}
+    averageTextureColor: {r: 0.05882353, g: 0.0627451, b: 0.078431375, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 0
+    material: {fileID: 2100000, guid: fde1562babb54a31b1d0febf655ce9e0, type: 2}
+    averageTextureColor: {r: 0.54901963, g: 0.27450982, b: 0.078431375, a: 1}
+  - materialApplicationLocation: 3
+    raceAndGender: 0
+    material: {fileID: 2100000, guid: 43ac2d0658cd458c8df6e0a44e15f60a, type: 2}
+    averageTextureColor: {r: 0.3137255, g: 0.3137255, b: 0.36862746, a: 1}
   - materialApplicationLocation: 1
     raceAndGender: 0
     material: {fileID: 2100000, guid: 6905d4104d4a4ce5a2c359c6c8ffc237, type: 2}

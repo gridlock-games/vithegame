@@ -58,6 +58,10 @@ namespace Vi.ScriptableObjects
                 {
                     materialApplicationLocation = MaterialApplicationLocation.Head;
                 }
+                else if (material.name.Contains("Facials"))
+                {
+                    materialApplicationLocation = MaterialApplicationLocation.Brows;
+                }
                 else
                 {
                     Debug.LogError("Unknown material application location! " + material.name);
@@ -164,7 +168,8 @@ namespace Vi.ScriptableObjects
         {
             Body,
             Head,
-            Eyes
+            Eyes,
+            Brows
         }
 
         public enum EquipmentType
@@ -195,36 +200,12 @@ namespace Vi.ScriptableObjects
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
-            equipmentOptions.Clear();
-            string[] filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
-            foreach (string filepath in filepaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<GameObject>(filepath).TryGetComponent(out WearableEquipment wearableEquipment))
-                {
-                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
-                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
-                    if (!importer.isReadable)
-                    {
-                        importer.isReadable = true;
-                        importer.SaveAndReimport();
-                    }
-
-                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
-                    foreach (Transform child in children)
-                    {
-                        child.gameObject.layer = LayerMask.NameToLayer("Character");
-                    }
-
-                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D)));
-                }
-            }
-
             characterMaterialOptions.Clear();
-            filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Materials\Character", "*.mat", SearchOption.AllDirectories);
+            string[] filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Materials\Character", "*.mat", SearchOption.AllDirectories);
             foreach (string filepath in filepaths)
             {
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(filepath);
-                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("_Facials_") | material.name.Contains("Body_Cloth")) { continue; }
+                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("Body_Cloth")) { continue; }
 
                 Texture2D texture2D = (Texture2D)material.GetTexture("_BaseMap");
                 TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
@@ -250,8 +231,63 @@ namespace Vi.ScriptableObjects
                         color = new Color(145 / 255f, 25 / 255f, 145 / 255f, 1);
                         break;
                 }
+                CharacterMaterial characterMaterial = new CharacterMaterial(filepath, material, color == Color.clear ? AverageColorFromTexture(texture2D) : color);
+                // Exclude brow materials from human male because the male model doesn't have brows by default
+                if (characterMaterial.materialApplicationLocation == MaterialApplicationLocation.Brows & characterMaterial.raceAndGender == RaceAndGender.HumanMale) { continue; }
+                characterMaterialOptions.Add(characterMaterial);
+            }
 
-                characterMaterialOptions.Add(new CharacterMaterial(filepath, material, color == Color.clear ? AverageColorFromTexture(texture2D) : color));
+            equipmentOptions.Clear();
+            filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
+            foreach (string filepath in filepaths)
+            {
+                // Check if this file is of an eligible equipment type
+                bool isEquipment = false;
+                foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
+                {
+                    if (Path.GetFileNameWithoutExtension(filepath).Contains(equipmentType.ToString()))
+                    {
+                        isEquipment = true;
+                        break;
+                    }
+                }
+                if (!isEquipment) { continue; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
+                if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { continue; }
+
+                // Add wearable equipment component to prefab here if necessary
+                if (!prefab.GetComponent<WearableEquipment>())
+                {
+                    Debug.Log(Path.GetFileNameWithoutExtension(filepath));
+                    foreach (Component comp in prefab.GetComponents<Component>())
+                    {
+                        if (comp.GetType() == typeof(Transform)) { continue; }
+
+                        DestroyImmediate(comp, true);
+                    }
+                    prefab.AddComponent<WearableEquipment>();
+                }
+
+                // Create the wearable equipment option object
+                if (prefab.TryGetComponent(out WearableEquipment wearableEquipment))
+                {
+                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                    if (!importer.isReadable)
+                    {
+                        importer.isReadable = true;
+                        importer.SaveAndReimport();
+                    }
+
+                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = LayerMask.NameToLayer("Character");
+                    }
+
+                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D)));
+                }
             }
         }
 
