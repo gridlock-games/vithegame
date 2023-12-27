@@ -17,6 +17,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class PlayerModelOption
         {
+            public RaceAndGender raceAndGender;
             public string name;
             public Weapon weapon;
             public string role;
@@ -40,8 +41,9 @@ namespace Vi.ScriptableObjects
             public MaterialApplicationLocation materialApplicationLocation;
             public RaceAndGender raceAndGender;
             public Material material;
+            public Color averageTextureColor;
 
-            public CharacterMaterial(string filePath, Material material)
+            public CharacterMaterial(string filePath, Material material, Color averageTextureColor)
             {
                 if (material.name.Contains("Eye"))
                 {
@@ -55,6 +57,10 @@ namespace Vi.ScriptableObjects
                 else if (material.name.Contains("Head"))
                 {
                     materialApplicationLocation = MaterialApplicationLocation.Head;
+                }
+                else if (material.name.Contains("Facials"))
+                {
+                    materialApplicationLocation = MaterialApplicationLocation.Brows;
                 }
                 else
                 {
@@ -84,6 +90,7 @@ namespace Vi.ScriptableObjects
                 }
 
                 this.material = material;
+                this.averageTextureColor = averageTextureColor;
             }
         }
 
@@ -91,9 +98,11 @@ namespace Vi.ScriptableObjects
         public class WearableEquipmentOption
         {
             public RaceAndGender raceAndGender;
+            public EquipmentType equipmentType;
             public WearableEquipment wearableEquipmentPrefab;
+            public Color averageTextureColor;
 
-            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab)
+            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab, Color averageTextureColor)
             {
                 if (wearableEquipmentPrefab.name.Contains("Hu_M_"))
                 {
@@ -116,7 +125,33 @@ namespace Vi.ScriptableObjects
                     raceAndGender = RaceAndGender.HumanMale;
                     Debug.LogError("Unknown race and gender! " + wearableEquipmentPrefab.name);
                 }
+
+                bool broken = false;
+                foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
+                {
+                    if (wearableEquipmentPrefab.name.Contains(type.ToString()))
+                    {
+                        equipmentType = type;
+                        broken = true;
+                        break;
+                    }
+                }
+
+                if (!broken)
+                {
+                    Debug.LogError("Unknown equipment type!" + wearableEquipmentPrefab.name);
+                }
+
                 this.wearableEquipmentPrefab = wearableEquipmentPrefab;
+                this.averageTextureColor = averageTextureColor;
+            }
+
+            public WearableEquipmentOption(EquipmentType equipmentType, Color averageTextureColor)
+            {
+                this.equipmentType = equipmentType;
+                raceAndGender = RaceAndGender.HumanMale;
+                wearableEquipmentPrefab = null;
+                this.averageTextureColor = averageTextureColor;
             }
         }
 
@@ -133,7 +168,24 @@ namespace Vi.ScriptableObjects
         {
             Body,
             Head,
-            Eyes
+            Eyes,
+            Brows
+        }
+
+        public enum EquipmentType
+        {
+            Belt,
+            Boots,
+            Cape,
+            Chest,
+            Gloves,
+            Helm,
+            Pants,
+            Robe,
+            Shoulders,
+            Beard,
+            Brows,
+            Hair
         }
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
@@ -148,25 +200,117 @@ namespace Vi.ScriptableObjects
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
-            equipmentOptions.Clear();
-            string[] filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
-            foreach (string filepath in filepaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<GameObject>(filepath).TryGetComponent(out WearableEquipment wearableEquipment))
-                {
-                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment));
-                }
-            }
-
             characterMaterialOptions.Clear();
-            filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Materials\Character", "*.mat", SearchOption.AllDirectories);
+            string[] filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Materials\Character", "*.mat", SearchOption.AllDirectories);
             foreach (string filepath in filepaths)
             {
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(filepath);
-                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("_Facials_")) { continue; }
-                characterMaterialOptions.Add(new CharacterMaterial(filepath, material));
+                if (material.name.Contains("Hair") | material.name.Contains("_UH_") | material.name.Contains("Body_Cloth")) { continue; }
+
+                Texture2D texture2D = (Texture2D)material.GetTexture("_BaseMap");
+                TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                if (!importer.isReadable)
+                {
+                    importer.isReadable = true;
+                    importer.SaveAndReimport();
+                }
+
+                Color color = Color.clear;
+                switch (material.name[^3..])
+                {
+                    case "_Bl":
+                        color = Color.blue;
+                        break;
+                    case "_Br":
+                        color = new Color(140 / 255f, 70 / 255f, 20 / 255f, 1);
+                        break;
+                    case "_Gn":
+                        color = Color.green;
+                        break;
+                    case "_Pe":
+                        color = new Color(145 / 255f, 25 / 255f, 145 / 255f, 1);
+                        break;
+                }
+                CharacterMaterial characterMaterial = new CharacterMaterial(filepath, material, color == Color.clear ? AverageColorFromTexture(texture2D) : color);
+                // Exclude brow materials from human male because the male model doesn't have brows by default
+                if (characterMaterial.materialApplicationLocation == MaterialApplicationLocation.Brows & characterMaterial.raceAndGender == RaceAndGender.HumanMale) { continue; }
+                characterMaterialOptions.Add(characterMaterial);
+            }
+
+            equipmentOptions.Clear();
+            filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
+            foreach (string filepath in filepaths)
+            {
+                // Check if this file is of an eligible equipment type
+                bool isEquipment = false;
+                foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
+                {
+                    if (Path.GetFileNameWithoutExtension(filepath).Contains(equipmentType.ToString()))
+                    {
+                        isEquipment = true;
+                        break;
+                    }
+                }
+                if (!isEquipment) { continue; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
+                if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { continue; }
+
+                // Add wearable equipment component to prefab here if necessary
+                if (!prefab.GetComponent<WearableEquipment>())
+                {
+                    Debug.Log(Path.GetFileNameWithoutExtension(filepath));
+                    foreach (Component comp in prefab.GetComponents<Component>())
+                    {
+                        if (comp.GetType() == typeof(Transform)) { continue; }
+
+                        DestroyImmediate(comp, true);
+                    }
+                    prefab.AddComponent<WearableEquipment>();
+                }
+
+                // Create the wearable equipment option object
+                if (prefab.TryGetComponent(out WearableEquipment wearableEquipment))
+                {
+                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                    if (!importer.isReadable)
+                    {
+                        importer.isReadable = true;
+                        importer.SaveAndReimport();
+                    }
+
+                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = LayerMask.NameToLayer("Character");
+                    }
+
+                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D)));
+                }
             }
         }
-        # endif
+
+        private Color32 AverageColorFromTexture(Texture2D tex)
+        {
+            Color32[] texColors = tex.GetPixels32();
+            int total = texColors.Length;
+
+            float r = 0;
+            float g = 0;
+            float b = 0;
+            float a = 0;
+
+            for (int i = 0; i < total; i++)
+            {
+                r += texColors[i].r;
+                g += texColors[i].g;
+                b += texColors[i].b;
+                a += texColors[i].a;
+            }
+
+            return new Color32((byte)(r / total), (byte)(g / total), (byte)(b / total), (byte)(a / total));
+        }
+        #endif
     }
 }

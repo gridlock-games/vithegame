@@ -253,6 +253,18 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
 
+        public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
+        {
+            if (characterMaterial == null) { return; }
+            animatorReference.ApplyCharacterMaterial(characterMaterial);
+        }
+
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        {
+            if (wearableEquipmentOption == null) { return; }
+            animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
+        }
+
         private void ChangeSkin(int characterIndex, int skinIndex)
         {
             animatorReference = GetComponentInChildren<AnimatorReference>();
@@ -267,8 +279,6 @@ namespace Vi.Core
             Animator = modelInstance.GetComponent<Animator>();
             LimbReferences = modelInstance.GetComponent<LimbReferences>();
             animatorReference = modelInstance.GetComponent<AnimatorReference>();
-
-            GetComponent<LoadoutManager>().EquipPrimaryWeapon();
         }
 
         private struct CharacterModelInfo : INetworkSerializable

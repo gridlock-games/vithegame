@@ -27,20 +27,28 @@ namespace Vi.Core
                 yield break;
             }
             string json = getRequest.downloadHandler.text;
-            if (json != "[]")
+            try
             {
-                foreach (string jsonSplit in json.Split("},"))
+                if (json != "[]")
                 {
-                    string finalJsonElement = jsonSplit;
-                    if (finalJsonElement[0] == '[')
-                        finalJsonElement = finalJsonElement.Remove(0, 1);
-                    if (finalJsonElement[^1] == ']')
-                        finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                    if (finalJsonElement[^1] != '}')
-                        finalJsonElement += "}";
-                    Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    foreach (string jsonSplit in json.Split("},"))
+                    {
+                        string finalJsonElement = jsonSplit;
+                        if (finalJsonElement[0] == '[')
+                            finalJsonElement = finalJsonElement.Remove(0, 1);
+                        if (finalJsonElement[^1] == ']')
+                            finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                        if (finalJsonElement[^1] != '}')
+                            finalJsonElement += "}";
+                        Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                    }
                 }
             }
+            catch
+            {
+                Servers = new List<Server>() { new Server("", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+            }
+
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
@@ -91,6 +99,18 @@ namespace Vi.Core
             public string label;
             public string __v;
             public string port;
+
+            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port)
+            {
+                this._id = _id;
+                this.type = type;
+                this.population = population;
+                this.progress = progress;
+                this.ip = ip;
+                this.label = label;
+                this.__v = __v;
+                this.port = port;
+            }
         }
 
         public struct ServerPostPayload
@@ -131,5 +151,32 @@ namespace Vi.Core
             }
         }
 
+        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", ""), new Character("Human_Male", "Char B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", "") };
+
+        public struct Character
+        {
+            public string characterModelName;
+            public string characterName;
+            public int characterLevel;
+            public string bodyColorName;
+            public string headColorName;
+            public string eyeColorName;
+            public string beardName;
+            public string browsName;
+            public string hairName;
+
+            public Character(string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
+            {
+                this.characterModelName = characterModelName;
+                this.characterName = characterName;
+                this.characterLevel = characterLevel;
+                this.bodyColorName = bodyColorName;
+                this.headColorName = headColorName;
+                this.eyeColorName = eyeColorName;
+                this.beardName = beardName;
+                this.browsName = browsName;
+                this.hairName = hairName;
+            }
+        }
     }
 }

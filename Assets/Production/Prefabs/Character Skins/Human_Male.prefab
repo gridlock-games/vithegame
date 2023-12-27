@@ -137,7 +137,7 @@ MonoBehaviour:
   tipAxis: 0
   tipMultiplier: 1
   offset: {x: 0, y: 0, z: 0}
-  debugLines: 1
+  debugLines: 0
 --- !u!1 &1053886462783487955
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,7 +956,7 @@ MonoBehaviour:
   tipAxis: 0
   tipMultiplier: -1
   offset: {x: 0, y: 0, z: 0}
-  debugLines: 1
+  debugLines: 0
 --- !u!1001 &9038563066095030440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1622,7 +1622,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       propertyPath: m_Name
-      value: Default_Male
+      value: Human_Male
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
@@ -3128,6 +3128,8 @@ MonoBehaviour:
   - characterMaterialType: 2
     skinnedMeshRenderers:
     - {fileID: 1614450552736105592}
+  - characterMaterialType: 3
+    skinnedMeshRenderers: []
 --- !u!114 &3445035062283173229
 MonoBehaviour:
   m_ObjectHideFlags: 0
