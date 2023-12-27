@@ -71,7 +71,7 @@ namespace Vi.Player
                 enableDisplay = !enableDisplay;
                 myLog = "";
             }
-            runtimeNetStatsMonitor.Visible = enableDisplay;
+            runtimeNetStatsMonitor.Visible = false;
         }
 
         private Coroutine fpsCounterCoroutine;
