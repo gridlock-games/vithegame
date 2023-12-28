@@ -23,7 +23,7 @@ namespace Vi.Player
 
         private void Start()
         {
-            enableDisplay = Debug.isDebugBuild;
+            enableDisplay = Debug.isDebugBuild & !Application.isEditor;
             DontDestroyOnLoad(gameObject);
             runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
         }

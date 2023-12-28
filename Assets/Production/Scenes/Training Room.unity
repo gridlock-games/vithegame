@@ -2607,7 +2607,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf98c2b17b3b5e041958e916eccd4123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  botDefinitions: []
+  botDefinitions:
+  - characterIndex: 0
+    skinIndex: 0
+    team: 2
+  - characterIndex: 0
+    skinIndex: 0
+    team: 2
+  - characterIndex: 0
+    skinIndex: 0
+    team: 2
 --- !u!4 &787044780
 Transform:
   m_ObjectHideFlags: 0
@@ -4284,7 +4293,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1282819393
 Transform:
   m_ObjectHideFlags: 0
@@ -4615,7 +4624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1364509987
 Transform:
   m_ObjectHideFlags: 0
@@ -5852,19 +5861,15 @@ MonoBehaviour:
   - gameModes: 00000000
     teams: 02000000
     spawnPositions:
-    - {x: 0, y: 1, z: 0}
+    - {x: 10, y: -4, z: 0}
+    - {x: -10, y: -4, z: 0}
+    - {x: 0, y: -4, z: 10}
+    - {x: 0, y: -4, z: -10}
     spawnRotations:
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 90, z: 0}
     - {x: 0, y: 180, z: 0}
-  - gameModes: 00000000
-    teams: 03000000
-    spawnPositions:
-    - {x: 0, y: 1, z: -10}
-    - {x: 10, y: 1, z: -10}
-    - {x: -10, y: 1, z: -10}
-    spawnRotations:
     - {x: 0, y: 0, z: 0}
-    - {x: 0, y: -35, z: 0}
-    - {x: 0, y: 35, z: 0}
 --- !u!4 &1590635238
 Transform:
   m_ObjectHideFlags: 0

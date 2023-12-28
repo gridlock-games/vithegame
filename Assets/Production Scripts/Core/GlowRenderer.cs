@@ -53,36 +53,41 @@ namespace Vi.Core
 
         private void Start()
         {
-            NetworkObject netObj = GetComponentInParent<NetworkObject>();
-
             foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
-                if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                RegisterNewRenderer(renderer);
+            }
+        }
+
+        public void RegisterNewRenderer(Renderer renderer)
+        {
+            NetworkObject netObj = GetComponentInParent<NetworkObject>();
+
+            if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+            {
+                skinnedMeshRenderer.updateWhenOffscreen = netObj.IsLocalPlayer;
+            }
+
+            List<Material> materialList = new List<Material>();
+
+            foreach (Material m in renderer.materials)
+            {
+                materialList.Add(m);
+            }
+
+            int materialCount = 1;
+            for (int i = 0; i < materialCount; i++)
+            {
+                materialList.Add(glowMaterial);
+            }
+
+            renderer.materials = materialList.ToArray();
+
+            foreach (Material m in renderer.materials)
+            {
+                if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
                 {
-                    skinnedMeshRenderer.updateWhenOffscreen = netObj.IsLocalPlayer;
-                }
-
-                List<Material> materialList = new List<Material>();
-
-                foreach (Material m in renderer.materials)
-                {
-                    materialList.Add(m);
-                }
-
-                int materialCount = 1;
-                for (int i = 0; i < materialCount; i++)
-                {
-                    materialList.Add(glowMaterial);
-                }
-
-                renderer.materials = materialList.ToArray();
-
-                foreach (Material m in renderer.materials)
-                {
-                    if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
-                    {
-                        glowMaterialInstances.Add(m);
-                    }
+                    glowMaterialInstances.Add(m);
                 }
             }
         }

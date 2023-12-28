@@ -19,6 +19,14 @@ namespace Vi.Player
                 counter++;
             }
 
+            StartCoroutine(Wait());
+        }
+
+        private IEnumerator Wait()
+        {
+            yield return null;
+            yield return null;
+            yield return null;
             foreach (int i in equipmentIndexesToAdd)
             {
                 GetComponent<AnimationHandler>().ApplyWearableEquipment(PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale)[i]);

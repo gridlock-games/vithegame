@@ -41,6 +41,11 @@ namespace Vi.Core
             }
 
             SkinnedMeshRenderer[] skinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
+            {
+                glowRenderer.RegisterNewRenderer(skinnedMeshRenderer);
+            }
+
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
             if (wearableEquipmentRendererDefinition != null)
             {
@@ -90,12 +95,14 @@ namespace Vi.Core
         Animator animator;
         WeaponHandler weaponHandler;
         LimbReferences limbReferences;
+        GlowRenderer glowRenderer;
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             weaponHandler = GetComponentInParent<WeaponHandler>();
             limbReferences = GetComponent<LimbReferences>();
+            glowRenderer = GetComponent<GlowRenderer>();
         }
 
         public bool ShouldApplyRootMotion()
