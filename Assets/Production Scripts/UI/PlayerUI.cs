@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using System.Linq;
 using Unity.Netcode;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -31,10 +32,36 @@ namespace Vi.UI
         [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
+        [Header("Mobile UI")]
+        [SerializeField] private Image rightMouseClickImage;
+        [SerializeField] private Sprite heavyAttackIcon;
+        [SerializeField] private Sprite aimIcon;
+
+        [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
+
+        [System.Serializable]
+        private struct PlatformUIDefinition
+        {
+            public RuntimePlatform[] platforms;
+            public GameObject[] gameObjectsToEnable;
+            public MoveUIDefinition[] objectsToMove;
+        }
+
+        [System.Serializable]
+        private struct MoveUIDefinition
+        {
+            public GameObject gameObjectToMove;
+            public Vector2 newAnchoredPosition;
+        }
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
+
+        public void OpenPauseMenu()
+        {
+            attributes.GetComponent<ActionMapHandler>().OnPause();
+        }
 
         private void Awake()
         {
@@ -44,6 +71,23 @@ namespace Vi.UI
 
         private void Start()
         {
+            fadeToWhiteImage.color = Color.black;
+            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+            }
+
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
             UpdateWeapon();
@@ -104,6 +148,8 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
+                rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
+
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));

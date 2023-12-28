@@ -73,7 +73,7 @@ namespace Vi.Player
 
         [SerializeField] private GameObject pausePrefab;
         GameObject pauseInstance;
-        void OnPause()
+        public void OnPause()
         {
             if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }

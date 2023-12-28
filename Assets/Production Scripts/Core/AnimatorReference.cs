@@ -11,6 +11,7 @@ namespace Vi.Core
     public class AnimatorReference : MonoBehaviour
     {
         [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
+        [SerializeField] private WearableEquipmentRendererDefinition[] wearableEquipmentRendererDefinitions;
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
@@ -20,7 +21,7 @@ namespace Vi.Core
                 skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
             }
         }
-
+        
         private Dictionary<CharacterReference.EquipmentType, GameObject> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, GameObject>();
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
         {
@@ -38,12 +39,36 @@ namespace Vi.Core
             {
                 wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform));
             }
+
+            SkinnedMeshRenderer[] skinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
+            {
+                glowRenderer.RegisterNewRenderer(skinnedMeshRenderer);
+            }
+
+            WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
+            if (wearableEquipmentRendererDefinition != null)
+            {
+                for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                {
+                    if (skinnedMeshRenderers.Length > 1)
+                        skinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
+                    wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !wearableEquipmentInstances[wearableEquipmentOption.equipmentType];
+                }
+            }
         }
 
         [System.Serializable]
         private class MaterialReplacementDefintion
         {
             public CharacterReference.MaterialApplicationLocation characterMaterialType;
+            public SkinnedMeshRenderer[] skinnedMeshRenderers;
+        }
+
+        [System.Serializable]
+        private class WearableEquipmentRendererDefinition
+        {
+            public CharacterReference.EquipmentType equipmentType;
             public SkinnedMeshRenderer[] skinnedMeshRenderers;
         }
 
@@ -70,12 +95,14 @@ namespace Vi.Core
         Animator animator;
         WeaponHandler weaponHandler;
         LimbReferences limbReferences;
+        GlowRenderer glowRenderer;
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             weaponHandler = GetComponentInParent<WeaponHandler>();
             limbReferences = GetComponent<LimbReferences>();
+            glowRenderer = GetComponent<GlowRenderer>();
         }
 
         public bool ShouldApplyRootMotion()

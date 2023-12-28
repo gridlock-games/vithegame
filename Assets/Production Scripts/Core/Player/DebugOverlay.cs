@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Multiplayer.Tools.NetStatsMonitor;
+using System.Linq;
+using UnityEngine.InputSystem;
 
 namespace Vi.Player
 {
@@ -21,6 +23,7 @@ namespace Vi.Player
 
         private void Start()
         {
+            enableDisplay = Debug.isDebugBuild & !Application.isEditor;
             DontDestroyOnLoad(gameObject);
             runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
         }
@@ -45,7 +48,10 @@ namespace Vi.Player
             output = logString;
             stack = stackTrace;
 
-            myLog = output + "\n" + stack + "\n" + myLog;
+            if (type == LogType.Error)
+                myLog = output + "\n" + stack + "\n" + myLog;
+            else
+                myLog = output + "\n" + myLog;
 
             if (myLog.Length > 1000)
             {
@@ -66,12 +72,12 @@ namespace Vi.Player
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.BackQuote))
+            if (Input.GetKeyDown(KeyCode.BackQuote) | Keyboard.current[Key.Backquote].wasPressedThisFrame)
             {
                 enableDisplay = !enableDisplay;
                 myLog = "";
             }
-            runtimeNetStatsMonitor.Visible = enableDisplay;
+            runtimeNetStatsMonitor.Visible = enableDisplay & Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer;
         }
 
         private Coroutine fpsCounterCoroutine;

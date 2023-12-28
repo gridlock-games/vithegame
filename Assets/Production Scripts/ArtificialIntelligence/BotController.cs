@@ -130,7 +130,7 @@ namespace Vi.ArtificialIntelligence
                             }
                             else
                             {
-                                weaponHandler.SendMessage("OnLightAttack");
+                                //weaponHandler.SendMessage("OnLightAttack");
                             }
                         }
                         break;

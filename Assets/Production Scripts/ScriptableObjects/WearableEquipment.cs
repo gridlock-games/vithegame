@@ -8,6 +8,8 @@ namespace Vi.ScriptableObjects
     [DisallowMultipleComponent]
     public class WearableEquipment : MonoBehaviour
     {
+        public CharacterReference.EquipmentType equipmentType;
+
         private void Start()
         {
             Transform target = GetComponentInParent<Animator>().GetComponentInChildren<SkinnedMeshRenderer>().rootBone;

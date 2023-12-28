@@ -432,7 +432,6 @@ namespace Vi.Core
 
         public void RespawnAllPlayers()
         {
-            playerSpawnPoints.ResetSpawnTracker();
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
                 RespawnPlayer(kvp.Value);

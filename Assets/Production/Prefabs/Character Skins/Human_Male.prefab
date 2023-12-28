@@ -1194,6 +1194,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: -5443069844453700554, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -5351058806802725389, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       propertyPath: m_Layer
@@ -1358,7 +1363,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[1]
       value: 
-      objectReference: {fileID: 2100000, guid: 5ea433bf705a4ef3a7436345efdf58a7, type: 2}
+      objectReference: {fileID: 2100000, guid: 9c0d686ffb5b424097c303685ee3d27e, type: 2}
     - target: {fileID: -3414868568525622631, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       propertyPath: m_Materials.Array.data[2]
@@ -1693,6 +1698,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1921178948141326730, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2031676142523458476, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
@@ -3130,6 +3140,21 @@ MonoBehaviour:
     - {fileID: 1614450552736105592}
   - characterMaterialType: 3
     skinnedMeshRenderers: []
+  wearableEquipmentRendererDefinitions:
+  - equipmentType: 3
+    skinnedMeshRenderers:
+    - {fileID: 3311445457593262641}
+  - equipmentType: 6
+    skinnedMeshRenderers:
+    - {fileID: 2627613128353046877}
+  - equipmentType: 1
+    skinnedMeshRenderers:
+    - {fileID: 4595218535290772157}
+    - {fileID: 51510509743588683}
+  - equipmentType: 4
+    skinnedMeshRenderers:
+    - {fileID: 8309669807307419677}
+    - {fileID: 3572916806647610077}
 --- !u!114 &3445035062283173229
 MonoBehaviour:
   m_ObjectHideFlags: 0

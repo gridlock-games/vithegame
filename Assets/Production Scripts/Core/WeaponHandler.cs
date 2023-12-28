@@ -59,7 +59,7 @@ namespace Vi.Core
             }
             weaponInstances.Clear();
 
-            canAim = false;
+            CanAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
@@ -99,7 +99,7 @@ namespace Vi.Core
                         {
                             Debug.LogWarning(instance + " does not have a runtime weapon component!");
                         }
-                        canAim = instance.GetComponent<ShooterWeapon>() | canAim;
+                        CanAim = instance.GetComponent<ShooterWeapon>() | CanAim;
                     }
                     broken = true;
                     break;
@@ -428,7 +428,7 @@ namespace Vi.Core
         }
 
         private bool toggleAim = true;
-        private bool canAim;
+        public bool CanAim { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -443,7 +443,7 @@ namespace Vi.Core
                 }
             }
 
-            if (canAim)
+            if (CanAim)
             {
                 if (toggleAim)
                 {
@@ -601,7 +601,14 @@ namespace Vi.Core
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            isBlocking.Value = value.isPressed;
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
+            }
+            else
+            {
+                isBlocking.Value = value.isPressed;
+            }
         }
 
         void OnTimeScaleChange()

@@ -11,6 +11,12 @@ namespace Vi.Core.SceneManagement
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
 
+        private void Awake()
+        {
+            Screen.SetResolution(1920, 1080, Screen.fullScreenMode, Screen.currentResolution.refreshRate);
+            Application.targetFrameRate = Screen.currentResolution.refreshRate;
+        }
+
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
