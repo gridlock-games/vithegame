@@ -286,7 +286,9 @@ namespace Vi.ScriptableObjects
                         child.gameObject.layer = LayerMask.NameToLayer("Character");
                     }
 
-                    equipmentOptions.Add(new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D)));
+                    WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
+                    equipmentOptions.Add(wearableEquipmentOption);
+                    wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
                 }
             }
         }
