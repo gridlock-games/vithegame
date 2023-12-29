@@ -18,9 +18,13 @@ public class DebugOverlay : MonoBehaviour
 
     private RuntimeNetStatsMonitor runtimeNetStatsMonitor;
 
+    void ToggleDebugOverlay(bool status)
+    {
+        enableDisplay = status;
+    }
+
     private void Start()
     {
-        enableDisplay = Debug.isDebugBuild & !Application.isEditor;
         DontDestroyOnLoad(gameObject);
         runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
         UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
