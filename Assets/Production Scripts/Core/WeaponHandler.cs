@@ -418,6 +418,8 @@ namespace Vi.Core
             {
                 Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
+
+            if (shouldRepeatLightAttack) { OnLightAttack(); }
         }
 
         void OnLightAttack()
@@ -425,6 +427,12 @@ namespace Vi.Core
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
             if (actionClip != null)
                 animationHandler.PlayAction(actionClip);
+        }
+
+        private bool shouldRepeatLightAttack;
+        void OnLightAttackHold(InputValue value)
+        {
+            shouldRepeatLightAttack = value.isPressed;
         }
 
         private bool toggleAim = true;
@@ -601,14 +609,15 @@ namespace Vi.Core
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
-            }
-            else
-            {
-                isBlocking.Value = value.isPressed;
-            }
+            isBlocking.Value = value.isPressed;
+            //if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            //{
+            //    if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
+            //}
+            //else
+            //{
+            //    isBlocking.Value = value.isPressed;
+            //}
         }
 
         void OnTimeScaleChange()

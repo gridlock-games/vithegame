@@ -187,7 +187,7 @@ namespace Vi.Player
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
-        private OnScreenStick moveJoystick;
+        private OnScreenStick[] joysticks = new OnScreenStick[0];
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -198,10 +198,14 @@ namespace Vi.Player
                 lookInput = Vector2.zero;
                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                 {
-                    if (!moveJoystick) { moveJoystick = System.Array.Find(GetComponentsInChildren<OnScreenStick>(), item => item.name.Contains("Move")); }
-                    if (!RectTransformUtility.RectangleContainsScreenPoint(moveJoystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition))
+                    if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+
+                    foreach (OnScreenStick joystick in joysticks)
                     {
-                        lookInput += touch.delta;
+                        if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                        {
+                            lookInput += touch.delta;
+                        }
                     }
                 }
             }

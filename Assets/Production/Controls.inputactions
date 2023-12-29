@@ -60,6 +60,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "LightAttackHold",
+                    "type": "Value",
+                    "id": "9f0e2966-fe01-4a0a-a9ae-c0251f559cee",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "HeavyAttack",
                     "type": "Value",
                     "id": "020ea129-7f33-4dae-bf36-6d4c69f3c8bd",
@@ -185,7 +194,7 @@
                     "id": "5679ec3b-e81b-42e2-aa4c-9fa6b3bec338",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "ScaleVector2(x=2,y=2)",
                     "groups": "Keyboard & Mouse",
                     "action": "Look",
                     "isComposite": false,
@@ -347,17 +356,6 @@
                 },
                 {
                     "name": "",
-                    "id": "6058aa31-70f2-433c-8833-5860b8622514",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "LightAttack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "4963394c-29fb-4f3d-bbf2-37b006f90917",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
@@ -452,6 +450,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Weapon2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aac1c7f1-fc97-48d5-ab71-b851a9fecfd5",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightAttackHold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
