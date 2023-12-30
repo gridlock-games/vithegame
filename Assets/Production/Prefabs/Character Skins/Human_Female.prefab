@@ -2365,7 +2365,20 @@ MonoBehaviour:
   - characterMaterialType: 3
     skinnedMeshRenderers:
     - {fileID: 8409120022737876532}
-  wearableEquipmentRendererDefinitions: []
+  wearableEquipmentRendererDefinitions:
+  - equipmentType: 3
+    skinnedMeshRenderers:
+    - {fileID: 1315561123507258486}
+  - equipmentType: 6
+    skinnedMeshRenderers:
+    - {fileID: 2000295262726735642}
+  - equipmentType: 1
+    skinnedMeshRenderers:
+    - {fileID: 4540280775520346892}
+  - equipmentType: 4
+    skinnedMeshRenderers:
+    - {fileID: 5540748535080900186}
+    - {fileID: 1018056652380396698}
 --- !u!114 &7293944411123305151
 MonoBehaviour:
   m_ObjectHideFlags: 0
