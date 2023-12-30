@@ -30,6 +30,7 @@ namespace Vi.UI
 
         private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
         private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
+        private List<GameObject> otherCustomizationRowParents = new List<GameObject>();
 
         private struct EquipmentCustomizationParent
         {
@@ -118,11 +119,18 @@ namespace Vi.UI
             }
             characterEquipmentParents.Clear();
 
+            foreach (GameObject rowParent in otherCustomizationRowParents)
+            {
+                Destroy(rowParent);
+            }
+            otherCustomizationRowParents.Clear();
+
             foreach (CustomizationButtonInfo buttonInfo in buttonReference)
             {
                 Destroy(buttonInfo.button.gameObject);
             }
             buttonReference.Clear();
+
 
             leftYLocalPosition = leftStartOffset;
             rightYLocalPosition = rightStartOffset;
@@ -215,6 +223,7 @@ namespace Vi.UI
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
             int raceCount = 2;
             leftQueuedSpacing = raceCount / 11 * -50;
@@ -239,11 +248,12 @@ namespace Vi.UI
                         break;
                 }
 
-                //image.GetComponent<Button>().onClick.AddListener();
+                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
                 buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), "Race", race));
             }
 
             Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+            otherCustomizationRowParents.Add(genderButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
             int genderCount = 2;
             leftQueuedSpacing = genderCount / 11 * -50;
@@ -261,6 +271,78 @@ namespace Vi.UI
             buttonReference.Add(new CustomizationButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
         }
 
+        private void RefreshButtonInteractability()
+        {
+            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            {
+                switch (buttonInfo.key)
+                {
+                    case "Eyes":
+                        buttonInfo.button.interactable = selectedCharacter.eyeColorName != buttonInfo.value;
+                        break;
+                    case "Body":
+                        buttonInfo.button.interactable = selectedCharacter.bodyColorName != buttonInfo.value;
+                        break;
+                    case "Brows":
+                        buttonInfo.button.interactable = selectedCharacter.hairName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hairName;
+                        break;
+                    case "Head":
+                        buttonInfo.button.interactable = selectedCharacter.headColorName != buttonInfo.value;
+                        break;
+                    case "Hair":
+                        buttonInfo.button.interactable = selectedCharacter.hairName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hairName;
+                        break;
+                    case "Beard":
+                        buttonInfo.button.interactable = selectedCharacter.beardName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beardName;
+                        break;
+                    case "Race":
+                        buttonInfo.button.interactable = selectedRace != buttonInfo.value;
+                        break;
+                    case "Gender":
+                        buttonInfo.button.interactable = selectedGender != buttonInfo.value;
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle button key " + buttonInfo.key);
+                        break;
+                }
+            }
+        }
+
+        private WebRequestManager.Character selectedCharacter;
+        private GameObject previewObject;
+        public void UpdateSelectedCharacter(WebRequestManager.Character character)
+        {
+            selectCharacterButton.interactable = true;
+            characterNameInputField.text = character.characterName;
+            if (previewObject) { Destroy(previewObject); }
+
+            // Instantiate the player model
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
+            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
+            int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
+            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
+            animationHandler.SetCharacter(characterIndex, skinIndex);
+
+            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
+
+            List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
+            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColorName));
+            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.headColorName));
+            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColorName));
+
+            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beardName));
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
+
+            selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+
+            RefreshButtonInteractability();
+            Debug.Log(JsonUtility.ToJson(selectedCharacter));
+        }
+
         private string selectedRace = "Human";
         private string selectedGender = "Male";
 
@@ -273,73 +355,22 @@ namespace Vi.UI
 
             CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
             CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == raceAndGender);
-            if (option == null) { return; }
+            if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
             selectedCharacter.characterModelName = option.skinOptions[0].name;
             RefreshMaterialsAndEquipmentOptions(raceAndGender);
             UpdateSelectedCharacter(selectedCharacter);
-
-            Debug.Log(JsonUtility.ToJson(selectedCharacter));
-
-            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
-            {
-
-            }
         }
 
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyCharacterMaterial(characterMaterial);
-
-            switch (characterMaterial.materialApplicationLocation)
-            {
-                case CharacterReference.MaterialApplicationLocation.Body:
-                    selectedCharacter.bodyColorName = characterMaterial.material.name;
-                    break;
-                case CharacterReference.MaterialApplicationLocation.Head:
-                    selectedCharacter.headColorName = characterMaterial.material.name;
-                    break;
-                case CharacterReference.MaterialApplicationLocation.Eyes:
-                    selectedCharacter.eyeColorName = characterMaterial.material.name;
-                    break;
-                default:
-                    Debug.LogError("Not sure how to handle material application location " + characterMaterial.materialApplicationLocation);
-                    break;
-            }
-
-            Debug.Log(JsonUtility.ToJson(selectedCharacter));
-
-            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
-            {
-
-            }
+            UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption);
-
-            switch (wearableEquipmentOption.equipmentType)
-            {
-                case CharacterReference.EquipmentType.Beard:
-                    selectedCharacter.beardName = wearableEquipmentOption.wearableEquipmentPrefab ? wearableEquipmentOption.wearableEquipmentPrefab.name : "";
-                    break;
-                case CharacterReference.EquipmentType.Brows:
-                    selectedCharacter.browsName = wearableEquipmentOption.wearableEquipmentPrefab ? wearableEquipmentOption.wearableEquipmentPrefab.name : "";
-                    break;
-                case CharacterReference.EquipmentType.Hair:
-                    selectedCharacter.hairName = wearableEquipmentOption.wearableEquipmentPrefab ? wearableEquipmentOption.wearableEquipmentPrefab.name : "";
-                    break;
-                default:
-                    Debug.LogError("Not sure how to handle equipment type " + wearableEquipmentOption.equipmentType);
-                    break;
-            }
-
-            Debug.Log(JsonUtility.ToJson(selectedCharacter));
-
-            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
-            {
-
-            }
+            UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
         private void Start()
@@ -424,37 +455,6 @@ namespace Vi.UI
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
             NetworkManager.Singleton.StartClient();
-        }
-
-        private WebRequestManager.Character selectedCharacter;
-        private GameObject previewObject;
-        public void UpdateSelectedCharacter(WebRequestManager.Character character)
-        {
-            selectCharacterButton.interactable = true;
-            selectedCharacter = character;
-            characterNameInputField.text = character.characterName;
-            if (previewObject) { Destroy(previewObject); }
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
-            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
-            int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-            animationHandler.SetCharacter(characterIndex, skinIndex);
-
-            var playerModelOption = playerModelOptionList[characterIndex];
-
-            var characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColorName));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.headColorName));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColorName));
-
-            var equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beardName));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
-
-            Debug.Log(JsonUtility.ToJson(character));
         }
 
         private void OnDrawGizmos()

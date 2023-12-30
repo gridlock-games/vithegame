@@ -13,6 +13,20 @@ namespace Vi.Core
         [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
         [SerializeField] private WearableEquipmentRendererDefinition[] wearableEquipmentRendererDefinitions;
 
+        public WebRequestManager.Character GetCharacterWebInfo(WebRequestManager.Character currentCharacter)
+        {
+            MaterialReplacementDefintion browsReplacementDefinition = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Brows);
+
+            return new WebRequestManager.Character(name.Replace("(Clone)", ""), currentCharacter.characterName, currentCharacter.characterLevel,
+                System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Body).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
+                System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Head).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
+                System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Eyes).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
+                wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
+                browsReplacementDefinition == null ? (wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Brows) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Brows].name.Replace("(Clone)", "") : "") : browsReplacementDefinition.skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
+                wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Hair].name.Replace("(Clone)", "") : ""
+            );
+        }
+
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation);
