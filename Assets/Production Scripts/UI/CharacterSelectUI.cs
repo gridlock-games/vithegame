@@ -341,9 +341,9 @@ namespace Vi.UI
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+            Debug.Log(JsonUtility.ToJson(selectedCharacter));
 
             RefreshButtonInteractability();
-            Debug.Log(JsonUtility.ToJson(selectedCharacter));
         }
 
         private string selectedRace = "Human";
