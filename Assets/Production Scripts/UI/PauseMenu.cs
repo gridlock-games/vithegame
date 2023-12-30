@@ -12,6 +12,7 @@ namespace Vi.UI
         [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private Slider volumeSlider;
+        [SerializeField] private Toggle debugOverlayToggle;
 
         public void OpenDisplayMenu()
         {
@@ -35,8 +36,14 @@ namespace Vi.UI
             PlayerPrefs.SetFloat("masterVolume", AudioListener.volume);
         }
 
+        public void SetDebugOverlay()
+        {
+            GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
+        }
+
         private void Start()
         {
+            GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
             volumeSlider.value = AudioListener.volume;
         }
     }

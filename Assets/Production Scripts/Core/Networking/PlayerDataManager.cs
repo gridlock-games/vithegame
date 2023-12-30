@@ -220,7 +220,7 @@ namespace Vi.Core
                     characterIndex,
                     skinIndex,
                     team,
-                    0,
+                    1,
                     0);
                 AddPlayerData(botData);
             }
