@@ -151,10 +151,56 @@ namespace Vi.Core
             }
         }
 
-        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10), new Character("Human_Male", "Char B", 1) };
-
-        public struct Character
+        public static List<Character> GetCharacters()
         {
+            List<Character> characterList = new List<Character>();
+
+            int i = 1;
+            while (PlayerPrefs.HasKey("Character " + i.ToString()))
+            {
+                characterList.Add(JsonUtility.FromJson<Character>(PlayerPrefs.GetString("Character " + i.ToString())));
+                i++;
+            }
+
+            return characterList;
+        }
+
+        public static void AddCharacter(Character character)
+        {
+            if (character.characterId == "")
+            {
+                int i = 1;
+                character.characterId = i.ToString();
+                while (PlayerPrefs.HasKey("Character " + i.ToString()))
+                {
+                    character.characterId = i.ToString();
+                    i++;
+                }
+                PlayerPrefs.SetString("Character " + i.ToString(), JsonUtility.ToJson(character));
+            }
+            else
+            {
+                PlayerPrefs.SetString("Character " + character.characterId.ToString(), JsonUtility.ToJson(character));
+            }
+        }
+
+        public static Character DefaultCharacter { get; private set; } = new Character()
+        {
+            characterId = "",
+            characterModelName = "Human_Male",
+            characterName = "",
+            characterLevel = 1,
+            bodyColorName = "",
+            headColorName = "",
+            eyeColorName = "",
+            beardName = "",
+            browsName = "",
+            hairName = ""
+        };
+
+        public struct Character : System.IEquatable<Character>
+        {
+            public string characterId;
             public string characterModelName;
             public string characterName;
             public int characterLevel;
@@ -165,8 +211,9 @@ namespace Vi.Core
             public string browsName;
             public string hairName;
 
-            public Character(string characterModelName, string characterName, int characterLevel)
+            public Character(string characterId, string characterModelName, string characterName, int characterLevel)
             {
+                this.characterId = characterId;
                 this.characterModelName = characterModelName;
                 this.characterName = characterName;
                 this.characterLevel = characterLevel;
@@ -178,8 +225,9 @@ namespace Vi.Core
                 hairName = "";
             }
 
-            public Character(string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
+            public Character(string characterId, string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
             {
+                this.characterId = characterId;
                 this.characterModelName = characterModelName;
                 this.characterName = characterName;
                 this.characterLevel = characterLevel;
@@ -189,6 +237,11 @@ namespace Vi.Core
                 this.beardName = beardName;
                 this.browsName = browsName;
                 this.hairName = hairName;
+            }
+
+            public bool Equals(Character other)
+            {
+                return characterId == other.characterId;
             }
         }
     }

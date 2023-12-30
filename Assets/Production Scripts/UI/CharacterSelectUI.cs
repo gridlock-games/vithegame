@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
@@ -26,7 +27,9 @@ namespace Vi.UI
         [SerializeField] private GameObject characterCustomizationButtonPrefab;
         [SerializeField] private GameObject removeEquipmentButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
-        [SerializeField] private Button createCharacterButton;
+        [SerializeField] private Button finishCharacterCustomizationButton;
+        [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
+        [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
         private List<MaterialCustomizationParent> characterMaterialParents = new List<MaterialCustomizationParent>();
         private List<EquipmentCustomizationParent> characterEquipmentParents = new List<EquipmentCustomizationParent>();
@@ -52,10 +55,6 @@ namespace Vi.UI
         [SerializeField] private Button closeServersMenuButton;
         [SerializeField] private Button refreshServersButton;
 
-        [Header("Old")]
-        [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
-        [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
-
         private List<CharacterReference.EquipmentType> equipmentTypesIncludedInCharacterAppearance = new List<CharacterReference.EquipmentType>()
         {
             CharacterReference.EquipmentType.Hair,
@@ -66,19 +65,32 @@ namespace Vi.UI
         private void Awake()
         {
             OpenCharacterSelect();
-            createCharacterButton.interactable = characterNameInputField.text.Length > 0;
+            finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter.characterId);
+
+            RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender.HumanMale);
+        }
+
+        private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
+
+        private void RefreshCharacterCards()
+        {
+            foreach (Transform child in characterCardParent)
+            {
+                Destroy(child.gameObject);
+            }
+            characterCardButtonReference.Clear();
 
             // Create character cards
-            foreach (WebRequestManager.Character character in WebRequestManager.Characters)
+            foreach (WebRequestManager.Character character in WebRequestManager.GetCharacters())
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
+                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character.characterId));
             }
-
-            RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender.HumanMale);
         }
 
         private readonly int leftStartOffset = 400;
@@ -89,15 +101,15 @@ namespace Vi.UI
         private int leftQueuedSpacing;
         private int rightQueuedSpacing;
 
-        private List<CustomizationButtonInfo> buttonReference = new List<CustomizationButtonInfo>();
+        private List<ButtonInfo> customizationButtonReference = new List<ButtonInfo>();
 
-        private struct CustomizationButtonInfo
+        private struct ButtonInfo
         {
             public Button button;
             public string key;
             public string value;
 
-            public CustomizationButtonInfo(Button button, string key, string value)
+            public ButtonInfo(Button button, string key, string value)
             {
                 this.button = button;
                 this.key = key;
@@ -125,11 +137,11 @@ namespace Vi.UI
             }
             otherCustomizationRowParents.Clear();
 
-            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            foreach (ButtonInfo buttonInfo in customizationButtonReference)
             {
                 Destroy(buttonInfo.button.gameObject);
             }
-            buttonReference.Clear();
+            customizationButtonReference.Clear();
 
 
             leftYLocalPosition = leftStartOffset;
@@ -173,7 +185,7 @@ namespace Vi.UI
                 materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
 
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
-                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
+                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
             }
 
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender))
@@ -207,7 +219,7 @@ namespace Vi.UI
                     buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
                     Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
                     removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType, Color.white)); });
-                    buttonReference.Add(new CustomizationButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
+                    customizationButtonReference.Add(new ButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
                 }
                 else
                 {
@@ -219,7 +231,7 @@ namespace Vi.UI
                 Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                 image.color = textureAverageColor;
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption); });
-                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.wearableEquipmentPrefab.name));
+                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.wearableEquipmentPrefab.name));
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
@@ -249,7 +261,7 @@ namespace Vi.UI
                 }
 
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                buttonReference.Add(new CustomizationButtonInfo(image.GetComponent<Button>(), "Race", race));
+                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), "Race", race));
             }
 
             Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
@@ -264,16 +276,31 @@ namespace Vi.UI
             Image boyButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
             boyButtonImage.color = Color.blue;
             boyButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            buttonReference.Add(new CustomizationButtonInfo(boyButtonImage.GetComponent<Button>(), "Gender", "Male"));
+            customizationButtonReference.Add(new ButtonInfo(boyButtonImage.GetComponent<Button>(), "Gender", "Male"));
             Image girlButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
             girlButtonImage.color = Color.magenta;
             girlButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            buttonReference.Add(new CustomizationButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
+            customizationButtonReference.Add(new ButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
         }
 
         private void RefreshButtonInteractability()
         {
-            foreach (CustomizationButtonInfo buttonInfo in buttonReference)
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter.characterId);
+
+            foreach (ButtonInfo buttonInfo in characterCardButtonReference)
+            {
+                switch (buttonInfo.key)
+                {
+                    case "CharacterCard":
+                        buttonInfo.button.interactable = selectedCharacter.characterId != buttonInfo.value;
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle button key " + buttonInfo.key);
+                        break;
+                }
+            }
+
+            foreach (ButtonInfo buttonInfo in customizationButtonReference)
             {
                 switch (buttonInfo.key)
                 {
@@ -316,10 +343,20 @@ namespace Vi.UI
             characterNameInputField.text = character.characterName;
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
+            
+            if (characterIndex == -1)
+            {
+                if (previewObject) { Destroy(previewObject); }
+                selectedCharacter = default;
+                RefreshButtonInteractability();
+                return;
+            }
+            
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
             if (selectedCharacter.characterModelName != character.characterModelName)
             {
+                RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
                 if (previewObject) { Destroy(previewObject); }
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
@@ -340,8 +377,15 @@ namespace Vi.UI
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
 
+            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            selectedRace = raceAndGenderStrings[0];
+            selectedGender = raceAndGenderStrings[1];
+
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
-            Debug.Log(JsonUtility.ToJson(selectedCharacter));
+            //Debug.Log(JsonUtility.ToJson(selectedCharacter));
+
+            finishCharacterCustomizationButton.onClick.RemoveAllListeners();
+            finishCharacterCustomizationButton.onClick.AddListener(delegate { ApplyCharacterChanges(selectedCharacter); });
 
             RefreshButtonInteractability();
         }
@@ -356,12 +400,11 @@ namespace Vi.UI
             else
                 selectedGender = stringChange;
 
-            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
-            CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == raceAndGender);
+            CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
             if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
-            selectedCharacter.characterModelName = option.skinOptions[0].name;
-            RefreshMaterialsAndEquipmentOptions(raceAndGender);
-            UpdateSelectedCharacter(selectedCharacter);
+            WebRequestManager.Character character = selectedCharacter;
+            character.characterModelName = option.skinOptions[0].name;
+            UpdateSelectedCharacter(character);
         }
 
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
@@ -407,8 +450,9 @@ namespace Vi.UI
 
         public void OnUsernameChange()
         {
-            createCharacterButton.interactable = characterNameInputField.text.Length > 0;
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(characterNameInputField.text + "|0|0");
+            finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
+            selectedCharacter.characterName = characterNameInputField.text;
+            //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(characterNameInputField.text + "|0|0");
         }
 
         public void ReturnToMainMenu()
@@ -416,13 +460,50 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
-        public void OpenCharacterCustomization(WebRequestManager.Character character)
+        public void OpenCharacterCustomization()
         {
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
 
             returnButton.onClick.RemoveAllListeners();
             returnButton.onClick.AddListener(OpenCharacterSelect);
+
+            selectedCharacter = new WebRequestManager.Character();
+            UpdateSelectedCharacter(WebRequestManager.DefaultCharacter);
+            finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
+        }
+
+        private void OpenCharacterCustomization(WebRequestManager.Character character)
+        {
+            characterSelectParent.SetActive(false);
+            characterCustomizationParent.SetActive(true);
+
+            returnButton.onClick.RemoveAllListeners();
+            returnButton.onClick.AddListener(OpenCharacterSelect);
+
+            selectedCharacter = new WebRequestManager.Character();
+            UpdateSelectedCharacter(character);
+            finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
+        }
+
+        public void OpenCharacterSelect()
+        {
+            RefreshCharacterCards();
+
+            characterSelectParent.SetActive(true);
+            characterCustomizationParent.SetActive(false);
+            serverListParent.SetActive(false);
+
+            returnButton.onClick.RemoveAllListeners();
+            returnButton.onClick.AddListener(ReturnToMainMenu);
+
+            UpdateSelectedCharacter(default);
+        }
+
+        public void ApplyCharacterChanges(WebRequestManager.Character character)
+        {
+            WebRequestManager.AddCharacter(character);
+            OpenCharacterSelect();
         }
 
         public void OpenServerBrowser()
@@ -430,16 +511,6 @@ namespace Vi.UI
             characterSelectParent.SetActive(false);
             serverListParent.SetActive(true);
             RefreshServerBrowser();
-        }
-
-        public void OpenCharacterSelect()
-        {
-            characterSelectParent.SetActive(true);
-            characterCustomizationParent.SetActive(false);
-            serverListParent.SetActive(false);
-
-            returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(ReturnToMainMenu);
         }
 
         public void RefreshServerBrowser()
