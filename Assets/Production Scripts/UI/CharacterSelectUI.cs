@@ -314,18 +314,21 @@ namespace Vi.UI
         {
             selectCharacterButton.interactable = true;
             characterNameInputField.text = character.characterName;
-            if (previewObject) { Destroy(previewObject); }
-
-            // Instantiate the player model
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
-            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
-            int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-            animationHandler.SetCharacter(characterIndex, skinIndex);
-
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
+
+            if (selectedCharacter.characterModelName != character.characterModelName)
+            {
+                if (previewObject) { Destroy(previewObject); }
+                // Instantiate the player model
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+                SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
+                int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
+                previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            }
+
+            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
 
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColorName));
