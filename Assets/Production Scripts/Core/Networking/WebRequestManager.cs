@@ -151,7 +151,7 @@ namespace Vi.Core
             }
         }
 
-        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", ""), new Character("Human_Male", "Char B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", "") };
+        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10), new Character("Human_Male", "Char B", 1) };
 
         public struct Character
         {
@@ -164,6 +164,19 @@ namespace Vi.Core
             public string beardName;
             public string browsName;
             public string hairName;
+
+            public Character(string characterModelName, string characterName, int characterLevel)
+            {
+                this.characterModelName = characterModelName;
+                this.characterName = characterName;
+                this.characterLevel = characterLevel;
+                bodyColorName = "";
+                headColorName = "";
+                eyeColorName = "";
+                beardName = "";
+                browsName = "";
+                hairName = "";
+            }
 
             public Character(string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
             {
