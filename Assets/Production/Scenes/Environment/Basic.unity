@@ -251,10 +251,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoints:
   - gameModes: 00000000
-    teams: 09000000
+    teams: 02000000
     spawnPositions:
-    - {x: 0, y: 1, z: 0}
+    - {x: 10, y: 1, z: 0}
+    - {x: -10, y: 1, z: 0}
+    - {x: 0, y: 1, z: 10}
+    - {x: 0, y: 1, z: -10}
     spawnRotations:
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
 --- !u!4 &1251550705
 Transform:
