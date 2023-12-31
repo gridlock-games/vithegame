@@ -162,12 +162,8 @@ namespace Vi.Core
             {
                 foreach (string sceneName in scenePayload.sceneNames)
                 {
-                    if (!SceneManager.GetSceneByName(sceneName).isLoaded)
-                    {
-                        return false;
-                    }
+                    if (!SceneManager.GetSceneByName(sceneName).isLoaded) { return false; }
                 }
-
                 if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
 
