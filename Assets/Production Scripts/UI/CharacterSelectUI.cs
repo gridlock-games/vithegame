@@ -313,7 +313,7 @@ namespace Vi.UI
                         buttonInfo.button.interactable = selectedCharacter.bodyColorName != buttonInfo.value;
                         break;
                     case "Brows":
-                        buttonInfo.button.interactable = selectedCharacter.hairName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hairName;
+                        buttonInfo.button.interactable = selectedCharacter.browsName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.browsName;
                         break;
                     case "Head":
                         buttonInfo.button.interactable = selectedCharacter.headColorName != buttonInfo.value;
