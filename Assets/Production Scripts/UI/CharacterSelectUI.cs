@@ -67,8 +67,6 @@ namespace Vi.UI
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter.characterId);
-
-            RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender.HumanMale);
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -117,7 +115,7 @@ namespace Vi.UI
             }
         }
 
-        private void RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender raceAndGender)
+        private void ClearMaterialsAndEquipmentOptions()
         {
             foreach (MaterialCustomizationParent materialCustomizationParent in characterMaterialParents)
             {
@@ -142,7 +140,11 @@ namespace Vi.UI
                 Destroy(buttonInfo.button.gameObject);
             }
             customizationButtonReference.Clear();
+        }
 
+        private void RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender raceAndGender)
+        {
+            ClearMaterialsAndEquipmentOptions();
 
             leftYLocalPosition = leftStartOffset;
             rightYLocalPosition = rightStartOffset;
@@ -354,9 +356,10 @@ namespace Vi.UI
             
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
-            if (selectedCharacter.characterModelName != character.characterModelName)
+            bool shouldCreateNewModel = selectedCharacter.characterModelName != character.characterModelName;
+            if (shouldCreateNewModel)
             {
-                RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
+                ClearMaterialsAndEquipmentOptions();
                 if (previewObject) { Destroy(previewObject); }
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
@@ -372,6 +375,13 @@ namespace Vi.UI
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.headColorName));
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColorName));
 
+            StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
+        }
+
+        private IEnumerator ApplyEquipment(WebRequestManager.Character character, CharacterReference.PlayerModelOption playerModelOption, bool shouldRefreshEquipmentOptions)
+        {
+            yield return null;
+            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beardName));
             animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
@@ -380,9 +390,9 @@ namespace Vi.UI
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
             selectedGender = raceAndGenderStrings[1];
+            if (shouldRefreshEquipmentOptions) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
-            //Debug.Log(JsonUtility.ToJson(selectedCharacter));
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { ApplyCharacterChanges(selectedCharacter); });

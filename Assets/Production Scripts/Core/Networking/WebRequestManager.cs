@@ -171,17 +171,13 @@ namespace Vi.Core
             {
                 int i = 1;
                 character.characterId = i.ToString();
-                while (PlayerPrefs.HasKey("Character " + i.ToString()))
+                while (PlayerPrefs.HasKey("Character " + character.characterId))
                 {
                     character.characterId = i.ToString();
                     i++;
                 }
-                PlayerPrefs.SetString("Character " + i.ToString(), JsonUtility.ToJson(character));
             }
-            else
-            {
-                PlayerPrefs.SetString("Character " + character.characterId.ToString(), JsonUtility.ToJson(character));
-            }
+            PlayerPrefs.SetString("Character " + character.characterId, JsonUtility.ToJson(character));
         }
 
         public static Character DefaultCharacter { get; private set; } = new Character()
