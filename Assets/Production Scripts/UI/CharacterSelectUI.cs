@@ -471,6 +471,7 @@ namespace Vi.UI
 
         public void OpenCharacterCustomization()
         {
+            returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
 
@@ -484,6 +485,7 @@ namespace Vi.UI
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
         {
+            returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
 
@@ -499,6 +501,7 @@ namespace Vi.UI
         {
             RefreshCharacterCards();
 
+            returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(true);
             characterCustomizationParent.SetActive(false);
             serverListParent.SetActive(false);
@@ -517,6 +520,7 @@ namespace Vi.UI
 
         public void OpenServerBrowser()
         {
+            returnButton.gameObject.SetActive(false);
             characterSelectParent.SetActive(false);
             serverListParent.SetActive(true);
             RefreshServerBrowser();
