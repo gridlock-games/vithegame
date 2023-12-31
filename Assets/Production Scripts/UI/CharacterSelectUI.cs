@@ -344,8 +344,10 @@ namespace Vi.UI
             selectCharacterButton.interactable = true;
             characterNameInputField.text = character.characterName;
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            int characterIndex = System.Array.FindIndex(playerModelOptionList, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == character.characterModelName) != -1);
-            
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
             if (characterIndex == -1)
             {
                 if (previewObject) { Destroy(previewObject); }
@@ -364,7 +366,6 @@ namespace Vi.UI
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
-                int skinIndex = System.Array.FindIndex(playerModelOptionList[characterIndex].skinOptions, skinItem => skinItem.name == character.characterModelName);
                 previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             }
 
@@ -542,6 +543,7 @@ namespace Vi.UI
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
             NetworkManager.Singleton.StartClient();
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(JsonUtility.ToJson(selectedCharacter));
         }
 
         private void OnDrawGizmos()

@@ -303,43 +303,6 @@ namespace Vi.Core
         public static PlayerDataManager Singleton { get { return _singleton; } }
         private static PlayerDataManager _singleton;
 
-        private const char payloadParseString = '|';
-
-        public struct ParsedConnectionData
-        {
-            public string playerName;
-            public int characterIndex;
-            public int skinIndex;
-
-            public ParsedConnectionData(string playerName, int characterIndex, int skinIndex)
-            {
-                this.playerName = playerName;
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
-            }
-        }
-
-        public static ParsedConnectionData ParseConnectionData(byte[] connectionData)
-        {
-            string payload = System.Text.Encoding.ASCII.GetString(connectionData);
-            string[] payloadOptions = payload.Split(payloadParseString);
-
-            string playerName = "Player Name";
-            int characterIndex = 0;
-            int skinIndex = 0;
-
-            if (payloadOptions.Length > 0) { playerName = payloadOptions[0]; }
-            if (payloadOptions.Length > 1) { int.TryParse(payloadOptions[1], out characterIndex); }
-            if (payloadOptions.Length > 2) { int.TryParse(payloadOptions[2], out skinIndex); }
-
-            return new ParsedConnectionData(playerName, characterIndex, skinIndex);
-        }
-
-        public static void SetConnectionData(ParsedConnectionData connectionData)
-        {
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData.playerName + payloadParseString + connectionData.characterIndex + payloadParseString + connectionData.skinIndex);
-        }
-
         private void Awake()
         {
             _singleton = this;
@@ -404,19 +367,22 @@ namespace Vi.Core
 
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
-            if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.playerName + "'s data has been added.");
+                if (IsServer)
                 {
-                    StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                    if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                    {
+                        StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                    }
                 }
             }
         }
 
         private void OnClientConnectCallback(ulong clientId)
         {
-
+            Debug.Log("Id: " + clientId + " has connected.");
         }
 
         public void RespawnPlayer(Attributes attributesToRespawn)
@@ -485,6 +451,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).playerName + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
         }
 

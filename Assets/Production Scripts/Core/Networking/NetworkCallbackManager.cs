@@ -60,15 +60,19 @@ namespace Vi.Core.SceneManagement
             // once it transitions from true to false the connection approval response will be processed.
             response.Pending = false;
 
-            PlayerDataManager.ParsedConnectionData parsedConnectionData = PlayerDataManager.ParseConnectionData(connectionData);
-
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
+            Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
+
+            WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
 
             PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, parsedConnectionData.playerName,
-                parsedConnectionData.characterIndex,
-                parsedConnectionData.skinIndex,
+            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, character.characterName,
+                characterIndex,
+                skinIndex,
                 clientTeam,
                 1,
                 2)));
@@ -94,7 +98,7 @@ namespace Vi.Core.SceneManagement
         private void OnClientStarted()
         {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port);
+            Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
         }
 
         private void OnClientStopped(bool test)

@@ -190,6 +190,14 @@ namespace Vi.ScriptableObjects
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
 
+        public KeyValuePair<int, int> GetPlayerModelOptionIndices(string characterModelName)
+        {
+            int characterIndex = System.Array.FindIndex(playerModelOptions, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == characterModelName) != -1);
+            if (characterIndex == -1) { return new KeyValuePair<int, int>(characterIndex, -1); }
+            int skinIndex = System.Array.FindIndex(playerModelOptions[characterIndex].skinOptions, skinItem => skinItem.name == characterModelName);
+            return new KeyValuePair<int, int>(characterIndex, skinIndex);
+        }
+
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
         public List<WearableEquipmentOption> GetWearableEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
