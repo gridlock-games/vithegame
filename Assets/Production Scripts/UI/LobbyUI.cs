@@ -127,10 +127,13 @@ namespace Vi.UI
                             NetSceneManager.Singleton.LoadScene("Free For All");
                             break;
                         case PlayerDataManager.GameMode.TeamElimination:
+                            NetSceneManager.Singleton.LoadScene("Team Elimination");
                             break;
                         case PlayerDataManager.GameMode.EssenceWar:
+                            NetSceneManager.Singleton.LoadScene("Essence War");
                             break;
                         case PlayerDataManager.GameMode.OutputRush:
+                            NetSceneManager.Singleton.LoadScene("Outpost Rush");
                             break;
                         default:
                             Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
