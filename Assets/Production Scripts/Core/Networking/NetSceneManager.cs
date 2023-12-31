@@ -157,7 +157,7 @@ namespace Vi.Core
 
         public bool ShouldSpawnPlayer()
         {
-            int counter = 0;
+            bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
             {
                 foreach (string sceneName in scenePayload.sceneNames)
@@ -167,10 +167,11 @@ namespace Vi.Core
                         return false;
                     }
                 }
-                counter++;
+
+                if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
 
-            return counter > 1;
+            return gameplaySceneIsLoaded;
         }
 
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
