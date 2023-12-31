@@ -13,8 +13,8 @@ namespace Vi.Core.SceneManagement
 
         private void Awake()
         {
-            Screen.SetResolution(1920, 1080, Screen.fullScreenMode, Screen.currentResolution.refreshRate);
-            Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            //Screen.SetResolution(1920, 1080, Screen.fullScreenMode, Screen.currentResolution.refreshRate);
+            //Application.targetFrameRate = Screen.currentResolution.refreshRate;
         }
 
         private void Start()

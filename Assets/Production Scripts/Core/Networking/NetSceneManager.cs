@@ -157,7 +157,7 @@ namespace Vi.Core
 
         public bool ShouldSpawnPlayer()
         {
-            return currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay).Count > 0;
+            return currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment).Count > 0;
         }
 
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();

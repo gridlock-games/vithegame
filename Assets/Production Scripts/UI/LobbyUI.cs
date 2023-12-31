@@ -121,7 +121,23 @@ namespace Vi.UI
             {
                 if (prev > 0 & current <= 0)
                 {
-                    NetSceneManager.Singleton.LoadScene("Free For All");
+                    switch (PlayerDataManager.Singleton.GetGameMode())
+                    {
+                        case PlayerDataManager.GameMode.FreeForAll:
+                            NetSceneManager.Singleton.LoadScene("Free For All");
+                            break;
+                        case PlayerDataManager.GameMode.TeamElimination:
+                            break;
+                        case PlayerDataManager.GameMode.EssenceWar:
+                            break;
+                        case PlayerDataManager.GameMode.OutputRush:
+                            break;
+                        default:
+                            Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
+                            break;
+                    }
+
+                    NetSceneManager.Singleton.LoadScene(PlayerDataManager.Singleton.GetMapName());
                 }
             }
         }
