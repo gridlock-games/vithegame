@@ -23,6 +23,12 @@ namespace Vi.Core.SceneManagement
             Instantiate(networkSceneManagerPrefab.gameObject);
             Instantiate(playerDataManagerPrefab.gameObject);
             NetSceneManager.Singleton.LoadScene("Main Menu");
+
+            NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+            NetworkManager.Singleton.OnServerStopped += OnServerStopped;
+            NetworkManager.Singleton.OnClientStarted += OnClientStarted;
+            NetworkManager.Singleton.OnServerStopped += OnClientStopped;
+            NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -72,6 +78,33 @@ namespace Vi.Core.SceneManagement
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             PlayerDataManager.Singleton.AddPlayerData(playerData);
+        }
+
+        private void OnServerStarted()
+        {
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+        }
+
+        private void OnServerStopped(bool test)
+        {
+            Debug.Log("Stopped Server " + test);
+        }
+
+        private void OnClientStarted()
+        {
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port);
+        }
+
+        private void OnClientStopped(bool test)
+        {
+            Debug.Log("Stopped Client " + test);
+        }
+
+        private void OnTransportFailure()
+        {
+            Debug.Log("Transport failure at time: " + Time.time);
         }
     }
 }

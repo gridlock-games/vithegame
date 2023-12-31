@@ -462,7 +462,6 @@ namespace Vi.UI
         {
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectedCharacter.characterName = characterNameInputField.text;
-            //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(characterNameInputField.text + "|0|0");
         }
 
         public void ReturnToMainMenu()
