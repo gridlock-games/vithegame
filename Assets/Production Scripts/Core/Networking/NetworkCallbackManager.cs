@@ -63,6 +63,7 @@ namespace Vi.Core.SceneManagement
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
+            // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
             WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
             int characterIndex = kvp.Key;
