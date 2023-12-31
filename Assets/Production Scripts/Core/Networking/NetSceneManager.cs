@@ -166,7 +166,6 @@ namespace Vi.Core
                 }
                 if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
-
             return gameplaySceneIsLoaded;
         }
 
