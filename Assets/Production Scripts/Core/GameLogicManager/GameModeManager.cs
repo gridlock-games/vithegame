@@ -59,7 +59,6 @@ namespace Vi.Core.GameModeManagers
         private bool isFirstRound = true;
         protected virtual void OnRoundStart()
         {
-            Debug.Log("Round Start");
             for (int i = 0; i < scoreList.Count; i++)
             {
                 PlayerScore playerScore = scoreList[i];
