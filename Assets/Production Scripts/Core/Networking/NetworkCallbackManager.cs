@@ -63,15 +63,27 @@ namespace Vi.Core.SceneManagement
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
+            string playerName = "Player Name";
+            int characterIndex = 0;
+            int skinIndex = 0;
+
             // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
+            try
+            {
+                WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
+                KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
+                characterIndex = kvp.Key;
+                skinIndex = kvp.Value;
+                playerName = character.characterName;
+            }
+            catch
+            {
+
+            }
 
             PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, character.characterName,
+            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName,
                 characterIndex,
                 skinIndex,
                 clientTeam,
