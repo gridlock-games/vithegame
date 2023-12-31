@@ -46,7 +46,7 @@ namespace Vi.Core
             }
             catch
             {
-                Servers = new List<Server>() { new Server("", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+                Servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
 
             getRequest.Dispose();
