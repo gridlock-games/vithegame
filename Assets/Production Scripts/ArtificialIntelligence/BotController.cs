@@ -190,7 +190,7 @@ namespace Vi.ArtificialIntelligence
 
         private void UpdateLocomotion()
         {
-            if (Vector3.Distance(transform.position, currentPosition.Value) > 4)
+            if (Vector3.Distance(transform.position, currentPosition.Value) > 2)
             {
                 //Debug.Log("Teleporting player: " + OwnerClientId);
                 transform.position = currentPosition.Value;
