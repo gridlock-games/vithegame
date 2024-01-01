@@ -74,7 +74,7 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value);
+            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
             Quaternion newRotation = currentRotation.Value;
             //if (IsOwner)
             //{
