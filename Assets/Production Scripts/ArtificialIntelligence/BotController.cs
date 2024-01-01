@@ -77,7 +77,7 @@ namespace Vi.ArtificialIntelligence
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
-
+            
             Vector3 lookDirection = inputDir.normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
@@ -211,5 +211,11 @@ namespace Vi.ArtificialIntelligence
                 transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
         }
 
+        void OnDodge()
+        {
+            Vector3 moveInput = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z), transform.forward, Vector3.up);
+            animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
     }
 }
