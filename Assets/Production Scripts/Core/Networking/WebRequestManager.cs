@@ -12,7 +12,7 @@ namespace Vi.Core
         public static List<Server> Servers { get; private set; } = new List<Server>();
 
         public static bool IsRefreshingServers { get; private set; }
-        public static IEnumerator GetRequest()
+        public static IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
@@ -22,7 +22,7 @@ namespace Vi.Core
             Servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.GetRequest() " + serverAPIURL);
+                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + serverAPIURL);
                 getRequest.Dispose();
                 yield break;
             }
@@ -53,7 +53,7 @@ namespace Vi.Core
             IsRefreshingServers = false;
         }
 
-        public static IEnumerator PutRequest(ServerPutPayload payload)
+        public static IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -64,12 +64,12 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.PutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
             }
             putRequest.Dispose();
         }
 
-        public static IEnumerator PostRequest(ServerPostPayload payload)
+        public static IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
@@ -84,7 +84,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.PostRequest()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.ServerPostRequest()" + postRequest.error);
             }
             postRequest.Dispose();
         }
@@ -151,6 +151,54 @@ namespace Vi.Core
             }
         }
 
+        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api";
+
+
+        public static List<Character> Characters { get; private set; } = new List<Character>();
+
+        public static bool IsRefreshingCharacters { get; private set; }
+        public static IEnumerator CharacterGetRequest()
+        {
+            if (IsRefreshingCharacters) { yield break; }
+            IsRefreshingCharacters = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL);
+            yield return getRequest.SendWebRequest();
+
+            Characters.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL);
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            Debug.Log(json);
+            try
+            {
+                if (json != "[]")
+                {
+                    foreach (string jsonSplit in json.Split("},"))
+                    {
+                        string finalJsonElement = jsonSplit;
+                        if (finalJsonElement[0] == '[')
+                            finalJsonElement = finalJsonElement.Remove(0, 1);
+                        if (finalJsonElement[^1] == ']')
+                            finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
+                        if (finalJsonElement[^1] != '}')
+                            finalJsonElement += "}";
+                        //Characters.Add(JsonUtility.FromJson<Character>(finalJsonElement));
+                    }
+                }
+            }
+            catch
+            {
+                Characters = new List<Character>() { DefaultCharacter, DefaultCharacter };
+            }
+
+            getRequest.Dispose();
+            IsRefreshingCharacters = false;
+        }
+
         public static List<Character> GetCharacters()
         {
             List<Character> characterList = new List<Character>();
@@ -183,9 +231,9 @@ namespace Vi.Core
         public static Character DefaultCharacter { get; private set; } = new Character()
         {
             characterId = "",
-            characterModelName = "Human_Male",
-            characterName = "",
-            characterLevel = 1,
+            model = "Human_Male",
+            name = "",
+            experience = 1,
             bodyColorName = "",
             headColorName = "",
             eyeColorName = "",
@@ -197,22 +245,25 @@ namespace Vi.Core
         public struct Character : System.IEquatable<Character>
         {
             public string characterId;
-            public string characterModelName;
-            public string characterName;
-            public int characterLevel;
+            public int slot;
+            public string model;
+            public string name;
+            public int experience;
             public string bodyColorName;
             public string headColorName;
             public string eyeColorName;
             public string beardName;
             public string browsName;
             public string hairName;
+            //private string dateCreated;
 
             public Character(string characterId, string characterModelName, string characterName, int characterLevel)
             {
+                slot = 0;
                 this.characterId = characterId;
-                this.characterModelName = characterModelName;
-                this.characterName = characterName;
-                this.characterLevel = characterLevel;
+                this.model = characterModelName;
+                this.name = characterName;
+                this.experience = characterLevel;
                 bodyColorName = "";
                 headColorName = "";
                 eyeColorName = "";
@@ -223,10 +274,11 @@ namespace Vi.Core
 
             public Character(string characterId, string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
             {
+                slot = 0;
                 this.characterId = characterId;
-                this.characterModelName = characterModelName;
-                this.characterName = characterName;
-                this.characterLevel = characterLevel;
+                this.model = characterModelName;
+                this.name = characterName;
+                this.experience = characterLevel;
                 this.bodyColorName = bodyColorName;
                 this.headColorName = headColorName;
                 this.eyeColorName = eyeColorName;

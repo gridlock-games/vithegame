@@ -342,9 +342,9 @@ namespace Vi.UI
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
             selectCharacterButton.interactable = true;
-            characterNameInputField.text = character.characterName;
+            characterNameInputField.text = character.name;
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
@@ -358,7 +358,7 @@ namespace Vi.UI
             
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
-            bool shouldCreateNewModel = selectedCharacter.characterModelName != character.characterModelName;
+            bool shouldCreateNewModel = selectedCharacter.model != character.model;
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -414,7 +414,7 @@ namespace Vi.UI
             CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
             if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
             WebRequestManager.Character character = selectedCharacter;
-            character.characterModelName = option.skinOptions[0].name;
+            character.model = option.skinOptions[0].name;
             UpdateSelectedCharacter(character);
         }
 
@@ -432,7 +432,8 @@ namespace Vi.UI
 
         private void Start()
         {
-            StartCoroutine(WebRequestManager.GetRequest());
+            StartCoroutine(WebRequestManager.ServerGetRequest());
+            StartCoroutine(WebRequestManager.CharacterGetRequest());
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
@@ -462,7 +463,7 @@ namespace Vi.UI
         public void OnUsernameChange()
         {
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectedCharacter.characterName = characterNameInputField.text;
+            selectedCharacter.name = characterNameInputField.text;
         }
 
         public void ReturnToMainMenu()
@@ -529,7 +530,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            StartCoroutine(WebRequestManager.GetRequest());
+            StartCoroutine(WebRequestManager.ServerGetRequest());
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);

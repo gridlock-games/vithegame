@@ -71,10 +71,10 @@ namespace Vi.Core.SceneManagement
             try
             {
                 WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
-                KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.characterModelName);
+                KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
                 characterIndex = kvp.Key;
                 skinIndex = kvp.Value;
-                playerName = character.characterName;
+                playerName = character.name;
             }
             catch
             {

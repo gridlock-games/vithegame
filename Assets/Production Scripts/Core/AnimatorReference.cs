@@ -17,7 +17,7 @@ namespace Vi.Core
         {
             MaterialReplacementDefintion browsReplacementDefinition = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Brows);
 
-            return new WebRequestManager.Character(currentCharacter.characterId, name.Replace("(Clone)", ""), currentCharacter.characterName, currentCharacter.characterLevel,
+            return new WebRequestManager.Character(currentCharacter.characterId, name.Replace("(Clone)", ""), currentCharacter.name, currentCharacter.experience,
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Body).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Head).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Eyes).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
