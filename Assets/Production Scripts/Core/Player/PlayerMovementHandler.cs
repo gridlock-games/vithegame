@@ -219,14 +219,19 @@ namespace Vi.Player
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
-            //Debug.Log(OwnerClientId + " " + movementPrediction.CurrentPosition + " " + movementPredictionRigidbody.position);
-            // Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition)
-            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
-            movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+            if (Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition) > 4)
+            {
+                movementPredictionRigidbody.position = movementPrediction.CurrentPosition;
+            }
+            else
+            {
+                Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
+                movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
-            //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
-            //if (angle > 180.0f) angle -= 360.0f;
-            //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
+                //if (angle > 180.0f) angle -= 360.0f;
+                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+            }
         }
 
         private void UpdateLocomotion()
