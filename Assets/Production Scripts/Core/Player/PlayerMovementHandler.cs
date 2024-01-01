@@ -28,6 +28,13 @@ namespace Vi.Player
         public void SetPredictionRigidbodyPosition(Vector3 newPosition)
         {
             movementPredictionRigidbody.position = newPosition;
+            SetPredictionRigidbodyPositionClientRpc(newPosition);
+        }
+
+        [ClientRpc]
+        private void SetPredictionRigidbodyPositionClientRpc(Vector3 newPosition)
+        {
+            movementPredictionRigidbody.position = newPosition;
         }
 
         public void SetCameraRotation(float rotationX, float rotationY)
