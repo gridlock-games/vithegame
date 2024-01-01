@@ -9,9 +9,6 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotController : MovementHandler
     {
-        [SerializeField] private bool moveToPlayer;
-        [SerializeField] private bool canLightAttack;
-
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
