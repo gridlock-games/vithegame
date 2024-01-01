@@ -28,13 +28,6 @@ namespace Vi.Player
         public void SetPredictionRigidbodyPosition(Vector3 newPosition)
         {
             movementPredictionRigidbody.position = newPosition;
-            SetPredictionRigidbodyPositionClientRpc(newPosition);
-        }
-
-        [ClientRpc]
-        private void SetPredictionRigidbodyPositionClientRpc(Vector3 newPosition)
-        {
-            movementPredictionRigidbody.position = newPosition;
         }
 
         public void SetCameraRotation(float rotationX, float rotationY)
@@ -136,9 +129,9 @@ namespace Vi.Player
                     if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
                     {
                         Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                         {
-                            //Debug.Log(Time.time + " climbing stairs");
+                            Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
                             movement.y += stairHeight / 2;
                         }
                     }
@@ -226,6 +219,8 @@ namespace Vi.Player
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
+            //Debug.Log(OwnerClientId + " " + movementPrediction.CurrentPosition + " " + movementPredictionRigidbody.position);
+            // Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition)
             Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
             movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
