@@ -11,9 +11,6 @@ namespace Vi.ArtificialIntelligence
     public class BotController : MovementHandler
     {
         [SerializeField] private Rigidbody networkColliderRigidbody;
-        private NavMeshAgent navMeshAgent;
-        private Attributes attributes;
-        private AnimationHandler animationHandler;
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
@@ -39,12 +36,17 @@ namespace Vi.ArtificialIntelligence
             if (IsServer) { NetworkManager.NetworkTickSystem.Tick -= ProcessMovementTick; }
         }
 
+        private NavMeshAgent navMeshAgent;
+        private Attributes attributes;
+        private AnimationHandler animationHandler;
+        private WeaponHandler weaponHandler;
         private new void Start()
         {
             base.Start();
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             navMeshAgent = GetComponent<NavMeshAgent>();
+            weaponHandler = GetComponent<WeaponHandler>();
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
@@ -75,23 +77,17 @@ namespace Vi.ArtificialIntelligence
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
-            Quaternion newRotation = currentRotation.Value;
-            //if (IsOwner)
-            //{
-            //    Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
-            //    camDirection.Scale(HORIZONTAL_PLANE);
 
-            //    if (attributes.ShouldApplyAilmentRotation())
-            //        newRotation = attributes.GetAilmentRotation();
-            //    if (weaponHandler.IsAiming())
-            //        newRotation = Quaternion.LookRotation(camDirection);
-            //    else
-            //        newRotation = Quaternion.RotateTowards(inputPayload.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
-            //}
-            //else
-            //{
-            //    newRotation = inputPayload.rotation;
-            //}
+            Vector3 lookDirection = inputDir.normalized;
+            lookDirection.Scale(HORIZONTAL_PLANE);
+
+            Quaternion newRotation;
+            if (attributes.ShouldApplyAilmentRotation())
+                newRotation = attributes.GetAilmentRotation();
+            if (weaponHandler.IsAiming())
+                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+            else
+                newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity
             RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
@@ -156,6 +152,7 @@ namespace Vi.ArtificialIntelligence
             }
 
             currentPosition.Value += movement + gravity;
+            currentRotation.Value = newRotation;
             navMeshAgent.nextPosition = currentPosition.Value;
         }
 
@@ -204,14 +201,14 @@ namespace Vi.ArtificialIntelligence
                 transform.position += movement;
             }
 
-            //animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
 
-            //if (attributes.ShouldApplyAilmentRotation())
-            //    transform.rotation = attributes.GetAilmentRotation();
-            //else if (weaponHandler.IsAiming())
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-            //else
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
+            if (attributes.ShouldApplyAilmentRotation())
+                transform.rotation = attributes.GetAilmentRotation();
+            else if (weaponHandler.IsAiming())
+                transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
+            else
+                transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
         }
 
     }
