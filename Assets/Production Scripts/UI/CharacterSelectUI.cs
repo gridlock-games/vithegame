@@ -14,6 +14,7 @@ namespace Vi.UI
     public class CharacterSelectUI : MonoBehaviour
     {
         [SerializeField] private Button returnButton;
+        [SerializeField] private Text webRequestStatusText;
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -74,15 +75,18 @@ namespace Vi.UI
 
         private IEnumerator RefreshCharacterCards()
         {
-            addCharacterButton.interactable = false;
-            yield return WebRequestManager.CharacterGetRequest();
-            addCharacterButton.interactable = true;
-
             foreach (Transform child in characterCardParent)
             {
                 Destroy(child.gameObject);
             }
             characterCardButtonReference.Clear();
+
+            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.text = "LOADING CHARACTERS";
+            addCharacterButton.interactable = false;
+            yield return WebRequestManager.CharacterGetRequest();
+            addCharacterButton.interactable = true;
+            webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
             foreach (WebRequestManager.Character character in WebRequestManager.Characters)
