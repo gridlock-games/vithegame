@@ -228,11 +228,11 @@ namespace Vi.Core
             CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
                 character.bodyColor, character.beard, character.brows, character.name, character.model);
 
-            WWWForm form = new WWWForm();
-            form.AddField("userId", payload.userId);
-            form.AddField("character", JsonUtility.ToJson(payload.character));
-            
-            UnityWebRequest postRequest = UnityWebRequest.Post(characterAPIURL + "createCharacterCosmetic", form);
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(characterAPIURL + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
