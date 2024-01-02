@@ -239,7 +239,6 @@ namespace Vi.Core
             {
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
             }
-
             postRequest.Dispose();
         }
 
