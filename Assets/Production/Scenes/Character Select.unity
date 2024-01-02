@@ -510,6 +510,7 @@ MonoBehaviour:
     type: 3}
   characterCardParent: {fileID: 1423855018}
   selectCharacterButton: {fileID: 619500212}
+  addCharacterButton: {fileID: 1527333622}
   characterCustomizationParent: {fileID: 1643527852}
   characterCustomizationRowPrefab: {fileID: 7883363755214482134, guid: 0e3910f502f5ac649a8bd98da8ad3d52,
     type: 3}
@@ -2467,6 +2468,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1527333620}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1527333622 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114395952271827194, guid: 9706d19e551117749b0ca82bb6c48214,
+    type: 3}
+  m_PrefabInstance: {fileID: 1527333620}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1643527852
 GameObject:
   m_ObjectHideFlags: 0

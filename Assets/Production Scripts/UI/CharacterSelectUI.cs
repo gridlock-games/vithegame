@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private CharacterCard characterCardPrefab;
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
+        [SerializeField] private Button addCharacterButton;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -73,7 +74,9 @@ namespace Vi.UI
 
         private IEnumerator RefreshCharacterCards()
         {
+            addCharacterButton.interactable = false;
             yield return WebRequestManager.CharacterGetRequest();
+            addCharacterButton.interactable = true;
 
             foreach (Transform child in characterCardParent)
             {
@@ -516,7 +519,8 @@ namespace Vi.UI
 
         public void ApplyCharacterChanges(WebRequestManager.Character character)
         {
-            WebRequestManager.AddCharacter(character);
+            Debug.Log("TODO Fix add character here");
+            //WebRequestManager.AddCharacter(character);
             OpenCharacterSelect();
         }
 
