@@ -204,6 +204,25 @@ namespace Vi.Core
             IsRefreshingCharacters = false;
         }
 
+        public IEnumerator CharacterPutRequest(Character character)
+        {
+            CharacterPutPayload payload = new CharacterPutPayload(character._id, character.slot, character.eyeColor, character.hair,
+                character.bodyColor, character.beard, character.brows, character.name, character.model);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "updateCharacterCosmetic", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
         public IEnumerator CharacterPostRequest(Character character)
         {
             CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
@@ -320,6 +339,32 @@ namespace Vi.Core
                 public string brows;
                 public string name;
                 public string model;
+            }
+        }
+
+        private struct CharacterPutPayload
+        {
+            public string id;
+            public int slot;
+            public string eyeColor;
+            public string hair;
+            public string bodyColor;
+            public string beard;
+            public string brows;
+            public string name;
+            public string model;
+
+            public CharacterPutPayload(string id, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            {
+                this.id = id;
+                this.slot = slot;
+                this.eyeColor = eyeColor;
+                this.hair = hair;
+                this.bodyColor = bodyColor;
+                this.beard = beard;
+                this.brows = brows;
+                this.name = name;
+                this.model = model;
             }
         }
     }

@@ -485,6 +485,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
+        private bool isEditingExistingCharacter;
         public void OpenCharacterCustomization()
         {
             returnButton.gameObject.SetActive(true);
@@ -497,6 +498,7 @@ namespace Vi.UI
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
+            isEditingExistingCharacter = false;
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -511,6 +513,7 @@ namespace Vi.UI
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(character);
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
+            isEditingExistingCharacter = true;
         }
 
         public void OpenCharacterSelect()
@@ -536,7 +539,7 @@ namespace Vi.UI
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
-            yield return WebRequestManager.Singleton.CharacterPostRequest(character);
+            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
