@@ -88,7 +88,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            addCharacterButton.interactable = true;
+            addCharacterButton.interactable = WebRequestManager.Singleton.Characters.Count < 5;
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
