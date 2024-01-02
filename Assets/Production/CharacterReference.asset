@@ -14,11 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerModelOptions:
   - raceAndGender: 0
-    name: Human Male
-    weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-    role: Greatsword
-    characterDescription: 
-    characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
     playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
       type: 3}
     botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
@@ -26,66 +21,23 @@ MonoBehaviour:
     skinOptions:
     - {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137, type: 3}
   - raceAndGender: 1
-    name: Human Female
-    weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-    role: Greatsword
-    characterDescription: 
-    characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
     playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
       type: 3}
     botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
       type: 3}
     skinOptions:
     - {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43, type: 3}
-  - raceAndGender: 0
-    name: Helsing
-    weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
-    role: Crossbow
-    characterDescription: 
-    characterImage: {fileID: 21300000, guid: ec62a4f0d6a8cb2459625b6c8a7bc042, type: 3}
-    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
-      type: 3}
-    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-      type: 3}
-    skinOptions:
-    - {fileID: 3181106131262141013, guid: 36081722d2a78cf4eb14553de1e7a2ec, type: 3}
-    - {fileID: 8232781601153318563, guid: 0cf368fca1eebcd48852c56208dcc6f3, type: 3}
-    - {fileID: 1493083935296309335, guid: cae1d3c5dbfc8f747a0c239d66a10754, type: 3}
-  - raceAndGender: 0
-    name: Malakas
-    weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
-    role: Brawler
-    characterDescription: 
-    characterImage: {fileID: 21300000, guid: 30b5f5d9330c6b44c8b2b8584e6508a6, type: 3}
-    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
-      type: 3}
-    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-      type: 3}
-    skinOptions:
-    - {fileID: 4663695231397878171, guid: 2805314ff8f78f142b8e0151137a3430, type: 3}
-    - {fileID: 6231887737971820693, guid: 4dbb29eae47f9f14e9c72544e1a66aa0, type: 3}
-  - raceAndGender: 0
-    name: Guinevere
-    weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-    role: Greatsword
-    characterDescription: 
-    characterImage: {fileID: 21300000, guid: 84b3d2b7e25852341a2cb047da97cd80, type: 3}
-    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
-      type: 3}
-    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-      type: 3}
-    skinOptions:
-    - {fileID: 2254751552651625958, guid: 856c1c4927e00484bb6cbf8713c8d538, type: 3}
-    - {fileID: 9203835464716394589, guid: ba5428fd1d7e791419f8b5ae6f1e4a03, type: 3}
-    - {fileID: 7878422891106188551, guid: b1f6e1c53d5fcfa4389b2c4bae52e2b7, type: 3}
   weaponOptions:
-  - animationController: {fileID: 22100000, guid: 57913356d0e72f74d9e4d2960e45cecd,
+  - weaponIcon: {fileID: 21300000, guid: dc0f869ac96783d46971b97069a861cb, type: 3}
+    animationController: {fileID: 22100000, guid: 57913356d0e72f74d9e4d2960e45cecd,
       type: 2}
     weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
-  - animationController: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
+  - weaponIcon: {fileID: 21300000, guid: e194add8f015c9e40ba63385dcac282d, type: 3}
+    animationController: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
       type: 2}
     weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-  - animationController: {fileID: 22100000, guid: fa5b32109bd18054b881861885a53fbc,
+  - weaponIcon: {fileID: 21300000, guid: 9fb685fb4ad54e6468d5fcefa48b0fc9, type: 3}
+    animationController: {fileID: 22100000, guid: fa5b32109bd18054b881861885a53fbc,
       type: 2}
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
   equipmentOptions:

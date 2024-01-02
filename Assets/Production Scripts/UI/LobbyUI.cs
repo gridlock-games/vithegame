@@ -15,10 +15,6 @@ namespace Vi.UI
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
-        //[SerializeField] private CharacterSelectElement characterSelectElement;
-        [SerializeField] private Transform characterSelectGridParent;
-        [SerializeField] private Text characterNameText;
-        [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
         [SerializeField] private Button lockCharacterButton;
@@ -33,9 +29,6 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
         [SerializeField] private TMP_Dropdown teamDropdown;
-
-        private readonly float size = 200;
-        private readonly int height = 2;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -75,24 +68,6 @@ namespace Vi.UI
             int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
             gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
             ChangeGameMode();
-
-            // Player models
-            CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            Quaternion rotation = Quaternion.Euler(0, 0, -45);
-            int characterIndex = 0;
-            for (int x = 0; x < playerModelOptions.Length; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (characterIndex >= playerModelOptions.Length) { return; }
-
-                    Vector3 pos = new Vector3(x * size - size, y * size, 0);
-                    //GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
-                    //g.transform.localPosition = rotation * pos;
-                    //g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
-                    characterIndex++;
-                }
-            }
         }
 
         public static string FromCamelCase(string inputString)
@@ -146,7 +121,26 @@ namespace Vi.UI
             {
                 if (prev > 0 & current <= 0)
                 {
-                    NetSceneManager.Singleton.LoadScene("Free For All");
+                    switch (PlayerDataManager.Singleton.GetGameMode())
+                    {
+                        case PlayerDataManager.GameMode.FreeForAll:
+                            NetSceneManager.Singleton.LoadScene("Free For All");
+                            break;
+                        case PlayerDataManager.GameMode.TeamElimination:
+                            NetSceneManager.Singleton.LoadScene("Team Elimination");
+                            break;
+                        case PlayerDataManager.GameMode.EssenceWar:
+                            NetSceneManager.Singleton.LoadScene("Essence War");
+                            break;
+                        case PlayerDataManager.GameMode.OutputRush:
+                            NetSceneManager.Singleton.LoadScene("Outpost Rush");
+                            break;
+                        default:
+                            Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
+                            break;
+                    }
+
+                    NetSceneManager.Singleton.LoadScene(PlayerDataManager.Singleton.GetMapName());
                 }
             }
         }
@@ -299,8 +293,6 @@ namespace Vi.UI
             CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
             previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-            characterNameText.text = playerModelOption.name;
-            characterRoleText.text = playerModelOption.role;
         }
 
         private new void OnDestroy()
@@ -369,13 +361,6 @@ namespace Vi.UI
         private void LockCharacterLocal()
         {
             lockCharacterButton.interactable = false;
-            foreach (Transform child in characterSelectGridParent)
-            {
-                //if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))
-                //{
-                //    characterSelectElement.SetButtonInteractability(false);
-                //}
-            }
         }
 
         private NetworkList<ulong> lockedClients;

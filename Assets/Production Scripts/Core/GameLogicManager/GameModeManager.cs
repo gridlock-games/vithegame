@@ -56,6 +56,18 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Returning to lobby!";
         }
 
+        private bool isFirstRound = true;
+        protected virtual void OnRoundStart()
+        {
+            for (int i = 0; i < scoreList.Count; i++)
+            {
+                PlayerScore playerScore = scoreList[i];
+                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
+            }
+            if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
+            isFirstRound = false;
+        }
+
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
             overtime.Value = false;
@@ -69,13 +81,7 @@ namespace Vi.Core.GameModeManagers
 
                 if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
             }
-
-            for (int i = 0; i < scoreList.Count; i++)
-            {
-                PlayerScore playerScore = scoreList[i];
-                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
-            }
-
+            
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
@@ -147,10 +153,19 @@ namespace Vi.Core.GameModeManagers
 
         private void OnRoundTimerChange(float prev, float current)
         {
-            if (current <= 0 & prev > 0)
+            if (Mathf.Approximately(current, roundDuration))
+            {
+                OnRoundTimerStart();
+            }
+            else if (current <= 0 & prev > 0)
             {
                 OnRoundTimerEnd();
             }
+        }
+
+        protected virtual void OnRoundTimerStart()
+        {
+            OnRoundStart();
         }
 
         protected virtual void OnRoundTimerEnd()
@@ -174,7 +189,6 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    PlayerDataManager.Singleton.RespawnAllPlayers();
                     roundTimer.Value = roundDuration;
                 }
             }

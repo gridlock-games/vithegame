@@ -18,11 +18,6 @@ namespace Vi.ScriptableObjects
         public class PlayerModelOption
         {
             public RaceAndGender raceAndGender;
-            public string name;
-            public Weapon weapon;
-            public string role;
-            public string characterDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            public Sprite characterImage;
             public GameObject playerPrefab;
             public GameObject botPrefab;
             public GameObject[] skinOptions;
@@ -31,6 +26,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class WeaponOption
         {
+            public Sprite weaponIcon;
             public RuntimeAnimatorController animationController;
             public Weapon weapon;
         }
@@ -189,6 +185,14 @@ namespace Vi.ScriptableObjects
         }
 
         public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
+
+        public KeyValuePair<int, int> GetPlayerModelOptionIndices(string characterModelName)
+        {
+            int characterIndex = System.Array.FindIndex(playerModelOptions, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == characterModelName) != -1);
+            if (characterIndex == -1) { return new KeyValuePair<int, int>(characterIndex, -1); }
+            int skinIndex = System.Array.FindIndex(playerModelOptions[characterIndex].skinOptions, skinItem => skinItem.name == characterModelName);
+            return new KeyValuePair<int, int>(characterIndex, skinIndex);
+        }
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 

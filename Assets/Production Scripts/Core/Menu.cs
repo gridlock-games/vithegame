@@ -30,8 +30,15 @@ namespace Vi.Core
         {
             if (message != "")
             {
-                transform.parent.SendMessage(message);
-                return;
+                try
+                {
+                    transform.parent.SendMessage(message);
+                    return;
+                }
+                catch
+                {
+
+                }
             }
 
             if (childMenu)

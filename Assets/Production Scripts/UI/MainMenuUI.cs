@@ -9,6 +9,8 @@ namespace Vi.UI
 {
     public class MainMenuUI : MonoBehaviour
     {
+        [SerializeField] private PauseMenu pauseMenu;
+
         public void StartHubServer()
         {
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
@@ -32,6 +34,11 @@ namespace Vi.UI
         {
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
+        }
+
+        public void OpenSettingsMenu()
+        {
+            Instantiate(pauseMenu.gameObject);
         }
     }
 }

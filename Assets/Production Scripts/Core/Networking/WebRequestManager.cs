@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace Vi.Core
         public static List<Server> Servers { get; private set; } = new List<Server>();
 
         public static bool IsRefreshingServers { get; private set; }
-        public static IEnumerator GetRequest()
+        public static IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
@@ -22,7 +23,7 @@ namespace Vi.Core
             Servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.GetRequest() " + serverAPIURL);
+                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + serverAPIURL);
                 getRequest.Dispose();
                 yield break;
             }
@@ -46,14 +47,14 @@ namespace Vi.Core
             }
             catch
             {
-                Servers = new List<Server>() { new Server("", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+                Servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
 
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
 
-        public static IEnumerator PutRequest(ServerPutPayload payload)
+        public static IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -64,12 +65,12 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.PutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
             }
             putRequest.Dispose();
         }
 
-        public static IEnumerator PostRequest(ServerPostPayload payload)
+        public static IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
@@ -84,7 +85,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.PostRequest()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.ServerPostRequest()" + postRequest.error);
             }
             postRequest.Dispose();
         }
@@ -150,33 +151,105 @@ namespace Vi.Core
                 this.port = port;
             }
         }
+        
+        // TODO Change the string at the end to be the account ID of whoever we sign in under
+        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
+        private static string currentlyLoggedInUserId = "652b4e237527296665a5059b";
 
-        public static List<Character> Characters { get; private set; } = new List<Character>() { new Character("Human_Male", "Char A", 10, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", ""), new Character("Human_Male", "Char B", 1, "M_HuM_Body_01", "M_HuM_Head_01_A", "M_Eye_Bl", "", "", "") };
+        public static List<Character> Characters { get; private set; } = new List<Character>();
+
+        public static bool IsRefreshingCharacters { get; private set; }
+        public static IEnumerator CharacterGetRequest()
+        {
+            if (IsRefreshingCharacters) { yield break; }
+            IsRefreshingCharacters = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + currentlyLoggedInUserId);
+            yield return getRequest.SendWebRequest();
+
+            Characters.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL + currentlyLoggedInUserId);
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            try
+            {
+                Characters = JsonConvert.DeserializeObject<List<Character>>(json);
+            }
+            catch
+            {
+                Characters = new List<Character>() { DefaultCharacter, DefaultCharacter };
+            }
+
+            getRequest.Dispose();
+            IsRefreshingCharacters = false;
+        }
+
+        public static Character DefaultCharacter { get; private set; } = new Character("", "Human_Male", "", 0, 1);
 
         public struct Character
         {
-            public string characterModelName;
-            public string characterName;
-            public int characterLevel;
-            public string bodyColorName;
-            public string headColorName;
-            public string eyeColorName;
-            public string beardName;
-            public string browsName;
-            public string hairName;
+            public string _id;
+            public int slot;
+            public string name;
+            public string model;
+            public int experience;
+            public string bodyColor;
+            public string eyeColor;
+            public string beard;
+            public string brows;
+            public string hair;
+            public string dateCreated;
+            public CharacterAttributes attributes;
+            public string userId;
+            public int level;
 
-            public Character(string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
+            public Character(string _id, string model, string name, int experience, int level)
             {
-                this.characterModelName = characterModelName;
-                this.characterName = characterName;
-                this.characterLevel = characterLevel;
-                this.bodyColorName = bodyColorName;
-                this.headColorName = headColorName;
-                this.eyeColorName = eyeColorName;
-                this.beardName = beardName;
-                this.browsName = browsName;
-                this.hairName = hairName;
+                slot = 0;
+                this._id = _id;
+                this.model = model;
+                this.name = name;
+                this.experience = experience;
+                bodyColor = "";
+                eyeColor = "";
+                beard = "";
+                brows = "";
+                hair = "";
+                dateCreated = "";
+                attributes = new CharacterAttributes();
+                userId = currentlyLoggedInUserId;
+                this.level = level;
             }
+
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level)
+            {
+                slot = 0;
+                this._id = _id;
+                this.model = model;
+                this.name = name;
+                this.experience = experience;
+                this.bodyColor = bodyColor;
+                this.eyeColor = eyeColor;
+                this.beard = beard;
+                this.brows = brows;
+                this.hair = hair;
+                dateCreated = "";
+                attributes = new CharacterAttributes();
+                userId = currentlyLoggedInUserId;
+                this.level = level;
+            }
+        }
+
+        public struct CharacterAttributes
+        {
+            public int strength;
+            public int vitality;
+            public int agility;
+            public int dexterity;
+            public int intelligence;
         }
     }
 }

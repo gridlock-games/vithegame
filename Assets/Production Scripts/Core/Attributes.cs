@@ -551,7 +551,7 @@ namespace Vi.Core
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this); }
+            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this, true); }
             IsRespawning = false;
         }
 
