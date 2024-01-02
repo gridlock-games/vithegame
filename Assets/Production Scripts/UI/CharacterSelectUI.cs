@@ -84,7 +84,10 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
             addCharacterButton.interactable = false;
-            yield return WebRequestManager.Singleton.CharacterGetRequest();
+            
+            WebRequestManager.Singleton.RefreshCharacters();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+
             addCharacterButton.interactable = true;
             webRequestStatusText.gameObject.SetActive(false);
 
@@ -444,7 +447,7 @@ namespace Vi.UI
 
         private void Start()
         {
-            StartCoroutine(WebRequestManager.Singleton.ServerGetRequest());
+            WebRequestManager.Singleton.RefreshServers();
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
@@ -553,7 +556,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            StartCoroutine(WebRequestManager.Singleton.ServerGetRequest());
+            WebRequestManager.Singleton.RefreshServers();
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);

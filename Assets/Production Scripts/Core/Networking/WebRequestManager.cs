@@ -28,7 +28,8 @@ namespace Vi.Core
         public List<Server> Servers { get; private set; } = new List<Server>();
 
         public bool IsRefreshingServers { get; private set; }
-        public IEnumerator ServerGetRequest()
+        public void RefreshServers() { StartCoroutine(ServerGetRequest()); }
+        private IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
@@ -174,7 +175,8 @@ namespace Vi.Core
         public List<Character> Characters { get; private set; } = new List<Character>();
 
         public bool IsRefreshingCharacters { get; private set; }
-        public IEnumerator CharacterGetRequest()
+        public void RefreshCharacters() { StartCoroutine(CharacterGetRequest()); }
+        private IEnumerator CharacterGetRequest()
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
