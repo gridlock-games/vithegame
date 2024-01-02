@@ -525,6 +525,14 @@ namespace Vi.UI
         {
             Debug.Log("TODO Fix add character here");
             //WebRequestManager.AddCharacter(character);
+            //OpenCharacterSelect();
+            StartCoroutine(ApplyCharacterChangesCoroutine(character));
+        }
+
+        private IEnumerator ApplyCharacterChangesCoroutine(WebRequestManager.Character character)
+        {
+            yield return WebRequestManager.CharacterPostRequest(character);
+
             OpenCharacterSelect();
         }
 

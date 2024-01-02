@@ -187,6 +187,26 @@ namespace Vi.Core
             IsRefreshingCharacters = false;
         }
 
+        public static IEnumerator CharacterPostRequest(Character character)
+        {
+            CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
+                character.bodyColor, character.beard, character.brows, character.name, character.model);
+
+            WWWForm form = new WWWForm();
+            form.AddField("userId", payload.userId);
+            form.AddField("character", JsonUtility.ToJson(payload.character));
+            
+            UnityWebRequest postRequest = UnityWebRequest.Post(characterAPIURL + "createCharacterCosmetic", form);
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+            }
+
+            postRequest.Dispose();
+        }
+
         public static Character DefaultCharacter { get; private set; } = new Character("", "Human_Male", "", 0, 1);
 
         public struct Character
@@ -250,6 +270,40 @@ namespace Vi.Core
             public int agility;
             public int dexterity;
             public int intelligence;
+        }
+
+        private struct CharacterPostPayload
+        {
+            public string userId;
+            public NestedCharacter character;
+
+            public CharacterPostPayload(string userId, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            {
+                this.userId = userId;
+                character = new NestedCharacter()
+                {
+                    slot = slot,
+                    eyeColor = eyeColor,
+                    hair = hair,
+                    bodyColor = bodyColor,
+                    beard = beard,
+                    brows = brows,
+                    name = name,
+                    model = model
+                };
+            }
+
+            public struct NestedCharacter
+            {
+                public int slot;
+                public string eyeColor;
+                public string hair;
+                public string bodyColor;
+                public string beard;
+                public string brows;
+                public string name;
+                public string model;
+            }
         }
     }
 }
