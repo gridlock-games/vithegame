@@ -6,14 +6,29 @@ using UnityEngine.Networking;
 
 namespace Vi.Core
 {
-    public static class WebRequestManager
+    public class WebRequestManager : MonoBehaviour
     {
+        private static WebRequestManager _singleton;
+
+        public static WebRequestManager Singleton
+        {
+            get
+            {
+                return _singleton;
+            }
+        }
+
+        private void Awake()
+        {
+            _singleton = this;
+        }
+
         private const string serverAPIURL = "38.60.245.223/servers/duels";
 
-        public static List<Server> Servers { get; private set; } = new List<Server>();
+        public List<Server> Servers { get; private set; } = new List<Server>();
 
-        public static bool IsRefreshingServers { get; private set; }
-        public static IEnumerator ServerGetRequest()
+        public bool IsRefreshingServers { get; private set; }
+        public IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
@@ -54,7 +69,7 @@ namespace Vi.Core
             IsRefreshingServers = false;
         }
 
-        public static IEnumerator ServerPutRequest(ServerPutPayload payload)
+        public IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -70,7 +85,7 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public static IEnumerator ServerPostRequest(ServerPostPayload payload)
+        public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
@@ -154,12 +169,12 @@ namespace Vi.Core
         
         // TODO Change the string at the end to be the account ID of whoever we sign in under
         private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
-        private static string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
 
-        public static List<Character> Characters { get; private set; } = new List<Character>();
+        public List<Character> Characters { get; private set; } = new List<Character>();
 
-        public static bool IsRefreshingCharacters { get; private set; }
-        public static IEnumerator CharacterGetRequest()
+        public bool IsRefreshingCharacters { get; private set; }
+        public IEnumerator CharacterGetRequest()
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
@@ -180,14 +195,14 @@ namespace Vi.Core
             }
             catch
             {
-                Characters = new List<Character>() { DefaultCharacter, DefaultCharacter };
+                Characters = new List<Character>() { GetDefaultCharacter(), GetDefaultCharacter() };
             }
 
             getRequest.Dispose();
             IsRefreshingCharacters = false;
         }
 
-        public static IEnumerator CharacterPostRequest(Character character)
+        public IEnumerator CharacterPostRequest(Character character)
         {
             CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
                 character.bodyColor, character.beard, character.brows, character.name, character.model);
@@ -207,7 +222,7 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
-        public static Character DefaultCharacter { get; private set; } = new Character("", "Human_Male", "", 0, 1);
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
 
         public struct Character
         {
@@ -240,7 +255,7 @@ namespace Vi.Core
                 hair = "";
                 dateCreated = "";
                 attributes = new CharacterAttributes();
-                userId = currentlyLoggedInUserId;
+                userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
             }
 
@@ -258,7 +273,7 @@ namespace Vi.Core
                 this.hair = hair;
                 dateCreated = "";
                 attributes = new CharacterAttributes();
-                userId = currentlyLoggedInUserId;
+                userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
             }
         }

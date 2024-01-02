@@ -84,12 +84,12 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
             addCharacterButton.interactable = false;
-            yield return WebRequestManager.CharacterGetRequest();
+            yield return WebRequestManager.Singleton.CharacterGetRequest();
             addCharacterButton.interactable = true;
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
-            foreach (WebRequestManager.Character character in WebRequestManager.Characters)
+            foreach (WebRequestManager.Character character in WebRequestManager.Singleton.Characters)
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
@@ -296,12 +296,14 @@ namespace Vi.UI
             customizationButtonReference.Add(new ButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
         }
 
-        private void RefreshButtonInteractability()
+        private void RefreshButtonInteractability(bool disableAll = false)
         {
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
+                if (disableAll) { buttonInfo.button.interactable = false; continue; }
+
                 switch (buttonInfo.key)
                 {
                     case "CharacterCard":
@@ -315,6 +317,8 @@ namespace Vi.UI
 
             foreach (ButtonInfo buttonInfo in customizationButtonReference)
             {
+                if (disableAll) { buttonInfo.button.interactable = false; continue; }
+
                 switch (buttonInfo.key)
                 {
                     case "Eyes":
@@ -404,7 +408,7 @@ namespace Vi.UI
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
-            finishCharacterCustomizationButton.onClick.AddListener(delegate { ApplyCharacterChanges(selectedCharacter); });
+            finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
 
             RefreshButtonInteractability();
         }
@@ -440,15 +444,15 @@ namespace Vi.UI
 
         private void Start()
         {
-            StartCoroutine(WebRequestManager.ServerGetRequest());
+            StartCoroutine(WebRequestManager.Singleton.ServerGetRequest());
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private void Update()
         {
-            if (!WebRequestManager.IsRefreshingServers)
+            if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -488,7 +492,7 @@ namespace Vi.UI
             returnButton.onClick.AddListener(OpenCharacterSelect);
 
             selectedCharacter = new WebRequestManager.Character();
-            UpdateSelectedCharacter(WebRequestManager.DefaultCharacter);
+            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
         }
 
@@ -521,17 +525,20 @@ namespace Vi.UI
             UpdateSelectedCharacter(default);
         }
 
-        public void ApplyCharacterChanges(WebRequestManager.Character character)
+        private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
         {
             Debug.Log("TODO Fix add character here");
-            //WebRequestManager.AddCharacter(character);
-            //OpenCharacterSelect();
-            StartCoroutine(ApplyCharacterChangesCoroutine(character));
-        }
+            RefreshButtonInteractability(true);
+            finishCharacterCustomizationButton.interactable = false;
+            returnButton.interactable = false;
+            characterNameInputField.interactable = false;
 
-        private IEnumerator ApplyCharacterChangesCoroutine(WebRequestManager.Character character)
-        {
-            yield return WebRequestManager.CharacterPostRequest(character);
+            yield return WebRequestManager.Singleton.CharacterPostRequest(character);
+
+            RefreshButtonInteractability();
+            finishCharacterCustomizationButton.interactable = true;
+            returnButton.interactable = true;
+            characterNameInputField.interactable = true;
 
             OpenCharacterSelect();
         }
@@ -546,7 +553,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            StartCoroutine(WebRequestManager.ServerGetRequest());
+            StartCoroutine(WebRequestManager.Singleton.ServerGetRequest());
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);
