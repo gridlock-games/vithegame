@@ -66,13 +66,15 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter.characterId);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
 
-        private void RefreshCharacterCards()
+        private IEnumerator RefreshCharacterCards()
         {
+            yield return WebRequestManager.CharacterGetRequest();
+
             foreach (Transform child in characterCardParent)
             {
                 Destroy(child.gameObject);
@@ -80,14 +82,14 @@ namespace Vi.UI
             characterCardButtonReference.Clear();
 
             // Create character cards
-            foreach (WebRequestManager.Character character in WebRequestManager.GetCharacters())
+            foreach (WebRequestManager.Character character in WebRequestManager.Characters)
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
-                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character.characterId));
+                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id));
             }
         }
 
@@ -154,6 +156,8 @@ namespace Vi.UI
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
+                if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head) { continue; }
+
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
                 if (!buttonParent)
                 {
@@ -170,7 +174,7 @@ namespace Vi.UI
                     GridLayoutGroup.Corner startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperRight : GridLayoutGroup.Corner.UpperLeft;
                     buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = startCorner;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
-                    headerText.text = characterMaterial.materialApplicationLocation.ToString();
+                    headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
                     {
                         headerText.transform.localPosition -= new Vector3(300, 0, 0);
@@ -287,14 +291,14 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability()
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter.characterId);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
                 switch (buttonInfo.key)
                 {
                     case "CharacterCard":
-                        buttonInfo.button.interactable = selectedCharacter.characterId != buttonInfo.value;
+                        buttonInfo.button.interactable = selectedCharacter._id != buttonInfo.value;
                         break;
                     default:
                         Debug.LogError("Not sure how to handle button key " + buttonInfo.key);
@@ -307,22 +311,19 @@ namespace Vi.UI
                 switch (buttonInfo.key)
                 {
                     case "Eyes":
-                        buttonInfo.button.interactable = selectedCharacter.eyeColorName != buttonInfo.value;
+                        buttonInfo.button.interactable = selectedCharacter.eyeColor != buttonInfo.value;
                         break;
                     case "Body":
-                        buttonInfo.button.interactable = selectedCharacter.bodyColorName != buttonInfo.value;
+                        buttonInfo.button.interactable = selectedCharacter.bodyColor != buttonInfo.value;
                         break;
                     case "Brows":
-                        buttonInfo.button.interactable = selectedCharacter.browsName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.browsName;
-                        break;
-                    case "Head":
-                        buttonInfo.button.interactable = selectedCharacter.headColorName != buttonInfo.value;
+                        buttonInfo.button.interactable = selectedCharacter.brows == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.brows;
                         break;
                     case "Hair":
-                        buttonInfo.button.interactable = selectedCharacter.hairName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hairName;
+                        buttonInfo.button.interactable = selectedCharacter.hair == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hair;
                         break;
                     case "Beard":
-                        buttonInfo.button.interactable = selectedCharacter.beardName == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beardName;
+                        buttonInfo.button.interactable = selectedCharacter.beard == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beard;
                         break;
                     case "Race":
                         buttonInfo.button.interactable = selectedRace != buttonInfo.value;
@@ -372,9 +373,9 @@ namespace Vi.UI
             AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
 
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColorName));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.headColorName));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColorName));
+            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
+            //animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
+            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
         }
@@ -384,9 +385,9 @@ namespace Vi.UI
             yield return null;
             AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beardName));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.browsName));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hairName));
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard));
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows));
+            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair));
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
@@ -433,7 +434,6 @@ namespace Vi.UI
         private void Start()
         {
             StartCoroutine(WebRequestManager.ServerGetRequest());
-            StartCoroutine(WebRequestManager.CharacterGetRequest());
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
@@ -501,7 +501,7 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
-            RefreshCharacterCards();
+            StartCoroutine(RefreshCharacterCards());
 
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(true);

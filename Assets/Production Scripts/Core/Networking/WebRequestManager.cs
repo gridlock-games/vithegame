@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -150,9 +151,10 @@ namespace Vi.Core
                 this.port = port;
             }
         }
-
-        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api";
-
+        
+        // TODO Change the string at the end to be the account ID of whoever we sign in under
+        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
+        private static string currentlyLoggedInUserId = "652b4e237527296665a5059b";
 
         public static List<Character> Characters { get; private set; } = new List<Character>();
 
@@ -161,34 +163,20 @@ namespace Vi.Core
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + currentlyLoggedInUserId);
             yield return getRequest.SendWebRequest();
 
             Characters.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL);
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL + currentlyLoggedInUserId);
                 getRequest.Dispose();
                 yield break;
             }
             string json = getRequest.downloadHandler.text;
-            Debug.Log(json);
             try
             {
-                if (json != "[]")
-                {
-                    foreach (string jsonSplit in json.Split("},"))
-                    {
-                        string finalJsonElement = jsonSplit;
-                        if (finalJsonElement[0] == '[')
-                            finalJsonElement = finalJsonElement.Remove(0, 1);
-                        if (finalJsonElement[^1] == ']')
-                            finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                        if (finalJsonElement[^1] != '}')
-                            finalJsonElement += "}";
-                        //Characters.Add(JsonUtility.FromJson<Character>(finalJsonElement));
-                    }
-                }
+                Characters = JsonConvert.DeserializeObject<List<Character>>(json);
             }
             catch
             {
@@ -199,98 +187,135 @@ namespace Vi.Core
             IsRefreshingCharacters = false;
         }
 
-        public static List<Character> GetCharacters()
-        {
-            List<Character> characterList = new List<Character>();
+        public static Character DefaultCharacter { get; private set; } = new Character("", "Human_Male", "", 0, 1);
 
-            int i = 1;
-            while (PlayerPrefs.HasKey("Character " + i.ToString()))
+        public struct Character
+        {
+            public string _id;
+            public int slot;
+            public string name;
+            public string model;
+            public int experience;
+            public string bodyColor;
+            public string eyeColor;
+            public string beard;
+            public string brows;
+            public string hair;
+            public string dateCreated;
+            public CharacterAttributes attributes;
+            public string userId;
+            public int level;
+
+            public Character(string _id, string model, string name, int experience, int level)
             {
-                characterList.Add(JsonUtility.FromJson<Character>(PlayerPrefs.GetString("Character " + i.ToString())));
-                i++;
+                slot = 0;
+                this._id = _id;
+                this.model = model;
+                this.name = name;
+                this.experience = experience;
+                bodyColor = "";
+                eyeColor = "";
+                beard = "";
+                brows = "";
+                hair = "";
+                dateCreated = "";
+                attributes = new CharacterAttributes();
+                userId = currentlyLoggedInUserId;
+                this.level = level;
             }
 
-            return characterList;
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level)
+            {
+                slot = 0;
+                this._id = _id;
+                this.model = model;
+                this.name = name;
+                this.experience = experience;
+                this.bodyColor = bodyColor;
+                this.eyeColor = eyeColor;
+                this.beard = beard;
+                this.brows = brows;
+                this.hair = hair;
+                dateCreated = "";
+                attributes = new CharacterAttributes();
+                userId = currentlyLoggedInUserId;
+                this.level = level;
+            }
+        }
+
+        public struct CharacterAttributes
+        {
+            public int strength;
+            public int vitality;
+            public int agility;
+            public int dexterity;
+            public int intelligence;
         }
 
         public static void AddCharacter(Character character)
         {
-            if (character.characterId == "")
-            {
-                int i = 1;
-                character.characterId = i.ToString();
-                while (PlayerPrefs.HasKey("Character " + character.characterId))
-                {
-                    character.characterId = i.ToString();
-                    i++;
-                }
-            }
-            PlayerPrefs.SetString("Character " + character.characterId, JsonUtility.ToJson(character));
+            //if (character.characterId == "")
+            //{
+            //    int i = 1;
+            //    character.characterId = i.ToString();
+            //    while (PlayerPrefs.HasKey("Character " + character.characterId))
+            //    {
+            //        character.characterId = i.ToString();
+            //        i++;
+            //    }
+            //}
+            //PlayerPrefs.SetString("Character " + character.characterId, JsonUtility.ToJson(character));
         }
 
-        public static Character DefaultCharacter { get; private set; } = new Character()
-        {
-            characterId = "",
-            model = "Human_Male",
-            name = "",
-            experience = 1,
-            bodyColorName = "",
-            headColorName = "",
-            eyeColorName = "",
-            beardName = "",
-            browsName = "",
-            hairName = ""
-        };
+        //public struct Character : System.IEquatable<Character>
+        //{
+        //    public string characterId;
+        //    public int slot;
+        //    public string model;
+        //    public string name;
+        //    public int experience;
+        //    public string bodyColorName;
+        //    public string headColorName;
+        //    public string eyeColorName;
+        //    public string beardName;
+        //    public string browsName;
+        //    public string hairName;
+        //    //private string dateCreated;
 
-        public struct Character : System.IEquatable<Character>
-        {
-            public string characterId;
-            public int slot;
-            public string model;
-            public string name;
-            public int experience;
-            public string bodyColorName;
-            public string headColorName;
-            public string eyeColorName;
-            public string beardName;
-            public string browsName;
-            public string hairName;
-            //private string dateCreated;
+        //    public Character(string characterId, string characterModelName, string characterName, int characterLevel)
+        //    {
+        //        slot = 0;
+        //        this.characterId = characterId;
+        //        this.model = characterModelName;
+        //        this.name = characterName;
+        //        this.experience = characterLevel;
+        //        bodyColorName = "";
+        //        headColorName = "";
+        //        eyeColorName = "";
+        //        beardName = "";
+        //        browsName = "";
+        //        hairName = "";
+        //    }
 
-            public Character(string characterId, string characterModelName, string characterName, int characterLevel)
-            {
-                slot = 0;
-                this.characterId = characterId;
-                this.model = characterModelName;
-                this.name = characterName;
-                this.experience = characterLevel;
-                bodyColorName = "";
-                headColorName = "";
-                eyeColorName = "";
-                beardName = "";
-                browsName = "";
-                hairName = "";
-            }
+        //    public Character(string characterId, string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
+        //    {
+        //        slot = 0;
+        //        this.characterId = characterId;
+        //        this.model = characterModelName;
+        //        this.name = characterName;
+        //        this.experience = characterLevel;
+        //        this.bodyColorName = bodyColorName;
+        //        this.headColorName = headColorName;
+        //        this.eyeColorName = eyeColorName;
+        //        this.beardName = beardName;
+        //        this.browsName = browsName;
+        //        this.hairName = hairName;
+        //    }
 
-            public Character(string characterId, string characterModelName, string characterName, int characterLevel, string bodyColorName, string headColorName, string eyeColorName, string beardName, string browsName, string hairName)
-            {
-                slot = 0;
-                this.characterId = characterId;
-                this.model = characterModelName;
-                this.name = characterName;
-                this.experience = characterLevel;
-                this.bodyColorName = bodyColorName;
-                this.headColorName = headColorName;
-                this.eyeColorName = eyeColorName;
-                this.beardName = beardName;
-                this.browsName = browsName;
-                this.hairName = hairName;
-            }
-
-            public bool Equals(Character other)
-            {
-                return characterId == other.characterId;
-            }
-        }
+        //    public bool Equals(Character other)
+        //    {
+        //        return characterId == other.characterId;
+        //    }
+        //}
     }
 }
