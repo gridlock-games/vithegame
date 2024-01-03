@@ -6,14 +6,30 @@ using UnityEngine.Networking;
 
 namespace Vi.Core
 {
-    public static class WebRequestManager
+    public class WebRequestManager : MonoBehaviour
     {
+        private static WebRequestManager _singleton;
+
+        public static WebRequestManager Singleton
+        {
+            get
+            {
+                return _singleton;
+            }
+        }
+
+        private void Awake()
+        {
+            _singleton = this;
+        }
+
         private const string serverAPIURL = "38.60.245.223/servers/duels";
 
-        public static List<Server> Servers { get; private set; } = new List<Server>();
+        public List<Server> Servers { get; private set; } = new List<Server>();
 
-        public static bool IsRefreshingServers { get; private set; }
-        public static IEnumerator ServerGetRequest()
+        public bool IsRefreshingServers { get; private set; }
+        public void RefreshServers() { StartCoroutine(ServerGetRequest()); }
+        private IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
@@ -54,7 +70,7 @@ namespace Vi.Core
             IsRefreshingServers = false;
         }
 
-        public static IEnumerator ServerPutRequest(ServerPutPayload payload)
+        public IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -70,7 +86,7 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public static IEnumerator ServerPostRequest(ServerPostPayload payload)
+        public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
@@ -154,12 +170,13 @@ namespace Vi.Core
         
         // TODO Change the string at the end to be the account ID of whoever we sign in under
         private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
-        private static string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
 
-        public static List<Character> Characters { get; private set; } = new List<Character>();
+        public List<Character> Characters { get; private set; } = new List<Character>();
 
-        public static bool IsRefreshingCharacters { get; private set; }
-        public static IEnumerator CharacterGetRequest()
+        public bool IsRefreshingCharacters { get; private set; }
+        public void RefreshCharacters() { StartCoroutine(CharacterGetRequest()); }
+        private IEnumerator CharacterGetRequest()
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
@@ -180,14 +197,52 @@ namespace Vi.Core
             }
             catch
             {
-                Characters = new List<Character>() { DefaultCharacter, DefaultCharacter };
+                Characters = new List<Character>() { GetDefaultCharacter(), GetDefaultCharacter() };
             }
 
             getRequest.Dispose();
             IsRefreshingCharacters = false;
         }
 
-        public static Character DefaultCharacter { get; private set; } = new Character("", "Human_Male", "", 0, 1);
+        public IEnumerator CharacterPutRequest(Character character)
+        {
+            CharacterPutPayload payload = new CharacterPutPayload(character._id, character.slot, character.eyeColor, character.hair,
+                character.bodyColor, character.beard, character.brows, character.name, character.model);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "updateCharacterCosmetic", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        public IEnumerator CharacterPostRequest(Character character)
+        {
+            CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
+                character.bodyColor, character.beard, character.brows, character.name, character.model);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(characterAPIURL + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+            }
+            postRequest.Dispose();
+        }
+
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
 
         public struct Character
         {
@@ -220,7 +275,7 @@ namespace Vi.Core
                 hair = "";
                 dateCreated = "";
                 attributes = new CharacterAttributes();
-                userId = currentlyLoggedInUserId;
+                userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
             }
 
@@ -238,7 +293,7 @@ namespace Vi.Core
                 this.hair = hair;
                 dateCreated = "";
                 attributes = new CharacterAttributes();
-                userId = currentlyLoggedInUserId;
+                userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
             }
         }
@@ -250,6 +305,66 @@ namespace Vi.Core
             public int agility;
             public int dexterity;
             public int intelligence;
+        }
+
+        private struct CharacterPostPayload
+        {
+            public string userId;
+            public NestedCharacter character;
+
+            public CharacterPostPayload(string userId, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            {
+                this.userId = userId;
+                character = new NestedCharacter()
+                {
+                    slot = slot,
+                    eyeColor = eyeColor,
+                    hair = hair,
+                    bodyColor = bodyColor,
+                    beard = beard,
+                    brows = brows,
+                    name = name,
+                    model = model
+                };
+            }
+
+            public struct NestedCharacter
+            {
+                public int slot;
+                public string eyeColor;
+                public string hair;
+                public string bodyColor;
+                public string beard;
+                public string brows;
+                public string name;
+                public string model;
+            }
+        }
+
+        private struct CharacterPutPayload
+        {
+            public string id;
+            public int slot;
+            public string eyeColor;
+            public string hair;
+            public string bodyColor;
+            public string beard;
+            public string brows;
+            public string name;
+            public string model;
+
+            public CharacterPutPayload(string id, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            {
+                this.id = id;
+                this.slot = slot;
+                this.eyeColor = eyeColor;
+                this.hair = hair;
+                this.bodyColor = bodyColor;
+                this.beard = beard;
+                this.brows = brows;
+                this.name = name;
+                this.model = model;
+            }
         }
     }
 }

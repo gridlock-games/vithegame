@@ -149,6 +149,14 @@ namespace Vi.ScriptableObjects
                 wearableEquipmentPrefab = null;
                 this.averageTextureColor = averageTextureColor;
             }
+
+            public WearableEquipmentOption(EquipmentType equipmentType)
+            {
+                this.equipmentType = equipmentType;
+                raceAndGender = RaceAndGender.HumanMale;
+                wearableEquipmentPrefab = null;
+                averageTextureColor = Color.white;
+            }
         }
 
         public enum RaceAndGender

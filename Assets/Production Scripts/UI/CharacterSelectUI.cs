@@ -84,12 +84,15 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
             addCharacterButton.interactable = false;
-            yield return WebRequestManager.CharacterGetRequest();
-            addCharacterButton.interactable = true;
+            
+            WebRequestManager.Singleton.RefreshCharacters();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+
+            addCharacterButton.interactable = WebRequestManager.Singleton.Characters.Count < 5;
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
-            foreach (WebRequestManager.Character character in WebRequestManager.Characters)
+            foreach (WebRequestManager.Character character in WebRequestManager.Singleton.Characters)
             {
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
@@ -231,7 +234,7 @@ namespace Vi.UI
 
                     buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
                     Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
-                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType, Color.white)); });
+                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType)); });
                     customizationButtonReference.Add(new ButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
                 }
                 else
@@ -296,12 +299,14 @@ namespace Vi.UI
             customizationButtonReference.Add(new ButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
         }
 
-        private void RefreshButtonInteractability()
+        private void RefreshButtonInteractability(bool disableAll = false)
         {
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
+                if (disableAll) { buttonInfo.button.interactable = false; continue; }
+
                 switch (buttonInfo.key)
                 {
                     case "CharacterCard":
@@ -315,6 +320,8 @@ namespace Vi.UI
 
             foreach (ButtonInfo buttonInfo in customizationButtonReference)
             {
+                if (disableAll) { buttonInfo.button.interactable = false; continue; }
+
                 switch (buttonInfo.key)
                 {
                     case "Eyes":
@@ -392,9 +399,12 @@ namespace Vi.UI
             yield return null;
             AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows));
-            animationHandler.ApplyWearableEquipment(equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair));
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard);
+            animationHandler.ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard));
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows);
+            animationHandler.ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows));
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair);
+            animationHandler.ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
@@ -404,7 +414,7 @@ namespace Vi.UI
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
-            finishCharacterCustomizationButton.onClick.AddListener(delegate { ApplyCharacterChanges(selectedCharacter); });
+            finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
 
             RefreshButtonInteractability();
         }
@@ -440,15 +450,15 @@ namespace Vi.UI
 
         private void Start()
         {
-            StartCoroutine(WebRequestManager.ServerGetRequest());
+            WebRequestManager.Singleton.RefreshServers();
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private void Update()
         {
-            if (!WebRequestManager.IsRefreshingServers)
+            if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -478,6 +488,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
+        private bool isEditingExistingCharacter;
         public void OpenCharacterCustomization()
         {
             returnButton.gameObject.SetActive(true);
@@ -488,8 +499,9 @@ namespace Vi.UI
             returnButton.onClick.AddListener(OpenCharacterSelect);
 
             selectedCharacter = new WebRequestManager.Character();
-            UpdateSelectedCharacter(WebRequestManager.DefaultCharacter);
+            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
+            isEditingExistingCharacter = false;
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -504,6 +516,7 @@ namespace Vi.UI
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(character);
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
+            isEditingExistingCharacter = true;
         }
 
         public void OpenCharacterSelect()
@@ -521,10 +534,21 @@ namespace Vi.UI
             UpdateSelectedCharacter(default);
         }
 
-        public void ApplyCharacterChanges(WebRequestManager.Character character)
+        private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
         {
             Debug.Log("TODO Fix add character here");
-            //WebRequestManager.AddCharacter(character);
+            RefreshButtonInteractability(true);
+            finishCharacterCustomizationButton.interactable = false;
+            returnButton.interactable = false;
+            characterNameInputField.interactable = false;
+
+            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+
+            RefreshButtonInteractability();
+            finishCharacterCustomizationButton.interactable = true;
+            returnButton.interactable = true;
+            characterNameInputField.interactable = true;
+
             OpenCharacterSelect();
         }
 
@@ -538,7 +562,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            StartCoroutine(WebRequestManager.ServerGetRequest());
+            WebRequestManager.Singleton.RefreshServers();
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);
