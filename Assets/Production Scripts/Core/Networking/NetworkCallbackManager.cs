@@ -63,37 +63,27 @@ namespace Vi.Core.SceneManagement
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            string playerName = "Player Name";
+            string playerName = "PlayerName";
             int characterIndex = 0;
             int skinIndex = 0;
-
-            // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            try
-            {
-                WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
-                KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
-                characterIndex = kvp.Key;
-                skinIndex = kvp.Value;
-                playerName = character.name;
-            }
-            catch
-            {
-
-            }
-
-            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
+            
+            PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
 
             StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName,
                 characterIndex,
                 skinIndex,
                 clientTeam,
                 1,
-                2)));
+                2),
+                payload));
         }
 
-        private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)
+        private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData, string characterId)
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
+            WebRequestManager.Singleton.GetCharacterById(characterId);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
+            playerData.playerName = WebRequestManager.Singleton.CharacterById.name;
             PlayerDataManager.Singleton.AddPlayerData(playerData);
         }
 

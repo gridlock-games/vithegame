@@ -204,6 +204,37 @@ namespace Vi.Core
             IsRefreshingCharacters = false;
         }
 
+        public bool IsGettingCharacterById { get; private set; }
+        public Character CharacterById { get; private set; }
+        public void GetCharacterById(string characterId) { StartCoroutine(CharacterByIdGetRequest(characterId)); }
+
+        private IEnumerator CharacterByIdGetRequest(string characterId)
+        {
+            if (IsGettingCharacterById) { yield break; }
+            IsGettingCharacterById = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + "getCharacter/" + characterId);
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + characterAPIURL + characterId);
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            try
+            {
+                CharacterById = JsonConvert.DeserializeObject<Character>(json);
+            }
+            catch
+            {
+                CharacterById = new();
+            }
+
+            getRequest.Dispose();
+            IsGettingCharacterById = false;
+        }
+
         public IEnumerator CharacterPutRequest(Character character)
         {
             CharacterPutPayload payload = new CharacterPutPayload(character._id, character.slot, character.eyeColor, character.hair,

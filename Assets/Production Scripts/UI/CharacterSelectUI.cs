@@ -575,9 +575,9 @@ namespace Vi.UI
             connectButton.interactable = false;
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
-            NetworkManager.Singleton.StartClient();
             // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(JsonUtility.ToJson(selectedCharacter));
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id);
+            NetworkManager.Singleton.StartClient();
         }
 
         private void OnDrawGizmos()
