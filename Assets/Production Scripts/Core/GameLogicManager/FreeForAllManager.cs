@@ -31,7 +31,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnGameEnd(winningPlayersDataIds);
             roundResultMessage.Value = "Game over! ";
-            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).playerName + " wins the free for all!";
+            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " wins the free for all!";
         }
 
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
@@ -45,7 +45,7 @@ namespace Vi.Core.GameModeManagers
             }
             else
             {
-                message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).playerName + " has won the round! ";
+                message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " has won the round! ";
             }
             roundResultMessage.Value = message;
         }
@@ -75,7 +75,7 @@ namespace Vi.Core.GameModeManagers
 
             int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayerObject().Key));
             if (localIndex == -1) { return string.Empty; }
-            return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayerObject().Key).playerName + ": " + scoreList[localIndex].kills;
+            return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayerObject().Key).character.name + ": " + scoreList[localIndex].kills;
         }
 
         public string GetRightScoreString()
@@ -98,7 +98,7 @@ namespace Vi.Core.GameModeManagers
             // Find player score with highest kills
             scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
             if (scoreList.Count > 0)
-                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).playerName + ": " + scoreList[0].kills.ToString();
+                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].kills.ToString();
             else
                 return string.Empty;
         }

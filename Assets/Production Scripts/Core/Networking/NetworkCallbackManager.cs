@@ -63,28 +63,17 @@ namespace Vi.Core.SceneManagement
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            string playerName = "PlayerName";
-            int characterIndex = 0;
-            int skinIndex = 0;
-            
             PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName,
-                characterIndex,
-                skinIndex,
-                clientTeam,
-                1,
-                2),
-                payload));
+            StartCoroutine(AddPlayerData(payload, (int)clientId, clientTeam));
         }
 
-        private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData, string characterId)
+        private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            playerData.playerName = WebRequestManager.Singleton.CharacterById.name;
-            PlayerDataManager.Singleton.AddPlayerData(playerData);
+            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(clientId, WebRequestManager.Singleton.CharacterById, team, 1, 2));
         }
 
         private void OnServerStarted()

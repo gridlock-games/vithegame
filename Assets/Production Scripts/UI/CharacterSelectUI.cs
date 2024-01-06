@@ -68,7 +68,7 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -99,7 +99,7 @@ namespace Vi.UI
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
-                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id));
+                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id.ToString()));
             }
         }
 
@@ -301,7 +301,7 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -357,9 +357,9 @@ namespace Vi.UI
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
             selectCharacterButton.interactable = true;
-            characterNameInputField.text = character.name;
+            characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
@@ -576,7 +576,7 @@ namespace Vi.UI
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
             // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
         }
 

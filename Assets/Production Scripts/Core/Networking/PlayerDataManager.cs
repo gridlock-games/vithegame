@@ -214,11 +214,12 @@ namespace Vi.Core
         {
             if (IsServer)
             {
+                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
+                botCharacter.name = "Bot " + (botClientId * -1).ToString();
+
                 botClientId--;
                 PlayerData botData = new PlayerData(botClientId,
-                    "Bot " + (botClientId * -1).ToString(),
-                    characterIndex,
-                    skinIndex,
+                    botCharacter,
                     team,
                     1,
                     0);
@@ -369,7 +370,7 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.playerName + "'s data has been added.");
+                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
                 if (IsServer)
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
@@ -451,7 +452,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).playerName + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
         }
 
@@ -477,9 +478,9 @@ namespace Vi.Core
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
-            public FixedString32Bytes playerName;
             public int characterIndex;
             public int skinIndex;
+            public WebRequestManager.Character character;
             public Team team;
             public int primaryWeaponIndex;
             public int secondaryWeaponIndex;
@@ -487,20 +488,23 @@ namespace Vi.Core
             public PlayerData(int id)
             {
                 this.id = id;
-                playerName = "Player Name";
                 characterIndex = 0;
                 skinIndex = 0;
+                character = new();
                 team = Team.Environment;
                 primaryWeaponIndex = 0;
                 secondaryWeaponIndex = 0;
             }
 
-            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
+            public PlayerData(int id, WebRequestManager.Character character, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
             {
                 this.id = id;
-                this.playerName = playerName;
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
+
+                KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+                characterIndex = kvp.Key;
+                skinIndex = kvp.Value;
+
+                this.character = character;
                 this.team = team;
                 this.primaryWeaponIndex = primaryWeaponIndex;
                 this.secondaryWeaponIndex = secondaryWeaponIndex;
@@ -514,7 +518,6 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
-                serializer.SerializeValue(ref playerName);
                 serializer.SerializeValue(ref characterIndex);
                 serializer.SerializeValue(ref skinIndex);
                 serializer.SerializeValue(ref team);
