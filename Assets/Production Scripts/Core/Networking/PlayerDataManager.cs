@@ -444,6 +444,11 @@ namespace Vi.Core
             playerObject.GetComponent<AnimationHandler>().SetCharacter(playerData.characterIndex, playerData.skinIndex);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
 
+            // TODO
+            //yield return null;
+
+            //playerObject.GetComponent<AnimationHandler>().ApplyCharacterAppearance(playerData.character);
+
             if (playerData.id >= 0)
                 playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
             else

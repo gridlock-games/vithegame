@@ -388,7 +388,6 @@ namespace Vi.UI
 
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
-            //animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
