@@ -23,7 +23,7 @@ namespace Vi.UI
         {
             if (!NetSceneManager.Singleton) { progressBarParent.SetActive(false); return; }
 
-            if (NetworkManager.Singleton.IsClient)
+            if (NetworkManager.Singleton.IsClient | !NetworkManager.Singleton.IsListening)
             {
                 spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer() & !PlayerDataManager.Singleton.GetLocalPlayerObject().Value);
                 progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | spawningPlayerObjectParent.activeSelf);

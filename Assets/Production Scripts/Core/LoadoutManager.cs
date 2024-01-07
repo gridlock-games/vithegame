@@ -33,7 +33,6 @@ namespace Vi.Core
         {
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            Debug.Log(playerData.character.name + " " + playerData.primaryWeaponIndex + " " + playerData.secondaryWeaponIndex);
             primaryWeapon = Instantiate(weaponOptions[playerData.primaryWeaponIndex].weapon);
             secondaryWeapon = Instantiate(weaponOptions[playerData.secondaryWeaponIndex].weapon);
             primaryRuntimeAnimatorController = weaponOptions[playerData.primaryWeaponIndex].animationController;
