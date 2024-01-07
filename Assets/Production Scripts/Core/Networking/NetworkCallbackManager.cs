@@ -13,8 +13,11 @@ namespace Vi.Core
 
         private void Awake()
         {
-            //Screen.SetResolution(1920, 1080, Screen.fullScreenMode, Screen.currentResolution.refreshRate);
-            //Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            //if (!Application.isEditor)
+            //{
+            //    Screen.SetResolution(Screen.currentResolution.height * (16/9), Screen.currentResolution.height, Screen.fullScreenMode);
+            //    Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            //}
         }
 
         private void Start()
