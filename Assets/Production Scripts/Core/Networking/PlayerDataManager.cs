@@ -428,6 +428,10 @@ namespace Vi.Core
                 spawnRotation = transformData.rotation;
             }
 
+            KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
             GameObject playerObject;
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
@@ -436,18 +440,15 @@ namespace Vi.Core
             else
             {
                 if (playerData.id >= 0)
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            playerObject.GetComponent<AnimationHandler>().SetCharacter(playerData.characterIndex, playerData.skinIndex);
+            AnimationHandler animationHandler = playerObject.GetComponent<AnimationHandler>();
+            animationHandler.SetCharacter(characterIndex, skinIndex);
+            animationHandler.SetCharacter(playerData.character);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
-
-            // TODO
-            //yield return null;
-
-            //playerObject.GetComponent<AnimationHandler>().ApplyCharacterAppearance(playerData.character);
 
             if (playerData.id >= 0)
                 playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
@@ -483,8 +484,6 @@ namespace Vi.Core
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
-            public int characterIndex;
-            public int skinIndex;
             public WebRequestManager.Character character;
             public Team team;
             public int primaryWeaponIndex;
@@ -493,8 +492,6 @@ namespace Vi.Core
             public PlayerData(int id)
             {
                 this.id = id;
-                characterIndex = 0;
-                skinIndex = 0;
                 character = new();
                 team = Team.Environment;
                 primaryWeaponIndex = 0;
@@ -504,11 +501,6 @@ namespace Vi.Core
             public PlayerData(int id, WebRequestManager.Character character, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
             {
                 this.id = id;
-
-                KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-                characterIndex = kvp.Key;
-                skinIndex = kvp.Value;
-
                 this.character = character;
                 this.team = team;
                 this.primaryWeaponIndex = primaryWeaponIndex;
@@ -523,8 +515,6 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
-                serializer.SerializeValue(ref characterIndex);
-                serializer.SerializeValue(ref skinIndex);
                 serializer.SerializeValue(ref team);
                 serializer.SerializeValue(ref primaryWeaponIndex);
                 serializer.SerializeValue(ref secondaryWeaponIndex);

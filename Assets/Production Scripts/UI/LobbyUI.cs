@@ -104,7 +104,8 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-            UpdateCharacterPreview(playerData.characterIndex, playerData.skinIndex);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
+            UpdateCharacterPreview(kvp.Key, kvp.Value);
         }
 
         private void OnCharacterLockTimerChange(float prev, float current)
