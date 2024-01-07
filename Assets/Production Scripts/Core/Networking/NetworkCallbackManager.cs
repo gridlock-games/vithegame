@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 
-namespace Vi.Core.SceneManagement
+namespace Vi.Core
 {
     public class NetworkCallbackManager : MonoBehaviour
     {
@@ -65,15 +65,43 @@ namespace Vi.Core.SceneManagement
 
             PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
 
-            StartCoroutine(AddPlayerData(payload, (int)clientId, clientTeam));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId, clientTeam));
         }
 
-        private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
+        private struct PlayerDataInput
         {
+            public string characterId;
+            public int clientId;
+            public PlayerDataManager.Team team;
+
+            public PlayerDataInput(string characterId, int clientId, PlayerDataManager.Team team)
+            {
+                this.characterId = characterId;
+                this.clientId = clientId;
+                this.team = team;
+            }
+        }
+
+        private Queue<PlayerDataInput> playerDataQueue = new Queue<PlayerDataInput>();
+        private void Update()
+        {
+            if (playerDataQueue.Count > 0)
+            {
+                if (!addPlayerDataRunning) { StartCoroutine(AddPlayerData(playerDataQueue.Dequeue())); }
+            }
+        }
+
+        private bool addPlayerDataRunning;
+        private IEnumerator AddPlayerData(PlayerDataInput playerDataInput)
+        {
+            addPlayerDataRunning = true;
+
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
-            WebRequestManager.Singleton.GetCharacterById(characterId);
+            WebRequestManager.Singleton.GetCharacterById(playerDataInput.characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(clientId, WebRequestManager.Singleton.CharacterById, team, 1, 2));
+            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(playerDataInput.clientId, WebRequestManager.Singleton.CharacterById, playerDataInput.team, 1, 2));
+            
+            addPlayerDataRunning = false;
         }
 
         private void OnServerStarted()

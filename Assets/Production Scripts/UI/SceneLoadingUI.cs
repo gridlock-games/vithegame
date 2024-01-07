@@ -3,23 +3,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
     public class SceneLoadingUI : MonoBehaviour
     {
+        [Header("Scene Loading")]
         [SerializeField] private GameObject progressBarParent;
         [SerializeField] private Image progressBarImage;
         [SerializeField] private Text progressBarText;
+        [Header("Player Object Spawning")]
+        [SerializeField] private GameObject spawningPlayerObjectParent;
+        [SerializeField] private Text spawningPlayerObjectText;
+        [SerializeField] private float spawningPlayerTextEllipseChangeDelay = 0.5f;
 
+        private float lastTextChangeTime;
         private void Update()
         {
             if (!NetSceneManager.Singleton) { progressBarParent.SetActive(false); return; }
-            progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
 
+            if (NetworkManager.Singleton.IsClient)
+            {
+                spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer() & !PlayerDataManager.Singleton.GetLocalPlayerObject().Value);
+                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | spawningPlayerObjectParent.activeSelf);
+
+                if (spawningPlayerObjectParent.activeSelf)
+                {
+                    if (Time.time - lastTextChangeTime > spawningPlayerTextEllipseChangeDelay)
+                    {
+                        lastTextChangeTime = Time.time;
+                        switch (spawningPlayerObjectText.text.Split(".").Length)
+                        {
+                            case 1:
+                                spawningPlayerObjectText.text = "Spawning Player Object.";
+                                break;
+                            case 2:
+                                spawningPlayerObjectText.text = "Spawning Player Object..";
+                                break;
+                            case 3:
+                                spawningPlayerObjectText.text = "Spawning Player Object...";
+                                break;
+                            case 4:
+                                spawningPlayerObjectText.text = "Spawning Player Object";
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
+            }
+            
             if (NetSceneManager.Singleton.LoadingOperations.Count == 0)
             {
-                progressBarText.text = "No scenes loading";
+                progressBarText.text = "Scene Loading Complete";
                 progressBarImage.fillAmount = 1;
             }
 
