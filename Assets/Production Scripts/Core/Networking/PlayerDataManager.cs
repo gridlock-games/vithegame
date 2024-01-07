@@ -447,7 +447,6 @@ namespace Vi.Core
 
             AnimationHandler animationHandler = playerObject.GetComponent<AnimationHandler>();
             animationHandler.SetCharacter(characterIndex, skinIndex);
-            animationHandler.SetCharacter(playerData.character);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
 
             if (playerData.id >= 0)
