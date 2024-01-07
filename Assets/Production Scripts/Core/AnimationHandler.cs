@@ -315,9 +315,8 @@ namespace Vi.Core
 
         private IEnumerator ChangeCharacter()
         {
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character;
-
             yield return null;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character;
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
             
             // Apply materials and equipment
