@@ -316,9 +316,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            int characterIndex = 0;
-            int skinIndex = 0;
-            PlayerDataManager.Singleton.AddBotData(characterIndex, skinIndex, team);
+            PlayerDataManager.Singleton.AddBotData(team);
         }
 
         public void ChangeGameMode()

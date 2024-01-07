@@ -210,7 +210,7 @@ namespace Vi.Core
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public void AddBotData(int characterIndex, int skinIndex, Team team)
+        public void AddBotData(Team team)
         {
             if (IsServer)
             {
@@ -227,11 +227,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(characterIndex, skinIndex, team);
+                AddBotDataServerRpc(team);
             }
         }
 
-        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(int characterIndex, int skinIndex, Team team) { AddBotData(characterIndex, skinIndex, team); }
+        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(Team team) { AddBotData(team); }
 
         public void AddPlayerData(PlayerData playerData)
         {

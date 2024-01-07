@@ -16,6 +16,7 @@ namespace Vi.UI
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
+            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
         public void StartLobbyServer()
