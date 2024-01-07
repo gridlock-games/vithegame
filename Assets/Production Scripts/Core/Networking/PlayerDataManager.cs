@@ -515,6 +515,7 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
+                serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
                 serializer.SerializeValue(ref primaryWeaponIndex);
                 serializer.SerializeValue(ref secondaryWeaponIndex);
