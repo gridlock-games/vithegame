@@ -453,8 +453,33 @@ namespace Vi.UI
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
+        private float lastTextChangeTime;
         private void Update()
         {
+            
+            if (webRequestStatusText.gameObject.activeSelf)
+            {
+                if (Time.time - lastTextChangeTime > 0.5f)
+                {
+                    lastTextChangeTime = Time.time;
+                    switch (webRequestStatusText.text.Split(".").Length)
+                    {
+                        case 1:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + ".";
+                            break;
+                        case 2:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + "..";
+                            break;
+                        case 3:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + "...";
+                            break;
+                        case 4:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "");
+                            break;
+                    }
+                }
+            }
+
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
                 foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
@@ -535,13 +560,17 @@ namespace Vi.UI
 
         private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
         {
-            Debug.Log("TODO Fix add character here");
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
+            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.text = "UPLOADING CHARACTER";
+
             yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+
+            webRequestStatusText.gameObject.SetActive(true);
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;

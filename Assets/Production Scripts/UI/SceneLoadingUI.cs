@@ -16,7 +16,6 @@ namespace Vi.UI
         [Header("Player Object Spawning")]
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
-        [SerializeField] private float spawningPlayerTextEllipseChangeDelay = 0.5f;
 
         private float lastTextChangeTime;
         private void Update()
@@ -30,7 +29,7 @@ namespace Vi.UI
 
                 if (spawningPlayerObjectParent.activeSelf)
                 {
-                    if (Time.time - lastTextChangeTime > spawningPlayerTextEllipseChangeDelay)
+                    if (Time.time - lastTextChangeTime > 0.5f)
                     {
                         lastTextChangeTime = Time.time;
                         switch (spawningPlayerObjectText.text.Split(".").Length)
