@@ -417,11 +417,6 @@ namespace Vi.Core
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
             if (localPlayers.ContainsKey(playerData.id)) { yield break; }
-            if (playerData.id >= 0)
-            {
-                Debug.Log("Waiting to spawn in ms: " + NetworkManager.NetworkConfig.NetworkTransport.GetCurrentRtt((ulong)playerData.id));
-                yield return new WaitForSeconds(NetworkManager.NetworkConfig.NetworkTransport.GetCurrentRtt((ulong)playerData.id) / 1000);
-            }
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
