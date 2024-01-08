@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
 namespace Vi.UI
 {
@@ -90,7 +91,7 @@ namespace Vi.UI
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
 
-            if (IsClient) { StartCoroutine(WaitForPlayerDataToUpdatePreview()); }
+            if (IsClient) { StartCoroutine(UpdateCharacterPreview()); }
         }
 
         public override void OnNetworkDespawn()
@@ -98,14 +99,6 @@ namespace Vi.UI
             characterLockTimer.OnValueChanged -= OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged -= OnStartGameTimerChange;
             lockedClients.OnListChanged -= OnLockedClientListChange;
-        }
-
-        private IEnumerator WaitForPlayerDataToUpdatePreview()
-        {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
-            UpdateCharacterPreview(kvp.Key, kvp.Value);
         }
 
         private void OnCharacterLockTimerChange(float prev, float current)
@@ -287,19 +280,25 @@ namespace Vi.UI
         }
 
         private GameObject previewObject;
-        public void UpdateCharacterPreview(int characterIndex, int skinIndex)
+        private IEnumerator UpdateCharacterPreview()
         {
-            if (previewObject) { Destroy(previewObject); }
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
-            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            //previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-        }
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.LocalClientId).character;
 
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
+
             if (previewObject) { Destroy(previewObject); }
+            // Instantiate the player model
+            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
+
+            previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
         }
 
         public void OpenRoomSettings()
