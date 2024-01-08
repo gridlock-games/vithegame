@@ -296,9 +296,14 @@ namespace Vi.UI
             if (previewObject) { Destroy(previewObject); }
             // Instantiate the player model
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (previewObject) { Destroy(previewObject); }
         }
 
         public void OpenRoomSettings()
