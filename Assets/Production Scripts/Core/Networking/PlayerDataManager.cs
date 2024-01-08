@@ -358,14 +358,25 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
         public override void OnNetworkDespawn()
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
+            NetworkManager.NetworkTickSystem.Tick -= Tick;
         }
 
+        private void Tick()
+        {
+            if (playersToSpawnQueue.Count > 0)
+            {
+                StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+            }
+        }
+
+        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
@@ -375,7 +386,7 @@ namespace Vi.Core
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
                     {
-                        StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                        playersToSpawnQueue.Enqueue(networkListEvent.Value);
                     }
                 }
             }
