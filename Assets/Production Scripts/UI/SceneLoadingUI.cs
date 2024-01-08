@@ -29,22 +29,25 @@ namespace Vi.UI
 
                 if (spawningPlayerObjectParent.activeSelf)
                 {
+                    string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                    if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
+                    
                     if (Time.time - lastTextChangeTime > 0.5f)
                     {
                         lastTextChangeTime = Time.time;
                         switch (spawningPlayerObjectText.text.Split(".").Length)
                         {
                             case 1:
-                                spawningPlayerObjectText.text = "Spawning Player Object.";
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + ".";
                                 break;
                             case 2:
-                                spawningPlayerObjectText.text = "Spawning Player Object..";
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "..";
                                 break;
                             case 3:
-                                spawningPlayerObjectText.text = "Spawning Player Object...";
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "...";
                                 break;
                             case 4:
-                                spawningPlayerObjectText.text = "Spawning Player Object";
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "");
                                 break;
                         }
                     }
@@ -52,6 +55,7 @@ namespace Vi.UI
             }
             else
             {
+                spawningPlayerObjectParent.SetActive(false);
                 progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
             }
             

@@ -57,18 +57,14 @@ namespace Vi.UI
             connectButton.interactable = false;
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
-            StartCoroutine(ConnectToLobbyServerCoroutine());
+            NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
         }
 
         private IEnumerator ConnectToLobbyServerCoroutine()
         {
-            NetworkManager.Singleton.Shutdown();
-            yield return new WaitUntil(() => NetworkManager.Singleton.ShutdownInProgress);
-            var unityTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            //unityTransport.ConnectionData.Address = "";
-            //unityTransport.ConnectionData.Port = 7777;
-            //NetworkManager.Singleton.StartClient();
-            Debug.Log("TODO Connect to lobby server");
+            NetworkManager.Singleton.Shutdown(true);
+            yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening);
+            NetworkManager.Singleton.StartClient();
         }
     }
 }
