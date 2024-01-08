@@ -544,6 +544,13 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                connectButton.interactable = true;
+                refreshServersButton.interactable = true;
+                NetworkManager.Singleton.Shutdown();
+            }
+
             StartCoroutine(RefreshCharacterCards());
 
             returnButton.gameObject.SetActive(true);
@@ -600,7 +607,6 @@ namespace Vi.UI
         public void StartClient()
         {
             connectButton.interactable = false;
-            closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
