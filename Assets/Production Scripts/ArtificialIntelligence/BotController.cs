@@ -17,6 +17,7 @@ namespace Vi.ArtificialIntelligence
             currentPosition.Value = newPosition;
             currentRotation.Value = newRotation;
             networkColliderRigidbody.position = newPosition;
+            if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
@@ -80,6 +81,7 @@ namespace Vi.ArtificialIntelligence
             {
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
+                navMeshAgent.nextPosition = currentPosition.Value;
                 return;
             }
 
@@ -166,14 +168,35 @@ namespace Vi.ArtificialIntelligence
         private void Update()
         {
             if (!CanMove()) { return; }
+            if (attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                navMeshAgent.destination = currentPosition.Value;
+            }
+            else
+            {
+                List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+                Attributes targetAttributes = null;
+                foreach (Attributes player in activePlayers)
+                {
+                    if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                    targetAttributes = player;
+                    break;
+                }
 
-            List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
-            Attributes targetAttributes = activePlayers.Count > 0 ? activePlayers[0] : null;
-            
-            if (targetAttributes) { navMeshAgent.destination = targetAttributes.transform.position; }
-            UpdateLocomotion();
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+                UpdateLocomotion();
+                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+
+                if (targetAttributes)
+                {
+                    navMeshAgent.destination = targetAttributes.transform.position;
+                    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                    {
+                        weaponHandler.SendMessage("OnLightAttack");
+                    }
+                }
+            }
         }
 
         private float positionStrength = 1;
