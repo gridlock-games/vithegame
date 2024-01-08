@@ -214,10 +214,11 @@ namespace Vi.Core
         {
             if (IsServer)
             {
+                botClientId--;
+
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
                 botCharacter.name = "Bot " + (botClientId * -1).ToString();
 
-                botClientId--;
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
                     team,
@@ -358,14 +359,25 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
         public override void OnNetworkDespawn()
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
+            NetworkManager.NetworkTickSystem.Tick -= Tick;
         }
 
+        private void Tick()
+        {
+            if (playersToSpawnQueue.Count > 0)
+            {
+                StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+            }
+        }
+
+        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
@@ -375,7 +387,7 @@ namespace Vi.Core
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
                     {
-                        StartCoroutine(SpawnPlayer(networkListEvent.Value));
+                        playersToSpawnQueue.Enqueue(networkListEvent.Value);
                     }
                 }
             }
@@ -445,8 +457,6 @@ namespace Vi.Core
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            AnimationHandler animationHandler = playerObject.GetComponent<AnimationHandler>();
-            animationHandler.SetCharacter(characterIndex, skinIndex);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
 
             if (playerData.id >= 0)

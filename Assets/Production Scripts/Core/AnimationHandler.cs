@@ -265,58 +265,32 @@ namespace Vi.Core
             animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
         }
 
-        private void ChangeSkin(int characterIndex, int skinIndex)
+        private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            bool shouldCreateNewSkin = true;
             animatorReference = GetComponentInChildren<AnimatorReference>();
             if (animatorReference)
             {
-                Destroy(animatorReference.gameObject);
+                shouldCreateNewSkin = animatorReference.name.Replace("(Clone)", "") != character.model;
+
+                if (shouldCreateNewSkin) { Destroy(animatorReference.gameObject); }
             }
 
-            CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
-
-            Animator = modelInstance.GetComponent<Animator>();
-            LimbReferences = modelInstance.GetComponent<LimbReferences>();
-            animatorReference = modelInstance.GetComponent<AnimatorReference>();
-        }
-
-        private struct CharacterModelInfo : INetworkSerializable
-        {
-            public int characterIndex;
-            public int skinIndex;
-
-            public CharacterModelInfo(int characterIndex, int skinIndex)
+            if (shouldCreateNewSkin)
             {
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
-            }
+                CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+                GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref characterIndex);
-                serializer.SerializeValue(ref skinIndex);
+                Animator = modelInstance.GetComponent<Animator>();
+                LimbReferences = modelInstance.GetComponent<LimbReferences>();
+                animatorReference = modelInstance.GetComponent<AnimatorReference>();
             }
-        }
-
-        private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
-        public void SetCharacter(int characterIndex, int skinIndex)
-        {
-            characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
-            if (IsSpawned)
-            {
-                ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
-            }
-            else if (!NetworkManager.IsServer) // This code block is for preview characters
-            {
-                ChangeSkin(characterIndex, skinIndex);
-            }
-        }
-
-        private IEnumerator ChangeCharacter()
-        {
+            
             yield return null;
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character;
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
             
             // Apply materials and equipment
@@ -334,10 +308,15 @@ namespace Vi.Core
             ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
         }
 
+        public void ChangeCharacter(WebRequestManager.Character character)
+        {
+            if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
+            StartCoroutine(ChangeCharacterCoroutine(character));
+        }
+
         public override void OnNetworkSpawn()
         {
-            ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
-            StartCoroutine(ChangeCharacter());
+            StartCoroutine(ChangeCharacterCoroutine(PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character));
         }
 
         private void Awake()

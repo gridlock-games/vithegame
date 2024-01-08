@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private GameObject removeEquipmentButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
         [SerializeField] private Button finishCharacterCustomizationButton;
+        [SerializeField] private Button deleteCharacterButton;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
@@ -374,6 +375,7 @@ namespace Vi.UI
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
+
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -381,39 +383,21 @@ namespace Vi.UI
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
-                previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             }
-
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-
-            List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
-
-            StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
-        }
-
-        private IEnumerator ApplyEquipment(WebRequestManager.Character character, CharacterReference.PlayerModelOption playerModelOption, bool shouldRefreshEquipmentOptions)
-        {
-            yield return null;
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard);
-            animationHandler.ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard));
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows);
-            animationHandler.ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows));
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair);
-            animationHandler.ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
+            
+            previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
             selectedGender = raceAndGenderStrings[1];
-            if (shouldRefreshEquipmentOptions) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
+            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
+            deleteCharacterButton.onClick.RemoveAllListeners();
+            deleteCharacterButton.onClick.AddListener(delegate { StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)); });
 
             RefreshButtonInteractability();
         }
@@ -568,6 +552,7 @@ namespace Vi.UI
         {
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
+            deleteCharacterButton.interactable = false;
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
@@ -580,6 +565,31 @@ namespace Vi.UI
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
+            deleteCharacterButton.interactable = true;
+            returnButton.interactable = true;
+            characterNameInputField.interactable = true;
+
+            OpenCharacterSelect();
+        }
+
+        private IEnumerator DeleteCharacterCoroutine(WebRequestManager.Character character)
+        {
+            RefreshButtonInteractability(true);
+            finishCharacterCustomizationButton.interactable = false;
+            deleteCharacterButton.interactable = false;
+            returnButton.interactable = false;
+            characterNameInputField.interactable = false;
+
+            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.text = "DELETING CHARACTER";
+
+            yield return WebRequestManager.Singleton.CharacterDeleteRequest(character._id.ToString());
+
+            webRequestStatusText.gameObject.SetActive(true);
+
+            RefreshButtonInteractability();
+            finishCharacterCustomizationButton.interactable = true;
+            deleteCharacterButton.interactable = true;
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
 
