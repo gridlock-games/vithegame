@@ -70,10 +70,5 @@ namespace Vi.UI
             //NetworkManager.Singleton.StartClient();
             Debug.Log("TODO Connect to lobby server");
         }
-
-        public void CloseServerBrowser()
-        {
-
-        }
     }
 }

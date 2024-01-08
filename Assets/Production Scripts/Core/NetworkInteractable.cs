@@ -7,6 +7,6 @@ namespace Vi.Core
 {
     public abstract class NetworkInteractable : NetworkBehaviour
     {
-        public abstract void Interact();
+        public abstract void Interact(GameObject invoker);
     }
 }

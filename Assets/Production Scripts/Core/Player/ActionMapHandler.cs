@@ -13,9 +13,30 @@ namespace Vi.Player
         [SerializeField] private GameObject playerUIPrefab;
         [SerializeField] private GameObject spectatorUIPrefab;
 
+        public MonoBehaviour ExternalUI { get; private set; }
+
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
         private PlayerInput playerInput;
+
+        public void SetExternalUI(MonoBehaviour externalUI)
+        {
+            this.ExternalUI = externalUI;
+            if (externalUI)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(false);
+                playerInput.SwitchCurrentActionMap("Menu");
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(true);
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            }
+        }
 
         private void OnEnable()
         {
@@ -48,6 +69,7 @@ namespace Vi.Player
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
+            if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (minimapInstance) { return; }
             if (pauseInstance) { return; }
@@ -75,6 +97,11 @@ namespace Vi.Player
         GameObject pauseInstance;
         public void OnPause()
         {
+            if (ExternalUI)
+            {
+                ExternalUI.SendMessage("OnPause");
+                return;
+            }
             if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }
 
@@ -104,6 +131,7 @@ namespace Vi.Player
         GameObject minimapInstance;
         void OnMinimap(InputValue value)
         {
+            if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (value.isPressed)

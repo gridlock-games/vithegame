@@ -2,18 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
+using Vi.Player;
 
-namespace Vi.ArtificialIntelligence
+namespace Vi.UI
 {
     public class LobbyManagerNPC : NetworkInteractable
     {
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private GameObject UI;
 
-        public override void Interact()
+        private GameObject invoker;
+        public override void Interact(GameObject invoker)
         {
+            this.invoker = invoker;
+            invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
             UI.SetActive(true);
-            Debug.Log(Time.time + " interact");
+        }
+
+        private void OnPause()
+        {
+            CloseServerBrowser();
+        }
+
+        public void CloseServerBrowser()
+        {
+            invoker.GetComponent<ActionMapHandler>().SetExternalUI(null);
+            invoker = null;
+            UI.SetActive(false);
         }
 
         private bool localPlayerInRange;

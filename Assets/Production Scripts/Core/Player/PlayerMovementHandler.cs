@@ -276,7 +276,7 @@ namespace Vi.Player
             {
                 if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
                 {
-                    networkInteractable.Interact();
+                    networkInteractable.Interact(gameObject);
                     break;
                 }
             }
