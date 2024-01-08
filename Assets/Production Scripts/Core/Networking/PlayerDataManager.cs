@@ -214,10 +214,11 @@ namespace Vi.Core
         {
             if (IsServer)
             {
+                botClientId--;
+
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
                 botCharacter.name = "Bot " + (botClientId * -1).ToString();
 
-                botClientId--;
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
                     team,
