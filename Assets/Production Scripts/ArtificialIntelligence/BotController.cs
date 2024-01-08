@@ -12,6 +12,13 @@ namespace Vi.ArtificialIntelligence
     {
         [SerializeField] private Rigidbody networkColliderRigidbody;
 
+        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        {
+            currentPosition.Value = newPosition;
+            currentRotation.Value = newRotation;
+            networkColliderRigidbody.position = newPosition;
+        }
+
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
@@ -162,7 +169,7 @@ namespace Vi.ArtificialIntelligence
 
             List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
             Attributes targetAttributes = activePlayers.Count > 0 ? activePlayers[0] : null;
-
+            
             if (targetAttributes) { navMeshAgent.destination = targetAttributes.transform.position; }
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
