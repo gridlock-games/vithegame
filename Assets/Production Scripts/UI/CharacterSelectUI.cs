@@ -95,7 +95,6 @@ namespace Vi.UI
             // Create character cards
             foreach (WebRequestManager.Character character in WebRequestManager.Singleton.Characters)
             {
-                Debug.Log(character.name);
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
@@ -376,6 +375,7 @@ namespace Vi.UI
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
+
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -383,34 +383,14 @@ namespace Vi.UI
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
-                previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
             }
-
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-
-            List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
-            animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
-
-            StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
-        }
-
-        private IEnumerator ApplyEquipment(WebRequestManager.Character character, CharacterReference.PlayerModelOption playerModelOption, bool shouldRefreshEquipmentOptions)
-        {
-            yield return null;
-            AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(playerModelOption.raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard);
-            animationHandler.ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard));
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows);
-            animationHandler.ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows));
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair);
-            animationHandler.ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
+            
+            previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
             selectedGender = raceAndGenderStrings[1];
-            if (shouldRefreshEquipmentOptions) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
+            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
 

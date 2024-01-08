@@ -445,8 +445,6 @@ namespace Vi.Core
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            AnimationHandler animationHandler = playerObject.GetComponent<AnimationHandler>();
-            animationHandler.SetCharacter(characterIndex, skinIndex);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
 
             if (playerData.id >= 0)

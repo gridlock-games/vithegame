@@ -293,7 +293,7 @@ namespace Vi.UI
 
             CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
             previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
+            //previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
         }
 
         private new void OnDestroy()
