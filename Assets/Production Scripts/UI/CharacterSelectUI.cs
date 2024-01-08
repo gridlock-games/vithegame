@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private GameObject removeEquipmentButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
         [SerializeField] private Button finishCharacterCustomizationButton;
+        [SerializeField] private Button deleteCharacterButton;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
@@ -94,6 +95,7 @@ namespace Vi.UI
             // Create character cards
             foreach (WebRequestManager.Character character in WebRequestManager.Singleton.Characters)
             {
+                Debug.Log(character.name);
                 CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
                 characterCard.Initialize(character);
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
@@ -414,6 +416,8 @@ namespace Vi.UI
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
+            deleteCharacterButton.onClick.RemoveAllListeners();
+            deleteCharacterButton.onClick.AddListener(delegate { StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)); });
 
             RefreshButtonInteractability();
         }
@@ -568,6 +572,7 @@ namespace Vi.UI
         {
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
+            deleteCharacterButton.interactable = false;
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
@@ -580,6 +585,31 @@ namespace Vi.UI
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
+            deleteCharacterButton.interactable = true;
+            returnButton.interactable = true;
+            characterNameInputField.interactable = true;
+
+            OpenCharacterSelect();
+        }
+
+        private IEnumerator DeleteCharacterCoroutine(WebRequestManager.Character character)
+        {
+            RefreshButtonInteractability(true);
+            finishCharacterCustomizationButton.interactable = false;
+            deleteCharacterButton.interactable = false;
+            returnButton.interactable = false;
+            characterNameInputField.interactable = false;
+
+            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.text = "DELETING CHARACTER";
+
+            yield return WebRequestManager.Singleton.CharacterDeleteRequest(character._id.ToString());
+
+            webRequestStatusText.gameObject.SetActive(true);
+
+            RefreshButtonInteractability();
+            finishCharacterCustomizationButton.interactable = true;
+            deleteCharacterButton.interactable = true;
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
 

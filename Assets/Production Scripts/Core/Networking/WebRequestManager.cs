@@ -275,6 +275,12 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
+        public IEnumerator CharacterDeleteRequest(string characterId)
+        {
+            Debug.Log("TODO: character delete request");
+            yield return new WaitForSeconds(3);
+        }
+
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
 
         public struct Character : INetworkSerializable
