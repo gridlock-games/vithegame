@@ -15,7 +15,7 @@ namespace Vi.UI
 
         public void Initialize(WebRequestManager.Character character)
         {
-            nameText.text = character.name;
+            nameText.text = character.name.ToString();
             levelText.text = "Lv." + character.experience.ToString();
         }
     }

@@ -68,7 +68,7 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -99,7 +99,7 @@ namespace Vi.UI
                 characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
                 characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
-                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id));
+                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id.ToString()));
             }
         }
 
@@ -301,7 +301,7 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id);
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -357,9 +357,9 @@ namespace Vi.UI
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
             selectCharacterButton.interactable = true;
-            characterNameInputField.text = character.name;
+            characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
@@ -388,7 +388,6 @@ namespace Vi.UI
 
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(playerModelOption.raceAndGender);
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
-            //animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
             animationHandler.ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             StartCoroutine(ApplyEquipment(character, playerModelOption, shouldCreateNewModel));
@@ -454,8 +453,32 @@ namespace Vi.UI
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
+        private float lastTextChangeTime;
         private void Update()
         {
+            if (webRequestStatusText.gameObject.activeSelf)
+            {
+                if (Time.time - lastTextChangeTime > 0.5f)
+                {
+                    lastTextChangeTime = Time.time;
+                    switch (webRequestStatusText.text.Split(".").Length)
+                    {
+                        case 1:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + ".";
+                            break;
+                        case 2:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + "..";
+                            break;
+                        case 3:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "") + "...";
+                            break;
+                        case 4:
+                            webRequestStatusText.text = webRequestStatusText.text.Replace(".", "");
+                            break;
+                    }
+                }
+            }
+
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
                 foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
@@ -521,6 +544,13 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                connectButton.interactable = true;
+                refreshServersButton.interactable = true;
+                NetworkManager.Singleton.Shutdown();
+            }
+
             StartCoroutine(RefreshCharacterCards());
 
             returnButton.gameObject.SetActive(true);
@@ -536,13 +566,17 @@ namespace Vi.UI
 
         private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
         {
-            Debug.Log("TODO Fix add character here");
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
+            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.text = "UPLOADING CHARACTER";
+
             yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+
+            webRequestStatusText.gameObject.SetActive(true);
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
@@ -573,11 +607,9 @@ namespace Vi.UI
         public void StartClient()
         {
             connectButton.interactable = false;
-            closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
-            // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(JsonUtility.ToJson(selectedCharacter));
         }
 
         private void OnDrawGizmos()

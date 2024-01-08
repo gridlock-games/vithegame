@@ -305,10 +305,6 @@ namespace Vi.Core
             characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
             if (IsSpawned)
             {
-                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-                playerData.characterIndex = characterIndex;
-                playerData.skinIndex = skinIndex;
-                PlayerDataManager.Singleton.SetPlayerData(playerData);
                 ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
             }
             else if (!NetworkManager.IsServer) // This code block is for preview characters
@@ -317,9 +313,31 @@ namespace Vi.Core
             }
         }
 
+        private IEnumerator ChangeCharacter()
+        {
+            yield return null;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character;
+            CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
+            
+            // Apply materials and equipment
+            CharacterReference.RaceAndGender raceAndGender = characterReference.GetPlayerModelOptions()[characterReference.GetPlayerModelOptionIndices(character.model.ToString()).Key].raceAndGender;
+            List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(raceAndGender);
+            ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
+            ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
+
+            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard);
+            ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard));
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows);
+            ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows));
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair);
+            ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
+        }
+
         public override void OnNetworkSpawn()
         {
             ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
+            StartCoroutine(ChangeCharacter());
         }
 
         private void Awake()

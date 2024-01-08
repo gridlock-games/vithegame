@@ -104,7 +104,8 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-            UpdateCharacterPreview(playerData.characterIndex, playerData.skinIndex);
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
+            UpdateCharacterPreview(kvp.Key, kvp.Value);
         }
 
         private void OnCharacterLockTimerChange(float prev, float current)
@@ -315,9 +316,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            int characterIndex = 0;
-            int skinIndex = 0;
-            PlayerDataManager.Singleton.AddBotData(characterIndex, skinIndex, team);
+            PlayerDataManager.Singleton.AddBotData(team);
         }
 
         public void ChangeGameMode()

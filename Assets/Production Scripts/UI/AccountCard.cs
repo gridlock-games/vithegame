@@ -17,7 +17,7 @@ namespace Vi.UI
         {
             this.playerDataId = playerDataId;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            nameDisplayText.text = playerData.playerName.ToString();
+            nameDisplayText.text = playerData.character.name.ToString();
             backgroundImage.color = PlayerDataManager.GetTeamColor(playerData.team);
         }
     }

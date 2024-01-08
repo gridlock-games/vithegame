@@ -210,15 +210,16 @@ namespace Vi.Core
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
         private int botClientId = 0;
-        public void AddBotData(int characterIndex, int skinIndex, Team team)
+        public void AddBotData(Team team)
         {
             if (IsServer)
             {
+                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
+                botCharacter.name = "Bot " + (botClientId * -1).ToString();
+
                 botClientId--;
                 PlayerData botData = new PlayerData(botClientId,
-                    "Bot " + (botClientId * -1).ToString(),
-                    characterIndex,
-                    skinIndex,
+                    botCharacter,
                     team,
                     1,
                     0);
@@ -226,11 +227,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(characterIndex, skinIndex, team);
+                AddBotDataServerRpc(team);
             }
         }
 
-        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(int characterIndex, int skinIndex, Team team) { AddBotData(characterIndex, skinIndex, team); }
+        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(Team team) { AddBotData(team); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -369,7 +370,7 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.playerName + "'s data has been added.");
+                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
                 if (IsServer)
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
@@ -427,6 +428,10 @@ namespace Vi.Core
                 spawnRotation = transformData.rotation;
             }
 
+            KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
             GameObject playerObject;
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
@@ -435,12 +440,13 @@ namespace Vi.Core
             else
             {
                 if (playerData.id >= 0)
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[GetPlayerData(playerData.id).characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
             }
 
-            playerObject.GetComponent<AnimationHandler>().SetCharacter(playerData.characterIndex, playerData.skinIndex);
+            AnimationHandler animationHandler = playerObject.GetComponent<AnimationHandler>();
+            animationHandler.SetCharacter(characterIndex, skinIndex);
             playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
 
             if (playerData.id >= 0)
@@ -451,7 +457,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).playerName + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
         }
 
@@ -477,9 +483,7 @@ namespace Vi.Core
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
-            public FixedString32Bytes playerName;
-            public int characterIndex;
-            public int skinIndex;
+            public WebRequestManager.Character character;
             public Team team;
             public int primaryWeaponIndex;
             public int secondaryWeaponIndex;
@@ -487,20 +491,16 @@ namespace Vi.Core
             public PlayerData(int id)
             {
                 this.id = id;
-                playerName = "Player Name";
-                characterIndex = 0;
-                skinIndex = 0;
+                character = new();
                 team = Team.Environment;
                 primaryWeaponIndex = 0;
                 secondaryWeaponIndex = 0;
             }
 
-            public PlayerData(int id, string playerName, int characterIndex, int skinIndex, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
+            public PlayerData(int id, WebRequestManager.Character character, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
             {
                 this.id = id;
-                this.playerName = playerName;
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
+                this.character = character;
                 this.team = team;
                 this.primaryWeaponIndex = primaryWeaponIndex;
                 this.secondaryWeaponIndex = secondaryWeaponIndex;
@@ -514,9 +514,7 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
-                serializer.SerializeValue(ref playerName);
-                serializer.SerializeValue(ref characterIndex);
-                serializer.SerializeValue(ref skinIndex);
+                serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
                 serializer.SerializeValue(ref primaryWeaponIndex);
                 serializer.SerializeValue(ref secondaryWeaponIndex);

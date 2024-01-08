@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Unity.Netcode;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -204,10 +206,41 @@ namespace Vi.Core
             IsRefreshingCharacters = false;
         }
 
+        public bool IsGettingCharacterById { get; private set; }
+        public Character CharacterById { get; private set; }
+        public void GetCharacterById(string characterId) { StartCoroutine(CharacterByIdGetRequest(characterId)); }
+
+        private IEnumerator CharacterByIdGetRequest(string characterId)
+        {
+            if (IsGettingCharacterById) { yield break; }
+            IsGettingCharacterById = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + "getCharacter/" + characterId);
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + characterAPIURL + "getCharacter/" + characterId);
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            try
+            {
+                CharacterById = JsonConvert.DeserializeObject<Character>(json);
+            }
+            catch
+            {
+                CharacterById = GetDefaultCharacter();
+            }
+
+            getRequest.Dispose();
+            IsGettingCharacterById = false;
+        }
+
         public IEnumerator CharacterPutRequest(Character character)
         {
-            CharacterPutPayload payload = new CharacterPutPayload(character._id, character.slot, character.eyeColor, character.hair,
-                character.bodyColor, character.beard, character.brows, character.name, character.model);
+            CharacterPutPayload payload = new CharacterPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
+                character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
 
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -225,8 +258,8 @@ namespace Vi.Core
 
         public IEnumerator CharacterPostRequest(Character character)
         {
-            CharacterPostPayload payload = new CharacterPostPayload(character.userId, character.slot, character.eyeColor, character.hair,
-                character.bodyColor, character.beard, character.brows, character.name, character.model);
+            CharacterPostPayload payload = new CharacterPostPayload(character.userId.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
+                character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -244,21 +277,21 @@ namespace Vi.Core
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
 
-        public struct Character
+        public struct Character : INetworkSerializable
         {
-            public string _id;
+            public FixedString32Bytes _id;
             public int slot;
-            public string name;
-            public string model;
+            public FixedString32Bytes name;
+            public FixedString32Bytes model;
             public int experience;
-            public string bodyColor;
-            public string eyeColor;
-            public string beard;
-            public string brows;
-            public string hair;
-            public string dateCreated;
+            public FixedString32Bytes bodyColor;
+            public FixedString32Bytes eyeColor;
+            public FixedString32Bytes beard;
+            public FixedString32Bytes brows;
+            public FixedString32Bytes hair;
+            public FixedString128Bytes dateCreated;
             public CharacterAttributes attributes;
-            public string userId;
+            public FixedString32Bytes userId;
             public int level;
 
             public Character(string _id, string model, string name, int experience, int level)
@@ -296,15 +329,42 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
             }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref _id);
+                serializer.SerializeValue(ref slot);
+                serializer.SerializeValue(ref name);
+                serializer.SerializeValue(ref model);
+                serializer.SerializeValue(ref experience);
+                serializer.SerializeValue(ref bodyColor);
+                serializer.SerializeValue(ref eyeColor);
+                serializer.SerializeValue(ref beard);
+                serializer.SerializeValue(ref brows);
+                serializer.SerializeValue(ref hair);
+                //serializer.SerializeValue(ref dateCreated);
+                serializer.SerializeNetworkSerializable(ref attributes);
+                serializer.SerializeValue(ref userId);
+                serializer.SerializeValue(ref level);
+            }
         }
 
-        public struct CharacterAttributes
+        public struct CharacterAttributes : INetworkSerializable
         {
             public int strength;
             public int vitality;
             public int agility;
             public int dexterity;
             public int intelligence;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref strength);
+                serializer.SerializeValue(ref vitality);
+                serializer.SerializeValue(ref agility);
+                serializer.SerializeValue(ref dexterity);
+                serializer.SerializeValue(ref intelligence);
+            }
         }
 
         private struct CharacterPostPayload

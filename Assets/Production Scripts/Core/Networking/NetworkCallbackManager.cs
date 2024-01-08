@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 
-namespace Vi.Core.SceneManagement
+namespace Vi.Core
 {
     public class NetworkCallbackManager : MonoBehaviour
     {
@@ -13,8 +13,11 @@ namespace Vi.Core.SceneManagement
 
         private void Awake()
         {
-            //Screen.SetResolution(1920, 1080, Screen.fullScreenMode, Screen.currentResolution.refreshRate);
-            //Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            //if (!Application.isEditor)
+            //{
+            //    Screen.SetResolution(Screen.currentResolution.height * (16/9), Screen.currentResolution.height, Screen.fullScreenMode);
+            //    Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            //}
         }
 
         private void Start()
@@ -63,38 +66,45 @@ namespace Vi.Core.SceneManagement
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            string playerName = "Player Name";
-            int characterIndex = 0;
-            int skinIndex = 0;
+            PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
 
-            // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
-            try
-            {
-                WebRequestManager.Character character = JsonUtility.FromJson<WebRequestManager.Character>(payload);
-                KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model);
-                characterIndex = kvp.Key;
-                skinIndex = kvp.Value;
-                playerName = character.name;
-            }
-            catch
-            {
-
-            }
-
-            PlayerDataManager.Team clientTeam = PlayerDataManager.Team.Competitor;
-
-            StartCoroutine(AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, playerName,
-                characterIndex,
-                skinIndex,
-                clientTeam,
-                1,
-                2)));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId, clientTeam));
         }
 
-        private IEnumerator AddPlayerData(PlayerDataManager.PlayerData playerData)
+        private struct PlayerDataInput
         {
+            public string characterId;
+            public int clientId;
+            public PlayerDataManager.Team team;
+
+            public PlayerDataInput(string characterId, int clientId, PlayerDataManager.Team team)
+            {
+                this.characterId = characterId;
+                this.clientId = clientId;
+                this.team = team;
+            }
+        }
+
+        private Queue<PlayerDataInput> playerDataQueue = new Queue<PlayerDataInput>();
+        private void Update()
+        {
+            if (playerDataQueue.Count > 0)
+            {
+                if (!addPlayerDataRunning) { StartCoroutine(AddPlayerData(playerDataQueue.Dequeue())); }
+            }
+        }
+
+        private bool addPlayerDataRunning;
+        private IEnumerator AddPlayerData(PlayerDataInput playerDataInput)
+        {
+            addPlayerDataRunning = true;
+
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
-            PlayerDataManager.Singleton.AddPlayerData(playerData);
+            WebRequestManager.Singleton.GetCharacterById(playerDataInput.characterId);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
+            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(playerDataInput.clientId, WebRequestManager.Singleton.CharacterById, playerDataInput.team, 1, 2));
+            
+            addPlayerDataRunning = false;
         }
 
         private void OnServerStarted()
