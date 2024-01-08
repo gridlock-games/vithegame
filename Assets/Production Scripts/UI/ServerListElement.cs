@@ -33,14 +33,14 @@ namespace Vi.UI
             networkTransport.ConnectionData.Port = ushort.Parse(Server.port);
         }
 
-        public void Initialize(CharacterSelectUI characterSelectUI, WebRequestManager.Server server)
+        public void Initialize(MonoBehaviour UIParent, WebRequestManager.Server server)
         {
             Server = server;
             serverNameText.text = server.label;
             playerCountText.text = server.population.ToString();
             regionText.text = "NA";
             pingText.text = "";
-            characterSelectUI.StartCoroutine(PingServer());
+            UIParent.StartCoroutine(PingServer());
         }
 
         private IEnumerator PingServer()

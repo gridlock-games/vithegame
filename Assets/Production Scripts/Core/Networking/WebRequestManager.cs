@@ -230,7 +230,7 @@ namespace Vi.Core
             }
             catch
             {
-                CharacterById = new();
+                CharacterById = GetDefaultCharacter();
             }
 
             getRequest.Dispose();

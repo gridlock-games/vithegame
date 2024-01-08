@@ -8,9 +8,11 @@ namespace Vi.ArtificialIntelligence
     public class LobbyManagerNPC : NetworkInteractable
     {
         [SerializeField] private GameObject worldSpaceLabel;
+        [SerializeField] private GameObject UI;
 
         public override void Interact()
         {
+            UI.SetActive(true);
             Debug.Log(Time.time + " interact");
         }
 
@@ -34,6 +36,7 @@ namespace Vi.ArtificialIntelligence
         private void Start()
         {
             worldSpaceLabel.transform.localScale = Vector3.zero;
+            UI.SetActive(false);
         }
 
         private const float scalingSpeed = 8;

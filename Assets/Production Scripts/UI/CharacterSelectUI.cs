@@ -456,7 +456,6 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
-            
             if (webRequestStatusText.gameObject.activeSelf)
             {
                 if (Time.time - lastTextChangeTime > 0.5f)
@@ -603,7 +602,6 @@ namespace Vi.UI
             connectButton.interactable = false;
             closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
-            // TODO Change this to only send the character id so that we can access it through the API (less bandwidth)
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
         }
