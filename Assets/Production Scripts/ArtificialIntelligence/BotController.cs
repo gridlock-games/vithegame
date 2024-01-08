@@ -85,7 +85,7 @@ namespace Vi.ArtificialIntelligence
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
             
-            Vector3 lookDirection = inputDir.normalized;
+            Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
             Quaternion newRotation;
