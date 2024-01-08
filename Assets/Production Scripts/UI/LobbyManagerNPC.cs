@@ -9,14 +9,14 @@ namespace Vi.UI
     public class LobbyManagerNPC : NetworkInteractable
     {
         [SerializeField] private GameObject worldSpaceLabel;
-        [SerializeField] private GameObject UI;
+        [SerializeField] private HubServerBrowser UI;
 
         private GameObject invoker;
         public override void Interact(GameObject invoker)
         {
             this.invoker = invoker;
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
-            UI.SetActive(true);
+            UI.gameObject.SetActive(true);
         }
 
         private void OnPause()
@@ -28,7 +28,10 @@ namespace Vi.UI
         {
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(null);
             invoker = null;
-            UI.SetActive(false);
+            UI.gameObject.SetActive(false);
+
+            UI.connectButton.interactable = true;
+            UI.refreshServersButton.interactable = true;
         }
 
         private bool localPlayerInRange;
@@ -51,7 +54,7 @@ namespace Vi.UI
         private void Start()
         {
             worldSpaceLabel.transform.localScale = Vector3.zero;
-            UI.SetActive(false);
+            UI.gameObject.SetActive(false);
         }
 
         private const float scalingSpeed = 8;

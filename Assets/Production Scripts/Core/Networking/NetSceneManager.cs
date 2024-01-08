@@ -126,6 +126,10 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
+
+            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
+            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
+            UnloadAllScenePayloadsOfType(SceneType.Environment);
         }
 
         private void Awake()

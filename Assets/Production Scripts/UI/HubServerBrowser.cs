@@ -12,9 +12,10 @@ namespace Vi.UI
     {
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
-        [SerializeField] private Button connectButton;
         [SerializeField] private Button closeServersMenuButton;
-        [SerializeField] private Button refreshServersButton;
+
+        public Button connectButton;
+        public Button refreshServersButton;
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private void Update()
@@ -55,7 +56,6 @@ namespace Vi.UI
         public void ConnectToLobbyServer()
         {
             connectButton.interactable = false;
-            closeServersMenuButton.interactable = false;
             refreshServersButton.interactable = false;
             NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
         }

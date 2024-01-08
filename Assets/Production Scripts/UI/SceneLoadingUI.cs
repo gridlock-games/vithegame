@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class SceneLoadingUI : MonoBehaviour
     {
+        [SerializeField] private GameObject parentOfAll;
         [Header("Scene Loading")]
         [SerializeField] private GameObject progressBarParent;
         [SerializeField] private Image progressBarImage;
@@ -20,12 +21,13 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
-            if (!NetSceneManager.Singleton) { progressBarParent.SetActive(false); return; }
+            if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
 
-            if (NetworkManager.Singleton.IsClient | !NetworkManager.Singleton.IsListening)
+            if (!NetworkManager.Singleton.IsServer)
             {
-                spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer() & !PlayerDataManager.Singleton.GetLocalPlayerObject().Value);
-                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | spawningPlayerObjectParent.activeSelf);
+                Attributes playerObject = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+                spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & !playerObject));
 
                 if (spawningPlayerObjectParent.activeSelf)
                 {
@@ -58,7 +60,9 @@ namespace Vi.UI
                 spawningPlayerObjectParent.SetActive(false);
                 progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
             }
-            
+
+            parentOfAll.SetActive(progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf);
+
             if (NetSceneManager.Singleton.LoadingOperations.Count == 0)
             {
                 progressBarText.text = "Scene Loading Complete";
@@ -67,8 +71,8 @@ namespace Vi.UI
 
             for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
             {
-                progressBarText.text = "Loading " + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
-                progressBarImage.fillAmount = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.progress;
+                progressBarText.text = (NetSceneManager.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                progressBarImage.fillAmount = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.isDone ? 1 : NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.progress;
             }
         }
     }
