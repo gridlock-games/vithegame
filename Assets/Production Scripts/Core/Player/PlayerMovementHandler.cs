@@ -268,6 +268,20 @@ namespace Vi.Player
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
 
+        void OnInteract()
+        {
+            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                {
+                    networkInteractable.Interact();
+                    break;
+                }
+            }
+        }
+
         private void OnDrawGizmos()
         {
             if (!Application.isPlaying) { return; }
