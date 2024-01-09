@@ -251,7 +251,7 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.CharacterPutRequest()" + putRequest.error);
             }
             putRequest.Dispose();
         }
@@ -275,10 +275,22 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
-        public IEnumerator CharacterDeleteRequest(string characterId)
+        public IEnumerator CharacterDisableRequest(string characterId)
         {
-            Debug.Log("TODO: character delete request");
-            yield return new WaitForSeconds(3);
+            CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "disableCharacter", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
         }
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
@@ -430,6 +442,16 @@ namespace Vi.Core
                 this.brows = brows;
                 this.name = name;
                 this.model = model;
+            }
+        }
+
+        private struct CharacterDisablePayload
+        {
+            public string characterId;
+
+            public CharacterDisablePayload(string characterId)
+            {
+                this.characterId = characterId;
             }
         }
     }
