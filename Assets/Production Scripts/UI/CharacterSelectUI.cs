@@ -561,7 +561,7 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "UPLOADING CHARACTER";
 
-            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
 
             webRequestStatusText.gameObject.SetActive(true);
 
