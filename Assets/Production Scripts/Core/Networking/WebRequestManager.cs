@@ -266,6 +266,7 @@ namespace Vi.Core
                 character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
 
             string json = JsonConvert.SerializeObject(payload);
+            Debug.Log(json);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "saveLoadOut", jsonData);

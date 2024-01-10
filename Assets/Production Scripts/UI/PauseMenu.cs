@@ -11,6 +11,7 @@ namespace Vi.UI
     {
         [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
+        [SerializeField] private LoadoutEditorMenu loadoutEditorMenu;
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private Toggle debugOverlayToggle;
 
@@ -25,6 +26,14 @@ namespace Vi.UI
         public void OpenControlMenu()
         {
             GameObject _settings = Instantiate(controlSettingsMenu.gameObject);
+            _settings.GetComponent<Menu>().SetLastMenu(gameObject);
+            childMenu = _settings;
+            gameObject.SetActive(false);
+        }
+
+        public void OpenLoadoutEditorMenu()
+        {
+            GameObject _settings = Instantiate(loadoutEditorMenu.gameObject);
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
             gameObject.SetActive(false);
