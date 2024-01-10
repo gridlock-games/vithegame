@@ -21,6 +21,7 @@ namespace Vi.UI
         [SerializeField] private CharacterCard characterCardPrefab;
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
+        [SerializeField] private Button goToTrainingRoomButton;
         [SerializeField] private Button addCharacterButton;
 
         [Header("Character Customization")]
@@ -70,6 +71,7 @@ namespace Vi.UI
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -303,6 +305,7 @@ namespace Vi.UI
         private void RefreshButtonInteractability(bool disableAll = false)
         {
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -358,6 +361,7 @@ namespace Vi.UI
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
             selectCharacterButton.interactable = true;
+            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
             characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
@@ -596,6 +600,13 @@ namespace Vi.UI
             characterNameInputField.interactable = true;
 
             OpenCharacterSelect();
+        }
+
+        public void GoToTrainingRoom()
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
+            NetworkManager.Singleton.StartHost();
+            NetSceneManager.Singleton.LoadScene("Training Room");
         }
 
         public void OpenServerBrowser()

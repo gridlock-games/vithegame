@@ -263,7 +263,7 @@ namespace Vi.Core
         {
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
                 character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
-                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.wepaon2ItemId.ToString());
+                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -449,7 +449,7 @@ namespace Vi.Core
             public FixedString32Bytes armsGearItemId;
             public FixedString32Bytes bootsGearItemId;
             public FixedString32Bytes weapon1ItemId;
-            public FixedString32Bytes wepaon2ItemId;
+            public FixedString32Bytes weapon2ItemId;
             public bool active;
 
             public LoadOut(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
@@ -460,7 +460,7 @@ namespace Vi.Core
                 this.armsGearItemId = armsGearItemId;
                 this.bootsGearItemId = bootsGearItemId;
                 this.weapon1ItemId = weapon1ItemId;
-                this.wepaon2ItemId = weapon2ItemId;
+                this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
             }
 
@@ -472,7 +472,7 @@ namespace Vi.Core
                 serializer.SerializeValue(ref armsGearItemId);
                 serializer.SerializeValue(ref bootsGearItemId);
                 serializer.SerializeValue(ref weapon1ItemId);
-                serializer.SerializeValue(ref wepaon2ItemId);
+                serializer.SerializeValue(ref weapon2ItemId);
                 serializer.SerializeValue(ref active);
             }
         }
@@ -553,7 +553,7 @@ namespace Vi.Core
                     armsGearItemId = armsGearItemId,
                     bootsGearItemId = bootsGearItemId,
                     weapon1ItemId = weapon1ItemId,
-                    wepaon2ItemId = weapon2ItemId
+                    weapon2ItemId = weapon2ItemId
                 };
             }
         }
@@ -566,7 +566,7 @@ namespace Vi.Core
             public string armsGearItemId;
             public string bootsGearItemId;
             public string weapon1ItemId;
-            public string wepaon2ItemId;
+            public string weapon2ItemId;
         }
 
         private struct CharacterDisablePayload

@@ -35,7 +35,7 @@ namespace Vi.Core
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
             CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.weapon.name == playerData.character.loadoutPreset1.weapon1ItemId);
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.weapon.name == playerData.character.loadoutPreset1.wepaon2ItemId);
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.weapon.name == playerData.character.loadoutPreset1.weapon2ItemId);
 
             primaryWeapon = Instantiate(primaryOption.weapon);
             secondaryWeapon = Instantiate(secondaryOption.weapon);
