@@ -509,6 +509,7 @@ namespace Vi.UI
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
+            deleteCharacterButton.gameObject.SetActive(false);
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -524,6 +525,7 @@ namespace Vi.UI
             UpdateSelectedCharacter(character);
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
             isEditingExistingCharacter = true;
+            deleteCharacterButton.gameObject.SetActive(true);
         }
 
         public void OpenCharacterSelect()
@@ -559,7 +561,7 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "UPLOADING CHARACTER";
 
-            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterPutRequest(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
 
             webRequestStatusText.gameObject.SetActive(true);
 
@@ -583,7 +585,7 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "DELETING CHARACTER";
 
-            yield return WebRequestManager.Singleton.CharacterDeleteRequest(character._id.ToString());
+            yield return WebRequestManager.Singleton.CharacterDisableRequest(character._id.ToString());
 
             webRequestStatusText.gameObject.SetActive(true);
 

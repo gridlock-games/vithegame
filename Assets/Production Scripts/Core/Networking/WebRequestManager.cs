@@ -195,7 +195,10 @@ namespace Vi.Core
             string json = getRequest.downloadHandler.text;
             try
             {
-                Characters = JsonConvert.DeserializeObject<List<Character>>(json);
+                foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                {
+                    Characters.Add(jsonStruct.ToCharacter());
+                }
             }
             catch
             {
@@ -226,7 +229,7 @@ namespace Vi.Core
             string json = getRequest.downloadHandler.text;
             try
             {
-                CharacterById = JsonConvert.DeserializeObject<Character>(json);
+                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
             }
             catch
             {
@@ -237,9 +240,9 @@ namespace Vi.Core
             IsGettingCharacterById = false;
         }
 
-        public IEnumerator CharacterPutRequest(Character character)
+        public IEnumerator UpdateCharacterCosmetics(Character character)
         {
-            CharacterPutPayload payload = new CharacterPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
+            CharacterCosmeticPutPayload payload = new CharacterCosmeticPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
                 character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
 
             string json = JsonUtility.ToJson(payload);
@@ -251,7 +254,27 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        public IEnumerator UpdateCharacterLoadout(Character character)
+        {
+            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
+                character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
+                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.wepaon2ItemId.ToString());
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "saveLoadOut", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
         }
@@ -275,32 +298,46 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
-        public IEnumerator CharacterDeleteRequest(string characterId)
+        public IEnumerator CharacterDisableRequest(string characterId)
         {
-            Debug.Log("TODO: character delete request");
-            yield return new WaitForSeconds(3);
+            CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "disableCharacter", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
+
+        public LoadOut GetDefaultLoadout() { return new LoadOut("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
 
         public struct Character : INetworkSerializable
         {
             public FixedString32Bytes _id;
-            public int slot;
             public FixedString32Bytes name;
             public FixedString32Bytes model;
-            public int experience;
             public FixedString32Bytes bodyColor;
             public FixedString32Bytes eyeColor;
             public FixedString32Bytes beard;
             public FixedString32Bytes brows;
             public FixedString32Bytes hair;
-            public FixedString128Bytes dateCreated;
             public CharacterAttributes attributes;
+            public LoadOut loadoutPreset1;
             public FixedString32Bytes userId;
+            public int slot;
             public int level;
+            public int experience;
 
-            public Character(string _id, string model, string name, int experience, int level)
+            public Character(string _id, string model, string name, int experience, int level, LoadOut loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -312,13 +349,13 @@ namespace Vi.Core
                 beard = "";
                 brows = "";
                 hair = "";
-                dateCreated = "";
                 attributes = new CharacterAttributes();
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
+                this.loadoutPreset1 = loadoutPreset1;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, LoadOut loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -330,28 +367,59 @@ namespace Vi.Core
                 this.beard = beard;
                 this.brows = brows;
                 this.hair = hair;
-                dateCreated = "";
                 attributes = new CharacterAttributes();
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
+                this.loadoutPreset1 = loadoutPreset1;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref _id);
-                serializer.SerializeValue(ref slot);
                 serializer.SerializeValue(ref name);
                 serializer.SerializeValue(ref model);
-                serializer.SerializeValue(ref experience);
                 serializer.SerializeValue(ref bodyColor);
                 serializer.SerializeValue(ref eyeColor);
                 serializer.SerializeValue(ref beard);
                 serializer.SerializeValue(ref brows);
                 serializer.SerializeValue(ref hair);
-                //serializer.SerializeValue(ref dateCreated);
                 serializer.SerializeNetworkSerializable(ref attributes);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset1);
                 serializer.SerializeValue(ref userId);
+                serializer.SerializeValue(ref slot);
                 serializer.SerializeValue(ref level);
+                serializer.SerializeValue(ref experience);
+            }
+        }
+
+        private struct CharacterJson
+        {
+            public string _id;
+            public int slot;
+            public string name;
+            public string model;
+            public int experience;
+            public string bodyColor;
+            public string eyeColor;
+            public string beard;
+            public string brows;
+            public string hair;
+            public string dateCreated;
+            public CharacterAttributes attributes;
+            public List<LoadOut> loadOuts;
+            public bool enabled;
+            public string userId;
+            public int level;
+            public object attack;
+            public object hp;
+            public object stamina;
+            public object critChance;
+            public object crit;
+            public string id;
+
+            public Character ToCharacter()
+            {
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, loadOuts.Count > 0 ? loadOuts[0] : Singleton.GetDefaultLoadout());
             }
         }
 
@@ -370,6 +438,42 @@ namespace Vi.Core
                 serializer.SerializeValue(ref agility);
                 serializer.SerializeValue(ref dexterity);
                 serializer.SerializeValue(ref intelligence);
+            }
+        }
+
+        public struct LoadOut : INetworkSerializable
+        {
+            public FixedString32Bytes loadoutSlot;
+            public FixedString32Bytes headGearItemId;
+            public FixedString32Bytes armorGearItemId;
+            public FixedString32Bytes armsGearItemId;
+            public FixedString32Bytes bootsGearItemId;
+            public FixedString32Bytes weapon1ItemId;
+            public FixedString32Bytes wepaon2ItemId;
+            public bool active;
+
+            public LoadOut(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            {
+                this.loadoutSlot = loadoutSlot;
+                this.headGearItemId = headGearItemId;
+                this.armorGearItemId = armorGearItemId;
+                this.armsGearItemId = armsGearItemId;
+                this.bootsGearItemId = bootsGearItemId;
+                this.weapon1ItemId = weapon1ItemId;
+                this.wepaon2ItemId = weapon2ItemId;
+                this.active = active;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref loadoutSlot);
+                serializer.SerializeValue(ref headGearItemId);
+                serializer.SerializeValue(ref armorGearItemId);
+                serializer.SerializeValue(ref armsGearItemId);
+                serializer.SerializeValue(ref bootsGearItemId);
+                serializer.SerializeValue(ref weapon1ItemId);
+                serializer.SerializeValue(ref wepaon2ItemId);
+                serializer.SerializeValue(ref active);
             }
         }
 
@@ -407,7 +511,7 @@ namespace Vi.Core
             }
         }
 
-        private struct CharacterPutPayload
+        private struct CharacterCosmeticPutPayload
         {
             public string id;
             public int slot;
@@ -419,7 +523,7 @@ namespace Vi.Core
             public string name;
             public string model;
 
-            public CharacterPutPayload(string id, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            public CharacterCosmeticPutPayload(string id, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
             {
                 this.id = id;
                 this.slot = slot;
@@ -430,6 +534,48 @@ namespace Vi.Core
                 this.brows = brows;
                 this.name = name;
                 this.model = model;
+            }
+        }
+
+        private struct CharacterLoadoutPutPayload
+        {
+            public string charId;
+            public NestedCharacterLoadoutPutPayload loadout;
+
+            public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
+            {
+                this.charId = charId;
+                loadout = new NestedCharacterLoadoutPutPayload()
+                {
+                    loadoutSlot = loadoutSlot,
+                    headGearItemId = headGearItemId,
+                    armorGearItemId = armorGearItemId,
+                    armsGearItemId = armsGearItemId,
+                    bootsGearItemId = bootsGearItemId,
+                    weapon1ItemId = weapon1ItemId,
+                    wepaon2ItemId = weapon2ItemId
+                };
+            }
+        }
+
+        private struct NestedCharacterLoadoutPutPayload
+        {
+            public string loadoutSlot;
+            public string headGearItemId;
+            public string armorGearItemId;
+            public string armsGearItemId;
+            public string bootsGearItemId;
+            public string weapon1ItemId;
+            public string wepaon2ItemId;
+        }
+
+        private struct CharacterDisablePayload
+        {
+            public string characterId;
+
+            public CharacterDisablePayload(string characterId)
+            {
+                this.characterId = characterId;
             }
         }
     }

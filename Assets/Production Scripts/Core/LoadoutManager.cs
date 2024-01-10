@@ -33,10 +33,14 @@ namespace Vi.Core
         {
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            primaryWeapon = Instantiate(weaponOptions[playerData.primaryWeaponIndex].weapon);
-            secondaryWeapon = Instantiate(weaponOptions[playerData.secondaryWeaponIndex].weapon);
-            primaryRuntimeAnimatorController = weaponOptions[playerData.primaryWeaponIndex].animationController;
-            secondaryRuntimeAnimatorController = weaponOptions[playerData.secondaryWeaponIndex].animationController;
+
+            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.weapon.name == playerData.character.loadoutPreset1.weapon1ItemId);
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.weapon.name == playerData.character.loadoutPreset1.wepaon2ItemId);
+
+            primaryWeapon = Instantiate(primaryOption.weapon);
+            secondaryWeapon = Instantiate(secondaryOption.weapon);
+            primaryRuntimeAnimatorController = primaryOption.animationController;
+            secondaryRuntimeAnimatorController = secondaryOption.animationController;
             EquipPrimaryWeapon();
         }
 

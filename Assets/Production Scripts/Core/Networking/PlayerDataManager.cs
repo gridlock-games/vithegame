@@ -221,9 +221,7 @@ namespace Vi.Core
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
-                    team,
-                    1,
-                    0);
+                    team);
                 AddPlayerData(botData);
             }
             else
@@ -495,25 +493,19 @@ namespace Vi.Core
             public int id;
             public WebRequestManager.Character character;
             public Team team;
-            public int primaryWeaponIndex;
-            public int secondaryWeaponIndex;
 
             public PlayerData(int id)
             {
                 this.id = id;
                 character = new();
                 team = Team.Environment;
-                primaryWeaponIndex = 0;
-                secondaryWeaponIndex = 0;
             }
 
-            public PlayerData(int id, WebRequestManager.Character character, Team team, int primaryWeaponIndex, int secondaryWeaponIndex)
+            public PlayerData(int id, WebRequestManager.Character character, Team team)
             {
                 this.id = id;
                 this.character = character;
                 this.team = team;
-                this.primaryWeaponIndex = primaryWeaponIndex;
-                this.secondaryWeaponIndex = secondaryWeaponIndex;
             }
 
             public bool Equals(PlayerData other)
@@ -526,8 +518,6 @@ namespace Vi.Core
                 serializer.SerializeValue(ref id);
                 serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
-                serializer.SerializeValue(ref primaryWeaponIndex);
-                serializer.SerializeValue(ref secondaryWeaponIndex);
             }
         }
     }

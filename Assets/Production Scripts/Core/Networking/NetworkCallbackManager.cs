@@ -102,7 +102,7 @@ namespace Vi.Core
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             WebRequestManager.Singleton.GetCharacterById(playerDataInput.characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(playerDataInput.clientId, WebRequestManager.Singleton.CharacterById, playerDataInput.team, 1, 2));
+            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(playerDataInput.clientId, WebRequestManager.Singleton.CharacterById, playerDataInput.team));
             
             addPlayerDataRunning = false;
         }
