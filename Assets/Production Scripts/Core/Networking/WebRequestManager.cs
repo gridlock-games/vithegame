@@ -25,7 +25,7 @@ namespace Vi.Core
             _singleton = this;
         }
 
-        private const string serverAPIURL = "38.60.245.223/servers/duels";
+        private const string APIURL = "154.90.35.191/";
 
         public List<Server> Servers { get; private set; } = new List<Server>();
 
@@ -35,13 +35,13 @@ namespace Vi.Core
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverAPIURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
             yield return getRequest.SendWebRequest();
 
             Servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + serverAPIURL);
+                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
                 getRequest.Dispose();
                 yield break;
             }
@@ -71,13 +71,13 @@ namespace Vi.Core
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
-
+        
         public IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(serverAPIURL, jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -98,7 +98,7 @@ namespace Vi.Core
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverAPIURL, form);
+            UnityWebRequest postRequest = UnityWebRequest.Post(APIURL + "servers/duels", form);
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
@@ -171,7 +171,6 @@ namespace Vi.Core
         }
         
         // TODO Change the string at the end to be the account ID of whoever we sign in under
-        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
         private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
 
         public List<Character> Characters { get; private set; } = new List<Character>();
@@ -182,13 +181,13 @@ namespace Vi.Core
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + currentlyLoggedInUserId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
             yield return getRequest.SendWebRequest();
 
             Characters.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL + currentlyLoggedInUserId);
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
                 getRequest.Dispose();
                 yield break;
             }
@@ -217,12 +216,12 @@ namespace Vi.Core
         {
             if (IsGettingCharacterById) { yield break; }
             IsGettingCharacterById = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + "getCharacter/" + characterId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + characterAPIURL + "getCharacter/" + characterId);
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
                 getRequest.Dispose();
                 yield break;
             }
@@ -248,7 +247,7 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "updateCharacterCosmetic", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -266,10 +265,9 @@ namespace Vi.Core
                 character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
 
             string json = JsonConvert.SerializeObject(payload);
-            Debug.Log(json);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "saveLoadOut", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -288,7 +286,7 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest postRequest = new UnityWebRequest(characterAPIURL + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
@@ -306,7 +304,7 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "disableCharacter", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
