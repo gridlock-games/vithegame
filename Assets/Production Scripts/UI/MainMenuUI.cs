@@ -10,6 +10,13 @@ namespace Vi.UI
     public class MainMenuUI : MonoBehaviour
     {
         [SerializeField] private PauseMenu pauseMenu;
+        [SerializeField] private InputField usernameInput;
+        [SerializeField] private InputField passwordInput;
+        [SerializeField] private Button loginButton;
+        [SerializeField] private Text loginErrorText;
+        [SerializeField] private GameObject authenticationParent;
+        [SerializeField] private GameObject playParent;
+        [SerializeField] private Text welcomeUserText;
 
         public void StartHubServer()
         {
@@ -31,15 +38,30 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
-        public void GoToTrainingRoom()
-        {
-            NetworkManager.Singleton.StartHost();
-            NetSceneManager.Singleton.LoadScene("Training Room");
-        }
-
         public void OpenSettingsMenu()
         {
             Instantiate(pauseMenu.gameObject);
+        }
+
+        public void Login()
+        {
+            StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
+        }
+
+        public void Logout()
+        {
+            WebRequestManager.Singleton.Logout();
+        }
+
+        private void Update()
+        {
+            loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+
+            authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
+            playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
+
+            welcomeUserText.text = "Welcome " + usernameInput.text;
+            loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }
     }
 }

@@ -3090,6 +3090,8 @@ MonoBehaviour:
     type: 3}
   controlSettingsMenu: {fileID: 760765561020720752, guid: d3756acb23f05ab4283c45280d8624b3,
     type: 3}
+  loadoutEditorMenu: {fileID: 1561909437198836160, guid: 44bc396ad9e84ec428e421e9dff1fd21,
+    type: 3}
   volumeSlider: {fileID: 7309343886541365622}
   debugOverlayToggle: {fileID: 701708017473621644}
 --- !u!1 &7309343887203894616
@@ -3711,11 +3713,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1361706856374316, guid: f9fa21dca98874c4196e015010414446, type: 3}
       propertyPath: m_Name
-      value: Character Select Button
+      value: Loadout Editor Button
       objectReference: {fileID: 0}
     - target: {fileID: 1361706856374316, guid: f9fa21dca98874c4196e015010414446, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1522089196768506, guid: f9fa21dca98874c4196e015010414446, type: 3}
       propertyPath: m_IsActive
@@ -3728,7 +3730,7 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3748,7 +3750,7 @@ PrefabInstance:
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OpenCharacterSelectMenu
+      value: OpenLoadoutEditorMenu
       objectReference: {fileID: 0}
     - target: {fileID: 114745404925296982, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3763,7 +3765,7 @@ PrefabInstance:
     - target: {fileID: 114902987647824782, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_Text
-      value: CHANGE CHARACTER
+      value: EDIT LOADOUT
       objectReference: {fileID: 0}
     - target: {fileID: 224172569267278494, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3798,7 +3800,7 @@ PrefabInstance:
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3808,7 +3810,7 @@ PrefabInstance:
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
@@ -3873,12 +3875,12 @@ PrefabInstance:
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 354.8394
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -250.16667
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224617439908966828, guid: f9fa21dca98874c4196e015010414446,
         type: 3}

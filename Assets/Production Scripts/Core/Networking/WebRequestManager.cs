@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.Netcode;
 using Unity.Collections;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -25,7 +26,7 @@ namespace Vi.Core
             _singleton = this;
         }
 
-        private const string serverAPIURL = "38.60.245.223/servers/duels";
+        private const string APIURL = "154.90.35.191/";
 
         public List<Server> Servers { get; private set; } = new List<Server>();
 
@@ -35,13 +36,13 @@ namespace Vi.Core
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverAPIURL);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
             yield return getRequest.SendWebRequest();
 
             Servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + serverAPIURL);
+                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
                 getRequest.Dispose();
                 yield break;
             }
@@ -71,13 +72,13 @@ namespace Vi.Core
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
-
+        
         public IEnumerator ServerPutRequest(ServerPutPayload payload)
         {
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(serverAPIURL, jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -98,7 +99,7 @@ namespace Vi.Core
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverAPIURL, form);
+            UnityWebRequest postRequest = UnityWebRequest.Post(APIURL + "servers/duels", form);
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
@@ -171,8 +172,94 @@ namespace Vi.Core
         }
         
         // TODO Change the string at the end to be the account ID of whoever we sign in under
-        private const string characterAPIURL = "https://us-central1-vithegame.cloudfunctions.net/api/characters/";
-        private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        public bool IsLoggedIn { get; private set; }
+        public bool IsLoggingIn { get; private set; }
+        public string LogInErrorText { get; private set; }
+        private string currentlyLoggedInUserId;
+
+        public IEnumerator Login(string username, string password)
+        {
+            IsLoggingIn = true;
+            LoginPayload payload = new LoginPayload(username, password);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+
+                IsLoggedIn = false;
+                currentlyLoggedInUserId = default;
+
+                LogInErrorText = "Server offline";
+            }
+            else
+            {
+                LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
+                IsLoggedIn = loginResultPayload.login;
+                currentlyLoggedInUserId = loginResultPayload.userId;
+
+                LogInErrorText = IsLoggedIn ? "" : "Invalid Username or Password";
+            }
+
+            postRequest.Dispose();
+            IsLoggingIn = false;
+        }
+
+        public void Logout()
+        {
+            IsLoggedIn = false;
+            currentlyLoggedInUserId = default;
+            LogInErrorText = default;
+        }
+
+        public struct LoginPayload
+        {
+            public string username;
+            public string password;
+
+            public LoginPayload(string username, string password)
+            {
+                this.username = username;
+                this.password = password;
+            }
+        }
+
+        private struct LoginResultPayload
+        {
+            public string userId;
+            public bool login;
+            public bool isPlayer;
+
+            public LoginResultPayload(string userId, bool login, bool isPlayer)
+            {
+                this.userId = userId;
+                this.login = login;
+                this.isPlayer = isPlayer;
+            }
+        }
+
+        public struct CreateUserPayload
+        {
+            public string username;
+            public string email;
+            public string password;
+            public bool isPlayer;
+
+            public CreateUserPayload(string username, string email, string password)
+            {
+                this.username = username;
+                this.email = email;
+                this.password = password;
+                isPlayer = true;
+            }
+        }
 
         public List<Character> Characters { get; private set; } = new List<Character>();
 
@@ -182,13 +269,13 @@ namespace Vi.Core
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + currentlyLoggedInUserId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
             yield return getRequest.SendWebRequest();
 
             Characters.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + characterAPIURL + currentlyLoggedInUserId);
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
                 getRequest.Dispose();
                 yield break;
             }
@@ -217,12 +304,12 @@ namespace Vi.Core
         {
             if (IsGettingCharacterById) { yield break; }
             IsGettingCharacterById = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(characterAPIURL + "getCharacter/" + characterId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + characterAPIURL + "getCharacter/" + characterId);
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
                 getRequest.Dispose();
                 yield break;
             }
@@ -248,7 +335,7 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "updateCharacterCosmetic", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -263,12 +350,12 @@ namespace Vi.Core
         {
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
                 character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
-                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.wepaon2ItemId.ToString());
+                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "saveLoadOut", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -287,7 +374,7 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest postRequest = new UnityWebRequest(characterAPIURL + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
@@ -305,7 +392,7 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(characterAPIURL + "disableCharacter", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
@@ -318,7 +405,7 @@ namespace Vi.Core
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
 
-        public LoadOut GetDefaultLoadout() { return new LoadOut("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
+        public Loadout GetDefaultLoadout() { return new Loadout("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
 
         public struct Character : INetworkSerializable
         {
@@ -331,13 +418,13 @@ namespace Vi.Core
             public FixedString32Bytes brows;
             public FixedString32Bytes hair;
             public CharacterAttributes attributes;
-            public LoadOut loadoutPreset1;
+            public Loadout loadoutPreset1;
             public FixedString32Bytes userId;
             public int slot;
             public int level;
             public int experience;
 
-            public Character(string _id, string model, string name, int experience, int level, LoadOut loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -355,7 +442,7 @@ namespace Vi.Core
                 this.loadoutPreset1 = loadoutPreset1;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, LoadOut loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -392,6 +479,42 @@ namespace Vi.Core
             }
         }
 
+        public struct Loadout : INetworkSerializable
+        {
+            public FixedString32Bytes loadoutSlot;
+            public FixedString32Bytes headGearItemId;
+            public FixedString32Bytes armorGearItemId;
+            public FixedString32Bytes armsGearItemId;
+            public FixedString32Bytes bootsGearItemId;
+            public FixedString32Bytes weapon1ItemId;
+            public FixedString32Bytes weapon2ItemId;
+            public bool active;
+
+            public Loadout(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            {
+                this.loadoutSlot = loadoutSlot;
+                this.headGearItemId = headGearItemId;
+                this.armorGearItemId = armorGearItemId;
+                this.armsGearItemId = armsGearItemId;
+                this.bootsGearItemId = bootsGearItemId;
+                this.weapon1ItemId = weapon1ItemId;
+                this.weapon2ItemId = weapon2ItemId;
+                this.active = active;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref loadoutSlot);
+                serializer.SerializeValue(ref headGearItemId);
+                serializer.SerializeValue(ref armorGearItemId);
+                serializer.SerializeValue(ref armsGearItemId);
+                serializer.SerializeValue(ref bootsGearItemId);
+                serializer.SerializeValue(ref weapon1ItemId);
+                serializer.SerializeValue(ref weapon2ItemId);
+                serializer.SerializeValue(ref active);
+            }
+        }
+
         private struct CharacterJson
         {
             public string _id;
@@ -406,7 +529,7 @@ namespace Vi.Core
             public string hair;
             public string dateCreated;
             public CharacterAttributes attributes;
-            public List<LoadOut> loadOuts;
+            public List<LoadoutJson> loadOuts;
             public bool enabled;
             public string userId;
             public int level;
@@ -419,7 +542,31 @@ namespace Vi.Core
 
             public Character ToCharacter()
             {
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, loadOuts.Count > 0 ? loadOuts[0] : Singleton.GetDefaultLoadout());
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout());
+            }
+        }
+
+        private struct LoadoutJson
+        {
+            public string loadoutSlot;
+            public string headGearItemId;
+            public string armorGearItemId;
+            public string armsGearItemId;
+            public string bootsGearItemId;
+            public string weapon1ItemId;
+            public string weapon2ItemId;
+            public bool active;
+
+            public LoadoutJson(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            {
+                this.loadoutSlot = loadoutSlot;
+                this.headGearItemId = headGearItemId;
+                this.armorGearItemId = armorGearItemId;
+                this.armsGearItemId = armsGearItemId;
+                this.bootsGearItemId = bootsGearItemId;
+                this.weapon1ItemId = weapon1ItemId;
+                this.weapon2ItemId = weapon2ItemId;
+                this.active = active;
             }
         }
 
@@ -438,42 +585,6 @@ namespace Vi.Core
                 serializer.SerializeValue(ref agility);
                 serializer.SerializeValue(ref dexterity);
                 serializer.SerializeValue(ref intelligence);
-            }
-        }
-
-        public struct LoadOut : INetworkSerializable
-        {
-            public FixedString32Bytes loadoutSlot;
-            public FixedString32Bytes headGearItemId;
-            public FixedString32Bytes armorGearItemId;
-            public FixedString32Bytes armsGearItemId;
-            public FixedString32Bytes bootsGearItemId;
-            public FixedString32Bytes weapon1ItemId;
-            public FixedString32Bytes wepaon2ItemId;
-            public bool active;
-
-            public LoadOut(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
-            {
-                this.loadoutSlot = loadoutSlot;
-                this.headGearItemId = headGearItemId;
-                this.armorGearItemId = armorGearItemId;
-                this.armsGearItemId = armsGearItemId;
-                this.bootsGearItemId = bootsGearItemId;
-                this.weapon1ItemId = weapon1ItemId;
-                this.wepaon2ItemId = weapon2ItemId;
-                this.active = active;
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref loadoutSlot);
-                serializer.SerializeValue(ref headGearItemId);
-                serializer.SerializeValue(ref armorGearItemId);
-                serializer.SerializeValue(ref armsGearItemId);
-                serializer.SerializeValue(ref bootsGearItemId);
-                serializer.SerializeValue(ref weapon1ItemId);
-                serializer.SerializeValue(ref wepaon2ItemId);
-                serializer.SerializeValue(ref active);
             }
         }
 
@@ -553,7 +664,7 @@ namespace Vi.Core
                     armsGearItemId = armsGearItemId,
                     bootsGearItemId = bootsGearItemId,
                     weapon1ItemId = weapon1ItemId,
-                    wepaon2ItemId = weapon2ItemId
+                    weapon2ItemId = weapon2ItemId
                 };
             }
         }
@@ -566,7 +677,7 @@ namespace Vi.Core
             public string armsGearItemId;
             public string bootsGearItemId;
             public string weapon1ItemId;
-            public string wepaon2ItemId;
+            public string weapon2ItemId;
         }
 
         private struct CharacterDisablePayload
@@ -577,6 +688,64 @@ namespace Vi.Core
             {
                 this.characterId = characterId;
             }
+        }
+
+        //private void Start()
+        //{
+        //    StartCoroutine(CreateItems());
+        //}
+
+        private IEnumerator CreateItems()
+        {
+            if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            for (int i = 0; i < weaponOptions.Length; i++)
+            {
+                Debug.Log("Creating item: " + (i+1) + " of " + weaponOptions.Length);
+                CharacterReference.WeaponOption weaponOption = weaponOptions[i];
+                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, "WEAPON", false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
+
+                string json = JsonConvert.SerializeObject(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                }
+                postRequest.Dispose();
+            }
+        }
+
+        public struct CreateItemPayload
+        {
+            public string name;
+            public string @class;
+            public bool isCraftOnly;
+            public string modelName;
+            public ItemAttributes attributes;
+
+            public CreateItemPayload(string name, string @class, bool isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
+            {
+                this.name = name;
+                this.@class = @class;
+                this.isCraftOnly = isCraftOnly;
+                this.modelName = modelName;
+                attributes = new ItemAttributes() { agi = agi, dex = dex, @int = @int, str = str, vit = vit };
+            }
+        }
+
+        public struct ItemAttributes
+        {
+            public int str;
+            public int agi;
+            public int @int;
+            public int vit;
+            public int dex;
         }
     }
 }

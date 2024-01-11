@@ -426,7 +426,7 @@ namespace Vi.Core
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
             if (playerData.id >= 0) { yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id)); }
-            if (localPlayers.ContainsKey(playerData.id)) { yield break; }
+            if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
