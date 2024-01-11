@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.Netcode;
 using Unity.Collections;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -317,7 +318,7 @@ namespace Vi.Core
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
 
-        public LoadOut GetDefaultLoadout() { return new LoadOut("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
+        public Loadout GetDefaultLoadout() { return new Loadout("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
 
         public struct Character : INetworkSerializable
         {
@@ -330,13 +331,13 @@ namespace Vi.Core
             public FixedString32Bytes brows;
             public FixedString32Bytes hair;
             public CharacterAttributes attributes;
-            public LoadOut loadoutPreset1;
+            public Loadout loadoutPreset1;
             public FixedString32Bytes userId;
             public int slot;
             public int level;
             public int experience;
 
-            public Character(string _id, string model, string name, int experience, int level, LoadOut loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -354,7 +355,7 @@ namespace Vi.Core
                 this.loadoutPreset1 = loadoutPreset1;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, LoadOut loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1)
             {
                 slot = 0;
                 this._id = _id;
@@ -391,56 +392,7 @@ namespace Vi.Core
             }
         }
 
-        private struct CharacterJson
-        {
-            public string _id;
-            public int slot;
-            public string name;
-            public string model;
-            public int experience;
-            public string bodyColor;
-            public string eyeColor;
-            public string beard;
-            public string brows;
-            public string hair;
-            public string dateCreated;
-            public CharacterAttributes attributes;
-            public List<LoadOut> loadOuts;
-            public bool enabled;
-            public string userId;
-            public int level;
-            public object attack;
-            public object hp;
-            public object stamina;
-            public object critChance;
-            public object crit;
-            public string id;
-
-            public Character ToCharacter()
-            {
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, loadOuts.Count > 0 ? loadOuts[0] : Singleton.GetDefaultLoadout());
-            }
-        }
-
-        public struct CharacterAttributes : INetworkSerializable
-        {
-            public int strength;
-            public int vitality;
-            public int agility;
-            public int dexterity;
-            public int intelligence;
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref strength);
-                serializer.SerializeValue(ref vitality);
-                serializer.SerializeValue(ref agility);
-                serializer.SerializeValue(ref dexterity);
-                serializer.SerializeValue(ref intelligence);
-            }
-        }
-
-        public struct LoadOut : INetworkSerializable
+        public struct Loadout : INetworkSerializable
         {
             public FixedString32Bytes loadoutSlot;
             public FixedString32Bytes headGearItemId;
@@ -451,7 +403,7 @@ namespace Vi.Core
             public FixedString32Bytes weapon2ItemId;
             public bool active;
 
-            public LoadOut(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            public Loadout(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
             {
                 this.loadoutSlot = loadoutSlot;
                 this.headGearItemId = headGearItemId;
@@ -473,6 +425,79 @@ namespace Vi.Core
                 serializer.SerializeValue(ref weapon1ItemId);
                 serializer.SerializeValue(ref weapon2ItemId);
                 serializer.SerializeValue(ref active);
+            }
+        }
+
+        private struct CharacterJson
+        {
+            public string _id;
+            public int slot;
+            public string name;
+            public string model;
+            public int experience;
+            public string bodyColor;
+            public string eyeColor;
+            public string beard;
+            public string brows;
+            public string hair;
+            public string dateCreated;
+            public CharacterAttributes attributes;
+            public List<LoadoutJson> loadOuts;
+            public bool enabled;
+            public string userId;
+            public int level;
+            public object attack;
+            public object hp;
+            public object stamina;
+            public object critChance;
+            public object crit;
+            public string id;
+
+            public Character ToCharacter()
+            {
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout());
+            }
+        }
+
+        private struct LoadoutJson
+        {
+            public string loadoutSlot;
+            public string headGearItemId;
+            public string armorGearItemId;
+            public string armsGearItemId;
+            public string bootsGearItemId;
+            public string weapon1ItemId;
+            public string weapon2ItemId;
+            public bool active;
+
+            public LoadoutJson(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            {
+                this.loadoutSlot = loadoutSlot;
+                this.headGearItemId = headGearItemId;
+                this.armorGearItemId = armorGearItemId;
+                this.armsGearItemId = armsGearItemId;
+                this.bootsGearItemId = bootsGearItemId;
+                this.weapon1ItemId = weapon1ItemId;
+                this.weapon2ItemId = weapon2ItemId;
+                this.active = active;
+            }
+        }
+
+        public struct CharacterAttributes : INetworkSerializable
+        {
+            public int strength;
+            public int vitality;
+            public int agility;
+            public int dexterity;
+            public int intelligence;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref strength);
+                serializer.SerializeValue(ref vitality);
+                serializer.SerializeValue(ref agility);
+                serializer.SerializeValue(ref dexterity);
+                serializer.SerializeValue(ref intelligence);
             }
         }
 
@@ -576,6 +601,64 @@ namespace Vi.Core
             {
                 this.characterId = characterId;
             }
+        }
+
+        //private void Start()
+        //{
+        //    StartCoroutine(CreateItems());
+        //}
+
+        private IEnumerator CreateItems()
+        {
+            if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            for (int i = 0; i < weaponOptions.Length; i++)
+            {
+                Debug.Log("Creating item: " + (i+1) + " of " + weaponOptions.Length);
+                CharacterReference.WeaponOption weaponOption = weaponOptions[i];
+                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, "WEAPON", "false", weaponOption.weapon.name, 1, 1, 1, 1, 1);
+
+                string json = JsonConvert.SerializeObject(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                }
+                postRequest.Dispose();
+            }
+        }
+
+        public struct CreateItemPayload
+        {
+            public string name;
+            public string @class;
+            public string isCraftOnly;
+            public string modelName;
+            public ItemAttributes attributes;
+
+            public CreateItemPayload(string name, string @class, string isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
+            {
+                this.name = name;
+                this.@class = @class;
+                this.isCraftOnly = isCraftOnly;
+                this.modelName = modelName;
+                attributes = new ItemAttributes() { agi = agi, dex = dex, @int = @int, str = str, vit = vit };
+            }
+        }
+
+        public struct ItemAttributes
+        {
+            public int str;
+            public int agi;
+            public int @int;
+            public int vit;
+            public int dex;
         }
     }
 }
