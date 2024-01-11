@@ -172,7 +172,94 @@ namespace Vi.Core
         }
         
         // TODO Change the string at the end to be the account ID of whoever we sign in under
-        private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
+        public bool IsLoggedIn { get; private set; }
+        public bool IsLoggingIn { get; private set; }
+        public string LogInErrorText { get; private set; }
+        private string currentlyLoggedInUserId;
+
+        public IEnumerator Login(string username, string password)
+        {
+            IsLoggingIn = true;
+            LoginPayload payload = new LoginPayload(username, password);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+
+                IsLoggedIn = false;
+                currentlyLoggedInUserId = default;
+
+                LogInErrorText = "Server offline";
+            }
+            else
+            {
+                LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
+                IsLoggedIn = loginResultPayload.login;
+                currentlyLoggedInUserId = loginResultPayload.userId;
+
+                LogInErrorText = IsLoggedIn ? "" : "Invalid Username or Password";
+            }
+
+            postRequest.Dispose();
+            IsLoggingIn = false;
+        }
+
+        public void Logout()
+        {
+            IsLoggedIn = false;
+            currentlyLoggedInUserId = default;
+            LogInErrorText = default;
+        }
+
+        public struct LoginPayload
+        {
+            public string username;
+            public string password;
+
+            public LoginPayload(string username, string password)
+            {
+                this.username = username;
+                this.password = password;
+            }
+        }
+
+        private struct LoginResultPayload
+        {
+            public string userId;
+            public bool login;
+            public bool isPlayer;
+
+            public LoginResultPayload(string userId, bool login, bool isPlayer)
+            {
+                this.userId = userId;
+                this.login = login;
+                this.isPlayer = isPlayer;
+            }
+        }
+
+        public struct CreateUserPayload
+        {
+            public string username;
+            public string email;
+            public string password;
+            public bool isPlayer;
+
+            public CreateUserPayload(string username, string email, string password)
+            {
+                this.username = username;
+                this.email = email;
+                this.password = password;
+                isPlayer = true;
+            }
+        }
 
         public List<Character> Characters { get; private set; } = new List<Character>();
 
@@ -617,7 +704,7 @@ namespace Vi.Core
             {
                 Debug.Log("Creating item: " + (i+1) + " of " + weaponOptions.Length);
                 CharacterReference.WeaponOption weaponOption = weaponOptions[i];
-                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, "WEAPON", "false", weaponOption.weapon.name, 1, 1, 1, 1, 1);
+                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, "WEAPON", false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -638,11 +725,11 @@ namespace Vi.Core
         {
             public string name;
             public string @class;
-            public string isCraftOnly;
+            public bool isCraftOnly;
             public string modelName;
             public ItemAttributes attributes;
 
-            public CreateItemPayload(string name, string @class, string isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
+            public CreateItemPayload(string name, string @class, bool isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
             {
                 this.name = name;
                 this.@class = @class;
