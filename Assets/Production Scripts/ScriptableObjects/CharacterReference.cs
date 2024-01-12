@@ -206,7 +206,7 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
-        public List<WearableEquipmentOption> GetEquipmentOptions() { Debug.LogWarning("GetEquipmentOptions() should only be called when creating items"); return equipmentOptions; }
+        public List<WearableEquipmentOption> GetEquipmentOptions() { if (!Application.isEditor) { Debug.LogWarning("GetEquipmentOptions() should only be called when creating items"); } return equipmentOptions; }
 
         public List<WearableEquipmentOption> GetWearableEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
