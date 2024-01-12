@@ -690,10 +690,10 @@ namespace Vi.Core
             }
         }
 
-        //private void Start()
-        //{
-        //    StartCoroutine(CreateItems());
-        //}
+        private void Start()
+        {
+            StartCoroutine(CreateItems());
+        }
 
         private IEnumerator CreateItems()
         {
