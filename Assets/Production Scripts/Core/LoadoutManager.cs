@@ -14,6 +14,8 @@ namespace Vi.Core
         private Weapon secondaryWeapon;
         private RuntimeAnimatorController secondaryRuntimeAnimatorController;
 
+        private NetworkVariable<int> currentEquippedWeapon = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private AnimationHandler animationHandler;
@@ -31,6 +33,8 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
+            currentEquippedWeapon.OnValueChanged += OnCurrentEquippedWeaponChange;
+
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
@@ -42,6 +46,27 @@ namespace Vi.Core
             primaryRuntimeAnimatorController = primaryOption.animationController;
             secondaryRuntimeAnimatorController = secondaryOption.animationController;
             EquipPrimaryWeapon();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            currentEquippedWeapon.OnValueChanged -= OnCurrentEquippedWeaponChange;
+        }
+
+        private void OnCurrentEquippedWeaponChange(int prev, int current)
+        {
+            switch (current)
+            {
+                case 1:
+                    weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
+                    break;
+                case 2:
+                    weaponHandler.SetNewWeapon(secondaryWeapon, secondaryRuntimeAnimatorController);
+                    break;
+                default:
+                    Debug.LogError(current + " not assigned to a weapon");
+                    break;
+            }
         }
 
         private void EquipPrimaryWeapon()
@@ -57,14 +82,24 @@ namespace Vi.Core
             }
         }
 
+        private bool CanSwapWeapons()
+        {
+            if (weaponHandler.IsAiming()) { return false; }
+            if (animationHandler.IsAiming()) { return false; }
+            if (!animationHandler.IsAtRest()) { return false; }
+            return true;
+        }
+
         void OnWeapon1()
         {
-            if (animationHandler.IsAtRest()) { weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController); }
+            if (!CanSwapWeapons()) { return; }
+            currentEquippedWeapon.Value = 1;
         }
 
         void OnWeapon2()
         {
-            if (animationHandler.IsAtRest()) { weaponHandler.SetNewWeapon(secondaryWeapon, secondaryRuntimeAnimatorController); }
+            if (!CanSwapWeapons()) { return; }
+            currentEquippedWeapon.Value = 2;
         }
     }
 }

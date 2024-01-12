@@ -176,7 +176,7 @@ namespace Vi.Core
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
         public string LogInErrorText { get; private set; }
-        private string currentlyLoggedInUserId;
+        private string currentlyLoggedInUserId = "";
 
         public IEnumerator Login(string username, string password)
         {
@@ -192,7 +192,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.Login()" + postRequest.error);
 
                 IsLoggedIn = false;
                 currentlyLoggedInUserId = default;
@@ -690,10 +690,10 @@ namespace Vi.Core
             }
         }
 
-        private void Start()
-        {
-            StartCoroutine(CreateItems());
-        }
+        //private void Start()
+        //{
+        //    StartCoroutine(CreateItems());
+        //}
 
         private IEnumerator CreateItems()
         {
