@@ -820,5 +820,35 @@ namespace Vi.Core
             public int __v;
             public string id;
         }
+
+        public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
+        {
+            AddItemPayload payload = new AddItemPayload(characterId, itemId);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+            }
+            postRequest.Dispose();
+        }
+
+        private struct AddItemPayload
+        {
+            public string charId;
+            public string itemId;
+
+            public AddItemPayload(string characterId, string itemId)
+            {
+                charId = characterId;
+                this.itemId = itemId;
+            }
+        }
     }
 }
