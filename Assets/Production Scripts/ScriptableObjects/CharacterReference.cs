@@ -26,6 +26,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class WeaponOption
         {
+            public string itemWebId;
             public Sprite weaponIcon;
             public RuntimeAnimatorController animationController;
             public Weapon weapon;
@@ -93,6 +94,7 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         public class WearableEquipmentOption
         {
+            public string itemWebId;
             public RaceAndGender raceAndGender;
             public EquipmentType equipmentType;
             public WearableEquipment wearableEquipmentPrefab;
@@ -204,6 +206,8 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
+        public List<WearableEquipmentOption> GetEquipmentOptions() { Debug.LogWarning("GetEquipmentOptions() should only be called when creating items"); return equipmentOptions; }
+
         public List<WearableEquipmentOption> GetWearableEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
@@ -249,7 +253,7 @@ namespace Vi.ScriptableObjects
                 characterMaterialOptions.Add(characterMaterial);
             }
 
-            equipmentOptions.Clear();
+            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
             filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
             foreach (string filepath in filepaths)
             {
@@ -299,7 +303,7 @@ namespace Vi.ScriptableObjects
                     }
 
                     WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
-                    equipmentOptions.Add(wearableEquipmentOption);
+                    if (!equipmentOptions.Contains(wearableEquipmentOption)) { equipmentOptions.Add(wearableEquipmentOption); }
                     wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
                 }
             }

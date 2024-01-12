@@ -53,6 +53,15 @@ namespace Vi.UI
             WebRequestManager.Singleton.Logout();
         }
 
+        private void Start()
+        {
+            if (!Application.isEditor)
+            {
+                usernameInput.text = "";
+                passwordInput.text = "";
+            }
+        }
+
         private void Update()
         {
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
