@@ -348,22 +348,24 @@ namespace Vi.Core
 
         public IEnumerator UpdateCharacterLoadout(Character character)
         {
-            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
-                character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
-                character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
+            Debug.Log("TODO: Update character loadout");
+            yield return null;
+            //CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
+            //    character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
+            //    character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
 
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            //string json = JsonConvert.SerializeObject(payload);
+            //byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
+            //UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+            //putRequest.SetRequestHeader("Content-Type", "application/json");
+            //yield return putRequest.SendWebRequest();
 
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
-            }
-            putRequest.Dispose();
+            //if (putRequest.result != UnityWebRequest.Result.Success)
+            //{
+            //    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
+            //}
+            //putRequest.Dispose();
         }
 
         public IEnumerator CharacterPostRequest(Character character)
@@ -405,7 +407,11 @@ namespace Vi.Core
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
 
-        public Loadout GetDefaultLoadout() { return new Loadout("1", "", "", "", "", "GreatSwordWeapon", "HammerWeapon", true); }
+        public Loadout GetDefaultLoadout()
+        {
+            return new Loadout("1", "65a2b5077fd3af802c750f7f", "65a2b5247fd3af802c751047", "65a2b4e27fd3af802c750e7f", "65a2b4f37fd3af802c750ef7",
+                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "65a2b48b7fd3af802c750c27", "65a2c0cb3cd406fe21bef274", true);
+        }
 
         public struct Character : INetworkSerializable
         {
@@ -482,20 +488,26 @@ namespace Vi.Core
         public struct Loadout : INetworkSerializable
         {
             public FixedString32Bytes loadoutSlot;
-            public FixedString32Bytes headGearItemId;
-            public FixedString32Bytes armorGearItemId;
-            public FixedString32Bytes armsGearItemId;
+            public FixedString32Bytes helmGearItemId;
+            public FixedString32Bytes shouldersGearItemId;
+            public FixedString32Bytes chestArmorGearItemId;
+            public FixedString32Bytes glovesGearItemId;
+            public FixedString32Bytes beltGearItemId;
+            public FixedString32Bytes robeGearItemId;
             public FixedString32Bytes bootsGearItemId;
             public FixedString32Bytes weapon1ItemId;
             public FixedString32Bytes weapon2ItemId;
             public bool active;
 
-            public Loadout(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            public Loadout(FixedString32Bytes loadoutSlot, FixedString32Bytes helmGearItemId, FixedString32Bytes shouldersGearItemId, FixedString32Bytes chestArmorGearItemId, FixedString32Bytes glovesGearItemId, FixedString32Bytes beltGearItemId, FixedString32Bytes robeGearItemId, FixedString32Bytes bootsGearItemId, FixedString32Bytes weapon1ItemId, FixedString32Bytes weapon2ItemId, bool active)
             {
                 this.loadoutSlot = loadoutSlot;
-                this.headGearItemId = headGearItemId;
-                this.armorGearItemId = armorGearItemId;
-                this.armsGearItemId = armsGearItemId;
+                this.helmGearItemId = helmGearItemId;
+                this.shouldersGearItemId = shouldersGearItemId;
+                this.chestArmorGearItemId = chestArmorGearItemId;
+                this.glovesGearItemId = glovesGearItemId;
+                this.beltGearItemId = beltGearItemId;
+                this.robeGearItemId = robeGearItemId;
                 this.bootsGearItemId = bootsGearItemId;
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
@@ -505,9 +517,12 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref loadoutSlot);
-                serializer.SerializeValue(ref headGearItemId);
-                serializer.SerializeValue(ref armorGearItemId);
-                serializer.SerializeValue(ref armsGearItemId);
+                serializer.SerializeValue(ref helmGearItemId);
+                serializer.SerializeValue(ref shouldersGearItemId);
+                serializer.SerializeValue(ref chestArmorGearItemId);
+                serializer.SerializeValue(ref glovesGearItemId);
+                serializer.SerializeValue(ref beltGearItemId);
+                serializer.SerializeValue(ref robeGearItemId);
                 serializer.SerializeValue(ref bootsGearItemId);
                 serializer.SerializeValue(ref weapon1ItemId);
                 serializer.SerializeValue(ref weapon2ItemId);
