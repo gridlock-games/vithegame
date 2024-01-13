@@ -34,7 +34,7 @@ namespace Vi.Core
             {
                 EquipPrimaryWeapon();
 
-                StartCoroutine(Wait());
+                StartCoroutine(ApplyDefaultEquipment());
             }
 
             foreach (string armorName in armorNames)
@@ -67,7 +67,7 @@ namespace Vi.Core
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.loadoutPreset1));
         }
 
-        private IEnumerator Wait()
+        private IEnumerator ApplyDefaultEquipment()
         {
             yield return null;
 
