@@ -176,7 +176,7 @@ namespace Vi.Core
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
         public string LogInErrorText { get; private set; }
-        private string currentlyLoggedInUserId;
+        private string currentlyLoggedInUserId = "";
 
         public IEnumerator Login(string username, string password)
         {
@@ -192,7 +192,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.Login()" + postRequest.error);
 
                 IsLoggedIn = false;
                 currentlyLoggedInUserId = default;
@@ -690,21 +690,40 @@ namespace Vi.Core
             }
         }
 
-        //private void Start()
-        //{
-        //    StartCoroutine(CreateItems());
-        //}
+        private void Start()
+        {
+            StartCoroutine(CreateItems());
+        }
 
         private IEnumerator CreateItems()
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
+
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "items/getItems");
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CreateItems() " + getRequest.error + APIURL + "servers/duels");
+                getRequest.Dispose();
+                yield break;
+            }
+
+            List<Item> itemList = JsonConvert.DeserializeObject<List<Item>>(getRequest.downloadHandler.text);
+
+            getRequest.Dispose();
+
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             for (int i = 0; i < weaponOptions.Length; i++)
             {
-                Debug.Log("Creating item: " + (i+1) + " of " + weaponOptions.Length);
                 CharacterReference.WeaponOption weaponOption = weaponOptions[i];
-                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, "WEAPON", false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
+
+                if (itemList.Exists(item => item._id == weaponOption.itemWebId)) { continue; }
+
+                Debug.Log("Creating weapon item: " + (i+1) + " of " + weaponOptions.Length);
+
+                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, ItemClass.WEAPON, false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -715,13 +734,45 @@ namespace Vi.Core
 
                 if (postRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                    Debug.LogError("Post request error in WebRequestManager.CreateItems()" + postRequest.error);
                 }
+
+                weaponOption.itemWebId = postRequest.downloadHandler.text;
+
+                postRequest.Dispose();
+            }
+
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetEquipmentOptions();
+
+            for (int i = 0; i < wearableEquipmentOptions.Count; i++)
+            {
+                CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions[i];
+
+                if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
+
+                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count);
+
+                CreateItemPayload payload = new CreateItemPayload(wearableEquipmentOption.wearableEquipmentPrefab.name, ItemClass.ARMOR, false, wearableEquipmentOption.wearableEquipmentPrefab.name, 1, 1, 1, 1, 1);
+
+                string json = JsonConvert.SerializeObject(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Post request error in WebRequestManager.CreateItems()" + postRequest.error);
+                }
+
+                wearableEquipmentOption.itemWebId = postRequest.downloadHandler.text;
+
                 postRequest.Dispose();
             }
         }
 
-        public struct CreateItemPayload
+        private struct CreateItemPayload
         {
             public string name;
             public string @class;
@@ -729,23 +780,75 @@ namespace Vi.Core
             public string modelName;
             public ItemAttributes attributes;
 
-            public CreateItemPayload(string name, string @class, bool isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
+            public CreateItemPayload(string name, ItemClass @class, bool isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
             {
                 this.name = name;
-                this.@class = @class;
+                this.@class = @class.ToString();
                 this.isCraftOnly = isCraftOnly;
                 this.modelName = modelName;
                 attributes = new ItemAttributes() { agi = agi, dex = dex, @int = @int, str = str, vit = vit };
             }
         }
 
-        public struct ItemAttributes
+        private enum ItemClass
+        {
+            WEAPON,
+            ARMOR,
+            ETC
+        }
+
+        private struct ItemAttributes
         {
             public int str;
             public int agi;
             public int @int;
             public int vit;
             public int dex;
+        }
+
+        private struct Item
+        {
+            public string _id;
+            public string @class;
+            public string name;
+            public int weight;
+            public ItemAttributes attributes;
+            public string isCraftOnly;
+            public bool isCashExclusive;
+            public bool isPassExclusive;
+            public string modelName;
+            public int __v;
+            public string id;
+        }
+
+        public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
+        {
+            AddItemPayload payload = new AddItemPayload(characterId, itemId);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+            }
+            postRequest.Dispose();
+        }
+
+        private struct AddItemPayload
+        {
+            public string charId;
+            public string itemId;
+
+            public AddItemPayload(string characterId, string itemId)
+            {
+                charId = characterId;
+                this.itemId = itemId;
+            }
         }
     }
 }
