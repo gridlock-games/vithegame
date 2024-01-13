@@ -405,7 +405,7 @@ namespace Vi.Core
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
 
-        public Loadout GetDefaultLoadout() { return new Loadout("1", "", "", "", "", "GreatSwordWeapon", "CrossbowWeapon", true); }
+        public Loadout GetDefaultLoadout() { return new Loadout("1", "", "", "", "", "GreatSwordWeapon", "HammerWeapon", true); }
 
         public struct Character : INetworkSerializable
         {
