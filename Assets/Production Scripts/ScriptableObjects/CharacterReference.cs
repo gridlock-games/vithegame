@@ -309,7 +309,7 @@ namespace Vi.ScriptableObjects
                     }
 
                     WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
-                    if (!equipmentOptions.Contains(wearableEquipmentOption)) { equipmentOptions.Add(wearableEquipmentOption); }
+                    if (!equipmentOptions.Exists(item => item.wearableEquipmentPrefab == wearableEquipmentOption.wearableEquipmentPrefab)) { equipmentOptions.Add(wearableEquipmentOption); }
                     wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
                 }
             }

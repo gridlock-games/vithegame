@@ -736,7 +736,7 @@ namespace Vi.Core
 
                 if (itemList.Exists(item => item._id == weaponOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating weapon item: " + (i+1) + " of " + weaponOptions.Length);
+                Debug.Log("Creating weapon item: " + (i+1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
                 CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, ItemClass.WEAPON, false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
 
@@ -765,7 +765,7 @@ namespace Vi.Core
 
                 if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count);
+                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.wearableEquipmentPrefab.name);
 
                 CreateItemPayload payload = new CreateItemPayload(wearableEquipmentOption.wearableEquipmentPrefab.name, ItemClass.ARMOR, false, wearableEquipmentOption.wearableEquipmentPrefab.name, 1, 1, 1, 1, 1);
 

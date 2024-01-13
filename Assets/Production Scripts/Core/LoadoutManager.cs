@@ -72,8 +72,7 @@ namespace Vi.Core
             yield return null;
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == "65a2b5157fd3af802c750fe1"));
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == "65a2b4b27fd3af802c750d31"));
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == "65a300868331757ffc765b58")); // Peasant pants
         }
 
         private IEnumerator ApplyEquipmentFromLoadout(WebRequestManager.Loadout loadout)
