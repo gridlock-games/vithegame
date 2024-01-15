@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 using Unity.Netcode;
 using Unity.Collections;
 using Vi.ScriptableObjects;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -287,9 +289,9 @@ namespace Vi.Core
                     Characters.Add(jsonStruct.ToCharacter());
                 }
             }
-            catch
+            catch (System.Exception e)
             {
-                Characters = new List<Character>() { GetDefaultCharacter(), GetDefaultCharacter() };
+                Debug.LogError(e);
             }
 
             getRequest.Dispose();
@@ -370,8 +372,7 @@ namespace Vi.Core
 
         public IEnumerator CharacterPostRequest(Character character)
         {
-            CharacterPostPayload payload = new CharacterPostPayload(character.userId.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
-                character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
+            CharacterPostPayload payload = new CharacterPostPayload(character);
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -405,7 +406,7 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout()); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(), CharacterReference.RaceAndGender.HumanMale); }
 
         public Loadout GetDefaultLoadout()
         {
@@ -429,8 +430,9 @@ namespace Vi.Core
             public int slot;
             public int level;
             public int experience;
+            public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -446,9 +448,10 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.raceAndGender = raceAndGender;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -464,6 +467,7 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.raceAndGender = raceAndGender;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -482,6 +486,7 @@ namespace Vi.Core
                 serializer.SerializeValue(ref slot);
                 serializer.SerializeValue(ref level);
                 serializer.SerializeValue(ref experience);
+                serializer.SerializeValue(ref raceAndGender);
             }
         }
 
@@ -542,22 +547,26 @@ namespace Vi.Core
             public string beard;
             public string brows;
             public string hair;
+            public string gender;
+            public string race;
             public string dateCreated;
-            public CharacterAttributes attributes;
-            public List<LoadoutJson> loadOuts;
+            public Attributes attributes;
+            public List<object> loadOuts;
             public bool enabled;
             public string userId;
             public int level;
-            public object attack;
-            public object hp;
-            public object stamina;
-            public object critChance;
-            public object crit;
+            public double attack;
+            public int defense;
+            public double hp;
+            public int stamina;
+            public double critChance;
+            public double crit;
             public string id;
 
             public Character ToCharacter()
             {
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout());
+                CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(char.ToUpper(race[0]) + race[1..].ToLower() + char.ToUpper(gender[0]) + gender[1..].ToLower());
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(), raceAndGender);
             }
         }
 
@@ -608,19 +617,24 @@ namespace Vi.Core
             public string userId;
             public NestedCharacter character;
 
-            public CharacterPostPayload(string userId, int slot, string eyeColor, string hair, string bodyColor, string beard, string brows, string name, string model)
+            public CharacterPostPayload(Character character)
             {
-                this.userId = userId;
-                character = new NestedCharacter()
+                userId = character.userId.ToString();
+
+                string[] raceAndGenderStrings = Regex.Matches(character.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+
+                this.character = new NestedCharacter()
                 {
-                    slot = slot,
-                    eyeColor = eyeColor,
-                    hair = hair,
-                    bodyColor = bodyColor,
-                    beard = beard,
-                    brows = brows,
-                    name = name,
-                    model = model
+                    slot = character.slot,
+                    eyeColor = character.eyeColor.ToString(),
+                    hair = string.IsNullOrEmpty(character.hair.ToString()) ? "null" : character.hair.ToString(),
+                    bodyColor = string.IsNullOrEmpty(character.bodyColor.ToString()) ? "null" : character.bodyColor.ToString(),
+                    beard = string.IsNullOrEmpty(character.beard.ToString()) ? "null" : character.beard.ToString(),
+                    brows = string.IsNullOrEmpty(character.brows.ToString()) ? "null" : character.brows.ToString(),
+                    name = string.IsNullOrEmpty(character.name.ToString()) ? "null" : character.name.ToString(),
+                    model = string.IsNullOrEmpty(character.model.ToString()) ? "null" : character.model.ToString(),
+                    race = string.IsNullOrEmpty(raceAndGenderStrings[0].ToUpper()) ? "null" : raceAndGenderStrings[0].ToUpper(),
+                    gender = string.IsNullOrEmpty(raceAndGenderStrings[1].ToUpper()) ? "null" : raceAndGenderStrings[1].ToUpper()
                 };
             }
 
@@ -634,6 +648,8 @@ namespace Vi.Core
                 public string brows;
                 public string name;
                 public string model;
+                public string race;
+                public string gender;
             }
         }
 
@@ -666,7 +682,7 @@ namespace Vi.Core
         private struct CharacterLoadoutPutPayload
         {
             public string charId;
-            public NestedCharacterLoadoutPutPayload loadout;
+            private NestedCharacterLoadoutPutPayload loadout;
 
             public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
             {
@@ -682,17 +698,17 @@ namespace Vi.Core
                     weapon2ItemId = weapon2ItemId
                 };
             }
-        }
 
-        private struct NestedCharacterLoadoutPutPayload
-        {
-            public string loadoutSlot;
-            public string headGearItemId;
-            public string armorGearItemId;
-            public string armsGearItemId;
-            public string bootsGearItemId;
-            public string weapon1ItemId;
-            public string weapon2ItemId;
+            private struct NestedCharacterLoadoutPutPayload
+            {
+                public string loadoutSlot;
+                public string headGearItemId;
+                public string armorGearItemId;
+                public string armsGearItemId;
+                public string bootsGearItemId;
+                public string weapon1ItemId;
+                public string weapon2ItemId;
+            }
         }
 
         private struct CharacterDisablePayload

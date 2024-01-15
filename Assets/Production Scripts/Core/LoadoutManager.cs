@@ -34,17 +34,17 @@ namespace Vi.Core
             {
                 EquipPrimaryWeapon();
 
-                StartCoroutine(ApplyDefaultEquipment());
+                //StartCoroutine(ApplyDefaultEquipment());
             }
 
             foreach (string armorName in armorNames)
             {
                 var option = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(CharacterReference.RaceAndGender.HumanMale).FindAll(item => item.wearableEquipmentPrefab.name.Contains(armorName));
 
-                foreach (var c in option)
-                {
-                    Debug.Log(c.itemWebId + " " + c.wearableEquipmentPrefab.name);
-                }
+                //foreach (var c in option)
+                //{
+                //    Debug.Log(c.itemWebId + " " + c.wearableEquipmentPrefab.name);
+                //}
             }
         }
 
