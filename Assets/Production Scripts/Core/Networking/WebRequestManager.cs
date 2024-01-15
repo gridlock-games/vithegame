@@ -754,7 +754,8 @@ namespace Vi.Core
 
                 Debug.Log("Creating weapon item: " + (i+1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
-                CreateItemPayload payload = new CreateItemPayload(weaponOption.weapon.name, ItemClass.WEAPON, false, weaponOption.weapon.name, 1, 1, 1, 1, 1);
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.weapon.name, 0, 1, 1, 1, 1, 1,
+                    false, false, false, weaponOption.weapon.name, true);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -783,7 +784,8 @@ namespace Vi.Core
 
                 Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.wearableEquipmentPrefab.name);
 
-                CreateItemPayload payload = new CreateItemPayload(wearableEquipmentOption.wearableEquipmentPrefab.name, ItemClass.ARMOR, false, wearableEquipmentOption.wearableEquipmentPrefab.name, 1, 1, 1, 1, 1);
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.wearableEquipmentPrefab.name, 0, 1, 1, 1, 1, 1,
+                    false, false, false, wearableEquipmentOption.wearableEquipmentPrefab.name, true);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -805,19 +807,45 @@ namespace Vi.Core
 
         private struct CreateItemPayload
         {
-            public string name;
             public string @class;
-            public bool isCraftOnly;
-            public string modelName;
-            public ItemAttributes attributes;
+            public string name;
+            public int weight;
 
-            public CreateItemPayload(string name, ItemClass @class, bool isCraftOnly, string modelName, int agi, int dex, int @int, int str, int vit)
+            [JsonProperty("attributes.strength")]
+            public int attributesstrength;
+
+            [JsonProperty("attributes.agility")]
+            public int attributesagility;
+
+            [JsonProperty("attributes.intelligence")]
+            public int attributesintelligence;
+
+            [JsonProperty("attributes.vitality")]
+            public int attributesvitality;
+
+            [JsonProperty("attributes.dexterity")]
+            public int attributesdexterity;
+            public bool isCraftOnly;
+            public bool isCashExclusive;
+            public bool isPassExclusive;
+            public string modelName;
+            public bool isBasicGear;
+
+            public CreateItemPayload(ItemClass @class, string name, int weight, int attributesstrength, int attributesagility, int attributesintelligence, int attributesvitality, int attributesdexterity, bool isCraftOnly, bool isCashExclusive, bool isPassExclusive, string modelName, bool isBasicGear)
             {
-                this.name = name;
                 this.@class = @class.ToString();
+                this.name = name;
+                this.weight = weight;
+                this.attributesstrength = attributesstrength;
+                this.attributesagility = attributesagility;
+                this.attributesintelligence = attributesintelligence;
+                this.attributesvitality = attributesvitality;
+                this.attributesdexterity = attributesdexterity;
                 this.isCraftOnly = isCraftOnly;
+                this.isCashExclusive = isCashExclusive;
+                this.isPassExclusive = isPassExclusive;
                 this.modelName = modelName;
-                attributes = new ItemAttributes() { agi = agi, dex = dex, @int = @int, str = str, vit = vit };
+                this.isBasicGear = isBasicGear;
             }
         }
 
@@ -828,28 +856,29 @@ namespace Vi.Core
             ETC
         }
 
-        private struct ItemAttributes
-        {
-            public int str;
-            public int agi;
-            public int @int;
-            public int vit;
-            public int dex;
-        }
-
         private struct Item
         {
             public string _id;
             public string @class;
             public string name;
             public int weight;
-            public ItemAttributes attributes;
+            private ItemAttributes attributes;
             public string isCraftOnly;
             public bool isCashExclusive;
             public bool isPassExclusive;
             public string modelName;
             public int __v;
             public string id;
+
+            private struct ItemAttributes
+            {
+                public int str;
+                public int agi;
+                public int @int;
+                public int vit;
+                public int dex;
+            }
+
         }
 
         public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
