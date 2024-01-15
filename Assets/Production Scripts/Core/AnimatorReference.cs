@@ -25,7 +25,7 @@ namespace Vi.Core
                 wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
                 browsReplacementDefinition == null ? (wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Brows) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Brows].name.Replace("(Clone)", "") : "") : browsReplacementDefinition.skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Hair].name.Replace("(Clone)", "") : "",
-                currentCharacter.level, currentCharacter.loadoutPreset1
+                currentCharacter.level, currentCharacter.loadoutPreset1, currentCharacter.raceAndGender
             );
         }
 
@@ -64,15 +64,6 @@ namespace Vi.Core
                 wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform));
             }
 
-            if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
-            {
-                SkinnedMeshRenderer[] skinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
-                {
-                    glowRenderer.RegisterNewRenderer(skinnedMeshRenderer);
-                }
-            }
-            
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
             if (wearableEquipmentRendererDefinition != null)
             {
@@ -80,10 +71,12 @@ namespace Vi.Core
                 {
                     if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                     {
-                        SkinnedMeshRenderer[] skinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                        if (skinnedMeshRenderers.Length > 1)
-                            skinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
+                        SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+                        if (equipmentSkinnedMeshRenderers.Length > 1)
+                            equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
                         wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !wearableEquipmentInstances[wearableEquipmentOption.equipmentType];
+
+                        glowRenderer.RegisterNewRenderer(equipmentSkinnedMeshRenderers[i]);
                     }
                     else
                     {
@@ -172,6 +165,7 @@ namespace Vi.Core
                         {
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
                         }
+                        renderersAlreadyEvaluated.Add(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i]);
                     }
                 }
             }
