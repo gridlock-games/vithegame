@@ -8,6 +8,7 @@ using Unity.Collections;
 using Vi.ScriptableObjects;
 using System.Text.RegularExpressions;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
@@ -26,6 +27,14 @@ namespace Vi.Core
         private void Awake()
         {
             _singleton = this;
+        }
+
+        public bool PlayingOffine { get; private set; }
+
+        public void SetPlayingOffline(bool shouldBeOffline)
+        {
+            if (!SceneManager.GetSceneByName("Main Menu").isLoaded) { Debug.LogError("You are calling WebRequestManager.SetPlayingOffline() when the main menu scene isn't loaded!"); return; }
+            PlayingOffine = shouldBeOffline;
         }
 
         private const string APIURL = "154.90.35.191/";
@@ -194,20 +203,35 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.Login()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
 
                 IsLoggedIn = false;
                 currentlyLoggedInUserId = default;
-
-                LogInErrorText = "Server offline";
             }
             else
             {
                 LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
                 IsLoggedIn = loginResultPayload.login;
                 currentlyLoggedInUserId = loginResultPayload.userId;
+            }
 
-                LogInErrorText = IsLoggedIn ? "" : "Invalid Username or Password";
+            switch (postRequest.result)
+            {
+                case UnityWebRequest.Result.InProgress:
+                    LogInErrorText = "Request in Progress";
+                    break;
+                case UnityWebRequest.Result.Success:
+                    LogInErrorText = IsLoggedIn ? "" : "Invalid Username or Password";
+                    break;
+                case UnityWebRequest.Result.ConnectionError:
+                    LogInErrorText = "Server Offline";
+                    break;
+                case UnityWebRequest.Result.ProtocolError:
+                    LogInErrorText = "Protocol Error";
+                    break;
+                case UnityWebRequest.Result.DataProcessingError:
+                    LogInErrorText = "Data Processing Error";
+                    break;
             }
 
             postRequest.Dispose();
@@ -723,7 +747,7 @@ namespace Vi.Core
 
         private void Start()
         {
-            StartCoroutine(CreateItems());
+            if (Application.isEditor) { StartCoroutine(CreateItems()); }
         }
 
         private IEnumerator CreateItems()
