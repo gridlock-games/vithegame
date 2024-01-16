@@ -373,21 +373,29 @@ namespace Vi.Core
 
         public IEnumerator UpdateCharacterCosmetics(Character character)
         {
-            CharacterCosmeticPutPayload payload = new CharacterCosmeticPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
+            if (PlayingOffine)
+            {
+                character._id = "OfflineCharacter";
+                PlayerPrefs.SetString("OfflineCharacter", JsonConvert.SerializeObject(ToCharacterJson(character)));
+            }
+            else
+            {
+                CharacterCosmeticPutPayload payload = new CharacterCosmeticPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
                 character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
 
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+                string json = JsonUtility.ToJson(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
+                UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
 
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
+                }
+                putRequest.Dispose();
             }
-            putRequest.Dispose();
         }
 
         public IEnumerator UpdateCharacterLoadout(Character character)
@@ -440,32 +448,62 @@ namespace Vi.Core
 
         public IEnumerator CharacterDisableRequest(string characterId)
         {
-            CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
-
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
-
-            if (putRequest.result != UnityWebRequest.Result.Success)
+            if (PlayingOffine)
             {
-                Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
+                PlayerPrefs.DeleteKey("OfflineCharacter");
             }
-            putRequest.Dispose();
+            else
+            {
+                CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
+
+                string json = JsonUtility.ToJson(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+                UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
+                }
+                putRequest.Dispose();
+            }
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(), CharacterReference.RaceAndGender.HumanMale); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
 
-        public Loadout GetDefaultLoadout()
+        public Loadout GetDefaultLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
+            switch (raceAndGender)
+            {
+                case CharacterReference.RaceAndGender.HumanMale:
+                    return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
+                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                case CharacterReference.RaceAndGender.HumanFemale:
+                    return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
+                        "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                case CharacterReference.RaceAndGender.OrcMale:
+                    return new Loadout("1", "Or_M_Helm_SMage_03_Bl", "Or_M_Shoulders_SMage_Bl", "Or_M_Chest_SMage_Bl", "Or_M_Gloves_SMage_Bl",
+                        "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                case CharacterReference.RaceAndGender.OrcFemale:
+                    return new Loadout("1", "Or_F_Helm_SMage_03_Bl", "Or_F_Shoulders_SMage_Bl", "Or_F_Chest_SMage_Bl", "Or_F_Gloves_SMage_Bl",
+                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                default:
+                    Debug.LogError("Not sure how to handle " + raceAndGender);
+                    break;
+            }
+
             return new Loadout("1", "65a2b5077fd3af802c750f7f", "65a2b5247fd3af802c751047", "65a2b4e27fd3af802c750e7f", "65a2b4f37fd3af802c750ef7",
-                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "GreatSwordWeapon", "HammerWeapon", true);
+                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "GreatSwordWeapon", "CrossbowWeapon", true);
         }
 
         private CharacterJson ToCharacterJson(Character character)
         {
+            string[] raceAndGenderStrings = Regex.Matches(character.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            string race = raceAndGenderStrings[0];
+            string gender = raceAndGenderStrings[1];
+
             return new CharacterJson()
             {
                 _id = character._id.ToString(),
@@ -482,8 +520,8 @@ namespace Vi.Core
                 slot = character.slot,
                 level = character.level,
                 experience = character.experience,
-                race = "HUMAN",
-                gender = "MALE"
+                race = race,
+                gender = gender
             };
         }
 
@@ -639,7 +677,7 @@ namespace Vi.Core
             public Character ToCharacter()
             {
                 CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(char.ToUpper(race[0]) + race[1..].ToLower() + char.ToUpper(gender[0]) + gender[1..].ToLower());
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(), raceAndGender);
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
             }
         }
 
@@ -967,7 +1005,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
             }
             postRequest.Dispose();
         }

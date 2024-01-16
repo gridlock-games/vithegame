@@ -92,7 +92,7 @@ namespace Vi.ScriptableObjects
         }
 
         [System.Serializable]
-        public class WearableEquipmentOption
+        public class WearableEquipmentOption : System.IEquatable<WearableEquipmentOption>
         {
             public string itemWebId;
             public RaceAndGender raceAndGender;
@@ -158,6 +158,11 @@ namespace Vi.ScriptableObjects
                 raceAndGender = RaceAndGender.HumanMale;
                 wearableEquipmentPrefab = null;
                 averageTextureColor = Color.white;
+            }
+
+            public bool Equals(WearableEquipmentOption other)
+            {
+                return other.raceAndGender == raceAndGender & other.equipmentType == equipmentType & other.wearableEquipmentPrefab.name == wearableEquipmentPrefab.name;
             }
         }
 
@@ -273,6 +278,7 @@ namespace Vi.ScriptableObjects
                         break;
                     }
                 }
+
                 if (!isEquipment) { continue; }
 
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
@@ -309,7 +315,7 @@ namespace Vi.ScriptableObjects
                     }
 
                     WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
-                    if (!equipmentOptions.Exists(item => item.wearableEquipmentPrefab == wearableEquipmentOption.wearableEquipmentPrefab)) { equipmentOptions.Add(wearableEquipmentOption); }
+                    if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
                     wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
                 }
             }

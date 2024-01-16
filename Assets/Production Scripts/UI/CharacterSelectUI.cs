@@ -397,6 +397,7 @@ namespace Vi.UI
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+            selectedCharacter.raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });

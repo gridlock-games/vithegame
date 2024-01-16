@@ -260,13 +260,13 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            if (characterMaterial == null) { return; }
+            if (characterMaterial == null) { Debug.LogWarning("Character Material is null"); return; }
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
         {
-            if (wearableEquipmentOption == null) { return; }
+            if (wearableEquipmentOption == null) { Debug.LogWarning("Equipment option is null"); return; }
             animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
         }
 
