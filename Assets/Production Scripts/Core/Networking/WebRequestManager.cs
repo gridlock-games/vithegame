@@ -9,7 +9,6 @@ using Vi.ScriptableObjects;
 using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine.SceneManagement;
-using System.IO;
 
 namespace Vi.Core
 {
@@ -296,12 +295,10 @@ namespace Vi.Core
         {
             if (PlayingOffine)
             {
-                string path = Path.Join(Application.persistentDataPath, "OfflineCharacter.json");
                 Characters.Clear();
-                if (File.Exists(path))
+                if (PlayerPrefs.HasKey("OfflineCharacter"))
                 {
-                    string json = File.ReadAllText(path);
-                    Characters.Add(JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter());
+                    Characters.Add(JsonConvert.DeserializeObject<CharacterJson>(PlayerPrefs.GetString("OfflineCharacter")).ToCharacter());
                 }
             }
             else
@@ -342,29 +339,36 @@ namespace Vi.Core
 
         private IEnumerator CharacterByIdGetRequest(string characterId)
         {
-            if (IsGettingCharacterById) { yield break; }
-            IsGettingCharacterById = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
+            if (PlayingOffine)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
+                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(PlayerPrefs.GetString("OfflineCharacter")).ToCharacter();
+            }
+            else
+            {
+                if (IsGettingCharacterById) { yield break; }
+                IsGettingCharacterById = true;
+                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
+                yield return getRequest.SendWebRequest();
+
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
+                    getRequest.Dispose();
+                    yield break;
+                }
+                string json = getRequest.downloadHandler.text;
+                try
+                {
+                    CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
+                }
+                catch
+                {
+                    CharacterById = GetDefaultCharacter();
+                }
+
                 getRequest.Dispose();
-                yield break;
+                IsGettingCharacterById = false;
             }
-            string json = getRequest.downloadHandler.text;
-            try
-            {
-                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
-            }
-            catch
-            {
-                CharacterById = GetDefaultCharacter();
-            }
-
-            getRequest.Dispose();
-            IsGettingCharacterById = false;
         }
 
         public IEnumerator UpdateCharacterCosmetics(Character character)
@@ -412,21 +416,8 @@ namespace Vi.Core
         {
             if (PlayingOffine)
             {
-                string path = Path.Join(Application.persistentDataPath, "OfflineCharacter.json");
-                if (File.Exists(path))
-                {
-                    //string json = File.ReadAllText(path);
-                    //ToCharacterJson(JsonConvert.DeserializeObject<Character>(json));
-                }
-                else
-                {
-                    using FileStream fs = File.Create(path);
-                    fs.Close();
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                    {
-                        outputFile.WriteLine(JsonConvert.SerializeObject(ToCharacterJson(character)));
-                    }
-                }
+                character._id = "OfflineCharacter";
+                PlayerPrefs.SetString("OfflineCharacter", JsonConvert.SerializeObject(ToCharacterJson(character)));
             }
             else
             {
