@@ -9,6 +9,7 @@ using Vi.ScriptableObjects;
 using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 namespace Vi.Core
 {
@@ -293,33 +294,46 @@ namespace Vi.Core
         public void RefreshCharacters() { StartCoroutine(CharacterGetRequest()); }
         private IEnumerator CharacterGetRequest()
         {
-            if (IsRefreshingCharacters) { yield break; }
-            IsRefreshingCharacters = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
-            yield return getRequest.SendWebRequest();
-
-            Characters.Clear();
-            if (getRequest.result != UnityWebRequest.Result.Success)
+            if (PlayingOffine)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
-                getRequest.Dispose();
-                yield break;
-            }
-            string json = getRequest.downloadHandler.text;
-            try
-            {
-                foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                string path = Path.Join(Application.persistentDataPath, "OfflineCharacter.json");
+                Characters.Clear();
+                if (File.Exists(path))
                 {
-                    Characters.Add(jsonStruct.ToCharacter());
+                    string json = File.ReadAllText(path);
+                    Characters.Add(JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter());
                 }
             }
-            catch (System.Exception e)
+            else
             {
-                Debug.LogError(e);
-            }
+                if (IsRefreshingCharacters) { yield break; }
+                IsRefreshingCharacters = true;
+                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
+                yield return getRequest.SendWebRequest();
 
-            getRequest.Dispose();
-            IsRefreshingCharacters = false;
+                Characters.Clear();
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
+                    getRequest.Dispose();
+                    yield break;
+                }
+                string json = getRequest.downloadHandler.text;
+                try
+                {
+                    foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                    {
+                        Characters.Add(jsonStruct.ToCharacter());
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError(e);
+                }
+
+                getRequest.Dispose();
+                IsRefreshingCharacters = false;
+            }
         }
 
         public bool IsGettingCharacterById { get; private set; }
@@ -396,20 +410,41 @@ namespace Vi.Core
 
         public IEnumerator CharacterPostRequest(Character character)
         {
-            CharacterPostPayload payload = new CharacterPostPayload(character);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
+            if (PlayingOffine)
             {
-                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                string path = Path.Join(Application.persistentDataPath, "OfflineCharacter.json");
+                if (File.Exists(path))
+                {
+                    //string json = File.ReadAllText(path);
+                    //ToCharacterJson(JsonConvert.DeserializeObject<Character>(json));
+                }
+                else
+                {
+                    using FileStream fs = File.Create(path);
+                    fs.Close();
+                    using (StreamWriter outputFile = new StreamWriter(path))
+                    {
+                        outputFile.WriteLine(JsonConvert.SerializeObject(ToCharacterJson(character)));
+                    }
+                }
             }
-            postRequest.Dispose();
+            else
+            {
+                CharacterPostPayload payload = new CharacterPostPayload(character);
+
+                string json = JsonConvert.SerializeObject(payload);
+                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                }
+                postRequest.Dispose();
+            }
         }
 
         public IEnumerator CharacterDisableRequest(string characterId)
@@ -435,7 +470,30 @@ namespace Vi.Core
         public Loadout GetDefaultLoadout()
         {
             return new Loadout("1", "65a2b5077fd3af802c750f7f", "65a2b5247fd3af802c751047", "65a2b4e27fd3af802c750e7f", "65a2b4f37fd3af802c750ef7",
-                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "65a2b48b7fd3af802c750c27", "65a2c0cb3cd406fe21bef274", true);
+                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "GreatSwordWeapon", "HammerWeapon", true);
+        }
+
+        private CharacterJson ToCharacterJson(Character character)
+        {
+            return new CharacterJson()
+            {
+                _id = character._id.ToString(),
+                name = character.name.ToString(),
+                model = character.model.ToString(),
+                bodyColor = character.bodyColor.ToString(),
+                eyeColor = character.eyeColor.ToString(),
+                beard = character.beard.ToString(),
+                brows = character.brows.ToString(),
+                hair = character.hair.ToString(),
+                attributes = new CharacterAttributes(),
+                loadOuts = new List<object>(),
+                userId = character.userId.ToString(),
+                slot = character.slot,
+                level = character.level,
+                experience = character.experience,
+                race = "HUMAN",
+                gender = "MALE"
+            };
         }
 
         public struct Character : INetworkSerializable
@@ -574,7 +632,7 @@ namespace Vi.Core
             public string gender;
             public string race;
             public string dateCreated;
-            public Attributes attributes;
+            public CharacterAttributes attributes;
             public List<object> loadOuts;
             public bool enabled;
             public string userId;
