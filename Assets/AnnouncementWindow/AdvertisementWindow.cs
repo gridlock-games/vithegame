@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class AdvertisementWindow : MonoBehaviour
 {
   [SerializeField] AdvertiseItem currentItem;
+  [SerializeField] Image adsImagePlacecard;
   // Start is called before the first frame update
   void Awake()
     {
@@ -18,9 +19,10 @@ public class AdvertisementWindow : MonoBehaviour
         
     }
 
-  void updateEvent(AdvertiseItem adsItem)
+  public void updateEvent(AdvertiseItem adsItem)
   {
-
+    currentItem = adsItem;
+    adsImagePlacecard.sprite = currentItem.adImage;
   }
 
   //on click

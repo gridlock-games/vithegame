@@ -13,11 +13,12 @@ public class AdvertisementUI : MonoBehaviour
   private void Awake()
   {
     window = this.gameObject.GetComponent<AdvertisementWindow>();
+    StartCoroutine(AdvertisementCoroutine());
   }
   // Start is called before the first frame update
   void Start()
     {
-        
+    
     }
 
     // Update is called once per frame
@@ -28,7 +29,7 @@ public class AdvertisementUI : MonoBehaviour
 
   void nextItem()
   {
-    if (currentItem >= advertiseItems.Count)
+    if (currentItem >= advertiseItems.Count - 1)
     {
       currentItem = 0;
     }
@@ -40,6 +41,17 @@ public class AdvertisementUI : MonoBehaviour
 
   void updateImage()
   {
-
+    window.updateEvent(advertiseItems[currentItem]);
   }
+
+  IEnumerator AdvertisementCoroutine()
+  {
+
+        while (true)
+        {
+      updateImage();
+      yield return new WaitForSeconds(5);
+      nextItem();
+    }
+    }
 }
