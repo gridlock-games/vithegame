@@ -55,8 +55,8 @@ namespace Vi.Core
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
-            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == playerData.character.loadoutPreset1.weapon1ItemId);
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == playerData.character.loadoutPreset1.weapon2ItemId);
+            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == playerData.character.loadoutPreset1.weapon1ItemId | item.weapon.name == playerData.character.loadoutPreset1.weapon1ItemId);
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == playerData.character.loadoutPreset1.weapon2ItemId | item.weapon.name == playerData.character.loadoutPreset1.weapon2ItemId);
 
             primaryWeapon = Instantiate(primaryOption.weapon);
             secondaryWeapon = Instantiate(secondaryOption.weapon);

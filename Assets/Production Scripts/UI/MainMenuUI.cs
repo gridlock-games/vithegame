@@ -10,11 +10,14 @@ namespace Vi.UI
     public class MainMenuUI : MonoBehaviour
     {
         [SerializeField] private PauseMenu pauseMenu;
+        [SerializeField] private GameObject initialParent;
+        [Header("Authentication")]
+        [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
         [SerializeField] private Text loginErrorText;
-        [SerializeField] private GameObject authenticationParent;
+        [Header("Online Play Menu")]
         [SerializeField] private GameObject playParent;
         [SerializeField] private Text welcomeUserText;
 
@@ -31,6 +34,24 @@ namespace Vi.UI
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7776;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
+        }
+
+        public void PlayOnline()
+        {
+            initialParent.SetActive(false);
+            authenticationParent.SetActive(true);
+            WebRequestManager.Singleton.SetPlayingOffline(false);
+        }
+
+        public void PlayOffline()
+        {
+            WebRequestManager.Singleton.SetPlayingOffline(true);
+            GoToCharacterSelect();
+        }
+
+        public void ReturnToInitialElements()
+        {
+            initialParent.SetActive(true);
         }
 
         public void GoToCharacterSelect()
@@ -60,15 +81,24 @@ namespace Vi.UI
                 usernameInput.text = "";
                 passwordInput.text = "";
             }
+            initialParent.SetActive(true);
         }
 
         private void Update()
         {
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
 
-            authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
-            playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
-
+            if (!initialParent.activeSelf)
+            {
+                authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
+                playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
+            }
+            else
+            {
+                authenticationParent.SetActive(false);
+                playParent.SetActive(false);
+            }
+            
             welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }
