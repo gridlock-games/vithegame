@@ -4,6 +4,10 @@ using UnityEngine;
 using Vi.Core;
 using Unity.Netcode;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
+using System.Net;
+using System.IO;
 
 namespace Vi.UI
 {
@@ -21,8 +25,20 @@ namespace Vi.UI
         [SerializeField] private GameObject playParent;
         [SerializeField] private Text welcomeUserText;
 
+        private bool startServerCalled;
         public void StartHubServer()
         {
+            if (startServerCalled) { return; }
+            startServerCalled = true;
+
+            string path = Application.dataPath;
+            path = path.Substring(0, path.LastIndexOf('/'));
+            path = path.Substring(0, path.LastIndexOf('/'));
+            path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
+            path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
+
+            System.Diagnostics.Process.Start(path);
+
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
@@ -31,6 +47,9 @@ namespace Vi.UI
 
         public void StartLobbyServer()
         {
+            if (startServerCalled) { return; }
+            startServerCalled = true;
+
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7776;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
@@ -86,6 +105,25 @@ namespace Vi.UI
 
         private void Update()
         {
+            bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
+            bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
+            {
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+                if (isHubInBuild & isLobbyInBuild)
+                {
+                    //StoreClient("Headless Client");
+                }
+                else if (isHubInBuild)
+                {
+                    StartHubServer();
+                }
+                else if (isLobbyInBuild)
+                {
+                    StartLobbyServer();
+                }
+            }
+
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
 
             if (!initialParent.activeSelf)
