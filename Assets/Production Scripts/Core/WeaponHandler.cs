@@ -479,7 +479,14 @@ namespace Vi.Core
         private bool shouldRepeatHeavyAttack;
         void OnHeavyAttackHold(InputValue value)
         {
-            shouldRepeatHeavyAttack = value.isPressed;
+            if (CanAim)
+            {
+                shouldRepeatHeavyAttack = value.isPressed;
+            }
+            else
+            {
+                HeavyAttack(value.isPressed);
+            }
         }
 
         void OnAbility1(InputValue value)

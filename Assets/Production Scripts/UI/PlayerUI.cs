@@ -41,6 +41,10 @@ namespace Vi.UI
         [SerializeField] private Sprite lightAttackIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private Sprite aimIcon;
+        [SerializeField] private Image primaryWeaponButton;
+        [SerializeField] private Image secondaryWeaponButton;
+        [SerializeField] private Button switchAttackTypeButton;
+        [SerializeField] private Image aimButton;
 
         [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
 
@@ -69,8 +73,10 @@ namespace Vi.UI
         }
 
         private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
-        public void ToggleAttackType()
+        public void ToggleAttackType(bool isRefreshing)
         {
+            if (isRefreshing) { attackType = Weapon.InputAttackType.HeavyAttack; }
+
             if (attackType == Weapon.InputAttackType.LightAttack)
             {
                 attackType = Weapon.InputAttackType.HeavyAttack;
@@ -101,7 +107,7 @@ namespace Vi.UI
 
         private void Start()
         {
-            ToggleAttackType();
+            ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
@@ -165,6 +171,10 @@ namespace Vi.UI
                     ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
                 }
             }
+
+            ToggleAttackType(true);
+            aimButton.gameObject.SetActive(weaponHandler.CanAim);
+            switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
         }
 
         private void UpdateActiveUIElements()
