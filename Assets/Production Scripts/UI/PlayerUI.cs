@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
+using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.UI
 {
@@ -33,9 +34,17 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
-        [SerializeField] private Image rightMouseClickImage;
+        [SerializeField] private OnScreenButton lightAttackButton;
+        [SerializeField] private OnScreenButton heavyAttackButton;
+        [SerializeField] private Image lookJoystickImage;
+        [SerializeField] private Image attackTypeToggleImage;
+        [SerializeField] private Sprite lightAttackIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private Sprite aimIcon;
+        [SerializeField] private Image primaryWeaponButton;
+        [SerializeField] private Image secondaryWeaponButton;
+        [SerializeField] private Button switchAttackTypeButton;
+        [SerializeField] private Image aimButton;
 
         [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
 
@@ -63,6 +72,33 @@ namespace Vi.UI
             attributes.GetComponent<ActionMapHandler>().OnPause();
         }
 
+        private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
+        public void ToggleAttackType(bool isRefreshing)
+        {
+            if (isRefreshing) { attackType = Weapon.InputAttackType.HeavyAttack; }
+
+            if (attackType == Weapon.InputAttackType.LightAttack)
+            {
+                attackType = Weapon.InputAttackType.HeavyAttack;
+                attackTypeToggleImage.sprite = lightAttackIcon;
+                lookJoystickImage.sprite = heavyAttackIcon;
+                lightAttackButton.enabled = false;
+                heavyAttackButton.enabled = true;
+            }
+            else if (attackType == Weapon.InputAttackType.HeavyAttack)
+            {
+                attackType = Weapon.InputAttackType.LightAttack;
+                attackTypeToggleImage.sprite = heavyAttackIcon;
+                lookJoystickImage.sprite = lightAttackIcon;
+                lightAttackButton.enabled = true;
+                heavyAttackButton.enabled = false;
+            }
+            else
+            {
+                Debug.LogError("Something's fucked up");
+            }
+        }
+
         private void Awake()
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
@@ -71,6 +107,7 @@ namespace Vi.UI
 
         private void Start()
         {
+            ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
@@ -134,6 +171,10 @@ namespace Vi.UI
                     ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
                 }
             }
+
+            ToggleAttackType(true);
+            aimButton.gameObject.SetActive(weaponHandler.CanAim);
+            switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
         }
 
         private void UpdateActiveUIElements()
@@ -148,7 +189,7 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
+                //rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
 
                 foreach (StatusIcon statusIcon in statusIcons)
                 {

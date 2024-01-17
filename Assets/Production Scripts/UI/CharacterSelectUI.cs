@@ -70,8 +70,8 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -91,7 +91,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            addCharacterButton.interactable = WebRequestManager.Singleton.Characters.Count < 5;
+            addCharacterButton.interactable = WebRequestManager.Singleton.PlayingOffine ? WebRequestManager.Singleton.Characters.Count < 1 : WebRequestManager.Singleton.Characters.Count < 5;
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
@@ -262,7 +262,8 @@ namespace Vi.UI
             raceButtonParent.GetComponentInChildren<Text>().text = "Race";
             raceButtonParent = raceButtonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
-            foreach (string race in new List<string>() { "Human", "Orc" })
+            //foreach (string race in new List<string>() { "Human", "Orc" })
+            foreach (string race in new List<string>() { "Human" })
             {
                 Image image = Instantiate(characterCustomizationButtonPrefab, raceButtonParent).GetComponent<Image>();
 
@@ -304,8 +305,8 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -360,8 +361,8 @@ namespace Vi.UI
         private GameObject previewObject;
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
-            selectCharacterButton.interactable = true;
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
@@ -394,9 +395,12 @@ namespace Vi.UI
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
             selectedGender = raceAndGenderStrings[1];
-            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
+            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+            selectedCharacter.raceAndGender = raceAndGender;
+            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyDefaultEquipment(raceAndGender));
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
@@ -607,6 +611,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
+            NetSceneManager.Singleton.LoadScene("Arena Map A");
         }
 
         public void OpenServerBrowser()

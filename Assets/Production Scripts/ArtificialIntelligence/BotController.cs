@@ -48,9 +48,9 @@ namespace Vi.ArtificialIntelligence
         private Attributes attributes;
         private AnimationHandler animationHandler;
         private WeaponHandler weaponHandler;
-        private new void Start()
+
+        private void Awake()
         {
-            base.Start();
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             navMeshAgent = GetComponent<NavMeshAgent>();
@@ -58,7 +58,18 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
+        }
+
+        private new void Start()
+        {
+            base.Start();
             networkColliderRigidbody.transform.SetParent(null, true);
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (networkColliderRigidbody) { Destroy(networkColliderRigidbody.gameObject); }
         }
 
         [SerializeField] private float angularSpeed = 540;

@@ -130,6 +130,8 @@ namespace Vi.Core
             UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
             UnloadAllScenePayloadsOfType(SceneType.Gameplay);
             UnloadAllScenePayloadsOfType(SceneType.Environment);
+
+            activeSceneGroupIndicies.Clear();
         }
 
         private void Awake()
@@ -144,6 +146,7 @@ namespace Vi.Core
 
         private void Update()
         {
+            LoadingOperations.RemoveAll(item => item.asyncOperation == null);
             LoadingOperations.RemoveAll(item => item.asyncOperation.isDone);
         }
 
