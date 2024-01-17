@@ -66,6 +66,12 @@ namespace Vi.ArtificialIntelligence
             networkColliderRigidbody.transform.SetParent(null, true);
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (networkColliderRigidbody) { Destroy(networkColliderRigidbody.gameObject); }
+        }
+
         [SerializeField] private float angularSpeed = 540;
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float runAnimationTransitionSpeed = 5;

@@ -365,6 +365,10 @@ namespace Vi.Core
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
+
+            playerDataList.Clear();
+            localPlayers.Clear();
+            botClientId = 0;
         }
 
         private void Tick()

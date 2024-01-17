@@ -63,7 +63,7 @@ namespace Vi.UI
         private IEnumerator ConnectToLobbyServerCoroutine()
         {
             NetworkManager.Singleton.Shutdown(true);
-            yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening);
+            yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening | !NetworkManager.Singleton.ShutdownInProgress);
             NetworkManager.Singleton.StartClient();
         }
     }

@@ -14,6 +14,7 @@ namespace Vi.UI
         [SerializeField] private LoadoutEditorMenu loadoutEditorMenu;
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private Toggle debugOverlayToggle;
+        [SerializeField] private Button goBackScenesButton;
 
         public void OpenDisplayMenu()
         {
@@ -54,6 +55,23 @@ namespace Vi.UI
         {
             GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
             volumeSlider.value = AudioListener.volume;
+
+            goBackScenesButton.onClick.AddListener(delegate { StartCoroutine(ReturnToMainMenu()); });
+        }
+
+        public IEnumerator ReturnToMainMenu()
+        {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                Debug.Log("Network Manager shutdown");
+                NetworkManager.Singleton.Shutdown();
+                //yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening | !NetworkManager.Singleton.ShutdownInProgress);
+                Debug.Log("shutdown complete");
+            }
+
+            Debug.Log("Loading main menu");
+            NetSceneManager.Singleton.LoadScene("Main Menu");
+            yield return null;
         }
     }
 }
