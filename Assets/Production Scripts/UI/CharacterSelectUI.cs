@@ -70,8 +70,8 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -304,8 +304,8 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -360,8 +360,8 @@ namespace Vi.UI
         private GameObject previewObject;
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
-            selectCharacterButton.interactable = true;
-            goToTrainingRoomButton.interactable = selectCharacterButton.interactable;
+            selectCharacterButton.interactable = !WebRequestManager.Singleton.PlayingOffine;
+            goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());

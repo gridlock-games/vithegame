@@ -420,6 +420,7 @@ namespace Vi.Core
             }
 
             if (shouldRepeatLightAttack) { OnLightAttack(); }
+            if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
         }
 
         void OnLightAttack()
@@ -442,7 +443,12 @@ namespace Vi.Core
 
         void OnHeavyAttack(InputValue value)
         {
-            if (value.isPressed)
+            HeavyAttack(value.isPressed);
+        }
+
+        private void HeavyAttack(bool isPressed)
+        {
+            if (isPressed)
             {
                 if (actionVFXPreviewInstance)
                 {
@@ -455,19 +461,25 @@ namespace Vi.Core
             {
                 if (toggleAim)
                 {
-                    if (value.isPressed) { aiming.Value = !aiming.Value; }
+                    if (isPressed) { aiming.Value = !aiming.Value; }
                 }
                 else
                 {
-                    aiming.Value = value.isPressed;
+                    aiming.Value = isPressed;
                 }
             }
-            else if (value.isPressed)
+            else if (isPressed)
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
                 if (actionClip != null)
                     animationHandler.PlayAction(actionClip);
             }
+        }
+
+        private bool shouldRepeatHeavyAttack;
+        void OnHeavyAttackHold(InputValue value)
+        {
+            shouldRepeatHeavyAttack = value.isPressed;
         }
 
         void OnAbility1(InputValue value)

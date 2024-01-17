@@ -13,8 +13,11 @@ namespace Vi.Core
 
         private void Awake()
         {
-            Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
-            Application.targetFrameRate = 60;
+            if (Application.platform == RuntimePlatform.IPhonePlayer | Application.platform == RuntimePlatform.Android)
+            {
+                Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
+                Application.targetFrameRate = 60;
+            }
 
             //if (!Application.isEditor)
             //{

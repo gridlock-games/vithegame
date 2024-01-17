@@ -78,6 +78,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "HeavyAttackHold",
+                    "type": "Value",
+                    "id": "971a3916-4d44-40cd-991e-cc890eae8a86",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Ability1",
                     "type": "Value",
                     "id": "70ef5d0b-59ff-4f78-9fdf-ed0267580554",
@@ -367,17 +376,6 @@
                 },
                 {
                     "name": "",
-                    "id": "fa668dc7-cadb-4bfc-8806-193fcaa9da94",
-                    "path": "<Gamepad>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "HeavyAttack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "66a25f1b-daf6-44e5-80bf-ef21bec2893e",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",
@@ -461,6 +459,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "LightAttackHold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "40be45e8-f56d-463b-9578-53efdd25a84f",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HeavyAttackHold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
