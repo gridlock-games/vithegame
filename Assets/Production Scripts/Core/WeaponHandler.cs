@@ -481,11 +481,11 @@ namespace Vi.Core
         {
             if (CanAim)
             {
-                shouldRepeatHeavyAttack = value.isPressed;
+                HeavyAttack(value.isPressed);
             }
             else
             {
-                HeavyAttack(value.isPressed);
+                shouldRepeatHeavyAttack = value.isPressed;
             }
         }
 
