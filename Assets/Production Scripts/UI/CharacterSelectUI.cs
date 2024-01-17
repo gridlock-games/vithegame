@@ -394,10 +394,12 @@ namespace Vi.UI
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
             selectedGender = raceAndGenderStrings[1];
-            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)); }
+            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
-            selectedCharacter.raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+            selectedCharacter.raceAndGender = raceAndGender;
+            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyDefaultEquipment(raceAndGender));
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
