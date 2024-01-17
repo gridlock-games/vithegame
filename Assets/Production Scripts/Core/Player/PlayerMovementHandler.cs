@@ -188,12 +188,14 @@ namespace Vi.Player
 
         private void OnEnable()
         {
-            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
 
         private void OnDisable()
         {
-            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
         }
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
