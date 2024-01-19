@@ -264,10 +264,10 @@ namespace Vi.Core
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
-        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             if (wearableEquipmentOption == null) { Debug.LogWarning("Equipment option is null"); return; }
-            animatorReference.ApplyWearableEquipment(wearableEquipmentOption);
+            animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
         }
 
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
@@ -304,13 +304,13 @@ namespace Vi.Core
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
-            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.beard);
-            ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard));
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.brows);
-            ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows));
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.wearableEquipmentPrefab.name == character.hair);
-            ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair));
+            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions();
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.models[raceAndGender].name == character.beard);
+            ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.models[raceAndGender].name == character.brows);
+            ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.models[raceAndGender].name == character.hair);
+            ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)

@@ -863,10 +863,10 @@ namespace Vi.Core
 
                 if (itemList.Exists(item => item._id == weaponOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating weapon item: " + (i+1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
+                Debug.Log("Creating weapon item: " + (i + 1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.weapon.name, 0, 1, 1, 1, 1, 1,
-                    false, false, false, weaponOption.weapon.name, true);
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                    weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -885,7 +885,7 @@ namespace Vi.Core
                 postRequest.Dispose();
             }
 
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions();
 
             for (int i = 0; i < wearableEquipmentOptions.Count; i++)
             {
@@ -893,10 +893,12 @@ namespace Vi.Core
 
                 if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.wearableEquipmentPrefab.name);
+                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanMale].name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.wearableEquipmentPrefab.name, 0, 1, 1, 1, 1, 1,
-                    false, false, false, wearableEquipmentOption.wearableEquipmentPrefab.name, true);
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanMale].name,
+                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanFemale].name,
+                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.OrcMale].name, wearableEquipmentOption.models[CharacterReference.RaceAndGender.OrcFemale].name);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -928,8 +930,8 @@ namespace Vi.Core
             [JsonProperty("attributes.agility")]
             public int attributesagility;
 
-            [JsonProperty("attributes.intelligence")]
-            public int attributesintelligence;
+            [JsonProperty("attributes.zzzz")]
+            public int attributeszzzz;
 
             [JsonProperty("attributes.vitality")]
             public int attributesvitality;
@@ -939,25 +941,61 @@ namespace Vi.Core
             public bool isCraftOnly;
             public bool isCashExclusive;
             public bool isPassExclusive;
-            public string modelName;
+            public ModelNames modelNames;
             public bool isBasicGear;
 
-            public CreateItemPayload(ItemClass @class, string name, int weight, int attributesstrength, int attributesagility, int attributesintelligence, int attributesvitality, int attributesdexterity, bool isCraftOnly, bool isCashExclusive, bool isPassExclusive, string modelName, bool isBasicGear)
+            public CreateItemPayload(ItemClass @class, string name, int weight,
+                int attributesstrength, int attributesagility, int attributeszzzz, int attributesvitality, int attributesdexterity,
+                bool isCraftOnly, bool isCashExclusive, bool isPassExclusive, bool isBasicGear,
+                string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
             {
                 this.@class = @class.ToString();
                 this.name = name;
                 this.weight = weight;
                 this.attributesstrength = attributesstrength;
                 this.attributesagility = attributesagility;
-                this.attributesintelligence = attributesintelligence;
+                this.attributeszzzz = attributeszzzz;
                 this.attributesvitality = attributesvitality;
                 this.attributesdexterity = attributesdexterity;
                 this.isCraftOnly = isCraftOnly;
                 this.isCashExclusive = isCashExclusive;
                 this.isPassExclusive = isPassExclusive;
-                this.modelName = modelName;
+                this.modelNames = new ModelNames(humanMaleModelName, humanFemaleModelName, orcMaleModelName, orcFemaleModelName);
                 this.isBasicGear = isBasicGear;
             }
+
+            public struct ModelNames
+            {
+                public Human human;
+                public Orc orc;
+
+                public ModelNames(string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
+                {
+                    human = new Human()
+                    {
+                        m = humanMaleModelName,
+                        f = humanFemaleModelName
+                    };
+                    orc = new Orc()
+                    {
+                        m = orcMaleModelName,
+                        f = orcFemaleModelName
+                    };
+                }
+            }
+
+            public struct Human
+            {
+                public string m;
+                public string f;
+            }
+
+            public struct Orc
+            {
+                public string m;
+                public string f;
+            }
+
         }
 
         private enum ItemClass

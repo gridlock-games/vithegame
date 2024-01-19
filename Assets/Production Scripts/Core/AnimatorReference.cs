@@ -45,7 +45,7 @@ namespace Vi.Core
         }
         
         private Dictionary<CharacterReference.EquipmentType, GameObject> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, GameObject>();
-        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
             {
@@ -54,14 +54,14 @@ namespace Vi.Core
                     Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
                 }
 
-                if (wearableEquipmentOption.wearableEquipmentPrefab)
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform);
+                if (wearableEquipmentOption.models[raceAndGender])
+                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.models[raceAndGender].gameObject, transform);
                 else
                     wearableEquipmentInstances.Remove(wearableEquipmentOption.equipmentType);
             }
-            else if (wearableEquipmentOption.wearableEquipmentPrefab)
+            else if (wearableEquipmentOption.models[raceAndGender])
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.wearableEquipmentPrefab.gameObject, transform));
+                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.models[raceAndGender].gameObject, transform));
             }
 
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
