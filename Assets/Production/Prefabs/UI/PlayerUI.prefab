@@ -683,7 +683,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MovementRange: 125
+  m_DynamicOriginRange: 100
   m_ControlPath: <Gamepad>/leftStick
+  m_Behaviour: 0
+  m_UseIsolatedInputActions: 0
+  m_PointerDownAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 3b0cc7bf-8f73-455f-bce5-188a8c86b5d9
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  m_PointerMoveAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 9a091fda-6bd1-49f8-9397-044fcfca43e7
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &4758944105944543620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -881,6 +902,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -971,7 +993,7 @@ MonoBehaviour:
   switchAttackTypeButton: {fileID: 4305966019654369716}
   aimButton: {fileID: 5353979728603681489}
   platformUIDefinitions:
-  - platforms: 080000000b00000007000000
+  - platforms: 080000000b000000
     gameObjectsToEnable:
     - {fileID: 3289547961240334779}
     objectsToMove:
@@ -2528,7 +2550,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MovementRange: 125
+  m_DynamicOriginRange: 100
   m_ControlPath: <Gamepad>/rightStick
+  m_Behaviour: 0
+  m_UseIsolatedInputActions: 0
+  m_PointerDownAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 0104007b-a4f6-4274-bf28-785f3e5e7b71
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  m_PointerMoveAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: ea6f3425-c7bf-4d40-8893-02c1cd467ab1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!1 &5766265470416114759
 GameObject:
   m_ObjectHideFlags: 0

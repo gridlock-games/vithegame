@@ -207,7 +207,7 @@ namespace Vi.UI
                 customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
             }
 
-            foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender))
+            foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender))
             {
                 if (!equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType)) { continue; }
 
@@ -218,7 +218,7 @@ namespace Vi.UI
 
                     bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
                     isOnLeftSide = !isOnLeftSide;
-                    int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions(raceAndGender).FindAll(item => item.equipmentType == equipmentOption.equipmentType).Count;
+                    int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).FindAll(item => item.equipmentType == equipmentOption.equipmentType).Count;
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
@@ -237,7 +237,7 @@ namespace Vi.UI
 
                     buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
                     Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
-                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType)); });
+                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
                     customizationButtonReference.Add(new ButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
                 }
                 else
@@ -249,8 +249,8 @@ namespace Vi.UI
 
                 Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                 image.color = textureAverageColor;
-                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption); });
-                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.wearableEquipmentPrefab.name));
+                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
+                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender).name));
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
@@ -433,9 +433,9 @@ namespace Vi.UI
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
-        public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
-            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption);
+            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
