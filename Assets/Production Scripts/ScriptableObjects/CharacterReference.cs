@@ -94,7 +94,7 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        private static readonly List<EquipmentType> equipmentTypesThatAreForCharacterCustomization = new List<EquipmentType>()
+        public static readonly List<EquipmentType> equipmentTypesThatAreForCharacterCustomization = new List<EquipmentType>()
         {
             EquipmentType.Beard,
             EquipmentType.Brows,
@@ -156,13 +156,17 @@ namespace Vi.ScriptableObjects
             public EquipmentType equipmentType;
             public Color averageTextureColor;
             public string itemWebId;
-            public Dictionary<RaceAndGender, WearableEquipment> Models { get; private set; }
+            [SerializeField] private RaceAndGender[] raceAndGenders;
             [SerializeField] private WearableEquipment[] wearableEquipmentOptions;
+
+            public WearableEquipment GetModel(RaceAndGender raceAndGender)
+            {
+                int index = System.Array.IndexOf(raceAndGenders, raceAndGender);
+                return wearableEquipmentOptions[index];
+            }
 
             public WearableEquipmentOption(Dictionary<RaceAndGender, WearableEquipment> models, Color averageTextureColor)
             {
-                this.Models = new Dictionary<RaceAndGender, WearableEquipment>(models);
-
                 equipmentType = GetEquipmentTypeFromFilename(models[RaceAndGender.HumanMale].name);
 
                 if (equipmentTypesThatAreForCharacterCustomization.Contains(equipmentType))
@@ -174,7 +178,8 @@ namespace Vi.ScriptableObjects
                 name = parsedName.Replace("Hu_M_", "").Replace("_", " ");
 
                 this.averageTextureColor = averageTextureColor;
-                wearableEquipmentOptions = System.Array.FindAll(models.Values.ToArray(), item => item != null);
+                raceAndGenders = models.Keys.ToArray();
+                wearableEquipmentOptions = models.Values.ToArray();
             }
 
             public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab, Color averageTextureColor)
@@ -188,23 +193,24 @@ namespace Vi.ScriptableObjects
                     Debug.LogError("This constructor should only be used for customization types!");
                 }
 
-                Models = new Dictionary<RaceAndGender, WearableEquipment>();
+                Dictionary<RaceAndGender, WearableEquipment> models = new Dictionary<RaceAndGender, WearableEquipment>();
                 foreach (RaceAndGender rg in System.Enum.GetValues(typeof(RaceAndGender)))
                 {
                     if (rg == raceAndGender)
                     {
-                        Models.Add(rg, wearableEquipmentPrefab);
+                        models.Add(rg, wearableEquipmentPrefab);
                     }
                     else
                     {
-                        Models.Add(rg, null);
+                        models.Add(rg, null);
                     }
                 }
 
                 name = wearableEquipmentPrefab.name;
 
                 this.averageTextureColor = averageTextureColor;
-                wearableEquipmentOptions = System.Array.FindAll(Models.Values.ToArray(), item => item != null);
+                raceAndGenders = models.Keys.ToArray();
+                wearableEquipmentOptions = models.Values.ToArray();
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)

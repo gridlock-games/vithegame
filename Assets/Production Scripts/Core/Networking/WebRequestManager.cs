@@ -865,7 +865,7 @@ namespace Vi.Core
 
                 Debug.Log("Creating weapon item: " + (i + 1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
                     weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name);
 
                 string json = JsonConvert.SerializeObject(payload);
@@ -891,14 +891,16 @@ namespace Vi.Core
             {
                 CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions[i];
 
+                if (CharacterReference.equipmentTypesThatAreForCharacterCustomization.Contains(wearableEquipmentOption.equipmentType)) { continue; }
                 if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanMale].name);
+                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.name);
 
                 CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
-                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanMale].name,
-                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanFemale].name,
-                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.OrcMale].name, wearableEquipmentOption.Models[CharacterReference.RaceAndGender.OrcFemale].name);
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanMale).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanFemale).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcMale).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcFemale).name);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
