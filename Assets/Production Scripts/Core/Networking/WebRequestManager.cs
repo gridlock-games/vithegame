@@ -885,7 +885,7 @@ namespace Vi.Core
                 postRequest.Dispose();
             }
 
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWearableEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
 
             for (int i = 0; i < wearableEquipmentOptions.Count; i++)
             {

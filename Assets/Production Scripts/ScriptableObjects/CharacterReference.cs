@@ -156,12 +156,13 @@ namespace Vi.ScriptableObjects
             public EquipmentType equipmentType;
             public Color averageTextureColor;
             public string itemWebId;
-            [SerializeField] private RaceAndGender[] raceAndGenders;
-            [SerializeField] private WearableEquipment[] wearableEquipmentOptions;
+            [SerializeField] private RaceAndGender[] raceAndGenders = new RaceAndGender[0];
+            [SerializeField] private WearableEquipment[] wearableEquipmentOptions = new WearableEquipment[0];
 
             public WearableEquipment GetModel(RaceAndGender raceAndGender)
             {
                 int index = System.Array.IndexOf(raceAndGenders, raceAndGender);
+                if (index == -1) { return null; }
                 return wearableEquipmentOptions[index];
             }
 
@@ -270,7 +271,9 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
-        public List<WearableEquipmentOption> GetWearableEquipmentOptions() { return equipmentOptions; }
+        public List<WearableEquipmentOption> GetArmorEquipmentOptions() { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType)); }
+
+        public List<WearableEquipmentOption> GetCharacterEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender) != null); }
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
