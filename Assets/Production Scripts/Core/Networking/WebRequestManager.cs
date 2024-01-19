@@ -893,12 +893,12 @@ namespace Vi.Core
 
                 if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
 
-                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanMale].name);
+                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanMale].name);
 
                 CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
-                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanMale].name,
-                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.HumanFemale].name,
-                    wearableEquipmentOption.models[CharacterReference.RaceAndGender.OrcMale].name, wearableEquipmentOption.models[CharacterReference.RaceAndGender.OrcFemale].name);
+                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanMale].name,
+                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.HumanFemale].name,
+                    wearableEquipmentOption.Models[CharacterReference.RaceAndGender.OrcMale].name, wearableEquipmentOption.Models[CharacterReference.RaceAndGender.OrcFemale].name);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);

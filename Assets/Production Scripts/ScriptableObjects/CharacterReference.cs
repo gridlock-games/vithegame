@@ -101,56 +101,110 @@ namespace Vi.ScriptableObjects
             EquipmentType.Hair,
         };
 
+        private static readonly Dictionary<RaceAndGender, string> raceAndGenderPrefixes = new Dictionary<RaceAndGender, string>()
+        {
+            { RaceAndGender.HumanMale, "Hu_M_" },
+            { RaceAndGender.HumanFemale, "Hu_F_" },
+            { RaceAndGender.OrcMale, "Or_M_" },
+            { RaceAndGender.OrcFemale, "Or_F_" }
+        };
+
+        private static EquipmentType GetEquipmentTypeFromFilename(string filename)
+        {
+            EquipmentType equipmentType = EquipmentType.Beard;
+            bool broken = false;
+            foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
+            {
+                if (filename.Contains(type.ToString()))
+                {
+                    equipmentType = type;
+                    broken = true;
+                    break;
+                }
+            }
+            if (!broken)
+            {
+                Debug.LogError("Unknown equipment type! " + filename);
+            }
+            return equipmentType;
+        }
+
+        private static RaceAndGender GetRaceAndGenderFromFilename(string filename)
+        {
+            RaceAndGender raceAndGender = RaceAndGender.HumanMale;
+            bool broken = false;
+            foreach (KeyValuePair<RaceAndGender, string> kvp in raceAndGenderPrefixes)
+            {
+                if (filename.Contains(kvp.Value))
+                {
+                    raceAndGender = kvp.Key;
+                    broken = true;
+                    break;
+                }
+            }
+            if (!broken)
+            {
+                Debug.LogError("Unknown race and gender! " + filename);
+            }
+            return raceAndGender;
+        }
 
         [System.Serializable]
         public class WearableEquipmentOption : System.IEquatable<WearableEquipmentOption>
         {
             public string name;
-            public Dictionary<RaceAndGender, WearableEquipment> models;
             public EquipmentType equipmentType;
             public Color averageTextureColor;
             public string itemWebId;
-            public WearableEquipment[] wearableEquipmentOptions;
+            public Dictionary<RaceAndGender, WearableEquipment> Models { get; private set; }
+            [SerializeField] private WearableEquipment[] wearableEquipmentOptions;
 
-            public WearableEquipmentOption(WearableEquipment humanMaleWearableEquipmentPrefab, WearableEquipment humanFemaleWearableEquipmentPrefab,
-                WearableEquipment orcMaleWearableEquipmentPrefab, WearableEquipment orcFemaleWearableEquipmentPrefab, Color averageTextureColor)
+            public WearableEquipmentOption(Dictionary<RaceAndGender, WearableEquipment> models, Color averageTextureColor)
             {
-                models = new Dictionary<RaceAndGender, WearableEquipment>
-                {
-                    { RaceAndGender.HumanMale, humanMaleWearableEquipmentPrefab },
-                    { RaceAndGender.HumanFemale, humanFemaleWearableEquipmentPrefab },
-                    { RaceAndGender.OrcMale, orcMaleWearableEquipmentPrefab },
-                    { RaceAndGender.OrcFemale, orcFemaleWearableEquipmentPrefab }
-                };
-                wearableEquipmentOptions = System.Array.FindAll(models.Values.ToArray(), item => item != null);
+                this.Models = new Dictionary<RaceAndGender, WearableEquipment>(models);
 
-                bool broken = false;
-                foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
-                {
-                    if (humanMaleWearableEquipmentPrefab.name.Contains(type.ToString()))
-                    {
-                        equipmentType = type;
-                        broken = true;
-                        break;
-                    }
-                }
+                equipmentType = GetEquipmentTypeFromFilename(models[RaceAndGender.HumanMale].name);
 
                 if (equipmentTypesThatAreForCharacterCustomization.Contains(equipmentType))
                 {
-                    name = models.First(item => item.Value != null).Value.name;
-                }
-                else
-                {
-                    string parsedName = humanMaleWearableEquipmentPrefab.name[^3] == '_' ? humanMaleWearableEquipmentPrefab.name[0..^3] : humanMaleWearableEquipmentPrefab.name;
-                    name = parsedName.Replace("Hu_M_", "").Replace("_", " ");
+                    Debug.LogError("This constructor should only be used for armor types!");
                 }
 
-                if (!broken)
-                {
-                    Debug.LogError("Unknown equipment type!" + humanMaleWearableEquipmentPrefab.name);
-                }
+                string parsedName = models[RaceAndGender.HumanMale].name[^3] == '_' ? models[RaceAndGender.HumanMale].name[0..^3] : models[RaceAndGender.HumanMale].name;
+                name = parsedName.Replace("Hu_M_", "").Replace("_", " ");
 
                 this.averageTextureColor = averageTextureColor;
+                wearableEquipmentOptions = System.Array.FindAll(models.Values.ToArray(), item => item != null);
+            }
+
+            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab, Color averageTextureColor)
+            {
+                RaceAndGender raceAndGender = GetRaceAndGenderFromFilename(wearableEquipmentPrefab.name);
+
+                equipmentType = GetEquipmentTypeFromFilename(wearableEquipmentPrefab.name);
+
+                if (!equipmentTypesThatAreForCharacterCustomization.Contains(equipmentType))
+                {
+                    Debug.LogError("This constructor should only be used for customization types!");
+                }
+
+                Models = new Dictionary<RaceAndGender, WearableEquipment>();
+                foreach (RaceAndGender rg in System.Enum.GetValues(typeof(RaceAndGender)))
+                {
+                    if (rg == raceAndGender)
+                    {
+                        Models.Add(rg, wearableEquipmentPrefab);
+                    }
+                    else
+                    {
+                        Models.Add(rg, null);
+                    }
+                }
+
+                name = wearableEquipmentPrefab.name;
+
+                this.averageTextureColor = averageTextureColor;
+                wearableEquipmentOptions = System.Array.FindAll(Models.Values.ToArray(), item => item != null);
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)
@@ -261,12 +315,13 @@ namespace Vi.ScriptableObjects
                 characterMaterialOptions.Add(characterMaterial);
             }
 
+            // Non-character customization equipment options (armor)
             equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
             filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\StylizedCharacter\Prefabs", "*.prefab", SearchOption.AllDirectories);
             foreach (string filepath in filepaths)
             {
-                string humanMaleString = "Hu_M_";
                 string filename = Path.GetFileNameWithoutExtension(filepath);
+                string humanMaleString = "Hu_M_";
 
                 // Check that this filename is a human male
                 if (filename.Substring(0, humanMaleString.Length) != humanMaleString) { continue; }
@@ -283,25 +338,22 @@ namespace Vi.ScriptableObjects
                 }
                 if (!isEquipment) { continue; }
 
+                if (equipmentTypesThatAreForCharacterCustomization.Contains(GetEquipmentTypeFromFilename(filename))) { continue; }
+
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
                 if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { Debug.LogWarning("No skinned mesh renderer " + filepath); continue; }
 
                 // Find paths for each race/gender prefab
                 string humanMalePath = filepath;
 
-                Dictionary<RaceAndGender, string> fileFinderDictionary = new Dictionary<RaceAndGender, string>()
-                {
-                    { RaceAndGender.HumanFemale, "Hu_F_" },
-                    { RaceAndGender.OrcMale, "Or_M_" },
-                    { RaceAndGender.OrcFemale, "Or_F_" }
-                };
-
                 string humanFemalePath = "";
                 string orcMalePath = "";
                 string orcFemalePath = "";
 
-                foreach (KeyValuePair<RaceAndGender, string> kvp in fileFinderDictionary)
+                foreach (KeyValuePair<RaceAndGender, string> kvp in raceAndGenderPrefixes)
                 {
+                    if (kvp.Key == RaceAndGender.HumanMale) { continue; }
+
                     string modifiedFilename = Path.GetFileNameWithoutExtension(humanMalePath).Replace(humanMaleString, kvp.Value);
                     string[] stringOptions = System.Array.FindAll(filepaths, item => LevenshteinDistance.Calculate(modifiedFilename, Path.GetFileNameWithoutExtension(item)) <= 0 & filename != Path.GetFileNameWithoutExtension(item));
                     System.Array.Sort(stringOptions, (x, y) => LevenshteinDistance.Calculate(Path.GetFileNameWithoutExtension(x), modifiedFilename).CompareTo(LevenshteinDistance.Calculate(Path.GetFileNameWithoutExtension(y), modifiedFilename)));
@@ -382,8 +434,7 @@ namespace Vi.ScriptableObjects
                     }
                 }
 
-                WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(models[RaceAndGender.HumanMale], models[RaceAndGender.HumanFemale],
-                    models[RaceAndGender.OrcMale], models[RaceAndGender.OrcFemale], AverageColorFromTexture(humanMaleTexture));
+                WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(models, AverageColorFromTexture(humanMaleTexture));
 
                 bool allModelsFound = true;
                 foreach (KeyValuePair<RaceAndGender, WearableEquipment> kvp in models)
@@ -403,6 +454,64 @@ namespace Vi.ScriptableObjects
                 foreach (KeyValuePair<RaceAndGender, WearableEquipment> kvp in models)
                 {
                     if (kvp.Value) { kvp.Value.equipmentType = wearableEquipmentOption.equipmentType; }
+                }
+            }
+
+            // Character customization equipment
+            foreach (string filepath in filepaths)
+            {
+                string filename = Path.GetFileNameWithoutExtension(filepath);
+
+                // Check if this file is of an eligible equipment type
+                bool isEquipment = false;
+                foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
+                {
+                    if (Path.GetFileNameWithoutExtension(filepath).Contains(equipmentType.ToString()))
+                    {
+                        isEquipment = true;
+                        break;
+                    }
+                }
+
+                if (!isEquipment) { continue; }
+
+                if (!equipmentTypesThatAreForCharacterCustomization.Contains(GetEquipmentTypeFromFilename(filename))) { continue; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
+                if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { continue; }
+
+                // Add wearable equipment component to prefab here if necessary
+                if (!prefab.GetComponent<WearableEquipment>())
+                {
+                    foreach (Component comp in prefab.GetComponents<Component>())
+                    {
+                        if (comp.GetType() == typeof(Transform)) { continue; }
+
+                        DestroyImmediate(comp, true);
+                    }
+                    prefab.AddComponent<WearableEquipment>();
+                }
+
+                // Create the wearable equipment option object
+                if (prefab.TryGetComponent(out WearableEquipment wearableEquipment))
+                {
+                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                    if (!importer.isReadable)
+                    {
+                        importer.isReadable = true;
+                        importer.SaveAndReimport();
+                    }
+
+                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = LayerMask.NameToLayer("Character");
+                    }
+
+                    WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
+                    if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
+                    wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
                 }
             }
         }

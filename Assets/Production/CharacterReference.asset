@@ -47,25 +47,25 @@ MonoBehaviour:
     animationController: {fileID: 22100000, guid: 57913356d0e72f74d9e4d2960e45cecd,
       type: 2}
     weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
-    itemWebId: 65a4bf7a5eaea25f19e0f026
+    itemWebId: false
   - name: 
     weaponIcon: {fileID: 21300000, guid: e194add8f015c9e40ba63385dcac282d, type: 3}
     animationController: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
       type: 2}
     weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-    itemWebId: 65a4bf7a5eaea25f19e0f028
+    itemWebId: false
   - name: 
     weaponIcon: {fileID: 21300000, guid: 9fb685fb4ad54e6468d5fcefa48b0fc9, type: 3}
     animationController: {fileID: 22100000, guid: fa5b32109bd18054b881861885a53fbc,
       type: 2}
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
-    itemWebId: 65a4bf7a5eaea25f19e0f02a
+    itemWebId: false
   - name: 
     weaponIcon: {fileID: 21300000, guid: 9fb685fb4ad54e6468d5fcefa48b0fc9, type: 3}
     animationController: {fileID: 22100000, guid: 414a7cada5a607b44a35e325ccc79aee,
       type: 2}
     weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
-    itemWebId: 65a4bf7b5eaea25f19e0f02c
+    itemWebId: false
   equipmentOptions:
   - name: Belt NArcher
     equipmentType: 0
@@ -418,6 +418,174 @@ MonoBehaviour:
     - {fileID: 4839766442196091073, guid: 09aaa6f255c65d347b4e95c27c3d8f46, type: 3}
     - {fileID: 525408736267790367, guid: 6d05b3394ba8ab94fb955c249d42bcac, type: 3}
     - {fileID: -8718758968237454888, guid: d0fac2cafeab105418bea94e101d00e1, type: 3}
+  - name: Hu_F_Hair_01_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -170647517754861900, guid: deaad56b574648b89b9e12953a710861, type: 3}
+  - name: Hu_F_Hair_01_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 3698098367457935559, guid: 07584faaa25e4bc0a0699077b3c9100d, type: 3}
+  - name: Hu_F_Hair_01_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -7586563433934684660, guid: 6cf0966d96ad4deb9d6c9f6a28e1eeb4, type: 3}
+  - name: Hu_F_Hair_01_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -3362755569239775174, guid: c0352374f8d14a6ca9dc432a35f12d96, type: 3}
+  - name: Hu_F_Hair_02_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 5254592634616830467, guid: 454c3289eafd472db611c407be0813bd, type: 3}
+  - name: Hu_F_Hair_02_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 4235389773715700399, guid: 51b42b15eef84ea98cd28cabfecbaf7c, type: 3}
+  - name: Hu_F_Hair_02_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 7989150110626741693, guid: deaa31dcdfcd4dfa96c02f4298f4871d, type: 3}
+  - name: Hu_F_Hair_02_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 2845711562535940576, guid: 3dd80c7126ee4441a8eec339e7f808aa, type: 3}
+  - name: Hu_F_Hair_03_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -6244368161915948123, guid: 2d53fdbe177a4895a113a38ac8860823, type: 3}
+  - name: Hu_F_Hair_03_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -4147045470892784236, guid: 47e55faf667844dc88c04ec394ecf983, type: 3}
+  - name: Hu_F_Hair_03_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -3103024064611946581, guid: f0ccd54e72d64b41aa539ac2d4426f2f, type: 3}
+  - name: Hu_F_Hair_03_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 2904285819330761691, guid: ad2b2b774a1e40468e685686b81c80f6, type: 3}
+  - name: Hu_F_Hair_04_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -5348311429536977336, guid: 2ce862f8ea7748eda8e8a45e9552a385, type: 3}
+  - name: Hu_F_Hair_04_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -114811808188394824, guid: 0ed53ef90d01443383a00395d0a0d74c, type: 3}
+  - name: Hu_F_Hair_04_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 3990161897009354776, guid: 875326c7cfda4eb4acf2435fa328dffc, type: 3}
+  - name: Hu_F_Hair_04_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -4003621110260854756, guid: 372b64f04cd84b6f923be4a9cb86e2c9, type: 3}
+  - name: Hu_F_Hair_07_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.45490196, g: 0.27058825, b: 0.12941177, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -9106498787089315508, guid: 7d87c81f4b3e4934a2593d28d3dea0cd, type: 3}
+  - name: Hu_F_Hair_07_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.05882353, g: 0.05490196, b: 0.078431375, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -4825991446924739618, guid: ec0ba81b637a47989da823c2e7549eae, type: 3}
+  - name: Hu_F_Hair_07_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.23529412, g: 0.10980392, b: 0.07450981, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 1884391973738749698, guid: f986598c06a941879f22d8cd120b7056, type: 3}
+  - name: Hu_F_Hair_07_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -7267301681838697992, guid: 7704fd91cf3140289fc32608b82aa196, type: 3}
+  - name: Hu_F_Hair_08_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.45490196, g: 0.27058825, b: 0.12941177, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 4591200374641665252, guid: cd7d785ebaea45d4b663061be020b0f2, type: 3}
+  - name: Hu_F_Hair_08_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.05882353, g: 0.05490196, b: 0.078431375, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -591163298650826523, guid: 3f8ad70247d94f49bddf124cd7df24bd, type: 3}
+  - name: Hu_F_Hair_08_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.23529412, g: 0.10980392, b: 0.07450981, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 5288937361499316063, guid: a6d0db39c44d47038ee4b392c4dac50d, type: 3}
+  - name: Hu_F_Hair_08_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 4611694925148047845, guid: 98d45242dab44c8c9cebcc5b4ee2174b, type: 3}
+  - name: Hu_F_Hair_10_Bd
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -8549911988001560641, guid: 5410c3e62737425e8e6a1c08002cfe75, type: 3}
+  - name: Hu_F_Hair_10_Bk
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 4947755935426372669, guid: c47d7aa4fbe942d0951ce872bf9aa87d, type: 3}
+  - name: Hu_F_Hair_10_Br
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: -2665030649312532125, guid: cd117d67b3314abaa482dc742cbac147, type: 3}
+  - name: Hu_F_Hair_10_Gr
+    equipmentType: 11
+    averageTextureColor: {r: 0.23137255, g: 0.23529412, b: 0.23921569, a: 0.9843137}
+    itemWebId: 
+    wearableEquipmentOptions:
+    - {fileID: 1888098800174163486, guid: 616b388b426c48ee838fa980b014c9fb, type: 3}
   - name: Hu_M_Beard_01_Bd
     equipmentType: 9
     averageTextureColor: {r: 0.43137255, g: 0.2627451, b: 0.1254902, a: 1}
@@ -664,112 +832,96 @@ MonoBehaviour:
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -1502123069486214505, guid: 25b56bf302a54a6287898b2787e97d8a, type: 3}
-    - {fileID: -170647517754861900, guid: deaad56b574648b89b9e12953a710861, type: 3}
   - name: Hu_M_Hair_01_Bk
     equipmentType: 11
     averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -42032091515738158, guid: b248126112a141c188ca21dca910b85c, type: 3}
-    - {fileID: 3698098367457935559, guid: 07584faaa25e4bc0a0699077b3c9100d, type: 3}
   - name: Hu_M_Hair_01_Br
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -5401809087430926707, guid: bc4daf52e62a4372941a5ff5da277208, type: 3}
-    - {fileID: -7586563433934684660, guid: 6cf0966d96ad4deb9d6c9f6a28e1eeb4, type: 3}
   - name: Hu_M_Hair_01_Gr
     equipmentType: 11
     averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 7910109796485397942, guid: 4826dae87f8448159436e58ecca46d17, type: 3}
-    - {fileID: -3362755569239775174, guid: c0352374f8d14a6ca9dc432a35f12d96, type: 3}
   - name: Hu_M_Hair_02_Bd
     equipmentType: 11
     averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -8205886485449985479, guid: 1ff86b16623d4513802099fe6eb97259, type: 3}
-    - {fileID: 5254592634616830467, guid: 454c3289eafd472db611c407be0813bd, type: 3}
   - name: Hu_M_Hair_02_Bk
     equipmentType: 11
     averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -6379815174301401285, guid: 3b265ca1ff8c4e40a8e0463433576cbf, type: 3}
-    - {fileID: 4235389773715700399, guid: 51b42b15eef84ea98cd28cabfecbaf7c, type: 3}
   - name: Hu_M_Hair_02_Br
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -5514307477663532987, guid: 768103082a0f4476899a335cefee43dd, type: 3}
-    - {fileID: 7989150110626741693, guid: deaa31dcdfcd4dfa96c02f4298f4871d, type: 3}
   - name: Hu_M_Hair_02_Gr
     equipmentType: 11
     averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 8458819880355624565, guid: 37dfbc96982549f6a03c60d7a9045ec3, type: 3}
-    - {fileID: 2845711562535940576, guid: 3dd80c7126ee4441a8eec339e7f808aa, type: 3}
   - name: Hu_M_Hair_03_Bd
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.25882354, b: 0.26666668, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -8939346370605287133, guid: 11fce4bd9c03412a9dcc5d76d7ef19e2, type: 3}
-    - {fileID: -6244368161915948123, guid: 2d53fdbe177a4895a113a38ac8860823, type: 3}
   - name: Hu_M_Hair_03_Bk
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.25882354, b: 0.26666668, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 3303735208659299984, guid: 2a2a3b90a98f45368f479cccc34dcf5c, type: 3}
-    - {fileID: -4147045470892784236, guid: 47e55faf667844dc88c04ec394ecf983, type: 3}
   - name: Hu_M_Hair_03_Br
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.25882354, b: 0.26666668, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -7029705000312460527, guid: 70b8e10891f141a4989f705a4c4c7aac, type: 3}
-    - {fileID: -3103024064611946581, guid: f0ccd54e72d64b41aa539ac2d4426f2f, type: 3}
   - name: Hu_M_Hair_03_Gr
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.25882354, b: 0.26666668, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 5703021464526387624, guid: baadc45c2927493fb3476efad5112748, type: 3}
-    - {fileID: 2904285819330761691, guid: ad2b2b774a1e40468e685686b81c80f6, type: 3}
   - name: Hu_M_Hair_04_Bd
     equipmentType: 11
     averageTextureColor: {r: 0.45882353, g: 0.28627452, b: 0.14117648, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 6944484040433258688, guid: 32eca6e65ff14af1a9348f39821d33ad, type: 3}
-    - {fileID: -5348311429536977336, guid: 2ce862f8ea7748eda8e8a45e9552a385, type: 3}
   - name: Hu_M_Hair_04_Bk
     equipmentType: 11
     averageTextureColor: {r: 0.0627451, g: 0.0627451, b: 0.08235294, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: -6484488352275366193, guid: 17aad5e125d94d3386303962802e9876, type: 3}
-    - {fileID: -114811808188394824, guid: 0ed53ef90d01443383a00395d0a0d74c, type: 3}
   - name: Hu_M_Hair_04_Br
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.11372549, b: 0.07450981, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 606452949670632358, guid: 222445a9af274b8eb796532ca3aea14a, type: 3}
-    - {fileID: 3990161897009354776, guid: 875326c7cfda4eb4acf2435fa328dffc, type: 3}
   - name: Hu_M_Hair_04_Gr
     equipmentType: 11
     averageTextureColor: {r: 0.34117648, g: 0.34509805, b: 0.4117647, a: 1}
     itemWebId: 
     wearableEquipmentOptions:
     - {fileID: 433747925995333748, guid: d545a4c57e754196956d550948c9f5a7, type: 3}
-    - {fileID: -4003621110260854756, guid: 372b64f04cd84b6f923be4a9cb86e2c9, type: 3}
   - name: Hu_M_Hair_09_Bd
     equipmentType: 11
     averageTextureColor: {r: 0.25490198, g: 0.25882354, b: 0.26666668, a: 1}

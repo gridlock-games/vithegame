@@ -250,7 +250,7 @@ namespace Vi.UI
                 Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
                 image.color = textureAverageColor;
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
-                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.models[raceAndGender].name));
+                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.Models[raceAndGender].name));
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
