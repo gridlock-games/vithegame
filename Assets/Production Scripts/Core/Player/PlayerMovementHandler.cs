@@ -200,9 +200,13 @@ namespace Vi.Player
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private readonly float minimapCameraOffset = 15;
         private void Update()
         {
             if (!IsSpawned) { return; }
+
+            bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+            minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
 
             // If on a mobile platform
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
