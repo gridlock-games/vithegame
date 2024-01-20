@@ -31,18 +31,17 @@ namespace Vi.UI
             if (startServerCalled) { return; }
             startServerCalled = true;
 
-            string path = Application.dataPath;
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = path.Substring(0, path.LastIndexOf('/'));
-            path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
-            path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
+            //string path = Application.dataPath;
+            //path = path.Substring(0, path.LastIndexOf('/'));
+            //path = path.Substring(0, path.LastIndexOf('/'));
+            //path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
+            //path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
 
-            System.Diagnostics.Process.Start(path);
+            //System.Diagnostics.Process.Start(path);
 
             NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
-            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
         public void StartLobbyServer()
