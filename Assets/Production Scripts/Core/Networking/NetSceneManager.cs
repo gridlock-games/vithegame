@@ -179,16 +179,11 @@ namespace Vi.Core
         public bool IsSceneGroupLoaded(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
-            bool allScenesLoaded = true;
             foreach (string sceneName in scenePayloads[sceneGroupIndex].sceneNames)
             {
-                if (SceneManager.GetSceneByName(sceneName).isLoaded)
-                {
-                    allScenesLoaded = false;
-                    break;
-                }
+                if (!SceneManager.GetSceneByName(sceneName).isLoaded) { return false; }
             }
-            return allScenesLoaded;
+            return true;
         }
 
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();

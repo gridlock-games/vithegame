@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Multiplayer.Tools.NetStatsMonitor;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
@@ -27,7 +28,7 @@ public class DebugOverlay : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
-        UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
+        DebugManager.instance.enableRuntimeUI = false;
     }
 
     void OnEnable()
@@ -74,6 +75,8 @@ public class DebugOverlay : MonoBehaviour
 
     private void Update()
     {
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
+
         if (Input.GetKeyDown(KeyCode.BackQuote) | Keyboard.current[Key.Backquote].wasPressedThisFrame)
         {
             enableDisplay = !enableDisplay;

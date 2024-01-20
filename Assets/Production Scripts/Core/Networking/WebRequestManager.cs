@@ -129,9 +129,13 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
-        private IEnumerator DeleteLobby(ServerDeletePayload lobbyServer)
+        public bool IsDeletingServer { get; private set; }
+        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
+        private IEnumerator DeleteServerCoroutine(string serverId)
         {
-            string json = JsonUtility.ToJson(lobbyServer);
+            ServerDeletePayload payload = new ServerDeletePayload(serverId);
+
+            string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
