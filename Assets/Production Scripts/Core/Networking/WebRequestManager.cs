@@ -120,6 +120,28 @@ namespace Vi.Core
             postRequest.Dispose();
         }
 
+        private IEnumerator DeleteLobby(ServerDeletePayload lobbyServer)
+        {
+            string json = JsonUtility.ToJson(lobbyServer);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
+            deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+
+            deleteRequest.SetRequestHeader("Content-Type", "application/json");
+            deleteRequest.SetRequestHeader("Content-Length", jsonData.Length.ToString());
+
+            deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+
+            yield return deleteRequest.SendWebRequest();
+
+            if (deleteRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
+            }
+            deleteRequest.Dispose();
+        }
+
         public struct Server
         {
             public string _id;
@@ -181,7 +203,17 @@ namespace Vi.Core
                 this.port = port;
             }
         }
-        
+
+        private struct ServerDeletePayload
+        {
+            public string serverId;
+
+            public ServerDeletePayload(string serverId)
+            {
+                this.serverId = serverId;
+            }
+        }
+
         // TODO Change the string at the end to be the account ID of whoever we sign in under
         //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
         public bool IsLoggedIn { get; private set; }
