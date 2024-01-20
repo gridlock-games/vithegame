@@ -176,6 +176,21 @@ namespace Vi.Core
             return gameplaySceneIsLoaded;
         }
 
+        public bool IsSceneGroupLoaded(string sceneGroupName)
+        {
+            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
+            bool allScenesLoaded = true;
+            foreach (string sceneName in scenePayloads[sceneGroupIndex].sceneNames)
+            {
+                if (SceneManager.GetSceneByName(sceneName).isLoaded)
+                {
+                    allScenesLoaded = false;
+                    break;
+                }
+            }
+            return allScenesLoaded;
+        }
+
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {

@@ -24,12 +24,22 @@ namespace Vi.UI
         [Header("Online Play Menu")]
         [SerializeField] private GameObject playParent;
         [SerializeField] private Text welcomeUserText;
+        [Header("Editor Only")]
+        [SerializeField] private Button startHubServerButton;
+        [SerializeField] private Button startLobbyServerButton;
 
         private bool startServerCalled;
+        private const int hubPort = 7777;
         public void StartHubServer()
         {
             if (startServerCalled) { return; }
             startServerCalled = true;
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+            networkTransport.ConnectionData.Port = hubPort;
+            NetworkManager.Singleton.StartServer();
+            NetSceneManager.Singleton.LoadScene("Player Hub");
 
             //string path = Application.dataPath;
             //path = path.Substring(0, path.LastIndexOf('/'));
@@ -38,10 +48,6 @@ namespace Vi.UI
             //path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
 
             //System.Diagnostics.Process.Start(path);
-
-            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7777;
-            NetworkManager.Singleton.StartServer();
-            NetSceneManager.Singleton.LoadScene("Player Hub");
         }
 
         public void StartLobbyServer()
@@ -49,7 +55,26 @@ namespace Vi.UI
             if (startServerCalled) { return; }
             startServerCalled = true;
 
-            NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Port = 7776;
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+
+            List<int> portList = new List<int>();
+            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+            {
+                portList.Add(int.Parse(server.port));
+            }
+
+            int lobbyPort = hubPort - 1;
+            portList.Sort();
+            portList.Reverse();
+            foreach (int port in portList)
+            {
+                lobbyPort = port - 1;
+                if (!portList.Contains(lobbyPort))
+                    break;
+            }
+
+            networkTransport.ConnectionData.Port = (ushort)lobbyPort;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
@@ -100,29 +125,37 @@ namespace Vi.UI
                 passwordInput.text = "";
             }
             initialParent.SetActive(true);
+            WebRequestManager.Singleton.RefreshServers();
+            startHubServerButton.gameObject.SetActive(Application.isEditor);
+            startLobbyServerButton.gameObject.SetActive(Application.isEditor);
         }
 
         private void Update()
         {
-            bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Hub") != -1;
-            bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
+            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+
+            if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
-                if (isHubInBuild & isLobbyInBuild)
+                bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Player Hub") != -1;
+                bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
                 {
-                    //StoreClient("Headless Client");
-                }
-                else if (isHubInBuild)
-                {
-                    StartHubServer();
-                }
-                else if (isLobbyInBuild)
-                {
-                    StartLobbyServer();
+                    if (isHubInBuild & isLobbyInBuild)
+                    {
+                        //StoreClient("Headless Client");
+                    }
+                    else if (isHubInBuild)
+                    {
+                        StartHubServer();
+                    }
+                    else if (isLobbyInBuild)
+                    {
+                        StartLobbyServer();
+                    }
                 }
             }
-
+            
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
 
             if (!initialParent.activeSelf)

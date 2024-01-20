@@ -102,6 +102,15 @@ namespace Vi.Core
 
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
+            foreach (Server server in Servers)
+            {
+                if (payload.ip == server.ip & payload.port == server.port)
+                {
+                    Debug.LogError("Server already exists in API!");
+                    yield break;
+                }
+            }
+
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
             form.AddField("population", payload.population);

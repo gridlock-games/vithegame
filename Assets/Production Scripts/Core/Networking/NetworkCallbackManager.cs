@@ -115,8 +115,32 @@ namespace Vi.Core
 
         private void OnServerStarted()
         {
+            StartCoroutine(CreateServerInAPI());
+        }
+
+        private IEnumerator CreateServerInAPI()
+        {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
+
+            yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") | NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"));
+
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
+            {
+                StartCoroutine(WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                    0, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString())));
+            }
+            else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
+            {
+                StartCoroutine(WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                    0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString())));
+            }
+            else
+            {
+                Debug.LogError("Not sure what scene group is loaded to create server");
+            }
+
+            Debug.Log("Finished Creating Server in API");
         }
 
         private void OnServerStopped(bool test)
