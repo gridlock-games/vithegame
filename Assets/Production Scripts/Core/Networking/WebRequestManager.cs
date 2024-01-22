@@ -162,7 +162,7 @@ namespace Vi.Core
         }
 
         public bool IsDeletingServer { get; private set; }
-        public void DeleteServer(string serverId) { Debug.Log("Detelting " + serverId); StartCoroutine(DeleteServerCoroutine(serverId)); }
+        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
         private IEnumerator DeleteServerCoroutine(string serverId)
         {
             if (IsDeletingServer) { yield break; }
