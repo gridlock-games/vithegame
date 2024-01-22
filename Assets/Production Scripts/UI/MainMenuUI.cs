@@ -37,6 +37,12 @@ namespace Vi.UI
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+
+            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+            {
+                networkTransport.ConnectionData.Address = "127.0.0.1";
+            }
+
             networkTransport.ConnectionData.Port = hubPort;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
@@ -49,6 +55,11 @@ namespace Vi.UI
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+
+            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+            {
+                networkTransport.ConnectionData.Address = "127.0.0.1";
+            }
 
             List<int> portList = new List<int>();
             foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)

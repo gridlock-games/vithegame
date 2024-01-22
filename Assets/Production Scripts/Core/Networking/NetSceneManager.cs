@@ -222,11 +222,11 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
-                StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1));
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
-                StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1));
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
         }
 

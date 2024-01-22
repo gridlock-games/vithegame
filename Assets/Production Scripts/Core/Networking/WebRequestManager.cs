@@ -49,6 +49,7 @@ namespace Vi.Core
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
+
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
             yield return getRequest.SendWebRequest();
 
