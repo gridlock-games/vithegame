@@ -94,7 +94,6 @@ namespace Vi.UI
                 {
                     if (emptyServerList.Count > 0 & !WebRequestManager.Singleton.IsDeletingServer)
                     {
-                        Debug.Log("Deleting server " + emptyServerList[0].port);
                         WebRequestManager.Singleton.DeleteServer(emptyServerList[0]._id.ToString());
                     }
                 }

@@ -109,6 +109,21 @@ namespace Vi.Core
         private bool thisServerCreated;
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
+            if (thisServer.type == 0)
+            {
+                foreach (Server server in servers)
+                {
+                    if (server.ip == payload.ip)
+                    {
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                        DeleteServer(server._id);
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                    }
+                }
+            }
+
+            yield return ServerGetRequest();
+
             foreach (Server server in servers)
             {
                 if (payload.ip == server.ip & payload.port == server.port)
@@ -147,9 +162,11 @@ namespace Vi.Core
         }
 
         public bool IsDeletingServer { get; private set; }
-        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
+        public void DeleteServer(string serverId) { Debug.Log("Detelting " + serverId); StartCoroutine(DeleteServerCoroutine(serverId)); }
         private IEnumerator DeleteServerCoroutine(string serverId)
         {
+            if (IsDeletingServer) { yield break; }
+            IsDeletingServer = true;
             ServerDeletePayload payload = new ServerDeletePayload(serverId);
 
             string json = JsonUtility.ToJson(payload);
@@ -159,7 +176,6 @@ namespace Vi.Core
             deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
 
             deleteRequest.SetRequestHeader("Content-Type", "application/json");
-            deleteRequest.SetRequestHeader("Content-Length", jsonData.Length.ToString());
 
             deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
 
@@ -170,6 +186,7 @@ namespace Vi.Core
                 Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
             }
             deleteRequest.Dispose();
+            IsDeletingServer = false;
         }
 
         public struct Server

@@ -127,13 +127,13 @@ namespace Vi.Core
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
-                StartCoroutine(WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataList().Count,
-                    0, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString())));
+                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                    0, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
             }
             else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
             {
-                StartCoroutine(WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataList().Count,
-                    0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString())));
+                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                    0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString()));
             }
             else
             {
