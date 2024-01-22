@@ -51,7 +51,7 @@ namespace Vi.UI
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
 
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.HubServers)
+            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
             {
                 portList.Add(int.Parse(server.port));
             }

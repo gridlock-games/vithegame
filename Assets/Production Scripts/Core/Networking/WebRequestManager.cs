@@ -105,13 +105,17 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
+        private Server thisServer;
+        private bool thisServerCreated;
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
             foreach (Server server in servers)
             {
                 if (payload.ip == server.ip & payload.port == server.port)
                 {
-                    Debug.LogError("Server already exists in API!");
+                    thisServer = server;
+                    thisServerCreated = true;
+                    Debug.LogWarning("Server already exists in API!");
                     yield break;
                 }
             }
@@ -130,8 +134,16 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.ServerPostRequest()" + postRequest.error);
+                yield break;
             }
+
+            thisServer = JsonConvert.DeserializeObject<Server>(postRequest.downloadHandler.text);
+
             postRequest.Dispose();
+
+            yield return ServerGetRequest();
+
+            thisServerCreated = true;
         }
 
         public bool IsDeletingServer { get; private set; }
@@ -885,6 +897,38 @@ namespace Vi.Core
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
+        }
+
+        private void Update()
+        {
+            if (thisServerCreated)
+            {
+                if (!IsRefreshingServers)
+                {
+                    RefreshServers();
+
+                    if (thisServer.type == 0)
+                    {
+                        if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
+                        {
+                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
+                            Application.Quit();
+                        }
+                    }
+                    else if (thisServer.type == 1)
+                    {
+                        if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
+                        {
+                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
+                            Application.Quit();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to handle server type: " + thisServer.type);
+                    }
+                }
+            }
         }
 
         private IEnumerator CreateItems()

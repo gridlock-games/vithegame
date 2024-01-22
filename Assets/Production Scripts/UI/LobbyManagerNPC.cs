@@ -124,17 +124,8 @@ namespace Vi.UI
 
             System.Diagnostics.Process.Start(path);
             Debug.Log("Waiting for server count change: " + originalServerCount);
-            while (true)
-            {
-                WebRequestManager.Singleton.RefreshServers();
-                yield return null;
-
-                if (WebRequestManager.Singleton.LobbyServers.Length != originalServerCount)
-                {
-                    Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
-                    break;
-                }
-            }
+            yield return new WaitUntil(() => WebRequestManager.Singleton.LobbyServers.Length != originalServerCount);
+            Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
 
             creatingNewLobby = false;
         }
