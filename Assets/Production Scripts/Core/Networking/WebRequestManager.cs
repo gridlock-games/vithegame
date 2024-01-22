@@ -92,6 +92,7 @@ namespace Vi.Core
         public IEnumerator UpdateServerProgress(int progress)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+            if (!thisServerCreated) { yield break; }
 
             ServerProgressPayload payload = new ServerProgressPayload(thisServer._id, progress);
 
@@ -112,8 +113,9 @@ namespace Vi.Core
         public IEnumerator UpdateServerPopulation(int population, string label)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+            if (!thisServerCreated) { yield break; }
 
-            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label);
+            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label == "" ? "Lobby" : label);
 
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
