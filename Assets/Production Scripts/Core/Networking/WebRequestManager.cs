@@ -39,9 +39,11 @@ namespace Vi.Core
 
         private const string APIURL = "154.90.35.191/";
 
-        public List<Server> Servers { get; private set; } = new List<Server>();
-
         public bool IsRefreshingServers { get; private set; }
+        public Server[] LobbyServers { get; private set; } = new Server[0];
+        public Server[] HubServers { get; private set; } = new Server[0];
+
+        private List<Server> servers = new List<Server>();
         public void RefreshServers() { StartCoroutine(ServerGetRequest()); }
         private IEnumerator ServerGetRequest()
         {
@@ -50,7 +52,7 @@ namespace Vi.Core
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
             yield return getRequest.SendWebRequest();
 
-            Servers.Clear();
+            servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
@@ -71,14 +73,17 @@ namespace Vi.Core
                             finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
                         if (finalJsonElement[^1] != '}')
                             finalJsonElement += "}";
-                        Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                        servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
                     }
                 }
             }
             catch
             {
-                Servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+                servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
+
+            HubServers = servers.FindAll(item => item.type == 0).ToArray();
+            LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
 
             getRequest.Dispose();
             IsRefreshingServers = false;
@@ -102,7 +107,7 @@ namespace Vi.Core
 
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
-            foreach (Server server in Servers)
+            foreach (Server server in servers)
             {
                 if (payload.ip == server.ip & payload.port == server.port)
                 {

@@ -77,20 +77,20 @@ namespace Vi.UI
             if (IsServer)
             {
                 List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
                 {
                     if (server.population == 0)
                         emptyServerList.Add(server);
                 }
 
-                if (emptyServerList.Count < emptyLobbyServersRequired | WebRequestManager.Singleton.Servers.Count < minimumLobbyServersRequired)
+                if (emptyServerList.Count < emptyLobbyServersRequired | WebRequestManager.Singleton.LobbyServers.Length < minimumLobbyServersRequired)
                 {
                     if (!creatingNewLobby)
                     {
                         StartCoroutine(CreateNewLobby());
                     }
                 }
-                else if (emptyServerList.Count > emptyLobbyServersRequired & WebRequestManager.Singleton.Servers.Count > minimumLobbyServersRequired)
+                else if (emptyServerList.Count > emptyLobbyServersRequired & WebRequestManager.Singleton.LobbyServers.Length > minimumLobbyServersRequired)
                 {
                     if (emptyServerList.Count > 0 & !WebRequestManager.Singleton.IsDeletingServer)
                     {
@@ -106,7 +106,7 @@ namespace Vi.UI
         {
             creatingNewLobby = true;
 
-            int originalServerCount = WebRequestManager.Singleton.Servers.Count;
+            int originalServerCount = WebRequestManager.Singleton.LobbyServers.Length;
 
             string path = "";
             if (Application.isEditor)
@@ -126,11 +126,12 @@ namespace Vi.UI
             Debug.Log("Waiting for server count change: " + originalServerCount);
             while (true)
             {
+                WebRequestManager.Singleton.RefreshServers();
                 yield return null;
 
-                if (WebRequestManager.Singleton.Servers.Count != originalServerCount)
+                if (WebRequestManager.Singleton.LobbyServers.Length != originalServerCount)
                 {
-                    Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.Servers.Count);
+                    Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
                     break;
                 }
             }

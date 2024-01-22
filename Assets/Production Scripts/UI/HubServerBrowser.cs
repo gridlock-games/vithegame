@@ -22,7 +22,7 @@ namespace Vi.UI
         {
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
                 {
                     if (server.type == 0) { continue; } // Skip other hub servers
 

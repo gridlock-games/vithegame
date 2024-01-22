@@ -51,7 +51,7 @@ namespace Vi.UI
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
 
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.HubServers)
             {
                 portList.Add(int.Parse(server.port));
             }
@@ -131,7 +131,7 @@ namespace Vi.UI
             {
                 bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Player Hub") != -1;
                 bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) //  | !(isHubInBuild & isLobbyInBuild)
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
                 {
                     if (isHubInBuild & isLobbyInBuild)
                     {
