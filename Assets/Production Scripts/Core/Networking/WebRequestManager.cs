@@ -89,8 +89,32 @@ namespace Vi.Core
             IsRefreshingServers = false;
         }
         
-        public IEnumerator ServerPutRequest(ServerPutPayload payload)
+        public IEnumerator UpdateServerProgress(int progress)
         {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+
+            ServerProgressPayload payload = new ServerProgressPayload(thisServer._id, progress);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        public IEnumerator UpdateServerPopulation(int population, string label)
+        {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+
+            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label);
+
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -109,7 +133,9 @@ namespace Vi.Core
         private bool thisServerCreated;
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
-            if (thisServer.type == 0)
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+
+            if (payload.type == 0)
             {
                 foreach (Server server in servers)
                 {
@@ -233,21 +259,29 @@ namespace Vi.Core
             }
         }
 
-        public struct ServerPutPayload
+        private struct ServerProgressPayload
+        {
+            public string serverId;
+            public int progress;
+
+            public ServerProgressPayload(string serverId, int progress)
+            {
+                this.serverId = serverId;
+                this.progress = progress;
+            }
+        }
+
+        private struct ServerPopulationPayload
         {
             public string serverId;
             public int population;
-            public int progress;
             public string label;
-            public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress, string label, string port)
+            public ServerPopulationPayload(string serverId, int population, string label)
             {
                 this.serverId = serverId;
                 this.population = population;
-                this.progress = progress;
                 this.label = label;
-                this.port = port;
             }
         }
 

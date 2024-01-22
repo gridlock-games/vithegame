@@ -128,7 +128,7 @@ namespace Vi.Core
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
                 yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataList().Count,
-                    0, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
+                    1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
             }
             else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
             {
