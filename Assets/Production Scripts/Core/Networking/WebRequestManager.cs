@@ -317,6 +317,11 @@ namespace Vi.Core
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
+            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
+            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
+            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
+            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
+
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
@@ -595,16 +600,16 @@ namespace Vi.Core
             {
                 case CharacterReference.RaceAndGender.HumanMale:
                     return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
-                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
                 case CharacterReference.RaceAndGender.HumanFemale:
                     return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
-                        "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                        "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
                 case CharacterReference.RaceAndGender.OrcMale:
                     return new Loadout("1", "Or_M_Helm_SMage_03_Bl", "Or_M_Shoulders_SMage_Bl", "Or_M_Chest_SMage_Bl", "Or_M_Gloves_SMage_Bl",
-                        "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                        "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
                 case CharacterReference.RaceAndGender.OrcFemale:
                     return new Loadout("1", "Or_F_Helm_SMage_03_Bl", "Or_F_Shoulders_SMage_Bl", "Or_F_Chest_SMage_Bl", "Or_F_Gloves_SMage_Bl",
-                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
                 default:
                     Debug.LogError("Not sure how to handle " + raceAndGender);
                     break;

@@ -199,14 +199,14 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded);
 
-                //if (targetAttributes)
-                //{
-                //    navMeshAgent.destination = targetAttributes.transform.position;
-                //    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                //    {
-                //        weaponHandler.SendMessage("OnLightAttack");
-                //    }
-                //}
+                if (targetAttributes)
+                {
+                    navMeshAgent.destination = targetAttributes.transform.position;
+                    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                    {
+                        weaponHandler.SendMessage("OnLightAttack");
+                    }
+                }
             }
         }
 
