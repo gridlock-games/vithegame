@@ -75,7 +75,7 @@ namespace Vi.Core
             {
                 if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsTag("CanDodge") & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime > 0.5f))
                 {
-                    if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                    if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
                 }
 
                 // Dodge lock checks
