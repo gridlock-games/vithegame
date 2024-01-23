@@ -176,6 +176,16 @@ namespace Vi.Core
             return gameplaySceneIsLoaded;
         }
 
+        public bool IsSceneGroupLoaded(string sceneGroupName)
+        {
+            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
+            foreach (string sceneName in scenePayloads[sceneGroupIndex].sceneNames)
+            {
+                if (!SceneManager.GetSceneByName(sceneName).isLoaded) { return false; }
+            }
+            return true;
+        }
+
         private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
@@ -212,6 +222,11 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
+            }
+            else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
+            {
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
         }
 

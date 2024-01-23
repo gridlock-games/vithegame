@@ -93,6 +93,18 @@ namespace Vi.Core
                 return false;
         }
 
+        public PlayerData GetLobbyLeader()
+        {
+            List<PlayerData> playerDataList = GetPlayerDataList();
+            playerDataList.RemoveAll(item => item.id < 0);
+            playerDataList = playerDataList.OrderBy(item => item.id).ToList();
+
+            if (playerDataList.Count > 0)
+                return playerDataList[0];
+            else
+                return new PlayerData();
+        }
+
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
             if (attackerTeam == Team.Peaceful) { return false; }
@@ -391,6 +403,14 @@ namespace Vi.Core
                     {
                         playersToSpawnQueue.Enqueue(networkListEvent.Value);
                     }
+                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, GetLobbyLeader().character.name.ToString()));
+                }
+            }
+            else if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Remove | networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.RemoveAt)
+            {
+                if (IsServer)
+                {
+                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, GetLobbyLeader().character.name.ToString()));
                 }
             }
         }

@@ -200,6 +200,7 @@ namespace Vi.Player
 
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private readonly float minimapCameraOffset = 15;
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -225,6 +226,12 @@ namespace Vi.Player
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+
+            if (minimapCameraInstance)
+            {
+                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
+            }
         }
 
         private float positionStrength = 1;

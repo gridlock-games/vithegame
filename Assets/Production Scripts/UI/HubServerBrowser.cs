@@ -22,10 +22,8 @@ namespace Vi.UI
         {
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
                 {
-                    if (server.type == 0) { continue; } // Skip other hub servers
-
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
                         ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();

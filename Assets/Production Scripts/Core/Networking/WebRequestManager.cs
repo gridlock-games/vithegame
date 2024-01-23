@@ -39,18 +39,21 @@ namespace Vi.Core
 
         private const string APIURL = "154.90.35.191/";
 
-        public List<Server> Servers { get; private set; } = new List<Server>();
-
         public bool IsRefreshingServers { get; private set; }
+        public Server[] LobbyServers { get; private set; } = new Server[0];
+        public Server[] HubServers { get; private set; } = new Server[0];
+
+        private List<Server> servers = new List<Server>();
         public void RefreshServers() { StartCoroutine(ServerGetRequest()); }
         private IEnumerator ServerGetRequest()
         {
             if (IsRefreshingServers) { yield break; }
             IsRefreshingServers = true;
+
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
             yield return getRequest.SendWebRequest();
 
-            Servers.Clear();
+            servers.Clear();
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
@@ -71,21 +74,29 @@ namespace Vi.Core
                             finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
                         if (finalJsonElement[^1] != '}')
                             finalJsonElement += "}";
-                        Servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
+                        servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
                     }
                 }
             }
             catch
             {
-                Servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+                servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
+
+            HubServers = servers.FindAll(item => item.type == 0).ToArray();
+            LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
 
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
         
-        public IEnumerator ServerPutRequest(ServerPutPayload payload)
+        public IEnumerator UpdateServerProgress(int progress)
         {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+            if (!thisServerCreated) { yield break; }
+
+            ServerProgressPayload payload = new ServerProgressPayload(thisServer._id, progress);
+
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
@@ -100,8 +111,59 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
+        public IEnumerator UpdateServerPopulation(int population, string label)
+        {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+            if (!thisServerCreated) { yield break; }
+
+            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label == "" ? "Lobby" : label);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        private Server thisServer;
+        private bool thisServerCreated;
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+
+            if (payload.type == 0)
+            {
+                foreach (Server server in servers)
+                {
+                    if (server.ip == payload.ip)
+                    {
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                        DeleteServer(server._id);
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                    }
+                }
+            }
+
+            yield return ServerGetRequest();
+
+            foreach (Server server in servers)
+            {
+                if (payload.ip == server.ip & payload.port == server.port)
+                {
+                    thisServer = server;
+                    thisServerCreated = true;
+                    Debug.LogWarning("Server already exists in API!");
+                    yield break;
+                }
+            }
+
             WWWForm form = new WWWForm();
             form.AddField("type", payload.type);
             form.AddField("population", payload.population);
@@ -116,8 +178,44 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.ServerPostRequest()" + postRequest.error);
+                yield break;
             }
+
+            thisServer = JsonConvert.DeserializeObject<Server>(postRequest.downloadHandler.text);
+
             postRequest.Dispose();
+
+            yield return ServerGetRequest();
+
+            thisServerCreated = true;
+        }
+
+        public bool IsDeletingServer { get; private set; }
+        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
+        private IEnumerator DeleteServerCoroutine(string serverId)
+        {
+            if (IsDeletingServer) { yield break; }
+            IsDeletingServer = true;
+            ServerDeletePayload payload = new ServerDeletePayload(serverId);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
+            deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+
+            deleteRequest.SetRequestHeader("Content-Type", "application/json");
+
+            deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+
+            yield return deleteRequest.SendWebRequest();
+
+            if (deleteRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
+            }
+            deleteRequest.Dispose();
+            IsDeletingServer = false;
         }
 
         public struct Server
@@ -164,24 +262,42 @@ namespace Vi.Core
             }
         }
 
-        public struct ServerPutPayload
+        private struct ServerProgressPayload
+        {
+            public string serverId;
+            public int progress;
+
+            public ServerProgressPayload(string serverId, int progress)
+            {
+                this.serverId = serverId;
+                this.progress = progress;
+            }
+        }
+
+        private struct ServerPopulationPayload
         {
             public string serverId;
             public int population;
-            public int progress;
             public string label;
-            public string port;
 
-            public ServerPutPayload(string serverId, int population, int progress, string label, string port)
+            public ServerPopulationPayload(string serverId, int population, string label)
             {
                 this.serverId = serverId;
                 this.population = population;
-                this.progress = progress;
                 this.label = label;
-                this.port = port;
             }
         }
-        
+
+        private struct ServerDeletePayload
+        {
+            public string serverId;
+
+            public ServerDeletePayload(string serverId)
+            {
+                this.serverId = serverId;
+            }
+        }
+
         // TODO Change the string at the end to be the account ID of whoever we sign in under
         //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
         public bool IsLoggedIn { get; private set; }
@@ -835,6 +951,38 @@ namespace Vi.Core
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
+        }
+
+        private void Update()
+        {
+            if (thisServerCreated)
+            {
+                if (!IsRefreshingServers)
+                {
+                    RefreshServers();
+
+                    if (thisServer.type == 0)
+                    {
+                        if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
+                        {
+                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
+                            Application.Quit();
+                        }
+                    }
+                    else if (thisServer.type == 1)
+                    {
+                        if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
+                        {
+                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
+                            Application.Quit();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to handle server type: " + thisServer.type);
+                    }
+                }
+            }
         }
 
         private IEnumerator CreateItems()

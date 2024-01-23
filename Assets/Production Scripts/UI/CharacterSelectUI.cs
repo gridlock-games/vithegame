@@ -473,7 +473,7 @@ namespace Vi.UI
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.Servers)
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.HubServers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
