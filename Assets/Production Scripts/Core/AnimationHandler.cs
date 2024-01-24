@@ -60,6 +60,7 @@ namespace Vi.Core
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (!movementHandler.CanMove()) { return; }
             if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
@@ -72,7 +73,10 @@ namespace Vi.Core
             // If we are not at rest and the last clip was a dodge, don't play this clip
             if (!Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
             {
-                if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsTag("CanDodge") & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime > 0.5f))
+                {
+                    if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                }
 
                 // Dodge lock checks
                 if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
@@ -257,6 +261,7 @@ namespace Vi.Core
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
+        MovementHandler movementHandler;
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
@@ -328,6 +333,7 @@ namespace Vi.Core
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+            movementHandler = GetComponent<MovementHandler>();
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
