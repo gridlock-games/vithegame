@@ -233,27 +233,15 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
-                    startPos.y += actionVFXPrefab.raycastOffset.y;
-                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    //startPos.y += actionVFXPrefab.raycastOffset.y;
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-                    bool bHit = false;
-                    RaycastHit floorHit = new RaycastHit();
-
-                    foreach (RaycastHit hit in allHits)
-                    {
-                        bHit = true;
-                        floorHit = hit;
-
-                        break;
-                    }
 
                     if (bHit)
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
-                            floorHit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                            Quaternion.LookRotation(Vector3.Cross(hit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
