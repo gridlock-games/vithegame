@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 1800198484446731463}
   - component: {fileID: 1800198484446731457}
   - component: {fileID: 1800198484446731462}
-  - component: {fileID: 99884056162510443}
-  - component: {fileID: 1686193236004128037}
-  - component: {fileID: 4697250616198047503}
   - component: {fileID: 595669297844828813}
+  - component: {fileID: -2512938027517078556}
+  - component: {fileID: 1244542673287554293}
+  - component: {fileID: 6700438063962835710}
   m_Layer: 0
   m_Name: olaf_fear
   m_TagString: Untagged
@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800198484446731460}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.4280024, y: 0.000100016594, z: 9.168509}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -3885,7 +3885,7 @@ ParticleSystem:
     outside: 0
     enter: 2
     exit: 0
-    colliderQueryMode: 0
+    colliderQueryMode: 2
     radiusScale: 1
     primitives: []
   SubModule:
@@ -4898,62 +4898,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &99884056162510443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1800198484446731460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3829528289
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &1686193236004128037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1800198484446731460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f92ec8667636df4cb53114cc721864c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  killDistance: 500
-  colliderLookBoxExtents: {x: 1, y: 1, z: 1}
-  particleRadius: 1
-  maxHits: 1
-  changeColorBasedOnTeam: 0
---- !u!114 &4697250616198047503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1800198484446731460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5845fd2b2a1013846ad36dd8396063f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  applyStatusToAttacker: 0
-  targetType: 2
-  statuses:
-  - status: 12
-    value: 0
-    duration: 8
-    delay: 0
 --- !u!82 &595669297844828813
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5050,6 +4994,56 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-2512938027517078556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800198484446731460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 1
+  onActivateVFXSpawnNormalizedTime: 0
+  raycastOffset: {x: 0, y: 2, z: 0}
+  crossProductDirection: {x: 1, y: 0, z: 0}
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+--- !u!54 &1244542673287554293
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800198484446731460}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &6700438063962835710
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800198484446731460}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 2, z: 4}
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &5645609730133912420
 GameObject:
   m_ObjectHideFlags: 0

@@ -382,8 +382,11 @@ namespace Vi.Core
                     }
                 }
 
-                RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
-                AddHP(damage);
+                if (damage != 0)
+                {
+                    RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                    AddHP(damage);
+                }
             }
 
             AddStamina(-attack.staminaDamage);
