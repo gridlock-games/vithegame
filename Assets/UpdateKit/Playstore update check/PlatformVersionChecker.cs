@@ -3,29 +3,27 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using System.Globalization;
+using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public class PlatformVersionChecker : MonoBehaviour
 {
-  public string NewVersionMessage = "A new version of Vi Version {0} is now available at {1}. Please update before proceeding.";
+  public string NewVersionMessage = $"A new version of Vi Version is now available at playstore. Please update before proceeding.";
 
-  bool MatchingVersion(Version networkVersion)
-  {
-    var compairingResult = GetCurrentBaseVersion().CompareTo(networkVersion);
-    if (compairingResult < 0) //user copy is Outdated
-      return false;
-    else
-      return true;
-  }
+  [SerializeField] GameObject notificationWindowCanvas;
+  Version serverVersion = new Version("1.0.0.1");
+
+  [SerializeField] UnityEvent playAction;
 
   //Change this to bool if this will be done as part of the download process otherwise this should be a check upon game bootup.
   void CheckGameVersion()
   {
-    Version serverVersion = new Version("1.0.0.1"); //Temp change this to server call.
-
+    serverVersion = GetCurrentServerVersion();
     bool CheckForlatestVersion = MatchingVersion(serverVersion);
     if (CheckForlatestVersion)
     {
-      //Do nothing and continue the process.
+      Destroy(this.gameObject);
+      //Destroy this checker since it no longer needed. (In most cases the server should forced users to reopen the app)
     }
     else
     {
@@ -39,8 +37,32 @@ public class PlatformVersionChecker : MonoBehaviour
     return new Version(versionInfo);
   }
 
-  void NotifyUser()
+  
+  Version GetCurrentServerVersion()
   {
-    //Insert code for user notification
+    //Replace this with the API retreval code.
+    return new Version("1.0.0.1");
+  }
+
+  bool MatchingVersion(Version networkVersion)
+  {
+    var compairingResult = GetCurrentBaseVersion().CompareTo(networkVersion);
+    if (compairingResult < 0) //user copy is Outdated
+      return false;
+    else
+      return true;
+  }
+
+  public void NotifyUser()
+  {
+    GameObject notificationWindow =  notificationWindowCanvas.GetComponentInChildren<MessageNotificationObject>().gameObject;
+    MessageNotificationObject messageNotification = notificationWindow.GetComponent<MessageNotificationObject>();
+    messageNotification.ShowDialogueBox(NewVersionMessage, "Go to PlayStore", playAction);
+    Instantiate(notificationWindowCanvas);
+  }
+
+  public void SentToStore()
+  {
+    PlatformDownloadPage.SentPeopleToStore();
   }
 }

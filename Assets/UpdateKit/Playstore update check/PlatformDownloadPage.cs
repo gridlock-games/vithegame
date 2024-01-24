@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformDownloadPage : MonoBehaviour
+public static class PlatformDownloadPage
 {
-  public void SentPeopleToStore()
+  public static void SentPeopleToStore()
   {
 #if UNITY_ANDROID
     //Sent to Android Play store
