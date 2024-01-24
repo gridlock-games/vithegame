@@ -18,10 +18,20 @@ namespace Vi.Core
             this.attack = attack;
         }
 
-        private ParticleSystem ps;
+        private ParticleSystem[] particleSystems;
+        private ParticleSystem thisParticleSystem;
         private void Awake()
         {
-            ps = GetComponentInChildren<ParticleSystem>();
+            thisParticleSystem = GetComponent<ParticleSystem>();
+            particleSystems = GetComponentsInChildren<ParticleSystem>();
+            foreach (ParticleSystem ps in particleSystems)
+            {
+                if (ps.trigger.enabled)
+                {
+                    ps.gameObject.AddComponent<ActionVFXChildTriggerParticleSystem>();
+                }
+            }
+
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -34,25 +44,33 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
-            bool skip = false;
-            for (int i = 0; i < ps.trigger.colliderCount; i++)
+            foreach (ParticleSystem ps in particleSystems)
             {
-                if (ps.trigger.GetCollider(i) == other)
+                bool skip = false;
+                for (int i = 0; i < ps.trigger.colliderCount; i++)
                 {
-                    skip = true;
-                    break;
+                    if (ps.trigger.GetCollider(i) == other)
+                    {
+                        skip = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!skip)
-            {
-                ps.trigger.AddCollider(other);
+                if (!skip)
+                {
+                    ps.trigger.AddCollider(other);
+                }
             }
         }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        public void OnParticleTrigger()
+        private void OnParticleTrigger()
+        {
+            ProcessOnParticleEnterMessage(thisParticleSystem);
+        }
+
+        public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
