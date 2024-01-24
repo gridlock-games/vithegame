@@ -6,7 +6,6 @@ using Unity.Netcode;
 
 namespace Vi.Core
 {
-    [RequireComponent(typeof(ParticleSystem))]
     [RequireComponent(typeof(Rigidbody))]
     public class ActionVFXParticleSystem : ActionVFX
     {
@@ -22,7 +21,7 @@ namespace Vi.Core
         private ParticleSystem ps;
         private void Awake()
         {
-            ps = GetComponent<ParticleSystem>();
+            ps = GetComponentInChildren<ParticleSystem>();
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)

@@ -227,7 +227,8 @@ namespace Vi.Core
                         }
                         else
                         {
-                            Debug.LogError(actionVFXPrefab + " has attachment type set to " + actionVFXPrefab.transformType + " but can't find a ShooterComponent to base off of");
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                     }
                     break;
