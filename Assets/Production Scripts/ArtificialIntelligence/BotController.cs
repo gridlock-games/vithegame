@@ -201,7 +201,11 @@ namespace Vi.ArtificialIntelligence
 
                 if (targetAttributes)
                 {
-                    navMeshAgent.destination = targetAttributes.transform.position;
+                    if (navMeshAgent.isOnNavMesh)
+                    {
+                        navMeshAgent.destination = targetAttributes.transform.position;
+                    }
+                    
                     if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                     {
                         weaponHandler.SendMessage("OnLightAttack");
