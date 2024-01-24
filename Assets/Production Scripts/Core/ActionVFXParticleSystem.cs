@@ -52,7 +52,7 @@ namespace Vi.Core
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        private void OnParticleTrigger()
+        public void OnParticleTrigger()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
