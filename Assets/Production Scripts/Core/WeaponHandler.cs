@@ -288,6 +288,8 @@ namespace Vi.Core
                 {
                     StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
                 }
+
+                if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
             else
             {

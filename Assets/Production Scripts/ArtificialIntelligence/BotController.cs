@@ -180,7 +180,7 @@ namespace Vi.ArtificialIntelligence
             if (!CanMove()) { return; }
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                navMeshAgent.destination = currentPosition.Value;
+                if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
             }
             else
             {
@@ -201,10 +201,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (targetAttributes)
                 {
-                    if (navMeshAgent.isOnNavMesh)
-                    {
-                        navMeshAgent.destination = targetAttributes.transform.position;
-                    }
+                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
                     
                     if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                     {

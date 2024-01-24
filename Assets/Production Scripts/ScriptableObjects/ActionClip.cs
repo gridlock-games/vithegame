@@ -142,6 +142,7 @@ namespace Vi.ScriptableObjects
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
+        public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

@@ -92,7 +92,7 @@ MonoBehaviour:
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: ffffffff
+  effectedWeaponBones: 
   mustBeAiming: 0
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.3
@@ -116,8 +116,9 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList:
-  - {fileID: 4219837563387387350, guid: 2620fa4eecb4ce04fabf98eb51b153ea, type: 3}
+  - {fileID: 82199973914113988, guid: c0f12ed2fca9d2045bac625817ae0b46, type: 3}
   previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

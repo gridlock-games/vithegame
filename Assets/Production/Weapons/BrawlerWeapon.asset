@@ -21,8 +21,6 @@ MonoBehaviour:
     attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
   - weaponBone: 5
     attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
-  - weaponBone: -1
-    attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
   drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
   sheatheSoundEffect: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
   hitAudioClip: {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
@@ -57,11 +55,6 @@ MonoBehaviour:
       weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 813787508998952853, guid: 3ee5a38cb3f3d6d4caca3c90801847b6,
-        type: 3}
-      weaponBone: -1
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
@@ -83,11 +76,6 @@ MonoBehaviour:
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 813787508998952853, guid: 3ee5a38cb3f3d6d4caca3c90801847b6,
-        type: 3}
-      weaponBone: -1
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:

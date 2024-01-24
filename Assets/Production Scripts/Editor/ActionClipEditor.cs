@@ -53,6 +53,7 @@ namespace Vi.Editor
 
         private SerializedProperty spActionVFXList;
         private SerializedProperty spPreviewActionVFX;
+        private SerializedProperty spPreviewActionVFXScale;
 
         private SerializedProperty spShouldAimBody;
         private SerializedProperty spShouldAimOffHand;
@@ -102,6 +103,7 @@ namespace Vi.Editor
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
+            spPreviewActionVFXScale = serializedObject.FindProperty("previewActionVFXScale");
 
             spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
             spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
@@ -261,6 +263,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.PropertyField(spPreviewActionVFX);
+                EditorGUILayout.PropertyField(spPreviewActionVFXScale);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
