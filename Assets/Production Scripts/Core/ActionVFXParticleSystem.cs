@@ -19,22 +19,8 @@ namespace Vi.Core
         }
 
         private ParticleSystem[] particleSystems;
-        private ParticleSystem thisParticleSystem;
         private void Awake()
         {
-            if (TryGetComponent(out thisParticleSystem))
-            {
-                ParticleSystem.TriggerModule triggerModule = thisParticleSystem.trigger;
-                triggerModule.colliderQueryMode = ParticleSystemColliderQueryMode.All;
-                triggerModule.enter = ParticleSystemOverlapAction.Callback;
-                triggerModule.exit = ParticleSystemOverlapAction.Ignore;
-                triggerModule.inside = ParticleSystemOverlapAction.Callback;
-                triggerModule.outside = ParticleSystemOverlapAction.Ignore;
-
-                ParticleSystem.MainModule mainModule = thisParticleSystem.main;
-                mainModule.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
-            }
-
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {
@@ -76,11 +62,6 @@ namespace Vi.Core
         }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
-
-        private void OnParticleTrigger()
-        {
-            ProcessOnParticleEnterMessage(thisParticleSystem);
-        }
 
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
