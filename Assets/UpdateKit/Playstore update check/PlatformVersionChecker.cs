@@ -16,18 +16,18 @@ public class PlatformVersionChecker : MonoBehaviour
   [SerializeField] UnityEvent playAction;
 
   //Change this to bool if this will be done as part of the download process otherwise this should be a check upon game bootup.
-  void CheckGameVersion()
+  public void CheckGameVersion()
   {
     serverVersion = GetCurrentServerVersion();
     bool CheckForlatestVersion = MatchingVersion(serverVersion);
     if (CheckForlatestVersion)
     {
-      Destroy(this.gameObject);
       //Destroy this checker since it no longer needed. (In most cases the server should forced users to reopen the app)
+      Destroy(this.gameObject);
     }
     else
     {
-      //Notify the user and disable any controls.
+      //Notify the user and disable any controls or deny access except the UI button.
       NotifyUser();
     }
   }
@@ -40,7 +40,7 @@ public class PlatformVersionChecker : MonoBehaviour
   
   Version GetCurrentServerVersion()
   {
-    //Replace this with the API retreval code.
+    //Replace this with the data retrieved from API
     return new Version("1.0.0.1");
   }
 
