@@ -11,12 +11,14 @@ namespace Vi.Core
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Projectile projectile;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
-        [Header("Hand IK Settings")]
+        [Header("IK Settings")]
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
         [SerializeField] private Transform offHandGrip;
+        [SerializeField] private Vector3 bodyAimIKOffset;
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
+        public Vector3 GetBodyAimIKOffset() { return bodyAimIKOffset; }
         public OffHandInfo GetOffHandInfo()
         {
             if (aimHand == LimbReferences.Hand.RightHand)

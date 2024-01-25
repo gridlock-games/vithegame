@@ -600,7 +600,7 @@ namespace Vi.Core
             {
                 case CharacterReference.RaceAndGender.HumanMale:
                     return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
-                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "LollipopWeapon", "BroadSwordWeapon", true);
+                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "LollipopWeapon", "CrossbowWeapon", true);
                 case CharacterReference.RaceAndGender.HumanFemale:
                     return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
                         "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);

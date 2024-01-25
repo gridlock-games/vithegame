@@ -40,8 +40,8 @@ MonoBehaviour:
     - weaponPrefab: {fileID: 899434540764439098, guid: fa9d0f1ed1aa53b41a0c15bcf2508253,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0.0604, y: -0.0273, z: -0.0521}
-      weaponRotationOffset: {x: 3.075497, y: 22.15016, z: 62.85931}
+      weaponPositionOffset: {x: 0.0649, y: -0.0248, z: 0.0348}
+      weaponRotationOffset: {x: -21.738, y: 93.606, z: 76.409}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -104,7 +104,7 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 8d54f1fe6e383ac4fa602f4a4d797b2c, type: 2}
+    attackClip: {fileID: 11400000, guid: 8dc603070004323448850cd8464ae2ae, type: 2}
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}

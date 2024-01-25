@@ -17,21 +17,29 @@ namespace Vi.Core
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, bool isAiming, bool instantAim, bool shouldAimBody)
+        public void AimHand(Hand hand, bool isAiming, bool instantAim, bool shouldAimBody, Vector3 bodyAimIKOffset)
         {
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
-                if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
+                if (rightHandAimBodyConstraint)
+                {
+                    rightHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0;
+                    rightHandAimBodyConstraint.data.offset = bodyAimIKOffset;
+                }
                 if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
                 if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
-                if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
+                if (leftHandAimBodyConstraint)
+                {
+                    leftHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0;
+                    leftHandAimBodyConstraint.data.offset = bodyAimIKOffset;
+                }
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
             animator.SetBool("Aiming", isAiming);
@@ -47,7 +55,7 @@ namespace Vi.Core
 
         public void ReachHand(Hand hand, Transform reachTarget, bool isReaching, bool instantReach)
         {
-            float weight = isReaching ? 1 : 0;
+            float weight = isReaching & reachTarget ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandReachRig.GetRig()) { return; }
