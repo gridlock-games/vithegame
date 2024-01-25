@@ -109,8 +109,6 @@ namespace Vi.Core
             List<ParticleSystem.Particle> inside = new List<ParticleSystem.Particle>();
             int numInside = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside, out ParticleSystem.ColliderData insideColliderData);
 
-            Debug.Log(Quaternion.Euler(0, 45, 0) * new Vector3(0, 0, 5));
-
             for (int particleIndex = 0; particleIndex < numInside; particleIndex++)
             {
                 for (int colliderIndex = 0; colliderIndex < insideColliderData.GetColliderCount(particleIndex); colliderIndex++)
