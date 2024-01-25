@@ -91,10 +91,10 @@ MonoBehaviour:
   transitionTime: 0.15
   agentStaminaCost: 0
   agentDefenseCost: 0
-  agentRageCost: 50
+  agentRageCost: 0
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.1
+  attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.4
   damage: 3
   staminaDamage: 0
@@ -112,13 +112,13 @@ MonoBehaviour:
   canCancelHeavyAttacks: 1
   canCancelAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 0d57b8fc116439f4bb1a2eff72541866, type: 3}
-  abilityCooldownTime: 60
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList:
   - {fileID: -6163045294197270457, guid: 96283ce958aaaa049bad792b96428ce5, type: 3}
-  - {fileID: 6850729114207578238, guid: 1346c4629ad68ed4eb0693664bb645ae, type: 3}
-  - {fileID: 1062214232066809875, guid: b42218594d11a894abf2e16f5d185d7b, type: 3}
+  - {fileID: -6163045294197270457, guid: 81b456dce9b80784c8c58be03d52c43f, type: 3}
+  - {fileID: -6163045294197270457, guid: e77e1cb598886f144898c2c6ec52c768, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
