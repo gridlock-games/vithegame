@@ -22,7 +22,19 @@ namespace Vi.Core
         private ParticleSystem thisParticleSystem;
         private void Awake()
         {
-            thisParticleSystem = GetComponent<ParticleSystem>();
+            if (TryGetComponent(out thisParticleSystem))
+            {
+                ParticleSystem.TriggerModule triggerModule = thisParticleSystem.trigger;
+                triggerModule.colliderQueryMode = ParticleSystemColliderQueryMode.All;
+                triggerModule.enter = ParticleSystemOverlapAction.Callback;
+                triggerModule.exit = ParticleSystemOverlapAction.Ignore;
+                triggerModule.inside = ParticleSystemOverlapAction.Callback;
+                triggerModule.outside = ParticleSystemOverlapAction.Ignore;
+
+                ParticleSystem.MainModule mainModule = thisParticleSystem.main;
+                mainModule.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
+            }
+
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {

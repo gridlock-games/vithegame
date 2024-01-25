@@ -13,6 +13,14 @@ namespace Vi.Core
         {
             actionVFXParticleSystem = GetComponentInParent<ActionVFXParticleSystem>();
             ps = GetComponent<ParticleSystem>();
+            ParticleSystem.TriggerModule triggerModule = ps.trigger;
+            triggerModule.colliderQueryMode = ParticleSystemColliderQueryMode.All;
+            triggerModule.enter = ParticleSystemOverlapAction.Callback;
+            triggerModule.exit = ParticleSystemOverlapAction.Ignore;
+            triggerModule.inside = ParticleSystemOverlapAction.Callback;
+            triggerModule.outside = ParticleSystemOverlapAction.Ignore;
+            ParticleSystem.MainModule mainModule = ps.main;
+            mainModule.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
         }
 
         private void OnParticleTrigger()
