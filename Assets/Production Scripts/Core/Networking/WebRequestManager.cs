@@ -600,7 +600,7 @@ namespace Vi.Core
             {
                 case CharacterReference.RaceAndGender.HumanMale:
                     return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
-                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
+                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
                 case CharacterReference.RaceAndGender.HumanFemale:
                     return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
                         "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
@@ -609,7 +609,7 @@ namespace Vi.Core
                         "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
                 case CharacterReference.RaceAndGender.OrcFemale:
                     return new Loadout("1", "Or_F_Helm_SMage_03_Bl", "Or_F_Shoulders_SMage_Bl", "Or_F_Chest_SMage_Bl", "Or_F_Gloves_SMage_Bl",
-                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
+                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
                 default:
                     Debug.LogError("Not sure how to handle " + raceAndGender);
                     break;

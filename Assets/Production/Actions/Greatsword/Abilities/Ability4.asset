@@ -87,6 +87,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  avatarLayer: 0
   transitionTime: 0.15
   agentStaminaCost: 0
   agentDefenseCost: 0
@@ -116,6 +117,11 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit: []
   actionVFXList:
   - {fileID: 8673425928235801585, guid: c7e120502a2410640b4e008812322bc2, type: 3}
+  previewActionVFX: {fileID: 2951280832426361480, guid: 5018b3ee257acd84fb55f47bf0955508,
+    type: 3}
+  previewActionVFXScale: {x: 0.45, y: 0.45, z: 0.45}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1
