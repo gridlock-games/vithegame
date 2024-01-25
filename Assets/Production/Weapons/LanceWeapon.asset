@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
+  m_Name: LanceWeapon
+  m_EditorClassIdentifier: 
+  attackSoundEffects:
+  - weaponBone: 18
+    attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
+  drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
+  sheatheSoundEffect: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
+  hitAudioClip: {fileID: 8300000, guid: 99ace9ddb8b8b48b7baf9df95c8d771b, type: 3}
+  knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
+    type: 3}
+  hitVFXPrefab: {fileID: 4329036519906242892, guid: 8fa4d75523fd22445abc60e9da3a5790,
+    type: 3}
+  blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
+  blockVFXPrefab: {fileID: 4329036519906242892, guid: 583f37b3acf6baf43bfe1b375082eba6,
+    type: 3}
+  weaponModelData:
+  - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
+      weaponRotationOffset: {x: 102.711, y: 6.029007, z: 2.182007}
+  - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
+      weaponRotationOffset: {x: 102.711, y: 6.029007, z: 2.182007}
+  hitReactions:
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: 05b1171e4538c0e43b5db798c2e1911d, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: 9dc8643244347494dadf539f987fd495, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: 49ece318b9e7d4747adcf8bd4b4595f4, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 5ea22a3e631747f40b1d6a2cbe07247e, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: a114819f2c0ea204fbef7303261d6fba, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: 19b2b3ef7f2225645a1c7d2cb4fb8da3, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: 5e4f61032e6e9d54380f051fd2315a83, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: 107e27049db271f4fb9e47f250223348, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: eda370bfd1557fa43a556f1efcbad27c, type: 2}
+    shouldAlreadyHaveAilment: 1
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: cb61798929dd974468c2eae5d29522bf, type: 2}
+    shouldAlreadyHaveAilment: 1
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: c0ec34330d54bfe428a47a06f0641b36, type: 2}
+    shouldAlreadyHaveAilment: 1
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: 788768a60d1b40e48945404237a0978e, type: 2}
+    shouldAlreadyHaveAilment: 1
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 0e8007f65893acd489b5c5efc73a34b8, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: 2e5e9730f3c6241459447289a5992e58, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: 280ed873bb7183841a8fe528a6a6a5b5, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: 282899389b0c395409acf1b0bc1e48ff, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: b896f757d35339a408512cb7b113cc8c, type: 2}
+    shouldAlreadyHaveAilment: 0
+  ability1: {fileID: 11400000, guid: b938073a9c1f9c94ca7f9b08debd4377, type: 2}
+  ability2: {fileID: 11400000, guid: 2f1daac69cd01ec42b82680231bab1ce, type: 2}
+  ability3: {fileID: 11400000, guid: 7f86ebf73305e4049a24e974c33deae5, type: 2}
+  ability4: {fileID: 11400000, guid: 09de4279f68a7d749a74cffd5818e98e, type: 2}
+  attackList:
+  - inputs: 00000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 8d54f1fe6e383ac4fa602f4a4d797b2c, type: 2}
+  - inputs: 0000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 926611997d4c8e646b81268594fa7da2, type: 2}
+  - inputs: 000000000000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 50504aaca4e0e604e9eb00569d8b2089, type: 2}
+  - inputs: 000000000000000001000000
+    comboCondition: 2
+    attackClip: {fileID: 11400000, guid: 06ce925b7769f9745876f78942f57de4, type: 2}
+  - inputs: 01000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: e62bb40f06cd24e488ad552625161e2f, type: 2}
+  - inputs: 0100000001000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 06ce925b7769f9745876f78942f57de4, type: 2}
+  dodgeStaminaCost: 20
+  dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
+  dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
+  dodgeFR: {fileID: 11400000, guid: c0bb9f32a0406bb4fbc7033646e9143f, type: 2}
+  dodgeB: {fileID: 11400000, guid: 28d1fd5cbe620264f8b454221540227e, type: 2}
+  dodgeBL: {fileID: 11400000, guid: 55fb95729b0b0ab49a53ebd449350c4b, type: 2}
+  dodgeBR: {fileID: 11400000, guid: 8e65494966795db4e988629afba64821, type: 2}
+  dodgeL: {fileID: 11400000, guid: e3582b9581dbb1f4d8c0978182f5c8ba, type: 2}
+  dodgeR: {fileID: 11400000, guid: 95469fd8448f39a4e9a6e64370077838, type: 2}
