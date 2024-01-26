@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class LoadoutEditorMenu : Menu
     {
+        [SerializeField] private WeaponSelectMenu weaponSelectMenu;
         [SerializeField] private Button[] loadoutButtons;
 
         [SerializeField] private Button primaryWeaponButton;
@@ -68,7 +69,12 @@ namespace Vi.UI
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption)
         {
-
+            GameObject _weaponSelect = Instantiate(weaponSelectMenu.gameObject);
+            WeaponSelectMenu menu = _weaponSelect.GetComponent<WeaponSelectMenu>();
+            menu.SetLastMenu(gameObject);
+            menu.Initialize(weaponOption);
+            childMenu = _weaponSelect;
+            gameObject.SetActive(false);
         }
     }
 }
