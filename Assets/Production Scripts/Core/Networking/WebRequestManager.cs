@@ -645,7 +645,7 @@ namespace Vi.Core
                 brows = character.brows.ToString(),
                 hair = character.hair.ToString(),
                 attributes = new CharacterAttributes(),
-                loadOuts = new List<object>(),
+                loadOuts = new List<LoadoutJson>(),
                 userId = character.userId.ToString(),
                 slot = character.slot,
                 level = character.level,
@@ -821,7 +821,7 @@ namespace Vi.Core
             public string race;
             public string dateCreated;
             public CharacterAttributes attributes;
-            public List<object> loadOuts;
+            public List<LoadoutJson> loadOuts;
             public bool enabled;
             public string userId;
             public int level;
