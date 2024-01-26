@@ -17,13 +17,14 @@ namespace Vi.Core
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, bool isAiming, bool instantAim, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
+        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool instantAim, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
         {
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
+                rightHandAimConstraint.data.offset = handAimIKOffset;
 
                 switch (bodyAimType)
                 {
@@ -52,6 +53,7 @@ namespace Vi.Core
             {
                 if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
+                leftHandAimConstraint.data.offset = handAimIKOffset;
 
                 switch (bodyAimType)
                 {
@@ -138,9 +140,11 @@ namespace Vi.Core
         [SerializeField] private RigWeightTarget rightHandAimRig;
         [SerializeField] private MultiAimConstraint rightHandAimBodyConstraint;
         [SerializeField] private MultiAimConstraint rightHandAimBodyInvertedConstraint;
+        [SerializeField] private MultiAimConstraint rightHandAimConstraint;
         [SerializeField] private RigWeightTarget leftHandAimRig;
         [SerializeField] private MultiAimConstraint leftHandAimBodyConstraint;
         [SerializeField] private MultiAimConstraint leftHandAimBodyInvertedConstraint;
+        [SerializeField] private MultiAimConstraint leftHandAimConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
 
