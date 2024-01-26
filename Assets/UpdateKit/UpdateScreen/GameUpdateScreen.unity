@@ -158,8 +158,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -1.5643e-10, y: -35.349}
-  m_SizeDelta: {x: 642.2119, y: 21.8509}
+  m_AnchoredPosition: {x: 0.000061035, y: -81}
+  m_SizeDelta: {x: 704.7542, y: 57.1311}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &152301460
 MonoBehaviour:
@@ -181,7 +181,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Vi recomends download over wifi
+  m_text: 'Vi recomends download over wifi or 5G network
+
+    (mobile network download
+    uses data)'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -208,8 +211,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14.3
-  m_fontSizeBase: 14.3
+  m_fontSize: 24.65
+  m_fontSizeBase: 24.65
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -678,8 +681,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 34.852905}
-  m_SizeDelta: {x: 1, y: 70.6976}
+  m_AnchoredPosition: {x: 0, y: 66.56171}
+  m_SizeDelta: {x: 1, y: 134.1152}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &910070752
 MonoBehaviour:
@@ -856,8 +859,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.000022888, y: -13.4414}
-  m_SizeDelta: {x: 580.6804, y: 22.9735}
+  m_AnchoredPosition: {x: 0.000022888, y: -26.766}
+  m_SizeDelta: {x: 580.6804, y: 65.355}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1328036393
 MonoBehaviour:
@@ -906,8 +909,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 27.3
-  m_fontSizeBase: 27.3
+  m_fontSize: 32.5
+  m_fontSizeBase: 32.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
