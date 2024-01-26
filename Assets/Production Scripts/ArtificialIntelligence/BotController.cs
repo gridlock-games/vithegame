@@ -180,7 +180,7 @@ namespace Vi.ArtificialIntelligence
             if (!CanMove()) { return; }
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                navMeshAgent.destination = currentPosition.Value;
+                if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
             }
             else
             {
@@ -201,10 +201,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (targetAttributes)
                 {
-                    if (navMeshAgent.isOnNavMesh)
-                    {
-                        navMeshAgent.destination = targetAttributes.transform.position;
-                    }
+                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
                     
                     if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                     {
@@ -246,7 +243,7 @@ namespace Vi.ArtificialIntelligence
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

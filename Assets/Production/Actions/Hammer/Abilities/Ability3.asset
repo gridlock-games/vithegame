@@ -96,7 +96,7 @@ MonoBehaviour:
   mustBeAiming: 0
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.3
-  damage: 20
+  damage: 0
   staminaDamage: 0
   defenseDamage: 0
   maxHitLimit: 1
@@ -114,9 +114,16 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 21300000, guid: 521d188f691f925488b018c3f7fb014a, type: 3}
   abilityCooldownTime: 12
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
-  actionVFXList: []
-  previewActionVFX: {fileID: 0}
+  statusesToApplyToTargetOnHit:
+  - status: 13
+    value: 0
+    duration: 8
+    delay: 0
+  actionVFXList:
+  - {fileID: -2512938027517078556, guid: cfd2d0330553b534cb6abb043f9f11f7, type: 3}
+  previewActionVFX: {fileID: 2951280832426361480, guid: 5018b3ee257acd84fb55f47bf0955508,
+    type: 3}
+  previewActionVFXScale: {x: 0.4, y: 0.4, z: 0.4}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

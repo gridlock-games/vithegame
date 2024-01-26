@@ -113,21 +113,10 @@ MonoBehaviour:
   canCancelAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 9bf97dcba80142747b174163e2666a20, type: 3}
   abilityCooldownTime: 50
-  statusesToApplyToSelfOnActivate:
-  - status: 8
-    value: 0.1
-    duration: 6
-    delay: 2
-  - status: 0
-    value: 3
-    duration: 6
-    delay: 2
-  - status: 10
-    value: 2
-    duration: 6
-    delay: 2
+  statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 82199973914113988, guid: 0d5da7402b014cd4a843ba22e274c93b, type: 3}
   previewActionVFX: {fileID: 0}
   aimDuringAnticipation: 0
   aimDuringAttack: 0

@@ -11,12 +11,18 @@ namespace Vi.Core
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Projectile projectile;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
-        [Header("Hand IK Settings")]
+        [Header("IK Settings")]
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
+        [SerializeField] Vector3 aimHandIKOffset;
         [SerializeField] private Transform offHandGrip;
+        [SerializeField] private Vector3 bodyAimIKOffset;
+        [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
+        public Vector3 GetAimHandIKOffset() { return aimHandIKOffset; }
+        public Vector3 GetBodyAimIKOffset() { return bodyAimIKOffset; }
+        public LimbReferences.BodyAimType GetBodyAimType() { return bodyAimType; }
         public OffHandInfo GetOffHandInfo()
         {
             if (aimHand == LimbReferences.Hand.RightHand)
@@ -105,7 +111,7 @@ namespace Vi.Core
                 Gizmos.color = Color.white;
             }
 
-            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * Vector3.forward * 10);
+            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * projectileForce * 10);
         }
     }
 }

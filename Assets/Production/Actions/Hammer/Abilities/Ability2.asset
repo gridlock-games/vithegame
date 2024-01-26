@@ -115,8 +115,11 @@ MonoBehaviour:
   abilityCooldownTime: 13
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 9059005774130335826, guid: 89ff078aac7e48d499356f32170eb49a, type: 3}
+  - {fileID: 6773071653687936824, guid: 82831a52d839c47488f5ecbae6c77eff, type: 3}
   previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
