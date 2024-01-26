@@ -129,8 +129,8 @@ GameObject:
   - component: {fileID: 5865407796670338933}
   - component: {fileID: 7923747880516758938}
   - component: {fileID: 2046628774834455945}
-  - component: {fileID: 6258410500988021796}
   - component: {fileID: 3585833358593552902}
+  - component: {fileID: 6258410500988021796}
   - component: {fileID: 4611389792943145688}
   - component: {fileID: 7865998422510067332}
   m_Layer: 6
@@ -187,6 +187,26 @@ CapsuleCollider:
   m_Height: 0.35076576
   m_Direction: 2
   m_Center: {x: 0, y: 0.0012795031, z: 0.16865432}
+--- !u!114 &3585833358593552902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6498076319814241743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1552740433
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &6258410500988021796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,26 +220,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killDistance: 500
---- !u!114 &3585833358593552902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6498076319814241743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &4611389792943145688
 MonoBehaviour:
   m_ObjectHideFlags: 0

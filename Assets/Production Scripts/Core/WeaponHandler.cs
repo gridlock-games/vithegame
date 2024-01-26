@@ -598,7 +598,7 @@ namespace Vi.Core
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset());
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(), shooterWeapon.GetBodyAimType());
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                     animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
                 }

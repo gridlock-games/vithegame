@@ -15,10 +15,12 @@ namespace Vi.Core
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
         [SerializeField] private Transform offHandGrip;
         [SerializeField] private Vector3 bodyAimIKOffset;
+        [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
         public Vector3 GetBodyAimIKOffset() { return bodyAimIKOffset; }
+        public LimbReferences.BodyAimType GetBodyAimType() { return bodyAimType; }
         public OffHandInfo GetOffHandInfo()
         {
             if (aimHand == LimbReferences.Hand.RightHand)

@@ -49,11 +49,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectileSpawnPoint: {fileID: 388568134400591690}
-  projectile: {fileID: 0}
+  projectile: {fileID: 2043419672111128291, guid: 75e3996dab961de438450fa8a29cd5b2,
+    type: 3}
   projectileForce: {x: 0, y: 0, z: 5}
   aimHand: 0
   offHandGrip: {fileID: 0}
-  bodyAimIKOffset: {x: 150, y: 0, z: 0}
+  bodyAimIKOffset: {x: 0, y: 0, z: 0}
+  bodyAimType: 1
 --- !u!1 &5163795561444201306
 GameObject:
   m_ObjectHideFlags: 0
