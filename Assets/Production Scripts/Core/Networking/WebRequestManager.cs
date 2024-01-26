@@ -519,26 +519,25 @@ namespace Vi.Core
             }
         }
 
-        public IEnumerator UpdateCharacterLoadout(Character character)
+        public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
         {
-            Debug.Log("TODO: Update character loadout");
-            yield return null;
-            //CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
-            //    character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
-            //    character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
+            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
+                newLoadout.helmGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(), newLoadout.glovesGearItemId.ToString(),
+                newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
 
-            //string json = JsonConvert.SerializeObject(payload);
-            //byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            string json = JsonConvert.SerializeObject(payload);
+            Debug.Log(json);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            //UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
-            //putRequest.SetRequestHeader("Content-Type", "application/json");
-            //yield return putRequest.SendWebRequest();
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
 
-            //if (putRequest.result != UnityWebRequest.Result.Success)
-            //{
-            //    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
-            //}
-            //putRequest.Dispose();
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
+            }
+            putRequest.Dispose();
         }
 
         public IEnumerator CharacterPostRequest(Character character)
@@ -596,11 +595,21 @@ namespace Vi.Core
 
         public Loadout GetDefaultLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             switch (raceAndGender)
             {
                 case CharacterReference.RaceAndGender.HumanMale:
-                    return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
-                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
+                    return new Loadout("1", armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Helm_SMage_03_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Shoulders_SMage_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Chest_SMage_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Gloves_SMage_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Belt_SMage_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Robe_SMage_Bl").itemWebId,
+                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Boots_SMage_Bl").itemWebId,
+                        System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
+                        System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
+                        true);
                 case CharacterReference.RaceAndGender.HumanFemale:
                     return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
                         "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
@@ -728,6 +737,26 @@ namespace Vi.Core
                 serializer.SerializeValue(ref level);
                 serializer.SerializeValue(ref experience);
                 serializer.SerializeValue(ref raceAndGender);
+            }
+
+            public Loadout GetLoadoutFromSlot(int loadoutSlot)
+            {
+                switch (loadoutSlot)
+                {
+                    case 0:
+                        return loadoutPreset1;
+                    case 1:
+                        return loadoutPreset2;
+                    case 2:
+                        return loadoutPreset3;
+                    case 3:
+                        return loadoutPreset4;
+                    default:
+                        Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
+                        break;
+                }
+
+                return Singleton.GetDefaultLoadout(raceAndGender);
             }
         }
 
@@ -923,7 +952,7 @@ namespace Vi.Core
         private struct CharacterLoadoutPutPayload
         {
             public string charId;
-            private NestedCharacterLoadoutPutPayload loadout;
+            public NestedCharacterLoadoutPutPayload loadout;
 
             public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
             {
@@ -940,7 +969,7 @@ namespace Vi.Core
                 };
             }
 
-            private struct NestedCharacterLoadoutPutPayload
+            public struct NestedCharacterLoadoutPutPayload
             {
                 public string loadoutSlot;
                 public string headGearItemId;
