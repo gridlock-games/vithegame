@@ -127,7 +127,7 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            HP.Value = maxHP;
+            HP.Value = maxHP / 2;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
@@ -270,8 +270,8 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { AddHP(attack.healAmount); return false; }
 
             if (isMeleeHit)
             {

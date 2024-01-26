@@ -30,6 +30,7 @@ namespace Vi.Editor
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spDamage;
+        private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
         private SerializedProperty spDefenseDamage;
         private SerializedProperty spMaxHitLimit;
@@ -81,6 +82,7 @@ namespace Vi.Editor
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spDamage = serializedObject.FindProperty("damage");
+            spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spDefenseDamage = serializedObject.FindProperty("defenseDamage");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
@@ -139,6 +141,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
@@ -183,6 +186,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
@@ -236,6 +240,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
