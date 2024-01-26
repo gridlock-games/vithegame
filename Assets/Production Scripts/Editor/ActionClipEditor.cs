@@ -51,6 +51,7 @@ namespace Vi.Editor
 
         private SerializedProperty spStatusesToApplyToSelfOnActivate;
         private SerializedProperty spStatusesToApplyToTargetOnHit;
+        private SerializedProperty spStatusesToApplyToTeammateOnHit;
 
         private SerializedProperty spActionVFXList;
         private SerializedProperty spPreviewActionVFX;
@@ -102,6 +103,7 @@ namespace Vi.Editor
 
             spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
+            spStatusesToApplyToTeammateOnHit = serializedObject.FindProperty("statusesToApplyToTeammateOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
@@ -134,6 +136,7 @@ namespace Vi.Editor
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
             EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
+            EditorGUILayout.PropertyField(spStatusesToApplyToTeammateOnHit);
             EditorGUILayout.Space();
             
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)

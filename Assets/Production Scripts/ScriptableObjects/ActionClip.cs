@@ -140,6 +140,7 @@ namespace Vi.ScriptableObjects
 
         public List<StatusPayload> statusesToApplyToSelfOnActivate = new List<StatusPayload>();
         public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
+        public List<StatusPayload> statusesToApplyToTeammateOnHit = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;

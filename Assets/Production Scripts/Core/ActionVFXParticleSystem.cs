@@ -77,7 +77,6 @@ namespace Vi.Core
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
                     if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes == attacker) { continue; }
                         if (networkCollider.Attributes)
                         {
                             bool canHit = true;
@@ -97,7 +96,7 @@ namespace Vi.Core
                                     }
                                     else
                                     {
-                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber, Time.time);
+                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
                                     }
                                 }
                             }
@@ -116,7 +115,6 @@ namespace Vi.Core
                     Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
                     if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes == attacker) { continue; }
                         if (networkCollider.Attributes)
                         {
                             bool canHit = true;

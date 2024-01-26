@@ -270,9 +270,6 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { AddHP(attack.healAmount); return false; }
-
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -281,6 +278,19 @@ namespace Vi.Core
             {
                 if (runtimeWeapon) { Debug.LogError("When processing a projectile hit, you shouldn't be passing in a runtime weapon!"); return false; }
             }
+
+            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                AddHP(attack.healAmount);
+                foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
+                {
+                    TryAddStatus(status.status, status.value, status.duration, status.delay);
+                }
+                return false;
+            }
+
+            if (attack.maxHitLimit == 0) { return false; }
 
             if (IsInvincible) { return false; }
             if (isMeleeHit)
@@ -318,7 +328,10 @@ namespace Vi.Core
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
-            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            if (damage != 0)
+            {
+                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
