@@ -100,6 +100,7 @@ namespace Vi.ScriptableObjects
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
+        public float animationSpeed = 1;
 
         public float agentStaminaCost = 20;
         public float agentDefenseCost = 0;

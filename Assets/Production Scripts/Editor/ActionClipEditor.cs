@@ -24,6 +24,7 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionVerticalMultiplier;
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
+        private SerializedProperty spAnimationSpeed;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
@@ -73,6 +74,7 @@ namespace Vi.Editor
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
+            spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
@@ -123,6 +125,7 @@ namespace Vi.Editor
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);
             EditorGUILayout.PropertyField(spTransitionTime);
+            EditorGUILayout.PropertyField(spAnimationSpeed);
             EditorGUILayout.PropertyField(spAvatarLayer);
             if (spShouldApplyRootMotion.boolValue)
             {
