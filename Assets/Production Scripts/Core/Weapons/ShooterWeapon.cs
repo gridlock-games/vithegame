@@ -111,7 +111,7 @@ namespace Vi.Core
                 Gizmos.color = Color.white;
             }
 
-            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * Vector3.forward * 10);
+            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * projectileForce * 10);
         }
     }
 }

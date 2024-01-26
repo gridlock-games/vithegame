@@ -51,10 +51,11 @@ MonoBehaviour:
   projectileSpawnPoint: {fileID: 388568134400591690}
   projectile: {fileID: 2043419672111128291, guid: 75e3996dab961de438450fa8a29cd5b2,
     type: 3}
-  projectileForce: {x: 0, y: 0, z: 5}
+  projectileForce: {x: 5, y: 0, z: 0}
   aimHand: 0
+  aimHandIKOffset: {x: -7.68, y: 83.84, z: -5.7}
   offHandGrip: {fileID: 0}
-  bodyAimIKOffset: {x: 0, y: 0, z: 0}
+  bodyAimIKOffset: {x: -30, y: 25, z: 0}
   bodyAimType: 1
 --- !u!1 &5163795561444201306
 GameObject:
@@ -80,7 +81,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5163795561444201306}
   m_LocalRotation: {x: -0.18301266, y: -0.18301266, z: 0.6830127, w: 0.6830127}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -287,12 +288,12 @@ PrefabInstance:
     - target: {fileID: 2914341651278369199, guid: 4f6a36381e3de3b48a492692c6225e62,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.761
+      value: 0.621
       objectReference: {fileID: 0}
     - target: {fileID: 2914341651278369199, guid: 4f6a36381e3de3b48a492692c6225e62,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.002
       objectReference: {fileID: 0}
     - target: {fileID: 2914341651278369199, guid: 4f6a36381e3de3b48a492692c6225e62,
         type: 3}

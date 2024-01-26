@@ -10,7 +10,6 @@ namespace Vi.Core
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
-        [SerializeField] private Vector3 rotationOffset;
 
         private Attributes attacker;
         private ActionClip attack;
