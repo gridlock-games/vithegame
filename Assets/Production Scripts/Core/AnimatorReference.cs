@@ -25,7 +25,7 @@ namespace Vi.Core
                 wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
                 browsReplacementDefinition == null ? (wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Brows) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Brows].name.Replace("(Clone)", "") : "") : browsReplacementDefinition.skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair) ? wearableEquipmentInstances[CharacterReference.EquipmentType.Hair].name.Replace("(Clone)", "") : "",
-                currentCharacter.level, currentCharacter.loadoutPreset1, currentCharacter.raceAndGender
+                currentCharacter.level, currentCharacter.loadoutPreset1, currentCharacter.loadoutPreset2, currentCharacter.loadoutPreset3, currentCharacter.loadoutPreset4, currentCharacter.raceAndGender
             );
         }
 

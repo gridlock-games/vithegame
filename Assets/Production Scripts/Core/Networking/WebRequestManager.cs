@@ -592,7 +592,7 @@ namespace Vi.Core
             }
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
 
         public Loadout GetDefaultLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
@@ -658,13 +658,16 @@ namespace Vi.Core
             public FixedString32Bytes hair;
             public CharacterAttributes attributes;
             public Loadout loadoutPreset1;
+            public Loadout loadoutPreset2;
+            public Loadout loadoutPreset3;
+            public Loadout loadoutPreset4;
             public FixedString32Bytes userId;
             public int slot;
             public int level;
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -680,10 +683,13 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.loadoutPreset2 = loadoutPreset2;
+                this.loadoutPreset3 = loadoutPreset3;
+                this.loadoutPreset4 = loadoutPreset4;
                 this.raceAndGender = raceAndGender;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -699,6 +705,9 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.loadoutPreset2 = loadoutPreset2;
+                this.loadoutPreset3 = loadoutPreset3;
+                this.loadoutPreset4 = loadoutPreset4;
                 this.raceAndGender = raceAndGender;
             }
 
@@ -798,7 +807,7 @@ namespace Vi.Core
             public Character ToCharacter()
             {
                 CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(char.ToUpper(race[0]) + race[1..].ToLower() + char.ToUpper(gender[0]) + gender[1..].ToLower());
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
             }
         }
 
