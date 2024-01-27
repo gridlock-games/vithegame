@@ -15,10 +15,12 @@ namespace Vi.UI
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
         private LoadoutManager loadoutManager;
-        public void Initialize(CharacterReference.WeaponOption initialOption, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot)
+        private int playerDataId;
+        public void Initialize(CharacterReference.WeaponOption initialOption, CharacterReference.WeaponOption otherWeapon, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
         {
             this.loadoutManager = loadoutManager;
             this.weaponType = weaponType;
+            this.playerDataId = playerDataId;
             Button invokeThis = null;
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
@@ -26,7 +28,9 @@ namespace Vi.UI
                 ele.Initialize(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
-                buttonList.Add(button);
+
+                if (weaponOption.itemWebId != otherWeapon.itemWebId) { buttonList.Add(button); }
+                else { button.interactable = false; }
 
                 if (weaponOption.itemWebId == initialOption.itemWebId) { invokeThis = button; }
             }
@@ -41,8 +45,9 @@ namespace Vi.UI
                 b.interactable = true;
             }
             button.interactable = false;
-            
-            WebRequestManager.Loadout newLoadout = WebRequestManager.Singleton.CharacterById.GetLoadoutFromSlot(loadoutSlot);
+
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:
@@ -56,8 +61,20 @@ namespace Vi.UI
                     break;
             }
 
-            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(WebRequestManager.Singleton.CharacterById, newLoadout));
+            if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
+            if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
+            
+            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
             loadoutManager.ChangeWeapon(weaponType, weaponOption);
+
+            playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
+        }
+
+        private GameObject weaponPreviewObject;
+        private void OnDestroy()
+        {
+            Destroy(weaponPreviewObject);
         }
     }
 }
