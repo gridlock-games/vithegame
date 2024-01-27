@@ -613,6 +613,36 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
+        private IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
+        {
+            UseCharacterLoadoutPayload payload = new UseCharacterLoadoutPayload(characterId, loadoutSlot);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UseCharacterLoadout()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        private struct UseCharacterLoadoutPayload
+        {
+            public string characterId;
+            public string loadoutSlot;
+
+            public UseCharacterLoadoutPayload(string characterId, string loadoutSlot)
+            {
+                this.characterId = characterId;
+                this.loadoutSlot = loadoutSlot;
+            }
+        }
+
         public IEnumerator CharacterPostRequest(Character character)
         {
             if (PlayingOffine)
@@ -649,8 +679,17 @@ namespace Vi.Core
                 if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon1ItemId.ToString()); }
                 if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon2ItemId.ToString()); }
 
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
                 yield return GetCharacterInventory(postRequest.downloadHandler.text);
+
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+                defaultLoadout.loadoutSlot = "2";
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+                defaultLoadout.loadoutSlot = "3";
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+                defaultLoadout.loadoutSlot = "4";
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+
+                yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
                 postRequest.Dispose();
             }
@@ -828,6 +867,16 @@ namespace Vi.Core
                 }
 
                 return Singleton.GetDefaultLoadout();
+            }
+
+            public Loadout GetActiveLoadout()
+            {
+                if (loadoutPreset1.active) { return loadoutPreset1; }
+                if (loadoutPreset2.active) { return loadoutPreset2; }
+                if (loadoutPreset3.active) { return loadoutPreset3; }
+                if (loadoutPreset4.active) { return loadoutPreset4; }
+                //Debug.LogWarning("No active loadout preset!");
+                return loadoutPreset1;
             }
 
             public Character ChangeLoadoutFromSlot(int loadoutSlot, Loadout newLoadout)

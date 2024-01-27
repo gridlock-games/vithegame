@@ -47,8 +47,8 @@ namespace Vi.Core
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
-            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == playerData.character.loadoutPreset1.weapon1ItemId).itemId);
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == playerData.character.loadoutPreset1.weapon2ItemId).itemId);
+            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == playerData.character.GetActiveLoadout().weapon1ItemId).itemId : playerData.character.GetActiveLoadout().weapon1ItemId));
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == playerData.character.GetActiveLoadout().weapon2ItemId).itemId : playerData.character.GetActiveLoadout().weapon2ItemId));
 
             primaryWeapon = Instantiate(primaryOption.weapon);
             secondaryWeapon = Instantiate(secondaryOption.weapon);
@@ -56,7 +56,7 @@ namespace Vi.Core
             secondaryRuntimeAnimatorController = secondaryOption.animationController;
             EquipPrimaryWeapon();
 
-            StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.loadoutPreset1));
+            StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));
         }
 
         public IEnumerator ApplyDefaultEquipment(CharacterReference.RaceAndGender raceAndGender)
@@ -104,13 +104,13 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
 
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.helmGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.shouldersGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.chestArmorGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.glovesGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.beltGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.robeGearItemId).itemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.bootsGearItemId).itemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.helmGearItemId).itemId : loadout.helmGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.shouldersGearItemId).itemId : loadout.shouldersGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.chestArmorGearItemId).itemId : loadout.chestArmorGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.glovesGearItemId).itemId : loadout.glovesGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.beltGearItemId).itemId : loadout.beltGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.robeGearItemId).itemId : loadout.robeGearItemId.ToString())), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.bootsGearItemId).itemId : loadout.bootsGearItemId.ToString())), raceAndGender);
         }
 
         public override void OnNetworkDespawn()
