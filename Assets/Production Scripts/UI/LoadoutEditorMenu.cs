@@ -42,8 +42,8 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId | item.weapon.name == loadout.weapon1ItemId);
-            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId | item.weapon.name == loadout.weapon2ItemId);
+            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId);
+            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId);
 
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;

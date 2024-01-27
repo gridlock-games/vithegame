@@ -521,23 +521,25 @@ namespace Vi.Core
 
         public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
         {
-            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
-                newLoadout.helmGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(), newLoadout.glovesGearItemId.ToString(),
-                newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
+            Debug.Log("TODO: Fix loadout property names");
+            yield return null;
+            //CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
+            //    newLoadout.helmGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(), newLoadout.glovesGearItemId.ToString(),
+            //    newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
 
-            string json = JsonConvert.SerializeObject(payload);
-            Debug.Log(json);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            //string json = JsonConvert.SerializeObject(payload);
+            //Debug.Log(json);
+            //byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
+            //UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+            //putRequest.SetRequestHeader("Content-Type", "application/json");
+            //yield return putRequest.SendWebRequest();
 
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
-            }
-            putRequest.Dispose();
+            //if (putRequest.result != UnityWebRequest.Result.Success)
+            //{
+            //    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
+            //}
+            //putRequest.Dispose();
         }
 
         public IEnumerator CharacterPostRequest(Character character)
@@ -597,35 +599,16 @@ namespace Vi.Core
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            switch (raceAndGender)
-            {
-                case CharacterReference.RaceAndGender.HumanMale:
-                    return new Loadout("1", armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Helm_SMage_03_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Shoulders_SMage_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Chest_SMage_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Gloves_SMage_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Belt_SMage_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Robe_SMage_Bl").itemWebId,
-                        armorOptions.Find(item => item.GetModel(raceAndGender).name == "Hu_M_Boots_SMage_Bl").itemWebId,
+            return new Loadout("1", armorOptions.Find(item => item.name == "Helm SMage 03").itemWebId,
+                        armorOptions.Find(item => item.name == "Shoulders SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Chest SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Gloves SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Belt SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Robe SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Boots SMage").itemWebId,
                         System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                         System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                         true);
-                case CharacterReference.RaceAndGender.HumanFemale:
-                    return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
-                        "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
-                case CharacterReference.RaceAndGender.OrcMale:
-                    return new Loadout("1", "Or_M_Helm_SMage_03_Bl", "Or_M_Shoulders_SMage_Bl", "Or_M_Chest_SMage_Bl", "Or_M_Gloves_SMage_Bl",
-                        "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
-                case CharacterReference.RaceAndGender.OrcFemale:
-                    return new Loadout("1", "Or_F_Helm_SMage_03_Bl", "Or_F_Shoulders_SMage_Bl", "Or_F_Chest_SMage_Bl", "Or_F_Gloves_SMage_Bl",
-                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "GreatSwordWeapon", "CrossbowWeapon", true);
-                default:
-                    Debug.LogError("Not sure how to handle " + raceAndGender);
-                    break;
-            }
-
-            return new Loadout("1", "65a2b5077fd3af802c750f7f", "65a2b5247fd3af802c751047", "65a2b4e27fd3af802c750e7f", "65a2b4f37fd3af802c750ef7",
-                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "GreatSwordWeapon", "CrossbowWeapon", true);
         }
 
         private CharacterJson ToCharacterJson(Character character)
