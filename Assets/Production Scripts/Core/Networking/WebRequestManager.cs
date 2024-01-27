@@ -519,15 +519,16 @@ namespace Vi.Core
             }
         }
 
-        public IEnumerator UpdateCharacterLoadout(Character character)
+        public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
         {
-            Debug.Log("TODO: Update character loadout");
+            Debug.Log("TODO: Fix loadout property names");
             yield return null;
             //CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
-            //    character.loadoutPreset1.headGearItemId.ToString(), character.loadoutPreset1.armorGearItemId.ToString(), character.loadoutPreset1.armsGearItemId.ToString(),
-            //    character.loadoutPreset1.bootsGearItemId.ToString(), character.loadoutPreset1.weapon1ItemId.ToString(), character.loadoutPreset1.weapon2ItemId.ToString());
+            //    newLoadout.helmGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(), newLoadout.glovesGearItemId.ToString(),
+            //    newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
 
             //string json = JsonConvert.SerializeObject(payload);
+            //Debug.Log(json);
             //byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             //UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
@@ -592,31 +593,22 @@ namespace Vi.Core
             }
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
 
         public Loadout GetDefaultLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
-            switch (raceAndGender)
-            {
-                case CharacterReference.RaceAndGender.HumanMale:
-                    return new Loadout("1", "Hu_M_Helm_SMage_03_Bl", "Hu_M_Shoulders_SMage_Bl", "Hu_M_Chest_SMage_Bl", "Hu_M_Gloves_SMage_Bl",
-                        "Hu_M_Belt_SMage_Bl", "Hu_M_Robe_SMage_Bl", "Hu_M_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
-                case CharacterReference.RaceAndGender.HumanFemale:
-                    return new Loadout("1", "Hu_F_Helm_SMage_03_Bl", "Hu_F_Shoulders_SMage_Bl", "Hu_F_Chest_SMage_Bl", "Hu_F_Gloves_SMage_Bl",
-                        "Hu_F_Belt_SMage_Bl", "Hu_F_Robe_SMage_Bl", "Hu_F_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
-                case CharacterReference.RaceAndGender.OrcMale:
-                    return new Loadout("1", "Or_M_Helm_SMage_03_Bl", "Or_M_Shoulders_SMage_Bl", "Or_M_Chest_SMage_Bl", "Or_M_Gloves_SMage_Bl",
-                        "Or_M_Belt_SMage_Bl", "Or_M_Robe_SMage_Bl", "Or_M_Boots_SMage_Bl", "HammerWeapon", "BrawlerWeapon", true);
-                case CharacterReference.RaceAndGender.OrcFemale:
-                    return new Loadout("1", "Or_F_Helm_SMage_03_Bl", "Or_F_Shoulders_SMage_Bl", "Or_F_Chest_SMage_Bl", "Or_F_Gloves_SMage_Bl",
-                        "Or_F_Belt_SMage_Bl", "Or_F_Robe_SMage_Bl", "Or_F_Boots_SMage_Bl", "HammerWeapon", "CrossbowWeapon", true);
-                default:
-                    Debug.LogError("Not sure how to handle " + raceAndGender);
-                    break;
-            }
-
-            return new Loadout("1", "65a2b5077fd3af802c750f7f", "65a2b5247fd3af802c751047", "65a2b4e27fd3af802c750e7f", "65a2b4f37fd3af802c750ef7",
-                "65a2b4987fd3af802c750c83", "65a2b5177fd3af802c750fef", "65a2b4b27fd3af802c750d33", "GreatSwordWeapon", "CrossbowWeapon", true);
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            return new Loadout("1", armorOptions.Find(item => item.name == "Helm SMage 03").itemWebId,
+                        armorOptions.Find(item => item.name == "Shoulders SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Chest SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Gloves SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Belt SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Robe SMage").itemWebId,
+                        armorOptions.Find(item => item.name == "Boots SMage").itemWebId,
+                        System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
+                        System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
+                        true);
         }
 
         private CharacterJson ToCharacterJson(Character character)
@@ -636,7 +628,7 @@ namespace Vi.Core
                 brows = character.brows.ToString(),
                 hair = character.hair.ToString(),
                 attributes = new CharacterAttributes(),
-                loadOuts = new List<object>(),
+                loadOuts = new List<LoadoutJson>(),
                 userId = character.userId.ToString(),
                 slot = character.slot,
                 level = character.level,
@@ -658,13 +650,16 @@ namespace Vi.Core
             public FixedString32Bytes hair;
             public CharacterAttributes attributes;
             public Loadout loadoutPreset1;
+            public Loadout loadoutPreset2;
+            public Loadout loadoutPreset3;
+            public Loadout loadoutPreset4;
             public FixedString32Bytes userId;
             public int slot;
             public int level;
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -680,10 +675,13 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.loadoutPreset2 = loadoutPreset2;
+                this.loadoutPreset3 = loadoutPreset3;
+                this.loadoutPreset4 = loadoutPreset4;
                 this.raceAndGender = raceAndGender;
             }
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 slot = 0;
                 this._id = _id;
@@ -699,6 +697,9 @@ namespace Vi.Core
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
+                this.loadoutPreset2 = loadoutPreset2;
+                this.loadoutPreset3 = loadoutPreset3;
+                this.loadoutPreset4 = loadoutPreset4;
                 this.raceAndGender = raceAndGender;
             }
 
@@ -719,6 +720,26 @@ namespace Vi.Core
                 serializer.SerializeValue(ref level);
                 serializer.SerializeValue(ref experience);
                 serializer.SerializeValue(ref raceAndGender);
+            }
+
+            public Loadout GetLoadoutFromSlot(int loadoutSlot)
+            {
+                switch (loadoutSlot)
+                {
+                    case 0:
+                        return loadoutPreset1;
+                    case 1:
+                        return loadoutPreset2;
+                    case 2:
+                        return loadoutPreset3;
+                    case 3:
+                        return loadoutPreset4;
+                    default:
+                        Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
+                        break;
+                }
+
+                return Singleton.GetDefaultLoadout(raceAndGender);
             }
         }
 
@@ -783,7 +804,7 @@ namespace Vi.Core
             public string race;
             public string dateCreated;
             public CharacterAttributes attributes;
-            public List<object> loadOuts;
+            public List<LoadoutJson> loadOuts;
             public bool enabled;
             public string userId;
             public int level;
@@ -798,7 +819,7 @@ namespace Vi.Core
             public Character ToCharacter()
             {
                 CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(char.ToUpper(race[0]) + race[1..].ToLower() + char.ToUpper(gender[0]) + gender[1..].ToLower());
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
             }
         }
 
@@ -914,7 +935,7 @@ namespace Vi.Core
         private struct CharacterLoadoutPutPayload
         {
             public string charId;
-            private NestedCharacterLoadoutPutPayload loadout;
+            public NestedCharacterLoadoutPutPayload loadout;
 
             public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
             {
@@ -931,7 +952,7 @@ namespace Vi.Core
                 };
             }
 
-            private struct NestedCharacterLoadoutPutPayload
+            public struct NestedCharacterLoadoutPutPayload
             {
                 public string loadoutSlot;
                 public string headGearItemId;

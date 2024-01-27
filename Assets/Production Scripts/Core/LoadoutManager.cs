@@ -9,6 +9,12 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class LoadoutManager : NetworkBehaviour
     {
+        public enum WeaponSlotType
+        {
+            Primary,
+            Secondary
+        }
+
         private Weapon primaryWeapon;
         private RuntimeAnimatorController primaryRuntimeAnimatorController;
         private Weapon secondaryWeapon;
@@ -61,13 +67,35 @@ namespace Vi.Core
             //animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.wearableEquipmentPrefab.name.Contains("Pants_Peasant"))); // Peasant pants
 
             WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout(raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId | item.GetModel(raceAndGender).name == loadout.helmGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.shouldersGearItemId | item.GetModel(raceAndGender).name == loadout.shouldersGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.chestArmorGearItemId | item.GetModel(raceAndGender).name == loadout.chestArmorGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.glovesGearItemId | item.GetModel(raceAndGender).name == loadout.glovesGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.beltGearItemId | item.GetModel(raceAndGender).name == loadout.beltGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.robeGearItemId | item.GetModel(raceAndGender).name == loadout.robeGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId | item.GetModel(raceAndGender).name == loadout.bootsGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.shouldersGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.chestArmorGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.glovesGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.beltGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.robeGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId), raceAndGender);
+        }
+
+        public void ChangeWeapon(WeaponSlotType weaponSlotType, CharacterReference.WeaponOption weaponOption)
+        {
+            if (!CanSwapWeapons()) { Debug.LogError("Can't swap weapons right now!"); }
+
+            switch (weaponSlotType)
+            {
+                case WeaponSlotType.Primary:
+                    primaryWeapon = Instantiate(weaponOption.weapon);
+                    primaryRuntimeAnimatorController = weaponOption.animationController;
+                    OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
+                    break;
+                case WeaponSlotType.Secondary:
+                    secondaryWeapon = Instantiate(weaponOption.weapon);
+                    secondaryRuntimeAnimatorController = weaponOption.animationController;
+                    OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
+                    break;
+                default:
+                    Debug.LogError("Not sure what weapon slot to swap " + weaponSlotType);
+                    break;
+            }
         }
 
         private IEnumerator ApplyEquipmentFromLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout)
@@ -76,13 +104,13 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
 
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId | item.GetModel(raceAndGender).name == loadout.helmGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.shouldersGearItemId | item.GetModel(raceAndGender).name == loadout.shouldersGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.chestArmorGearItemId | item.GetModel(raceAndGender).name == loadout.chestArmorGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.glovesGearItemId | item.GetModel(raceAndGender).name == loadout.glovesGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.beltGearItemId | item.GetModel(raceAndGender).name == loadout.beltGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.robeGearItemId | item.GetModel(raceAndGender).name == loadout.robeGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId | item.GetModel(raceAndGender).name == loadout.bootsGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.shouldersGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.chestArmorGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.glovesGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.beltGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.robeGearItemId), raceAndGender);
+            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId), raceAndGender);
         }
 
         public override void OnNetworkDespawn()
