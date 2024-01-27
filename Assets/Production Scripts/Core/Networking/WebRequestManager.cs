@@ -89,7 +89,7 @@ namespace Vi.Core
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
-        
+
         public IEnumerator UpdateServerProgress(int progress)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
@@ -546,9 +546,62 @@ namespace Vi.Core
             public string id;
         }
 
+        private IEnumerator AddItemToInventory(string charId, string itemId)
+        {
+            AddCharacterInventoryPayload payload = new AddCharacterInventoryPayload(charId, itemId);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
+            }
+
+            postRequest.Dispose();
+        }
+
+        private struct AddCharacterInventoryPayload
+        {
+            public string charId;
+            public string itemId;
+
+            public AddCharacterInventoryPayload(string charId, string itemId)
+            {
+                this.charId = charId;
+                this.itemId = itemId;
+            }
+        }
+
         public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
         {
             yield return GetCharacterInventory(character);
+
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.helmGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.shouldersGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.chestArmorGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.glovesGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.beltGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.robeGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.bootsGearItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.weapon1ItemId.ToString()); }
+            if (!inventoryItems.Exists(item => item.itemId == newLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.weapon2ItemId.ToString()); }
+
+            yield return GetCharacterInventory(character);
+
+            newLoadout.helmGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.helmGearItemId).id;
+            newLoadout.shouldersGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.shouldersGearItemId).id;
+            newLoadout.chestArmorGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.chestArmorGearItemId).id;
+            newLoadout.glovesGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.glovesGearItemId).id;
+            newLoadout.beltGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.beltGearItemId).id;
+            newLoadout.robeGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.robeGearItemId).id;
+            newLoadout.bootsGearItemId = inventoryItems.Find(item => item.itemId == newLoadout.bootsGearItemId).id;
+            newLoadout.weapon1ItemId = inventoryItems.Find(item => item.itemId == newLoadout.weapon1ItemId).id;
+            newLoadout.weapon2ItemId = inventoryItems.Find(item => item.itemId == newLoadout.weapon2ItemId).id;
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), newLoadout.loadoutSlot.ToString(),
                 newLoadout.helmGearItemId.ToString(), newLoadout.shouldersGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(),
@@ -591,6 +644,7 @@ namespace Vi.Core
                 {
                     Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
                 }
+
                 postRequest.Dispose();
             }
         }
