@@ -853,18 +853,11 @@ namespace Vi.Core
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    Singleton.GetDefaultLoadout(raceAndGender),
-                    Singleton.GetDefaultLoadout(raceAndGender),
-                    Singleton.GetDefaultLoadout(raceAndGender),
-                    Singleton.GetDefaultLoadout(raceAndGender),
+                    loadout1Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
-
-                //return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                //    loadout1Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                //    loadout2Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                //    loadout3Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                //    loadout4Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
-                //    raceAndGender);
             }
         }
 
@@ -899,8 +892,8 @@ namespace Vi.Core
 
             public Loadout ToLoadout()
             {
-                return new Loadout(loadoutSlot, helmGearItemId, shouldersGearItemId, chestArmorGearItemId,
-                    glovesGearItemId, beltGearItemId, robeGearItemId, bootsGearItemId, weapon1ItemId, weapon2ItemId, false);
+                return new Loadout(loadoutSlot, helmGearItemId ?? "", shouldersGearItemId ?? "", chestArmorGearItemId ?? "", glovesGearItemId ?? "",
+                    beltGearItemId ?? "", robeGearItemId ?? "", bootsGearItemId ?? "", weapon1ItemId ?? "", weapon2ItemId ?? "", false);
             }
         }
 
