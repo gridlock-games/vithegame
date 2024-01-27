@@ -147,7 +147,7 @@ namespace Vi.Core
             }
         }
 
-        private bool CanSwapWeapons()
+        public bool CanSwapWeapons()
         {
             if (weaponHandler.IsAiming()) { return false; }
             if (animationHandler.IsAiming()) { return false; }

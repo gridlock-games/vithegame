@@ -38,6 +38,12 @@ namespace Vi.Player
             }
         }
 
+        private LoadoutManager loadoutManager;
+        private void Awake()
+        {
+            loadoutManager = GetComponent<LoadoutManager>();
+        }
+
         private void OnEnable()
         {
             playerInput = GetComponent<PlayerInput>();
@@ -135,6 +141,7 @@ namespace Vi.Player
         GameObject inventoryInstance;
         void OnInventory()
         {
+            if (!loadoutManager.CanSwapWeapons()) { return; }
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
