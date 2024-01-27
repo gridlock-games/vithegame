@@ -45,26 +45,26 @@ namespace Vi.UI
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             WebRequestManager.Loadout loadout = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.GetLoadoutFromSlot(loadoutSlot);
-            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId);
-            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId);
+            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.weapon1ItemId).itemId);
+            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.weapon2ItemId).itemId);
 
             primaryWeaponButton.onClick.RemoveAllListeners();
-            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
+            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
             primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
-            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
+            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
         }
 
-        private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
+        private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
         {
             GameObject _weaponSelect = Instantiate(weaponSelectMenu.gameObject);
             WeaponSelectMenu menu = _weaponSelect.GetComponent<WeaponSelectMenu>();
             menu.SetLastMenu(gameObject);
-            menu.Initialize(weaponOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
+            menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
             gameObject.SetActive(false);
         }

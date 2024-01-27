@@ -2093,6 +2093,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 7712628771836892368, guid: e74a03ff3d7249119ba3ba1ad37b5390,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a1b98f2b83846ac9feae91c0feb5e8b, type: 2}
     - target: {fileID: 7760529741015004501, guid: e74a03ff3d7249119ba3ba1ad37b5390,
         type: 3}
       propertyPath: m_Layer
@@ -2223,7 +2228,6 @@ MonoBehaviour:
     - {fileID: 7895058642634997851}
   - equipmentType: 4
     skinnedMeshRenderers:
-    - {fileID: 2194944211714618637}
     - {fileID: 6679522622513135565}
 --- !u!114 &3827754237064686222
 MonoBehaviour:

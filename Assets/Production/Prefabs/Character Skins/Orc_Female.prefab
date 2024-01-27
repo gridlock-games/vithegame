@@ -1868,6 +1868,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3920681328931930331, guid: 85c6820557ae9624c8f36c1bebd6e4be,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a0f6abe183a54af0a7726dc476d642ff, type: 2}
     - target: {fileID: 4114008278813727546, guid: 85c6820557ae9624c8f36c1bebd6e4be,
         type: 3}
       propertyPath: m_Layer
@@ -2063,6 +2068,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 7712628771836892368, guid: 85c6820557ae9624c8f36c1bebd6e4be,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a1b98f2b83846ac9feae91c0feb5e8b, type: 2}
     - target: {fileID: 7731726236583091793, guid: 85c6820557ae9624c8f36c1bebd6e4be,
         type: 3}
       propertyPath: m_Layer
@@ -2236,7 +2246,6 @@ MonoBehaviour:
   - equipmentType: 4
     skinnedMeshRenderers:
     - {fileID: 7663659417172507010}
-    - {fileID: 2926959244110263106}
 --- !u!114 &2869654574145025752
 MonoBehaviour:
   m_ObjectHideFlags: 0

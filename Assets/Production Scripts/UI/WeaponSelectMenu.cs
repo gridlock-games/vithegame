@@ -16,7 +16,7 @@ namespace Vi.UI
         private LoadoutManager.WeaponSlotType weaponType;
         private LoadoutManager loadoutManager;
         private int playerDataId;
-        public void Initialize(CharacterReference.WeaponOption initialOption, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
+        public void Initialize(CharacterReference.WeaponOption initialOption, CharacterReference.WeaponOption otherWeapon, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
         {
             this.loadoutManager = loadoutManager;
             this.weaponType = weaponType;
@@ -28,7 +28,9 @@ namespace Vi.UI
                 ele.Initialize(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
-                buttonList.Add(button);
+
+                if (weaponOption.itemWebId != otherWeapon.itemWebId) { buttonList.Add(button); }
+                else { button.interactable = false; }
 
                 if (weaponOption.itemWebId == initialOption.itemWebId) { invokeThis = button; }
             }
