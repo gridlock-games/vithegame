@@ -567,7 +567,6 @@ namespace Vi.Core
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
-            Debug.Log("Successfully updated character loadout " + newLoadout.loadoutSlot);
         }
 
         public IEnumerator CharacterPostRequest(Character character)
@@ -768,6 +767,30 @@ namespace Vi.Core
                 }
 
                 return Singleton.GetDefaultLoadout(raceAndGender);
+            }
+
+            public Character ChangeLoadoutFromSlot(int loadoutSlot, Loadout newLoadout)
+            {
+                Character copy = this;
+                switch (loadoutSlot)
+                {
+                    case 0:
+                        copy.loadoutPreset1 = newLoadout;
+                        break;
+                    case 1:
+                        copy.loadoutPreset2 = newLoadout;
+                        break;
+                    case 2:
+                        copy.loadoutPreset3 = newLoadout;
+                        break;
+                    case 3:
+                        copy.loadoutPreset4 = newLoadout;
+                        break;
+                    default:
+                        Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
+                        break;
+                }
+                return copy;
             }
         }
 

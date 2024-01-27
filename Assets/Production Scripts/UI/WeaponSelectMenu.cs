@@ -15,10 +15,12 @@ namespace Vi.UI
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
         private LoadoutManager loadoutManager;
-        public void Initialize(CharacterReference.WeaponOption initialOption, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot)
+        private int playerDataId;
+        public void Initialize(CharacterReference.WeaponOption initialOption, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
         {
             this.loadoutManager = loadoutManager;
             this.weaponType = weaponType;
+            this.playerDataId = playerDataId;
             Button invokeThis = null;
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
@@ -41,8 +43,9 @@ namespace Vi.UI
                 b.interactable = true;
             }
             button.interactable = false;
-            
-            WebRequestManager.Loadout newLoadout = WebRequestManager.Singleton.CharacterById.GetLoadoutFromSlot(loadoutSlot);
+
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:
@@ -58,8 +61,12 @@ namespace Vi.UI
 
             if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
-            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(WebRequestManager.Singleton.CharacterById, newLoadout));
+            
+            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character, newLoadout));
             loadoutManager.ChangeWeapon(weaponType, weaponOption);
+
+            playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
         }
 
         private GameObject weaponPreviewObject;

@@ -16,9 +16,11 @@ namespace Vi.UI
         [SerializeField] private Button secondaryWeaponButton;
 
         private LoadoutManager loadoutManager;
+        private Attributes attributes;
         private void Awake()
         {
             loadoutManager = GetComponentInParent<LoadoutManager>();
+            attributes = GetComponentInParent<Attributes>();
         }
 
         private void OnEnable()
@@ -27,13 +29,13 @@ namespace Vi.UI
             {
                 Button button = loadoutButtons[i];
                 int var = i;
-                button.onClick.AddListener(delegate { OpenLoadout(button, WebRequestManager.Singleton.CharacterById.GetLoadoutFromSlot(var), var); });
+                button.onClick.AddListener(delegate { OpenLoadout(button, var); });
             }
 
             loadoutButtons[0].onClick.Invoke();
         }
 
-        private void OpenLoadout(Button button, WebRequestManager.Loadout loadout, int loadoutSlot)
+        private void OpenLoadout(Button button, int loadoutSlot)
         {
             foreach (Button b in loadoutButtons)
             {
@@ -42,6 +44,7 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
+            WebRequestManager.Loadout loadout = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.GetLoadoutFromSlot(loadoutSlot);
             CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId);
             CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId);
 
@@ -61,7 +64,7 @@ namespace Vi.UI
             GameObject _weaponSelect = Instantiate(weaponSelectMenu.gameObject);
             WeaponSelectMenu menu = _weaponSelect.GetComponent<WeaponSelectMenu>();
             menu.SetLastMenu(gameObject);
-            menu.Initialize(weaponOption, weaponType, loadoutManager, loadoutSlot);
+            menu.Initialize(weaponOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
             gameObject.SetActive(false);
         }
