@@ -62,7 +62,7 @@ namespace Vi.UI
             if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
             
-            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character, newLoadout));
+            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
             loadoutManager.ChangeWeapon(weaponType, weaponOption);
 
             playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);

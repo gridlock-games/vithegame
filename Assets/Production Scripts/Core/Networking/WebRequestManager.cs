@@ -489,7 +489,7 @@ namespace Vi.Core
 
                 getRequest.Dispose();
 
-                yield return GetCharacterInventory(CharacterById);
+                yield return GetCharacterInventory(CharacterById._id.ToString());
 
                 IsGettingCharacterById = false;
             }
@@ -523,9 +523,9 @@ namespace Vi.Core
         }
 
         public List<InventoryItem> InventoryItems { get; private set; } = new List<InventoryItem>();
-        private IEnumerator GetCharacterInventory(Character character)
+        private IEnumerator GetCharacterInventory(string characterId)
         {
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + character._id);
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
@@ -580,33 +580,21 @@ namespace Vi.Core
             }
         }
 
-        public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
+        public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout)
         {
-            yield return GetCharacterInventory(character);
+            yield return GetCharacterInventory(characterId.ToString());
 
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.helmGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.shouldersGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.chestArmorGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.glovesGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.beltGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.robeGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.bootsGearItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.weapon1ItemId.ToString()); }
-            if (!InventoryItems.Exists(item => item.itemId == newLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(character._id.ToString(), newLoadout.weapon2ItemId.ToString()); }
+            newLoadout.helmGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id;
+            newLoadout.shouldersGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id;
+            newLoadout.chestArmorGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id;
+            newLoadout.glovesGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id;
+            newLoadout.beltGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id;
+            newLoadout.robeGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id;
+            newLoadout.bootsGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id;
+            newLoadout.weapon1ItemId = InventoryItems.Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id;
+            newLoadout.weapon2ItemId = InventoryItems.Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id;
 
-            yield return GetCharacterInventory(character);
-
-            newLoadout.helmGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.helmGearItemId).id;
-            newLoadout.shouldersGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.shouldersGearItemId).id;
-            newLoadout.chestArmorGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.chestArmorGearItemId).id;
-            newLoadout.glovesGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.glovesGearItemId).id;
-            newLoadout.beltGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.beltGearItemId).id;
-            newLoadout.robeGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.robeGearItemId).id;
-            newLoadout.bootsGearItemId = InventoryItems.Find(item => item.itemId == newLoadout.bootsGearItemId).id;
-            newLoadout.weapon1ItemId = InventoryItems.Find(item => item.itemId == newLoadout.weapon1ItemId).id;
-            newLoadout.weapon2ItemId = InventoryItems.Find(item => item.itemId == newLoadout.weapon2ItemId).id;
-
-            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), newLoadout.loadoutSlot.ToString(),
+            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout.loadoutSlot.ToString(),
                 newLoadout.helmGearItemId.ToString(), newLoadout.shouldersGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(),
                 newLoadout.glovesGearItemId.ToString(), newLoadout.beltGearItemId.ToString(), newLoadout.robeGearItemId.ToString(),
                 newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
@@ -648,6 +636,22 @@ namespace Vi.Core
                     Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
                 }
 
+                yield return GetCharacterInventory(postRequest.downloadHandler.text);
+
+                Loadout defaultLoadout = GetDefaultLoadout();
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.helmGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.shouldersGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.chestArmorGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.glovesGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.beltGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.robeGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.bootsGearItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon1ItemId.ToString()); }
+                if (!InventoryItems.Exists(item => item.itemId == defaultLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon2ItemId.ToString()); }
+
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+                yield return GetCharacterInventory(postRequest.downloadHandler.text);
+
                 postRequest.Dispose();
             }
         }
@@ -677,9 +681,9 @@ namespace Vi.Core
             }
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), GetDefaultLoadout(CharacterReference.RaceAndGender.HumanMale), CharacterReference.RaceAndGender.HumanMale); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(), GetDefaultLoadout(), GetDefaultLoadout(), GetDefaultLoadout(), CharacterReference.RaceAndGender.HumanMale); }
 
-        public Loadout GetDefaultLoadout(CharacterReference.RaceAndGender raceAndGender)
+        public Loadout GetDefaultLoadout()
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
@@ -823,7 +827,7 @@ namespace Vi.Core
                         break;
                 }
 
-                return Singleton.GetDefaultLoadout(raceAndGender);
+                return Singleton.GetDefaultLoadout();
             }
 
             public Character ChangeLoadoutFromSlot(int loadoutSlot, Loadout newLoadout)
@@ -933,10 +937,10 @@ namespace Vi.Core
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    loadout1Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                    loadout2Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                    loadout3Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                    loadout4Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                    loadout1Index == -1 ? Singleton.GetDefaultLoadout() : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Singleton.GetDefaultLoadout() : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Singleton.GetDefaultLoadout() : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Singleton.GetDefaultLoadout() : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
             }
         }
