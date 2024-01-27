@@ -519,27 +519,55 @@ namespace Vi.Core
             }
         }
 
+        private List<InventoryItem> inventoryItems = new List<InventoryItem>();
+        private IEnumerator GetCharacterInventory(Character character)
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + character._id);
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.GetCharacterInventory()");
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            inventoryItems = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
+
+            getRequest.Dispose();
+        }
+
+        public struct InventoryItem
+        {
+            public string charId;
+            public List<int> loadoutSlot;
+            public string itemId;
+            public bool enabled;
+            public string id;
+        }
+
         public IEnumerator UpdateCharacterLoadout(Character character, Loadout newLoadout)
         {
-            Debug.Log("TODO: Fix loadout property names");
-            yield return null;
-            //CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), character.loadoutPreset1.loadoutSlot.ToString(),
-            //    newLoadout.helmGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(), newLoadout.glovesGearItemId.ToString(),
-            //    newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
+            yield return GetCharacterInventory(character);
 
-            //string json = JsonConvert.SerializeObject(payload);
-            //Debug.Log(json);
-            //byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(character._id.ToString(), newLoadout.loadoutSlot.ToString(),
+                newLoadout.helmGearItemId.ToString(), newLoadout.shouldersGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(),
+                newLoadout.glovesGearItemId.ToString(), newLoadout.beltGearItemId.ToString(), newLoadout.robeGearItemId.ToString(),
+                newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
 
-            //UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
-            //putRequest.SetRequestHeader("Content-Type", "application/json");
-            //yield return putRequest.SendWebRequest();
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            //if (putRequest.result != UnityWebRequest.Result.Success)
-            //{
-            //    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
-            //}
-            //putRequest.Dispose();
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
+            }
+            putRequest.Dispose();
+            Debug.Log("Successfully updated character loadout " + newLoadout.loadoutSlot);
         }
 
         public IEnumerator CharacterPostRequest(Character character)
@@ -819,7 +847,24 @@ namespace Vi.Core
             public Character ToCharacter()
             {
                 CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(char.ToUpper(race[0]) + race[1..].ToLower() + char.ToUpper(gender[0]) + gender[1..].ToLower());
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), Singleton.GetDefaultLoadout(raceAndGender), raceAndGender);
+                int loadout1Index = loadOuts.FindIndex(item => item.loadoutSlot == "1");
+                int loadout2Index = loadOuts.FindIndex(item => item.loadoutSlot == "2");
+                int loadout3Index = loadOuts.FindIndex(item => item.loadoutSlot == "3");
+                int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
+
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                    Singleton.GetDefaultLoadout(raceAndGender),
+                    Singleton.GetDefaultLoadout(raceAndGender),
+                    Singleton.GetDefaultLoadout(raceAndGender),
+                    Singleton.GetDefaultLoadout(raceAndGender),
+                    raceAndGender);
+
+                //return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                //    loadout1Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                //    loadout2Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                //    loadout3Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                //    loadout4Index == -1 ? Singleton.GetDefaultLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                //    raceAndGender);
             }
         }
 
@@ -850,6 +895,12 @@ namespace Vi.Core
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
+            }
+
+            public Loadout ToLoadout()
+            {
+                return new Loadout(loadoutSlot, helmGearItemId, shouldersGearItemId, chestArmorGearItemId,
+                    glovesGearItemId, beltGearItemId, robeGearItemId, bootsGearItemId, weapon1ItemId, weapon2ItemId, false);
             }
         }
 
@@ -943,15 +994,18 @@ namespace Vi.Core
             public string charId;
             public NestedCharacterLoadoutPutPayload loadout;
 
-            public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
+            public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string helmGearItemId, string shouldersGearItemId, string chestArmorGearItemId, string glovesGearItemId, string beltGearItemId, string robeGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
             {
                 this.charId = charId;
                 loadout = new NestedCharacterLoadoutPutPayload()
                 {
                     loadoutSlot = loadoutSlot,
-                    headGearItemId = headGearItemId,
-                    armorGearItemId = armorGearItemId,
-                    armsGearItemId = armsGearItemId,
+                    helmGearItemId = helmGearItemId,
+                    shouldersGearItemId = shouldersGearItemId,
+                    chestArmorGearItemId = chestArmorGearItemId,
+                    glovesGearItemId = glovesGearItemId,
+                    beltGearItemId = beltGearItemId,
+                    robeGearItemId = robeGearItemId,
                     bootsGearItemId = bootsGearItemId,
                     weapon1ItemId = weapon1ItemId,
                     weapon2ItemId = weapon2ItemId
@@ -961,9 +1015,12 @@ namespace Vi.Core
             public struct NestedCharacterLoadoutPutPayload
             {
                 public string loadoutSlot;
-                public string headGearItemId;
-                public string armorGearItemId;
-                public string armsGearItemId;
+                public string helmGearItemId;
+                public string shouldersGearItemId;
+                public string chestArmorGearItemId;
+                public string glovesGearItemId;
+                public string beltGearItemId;
+                public string robeGearItemId;
                 public string bootsGearItemId;
                 public string weapon1ItemId;
                 public string weapon2ItemId;
