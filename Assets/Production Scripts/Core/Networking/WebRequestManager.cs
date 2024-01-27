@@ -826,20 +826,26 @@ namespace Vi.Core
         private struct LoadoutJson
         {
             public string loadoutSlot;
-            public string headGearItemId;
-            public string armorGearItemId;
-            public string armsGearItemId;
+            public string helmGearItemId;
+            public string shouldersGearItemId;
+            public string chestArmorGearItemId;
+            public string glovesGearItemId;
+            public string beltGearItemId;
+            public string robeGearItemId;
             public string bootsGearItemId;
             public string weapon1ItemId;
             public string weapon2ItemId;
             public bool active;
 
-            public LoadoutJson(string loadoutSlot, string headGearItemId, string armorGearItemId, string armsGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
+            public LoadoutJson(string loadoutSlot, string helmGearItemId, string shouldersGearItemId, string chestArmorGearItemId, string glovesGearItemId, string beltGearItemId, string robeGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId, bool active)
             {
                 this.loadoutSlot = loadoutSlot;
-                this.headGearItemId = headGearItemId;
-                this.armorGearItemId = armorGearItemId;
-                this.armsGearItemId = armsGearItemId;
+                this.helmGearItemId = helmGearItemId;
+                this.shouldersGearItemId = shouldersGearItemId;
+                this.chestArmorGearItemId = chestArmorGearItemId;
+                this.glovesGearItemId = glovesGearItemId;
+                this.beltGearItemId = beltGearItemId;
+                this.robeGearItemId = robeGearItemId;
                 this.bootsGearItemId = bootsGearItemId;
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
