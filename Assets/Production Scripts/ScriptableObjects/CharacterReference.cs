@@ -32,6 +32,7 @@ namespace Vi.ScriptableObjects
             public Sprite weaponIcon;
             public RuntimeAnimatorController animationController;
             public Weapon weapon;
+            public GameObject weaponPreviewPrefab;
             public string itemWebId;
         }
 

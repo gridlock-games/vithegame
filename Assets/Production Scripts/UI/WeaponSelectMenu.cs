@@ -56,8 +56,16 @@ namespace Vi.UI
                     break;
             }
 
+            if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
+            if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
             loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(WebRequestManager.Singleton.CharacterById, newLoadout));
             loadoutManager.ChangeWeapon(weaponType, weaponOption);
+        }
+
+        private GameObject weaponPreviewObject;
+        private void OnDestroy()
+        {
+            Destroy(weaponPreviewObject);
         }
     }
 }
