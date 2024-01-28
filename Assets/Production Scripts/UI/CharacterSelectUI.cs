@@ -23,6 +23,10 @@ namespace Vi.UI
         [SerializeField] private Button selectCharacterButton;
         [SerializeField] private Button goToTrainingRoomButton;
         [SerializeField] private Button addCharacterButton;
+        [SerializeField] private Image primaryWeaponIcon;
+        [SerializeField] private Text primaryWeaponText;
+        [SerializeField] private Image secondaryWeaponIcon;
+        [SerializeField] private Text secondaryWeaponText;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -378,6 +382,27 @@ namespace Vi.UI
             
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
+            {
+                primaryWeaponIcon.gameObject.SetActive(true);
+                secondaryWeaponIcon.gameObject.SetActive(true);
+
+                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
+                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
+
+                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                primaryWeaponText.text = primaryOption.name;
+                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                secondaryWeaponText.text = secondaryOption.name;
+            }
+            else
+            {
+                primaryWeaponIcon.gameObject.SetActive(false);
+                secondaryWeaponIcon.gameObject.SetActive(false);
+            }
+            
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
 
             if (shouldCreateNewModel)
@@ -441,6 +466,9 @@ namespace Vi.UI
         private void Start()
         {
             WebRequestManager.Singleton.RefreshServers();
+
+            primaryWeaponIcon.gameObject.SetActive(false);
+            secondaryWeaponIcon.gameObject.SetActive(false);
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -13,15 +14,14 @@ namespace Vi.Core
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
         [Header("IK Settings")]
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
-        [SerializeField] Vector3 aimHandIKOffset;
         [SerializeField] private Transform offHandGrip;
-        [SerializeField] private Vector3 bodyAimIKOffset;
         [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
+        [SerializeField] private List<InverseKinematicsData> IKData = new List<InverseKinematicsData>();
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
-        public Vector3 GetAimHandIKOffset() { return aimHandIKOffset; }
-        public Vector3 GetBodyAimIKOffset() { return bodyAimIKOffset; }
+        public Vector3 GetAimHandIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).aimHandIKOffset; }
+        public Vector3 GetBodyAimIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).bodyAimIKOffset; }
         public LimbReferences.BodyAimType GetBodyAimType() { return bodyAimType; }
         public OffHandInfo GetOffHandInfo()
         {
@@ -42,6 +42,14 @@ namespace Vi.Core
                 this.offHand = offHand;
                 this.offHandTarget = offHandTarget;
             }
+        }
+
+        [System.Serializable]
+        private struct InverseKinematicsData
+        {
+            public CharacterReference.RaceAndGender raceAndGender;
+            public Vector3 aimHandIKOffset;
+            public Vector3 bodyAimIKOffset;
         }
 
         public override void ResetHitCounter()

@@ -40,8 +40,24 @@ MonoBehaviour:
     - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
         type: 3}
       weaponBone: 18
+      weaponPositionOffset: {x: 0.0905, y: -0.0224, z: 0.009}
+      weaponRotationOffset: {x: 81.825, y: 25.117, z: 4.348}
+  - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
+        type: 3}
+      weaponBone: 18
       weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
-      weaponRotationOffset: {x: 102.711, y: 6.029007, z: 2.182007}
+      weaponRotationOffset: {x: 92.96701, y: -147.181, z: -167.978}
+  - skinPrefab: {fileID: 3053794231721553574, guid: 0bd975ac38fa2ef478d9b5cd810a7824,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0.0905, y: -0.0224, z: 0.009}
+      weaponRotationOffset: {x: 81.825, y: 25.117, z: 4.348}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}

@@ -45,8 +45,8 @@ namespace Vi.UI
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             WebRequestManager.Loadout loadout = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.GetLoadoutFromSlot(loadoutSlot);
-            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.weapon1ItemId).itemId);
-            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems.Find(item => item.id == loadout.weapon2ItemId).itemId);
+            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId);
+            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId);
 
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });

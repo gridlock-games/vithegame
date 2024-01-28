@@ -50,7 +50,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -136,7 +136,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -459,7 +459,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -545,7 +545,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -683,7 +683,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -769,7 +769,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 4682795561356536048}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -2013,6 +2013,11 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: f43717b4443424143a76fa91375634b0, type: 2}
+    - target: {fileID: 5866666021909216657, guid: e74a03ff3d7249119ba3ba1ad37b5390,
+        type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5956445863220744914, guid: e74a03ff3d7249119ba3ba1ad37b5390,
         type: 3}
       propertyPath: m_Layer
@@ -2244,7 +2249,21 @@ MonoBehaviour:
   m_RigLayers:
   - m_Rig: {fileID: 8612555621927321448}
     m_Active: 1
-  m_Effectors: []
+  - m_Rig: {fileID: 867131881976996025}
+    m_Active: 1
+  - m_Rig: {fileID: 467132980032351002}
+    m_Active: 1
+  - m_Rig: {fileID: 3094954259458727829}
+    m_Active: 1
+  m_Effectors:
+  - m_Transform: {fileID: 4682795561356536048}
+    m_Style:
+      shape: {fileID: 4300000, guid: e050c2b16fe384bd994474655a4b4968, type: 2}
+      color: {r: 1, g: 0, b: 1, a: 0.5}
+      size: 0.25
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+    m_Visible: 1
 --- !u!114 &4619786044580274280
 MonoBehaviour:
   m_ObjectHideFlags: 0

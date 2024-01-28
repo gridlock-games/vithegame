@@ -266,10 +266,21 @@ MonoBehaviour:
     type: 3}
   projectileForce: {x: 0, y: 0, z: 30}
   aimHand: 0
-  aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
   offHandGrip: {fileID: 7091157248621488037}
-  bodyAimIKOffset: {x: 35, y: 0, z: 0}
   bodyAimType: 0
+  IKData:
+  - raceAndGender: 0
+    aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
+    bodyAimIKOffset: {x: 35, y: 0, z: 0}
+  - raceAndGender: 1
+    aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
+    bodyAimIKOffset: {x: 25, y: 0, z: 0}
+  - raceAndGender: 2
+    aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
+    bodyAimIKOffset: {x: 35, y: 0, z: 0}
+  - raceAndGender: 3
+    aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
+    bodyAimIKOffset: {x: 25, y: 0, z: 0}
 --- !u!1 &3265713617666746969
 GameObject:
   m_ObjectHideFlags: 0

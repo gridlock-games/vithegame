@@ -127,7 +127,7 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            HP.Value = maxHP / 2;
+            HP.Value = maxHP;
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;

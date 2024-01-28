@@ -73,7 +73,6 @@ namespace Vi.Core
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
             PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
-            clientTeam = PlayerDataManager.Team.Red;
 
             playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId, clientTeam));
         }
