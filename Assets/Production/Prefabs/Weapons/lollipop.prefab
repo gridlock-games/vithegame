@@ -53,13 +53,14 @@ MonoBehaviour:
     type: 3}
   projectileForce: {x: 5, y: 0, z: 0}
   aimHand: 0
-  aimHandIKOffset: {x: -7.68, y: 83.84, z: -5.7}
   offHandGrip: {fileID: 0}
-  bodyAimIKOffset: {x: -30, y: 25, z: 0}
   bodyAimType: 1
   IKData:
   - raceAndGender: 0
     aimHandIKOffset: {x: -7.68, y: 83.84, z: -5.7}
+    bodyAimIKOffset: {x: -30, y: 25, z: 0}
+  - raceAndGender: 1
+    aimHandIKOffset: {x: -6.82, y: 75.99, z: 18.2}
     bodyAimIKOffset: {x: -30, y: 25, z: 0}
 --- !u!1 &5163795561444201306
 GameObject:
