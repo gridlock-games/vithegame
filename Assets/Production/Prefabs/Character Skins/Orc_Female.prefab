@@ -2282,6 +2282,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
+--- !u!114 &231704768086206704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3053794231721553574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RigLayers:
+  - m_Rig: {fileID: 5899847629212728364}
+    m_Active: 1
+  - m_Rig: {fileID: 5227703228472601088}
+    m_Active: 1
+  - m_Rig: {fileID: 4687902387526146774}
+    m_Active: 1
+  - m_Rig: {fileID: 8652087412179212891}
+    m_Active: 1
+  m_Effectors: []
 --- !u!4 &4419808045311512174 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -7208441673433506407, guid: 85c6820557ae9624c8f36c1bebd6e4be,
