@@ -9994,9 +9994,9 @@ GameObject:
   - component: {fileID: 372131253039766397}
   - component: {fileID: 372131253039766386}
   - component: {fileID: 372131253039766387}
+  - component: {fileID: 3016408163109216808}
   - component: {fileID: 5440344506437680332}
   - component: {fileID: 5866758848286901559}
-  - component: {fileID: 3016408163109216808}
   m_Layer: 0
   m_Name: lubu_wall
   m_TagString: Untagged
@@ -14908,6 +14908,26 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &3016408163109216808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 372131253039766384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2400518869
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &5440344506437680332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14924,6 +14944,7 @@ MonoBehaviour:
   colliderLookBoxExtents: {x: 0, y: 0, z: 0}
   particleRadius: 1
   maxHits: 0
+  changeColorBasedOnTeam: 0
 --- !u!82 &5866758848286901559
 AudioSource:
   m_ObjectHideFlags: 0
@@ -15020,26 +15041,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3016408163109216808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 372131253039766384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &372131253214689640
 GameObject:
   m_ObjectHideFlags: 0

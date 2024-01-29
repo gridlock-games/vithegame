@@ -65,7 +65,12 @@ public class DebugOverlay : MonoBehaviour
     void OnGUI()
     {
         if (!enableDisplay) { return; }
-        GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
+
+        if (!Application.isEditor)
+        {
+            GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
+        }
+        
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.yellow;
         style.fontSize = 24;

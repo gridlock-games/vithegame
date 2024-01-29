@@ -111,13 +111,12 @@ namespace Vi.ArtificialIntelligence
 
             // Handle gravity
             RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
-                if (hit.transform.root == transform) { continue; }
                 gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
                 break;
@@ -181,7 +180,7 @@ namespace Vi.ArtificialIntelligence
             if (!CanMove()) { return; }
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                navMeshAgent.destination = currentPosition.Value;
+                if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
             }
             else
             {
@@ -198,10 +197,12 @@ namespace Vi.ArtificialIntelligence
                 UpdateLocomotion();
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+                animationHandler.Animator.SetBool("IsGrounded", isGrounded);
 
                 if (targetAttributes)
                 {
-                    navMeshAgent.destination = targetAttributes.transform.position;
+                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+                    
                     if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                     {
                         weaponHandler.SendMessage("OnLightAttack");
@@ -242,7 +243,7 @@ namespace Vi.ArtificialIntelligence
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

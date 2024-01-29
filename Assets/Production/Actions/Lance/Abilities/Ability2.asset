@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
+  m_Name: Ability2
+  m_EditorClassIdentifier: 
+  clipType: 4
+  hitReactionType: 0
+  shouldApplyRootMotion: 1
+  rootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  avatarLayer: 0
+  transitionTime: 0.15
+  agentStaminaCost: 20
+  agentDefenseCost: 0
+  agentRageCost: 0
+  effectedWeaponBones: 12000000
+  mustBeAiming: 0
+  attackingNormalizedTime: 0.1
+  recoveryNormalizedTime: 0.45
+  damage: 7
+  staminaDamage: 0
+  defenseDamage: 1
+  maxHitLimit: 1
+  timeBetweenHits: 1
+  isBlockable: 1
+  isUninterruptable: 1
+  isInvincible: 0
+  ailment: 4
+  ailmentDuration: 2
+  grabDistance: 3
+  dodgeLock: 1
+  canCancelLightAttacks: 0
+  canCancelHeavyAttacks: 0
+  canCancelAbilities: 0
+  abilityImageIcon: {fileID: 21300000, guid: e5b06940777aae4439de6aef6708692b, type: 3}
+  abilityCooldownTime: 10
+  statusesToApplyToSelfOnActivate: []
+  statusesToApplyToTargetOnHit: []
+  actionVFXList:
+  - {fileID: 6773071653687936824, guid: cafbfd0c1cb2bd1488fb2eaf3c771ac6, type: 3}
+  previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1

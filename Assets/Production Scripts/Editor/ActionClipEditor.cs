@@ -24,12 +24,14 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionVerticalMultiplier;
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
+        private SerializedProperty spAnimationSpeed;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spDamage;
+        private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
         private SerializedProperty spDefenseDamage;
         private SerializedProperty spMaxHitLimit;
@@ -50,9 +52,11 @@ namespace Vi.Editor
 
         private SerializedProperty spStatusesToApplyToSelfOnActivate;
         private SerializedProperty spStatusesToApplyToTargetOnHit;
+        private SerializedProperty spStatusesToApplyToTeammateOnHit;
 
         private SerializedProperty spActionVFXList;
         private SerializedProperty spPreviewActionVFX;
+        private SerializedProperty spPreviewActionVFXScale;
 
         private SerializedProperty spShouldAimBody;
         private SerializedProperty spShouldAimOffHand;
@@ -70,6 +74,7 @@ namespace Vi.Editor
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
+            spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
@@ -80,6 +85,7 @@ namespace Vi.Editor
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spDamage = serializedObject.FindProperty("damage");
+            spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spDefenseDamage = serializedObject.FindProperty("defenseDamage");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
@@ -99,9 +105,11 @@ namespace Vi.Editor
 
             spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
+            spStatusesToApplyToTeammateOnHit = serializedObject.FindProperty("statusesToApplyToTeammateOnHit");
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
+            spPreviewActionVFXScale = serializedObject.FindProperty("previewActionVFXScale");
 
             spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
             spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
@@ -117,6 +125,7 @@ namespace Vi.Editor
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);
             EditorGUILayout.PropertyField(spTransitionTime);
+            EditorGUILayout.PropertyField(spAnimationSpeed);
             EditorGUILayout.PropertyField(spAvatarLayer);
             if (spShouldApplyRootMotion.boolValue)
             {
@@ -130,6 +139,7 @@ namespace Vi.Editor
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
             EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
+            EditorGUILayout.PropertyField(spStatusesToApplyToTeammateOnHit);
             EditorGUILayout.Space();
             
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
@@ -137,6 +147,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
@@ -181,6 +192,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spMustBeAiming);
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
@@ -234,6 +246,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
@@ -261,6 +274,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.PropertyField(spPreviewActionVFX);
+                EditorGUILayout.PropertyField(spPreviewActionVFXScale);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);

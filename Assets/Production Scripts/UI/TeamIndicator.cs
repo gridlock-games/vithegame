@@ -15,6 +15,8 @@ namespace Vi.UI
         {
             attributes = GetComponentInParent<Attributes>();
             renderers = GetComponentsInChildren<Renderer>();
+
+            Update();
         }
 
         private void Update()

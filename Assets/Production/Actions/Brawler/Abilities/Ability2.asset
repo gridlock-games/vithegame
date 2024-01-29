@@ -87,14 +87,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  avatarLayer: 0
   transitionTime: 0.15
   agentStaminaCost: 16
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 1
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.7
   damage: 20
   staminaDamage: 0
   defenseDamage: 0
@@ -115,7 +116,12 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList:
-  - {fileID: 8613483246294653544, guid: 14e6fbcf1ef903b4a93ab22a667aa59f, type: 3}
+  - {fileID: 5283648585088115846, guid: 14e6fbcf1ef903b4a93ab22a667aa59f, type: 3}
+  previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
+    type: 3}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1

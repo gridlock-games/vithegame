@@ -9668,8 +9668,8 @@ GameObject:
   - component: {fileID: 4255409261442466}
   - component: {fileID: 198246879123670484}
   - component: {fileID: 199001336000980014}
-  - component: {fileID: 765724917833394534}
   - component: {fileID: 311495297861440834}
+  - component: {fileID: 765724917833394534}
   - component: {fileID: 388587617495982865}
   m_Layer: 0
   m_Name: gretel_diabetus
@@ -14558,6 +14558,26 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &311495297861440834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447245624076032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 203164571
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &765724917833394534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14574,26 +14594,7 @@ MonoBehaviour:
   colliderLookBoxExtents: {x: 4, y: 1, z: 4}
   particleRadius: 2.1
   maxHits: 0
---- !u!114 &311495297861440834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1447245624076032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  changeColorBasedOnTeam: 0
 --- !u!114 &388587617495982865
 MonoBehaviour:
   m_ObjectHideFlags: 0

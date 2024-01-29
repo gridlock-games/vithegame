@@ -95,6 +95,8 @@ MonoBehaviour:
     type: 3}
   pausePrefab: {fileID: 7309343886950099489, guid: d228d73cb92b5344589d4bdcbcc33e48,
     type: 3}
+  inventoryPrefab: {fileID: 467996925357133693, guid: 44bc396ad9e84ec428e421e9dff1fd21,
+    type: 3}
   minimapPrefab: {fileID: 2631241405440325885, guid: 1aeeb20b0dfad7741a8898aad1888386,
     type: 3}
 --- !u!114 &3945128955595459579
@@ -109,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 1977550921
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -137,7 +139,7 @@ MonoBehaviour:
   movementPredictionRigidbody: {fileID: 3111202478790198839}
   gravitySphereCastPositionOffset: {x: 0, y: 0.75, z: 0}
   gravitySphereCastRadius: 0.75
-  stairHeight: 0.5
+  stairHeight: 0.6
   rampCheckHeight: 0.1
 --- !u!114 &3945128955595459581
 MonoBehaviour:
@@ -213,7 +215,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e02eeb6ad314904db188a3fa6204532, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  armorNames: []
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +281,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 247
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
