@@ -5,6 +5,11 @@ using UnityEngine;
 using System.Globalization;
 using UnityEngine.Events;
 using Unity.VisualScripting;
+using Vi.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEditor.PackageManager.Requests;
+using Mono.Cecil.Cil;
 
 public class PlatformVersionChecker : MonoBehaviour
 {
@@ -40,8 +45,9 @@ public class PlatformVersionChecker : MonoBehaviour
   
   Version GetCurrentServerVersion()
   {
-    //Replace this with the data retrieved from API
-    return new Version("1.0.0.1");
+    string versionData = WebRequestManager.Singleton.gameVersion.Version;
+    Debug.Log(versionData);
+    return new Version(versionData);
   }
 
   bool MatchingVersion(Version networkVersion)
@@ -49,6 +55,8 @@ public class PlatformVersionChecker : MonoBehaviour
     var compairingResult = GetCurrentBaseVersion().CompareTo(networkVersion);
     if (compairingResult < 0) //user copy is Outdated
       return false;
+    else if (compairingResult > 0) //user copy is overdated but will return true
+    return true;
     else
       return true;
   }
@@ -65,4 +73,10 @@ public class PlatformVersionChecker : MonoBehaviour
   {
     PlatformDownloadPage.SentPeopleToStore();
   }
+}
+
+[System.Serializable]
+public class RemoteServerVersion
+{
+
 }
