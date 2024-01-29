@@ -639,17 +639,18 @@ namespace Vi.Core
             {
                 Debug.LogError("Put request error in WebRequestManager.UseCharacterLoadout()" + putRequest.error);
             }
+
             putRequest.Dispose();
         }
 
         private struct UseCharacterLoadoutPayload
         {
-            public string characterId;
+            public string charId;
             public string loadoutSlot;
 
-            public UseCharacterLoadoutPayload(string characterId, string loadoutSlot)
+            public UseCharacterLoadoutPayload(string charId, string loadoutSlot)
             {
-                this.characterId = characterId;
+                this.charId = charId;
                 this.loadoutSlot = loadoutSlot;
             }
         }
@@ -1177,6 +1178,7 @@ namespace Vi.Core
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
+            StartCoroutine(VersionGetRequest());
         }
 
         private void Update()
@@ -1434,6 +1436,36 @@ namespace Vi.Core
                 charId = characterId;
                 this.itemId = itemId;
             }
+        }
+
+        public GameVersion gameVersion { get; private set; }
+        private IEnumerator VersionGetRequest()
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/version");
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "servers/duels");
+                getRequest.Dispose();
+                yield break;
+            }
+
+            Version version = JsonConvert.DeserializeObject<Version>(getRequest.downloadHandler.text);
+            gameVersion = version.gameversion;
+
+            getRequest.Dispose();
+        }
+
+        public class GameVersion
+        {
+            public string Version;
+            public string Type;
+        }
+
+        private class Version
+        {
+            public GameVersion gameversion;
         }
     }
 }
