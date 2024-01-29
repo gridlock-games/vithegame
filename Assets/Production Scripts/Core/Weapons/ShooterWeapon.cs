@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -11,12 +12,17 @@ namespace Vi.Core
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Projectile projectile;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
-        [Header("Hand IK Settings")]
+        [Header("IK Settings")]
         [SerializeField] private LimbReferences.Hand aimHand = LimbReferences.Hand.RightHand;
         [SerializeField] private Transform offHandGrip;
+        [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
+        [SerializeField] private List<InverseKinematicsData> IKData = new List<InverseKinematicsData>();
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
+        public Vector3 GetAimHandIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).aimHandIKOffset; }
+        public Vector3 GetBodyAimIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).bodyAimIKOffset; }
+        public LimbReferences.BodyAimType GetBodyAimType() { return bodyAimType; }
         public OffHandInfo GetOffHandInfo()
         {
             if (aimHand == LimbReferences.Hand.RightHand)
@@ -36,6 +42,14 @@ namespace Vi.Core
                 this.offHand = offHand;
                 this.offHandTarget = offHandTarget;
             }
+        }
+
+        [System.Serializable]
+        private struct InverseKinematicsData
+        {
+            public CharacterReference.RaceAndGender raceAndGender;
+            public Vector3 aimHandIKOffset;
+            public Vector3 bodyAimIKOffset;
         }
 
         public override void ResetHitCounter()
@@ -105,7 +119,7 @@ namespace Vi.Core
                 Gizmos.color = Color.white;
             }
 
-            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * Vector3.forward * 10);
+            Gizmos.DrawRay(projectileSpawnPoint.position, projectileSpawnPoint.rotation * projectileForce * 10);
         }
     }
 }

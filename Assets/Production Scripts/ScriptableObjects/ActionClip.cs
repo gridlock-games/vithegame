@@ -100,6 +100,7 @@ namespace Vi.ScriptableObjects
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
+        public float animationSpeed = 1;
 
         public float agentStaminaCost = 20;
         public float agentDefenseCost = 0;
@@ -110,6 +111,7 @@ namespace Vi.ScriptableObjects
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;
+        public float healAmount = 0;
         public float staminaDamage = 0;
         public float defenseDamage = 0;
         public int maxHitLimit = 1;
@@ -118,7 +120,7 @@ namespace Vi.ScriptableObjects
         public bool isUninterruptable;
         public bool isInvincible;
         public Ailment ailment = Ailment.None;
-        public float ailmentDuration = 5;
+        public float ailmentDuration = 2;
         public float grabDistance = 3;
 
         public enum DodgeLock
@@ -139,9 +141,11 @@ namespace Vi.ScriptableObjects
 
         public List<StatusPayload> statusesToApplyToSelfOnActivate = new List<StatusPayload>();
         public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
+        public List<StatusPayload> statusesToApplyToTeammateOnHit = new List<StatusPayload>();
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
+        public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

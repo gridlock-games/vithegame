@@ -94,8 +94,8 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.4
-  recoveryNormalizedTime: 0.7
+  attackingNormalizedTime: 1
+  recoveryNormalizedTime: 1
   damage: 8
   staminaDamage: 0
   defenseDamage: 3
@@ -120,6 +120,7 @@ MonoBehaviour:
   - {fileID: 1690537743943305692, guid: 3444ae63b408f5f41af8b6fe73845edf, type: 3}
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
     type: 3}
+  previewActionVFXScale: {x: 0.7, y: 0.7, z: 0.7}
   aimDuringAnticipation: 1
   aimDuringAttack: 1
   aimDuringRecovery: 0

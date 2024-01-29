@@ -87,14 +87,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  avatarLayer: 0
   transitionTime: 0.15
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
   mustBeAiming: 0
-  attackingNormalizedTime: 1
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.3
   damage: 0
   staminaDamage: 0
   defenseDamage: 0
@@ -127,6 +128,9 @@ MonoBehaviour:
     delay: 2
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  previewActionVFX: {fileID: 0}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1

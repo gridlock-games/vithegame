@@ -87,6 +87,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  avatarLayer: 0
   transitionTime: 0.15
   agentStaminaCost: 15
   agentDefenseCost: 0
@@ -100,9 +101,9 @@ MonoBehaviour:
   defenseDamage: 0
   maxHitLimit: 1
   timeBetweenHits: 1
-  isBlockable: 1
-  isUninterruptable: 0
-  isInvincible: 1
+  isBlockable: 0
+  isUninterruptable: 1
+  isInvincible: 0
   ailment: 0
   ailmentDuration: 2
   grabDistance: 3
@@ -115,6 +116,10 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   actionVFXList: []
+  previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1
