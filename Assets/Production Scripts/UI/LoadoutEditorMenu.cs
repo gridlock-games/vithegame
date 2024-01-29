@@ -15,12 +15,28 @@ namespace Vi.UI
         [SerializeField] private Button primaryWeaponButton;
         [SerializeField] private Button secondaryWeaponButton;
 
+        [SerializeField] private Camera characterPreviewCameraPrefab;
+        [SerializeField] private Vector3 characterPreviewCameraOffset;
+
         private LoadoutManager loadoutManager;
         private Attributes attributes;
+        private GameObject camInstance;
         private void Awake()
         {
             loadoutManager = GetComponentInParent<LoadoutManager>();
             attributes = GetComponentInParent<Attributes>();
+
+            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform);
+            camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
+            camInstance.transform.LookAt(transform.root);
+            camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
+        }
+
+        private void Update()
+        {
+            camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
+            camInstance.transform.LookAt(transform.root);
+            camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
         }
 
         private void OnEnable()

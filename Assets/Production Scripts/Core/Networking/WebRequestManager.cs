@@ -639,17 +639,18 @@ namespace Vi.Core
             {
                 Debug.LogError("Put request error in WebRequestManager.UseCharacterLoadout()" + putRequest.error);
             }
+
             putRequest.Dispose();
         }
 
         private struct UseCharacterLoadoutPayload
         {
-            public string characterId;
+            public string charId;
             public string loadoutSlot;
 
-            public UseCharacterLoadoutPayload(string characterId, string loadoutSlot)
+            public UseCharacterLoadoutPayload(string charId, string loadoutSlot)
             {
-                this.characterId = characterId;
+                this.charId = charId;
                 this.loadoutSlot = loadoutSlot;
             }
         }

@@ -51,10 +51,10 @@ namespace Vi.UI
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:
-                    newLoadout.weapon1ItemId = weaponOption.itemWebId;
+                    newLoadout.weapon1ItemId = WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
                     break;
                 case LoadoutManager.WeaponSlotType.Secondary:
-                    newLoadout.weapon2ItemId = weaponOption.itemWebId;
+                    newLoadout.weapon2ItemId = WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
                     break;
                 default:
                     Debug.LogError("Not sure how to handle weapon slot type " + weaponType);
@@ -64,7 +64,7 @@ namespace Vi.UI
             if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
             
-            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
+            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
             loadoutManager.ChangeWeapon(weaponType, weaponOption);
 
             playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
