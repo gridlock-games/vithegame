@@ -76,8 +76,32 @@ namespace Vi.Core
             animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId), raceAndGender);
         }
 
+        public void ChangeWeaponBeforeSpawn(WeaponSlotType weaponSlotType, CharacterReference.WeaponOption weaponOption)
+        {
+            if (IsSpawned) { Debug.LogError("ChangeWeaponBeforeSpawn() should only be called when an object isn't spawned! Use it for displaying previews"); return; }
+
+            switch (weaponSlotType)
+            {
+                case WeaponSlotType.Primary:
+                    primaryWeapon = Instantiate(weaponOption.weapon);
+                    primaryRuntimeAnimatorController = weaponOption.animationController;
+                    OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
+                    break;
+                case WeaponSlotType.Secondary:
+                    secondaryWeapon = Instantiate(weaponOption.weapon);
+                    secondaryRuntimeAnimatorController = weaponOption.animationController;
+                    OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
+                    break;
+                default:
+                    Debug.LogError("Not sure what weapon slot to swap " + weaponSlotType);
+                    break;
+            }
+        }
+
         public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId)
         {
+            if (!IsSpawned) { Debug.LogError("ChangeWeapon() should only be called when spawned!"); return; }
+
             if (IsServer)
             {
                 ChangeWeaponOnServer(weaponSlotType, inventoryItemId);

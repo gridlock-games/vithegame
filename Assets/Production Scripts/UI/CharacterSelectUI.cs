@@ -384,25 +384,6 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
-            {
-                primaryWeaponIcon.gameObject.SetActive(true);
-                secondaryWeaponIcon.gameObject.SetActive(true);
-
-                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
-                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
-
-                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-                primaryWeaponText.text = primaryOption.name;
-                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-                secondaryWeaponText.text = secondaryOption.name;
-            }
-            else
-            {
-                primaryWeaponIcon.gameObject.SetActive(false);
-                secondaryWeaponIcon.gameObject.SetActive(false);
-            }
-            
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
 
             if (shouldCreateNewModel)
@@ -415,6 +396,28 @@ namespace Vi.UI
             }
             
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
+
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
+            {
+                primaryWeaponIcon.gameObject.SetActive(true);
+                secondaryWeaponIcon.gameObject.SetActive(true);
+
+                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
+                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
+
+                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                primaryWeaponText.text = primaryOption.name;
+                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                secondaryWeaponText.text = secondaryOption.name;
+
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+            }
+            else
+            {
+                primaryWeaponIcon.gameObject.SetActive(false);
+                secondaryWeaponIcon.gameObject.SetActive(false);
+            }
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];

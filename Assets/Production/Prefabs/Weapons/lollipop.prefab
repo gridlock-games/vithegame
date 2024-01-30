@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 518123274900306048}
   - component: {fileID: 1297605476639087757}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: lollipop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +77,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 388568134400591690}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: projectile_spawn_point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,6 +168,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b8429e260a2f3c2489982da2e0f2c575,
         type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8429e260a2f3c2489982da2e0f2c575,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -248,6 +253,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5474014686464707439, guid: 1a8eaaa38b934ed4dbe357ed598e1318,
         type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5474014686464707439, guid: 1a8eaaa38b934ed4dbe357ed598e1318,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -266,10 +276,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 518123274900306048}
     m_Modifications:
+    - target: {fileID: 1585320752855419079, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2278028059042652776, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2538344530669914901, guid: 4f6a36381e3de3b48a492692c6225e62,
         type: 3}
       propertyPath: m_Name
       value: Lollipop_Wrapped1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2538344530669914901, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2914341651278369199, guid: 4f6a36381e3de3b48a492692c6225e62,
         type: 3}
@@ -345,6 +370,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462555389511099619, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8042389895471831692, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8290919376598407422, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8323455008461300516, guid: 4f6a36381e3de3b48a492692c6225e62,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3762987444620707344, guid: 4f6a36381e3de3b48a492692c6225e62, type: 3}
