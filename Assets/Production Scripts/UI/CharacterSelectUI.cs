@@ -509,6 +509,19 @@ namespace Vi.UI
                         serverListElementList.Add(serverListElementInstance);
                     }
                 }
+
+                if (Application.isEditor)
+                {
+                    foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                    {
+                        if (!serverListElementList.Find(item => item.Server._id == server._id))
+                        {
+                            ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                            serverListElementInstance.Initialize(this, server);
+                            serverListElementList.Add(serverListElementInstance);
+                        }
+                    }
+                }
             }
 
             serverListElementList = serverListElementList.OrderBy(item => item.pingTime).ToList();
