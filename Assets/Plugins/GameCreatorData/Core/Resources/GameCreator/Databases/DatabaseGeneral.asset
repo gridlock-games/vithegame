@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e4bf9212ebac0c5e9348cbbe640b830dfc9fe4e90d58705d0a66613a230193b6
-size 756
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33366f118fc441e8a5985c060dae814, type: 3}
+  m_Name: DatabaseGeneral
+  m_EditorClassIdentifier: 
+  generalRenderMode: 0
+  prefabSimpleMessage: {fileID: 0}
+  prefabFloatingMessage: {fileID: 0}
+  prefabTouchstick: {fileID: 0}
+  forceDisplayInEditor: 0
+  touchstickMode: 0
+  saveScenes: 1
+  provider: {fileID: 0}
+  toolbarPositionX: 10
+  toolbarPositionY: 10
+  musicAudioMixer: {fileID: 0}
+  soundAudioMixer: {fileID: 0}
+  voiceAudioMixer: {fileID: 0}
