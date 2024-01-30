@@ -624,7 +624,7 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        private IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
+        public IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
         {
             UseCharacterLoadoutPayload payload = new UseCharacterLoadoutPayload(characterId, loadoutSlot);
 
@@ -854,6 +854,9 @@ namespace Vi.Core
                 serializer.SerializeValue(ref hair);
                 serializer.SerializeNetworkSerializable(ref attributes);
                 serializer.SerializeNetworkSerializable(ref loadoutPreset1);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset2);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset3);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset4);
                 serializer.SerializeValue(ref userId);
                 serializer.SerializeValue(ref slot);
                 serializer.SerializeValue(ref level);
@@ -875,10 +878,26 @@ namespace Vi.Core
                         return loadoutPreset4;
                     default:
                         Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
-                        break;
+                        return Singleton.GetDefaultLoadout();
                 }
+            }
 
-                return Singleton.GetDefaultLoadout();
+            public bool IsSlotActive(int loadoutSlot)
+            {
+                switch (loadoutSlot)
+                {
+                    case 0:
+                        return loadoutPreset1.active;
+                    case 1:
+                        return loadoutPreset2.active;
+                    case 2:
+                        return loadoutPreset3.active;
+                    case 3:
+                        return loadoutPreset4.active;
+                    default:
+                        Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
+                        return false;
+                }
             }
 
             public Loadout GetActiveLoadout()
@@ -887,7 +906,7 @@ namespace Vi.Core
                 if (loadoutPreset2.active) { return loadoutPreset2; }
                 if (loadoutPreset3.active) { return loadoutPreset3; }
                 if (loadoutPreset4.active) { return loadoutPreset4; }
-                //Debug.LogWarning("No active loadout preset!");
+
                 return loadoutPreset1;
             }
 
@@ -912,6 +931,33 @@ namespace Vi.Core
                         Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
                         break;
                 }
+                return copy;
+            }
+
+            public Character ChangeActiveLoadoutFromSlot(int loadoutSlot)
+            {
+                Character copy = this;
+
+                copy.loadoutPreset1 = new Loadout(loadoutPreset1.loadoutSlot, loadoutPreset1.helmGearItemId,
+                    loadoutPreset1.shouldersGearItemId, loadoutPreset1.chestArmorGearItemId, loadoutPreset1.glovesGearItemId,
+                    loadoutPreset1.beltGearItemId, loadoutPreset1.robeGearItemId, loadoutPreset1.bootsGearItemId,
+                    loadoutPreset1.weapon1ItemId, loadoutPreset1.weapon2ItemId, loadoutSlot == 0);
+
+                copy.loadoutPreset2 = new Loadout(loadoutPreset2.loadoutSlot, loadoutPreset2.helmGearItemId,
+                    loadoutPreset2.shouldersGearItemId, loadoutPreset2.chestArmorGearItemId, loadoutPreset2.glovesGearItemId,
+                    loadoutPreset2.beltGearItemId, loadoutPreset2.robeGearItemId, loadoutPreset2.bootsGearItemId,
+                    loadoutPreset2.weapon1ItemId, loadoutPreset2.weapon2ItemId, loadoutSlot == 1);
+
+                copy.loadoutPreset3 = new Loadout(loadoutPreset3.loadoutSlot, loadoutPreset3.helmGearItemId,
+                    loadoutPreset3.shouldersGearItemId, loadoutPreset3.chestArmorGearItemId, loadoutPreset3.glovesGearItemId,
+                    loadoutPreset3.beltGearItemId, loadoutPreset3.robeGearItemId, loadoutPreset3.bootsGearItemId,
+                    loadoutPreset3.weapon1ItemId, loadoutPreset3.weapon2ItemId, loadoutSlot == 2);
+
+                copy.loadoutPreset4 = new Loadout(loadoutPreset4.loadoutSlot, loadoutPreset4.helmGearItemId,
+                    loadoutPreset4.shouldersGearItemId, loadoutPreset4.chestArmorGearItemId, loadoutPreset4.glovesGearItemId,
+                    loadoutPreset4.beltGearItemId, loadoutPreset4.robeGearItemId, loadoutPreset4.bootsGearItemId,
+                    loadoutPreset4.weapon1ItemId, loadoutPreset4.weapon2ItemId, loadoutSlot == 3);
+
                 return copy;
             }
         }
@@ -1038,7 +1084,7 @@ namespace Vi.Core
             public Loadout ToLoadout()
             {
                 return new Loadout(loadoutSlot, helmGearItemId ?? "", shouldersGearItemId ?? "", chestArmorGearItemId ?? "", glovesGearItemId ?? "",
-                    beltGearItemId ?? "", robeGearItemId ?? "", bootsGearItemId ?? "", weapon1ItemId ?? "", weapon2ItemId ?? "", false);
+                    beltGearItemId ?? "", robeGearItemId ?? "", bootsGearItemId ?? "", weapon1ItemId ?? "", weapon2ItemId ?? "", active);
             }
         }
 

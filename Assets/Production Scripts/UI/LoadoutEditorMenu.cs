@@ -41,14 +41,16 @@ namespace Vi.UI
 
         private void OnEnable()
         {
+            int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
                 Button button = loadoutButtons[i];
                 int var = i;
+                if (PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
                 button.onClick.AddListener(delegate { OpenLoadout(button, var); });
             }
 
-            loadoutButtons[0].onClick.Invoke();
+            loadoutButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
         private void OpenLoadout(Button button, int loadoutSlot)
@@ -60,9 +62,19 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            WebRequestManager.Loadout loadout = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.GetLoadoutFromSlot(loadoutSlot);
-            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId);
-            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId);
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+
+            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot+1).ToString()));
+
+            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
+
+            CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId);
+            CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId);
+
+            loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Primary, loadout.weapon1ItemId.ToString());
+            loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Secondary, loadout.weapon2ItemId.ToString());
 
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
