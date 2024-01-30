@@ -65,7 +65,7 @@ namespace Vi.UI
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
             WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
-            WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot+1).ToString());
+            loadoutManager.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot+1).ToString()));
 
             playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
             PlayerDataManager.Singleton.SetPlayerData(playerData);

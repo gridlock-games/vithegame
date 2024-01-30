@@ -1081,7 +1081,7 @@ namespace Vi.Core
             public Loadout ToLoadout()
             {
                 return new Loadout(loadoutSlot, helmGearItemId ?? "", shouldersGearItemId ?? "", chestArmorGearItemId ?? "", glovesGearItemId ?? "",
-                    beltGearItemId ?? "", robeGearItemId ?? "", bootsGearItemId ?? "", weapon1ItemId ?? "", weapon2ItemId ?? "", false);
+                    beltGearItemId ?? "", robeGearItemId ?? "", bootsGearItemId ?? "", weapon1ItemId ?? "", weapon2ItemId ?? "", active);
             }
         }
 
