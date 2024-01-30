@@ -76,9 +76,35 @@ namespace Vi.Core
             animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId), raceAndGender);
         }
 
-        public void ChangeWeapon(WeaponSlotType weaponSlotType, CharacterReference.WeaponOption weaponOption)
+        public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId)
         {
-            if (!CanSwapWeapons()) { Debug.LogError("Can't swap weapons right now!"); }
+            if (IsServer)
+            {
+                ChangeWeaponOnServer(weaponSlotType, inventoryItemId);
+            }
+            else
+            {
+                ChangeWeaponServerRpc(weaponSlotType, inventoryItemId);
+            }
+        }
+
+        [ServerRpc] private void ChangeWeaponServerRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { ChangeWeaponOnServer(weaponSlotType, inventoryItemId); }
+
+        private void ChangeWeaponOnServer(WeaponSlotType weaponSlotType, string inventoryItemId)
+        {
+            StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId));
+            ChangeWeaponClientRpc(weaponSlotType, inventoryItemId);
+        }
+
+        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId)); }
+
+        private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId)
+        {
+            yield return new WaitUntil(() => CanSwapWeapons());
+
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            CharacterReference.WeaponOption weaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == inventoryItemId).itemId);
 
             switch (weaponSlotType)
             {
