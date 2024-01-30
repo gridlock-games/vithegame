@@ -51,10 +51,10 @@ namespace Vi.UI
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:
-                    newLoadout.weapon1ItemId = WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
+                    newLoadout.weapon1ItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
                     break;
                 case LoadoutManager.WeaponSlotType.Secondary:
-                    newLoadout.weapon2ItemId = WebRequestManager.Singleton.InventoryItems[WebRequestManager.Singleton.CharacterById._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
+                    newLoadout.weapon2ItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
                     break;
                 default:
                     Debug.LogError("Not sure how to handle weapon slot type " + weaponType);

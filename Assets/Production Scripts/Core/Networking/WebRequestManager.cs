@@ -854,6 +854,9 @@ namespace Vi.Core
                 serializer.SerializeValue(ref hair);
                 serializer.SerializeNetworkSerializable(ref attributes);
                 serializer.SerializeNetworkSerializable(ref loadoutPreset1);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset2);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset3);
+                serializer.SerializeNetworkSerializable(ref loadoutPreset4);
                 serializer.SerializeValue(ref userId);
                 serializer.SerializeValue(ref slot);
                 serializer.SerializeValue(ref level);
@@ -903,7 +906,7 @@ namespace Vi.Core
                 if (loadoutPreset2.active) { return loadoutPreset2; }
                 if (loadoutPreset3.active) { return loadoutPreset3; }
                 if (loadoutPreset4.active) { return loadoutPreset4; }
-                //Debug.LogWarning("No active loadout preset!");
+
                 return loadoutPreset1;
             }
 
