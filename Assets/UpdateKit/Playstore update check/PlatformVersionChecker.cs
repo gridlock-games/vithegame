@@ -75,8 +75,3 @@ public class PlatformVersionChecker : MonoBehaviour
   }
 }
 
-[System.Serializable]
-public class RemoteServerVersion
-{
-
-}
