@@ -266,7 +266,7 @@ namespace Vi.UI
             raceButtonParent.GetComponentInChildren<Text>().text = "Race";
             raceButtonParent = raceButtonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
-            foreach (string race in new List<string>() { "Human", "Orc" })
+            foreach (string race in new List<string>() { "Human" }) // , "Orc"
             {
                 Image image = Instantiate(characterCustomizationButtonPrefab, raceButtonParent).GetComponent<Image>();
 
