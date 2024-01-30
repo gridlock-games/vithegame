@@ -906,7 +906,6 @@ namespace Vi.Core
                 if (loadoutPreset2.active) { return loadoutPreset2; }
                 if (loadoutPreset3.active) { return loadoutPreset3; }
                 if (loadoutPreset4.active) { return loadoutPreset4; }
-
                 return loadoutPreset1;
             }
 

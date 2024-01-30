@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 using System.Text.RegularExpressions;
-using UnityEngine.SceneManagement;
 
 namespace Vi.UI
 {
@@ -26,6 +25,11 @@ namespace Vi.UI
         [SerializeField] private Text gameModeText;
         [SerializeField] private Text mapText;
         [SerializeField] private Button roomSettingsButton;
+        [SerializeField] private Image primaryWeaponIcon;
+        [SerializeField] private Text primaryWeaponText;
+        [SerializeField] private Image secondaryWeaponIcon;
+        [SerializeField] private Text secondaryWeaponText;
+        [SerializeField] private Button[] loadoutPresetButtons;
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
@@ -91,7 +95,26 @@ namespace Vi.UI
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
 
-            if (IsClient) { StartCoroutine(UpdateCharacterPreview()); }
+            if (IsClient)
+            {
+                StartCoroutine(UpdateCharacterPreview());
+                StartCoroutine(InitializeLoadoutButtons());
+            }
+        }
+
+        private IEnumerator InitializeLoadoutButtons()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
+            {
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+            }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
         public override void OnNetworkDespawn()
@@ -322,6 +345,36 @@ namespace Vi.UI
         public void AddBot(PlayerDataManager.Team team)
         {
             PlayerDataManager.Singleton.AddBotData(team);
+        }
+
+        private void ChooseLoadoutPreset(Button button, int loadoutSlot)
+        {
+            foreach (Button b in loadoutPresetButtons)
+            {
+                b.interactable = button != b;
+            }
+
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+
+            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
+
+            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
+
+            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon1ItemId).itemId);
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon2ItemId).itemId);
+
+            primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+            primaryWeaponText.text = primaryOption.name;
+            secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+            secondaryWeaponText.text = secondaryOption.name;
+
+            if (previewObject)
+            {
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+            }
         }
 
         public void ChangeGameMode()
