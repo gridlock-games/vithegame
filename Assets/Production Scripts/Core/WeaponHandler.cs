@@ -42,20 +42,30 @@ namespace Vi.Core
             movementHandler = GetComponent<MovementHandler>();
         }
 
-        public void SetNewWeapon(Weapon weapon, GameObject skinPrefab)
+        public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
         {
-            weaponInstance = Instantiate(weapon);
-            EquipWeapon(skinPrefab);
+            if (IsOwner & aiming.Value) { aiming.Value = false; return; }
+
+            weaponInstance = weapon;
+            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
+            EquipWeapon();
         }
 
-        private void EquipWeapon(GameObject skinPrefab)
+        private void EquipWeapon()
         {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                Destroy(kvp.Value);
+            }
+            weaponInstances.Clear();
+
+            CanAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == skinPrefab.name)
+                if (data.skinPrefab.name == animationHandler.LimbReferences.name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -89,7 +99,7 @@ namespace Vi.Core
                         {
                             Debug.LogWarning(instance + " does not have a runtime weapon component!");
                         }
-                        canAim = instance.GetComponent<ShooterWeapon>() | canAim;
+                        CanAim = instance.GetComponent<ShooterWeapon>() | CanAim;
                     }
                     broken = true;
                     break;
@@ -217,33 +227,22 @@ namespace Vi.Core
                         }
                         else
                         {
-                            Debug.LogError(actionVFXPrefab + " has attachment type set to " + actionVFXPrefab.transformType + " but can't find a ShooterComponent to base off of");
+                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                     }
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
-                    startPos.y += actionVFXPrefab.raycastOffset.y;
-                    RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    //startPos.y += actionVFXPrefab.raycastOffset.y;
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-                    bool bHit = false;
-                    RaycastHit floorHit = new RaycastHit();
-
-                    foreach (RaycastHit hit in allHits)
-                    {
-                        bHit = true;
-                        floorHit = hit;
-
-                        break;
-                    }
 
                     if (bHit)
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
-                            floorHit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(floorHit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                            Quaternion.LookRotation(Vector3.Cross(hit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
@@ -278,6 +277,8 @@ namespace Vi.Core
                 {
                     StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
                 }
+
+                if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
             else
             {
@@ -408,6 +409,9 @@ namespace Vi.Core
             {
                 Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
+
+            if (shouldRepeatLightAttack) { OnLightAttack(); }
+            if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
         }
 
         void OnLightAttack()
@@ -417,27 +421,25 @@ namespace Vi.Core
                 animationHandler.PlayAction(actionClip);
         }
 
+        private bool shouldRepeatLightAttack;
+        void OnLightAttackHold(InputValue value)
+        {
+            shouldRepeatLightAttack = value.isPressed;
+        }
+
         private bool toggleAim = true;
-        private bool canAim;
+        public bool CanAim { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        void OnAim(InputValue value)
-        {
-            if (!canAim) { return; }
-
-            if (toggleAim)
-            {
-                if (value.isPressed) { aiming.Value = !aiming.Value; }
-            }
-            else
-            {
-                aiming.Value = value.isPressed;
-            }
-        }
 
         void OnHeavyAttack(InputValue value)
         {
-            if (value.isPressed)
+            HeavyAttack(value.isPressed);
+        }
+
+        private void HeavyAttack(bool isPressed)
+        {
+            if (isPressed)
             {
                 if (actionVFXPreviewInstance)
                 {
@@ -446,22 +448,35 @@ namespace Vi.Core
                 }
             }
 
-            if (canAim)
+            if (CanAim)
             {
                 if (toggleAim)
                 {
-                    if (value.isPressed) { aiming.Value = !aiming.Value; }
+                    if (isPressed) { aiming.Value = !aiming.Value; }
                 }
                 else
                 {
-                    aiming.Value = value.isPressed;
+                    aiming.Value = isPressed;
                 }
             }
-            else if (value.isPressed)
+            else if (isPressed)
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
                 if (actionClip != null)
                     animationHandler.PlayAction(actionClip);
+            }
+        }
+
+        private bool shouldRepeatHeavyAttack;
+        void OnHeavyAttackHold(InputValue value)
+        {
+            if (CanAim)
+            {
+                HeavyAttack(value.isPressed);
+            }
+            else
+            {
+                shouldRepeatHeavyAttack = value.isPressed;
             }
         }
 
@@ -583,7 +598,8 @@ namespace Vi.Core
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody);
+                    CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                     animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
                 }
@@ -605,6 +621,14 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             isBlocking.Value = value.isPressed;
+            //if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            //{
+            //    if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
+            //}
+            //else
+            //{
+            //    isBlocking.Value = value.isPressed;
+            //}
         }
 
         void OnTimeScaleChange()

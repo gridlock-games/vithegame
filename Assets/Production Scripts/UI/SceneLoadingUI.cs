@@ -1,0 +1,79 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Vi.Core;
+using UnityEngine.UI;
+using Unity.Netcode;
+
+namespace Vi.UI
+{
+    public class SceneLoadingUI : MonoBehaviour
+    {
+        [SerializeField] private GameObject parentOfAll;
+        [Header("Scene Loading")]
+        [SerializeField] private GameObject progressBarParent;
+        [SerializeField] private Image progressBarImage;
+        [SerializeField] private Text progressBarText;
+        [Header("Player Object Spawning")]
+        [SerializeField] private GameObject spawningPlayerObjectParent;
+        [SerializeField] private Text spawningPlayerObjectText;
+
+        private float lastTextChangeTime;
+        private void Update()
+        {
+            if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
+
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                Attributes playerObject = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+                spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+
+                if (spawningPlayerObjectParent.activeSelf)
+                {
+                    string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                    if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
+                    
+                    if (Time.time - lastTextChangeTime > 0.5f)
+                    {
+                        lastTextChangeTime = Time.time;
+                        switch (spawningPlayerObjectText.text.Split(".").Length)
+                        {
+                            case 1:
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + ".";
+                                break;
+                            case 2:
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "..";
+                                break;
+                            case 3:
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "...";
+                                break;
+                            case 4:
+                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "");
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                spawningPlayerObjectParent.SetActive(false);
+                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
+            }
+
+            parentOfAll.SetActive(progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf);
+
+            if (NetSceneManager.Singleton.LoadingOperations.Count == 0)
+            {
+                progressBarText.text = "Scene Loading Complete";
+                progressBarImage.fillAmount = 1;
+            }
+
+            for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
+            {
+                progressBarText.text = (NetSceneManager.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                progressBarImage.fillAmount = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.isDone ? 1 : NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.progress;
+            }
+        }
+    }
+}

@@ -56,6 +56,18 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Returning to lobby!";
         }
 
+        private bool isFirstRound = true;
+        protected virtual void OnRoundStart()
+        {
+            for (int i = 0; i < scoreList.Count; i++)
+            {
+                PlayerScore playerScore = scoreList[i];
+                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
+            }
+            if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
+            isFirstRound = false;
+        }
+
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
             overtime.Value = false;
@@ -69,13 +81,7 @@ namespace Vi.Core.GameModeManagers
 
                 if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
             }
-
-            for (int i = 0; i < scoreList.Count; i++)
-            {
-                PlayerScore playerScore = scoreList[i];
-                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
-            }
-
+            
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
@@ -96,12 +102,15 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
-            scoreList.OnListChanged += OnScoreListChange;
+            _singleton = this;
             if (IsServer)
             {
-                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                {
+                    AddPlayerScore(playerData.id);
+                }
             }
             //roundTimer.Value = roundDuration;
             nextGameActionTimer.Value = nextGameActionDuration;
@@ -109,30 +118,11 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkDespawn()
         {
-            scoreList.OnListChanged -= OnScoreListChange;
             if (IsServer)
             {
-                //PlayerDataManager.Singleton.playerDataList.OnListChanged += OnPlayerDataListChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
-        }
-
-        //public void OnPlayerDataListChange(NetworkListEvent<PlayerDataManager.PlayerData> networkListEvent)
-        //{
-        //    if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Add)
-        //    {
-        //        scoreList.Add(new PlayerScore(networkListEvent.Value.id));
-        //    }
-        //    else if (networkListEvent.Type == NetworkListEvent<PlayerDataManager.PlayerData>.EventType.Remove)
-        //    {
-        //        scoreList.Remove(new PlayerScore(networkListEvent.Value.id));
-        //    }
-        //}
-
-        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
-        {
-            //Debug.Log(networkListEvent.Type + " " + networkListEvent.Value.id);
         }
 
         public void AddPlayerScore(int id)
@@ -156,12 +146,26 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
 
+        public void RemovePlayerScore(int id)
+        {
+            scoreList.Remove(new PlayerScore(id));
+        }
+
         private void OnRoundTimerChange(float prev, float current)
         {
-            if (current <= 0 & prev > 0)
+            if (Mathf.Approximately(current, roundDuration))
+            {
+                OnRoundTimerStart();
+            }
+            else if (current <= 0 & prev > 0)
             {
                 OnRoundTimerEnd();
             }
+        }
+
+        protected virtual void OnRoundTimerStart()
+        {
+            OnRoundStart();
         }
 
         protected virtual void OnRoundTimerEnd()
@@ -176,16 +180,15 @@ namespace Vi.Core.GameModeManagers
 
         private void OnNextGameActionTimerChange(float prev, float current)
         {
-            PlayerDataManager.Singleton.SetAllPlayersMobility(current <= 0);
+            PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
                 if (gameOver)
                 {
-                    NetworkManager.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
+                    NetSceneManager.Singleton.LoadScene("Lobby");
                 }
                 else
                 {
-                    PlayerDataManager.Singleton.RespawnAllPlayers();
                     roundTimer.Value = roundDuration;
                 }
             }
@@ -218,24 +221,29 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
-            _singleton = this;
             scoreList = new NetworkList<PlayerScore>();
         }
 
         private GameObject UIInstance;
         protected void Start()
         {
-            UIInstance = Instantiate(UIPrefab, transform);
+            if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
         protected void Update()
         {
             if (!IsServer) { return; }
-
-            if (nextGameActionTimer.Value > 0)
-                nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
-            else if (!gameOver)
-                roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+            if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
+            {
+                nextGameActionTimer.Value = 0;
+            }
+            else
+            {
+                if (nextGameActionTimer.Value > 0)
+                    nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
+                else if (!gameOver)
+                    roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+            }
         }
 
         public struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>

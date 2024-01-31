@@ -21,8 +21,6 @@ MonoBehaviour:
     attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
   - weaponBone: 5
     attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
-  - weaponBone: -1
-    attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
   drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
   sheatheSoundEffect: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
   hitAudioClip: {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
@@ -34,7 +32,7 @@ MonoBehaviour:
   blockVFXPrefab: {fileID: 4329036519906242892, guid: 583f37b3acf6baf43bfe1b375082eba6,
     type: 3}
   weaponModelData:
-  - skinPrefab: {fileID: 4663695231397878171, guid: 2805314ff8f78f142b8e0151137a3430,
+  - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
       type: 3}
     data:
     - weaponPrefab: {fileID: 2001834763269464374, guid: 3ce56f1a15f747241bb148d9d3d5bcfe,
@@ -57,12 +55,7 @@ MonoBehaviour:
       weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 813787508998952853, guid: 3ee5a38cb3f3d6d4caca3c90801847b6,
-        type: 3}
-      weaponBone: -1
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
-  - skinPrefab: {fileID: 6231887737971820693, guid: 4dbb29eae47f9f14e9c72544e1a66aa0,
+  - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
     - weaponPrefab: {fileID: 2001834763269464374, guid: 3ce56f1a15f747241bb148d9d3d5bcfe,
@@ -85,9 +78,50 @@ MonoBehaviour:
       weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 813787508998952853, guid: 3ee5a38cb3f3d6d4caca3c90801847b6,
+  - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 3ce56f1a15f747241bb148d9d3d5bcfe,
         type: 3}
-      weaponBone: -1
+      weaponBone: 17
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
+        type: 3}
+      weaponBone: 5
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 3b0a39ccde5409d47ab2cbbb8f234471,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
+        type: 3}
+      weaponBone: 6
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+  - skinPrefab: {fileID: 3053794231721553574, guid: 0bd975ac38fa2ef478d9b5cd810a7824,
+      type: 3}
+    data:
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 3ce56f1a15f747241bb148d9d3d5bcfe,
+        type: 3}
+      weaponBone: 17
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
+        type: 3}
+      weaponBone: 5
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 3b0a39ccde5409d47ab2cbbb8f234471,
+        type: 3}
+      weaponBone: 18
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
+        type: 3}
+      weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
@@ -150,39 +184,25 @@ MonoBehaviour:
   ability3: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
   ability4: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
   attackList:
-  - inputIndex: 0
-    inputs: 00000000
-    InputAttackType: 0
+  - inputs: 00000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: ea9a41cfab322534e88d232184459c8c, type: 2}
-  - inputIndex: 1
-    inputs: 0000000000000000
-    InputAttackType: 0
+  - inputs: 0000000000000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 23dbfed4b5eefa14689453a7b02d1159, type: 2}
-  - inputIndex: 2
-    inputs: 000000000000000000000000
-    InputAttackType: 0
+  - inputs: 000000000000000000000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: d2685f7596e5ecf48a4a54ade519ab77, type: 2}
-  - inputIndex: 3
-    inputs: 00000000000000000000000000000000
-    InputAttackType: 0
+  - inputs: 00000000000000000000000000000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 8ca4088e1f798ed4db316e9970371d35, type: 2}
-  - inputIndex: 0
-    inputs: 01000000
-    InputAttackType: 1
+  - inputs: 01000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
-  - inputIndex: 1
-    inputs: 0100000001000000
-    InputAttackType: 1
+  - inputs: 0100000001000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: c3ee966b76e1695448b68582c5ef2d0e, type: 2}
-  - inputIndex: 2
-    inputs: 010000000100000001000000
-    InputAttackType: 1
+  - inputs: 010000000100000001000000
     comboCondition: 2
     attackClip: {fileID: 11400000, guid: 9c2945988dc26f6429300db2e7342824, type: 2}
   dodgeStaminaCost: 20

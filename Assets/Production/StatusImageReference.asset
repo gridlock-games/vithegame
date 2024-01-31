@@ -1,3 +1,45 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:905911440994e3a2496f25ea57f048d879127074e608740c43690c09398501b1
-size 1809
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f6015d2549fb0b42bc8635064bf2441, type: 3}
+  m_Name: StatusImageReference
+  m_EditorClassIdentifier: 
+  statusIcons:
+  - status: 0
+    icon: {fileID: 21300000, guid: c17037db160a09148b8a81198be186b6, type: 3}
+  - status: 1
+    icon: {fileID: 21300000, guid: 9bf97dcba80142747b174163e2666a20, type: 3}
+  - status: 2
+    icon: {fileID: 21300000, guid: 1df88ca9993ad6a4cae1152952dcc859, type: 3}
+  - status: 3
+    icon: {fileID: 21300000, guid: f32608897d9e3cd42b2523a60dd6ea5e, type: 3}
+  - status: 4
+    icon: {fileID: 21300000, guid: 2b0fb993deb15b1449ae2dc478e5776a, type: 3}
+  - status: 5
+    icon: {fileID: 21300000, guid: 88e8a68c750d1b540aea875be693ea9e, type: 3}
+  - status: 6
+    icon: {fileID: 21300000, guid: d45aee3791d25144f9e4eec763298a78, type: 3}
+  - status: 7
+    icon: {fileID: 21300000, guid: 551df522c97bd56489ae419fb9c8036f, type: 3}
+  - status: 8
+    icon: {fileID: 21300000, guid: efb4857a763ee474f8f4831aecc93f07, type: 3}
+  - status: 9
+    icon: {fileID: 21300000, guid: dc1491b99cf406c4c8541b8b2f919881, type: 3}
+  - status: 10
+    icon: {fileID: 21300000, guid: a0d8bdcdb8ae44d43a5abd935b771c62, type: 3}
+  - status: 11
+    icon: {fileID: 21300000, guid: b625a129276b1f64ebdac9c92e400c1f, type: 3}
+  - status: 12
+    icon: {fileID: 21300000, guid: f53ec4f9c96b94348acdd3b1fb1bf4ee, type: 3}
+  - status: 13
+    icon: {fileID: 21300000, guid: c0dc85e156fa63d48950109e8af8f1e7, type: 3}
+  - status: 14
+    icon: {fileID: 21300000, guid: f531143d2ad9d5641bcb003ddcf86c8b, type: 3}

@@ -17,21 +17,65 @@ namespace Vi.Core
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, bool isAiming, bool instantAim, bool shouldAimBody)
+        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool instantAim, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
         {
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
-                if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
+                rightHandAimConstraint.data.offset = handAimIKOffset;
+
+                switch (bodyAimType)
+                {
+                    case BodyAimType.Normal:
+                        if (rightHandAimBodyConstraint)
+                        {
+                            rightHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0;
+                            rightHandAimBodyConstraint.data.offset = bodyAimIKOffset;
+                        }
+                        break;
+                    case BodyAimType.Inverted:
+                        if (rightHandAimBodyInvertedConstraint)
+                        {
+                            rightHandAimBodyInvertedConstraint.weight = shouldAimBody ? 1 : 0;
+                            rightHandAimBodyInvertedConstraint.data.offset = bodyAimIKOffset;
+                        }
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle body type " + bodyAimType);
+                        break;
+                }
+
                 if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
                 if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
-                if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0; }
+                leftHandAimConstraint.data.offset = handAimIKOffset;
+
+                switch (bodyAimType)
+                {
+                    case BodyAimType.Normal:
+                        if (leftHandAimBodyConstraint)
+                        {
+                            leftHandAimBodyConstraint.weight = shouldAimBody ? 1 : 0;
+                            leftHandAimBodyConstraint.data.offset = bodyAimIKOffset;
+                        }
+                        break;
+                    case BodyAimType.Inverted:
+                        if (leftHandAimBodyInvertedConstraint)
+                        {
+                            leftHandAimBodyInvertedConstraint.weight = shouldAimBody ? 1 : 0;
+                            leftHandAimBodyInvertedConstraint.data.offset = bodyAimIKOffset;
+                        }
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle body type " + bodyAimType);
+                        break;
+                }
+
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
             animator.SetBool("Aiming", isAiming);
@@ -47,7 +91,7 @@ namespace Vi.Core
 
         public void ReachHand(Hand hand, Transform reachTarget, bool isReaching, bool instantReach)
         {
-            float weight = isReaching ? 1 : 0;
+            float weight = isReaching & reachTarget ? 1 : 0;
             if (hand == Hand.RightHand)
             {
                 if (!rightHandReachRig.GetRig()) { return; }
@@ -77,6 +121,15 @@ namespace Vi.Core
 
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
+
+            rightHandAimRig.weight = 0;
+            rightHandAimBodyConstraint.weight = 0;
+            rightHandAimBodyInvertedConstraint.weight = 0;
+            leftHandAimRig.weight = 0;
+            leftHandAimBodyConstraint.weight = 0;
+            leftHandAimBodyInvertedConstraint.weight = 0;
+            rightHandReachRig.weight = 0;
+            leftHandReachRig.weight = 0;
         }
 
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
@@ -86,9 +139,19 @@ namespace Vi.Core
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
         [SerializeField] private MultiAimConstraint rightHandAimBodyConstraint;
+        [SerializeField] private MultiAimConstraint rightHandAimBodyInvertedConstraint;
+        [SerializeField] private MultiAimConstraint rightHandAimConstraint;
         [SerializeField] private RigWeightTarget leftHandAimRig;
         [SerializeField] private MultiAimConstraint leftHandAimBodyConstraint;
+        [SerializeField] private MultiAimConstraint leftHandAimBodyInvertedConstraint;
+        [SerializeField] private MultiAimConstraint leftHandAimConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
+
+        public enum BodyAimType
+        {
+            Normal,
+            Inverted
+        }
     }
 }

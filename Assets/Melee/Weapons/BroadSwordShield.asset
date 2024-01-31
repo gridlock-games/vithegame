@@ -1,3 +1,104 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:77e238265f74ab3d9591135544331f141eb2d2c6542ed1db18e285dc26214802
-size 2518
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84d575e15c40443894df03f985f2eed, type: 3}
+  m_Name: BroadSwordShield
+  m_EditorClassIdentifier: 
+  shieldName:
+    content: Hammer Shield
+    postProcess: 0
+    translationID: 0
+  shieldDescription:
+    content: Shield Description
+    postProcess: 0
+    translationID: 0
+  prefab: {fileID: 0}
+  attachment: 18
+  perfectBlockClip: {fileID: 11400000, guid: d63237cf1eceb4783b1ede61886b4e6f, type: 2}
+  blockingHitReaction:
+  - {fileID: 11400000, guid: 973419a156bd47f4da1dd3d0b92c23db, type: 2}
+  groundPerfectBlockReaction: {fileID: 11400000, guid: 3deaaf5926fd54b608596e9d5526322f,
+    type: 2}
+  airbornPerfectBlockReaction: {fileID: 11400000, guid: 3deaaf5926fd54b608596e9d5526322f,
+    type: 2}
+  defenseRunSpeed: 3
+  lowerBodyRotation: 0
+  defenseAngle:
+    optionIndex: 0
+    value: 120
+    global:
+      allowTypesMask: 4
+      name: 
+    local:
+      allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  defenseRecoveryRate:
+    optionIndex: 0
+    value: 0.5
+    global:
+      allowTypesMask: 4
+      name: 
+    local:
+      allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  maxDefense:
+    optionIndex: 0
+    value: 10
+    global:
+      allowTypesMask: 4
+      name: 
+    local:
+      allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  delayDefense:
+    optionIndex: 0
+    value: 1
+    global:
+      allowTypesMask: 4
+      name: 
+    local:
+      allowTypesMask: 4
+      name: 
+      targetType: 2
+      targetObject: {fileID: 0}
+    list:
+      targetType: 3
+      targetObject: {fileID: 0}
+      select: 1
+      index: 0
+  perfectBlockWindow: 0
+  audioBlock: {fileID: 0}
+  audioPerfectBlock: {fileID: 0}
+  prefabImpactBlock: {fileID: 4329036519906242892, guid: cd4c04229338348b2b653790e4ca1042,
+    type: 3}
+  prefabImpactPerfectBlock: {fileID: 4329036519906242892, guid: d148929d442b347c0bf239d9015c7d2c,
+    type: 3}

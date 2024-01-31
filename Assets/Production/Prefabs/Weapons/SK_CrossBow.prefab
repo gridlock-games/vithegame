@@ -173,14 +173,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2585439653096148901}
-  m_LocalRotation: {x: 0.12661916, y: 0.3273318, z: -0.10597738, w: 0.9303711}
-  m_LocalPosition: {x: -0.18131024, y: 0, z: -0.03759827}
+  m_LocalRotation: {x: -0.1285465, y: 0.43059176, z: -0.11475356, w: 0.88594484}
+  m_LocalPosition: {x: -0.1899, y: -0.0337, z: 0.0055}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2834490366527540041}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 17.757, y: 37.689, z: -6.893}
+  m_LocalEulerAnglesHint: {x: -7.409, y: 413.048, z: 341.538}
 --- !u!1 &2624200093762674490
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,6 +267,20 @@ MonoBehaviour:
   projectileForce: {x: 0, y: 0, z: 30}
   aimHand: 0
   offHandGrip: {fileID: 7091157248621488037}
+  bodyAimType: 0
+  IKData:
+  - raceAndGender: 0
+    aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
+    bodyAimIKOffset: {x: 35, y: 0, z: 0}
+  - raceAndGender: 1
+    aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
+    bodyAimIKOffset: {x: 25, y: 0, z: 0}
+  - raceAndGender: 2
+    aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
+    bodyAimIKOffset: {x: 35, y: 0, z: 0}
+  - raceAndGender: 3
+    aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
+    bodyAimIKOffset: {x: 25, y: 0, z: 0}
 --- !u!1 &3265713617666746969
 GameObject:
   m_ObjectHideFlags: 0

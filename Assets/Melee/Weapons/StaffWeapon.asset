@@ -1,3 +1,108 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:4b94da2b6467110936ae62a3883a063e1a8520dd24b178973ea17960954ef5f3
-size 5171
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 174e3c307f7474e6fa3b8acd263a757e, type: 3}
+  m_Name: StaffWeapon
+  m_EditorClassIdentifier: 
+  weaponName:
+    content: Staff
+    postProcess: 0
+    translationID: 0
+  weaponDescription:
+    content: Staff
+    postProcess: 0
+    translationID: 0
+  meleeWeaponName: Staff
+  defaultShield: {fileID: 11400000, guid: 5542b75758edd794c99bb781d3c815ee, type: 2}
+  characterState: {fileID: 11400000, guid: f042c26559756124bac3c7c586d9d6b6, type: 2}
+  characterMask: {fileID: 0}
+  weaponImage: {fileID: 21300000, guid: 022ea3bb40f5be6479da543f4da5c695, type: 3}
+  weaponModelData:
+  - skinPrefab: {fileID: 6715512578157014287, guid: 3f36fc5b46f440a4eba7eeb3d8c34809,
+      type: 3}
+    data:
+    - prefabWeapon: {fileID: 899434540764439098, guid: f8b9913f88a885949bfdc3fa2a8a3296,
+        type: 3}
+      attachmentWeapon: 18
+      positionOffsetWeapon: {x: -0.231, y: -0.044, z: -0.496}
+      rotationOffsetWeapon: {x: 82.02671, y: 303.3644, z: 271.7539}
+  audioSheathe: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
+  audioDraw: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
+  audioImpactNormal: {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
+  audioImpactKnockback: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
+    type: 3}
+  audioSwing: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
+  groundHitReactionsFront:
+  - {fileID: 11400000, guid: 438f1070659bb4c4d87d9e92d5d5dda2, type: 2}
+  groundHitReactionsBehind:
+  - {fileID: 11400000, guid: 15da18f858f48fd43a292225ceb93bba, type: 2}
+  airborneHitReactionsFront:
+  - {fileID: 11400000, guid: 438f1070659bb4c4d87d9e92d5d5dda2, type: 2}
+  airborneHitReactionsBehind:
+  - {fileID: 11400000, guid: 15da18f858f48fd43a292225ceb93bba, type: 2}
+  knockbackReaction:
+  - {fileID: 11400000, guid: c54f9e10aa0495343bda09fd05642651, type: 2}
+  knockupReaction:
+  - {fileID: 11400000, guid: 417ba51b71e5fcf4584e2808d994f0cc, type: 2}
+  - {fileID: 11400000, guid: abf3b82b4653afa41a6243708ee74101, type: 2}
+  - {fileID: 11400000, guid: eb8a235b1ef10b14e8221ddd40e2cc07, type: 2}
+  - {fileID: 11400000, guid: 67a2470128d42954e8db529809e897e7, type: 2}
+  - {fileID: 11400000, guid: a38994534ab5c7546bfef27b42377285, type: 2}
+  - {fileID: 11400000, guid: 799468a46a5951442830c765515c4c35, type: 2}
+  groundHitReactionsBackMiddle: []
+  groundHitReactionsLeftMiddle:
+  - {fileID: 11400000, guid: 07faa3aa51662024ca544ef707af4436, type: 2}
+  groundHitReactionsRightMiddle:
+  - {fileID: 11400000, guid: 09312f4934a938b41bff456524a3d7d4, type: 2}
+  dodgeF: {fileID: 11400000, guid: 25a1b1a4e2963ba4abe8a07bd25f31cf, type: 2}
+  dodgeFL: {fileID: 11400000, guid: 32d595d35c6f75145a1af37daba9909a, type: 2}
+  dodgeFR: {fileID: 11400000, guid: 57a33878e3f62bc48becc19541114d6a, type: 2}
+  dodgeB: {fileID: 11400000, guid: a3c614243999ff34ca18559203fbc486, type: 2}
+  dodgeBL: {fileID: 11400000, guid: 52a681399d5e9624fab6f2aa3af1070b, type: 2}
+  dodgeBR: {fileID: 11400000, guid: 7cac2b9c94aaa0e47b4492428d342ee0, type: 2}
+  dodgeL: {fileID: 11400000, guid: a4cf1b9bb856d0c4daf3b6c90f37509a, type: 2}
+  dodgeR: {fileID: 11400000, guid: 2800637ee7e672f4c95b05b8085fb76a, type: 2}
+  grabAttack: {fileID: 11400000, guid: e76d5f01728da874ca52595426e5e20c, type: 2}
+  grabReaction: {fileID: 11400000, guid: 9f03b9936b1c7b74d9636e75c63373ff, type: 2}
+  grabPlaceholderPosition: {x: -0.15, y: 0, z: 1.95}
+  knockbackF: {fileID: 11400000, guid: c54f9e10aa0495343bda09fd05642651, type: 2}
+  knockupF: {fileID: 11400000, guid: 496f986c572f5ef4287adda3bac6e605, type: 2}
+  staggerF: {fileID: 11400000, guid: 46841ba5b8dad7746886989ee1bf95ea, type: 2}
+  combos:
+  - combo: 00000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: ec9a27b7bb99ec34ea9b917a6046a211, type: 2}
+    isEnabled: 1
+  - combo: 02000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: b7261fc3af2874af4aa6f2a7f1305d44, type: 2}
+    isEnabled: 1
+  - combo: 03000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: c91109ab3fb7340dfac2616e4b357ee8, type: 2}
+    isEnabled: 1
+  - combo: 04000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 5b26b19102fa9472e9af0d7a10a007fe, type: 2}
+    isEnabled: 1
+  - combo: 05000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 1877ad141f7964d65b4877c4ac4abb68, type: 2}
+    isEnabled: 1
+  prefabImpactNormal: {fileID: 1931391723872664, guid: 8690041cf7250174eb66ceb76d6bf32a,
+    type: 3}
+  prefabImpactHit: {fileID: 4329036519906242892, guid: 9408437927dbd43d6bca1f23faa3aba8,
+    type: 3}
+  prefabImpactKnockback: {fileID: 4329036519906242892, guid: 9408437927dbd43d6bca1f23faa3aba8,
+    type: 3}
+  recoveryStandUp: {fileID: 11400000, guid: d31c1285ea9f23b49b90b5065627fb78, type: 2}
+  recoveryStandDown: {fileID: 0}
+  recoveryStun: {fileID: 11400000, guid: 7e58ad38ca8185f46bee2b8184af0f43, type: 2}

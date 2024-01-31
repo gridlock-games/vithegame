@@ -28,6 +28,8 @@ namespace Vi.UI
 
         protected void Update()
         {
+            if (!freeForAllManager.IsSpawned) { return; }
+
             roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
             roundTimerText.color = freeForAllManager.IsInOvertime() ? Color.red : Color.white;
             leftScoreText.text = freeForAllManager.GetLeftScoreString();

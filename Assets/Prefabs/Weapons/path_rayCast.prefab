@@ -1,3 +1,86 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:ce130ca03dadc2d96913d03f9c0cee88733b8360fac0387c2bd7fc485057056b
-size 2368
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &20404056605272369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1981988788302226075}
+  - component: {fileID: 607843008084278115}
+  - component: {fileID: 5280840830146944874}
+  m_Layer: 0
+  m_Name: path_rayCast
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1981988788302226075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20404056605272369}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 2.2692, z: 4.3434772}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &607843008084278115
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20404056605272369}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &5280840830146944874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20404056605272369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46ce5ca9303944be08d0e95a6aab1c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  captureHits: 0
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  segmentResolution: 0.05
+  pointA: {x: 0, y: 0, z: -0.45}
+  pointB: {x: 0, y: 0, z: 0.8}
+  radius: 0.5
+  offset: {x: 0, y: 0, z: 0}
+  boxInterframePredictions: 5
+  boxCenter: {x: 0, y: 0, z: 0.2}
+  boxSize: {x: 1, y: 1, z: 1.3}
+  debugMode: 0
+  EventAttackStart:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttackEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttackActivation:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttackRecovery:
+    m_PersistentCalls:
+      m_Calls: []
+  weaponBone: -1
+  enableWeaponTrail: 0
+  trailMaterial: {fileID: 0}
+  trailGranularity: 60
+  trailDuration: 0.5
+  isOrbitLocked: 0
