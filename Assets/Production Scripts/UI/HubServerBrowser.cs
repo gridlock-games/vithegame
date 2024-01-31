@@ -13,15 +13,14 @@ namespace Vi.UI
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
         [SerializeField] private Button closeServersMenuButton;
-
-        public Button connectButton;
-        public Button refreshServersButton;
+        [SerializeField] private Button connectButton;
+        [SerializeField] private Button refreshServersButton;
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private void Update()
         {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
+            connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
