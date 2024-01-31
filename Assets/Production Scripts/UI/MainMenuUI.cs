@@ -124,6 +124,7 @@ namespace Vi.UI
 
         public void ReturnToInitialElements()
         {
+            WebRequestManager.Singleton.ResetLogInErrorText();
             initialParent.SetActive(true);
         }
 

@@ -385,6 +385,8 @@ namespace Vi.Core
         public string LogInErrorText { get; private set; }
         private string currentlyLoggedInUserId = "";
 
+        public void ResetLogInErrorText() { LogInErrorText = ""; }
+
         public IEnumerator Login(string username, string password)
         {
             IsLoggingIn = true;
