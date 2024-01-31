@@ -452,7 +452,6 @@ namespace Vi.Core
             if (playerData.id >= 0)
             {
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
-                Debug.Log("INVENTORY IS FOUND: " + WebRequestManager.Singleton.InventoryItems.ContainsKey(playerData.character._id.ToString()));
             }
             if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
 

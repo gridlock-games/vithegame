@@ -72,7 +72,7 @@ namespace Vi.Core
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            PlayerDataManager.Team clientTeam = SceneManager.GetSceneByName("Player Hub").isLoaded ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
+            PlayerDataManager.Team clientTeam = NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
 
             playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId, clientTeam));
         }
