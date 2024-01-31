@@ -116,19 +116,27 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
-            Debug.DrawRay(movementPrediction.CurrentPosition, movement.normalized * 1, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
             // If we hit an object in the direction we are moving, we need to check if it is a stair/climbable
             if (Physics.Raycast(movementPrediction.CurrentPosition, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
             {
-                Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                //Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
                 // Check if we are walking up a ramp
                 if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                 {
                     // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
-                    if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
+                    if (Mathf.Abs(rampHit.distance - lowerHit.distance) < 0.1f)
                     {
                         Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        
+                        if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, out RaycastHit upperHit, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        {
+                            //Debug.Log(Time.time + " " + Mathf.Abs(lowerHit.distance - upperHit.distance));
+                            if (Mathf.Abs(lowerHit.distance - upperHit.distance) > 0.1f)
+                            {
+                                movement.y += stairHeight / 2;
+                            }
+                        }
+                        else
                         {
                             //Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
                             movement.y += stairHeight / 2;
@@ -302,12 +310,12 @@ namespace Vi.Player
             }
         }
 
-        private void OnDrawGizmos()
-        {
-            if (!Application.isPlaying) { return; }
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
-        }
+        //private void OnDrawGizmos()
+        //{
+        //    if (!Application.isPlaying) { return; }
+        //    Gizmos.color = Color.green;
+        //    Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
+        //}
     }
 }
 
