@@ -298,6 +298,86 @@ namespace Vi.Core
             }
         }
 
+        public IEnumerator CreateAccount(string username, string email, string password)
+        {
+            IsLoggingIn = true;
+            LogInErrorText = "";
+            CreateAccountPayload payload = new CreateAccountPayload(username, email, password, true);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/create", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
+            }
+            else
+            {
+                CreateAccountResultPayload badResultPayload = JsonConvert.DeserializeObject<CreateAccountResultPayload>(postRequest.downloadHandler.text);
+
+                if (badResultPayload.mes == null)
+                {
+                    CreateAccountSuccessPayload goodResultPayload = JsonConvert.DeserializeObject<CreateAccountSuccessPayload>(postRequest.downloadHandler.text);
+                }
+                else
+                {
+                    LogInErrorText = badResultPayload.mes;
+                }
+            }
+
+            switch (postRequest.result)
+            {
+                case UnityWebRequest.Result.InProgress:
+                    LogInErrorText = "Request in Progress";
+                    break;
+                case UnityWebRequest.Result.ConnectionError:
+                    LogInErrorText = "Server Offline";
+                    break;
+                case UnityWebRequest.Result.ProtocolError:
+                    LogInErrorText = "Protocol Error";
+                    break;
+                case UnityWebRequest.Result.DataProcessingError:
+                    LogInErrorText = "Data Processing Error";
+                    break;
+            }
+
+            postRequest.Dispose();
+            IsLoggingIn = false;
+        }
+
+        private struct CreateAccountPayload
+        {
+            public string username;
+            public string email;
+            public string password;
+            public bool isPlayer;
+
+            public CreateAccountPayload(string username, string email, string password, bool isPlayer)
+            {
+                this.username = username;
+                this.email = email;
+                this.password = password;
+                this.isPlayer = isPlayer;
+            }
+        }
+
+        private struct CreateAccountResultPayload
+        {
+            public string mes;
+        }
+
+        private struct CreateAccountSuccessPayload
+        {
+            public string username;
+            public bool isPlayer;
+            public List<string> dateCreated;
+            public string id;
+        }
+
         // TODO Change the string at the end to be the account ID of whoever we sign in under
         //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
         public bool IsLoggedIn { get; private set; }
@@ -308,6 +388,7 @@ namespace Vi.Core
         public IEnumerator Login(string username, string password)
         {
             IsLoggingIn = true;
+            LogInErrorText = "";
             LoginPayload payload = new LoginPayload(username, password);
 
             string json = JsonConvert.SerializeObject(payload);
@@ -316,11 +397,6 @@ namespace Vi.Core
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
-            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
-            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
-            if (postRequest.result != UnityWebRequest.Result.Success) { yield return postRequest.SendWebRequest(); }
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
@@ -334,15 +410,22 @@ namespace Vi.Core
                 LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
                 IsLoggedIn = loginResultPayload.login;
                 currentlyLoggedInUserId = loginResultPayload.userId;
+
+                if (!IsLoggedIn)
+                {
+                    LogInErrorText = "Invalid Username or Password";
+
+                    if (postRequest.downloadHandler.text.Contains("isVerified"))
+                    {
+                        LogInErrorText = "Verify Your Email";
+                    }
+                }
             }
 
             switch (postRequest.result)
             {
                 case UnityWebRequest.Result.InProgress:
                     LogInErrorText = "Request in Progress";
-                    break;
-                case UnityWebRequest.Result.Success:
-                    LogInErrorText = IsLoggedIn ? "" : "Invalid Username or Password";
                     break;
                 case UnityWebRequest.Result.ConnectionError:
                     LogInErrorText = "Server Offline";

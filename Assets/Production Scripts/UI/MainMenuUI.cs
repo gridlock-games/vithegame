@@ -18,6 +18,7 @@ namespace Vi.UI
         [Header("Authentication")]
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
+        [SerializeField] private InputField emailInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
         [SerializeField] private Text loginErrorText;
@@ -84,9 +85,35 @@ namespace Vi.UI
 
         public void PlayOnline()
         {
+            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
+            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
             WebRequestManager.Singleton.SetPlayingOffline(false);
+
+            emailInput.gameObject.SetActive(false);
+            loginButton.GetComponentInChildren<Text>().text = "LOGIN";
+
+            loginButton.onClick.RemoveAllListeners();
+            loginButton.onClick.AddListener(Login);
+        }
+
+        public void OpenCreateAccount()
+        {
+            usernameInput.text = "";
+            passwordInput.text = "";
+            emailInput.text = "";
+
+            initialParent.SetActive(false);
+            authenticationParent.SetActive(true);
+            WebRequestManager.Singleton.SetPlayingOffline(false);
+
+            emailInput.gameObject.SetActive(true);
+            loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
+
+            loginButton.onClick.RemoveAllListeners();
+            loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
         }
 
         public void PlayOffline()
@@ -110,8 +137,22 @@ namespace Vi.UI
             Instantiate(pauseMenu.gameObject);
         }
 
+        public IEnumerator CreateAccount()
+        {
+            PlayerPrefs.SetString("username", usernameInput.text);
+            PlayerPrefs.SetString("password", passwordInput.text);
+            yield return WebRequestManager.Singleton.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
+
+            if (string.IsNullOrEmpty(WebRequestManager.Singleton.LogInErrorText))
+            {
+                ReturnToInitialElements();
+            }
+        }
+
         public void Login()
         {
+            PlayerPrefs.SetString("username", usernameInput.text);
+            PlayerPrefs.SetString("password", passwordInput.text);
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
         }
 
@@ -122,11 +163,6 @@ namespace Vi.UI
 
         private void Start()
         {
-            if (!Application.isEditor)
-            {
-                usernameInput.text = "";
-                passwordInput.text = "";
-            }
             initialParent.SetActive(true);
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
