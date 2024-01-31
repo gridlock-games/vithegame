@@ -141,6 +141,7 @@ namespace Vi.Player
         GameObject inventoryInstance;
         void OnInventory()
         {
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { return; }
             if (!loadoutManager.CanSwapWeapons()) { return; }
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
