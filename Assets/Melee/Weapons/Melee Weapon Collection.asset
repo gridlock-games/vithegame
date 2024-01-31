@@ -1,3 +1,29 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:228c4d147aa3c06d58123347ac3bffebf96ac0b9b1475d2c225b9d6294531abe
-size 1154
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b92ba1ee9914ad40aaf68755fc72446, type: 3}
+  m_Name: Melee Weapon Collection
+  m_EditorClassIdentifier: 
+  weaponCollections:
+  - meleeWeapon: {fileID: 11400000, guid: cc8efbf120c4edd41bda302fcd44bbf6, type: 2}
+    weaponType: 0
+  - meleeWeapon: {fileID: 11400000, guid: 086d96fd0f118a6498b98de22b013daa, type: 2}
+    weaponType: 2
+  - meleeWeapon: {fileID: 11400000, guid: 9bdee39b8a4026a4782c353203b62ece, type: 2}
+    weaponType: 1
+  - meleeWeapon: {fileID: 11400000, guid: e2728bbb651e0604bac65e7a399d55d6, type: 2}
+    weaponType: 5
+  - meleeWeapon: {fileID: 11400000, guid: bc0cf9ac27b28314fb2600c90bab7f06, type: 2}
+    weaponType: 6
+  - meleeWeapon: {fileID: 11400000, guid: a2fd318b8861fba41ab686abc7aa646c, type: 2}
+    weaponType: 7
+  - meleeWeapon: {fileID: 11400000, guid: 49b52ed7ae126fd4bb3fff654d3072b9, type: 2}
+    weaponType: 9

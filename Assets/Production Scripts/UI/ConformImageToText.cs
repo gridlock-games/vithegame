@@ -10,7 +10,8 @@ namespace Vi.UI
     public class ConformImageToText : MonoBehaviour
     {
         [SerializeField] private Text textToConformTo;
-        private const int padding = 10;
+        [SerializeField] private int horizontalPadding = 10;
+        [SerializeField] private int verticalPadding = 10;
 
         private Image image;
         private void Start()
@@ -22,8 +23,8 @@ namespace Vi.UI
         {
             image.enabled = textToConformTo.enabled & textToConformTo.text != "";
             // Scale size of name background by size of text
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textToConformTo.preferredWidth * textToConformTo.transform.localScale.x + padding);
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, textToConformTo.preferredHeight * textToConformTo.transform.localScale.y + padding);
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textToConformTo.preferredWidth * textToConformTo.transform.localScale.x + horizontalPadding);
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, textToConformTo.preferredHeight * textToConformTo.transform.localScale.y + verticalPadding);
         }
     }
 }

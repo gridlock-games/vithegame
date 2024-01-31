@@ -6,7 +6,6 @@ using Unity.Netcode;
 
 namespace Vi.Core
 {
-    [RequireComponent(typeof(ParticleSystem))]
     [RequireComponent(typeof(Rigidbody))]
     public class ActionVFXParticleSystem : ActionVFX
     {
@@ -19,10 +18,18 @@ namespace Vi.Core
             this.attack = attack;
         }
 
-        private ParticleSystem ps;
+        private ParticleSystem[] particleSystems;
         private void Awake()
         {
-            ps = GetComponent<ParticleSystem>();
+            particleSystems = GetComponentsInChildren<ParticleSystem>();
+            foreach (ParticleSystem ps in particleSystems)
+            {
+                if (ps.trigger.enabled)
+                {
+                    ps.gameObject.AddComponent<ActionVFXChildTriggerParticleSystem>();
+                }
+            }
+
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -35,25 +42,28 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
-            bool skip = false;
-            for (int i = 0; i < ps.trigger.colliderCount; i++)
+            foreach (ParticleSystem ps in particleSystems)
             {
-                if (ps.trigger.GetCollider(i) == other)
+                bool skip = false;
+                for (int i = 0; i < ps.trigger.colliderCount; i++)
                 {
-                    skip = true;
-                    break;
+                    if (ps.trigger.GetCollider(i) == other)
+                    {
+                        skip = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!skip)
-            {
-                ps.trigger.AddCollider(other);
+                if (!skip)
+                {
+                    ps.trigger.AddCollider(other);
+                }
             }
         }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        private void OnParticleTrigger()
+        public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
@@ -67,7 +77,6 @@ namespace Vi.Core
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
                     if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes == attacker) { continue; }
                         if (networkCollider.Attributes)
                         {
                             bool canHit = true;
@@ -87,7 +96,7 @@ namespace Vi.Core
                                     }
                                     else
                                     {
-                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber, Time.time);
+                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
                                     }
                                 }
                             }
@@ -106,7 +115,6 @@ namespace Vi.Core
                     Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
                     if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes == attacker) { continue; }
                         if (networkCollider.Attributes)
                         {
                             bool canHit = true;

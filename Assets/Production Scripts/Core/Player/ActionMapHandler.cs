@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
+using Unity.Netcode;
 
 namespace Vi.Player
 {
@@ -12,9 +13,36 @@ namespace Vi.Player
         [SerializeField] private GameObject playerUIPrefab;
         [SerializeField] private GameObject spectatorUIPrefab;
 
+        public MonoBehaviour ExternalUI { get; private set; }
+
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
         private PlayerInput playerInput;
+
+        public void SetExternalUI(MonoBehaviour externalUI)
+        {
+            ExternalUI = externalUI;
+            if (externalUI)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(false);
+                playerInput.SwitchCurrentActionMap("Menu");
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(true);
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            }
+        }
+
+        private LoadoutManager loadoutManager;
+        private void Awake()
+        {
+            loadoutManager = GetComponent<LoadoutManager>();
+        }
 
         private void OnEnable()
         {
@@ -35,13 +63,24 @@ namespace Vi.Player
             }
         }
 
+        private void OnDestroy()
+        {
+            if (TryGetComponent(out NetworkObject netObj))
+            {
+                if (netObj.IsLocalPlayer) { Cursor.lockState = CursorLockMode.None; }
+            }
+        }
+
         [SerializeField] private GameObject scoreboardPrefab;
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
+            if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (minimapInstance) { return; }
             if (pauseInstance) { return; }
+            if (inventoryInstance) { return; }
+
             if (value.isPressed)
             {
                 scoreboardInstance = Instantiate(scoreboardPrefab);
@@ -51,6 +90,7 @@ namespace Vi.Player
                 Cursor.lockState = CursorLockMode.Locked;
                 Destroy(scoreboardInstance);
             }
+
             if (playerUIInstance)
                 playerUIInstance.SetActive(!value.isPressed);
             if (spectatorUIInstance)
@@ -64,10 +104,17 @@ namespace Vi.Player
 
         [SerializeField] private GameObject pausePrefab;
         GameObject pauseInstance;
-        void OnPause()
+        public void OnPause()
         {
+            if (ExternalUI)
+            {
+                ExternalUI.SendMessage("OnPause");
+                return;
+            }
             if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }
+            if (inventoryInstance) { return; }
+
             if (pauseInstance)
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -90,12 +137,47 @@ namespace Vi.Player
             }
         }
 
+        [SerializeField] private GameObject inventoryPrefab;
+        GameObject inventoryInstance;
+        void OnInventory()
+        {
+            if (!loadoutManager.CanSwapWeapons()) { return; }
+            if (ExternalUI) { return; }
+            if (scoreboardInstance) { return; }
+            if (pauseInstance) { return; }
+            if (minimapInstance) { return; }
+
+            if (inventoryInstance)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                inventoryInstance.GetComponent<Menu>().DestroyAllMenus();
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(true);
+                if (spectatorUIInstance)
+                    spectatorUIInstance.SetActive(true);
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                if (playerUIInstance)
+                    playerUIInstance.SetActive(false);
+                if (spectatorUIInstance)
+                    spectatorUIInstance.SetActive(false);
+                inventoryInstance = Instantiate(inventoryPrefab, transform);
+                playerInput.SwitchCurrentActionMap("Menu");
+            }
+        }
+
         [SerializeField] private GameObject minimapPrefab;
         GameObject minimapInstance;
         void OnMinimap(InputValue value)
         {
+            if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
+            if (inventoryInstance) { return; }
+
             if (value.isPressed)
             {
                 minimapInstance = Instantiate(minimapPrefab);

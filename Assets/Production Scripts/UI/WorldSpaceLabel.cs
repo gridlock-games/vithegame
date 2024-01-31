@@ -73,7 +73,7 @@ namespace Vi.UI
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
             //nameDisplay.text = "Ailment: " + attributes.GetAilment().ToString();
-            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).playerName.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
             //nameDisplay.text = GameLogicManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).team + " " + attributes.GetTeam();
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameBackground.color = relativeTeamColor;

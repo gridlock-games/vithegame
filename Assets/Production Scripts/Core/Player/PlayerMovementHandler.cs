@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.OnScreen;
 using Vi.Core;
 using Vi.ScriptableObjects;
 
@@ -46,7 +47,7 @@ namespace Vi.Player
 
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
-        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         [SerializeField] private float stairHeight = 0.5f;
         [SerializeField] private float rampCheckHeight = 0.1f;
@@ -55,7 +56,7 @@ namespace Vi.Player
         private bool isGrounded = true;
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (!CanMove())
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (IsOwner)
                 {
@@ -85,13 +86,12 @@ namespace Vi.Player
 
             // Handle gravity
             RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
-                if (hit.transform.root == transform) { continue; }
                 gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
                 break;
@@ -100,7 +100,7 @@ namespace Vi.Player
             isGrounded = bHit;
 
             Vector3 animDir = Vector3.zero;
-            // Apply movement to charactercontroller
+            // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())
@@ -128,9 +128,9 @@ namespace Vi.Player
                     if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
                     {
                         Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                         {
-                            //Debug.Log(Time.time + " climbing stairs");
+                            //Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
                             movement.y += stairHeight / 2;
                         }
                     }
@@ -164,6 +164,13 @@ namespace Vi.Player
             }
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            if (cameraInstance) { Destroy(cameraInstance.gameObject); }
+            if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
+        }
+
         private PlayerNetworkMovementPrediction movementPrediction;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -178,24 +185,72 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
+        private void OnEnable()
+        {
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+        }
+
+        private void OnDisable()
+        {
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+        }
+
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+        private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private readonly float minimapCameraOffset = 15;
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
+            // If on a mobile platform
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                lookInput = Vector2.zero;
+                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                {
+                    if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+
+                    foreach (OnScreenStick joystick in joysticks)
+                    {
+                        if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                        {
+                            lookInput += touch.delta;
+                        }
+                    }
+                }
+            }
+            
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetBool("IsGrounded", isGrounded);
+
+            if (minimapCameraInstance)
+            {
+                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
+            }
         }
 
         private float positionStrength = 1;
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
-            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
-            movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+            if (Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition) > 4)
+            {
+                movementPredictionRigidbody.position = movementPrediction.CurrentPosition;
+            }
+            else
+            {
+                Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
+                movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
-            //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
-            //if (angle > 180.0f) angle -= 360.0f;
-            //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
+                //if (angle > 180.0f) angle -= 360.0f;
+                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+            }
         }
 
         private void UpdateLocomotion()
@@ -211,7 +266,8 @@ namespace Vi.Player
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            if (weaponHandler.CurrentActionClip != null)
+                animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
@@ -230,6 +286,20 @@ namespace Vi.Player
         {
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
+
+        void OnInteract()
+        {
+            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                {
+                    networkInteractable.Interact(gameObject);
+                    break;
+                }
+            }
         }
 
         private void OnDrawGizmos()

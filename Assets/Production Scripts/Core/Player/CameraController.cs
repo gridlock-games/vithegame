@@ -46,6 +46,11 @@ namespace Vi.Player
             currentPositionOffset = positionOffset;
         }
 
+        private void OnDestroy()
+        {
+            Destroy(cameraInterp);
+        }
+
         private void Update()
         {
             // Update camera interp transform
@@ -83,6 +88,15 @@ namespace Vi.Player
             // Update camera transform itself
             transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             transform.LookAt(cameraInterp.transform);
+
+            // Move camera if there is a wall in the way
+            Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
+            bool bHit = Physics.SphereCast(cameraInterp.transform.position, 0.5f, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            //bool bHit = Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            if (bHit)
+            {
+                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance);
+            }
         }
     }
 }

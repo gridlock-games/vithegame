@@ -7,6 +7,8 @@ using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using System.Linq;
 using Unity.Netcode;
+using Vi.Player;
+using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.UI
 {
@@ -31,17 +33,124 @@ namespace Vi.UI
         [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
+        [Header("Mobile UI")]
+        [SerializeField] private OnScreenButton lightAttackButton;
+        [SerializeField] private OnScreenButton heavyAttackButton;
+        [SerializeField] private Image lookJoystickImage;
+        [SerializeField] private Image attackTypeToggleImage;
+        [SerializeField] private Sprite lightAttackIcon;
+        [SerializeField] private Sprite heavyAttackIcon;
+        [SerializeField] private Sprite aimIcon;
+        [SerializeField] private Image primaryWeaponButton;
+        [SerializeField] private Image secondaryWeaponButton;
+        [SerializeField] private Button switchAttackTypeButton;
+        [SerializeField] private Image aimButton;
+
+        [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
+
+        [System.Serializable]
+        private struct PlatformUIDefinition
+        {
+            public RuntimePlatform[] platforms;
+            public GameObject[] gameObjectsToEnable;
+            public MoveUIDefinition[] objectsToMove;
+        }
+
+        [System.Serializable]
+        private struct MoveUIDefinition
+        {
+            public GameObject gameObjectToMove;
+            public Vector2 newAnchoredPosition;
+        }
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
-        private void Start()
+        public void OpenPauseMenu()
         {
-            playerCard.Initialize(GetComponentInParent<Attributes>());
+            attributes.GetComponent<ActionMapHandler>().OnPause();
+        }
+
+        private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
+        public void ToggleAttackType(bool isRefreshing)
+        {
+            if (isRefreshing) { attackType = Weapon.InputAttackType.HeavyAttack; }
+
+            if (attackType == Weapon.InputAttackType.LightAttack)
+            {
+                attackType = Weapon.InputAttackType.HeavyAttack;
+                attackTypeToggleImage.sprite = lightAttackIcon;
+                lookJoystickImage.sprite = heavyAttackIcon;
+                lightAttackButton.enabled = false;
+                heavyAttackButton.enabled = true;
+            }
+            else if (attackType == Weapon.InputAttackType.HeavyAttack)
+            {
+                attackType = Weapon.InputAttackType.LightAttack;
+                attackTypeToggleImage.sprite = heavyAttackIcon;
+                lookJoystickImage.sprite = lightAttackIcon;
+                lightAttackButton.enabled = true;
+                heavyAttackButton.enabled = false;
+            }
+            else
+            {
+                Debug.LogError("Something's fucked up");
+            }
+        }
+
+        private void Awake()
+        {
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+        }
 
+        private void Start()
+        {
+            ToggleAttackType(false);
+            fadeToWhiteImage.color = Color.black;
+            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+            }
+
+            playerCard.Initialize(GetComponentInParent<Attributes>());
+
+            UpdateWeapon();
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
+                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
+                {
+                    statusIcon.InitializeStatusIcon(status);
+                    statusIconGameObject.SetActive(false);
+                    statusIcons.Add(statusIcon);
+                }
+            }
+        }
+
+        private Weapon lastWeapon;
+        private void UpdateWeapon()
+        {
+            if (lastWeapon == weaponHandler.GetWeapon())
+            {
+                lastWeapon = weaponHandler.GetWeapon();
+                return;
+            }
+
+            lastWeapon = weaponHandler.GetWeapon();
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding inputBinding in controlsAsset.bindings)
             {
@@ -63,16 +172,9 @@ namespace Vi.UI
                 }
             }
 
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
-                {
-                    statusIcon.InitializeStatusIcon(status);
-                    statusIconGameObject.SetActive(false);
-                    statusIcons.Add(statusIcon);
-                }
-            }
+            ToggleAttackType(true);
+            aimButton.gameObject.SetActive(weaponHandler.CanAim);
+            switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
         }
 
         private void UpdateActiveUIElements()
@@ -83,15 +185,19 @@ namespace Vi.UI
 
         private void Update()
         {
+            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
+                //rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
+
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
                 }
 
                 // Order player cards by distance
-                List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayersOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                 for (int i = 0; i < teammatePlayerCards.Length; i++)
                 {
                     if (i < teammateAttributes.Count)
@@ -110,7 +216,8 @@ namespace Vi.UI
             else
             {
                 NetworkObject killerNetObj = attributes.GetKiller();
-                Attributes killerAttributes = killerNetObj.GetComponent<Attributes>();
+                Attributes killerAttributes = null;
+                if (killerNetObj) { killerAttributes = killerNetObj.GetComponent<Attributes>(); }
 
                 if (killerAttributes)
                 {
@@ -120,15 +227,19 @@ namespace Vi.UI
                 else
                 {
                     killerCard.Initialize(null);
-                    killedByText.text = "Killed by " + killerNetObj.name;
+                    killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name : "Unknown");
                 }
 
                 respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
 
-                fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
-                fadeToWhiteImage.color = fadeToBlackImage.color;
+                if (attributes.IsRespawning)
+                {
+                    fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
+                    fadeToWhiteImage.color = fadeToBlackImage.color;
+                }
             }
             UpdateActiveUIElements();
+            UpdateWeapon();
         }
     }
 }

@@ -1,3 +1,124 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:9fbccfd0a6b4cd0b40a3f1e78259924567606cf777b60b86bf69bb1fa618e4b2
-size 5868
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 174e3c307f7474e6fa3b8acd263a757e, type: 3}
+  m_Name: BroadSwordWeapon
+  m_EditorClassIdentifier: 
+  weaponName:
+    content: Hammer
+    postProcess: 0
+    translationID: 0
+  weaponDescription:
+    content: Super sword
+    postProcess: 0
+    translationID: 0
+  meleeWeaponName: Hammer
+  defaultShield: {fileID: 11400000, guid: 4679216f0ab2a9d47be1e1156d5a5161, type: 2}
+  characterState: {fileID: 11400000, guid: ba960760240f88a4c95b243ef5ffca1a, type: 2}
+  characterMask: {fileID: 0}
+  weaponImage: {fileID: 21300000, guid: ae1ce59531c04bf458addc54f9f523bc, type: 3}
+  weaponModelData:
+  - skinPrefab: {fileID: 3117764225834744060, guid: 1e6a408f121fc684f9f5ace59e91ebf6,
+      type: 3}
+    data:
+    - prefabWeapon: {fileID: 6544459016060179339, guid: 0da98a3abb9a9424288dcc6d7799615d,
+        type: 3}
+      attachmentWeapon: 18
+      positionOffsetWeapon: {x: 0.03217744, y: -0.0764091, z: -0.008112363}
+      rotationOffsetWeapon: {x: 350.3857, y: 3.091638, z: 331.1895}
+  - skinPrefab: {fileID: 2225821658021408223, guid: 847a8c80d7e1d4a7da03e632785263a4,
+      type: 3}
+    data:
+    - prefabWeapon: {fileID: 6544459016060179339, guid: 0da98a3abb9a9424288dcc6d7799615d,
+        type: 3}
+      attachmentWeapon: 18
+      positionOffsetWeapon: {x: -0.39, y: 0.072, z: -0.092}
+      rotationOffsetWeapon: {x: 7.963385, y: 258.15826, z: 60.808178}
+  audioSheathe: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
+  audioDraw: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
+  audioImpactNormal: {fileID: 8300000, guid: 99ace9ddb8b8b48b7baf9df95c8d771b, type: 3}
+  audioImpactKnockback: {fileID: 8300000, guid: 99ace9ddb8b8b48b7baf9df95c8d771b,
+    type: 3}
+  audioSwing: {fileID: 8300000, guid: c798fe8bbfc1247fe856b149c1457659, type: 3}
+  groundHitReactionsFront:
+  - {fileID: 11400000, guid: 1d6ba6882a04226469cebe8bfc542a1d, type: 2}
+  groundHitReactionsBehind:
+  - {fileID: 11400000, guid: bdc7afbe92345714e8f83436f59d3d11, type: 2}
+  airborneHitReactionsFront:
+  - {fileID: 11400000, guid: 1d6ba6882a04226469cebe8bfc542a1d, type: 2}
+  airborneHitReactionsBehind:
+  - {fileID: 11400000, guid: bdc7afbe92345714e8f83436f59d3d11, type: 2}
+  knockbackReaction:
+  - {fileID: 11400000, guid: c54f9e10aa0495343bda09fd05642651, type: 2}
+  knockupReaction:
+  - {fileID: 11400000, guid: 417ba51b71e5fcf4584e2808d994f0cc, type: 2}
+  - {fileID: 11400000, guid: abf3b82b4653afa41a6243708ee74101, type: 2}
+  - {fileID: 11400000, guid: eb8a235b1ef10b14e8221ddd40e2cc07, type: 2}
+  - {fileID: 11400000, guid: 67a2470128d42954e8db529809e897e7, type: 2}
+  - {fileID: 11400000, guid: a38994534ab5c7546bfef27b42377285, type: 2}
+  - {fileID: 11400000, guid: 799468a46a5951442830c765515c4c35, type: 2}
+  groundHitReactionsBackMiddle: []
+  groundHitReactionsLeftMiddle:
+  - {fileID: 11400000, guid: 07faa3aa51662024ca544ef707af4436, type: 2}
+  groundHitReactionsRightMiddle:
+  - {fileID: 11400000, guid: 09312f4934a938b41bff456524a3d7d4, type: 2}
+  dodgeF: {fileID: 11400000, guid: a7a29ddbbdaa44d49b114885fa3a9dfb, type: 2}
+  dodgeFL: {fileID: 11400000, guid: 4e347a615d100a74ab02c3048de96be6, type: 2}
+  dodgeFR: {fileID: 11400000, guid: 2cc4cdc603ed94c4ba9ad17bf7ae0a5f, type: 2}
+  dodgeB: {fileID: 11400000, guid: 73b3a2552894b194984241bda0bbfa3d, type: 2}
+  dodgeBL: {fileID: 11400000, guid: 8f4581645bdb3454db12fd053a576d5c, type: 2}
+  dodgeBR: {fileID: 11400000, guid: 86f6e06b1dd846144845663d653aeadb, type: 2}
+  dodgeL: {fileID: 11400000, guid: ecae8d9caffb2594db7ef2c19dd074ad, type: 2}
+  dodgeR: {fileID: 11400000, guid: b76e30e8f9e0b2f4bb7ea070c6359733, type: 2}
+  grabAttack: {fileID: 11400000, guid: 7fdcb565612ad0042826a4484329822c, type: 2}
+  grabReaction: {fileID: 11400000, guid: 78ef6931b63787944998cac433d53f43, type: 2}
+  grabPlaceholderPosition: {x: 0.25, y: 0, z: 2}
+  knockbackF: {fileID: 11400000, guid: c54f9e10aa0495343bda09fd05642651, type: 2}
+  knockupF: {fileID: 11400000, guid: 496f986c572f5ef4287adda3bac6e605, type: 2}
+  staggerF: {fileID: 11400000, guid: 46841ba5b8dad7746886989ee1bf95ea, type: 2}
+  combos:
+  - combo: 00000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 7f493233a44b6f642a7c2dcb6c73700d, type: 2}
+    isEnabled: 1
+  - combo: 0000000000000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: dc560a45dfeb83741a53fb402388af9d, type: 2}
+    isEnabled: 1
+  - combo: 000000000000000000000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 726f8cbb1215d5a4c8ca7cafddbffb1a, type: 2}
+    isEnabled: 1
+  - combo: 02000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: fa54b1f44e0513845ab6d7bf543bcf02, type: 2}
+    isEnabled: 1
+  - combo: 03000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 18cce4a438116434b8d92c4dbb056661, type: 2}
+    isEnabled: 1
+  - combo: 04000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 18771aca8c2aa2d459d40a82e513cc6d, type: 2}
+    isEnabled: 1
+  - combo: 05000000
+    condition: 0
+    meleeClip: {fileID: 11400000, guid: 510fb61ec01e5874386c1a7e257b739b, type: 2}
+    isEnabled: 1
+  prefabImpactNormal: {fileID: 1931391723872664, guid: 8690041cf7250174eb66ceb76d6bf32a,
+    type: 3}
+  prefabImpactHit: {fileID: 4329036519906242892, guid: 9408437927dbd43d6bca1f23faa3aba8,
+    type: 3}
+  prefabImpactKnockback: {fileID: 4329036519906242892, guid: 9408437927dbd43d6bca1f23faa3aba8,
+    type: 3}
+  recoveryStandUp: {fileID: 11400000, guid: ffdf69cdb3e3613498e13add516f2f3c, type: 2}
+  recoveryStandDown: {fileID: 0}
+  recoveryStun: {fileID: 11400000, guid: 7e58ad38ca8185f46bee2b8184af0f43, type: 2}

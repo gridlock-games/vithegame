@@ -36,6 +36,11 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAiming()
+        {
+            return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
@@ -55,6 +60,7 @@ namespace Vi.Core
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (!movementHandler.CanMove()) { return; }
             if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
@@ -67,7 +73,10 @@ namespace Vi.Core
             // If we are not at rest and the last clip was a dodge, don't play this clip
             if (!Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
             {
-                if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsTag("CanDodge") & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime > 0.5f))
+                {
+                    if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                }
 
                 // Dodge lock checks
                 if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
@@ -163,13 +172,12 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // Play the action clip based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -214,13 +222,12 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
             // Play the action clip on the client side based on its type
-            if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"), 0);
-            }
-            else
-            {
-                Animator.CrossFade(actionStateName, 0.15f, Animator.GetLayerIndex("Actions"));
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                else
+                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Set the current action clip for the weapon handler
@@ -254,58 +261,79 @@ namespace Vi.Core
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimatorReference animatorReference;
+        MovementHandler movementHandler;
 
-        private void ChangeSkin(int characterIndex, int skinIndex)
+        public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
+            if (characterMaterial == null) { Debug.LogWarning("Character Material is null"); return; }
+            animatorReference.ApplyCharacterMaterial(characterMaterial);
+        }
+
+        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
+        {
+            if (wearableEquipmentOption == null) { Debug.LogWarning("Equipment option is null"); return; }
+            animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+        }
+
+        private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
+        {
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            bool shouldCreateNewSkin = true;
             animatorReference = GetComponentInChildren<AnimatorReference>();
             if (animatorReference)
             {
-                Destroy(animatorReference.gameObject);
+                shouldCreateNewSkin = animatorReference.name.Replace("(Clone)", "") != character.model;
+
+                if (shouldCreateNewSkin) { Destroy(animatorReference.gameObject); }
             }
 
-            CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+            if (shouldCreateNewSkin)
+            {
+                CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+                GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
-            Animator = modelInstance.GetComponent<Animator>();
-            LimbReferences = modelInstance.GetComponent<LimbReferences>();
-            animatorReference = modelInstance.GetComponent<AnimatorReference>();
-            weaponHandler.SetNewWeapon(modelOption.weapon, modelOption.skinOptions[skinIndex]);
+                Animator = modelInstance.GetComponent<Animator>();
+                LimbReferences = modelInstance.GetComponent<LimbReferences>();
+                animatorReference = modelInstance.GetComponent<AnimatorReference>();
+            }
+            
+            yield return null;
+            CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
+            
+            // Apply materials and equipment
+            CharacterReference.RaceAndGender raceAndGender = characterReference.GetPlayerModelOptions()[characterReference.GetPlayerModelOptionIndices(character.model.ToString()).Key].raceAndGender;
+            List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(raceAndGender);
+            ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
+            ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
+
+            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.beard);
+            ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.brows);
+            ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.hair);
+            ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
-        private struct CharacterModelInfo : INetworkSerializable
+        public void ChangeCharacter(WebRequestManager.Character character)
         {
-            public int characterIndex;
-            public int skinIndex;
-
-            public CharacterModelInfo(int characterIndex, int skinIndex)
-            {
-                this.characterIndex = characterIndex;
-                this.skinIndex = skinIndex;
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref characterIndex);
-                serializer.SerializeValue(ref skinIndex);
-            }
-        }
-
-        private NetworkVariable<CharacterModelInfo> characterModelInfo = new NetworkVariable<CharacterModelInfo>(new CharacterModelInfo(-1, -1));
-        public void SetCharacterSkin(int characterIndex, int skinIndex)
-        {
-            if (IsSpawned) { Debug.LogError("AnimationHandler.SetCharacterSkin() should be called before spawning the object!"); return; }
-            characterModelInfo.Value = new CharacterModelInfo(characterIndex, skinIndex);
+            if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
+            StartCoroutine(ChangeCharacterCoroutine(character));
         }
 
         public override void OnNetworkSpawn()
         {
-            ChangeSkin(characterModelInfo.Value.characterIndex, characterModelInfo.Value.skinIndex);
+            StartCoroutine(ChangeCharacterCoroutine(PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character));
         }
 
         private void Awake()
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+            movementHandler = GetComponent<MovementHandler>();
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }

@@ -18,10 +18,24 @@ namespace Vi.UI
 
         private void Start()
         {
-            movementHandler = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<MovementHandler>();
+            if (NetworkManager.Singleton.LocalClient.PlayerObject)
+            {
+                movementHandler = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<MovementHandler>();
 
-            mouseXSensitivityInput.text = movementHandler.GetLookSensitivity().x.ToString();
-            mouseYSensitivityInput.text = movementHandler.GetLookSensitivity().y.ToString();
+                mouseXSensitivityInput.text = movementHandler.GetLookSensitivity().x.ToString();
+                mouseYSensitivityInput.text = movementHandler.GetLookSensitivity().y.ToString();
+            }
+            else if (PlayerPrefs.HasKey("MouseXSensitivity") & PlayerPrefs.HasKey("MouseYSensitivity"))
+            {
+                mouseXSensitivityInput.text = PlayerPrefs.GetFloat("MouseXSensitivity").ToString();
+                mouseYSensitivityInput.text = PlayerPrefs.GetFloat("MouseYSensitivity").ToString();
+            }
+            else
+            {
+                mouseXSensitivityInput.text = "0.2";
+                mouseYSensitivityInput.text = "0.2";
+            }
+            ChangeMouseSensitivity();
         }
 
         public void ChangeMouseSensitivity()
@@ -38,7 +52,8 @@ namespace Vi.UI
                 mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
                 return;
             }
-            movementHandler.SetLookSensitivity(new Vector2(mouseXSens, mouseYSens));
+            if (movementHandler) { movementHandler.SetLookSensitivity(new Vector2(mouseXSens, mouseYSens)); }
+            
             PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens);
             PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens);
         }

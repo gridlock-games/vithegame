@@ -14,7 +14,7 @@ namespace Vi.Core
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
-        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).playerName.ToString(); }
+        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
         public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -22,11 +22,12 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor()
         {
+            if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
+
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
             else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
             else { return Color.cyan; }
         }
@@ -154,7 +155,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
-            if (IsServer) { PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId()); }
+            PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
         private void OnHPChanged(float prev, float current)
@@ -269,9 +270,6 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
-            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -280,6 +278,19 @@ namespace Vi.Core
             {
                 if (runtimeWeapon) { Debug.LogError("When processing a projectile hit, you shouldn't be passing in a runtime weapon!"); return false; }
             }
+
+            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                AddHP(attack.healAmount);
+                foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
+                {
+                    TryAddStatus(status.status, status.value, status.duration, status.delay);
+                }
+                return false;
+            }
+
+            if (attack.maxHitLimit == 0) { return false; }
 
             if (IsInvincible) { return false; }
             if (isMeleeHit)
@@ -317,7 +328,10 @@ namespace Vi.Core
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
-            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            if (damage != 0)
+            {
+                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
@@ -381,8 +395,11 @@ namespace Vi.Core
                     }
                 }
 
-                RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
-                AddHP(damage);
+                if (damage != 0)
+                {
+                    RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                    AddHP(damage);
+                }
             }
 
             AddStamina(-attack.staminaDamage);
@@ -545,11 +562,12 @@ namespace Vi.Core
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
         {
+            if (!GameModeManager.Singleton) { yield break; }
             if (GameModeManager.Singleton.GetRespawnTime() <= 0) { yield break; }
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            PlayerDataManager.Singleton.RespawnPlayer(this);
+            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this, true); }
             IsRespawning = false;
         }
 
