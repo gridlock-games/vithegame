@@ -217,7 +217,7 @@ namespace Vi.UI
                 if (teamParentDict.ContainsKey(playerData.team))
                 {
                     AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                    accountCard.Initialize(playerData.id);
+                    accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
                 }
             }
 
