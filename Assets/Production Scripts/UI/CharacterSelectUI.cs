@@ -61,7 +61,6 @@ namespace Vi.UI
         [SerializeField] private GameObject serverListParent;
         [SerializeField] private Button connectButton;
         [SerializeField] private Button closeServersMenuButton;
-        [SerializeField] private Button refreshServersButton;
 
         private List<CharacterReference.EquipmentType> equipmentTypesIncludedInCharacterAppearance = new List<CharacterReference.EquipmentType>()
         {
@@ -478,6 +477,9 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
+
             if (webRequestStatusText.gameObject.activeSelf)
             {
                 if (Time.time - lastTextChangeTime > 0.5f)
@@ -583,8 +585,6 @@ namespace Vi.UI
         {
             if (NetworkManager.Singleton.IsListening)
             {
-                connectButton.interactable = true;
-                refreshServersButton.interactable = true;
                 NetworkManager.Singleton.Shutdown();
             }
 
@@ -677,8 +677,6 @@ namespace Vi.UI
 
         public void StartClient()
         {
-            connectButton.interactable = false;
-            refreshServersButton.interactable = false;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
         }

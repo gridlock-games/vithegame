@@ -495,6 +495,10 @@ namespace Vi.Core
         {
             Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
+            if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
+            {
+                Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
+            }
         }
 
         public List<PlayerData> GetPlayerDataList()
