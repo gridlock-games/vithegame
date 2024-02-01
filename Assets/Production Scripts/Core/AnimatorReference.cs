@@ -135,12 +135,14 @@ namespace Vi.Core
 
         private void Start()
         {
-            SkinnedMeshRenderer[] skinnedMeshRenderersToEvaluate = GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderersToEvaluate)
+            List<SkinnedMeshRenderer> skinnedMeshRenderersToEvaluate = new List<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>())
             {
+                if (skinnedMeshRenderer.GetComponentInParent<RuntimeWeapon>()) { continue; }
                 skinnedMeshRenderer.enabled = false;
+                skinnedMeshRenderersToEvaluate.Add(skinnedMeshRenderer);
             }
-            StartCoroutine(DisplayRenderersBasedOnEquipment(skinnedMeshRenderersToEvaluate));
+            StartCoroutine(DisplayRenderersBasedOnEquipment(skinnedMeshRenderersToEvaluate.ToArray()));
         }
 
         private IEnumerator DisplayRenderersBasedOnEquipment(SkinnedMeshRenderer[] skinnedMeshRenderersToEvaluate)

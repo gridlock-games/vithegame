@@ -303,6 +303,32 @@ namespace Vi.Core
             }
         }
 
+        public void KickPlayer(int clientId)
+        {
+            if (IsServer)
+            {
+                KickPlayerOnServer(clientId);
+            }
+            else
+            {
+                KickPlayerServerRpc(clientId);
+            }
+        }
+
+        [ServerRpc] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
+
+        private void KickPlayerOnServer(int clientId)
+        {
+            if (clientId >= 0)
+            {
+                NetworkManager.DisconnectClient((ulong)clientId);
+            }
+            else
+            {
+                RemovePlayerData(clientId);
+            }
+        }
+
         public void RemovePlayerData(int clientId)
         {
             playerDataList.Remove(new PlayerData(clientId));
@@ -452,7 +478,6 @@ namespace Vi.Core
             if (playerData.id >= 0)
             {
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
-                Debug.Log("INVENTORY IS FOUND: " + WebRequestManager.Singleton.InventoryItems.ContainsKey(playerData.character._id.ToString()));
             }
             if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
 
@@ -495,6 +520,10 @@ namespace Vi.Core
         {
             Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
+            if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
+            {
+                Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
+            }
         }
 
         public List<PlayerData> GetPlayerDataList()
