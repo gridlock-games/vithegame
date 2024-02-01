@@ -303,6 +303,32 @@ namespace Vi.Core
             }
         }
 
+        public void KickPlayer(int clientId)
+        {
+            if (IsServer)
+            {
+                KickPlayerOnServer(clientId);
+            }
+            else
+            {
+                KickPlayerServerRpc(clientId);
+            }
+        }
+
+        [ServerRpc] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
+
+        private void KickPlayerOnServer(int clientId)
+        {
+            if (clientId >= 0)
+            {
+                NetworkManager.DisconnectClient((ulong)clientId);
+            }
+            else
+            {
+                RemovePlayerData(clientId);
+            }
+        }
+
         public void RemovePlayerData(int clientId)
         {
             playerDataList.Remove(new PlayerData(clientId));

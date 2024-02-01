@@ -176,6 +176,11 @@ namespace Vi.Core
             return gameplaySceneIsLoaded;
         }
 
+        public bool IsBusyLoadingScenes()
+        {
+            return LoadingOperations.Count > 0;
+        }
+
         public bool IsSceneGroupLoaded(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);

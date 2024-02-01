@@ -72,22 +72,18 @@ namespace Vi.Core
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            PlayerDataManager.Team clientTeam = NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
-
-            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId, clientTeam));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId));
         }
 
         private struct PlayerDataInput
         {
             public string characterId;
             public int clientId;
-            public PlayerDataManager.Team team;
 
-            public PlayerDataInput(string characterId, int clientId, PlayerDataManager.Team team)
+            public PlayerDataInput(string characterId, int clientId)
             {
                 this.characterId = characterId;
                 this.clientId = clientId;
-                this.team = team;
             }
         }
 
@@ -96,19 +92,38 @@ namespace Vi.Core
         {
             if (playerDataQueue.Count > 0)
             {
-                if (!addPlayerDataRunning) { StartCoroutine(AddPlayerData(playerDataQueue.Dequeue())); }
+                if (!addPlayerDataRunning & !NetSceneManager.Singleton.IsBusyLoadingScenes())
+                {
+                    PlayerDataManager.Team clientTeam = NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
+
+                    if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
+                    {
+                        clientTeam = PlayerDataManager.Team.Peaceful;
+                    }
+                    else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    {
+                        clientTeam = PlayerDataManager.Team.Competitor;
+                    }
+                    else // Game in progress
+                    {
+                        clientTeam = PlayerDataManager.Team.Spectator;
+                    }
+
+                    PlayerDataInput data = playerDataQueue.Dequeue();
+                    StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
+                }
             }
         }
 
         private bool addPlayerDataRunning;
-        private IEnumerator AddPlayerData(PlayerDataInput playerDataInput)
+        private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
         {
             addPlayerDataRunning = true;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
-            WebRequestManager.Singleton.GetCharacterById(playerDataInput.characterId);
+            WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(playerDataInput.clientId, WebRequestManager.Singleton.CharacterById, playerDataInput.team));
+            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(clientId, WebRequestManager.Singleton.CharacterById, team));
             
             addPlayerDataRunning = false;
         }
