@@ -185,7 +185,8 @@ namespace Vi.UI
                 }
             }
 
-            bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
+            //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
+            bool canCountDown = playerDataList.Count >= 2;
             if (IsServer)
             {
                 if (canCountDown)
@@ -199,7 +200,20 @@ namespace Vi.UI
                     startGameTimer.Value = 5;
                 }
             }
-            characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+
+            //characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+            if (startingGame & canCountDown)
+            {
+                characterLockTimeText.text = "Starting game in " + startGameTimer.Value.ToString("F0");
+            }
+            else if (!canCountDown)
+            {
+                characterLockTimeText.text = "Need 2 or more players to play";
+            }
+            else
+            {
+                characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+            }
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
@@ -233,6 +247,7 @@ namespace Vi.UI
                     }
                 }
             }
+            lastPlayersString = playersString;
             
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {

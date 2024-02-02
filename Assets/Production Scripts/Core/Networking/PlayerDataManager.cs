@@ -278,14 +278,21 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(ulong clientId)
         {
-            foreach (PlayerData playerData in playerDataList)
+            try
             {
-                if (playerData.id == (int)clientId)
+                foreach (PlayerData playerData in playerDataList)
                 {
-                    return playerData;
+                    if (playerData.id == (int)clientId)
+                    {
+                        return playerData;
+                    }
                 }
+                Debug.LogError("Could not find player data with ID: " + clientId);
             }
-            Debug.LogError("Could not find player data with ID: " + clientId);
+            catch
+            {
+                return new PlayerData();
+            }
             return new PlayerData();
         }
 
@@ -315,7 +322,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
+        [ServerRpc(RequireOwnership = false)] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
 
         private void KickPlayerOnServer(int clientId)
         {
@@ -523,6 +530,22 @@ namespace Vi.Core
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
+            }
+            if (IsClient)
+            {
+                StartCoroutine(ReturnToCharacterSelect());
+            }
+        }
+
+        private IEnumerator ReturnToCharacterSelect()
+        {
+            Debug.Log(NetSceneManager.Singleton.IsBusyLoadingScenes());
+            yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
+            Debug.Log("Not busy");
+            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
+            {
+                Debug.Log("Loading character select");
+                NetSceneManager.Singleton.LoadScene("Character Select");
             }
         }
 
