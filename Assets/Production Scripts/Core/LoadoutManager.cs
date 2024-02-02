@@ -15,8 +15,11 @@ namespace Vi.Core
             Secondary
         }
 
+        public CharacterReference.WeaponOption PrimaryWeaponOption { get; private set; }
         private Weapon primaryWeapon;
         private RuntimeAnimatorController primaryRuntimeAnimatorController;
+
+        public CharacterReference.WeaponOption SecondaryWeaponOption { get; private set; }
         private Weapon secondaryWeapon;
         private RuntimeAnimatorController secondaryRuntimeAnimatorController;
 
@@ -47,13 +50,13 @@ namespace Vi.Core
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
-            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon1ItemId).itemId : playerData.character.GetActiveLoadout().weapon1ItemId));
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon2ItemId).itemId : playerData.character.GetActiveLoadout().weapon2ItemId));
+            PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon1ItemId).itemId : playerData.character.GetActiveLoadout().weapon1ItemId));
+            SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon2ItemId).itemId : playerData.character.GetActiveLoadout().weapon2ItemId));
 
-            primaryWeapon = Instantiate(primaryOption.weapon);
-            secondaryWeapon = Instantiate(secondaryOption.weapon);
-            primaryRuntimeAnimatorController = primaryOption.animationController;
-            secondaryRuntimeAnimatorController = secondaryOption.animationController;
+            primaryWeapon = Instantiate(PrimaryWeaponOption.weapon);
+            secondaryWeapon = Instantiate(SecondaryWeaponOption.weapon);
+            primaryRuntimeAnimatorController = PrimaryWeaponOption.animationController;
+            secondaryRuntimeAnimatorController = SecondaryWeaponOption.animationController;
             EquipPrimaryWeapon();
 
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));

@@ -72,6 +72,11 @@ namespace Vi.UI
             attributes.GetComponent<ActionMapHandler>().OnPause();
         }
 
+        public void OpenInventoryMenu()
+        {
+            attributes.GetComponent<ActionMapHandler>().OnInventory();
+        }
+
         private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
         public void ToggleAttackType(bool isRefreshing)
         {
@@ -175,6 +180,9 @@ namespace Vi.UI
             ToggleAttackType(true);
             aimButton.gameObject.SetActive(weaponHandler.CanAim);
             switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
+
+            primaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().PrimaryWeaponOption.weaponIcon;
+            secondaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().SecondaryWeaponOption.weaponIcon;
         }
 
         private void UpdateActiveUIElements()
