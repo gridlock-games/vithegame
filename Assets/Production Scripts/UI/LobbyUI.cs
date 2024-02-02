@@ -66,6 +66,7 @@ namespace Vi.UI
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
                 if (gameMode == PlayerDataManager.GameMode.None) { continue; }
+                if (gameMode != PlayerDataManager.GameMode.FreeForAll) { continue; }
                 gameModeList.Add(gameMode);
                 gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
             }
@@ -162,6 +163,7 @@ namespace Vi.UI
             }
         }
 
+        private string lastPlayersString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
@@ -204,25 +206,34 @@ namespace Vi.UI
             leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
 
-            foreach (Transform child in leftTeamParent.transformParent)
+            string playersString = "";
+            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataList())
             {
-                Destroy(child.gameObject);
+                playersString += data.id.ToString() + data.character.name + data.character.name.ToString();
             }
 
-            foreach (Transform child in rightTeamParent.transformParent)
+            if (lastPlayersString != playersString)
             {
-                Destroy(child.gameObject);
-            }
-
-            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
-            {
-                if (teamParentDict.ContainsKey(playerData.team))
+                foreach (Transform child in leftTeamParent.transformParent)
                 {
-                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                    accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+                    Destroy(child.gameObject);
+                }
+
+                foreach (Transform child in rightTeamParent.transformParent)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                {
+                    if (teamParentDict.ContainsKey(playerData.team))
+                    {
+                        AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                        accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+                    }
                 }
             }
-
+            
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
                 // Player account card display logic
