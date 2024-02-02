@@ -221,13 +221,20 @@ namespace Vi.Player
                 {
                     foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
-
-                        foreach (OnScreenStick joystick in joysticks)
+                        if (touch.isTap)
                         {
-                            if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                            OnInteract();
+                        }
+                        else
+                        {
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+
+                            foreach (OnScreenStick joystick in joysticks)
                             {
-                                lookInput += touch.delta;
+                                if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                                {
+                                    lookInput += touch.delta;
+                                }
                             }
                         }
                     }
