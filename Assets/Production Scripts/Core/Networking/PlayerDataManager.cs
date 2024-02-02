@@ -83,7 +83,7 @@ namespace Vi.Core
         {
             if (IsServer) { return true; }
 
-            List<PlayerData> playerDataList = GetPlayerDataList();
+            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -95,7 +95,7 @@ namespace Vi.Core
 
         public PlayerData GetLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataList();
+            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -513,9 +513,9 @@ namespace Vi.Core
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
-            }
 
-            playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+                playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+            }
 
             if (playerData.id >= 0)
                 playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
@@ -549,11 +549,22 @@ namespace Vi.Core
             }
         }
 
-        public List<PlayerData> GetPlayerDataList()
+        public List<PlayerData> GetPlayerDataListWithSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
             foreach (PlayerData playerData in playerDataList)
             {
+                playerDatas.Add(playerData);
+            }
+            return playerDatas;
+        }
+
+        public List<PlayerData> GetPlayerDataListWithoutSpectators()
+        {
+            List<PlayerData> playerDatas = new List<PlayerData>();
+            foreach (PlayerData playerData in playerDataList)
+            {
+                if (playerData.team == Team.Spectator) { continue; }
                 playerDatas.Add(playerData);
             }
             return playerDatas;

@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private Image secondaryWeaponIcon;
         [SerializeField] private Text secondaryWeaponText;
         [SerializeField] private Button[] loadoutPresetButtons;
+        [SerializeField] private Button spectateButton;
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
@@ -163,15 +164,30 @@ namespace Vi.UI
             }
         }
 
+        public void SwitchToSpectate()
+        {
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            if (playerData.team == PlayerDataManager.Team.Spectator)
+            {
+                playerData.team = PlayerDataManager.Team.Competitor;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+            else
+            {
+                playerData.team = PlayerDataManager.Team.Spectator;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+        }
+
         private string lastPlayersString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
-
+            
             // Timer logic
-            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
+            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             bool startingGame = playerDataList.Count != 0;
             foreach (PlayerDataManager.PlayerData playerData in playerDataList)
             {
@@ -221,9 +237,9 @@ namespace Vi.UI
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
 
             string playersString = "";
-            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataList())
+            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
-                playersString += data.id.ToString() + data.character.name + data.character.name.ToString();
+                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString();
             }
 
             if (lastPlayersString != playersString)
@@ -238,7 +254,7 @@ namespace Vi.UI
                     Destroy(child.gameObject);
                 }
 
-                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (teamParentDict.ContainsKey(playerData.team))
                     {
@@ -248,6 +264,18 @@ namespace Vi.UI
                 }
             }
             lastPlayersString = playersString;
+
+            if (IsClient)
+            {
+                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                {
+                    spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
+                }
+                else
+                {
+                    spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
+                }
+            }
             
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
@@ -433,7 +461,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (playerData.id >= 0)
                     {
