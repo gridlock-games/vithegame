@@ -32,6 +32,8 @@ namespace Vi.UI
             originalBorderImageColor = borderImage.color;
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = GetComponentInParent<Attributes>();
+
+            keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
 
         private void Update()
