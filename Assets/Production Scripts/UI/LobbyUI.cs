@@ -474,6 +474,7 @@ namespace Vi.UI
         private void LockCharacterLocal()
         {
             lockCharacterButton.interactable = false;
+            spectateButton.interactable = false;
         }
 
         private NetworkList<ulong> lockedClients;

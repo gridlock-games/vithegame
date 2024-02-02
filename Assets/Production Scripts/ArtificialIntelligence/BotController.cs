@@ -83,7 +83,7 @@ namespace Vi.ArtificialIntelligence
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>();
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
-        private bool isGrounded;
+        private NetworkVariable<bool> isGrounded = new NetworkVariable<bool>();
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void ProcessMovementTick()
         {
@@ -122,7 +122,7 @@ namespace Vi.ArtificialIntelligence
                 break;
             }
             if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
-            isGrounded = bHit;
+            if (IsServer) { isGrounded.Value = bHit; }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
@@ -137,7 +137,7 @@ namespace Vi.ArtificialIntelligence
                 //Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
                 Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
@@ -197,7 +197,7 @@ namespace Vi.ArtificialIntelligence
                 UpdateLocomotion();
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-                animationHandler.Animator.SetBool("IsGrounded", isGrounded);
+                animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
 
                 if (targetAttributes)
                 {
