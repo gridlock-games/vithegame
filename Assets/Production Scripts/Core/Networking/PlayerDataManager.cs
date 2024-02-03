@@ -83,7 +83,7 @@ namespace Vi.Core
         {
             if (IsServer) { return true; }
 
-            List<PlayerData> playerDataList = GetPlayerDataList();
+            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -95,7 +95,7 @@ namespace Vi.Core
 
         public PlayerData GetLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataList();
+            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -278,14 +278,21 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(ulong clientId)
         {
-            foreach (PlayerData playerData in playerDataList)
+            try
             {
-                if (playerData.id == (int)clientId)
+                foreach (PlayerData playerData in playerDataList)
                 {
-                    return playerData;
+                    if (playerData.id == (int)clientId)
+                    {
+                        return playerData;
+                    }
                 }
+                Debug.LogError("Could not find player data with ID: " + clientId);
             }
-            Debug.LogError("Could not find player data with ID: " + clientId);
+            catch
+            {
+                return new PlayerData();
+            }
             return new PlayerData();
         }
 
@@ -315,7 +322,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
+        [ServerRpc(RequireOwnership = false)] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
 
         private void KickPlayerOnServer(int clientId)
         {
@@ -429,14 +436,14 @@ namespace Vi.Core
                     {
                         playersToSpawnQueue.Enqueue(networkListEvent.Value);
                     }
-                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, GetLobbyLeader().character.name.ToString()));
+                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
                 }
             }
             else if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Remove | networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.RemoveAt)
             {
                 if (IsServer)
                 {
-                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, GetLobbyLeader().character.name.ToString()));
+                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
                 }
             }
         }
@@ -506,9 +513,9 @@ namespace Vi.Core
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
                     playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
-            }
 
-            playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+                playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+            }
 
             if (playerData.id >= 0)
                 playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
@@ -524,13 +531,40 @@ namespace Vi.Core
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
             }
+            if (IsClient)
+            {
+                StartCoroutine(ReturnToCharacterSelect());
+            }
         }
 
-        public List<PlayerData> GetPlayerDataList()
+        private IEnumerator ReturnToCharacterSelect()
+        {
+            Debug.Log(NetSceneManager.Singleton.IsBusyLoadingScenes());
+            yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
+            Debug.Log("Not busy");
+            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
+            {
+                Debug.Log("Loading character select");
+                NetSceneManager.Singleton.LoadScene("Character Select");
+            }
+        }
+
+        public List<PlayerData> GetPlayerDataListWithSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
             foreach (PlayerData playerData in playerDataList)
             {
+                playerDatas.Add(playerData);
+            }
+            return playerDatas;
+        }
+
+        public List<PlayerData> GetPlayerDataListWithoutSpectators()
+        {
+            List<PlayerData> playerDatas = new List<PlayerData>();
+            foreach (PlayerData playerData in playerDataList)
+            {
+                if (playerData.team == Team.Spectator) { continue; }
                 playerDatas.Add(playerData);
             }
             return playerDatas;

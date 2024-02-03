@@ -142,12 +142,12 @@ namespace Vi.Core
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
             }
             else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
             {
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataList().Count,
+                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString()));
             }
             else
