@@ -16,6 +16,7 @@ namespace Vi.UI
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private GameObject initialParent;
         [Header("Authentication")]
+        [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -88,6 +89,7 @@ namespace Vi.UI
             if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
             if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
 
+            viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
             WebRequestManager.Singleton.SetPlayingOffline(false);
@@ -105,6 +107,7 @@ namespace Vi.UI
             passwordInput.text = "";
             emailInput.text = "";
 
+            viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
             WebRequestManager.Singleton.SetPlayingOffline(false);
@@ -126,6 +129,7 @@ namespace Vi.UI
         {
             WebRequestManager.Singleton.ResetLogInErrorText();
             initialParent.SetActive(true);
+            viLogo.enabled = true;
         }
 
         public void GoToCharacterSelect()
