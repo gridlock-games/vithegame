@@ -113,7 +113,6 @@ namespace Vi.UI
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
-            playerInput.onControlsChanged += delegate { UpdateWeapon(true); };
         }
 
         private void Start()
@@ -164,15 +163,66 @@ namespace Vi.UI
                 }
             }
 
-            Debug.Log(Time.time + " Refreshing weapon " + playerInput.currentControlScheme);
-            Debug.Log(playerInput.actions["Ability1"].GetBindingDisplayString(InputBinding.MaskByGroup("Gamepad")));
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
+            foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                {
+                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    {
+                        ability1.UpdateCard(abilities[0], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
 
+            foreach (InputBinding binding in playerInput.actions["Ability2"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                {
+                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    {
+                        ability2.UpdateCard(abilities[1], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
 
-            ability1.UpdateCard(abilities[0], playerInput.actions["Ability1"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
-            ability2.UpdateCard(abilities[1], playerInput.actions["Ability2"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
-            ability3.UpdateCard(abilities[2], playerInput.actions["Ability3"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
-            ability4.UpdateCard(abilities[3], playerInput.actions["Ability4"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
+            foreach (InputBinding binding in playerInput.actions["Ability3"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                {
+                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    {
+                        ability3.UpdateCard(abilities[2], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            foreach (InputBinding binding in playerInput.actions["Ability4"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                {
+                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    {
+                        ability4.UpdateCard(abilities[3], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
 
             lastWeapon = weaponHandler.GetWeapon();
 
@@ -190,6 +240,7 @@ namespace Vi.UI
             deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
         }
 
+        private string lastControlScheme;
         private void Update()
         {
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
@@ -246,7 +297,9 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
-            UpdateWeapon(false);
+            UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
+
+            lastControlScheme = playerInput.currentControlScheme;
         }
     }
 }
