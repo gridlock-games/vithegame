@@ -63,8 +63,6 @@ namespace Vi.UI
             public Vector2 newAnchoredPosition;
         }
 
-        private WeaponHandler weaponHandler;
-        private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         public void OpenPauseMenu()
@@ -104,10 +102,18 @@ namespace Vi.UI
             }
         }
 
+        private WeaponHandler weaponHandler;
+        private Attributes attributes;
+        private LoadoutManager loadoutManager;
+        private PlayerInput playerInput;
+
         private void Awake()
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
-            attributes = GetComponentInParent<Attributes>();
+            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
+            attributes = weaponHandler.GetComponent<Attributes>();
+            playerInput = weaponHandler.GetComponent<PlayerInput>();
+            playerInput.onControlsChanged += delegate { UpdateWeapon(true); };
         }
 
         private void Start()
@@ -132,7 +138,7 @@ namespace Vi.UI
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
-            UpdateWeapon();
+            UpdateWeapon(false);
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
@@ -147,42 +153,35 @@ namespace Vi.UI
         }
 
         private Weapon lastWeapon;
-        private void UpdateWeapon()
+        private void UpdateWeapon(bool forceRefresh)
         {
-            if (lastWeapon == weaponHandler.GetWeapon())
+            if (!forceRefresh)
             {
-                lastWeapon = weaponHandler.GetWeapon();
-                return;
+                if (lastWeapon == weaponHandler.GetWeapon())
+                {
+                    lastWeapon = weaponHandler.GetWeapon();
+                    return;
+                }
             }
 
-            lastWeapon = weaponHandler.GetWeapon();
+            Debug.Log(Time.time + " Refreshing weapon " + playerInput.currentControlScheme);
+            Debug.Log(playerInput.actions["Ability1"].GetBindingDisplayString(InputBinding.MaskByGroup("Gamepad")));
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
-            foreach (InputBinding inputBinding in controlsAsset.bindings)
-            {
-                if (inputBinding.action == "Ability1")
-                {
-                    ability1.UpdateCard(abilities[0], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability2")
-                {
-                    ability2.UpdateCard(abilities[1], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability3")
-                {
-                    ability3.UpdateCard(abilities[2], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability4")
-                {
-                    ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
-                }
-            }
+
+
+            ability1.UpdateCard(abilities[0], playerInput.actions["Ability1"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
+            ability2.UpdateCard(abilities[1], playerInput.actions["Ability2"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
+            ability3.UpdateCard(abilities[2], playerInput.actions["Ability3"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
+            ability4.UpdateCard(abilities[3], playerInput.actions["Ability4"].GetBindingDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions, playerInput.currentControlScheme));
+
+            lastWeapon = weaponHandler.GetWeapon();
 
             ToggleAttackType(true);
             aimButton.gameObject.SetActive(weaponHandler.CanAim);
             switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
 
-            primaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().PrimaryWeaponOption.weaponIcon;
-            secondaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().SecondaryWeaponOption.weaponIcon;
+            primaryWeaponButton.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
+            secondaryWeaponButton.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
         }
 
         private void UpdateActiveUIElements()
@@ -247,7 +246,7 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
-            UpdateWeapon();
+            UpdateWeapon(false);
         }
     }
 }
