@@ -292,10 +292,14 @@ namespace Vi.UI
                         possibleTeams[0] = localTeam;
                     }
                 }
+
+                leftTeamParent.teamTitleText.text = "";
+                rightTeamParent.teamTitleText.text = "";
+                leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                rightTeamParent.addBotButton.onClick.RemoveAllListeners();
+                
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
-                    leftTeamParent.addBotButton.onClick.RemoveAllListeners();
-                    rightTeamParent.addBotButton.onClick.RemoveAllListeners();
                     if (i == 0)
                     {
                         leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
