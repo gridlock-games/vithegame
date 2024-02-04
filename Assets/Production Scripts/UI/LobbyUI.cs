@@ -294,12 +294,13 @@ namespace Vi.UI
                 }
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
+                    leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                    rightTeamParent.addBotButton.onClick.RemoveAllListeners();
                     if (i == 0)
                     {
                         leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
                         leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else if (i == 1)
@@ -307,7 +308,6 @@ namespace Vi.UI
                         rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        rightTeamParent.addBotButton.onClick.RemoveAllListeners();
                         rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else
