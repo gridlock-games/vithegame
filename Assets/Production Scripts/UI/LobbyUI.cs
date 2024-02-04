@@ -307,8 +307,8 @@ namespace Vi.UI
                         rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
-                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        rightTeamParent.addBotButton.onClick.RemoveAllListeners();
+                        rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else
                     {
