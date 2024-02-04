@@ -67,7 +67,6 @@ namespace Vi.UI
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
                 if (gameMode == PlayerDataManager.GameMode.None) { continue; }
-                if (gameMode != PlayerDataManager.GameMode.FreeForAll) { continue; }
                 gameModeList.Add(gameMode);
                 gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
             }
