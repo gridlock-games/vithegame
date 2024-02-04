@@ -213,7 +213,7 @@
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
                     "processors": "ScaleVector2(x=2,y=2)",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -279,7 +279,7 @@
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -301,7 +301,7 @@
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Ability1",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -323,7 +323,7 @@
                     "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Ability2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -345,7 +345,7 @@
                     "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Ability3",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -367,7 +367,7 @@
                     "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Ability4",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -389,7 +389,7 @@
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -411,7 +411,7 @@
                     "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Dodge",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -466,7 +466,7 @@
                     "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Block",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -488,7 +488,7 @@
                     "path": "<Gamepad>/dpad/left",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Scoreboard",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -510,7 +510,7 @@
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -543,7 +543,7 @@
                     "path": "<Gamepad>/dpad/right",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Minimap",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -554,7 +554,7 @@
                     "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "LightAttackHold",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -565,7 +565,7 @@
                     "path": "<Gamepad>/leftTrigger",
                     "interactions": "Press",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "HeavyAttackHold",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -587,7 +587,7 @@
                     "path": "<Gamepad>/select",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -609,7 +609,7 @@
                     "path": "<Gamepad>/dpad/up",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Weapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -631,7 +631,7 @@
                     "path": "<Gamepad>/dpad/down",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Gamepad;Touchscreen",
                     "action": "Weapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1110,12 +1110,17 @@
             ]
         },
         {
-            "name": "Mobile",
-            "bindingGroup": "Mobile",
+            "name": "Touchscreen",
+            "bindingGroup": "Touchscreen",
             "devices": [
                 {
                     "devicePath": "<Touchscreen>",
                     "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Gamepad>",
+                    "isOptional": true,
                     "isOR": false
                 }
             ]

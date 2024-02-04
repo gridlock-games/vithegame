@@ -163,13 +163,15 @@ namespace Vi.UI
                 }
             }
 
+            InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
             foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
             {
                 bool shouldBreak = false;
-                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
                         ability1.UpdateCard(abilities[0], binding.ToDisplayString());
                         shouldBreak = true;
@@ -182,9 +184,9 @@ namespace Vi.UI
             foreach (InputBinding binding in playerInput.actions["Ability2"].bindings)
             {
                 bool shouldBreak = false;
-                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
                         ability2.UpdateCard(abilities[1], binding.ToDisplayString());
                         shouldBreak = true;
@@ -197,9 +199,9 @@ namespace Vi.UI
             foreach (InputBinding binding in playerInput.actions["Ability3"].bindings)
             {
                 bool shouldBreak = false;
-                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
                         ability3.UpdateCard(abilities[2], binding.ToDisplayString());
                         shouldBreak = true;
@@ -212,9 +214,9 @@ namespace Vi.UI
             foreach (InputBinding binding in playerInput.actions["Ability4"].bindings)
             {
                 bool shouldBreak = false;
-                foreach (string controlWord in playerInput.currentControlScheme.Split(" "))
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(controlWord.ToLower()))
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
                         ability4.UpdateCard(abilities[3], binding.ToDisplayString());
                         shouldBreak = true;
