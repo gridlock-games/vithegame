@@ -103,7 +103,7 @@ namespace Vi.Core
             }
         }
 
-        public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId)
+        public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
             if (!IsSpawned) { Debug.LogError("ChangeWeapon() should only be called when spawned!"); return; }
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
@@ -125,19 +125,19 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                ChangeWeaponOnServer(weaponSlotType, inventoryItemId);
+                ChangeWeaponOnServer(weaponSlotType, inventoryItemId, waitForDeath);
             }
             else
             {
-                ChangeWeaponServerRpc(weaponSlotType, inventoryItemId);
+                ChangeWeaponServerRpc(weaponSlotType, inventoryItemId, waitForDeath);
             }
         }
 
-        [ServerRpc] private void ChangeWeaponServerRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { ChangeWeaponOnServer(weaponSlotType, inventoryItemId); }
+        [ServerRpc] private void ChangeWeaponServerRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath) { ChangeWeaponOnServer(weaponSlotType, inventoryItemId, waitForDeath); }
 
-        private void ChangeWeaponOnServer(WeaponSlotType weaponSlotType, string inventoryItemId)
+        private void ChangeWeaponOnServer(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
-            Coroutine coroutine = StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId));
+            Coroutine coroutine = StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath));
 
             if (!changeWeaponCoroutines.ContainsKey(weaponSlotType))
             {
@@ -149,16 +149,19 @@ namespace Vi.Core
                 changeWeaponCoroutines[weaponSlotType] = coroutine;
             }
 
-            ChangeWeaponClientRpc(weaponSlotType, inventoryItemId);
+            ChangeWeaponClientRpc(weaponSlotType, inventoryItemId, waitForDeath);
         }
 
-        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { if (!IsServer) { StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId)); } }
+        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath) { if (!IsServer) { StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath)); } }
 
         private Dictionary<WeaponSlotType, Coroutine> changeWeaponCoroutines = new Dictionary<WeaponSlotType, Coroutine>();
-        private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId)
+        private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
-            yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
-            yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
+            if (waitForDeath)
+            {
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
+            }
             yield return new WaitUntil(() => CanSwapWeapons());
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
