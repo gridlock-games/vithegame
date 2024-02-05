@@ -61,7 +61,6 @@ namespace Vi.UI
         [SerializeField] private GameObject serverListParent;
         [SerializeField] private Button connectButton;
         [SerializeField] private Button closeServersMenuButton;
-        [SerializeField] private Button refreshServersButton;
 
         private List<CharacterReference.EquipmentType> equipmentTypesIncludedInCharacterAppearance = new List<CharacterReference.EquipmentType>()
         {
@@ -84,7 +83,7 @@ namespace Vi.UI
         {
             foreach (Transform child in characterCardParent)
             {
-                Destroy(child.gameObject);
+                if (child.GetComponent<CharacterCard>()) { Destroy(child.gameObject); }
             }
             characterCardButtonReference.Clear();
 
@@ -266,7 +265,7 @@ namespace Vi.UI
             raceButtonParent.GetComponentInChildren<Text>().text = "Race";
             raceButtonParent = raceButtonParent.GetComponentInChildren<GridLayoutGroup>().transform;
 
-            foreach (string race in new List<string>() { "Human", "Orc" })
+            foreach (string race in new List<string>() { "Human" }) // , "Orc"
             {
                 Image image = Instantiate(characterCustomizationButtonPrefab, raceButtonParent).GetComponent<Image>();
 
@@ -384,25 +383,6 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
-            {
-                primaryWeaponIcon.gameObject.SetActive(true);
-                secondaryWeaponIcon.gameObject.SetActive(true);
-
-                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
-                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
-
-                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-                primaryWeaponText.text = primaryOption.name;
-                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-                secondaryWeaponText.text = secondaryOption.name;
-            }
-            else
-            {
-                primaryWeaponIcon.gameObject.SetActive(false);
-                secondaryWeaponIcon.gameObject.SetActive(false);
-            }
-            
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
 
             if (shouldCreateNewModel)
@@ -415,6 +395,28 @@ namespace Vi.UI
             }
             
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
+
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
+            {
+                primaryWeaponIcon.gameObject.SetActive(true);
+                secondaryWeaponIcon.gameObject.SetActive(true);
+
+                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
+                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
+
+                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                primaryWeaponText.text = primaryOption.name;
+                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                secondaryWeaponText.text = secondaryOption.name;
+
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+            }
+            else
+            {
+                primaryWeaponIcon.gameObject.SetActive(false);
+                secondaryWeaponIcon.gameObject.SetActive(false);
+            }
 
             string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
             selectedRace = raceAndGenderStrings[0];
@@ -475,6 +477,9 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
+
             if (webRequestStatusText.gameObject.activeSelf)
             {
                 if (Time.time - lastTextChangeTime > 0.5f)
@@ -507,6 +512,19 @@ namespace Vi.UI
                         ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
                         serverListElementInstance.Initialize(this, server);
                         serverListElementList.Add(serverListElementInstance);
+                    }
+                }
+
+                if (Application.isEditor)
+                {
+                    foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                    {
+                        if (!serverListElementList.Find(item => item.Server._id == server._id))
+                        {
+                            ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                            serverListElementInstance.Initialize(this, server);
+                            serverListElementList.Add(serverListElementInstance);
+                        }
                     }
                 }
             }
@@ -567,8 +585,6 @@ namespace Vi.UI
         {
             if (NetworkManager.Singleton.IsListening)
             {
-                connectButton.interactable = true;
-                refreshServersButton.interactable = true;
                 NetworkManager.Singleton.Shutdown();
             }
 
@@ -638,7 +654,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
-            //NetSceneManager.Singleton.LoadScene("Arena Map B");
+            NetSceneManager.Singleton.LoadScene("Arena Map A");
         }
 
         public void OpenServerBrowser()
@@ -661,8 +677,6 @@ namespace Vi.UI
 
         public void StartClient()
         {
-            connectButton.interactable = false;
-            refreshServersButton.interactable = false;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartClient();
         }

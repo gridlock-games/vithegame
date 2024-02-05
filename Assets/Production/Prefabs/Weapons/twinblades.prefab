@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 518123274900306048}
   - component: {fileID: 9061045801013658348}
   - component: {fileID: 9139111217671485027}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: twinblades
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,6 +127,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spear2h
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8429e260a2f3c2489982da2e0f2c575,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8429e260a2f3c2489982da2e0f2c575, type: 3}
 --- !u!4 &4804669915917762402 stripped
@@ -201,6 +206,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Spear1H_Medium
+      objectReference: {fileID: 0}
+    - target: {fileID: 5474014686464707439, guid: 1a8eaaa38b934ed4dbe357ed598e1318,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a8eaaa38b934ed4dbe357ed598e1318, type: 3}

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6544459016059817899}
   - component: {fileID: 9177593674190269357}
   - component: {fileID: 1685973915010715908}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: tesaiga
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,6 +121,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: -569420960758788450, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 761900485930723368, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
         type: 3}
       propertyPath: m_Name
@@ -128,8 +138,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
         type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1859972793027502828, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2796050349295568970, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021465297024921149, guid: 95bc8d566875f42e9bd2c70c53d5f8ed,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95bc8d566875f42e9bd2c70c53d5f8ed, type: 3}

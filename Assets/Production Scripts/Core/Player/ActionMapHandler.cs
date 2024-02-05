@@ -139,8 +139,9 @@ namespace Vi.Player
 
         [SerializeField] private GameObject inventoryPrefab;
         GameObject inventoryInstance;
-        void OnInventory()
+        public void OnInventory()
         {
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { return; }
             if (!loadoutManager.CanSwapWeapons()) { return; }
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }

@@ -25,7 +25,7 @@ namespace Vi.UI
 
             if (!NetworkManager.Singleton.IsServer)
             {
-                Attributes playerObject = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+                NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
                 spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
                 progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
 

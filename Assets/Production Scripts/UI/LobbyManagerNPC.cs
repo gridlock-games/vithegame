@@ -35,9 +35,6 @@ namespace Vi.UI
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(null);
             invoker = null;
             UI.gameObject.SetActive(false);
-
-            UI.connectButton.interactable = true;
-            UI.refreshServersButton.interactable = true;
         }
 
         private bool localPlayerInRange;
