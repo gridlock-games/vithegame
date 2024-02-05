@@ -152,7 +152,23 @@ namespace Vi.Core
             ChangeWeaponClientRpc(weaponSlotType, inventoryItemId, waitForDeath);
         }
 
-        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath) { if (!IsServer) { StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath)); } }
+        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
+        {
+            if (!IsServer)
+            {
+                Coroutine coroutine = StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath));
+
+                if (!changeWeaponCoroutines.ContainsKey(weaponSlotType))
+                {
+                    changeWeaponCoroutines.Add(weaponSlotType, coroutine);
+                }
+                else
+                {
+                    if (changeWeaponCoroutines[weaponSlotType] != null) { StopCoroutine(changeWeaponCoroutines[weaponSlotType]); }
+                    changeWeaponCoroutines[weaponSlotType] = coroutine;
+                }
+            }
+        }
 
         private Dictionary<WeaponSlotType, Coroutine> changeWeaponCoroutines = new Dictionary<WeaponSlotType, Coroutine>();
         private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)

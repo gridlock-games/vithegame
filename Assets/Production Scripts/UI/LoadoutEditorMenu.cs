@@ -80,11 +80,13 @@ namespace Vi.UI
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
             primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name;
+            primaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
             secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
+            secondaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
         }
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
