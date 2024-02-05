@@ -47,22 +47,15 @@ namespace Vi.UI
             GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
             volumeSlider.value = AudioListener.volume;
 
-            goBackScenesButton.onClick.AddListener(delegate { StartCoroutine(ReturnToMainMenu()); });
+            goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
+            goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
         }
 
-        public IEnumerator ReturnToMainMenu()
+        public void ReturnToCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening)
-            {
-                Debug.Log("Network Manager shutdown");
-                NetworkManager.Singleton.Shutdown();
-                //yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening | !NetworkManager.Singleton.ShutdownInProgress);
-                Debug.Log("shutdown complete");
-            }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
 
-            Debug.Log("Loading main menu");
-            NetSceneManager.Singleton.LoadScene("Main Menu");
-            yield return null;
+            NetSceneManager.Singleton.LoadScene("Character Select");
         }
     }
 }
