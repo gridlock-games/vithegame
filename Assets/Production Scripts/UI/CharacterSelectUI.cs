@@ -83,7 +83,7 @@ namespace Vi.UI
         {
             foreach (Transform child in characterCardParent)
             {
-                Destroy(child.gameObject);
+                if (child.GetComponent<CharacterCard>()) { Destroy(child.gameObject); }
             }
             characterCardButtonReference.Clear();
 

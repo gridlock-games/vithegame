@@ -67,7 +67,6 @@ namespace Vi.UI
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
                 if (gameMode == PlayerDataManager.GameMode.None) { continue; }
-                if (gameMode != PlayerDataManager.GameMode.FreeForAll) { continue; }
                 gameModeList.Add(gameMode);
                 gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
             }
@@ -293,6 +292,12 @@ namespace Vi.UI
                         possibleTeams[0] = localTeam;
                     }
                 }
+
+                leftTeamParent.teamTitleText.text = "";
+                rightTeamParent.teamTitleText.text = "";
+                leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                rightTeamParent.addBotButton.onClick.RemoveAllListeners();
+                
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
                     if (i == 0)
@@ -300,7 +305,6 @@ namespace Vi.UI
                         leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
                         leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else if (i == 1)
@@ -308,8 +312,7 @@ namespace Vi.UI
                         rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
-                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else
                     {

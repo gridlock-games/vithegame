@@ -73,9 +73,35 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            int localIndex = scoreList.IndexOf(new PlayerScore(PlayerDataManager.Singleton.GetLocalPlayerObject().Key));
-            if (localIndex == -1) { return string.Empty; }
-            return PlayerDataManager.Singleton.GetPlayerData(PlayerDataManager.Singleton.GetLocalPlayerObject().Key).character.name + ": " + scoreList[localIndex].kills;
+            int localPlayerKey = PlayerDataManager.Singleton.GetLocalPlayerObject().Key;
+            int localIndex = scoreList.IndexOf(new PlayerScore(localPlayerKey));
+            if (localIndex == -1)
+            {
+                // If we're a spectator
+                List<PlayerScore> scoreList = new List<PlayerScore>();
+                PlayerScore localPlayerScore;
+                foreach (PlayerScore playerScore in this.scoreList)
+                {
+                    if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
+                    {
+                        localPlayerScore = playerScore;
+                    }
+                    else
+                    {
+                        scoreList.Add(playerScore);
+                    }
+                }
+                // Find player score with second highest kills
+                scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+                if (scoreList.Count > 1)
+                    return PlayerDataManager.Singleton.GetPlayerData(scoreList[1].id).character.name + ": " + scoreList[1].kills.ToString();
+                else
+                    return string.Empty;
+            }
+            else
+            {
+                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreList[localIndex].kills;
+            }
         }
 
         public string GetRightScoreString()

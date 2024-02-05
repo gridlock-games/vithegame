@@ -63,8 +63,6 @@ namespace Vi.UI
             public Vector2 newAnchoredPosition;
         }
 
-        private WeaponHandler weaponHandler;
-        private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         public void OpenPauseMenu()
@@ -104,10 +102,17 @@ namespace Vi.UI
             }
         }
 
+        private WeaponHandler weaponHandler;
+        private Attributes attributes;
+        private LoadoutManager loadoutManager;
+        private PlayerInput playerInput;
+
         private void Awake()
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
-            attributes = GetComponentInParent<Attributes>();
+            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
+            attributes = weaponHandler.GetComponent<Attributes>();
+            playerInput = weaponHandler.GetComponent<PlayerInput>();
         }
 
         private void Start()
@@ -132,7 +137,7 @@ namespace Vi.UI
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
-            UpdateWeapon();
+            UpdateWeapon(false);
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
@@ -147,42 +152,88 @@ namespace Vi.UI
         }
 
         private Weapon lastWeapon;
-        private void UpdateWeapon()
+        private void UpdateWeapon(bool forceRefresh)
         {
-            if (lastWeapon == weaponHandler.GetWeapon())
+            if (!forceRefresh)
             {
-                lastWeapon = weaponHandler.GetWeapon();
-                return;
+                if (lastWeapon == weaponHandler.GetWeapon())
+                {
+                    lastWeapon = weaponHandler.GetWeapon();
+                    return;
+                }
+            }
+
+            InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+
+            List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
+            foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    {
+                        ability1.UpdateCard(abilities[0], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            foreach (InputBinding binding in playerInput.actions["Ability2"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    {
+                        ability2.UpdateCard(abilities[1], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            foreach (InputBinding binding in playerInput.actions["Ability3"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    {
+                        ability3.UpdateCard(abilities[2], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            foreach (InputBinding binding in playerInput.actions["Ability4"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    {
+                        ability4.UpdateCard(abilities[3], binding.ToDisplayString());
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
             }
 
             lastWeapon = weaponHandler.GetWeapon();
-            List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
-            foreach (InputBinding inputBinding in controlsAsset.bindings)
-            {
-                if (inputBinding.action == "Ability1")
-                {
-                    ability1.UpdateCard(abilities[0], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability2")
-                {
-                    ability2.UpdateCard(abilities[1], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability3")
-                {
-                    ability3.UpdateCard(abilities[2], inputBinding.ToDisplayString());
-                }
-                else if (inputBinding.action == "Ability4")
-                {
-                    ability4.UpdateCard(abilities[3], inputBinding.ToDisplayString());
-                }
-            }
 
             ToggleAttackType(true);
             aimButton.gameObject.SetActive(weaponHandler.CanAim);
             switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
 
-            primaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().PrimaryWeaponOption.weaponIcon;
-            secondaryWeaponButton.sprite = weaponHandler.GetComponent<LoadoutManager>().SecondaryWeaponOption.weaponIcon;
+            primaryWeaponButton.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
+            secondaryWeaponButton.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
         }
 
         private void UpdateActiveUIElements()
@@ -191,6 +242,7 @@ namespace Vi.UI
             deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
         }
 
+        private string lastControlScheme;
         private void Update()
         {
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
@@ -247,7 +299,9 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
-            UpdateWeapon();
+            UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
+
+            lastControlScheme = playerInput.currentControlScheme;
         }
     }
 }
