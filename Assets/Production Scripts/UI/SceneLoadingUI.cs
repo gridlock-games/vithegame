@@ -23,42 +23,34 @@ namespace Vi.UI
         {
             if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
 
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-                spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
-                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+            NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
+            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+            progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
 
-                if (spawningPlayerObjectParent.activeSelf)
+            if (spawningPlayerObjectParent.activeSelf)
+            {
+                string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
+
+                if (Time.time - lastTextChangeTime > 0.5f)
                 {
-                    string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
-                    if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
-                    
-                    if (Time.time - lastTextChangeTime > 0.5f)
+                    lastTextChangeTime = Time.time;
+                    switch (spawningPlayerObjectText.text.Split(".").Length)
                     {
-                        lastTextChangeTime = Time.time;
-                        switch (spawningPlayerObjectText.text.Split(".").Length)
-                        {
-                            case 1:
-                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + ".";
-                                break;
-                            case 2:
-                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "..";
-                                break;
-                            case 3:
-                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "...";
-                                break;
-                            case 4:
-                                spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "");
-                                break;
-                        }
+                        case 1:
+                            spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + ".";
+                            break;
+                        case 2:
+                            spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "..";
+                            break;
+                        case 3:
+                            spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "") + "...";
+                            break;
+                        case 4:
+                            spawningPlayerObjectText.text = spawningPlayerObjectText.text.Replace(".", "");
+                            break;
                     }
                 }
-            }
-            else
-            {
-                spawningPlayerObjectParent.SetActive(false);
-                progressBarParent.SetActive(NetSceneManager.Singleton.LoadingOperations.Count > 0);
             }
 
             parentOfAll.SetActive(progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf);
