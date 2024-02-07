@@ -49,6 +49,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
     // Check the download size
     AsyncOperationHandle<long> getDownloadSize = Addressables.GetDownloadSizeAsync(key);
     long downloadSize = 0;
+
     if (getDownloadSize.Status == AsyncOperationStatus.Succeeded)
     {
       downloadSize = getDownloadSize.Result;
