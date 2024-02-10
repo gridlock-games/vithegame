@@ -11,8 +11,7 @@ namespace Vi.Core
 {
     public class NetSceneManager : NetworkBehaviour
     {
-        [SerializeField] private ScenePayload2[] scenePayloads2;
-        //[SerializeField] private ScenePayload[] scenePayloads;
+        [SerializeField] private ScenePayload[] scenePayloads;
 
         public static NetSceneManager Singleton { get { return _singleton; } }
         private static NetSceneManager _singleton;
@@ -21,12 +20,12 @@ namespace Vi.Core
 
         public void LoadScene(string sceneGroupName)
         {
-            int sceneGroupIndex = System.Array.FindIndex(scenePayloads2, item => item.name == sceneGroupName);
+            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
 
-            switch (scenePayloads2[sceneGroupIndex].sceneType)
+            switch (scenePayloads[sceneGroupIndex].sceneType)
             {
                 case SceneType.LocalUI:
-                    LoadScenePayload(scenePayloads2[sceneGroupIndex]);
+                    LoadScenePayload(scenePayloads[sceneGroupIndex]);
                     break;
                 case SceneType.SynchronizedUI:
                 case SceneType.Gameplay:
@@ -38,7 +37,7 @@ namespace Vi.Core
                     activeSceneGroupIndicies.Add(sceneGroupIndex);
                     break;
                 default:
-                    Debug.LogError("Scene type: " + scenePayloads2[sceneGroupIndex].sceneType + " has not been implemented yet!");
+                    Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
                     break;
             }
         }
@@ -69,7 +68,7 @@ namespace Vi.Core
         }
 
         public List<AsyncOperationUI> LoadingOperations { get; private set; } = new List<AsyncOperationUI>();
-        private void LoadScenePayload(ScenePayload2 scenePayload)
+        private void LoadScenePayload(ScenePayload scenePayload)
         {
             switch (scenePayload.sceneType)
             {
@@ -198,7 +197,7 @@ namespace Vi.Core
             //return true;
         }
 
-        private List<ScenePayload2> currentlyLoadedScenePayloads = new List<ScenePayload2>();
+        private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             //Debug.Log("Loaded " + scene.name);
@@ -233,7 +232,7 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
-                LoadScenePayload(scenePayloads2[networkListEvent.Value]);
+                LoadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
@@ -252,14 +251,6 @@ namespace Vi.Core
 
         [System.Serializable]
         public struct ScenePayload
-        {
-            public string name;
-            public SceneType sceneType;
-            public string[] sceneNames;
-        }
-
-        [System.Serializable]
-        public struct ScenePayload2
         {
             public string name;
             public SceneType sceneType;
