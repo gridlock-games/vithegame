@@ -8,7 +8,7 @@ namespace Vi.Core
 {
     public class GameInitialization : MonoBehaviour
     {
-        [SerializeField] private AssetReference baseSceneReference;
+        [SerializeField] private SceneReference baseSceneReference;
 
         private void Start()
         {
