@@ -78,10 +78,10 @@ namespace Vi.Core
                 case SceneType.LocalUI:
                     // Unload UI scenes
                     UnloadAllScenePayloadsOfType(SceneType.LocalUI);
-                    foreach (AssetReference scene in scenePayload.sceneReferences)
+                    foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        LoadingOperations.Add(new AsyncOperationUI(scene.editorAsset.name, handle, AsyncOperationUI.LoadingType.Loading));
+                        LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
                         sceneHandles.Add(handle);
                     }
                     break;
@@ -92,16 +92,16 @@ namespace Vi.Core
                     UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
                     UnloadAllScenePayloadsOfType(SceneType.Gameplay);
                     UnloadAllScenePayloadsOfType(SceneType.Environment);
-                    foreach (AssetReference scene in scenePayload.sceneReferences)
+                    foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        LoadingOperations.Add(new AsyncOperationUI(scene.editorAsset.name, handle, AsyncOperationUI.LoadingType.Loading));
+                        LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
                         sceneHandles.Add(handle);
                     }
                     break;
                 case SceneType.Environment:
                     AsyncOperationHandle<SceneInstance> handle2 = Addressables.LoadSceneAsync(scenePayload.sceneReferences[0], LoadSceneMode.Additive);
-                    LoadingOperations.Add(new AsyncOperationUI(scenePayload.sceneReferences[0].editorAsset.name, handle2, AsyncOperationUI.LoadingType.Loading));
+                    LoadingOperations.Add(new AsyncOperationUI(scenePayload.sceneReferences[0].SceneName, handle2, AsyncOperationUI.LoadingType.Loading));
                     sceneHandles.Add(handle2);
                     break;
                 default:
@@ -117,11 +117,11 @@ namespace Vi.Core
             //Debug.Log("Unloading all " + sceneType + " Count: " + currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType).Count);
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
             {
-                foreach (AssetReference scene in scenePayload.sceneReferences)
+                foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
-                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.editorAsset.name);
+                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                     if (!handle.IsValid()) { continue; }
-                    LoadingOperations.Add(new AsyncOperationUI(scene.editorAsset.name, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
                     sceneHandles.Remove(handle);
                 }
             }
@@ -169,10 +169,10 @@ namespace Vi.Core
             base.OnDestroy();
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
             {
-                foreach (AssetReference scene in scenePayload.sceneReferences)
+                foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
-                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.editorAsset.name);
-                    LoadingOperations.Add(new AsyncOperationUI(scene.editorAsset.name, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
+                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
                     sceneHandles.Remove(handle);
                 }
             }
@@ -183,9 +183,9 @@ namespace Vi.Core
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
             {
-                foreach (AssetReference scene in scenePayload.sceneReferences)
+                foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
-                    if (!SceneManager.GetSceneByName(scene.editorAsset.name).isLoaded) { return false; }
+                    if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }
                 }
                 if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
@@ -200,9 +200,9 @@ namespace Vi.Core
         public bool IsSceneGroupLoaded(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
-            foreach (AssetReference scene in scenePayloads[sceneGroupIndex].sceneReferences)
+            foreach (SceneReference scene in scenePayloads[sceneGroupIndex].sceneReferences)
             {
-                if (!SceneManager.GetSceneByName(scene.editorAsset.name).isLoaded) { return false; }
+                if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }
             }
             return true;
         }
@@ -264,7 +264,7 @@ namespace Vi.Core
         {
             public string name;
             public SceneType sceneType;
-            public AssetReference[] sceneReferences;
+            public SceneReference[] sceneReferences;
         }
     }
 }
