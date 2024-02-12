@@ -7,6 +7,7 @@ public class StorageCheck : MonoBehaviour
   [SerializeField] private GameObject notificationWindowCanvas;
   public string FileSizeError = $"This device storage space is not suffience to download additional content.";
   private UnityEvent refreshGame;
+  private float freeSpaceRequired;
 
   // Start is called before the first frame update
   private void Start()
@@ -22,6 +23,7 @@ public class StorageCheck : MonoBehaviour
   public bool DeterminedFreeSizeOutput(float deviceFileSize)
   {
     float emptyStorageSize = GetDeviceFreeStorage();
+    freeSpaceRequired = emptyStorageSize;
     if (emptyStorageSize + sizeheadwaySpace < deviceFileSize)
     {
       //Cancel the download and start notification
@@ -56,7 +58,7 @@ public class StorageCheck : MonoBehaviour
   {
     GameObject notificationWindow = notificationWindowCanvas.GetComponentInChildren<MessageNotificationObject>().gameObject;
     MessageNotificationObject messageNotification = notificationWindow.GetComponent<MessageNotificationObject>();
-    messageNotification.ShowDialogueBox(FileSizeError, "Retry", refreshGame);
+    messageNotification.ShowDialogueBox(FileSizeError + $"\nFree Space required: " + freeSpaceRequired, "Retry", refreshGame);
     Instantiate(notificationWindowCanvas);
   }
 
