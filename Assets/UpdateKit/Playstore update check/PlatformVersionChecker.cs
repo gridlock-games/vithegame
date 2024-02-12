@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Vi.Core;
 
+//This Script handle the checks to determins if there a new version required to download over on the platform provider.
 public class PlatformVersionChecker : MonoBehaviour
 {
     public string NewVersionMessage = $"A new version of Vi Version is now available at playstore. Please update before proceeding.";

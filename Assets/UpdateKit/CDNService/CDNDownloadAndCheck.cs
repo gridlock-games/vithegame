@@ -5,6 +5,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
+//This handles all download and Checks for Content Update
 public class CDNDownloadAndCheck : MonoBehaviour
 {
   [SerializeField]
@@ -17,7 +18,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
   public UnityEvent<bool> FailureEvent;
 
   private bool completeDownloadSuccess = false;
-
+  
   public (bool checkSuccessful,List<string> toDownload, float totalFileSize) CheckingForUpdate(List<string> key)
   {
     float totalBytes = 0;
@@ -31,6 +32,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
         totalBytes += result.downloadSize;
         downloadList.Add(key[i]);
       }
+
       else if (result.checkingResult == false)
       {
         //Send a Error that update checking has failed
@@ -61,6 +63,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
     }
   }
 
+  //This handles download of multiple assets files at the same time.
   public IEnumerator DownloadExternalFiles(List<string> key)
   {
     for (int i = 0; i < key.Count; i++)
@@ -94,6 +97,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
     }
   }
 
+  //This handles download of single assets files.
   public IEnumerator DownloadExternalFilesSingle(string key)
   {
     AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(key, false);

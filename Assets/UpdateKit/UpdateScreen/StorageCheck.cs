@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+//This Handles codes related to free space before download the assets. - To prevent devices bugs related to storage a 1GB headway (1000MB) was setup.
 public class StorageCheck : MonoBehaviour
 {
   [SerializeField] private float sizeheadwaySpace = 1000.0f; //Mimicing 1Gb
   [SerializeField] private GameObject notificationWindowCanvas;
-  public string FileSizeError = $"This device storage space is not suffience to download additional content.";
+  public string FileSizeError = $"This device storage space is not sufficient to download additional content.";
   private UnityEvent refreshGame;
   private float freeSpaceRequired;
 
@@ -20,11 +21,11 @@ public class StorageCheck : MonoBehaviour
   {
   }
 
-  public bool DeterminedFreeSizeOutput(float deviceFileSize)
+  public bool DeterminedFreeSizeOutput(float gameFileSize)
   {
     float emptyStorageSize = GetDeviceFreeStorage();
     freeSpaceRequired = emptyStorageSize;
-    if (emptyStorageSize + sizeheadwaySpace < deviceFileSize)
+    if (emptyStorageSize + sizeheadwaySpace < gameFileSize)
     {
       //Cancel the download and start notification
       NotifyUser();

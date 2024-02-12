@@ -5,6 +5,8 @@ using UnityEngine;
 public class CDNDownloadManager : MonoBehaviour
 {
   CDNDownloadAndCheck dac = new CDNDownloadAndCheck();
+  StorageCheck sc = new StorageCheck();
+
   [SerializeField]
   MessageNotificationObject mno;
 
@@ -21,4 +23,9 @@ public class CDNDownloadManager : MonoBehaviour
     {
         
     }
+
+  void beginCheck()
+  {
+
+  }
 }
