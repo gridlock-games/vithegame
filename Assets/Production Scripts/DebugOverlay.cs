@@ -8,6 +8,8 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
 {
+    [SerializeField] private bool enableDisplay;
+
     private bool ignoreInfo;
     private bool ignoreWarnings;
     private bool ignoreErrors;
@@ -15,7 +17,6 @@ public class DebugOverlay : MonoBehaviour
     static string myLog = "";
     private string output;
     private string stack;
-    private bool enableDisplay;
 
     private RuntimeNetStatsMonitor runtimeNetStatsMonitor;
 
@@ -26,7 +27,6 @@ public class DebugOverlay : MonoBehaviour
 
     private void Start()
     {
-        DontDestroyOnLoad(gameObject);
         runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
         DebugManager.instance.enableRuntimeUI = false;
     }

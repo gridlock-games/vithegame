@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Core
 {
@@ -17,8 +18,14 @@ namespace Vi.Core
 
         private IEnumerator LoadScenes()
         {
-            yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-            SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            Debug.Log(baseSceneReference);
+
+            AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);
+            yield return new WaitUntil(() => downloadSize.IsDone);
+            Debug.Log(downloadSize.Result);
+
+            //yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
+            //SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
         }
     }
 }
