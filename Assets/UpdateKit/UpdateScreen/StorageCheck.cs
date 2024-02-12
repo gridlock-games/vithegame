@@ -45,7 +45,13 @@ public class StorageCheck : MonoBehaviour
 #if UNITY_IOS
     return 1000.0f;
   }
+  
 #endif
+#if UNITY_EDITOR_WIN && !(UNITY_ANDROID || UNITY_IOS)
+  return 1000.0f;
+  }
+#endif
+
   private void NotifyUser()
   {
     GameObject notificationWindow = notificationWindowCanvas.GetComponentInChildren<MessageNotificationObject>().gameObject;
