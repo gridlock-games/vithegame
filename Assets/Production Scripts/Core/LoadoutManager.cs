@@ -86,11 +86,13 @@ namespace Vi.Core
             switch (weaponSlotType)
             {
                 case WeaponSlotType.Primary:
+                    PrimaryWeaponOption = weaponOption;
                     primaryWeapon = Instantiate(weaponOption.weapon);
                     primaryRuntimeAnimatorController = weaponOption.animationController;
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 case WeaponSlotType.Secondary:
+                    SecondaryWeaponOption = weaponOption;
                     secondaryWeapon = Instantiate(weaponOption.weapon);
                     secondaryRuntimeAnimatorController = weaponOption.animationController;
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
@@ -101,34 +103,82 @@ namespace Vi.Core
             }
         }
 
-        public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId)
+        public void ChangeWeapon(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
             if (!IsSpawned) { Debug.LogError("ChangeWeapon() should only be called when spawned!"); return; }
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            CharacterReference.WeaponOption weaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == inventoryItemId).itemId);
+            
+            switch (weaponSlotType)
+            {
+                case WeaponSlotType.Primary:
+                    if (primaryWeapon.name.Replace("(Clone)", "") == weaponOption.weapon.name) { return; }
+                    break;
+                case WeaponSlotType.Secondary:
+                    if (secondaryWeapon.name.Replace("(Clone)", "") == weaponOption.weapon.name) { return; }
+                    break;
+                default:
+                    Debug.LogError("Not sure what weapon slot to swap " + weaponSlotType);
+                    break;
+            }
 
             if (IsServer)
             {
-                ChangeWeaponOnServer(weaponSlotType, inventoryItemId);
+                ChangeWeaponOnServer(weaponSlotType, inventoryItemId, waitForDeath);
             }
             else
             {
-                ChangeWeaponServerRpc(weaponSlotType, inventoryItemId);
+                ChangeWeaponServerRpc(weaponSlotType, inventoryItemId, waitForDeath);
             }
         }
 
-        [ServerRpc] private void ChangeWeaponServerRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { ChangeWeaponOnServer(weaponSlotType, inventoryItemId); }
+        [ServerRpc] private void ChangeWeaponServerRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath) { ChangeWeaponOnServer(weaponSlotType, inventoryItemId, waitForDeath); }
 
-        private void ChangeWeaponOnServer(WeaponSlotType weaponSlotType, string inventoryItemId)
+        private void ChangeWeaponOnServer(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
-            StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId));
-            ChangeWeaponClientRpc(weaponSlotType, inventoryItemId);
+            Coroutine coroutine = StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath));
+
+            if (!changeWeaponCoroutines.ContainsKey(weaponSlotType))
+            {
+                changeWeaponCoroutines.Add(weaponSlotType, coroutine);
+            }
+            else
+            {
+                if (changeWeaponCoroutines[weaponSlotType] != null) { StopCoroutine(changeWeaponCoroutines[weaponSlotType]); }
+                changeWeaponCoroutines[weaponSlotType] = coroutine;
+            }
+
+            ChangeWeaponClientRpc(weaponSlotType, inventoryItemId, waitForDeath);
         }
 
-        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId) { StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId)); }
-
-        private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId)
+        [ClientRpc] private void ChangeWeaponClientRpc(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
         {
-            yield return new WaitUntil(() => CanSwapWeapons());
+            if (!IsServer)
+            {
+                Coroutine coroutine = StartCoroutine(ChangeWeaponWhenPossible(weaponSlotType, inventoryItemId, waitForDeath));
 
+                if (!changeWeaponCoroutines.ContainsKey(weaponSlotType))
+                {
+                    changeWeaponCoroutines.Add(weaponSlotType, coroutine);
+                }
+                else
+                {
+                    if (changeWeaponCoroutines[weaponSlotType] != null) { StopCoroutine(changeWeaponCoroutines[weaponSlotType]); }
+                    changeWeaponCoroutines[weaponSlotType] = coroutine;
+                }
+            }
+        }
+
+        private Dictionary<WeaponSlotType, Coroutine> changeWeaponCoroutines = new Dictionary<WeaponSlotType, Coroutine>();
+        private IEnumerator ChangeWeaponWhenPossible(WeaponSlotType weaponSlotType, string inventoryItemId, bool waitForDeath)
+        {
+            if (waitForDeath)
+            {
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
+            }
+            yield return new WaitUntil(() => CanSwapWeapons());
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
             CharacterReference.WeaponOption weaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == inventoryItemId).itemId);
@@ -136,11 +186,13 @@ namespace Vi.Core
             switch (weaponSlotType)
             {
                 case WeaponSlotType.Primary:
+                    PrimaryWeaponOption = weaponOption;
                     primaryWeapon = Instantiate(weaponOption.weapon);
                     primaryRuntimeAnimatorController = weaponOption.animationController;
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 case WeaponSlotType.Secondary:
+                    SecondaryWeaponOption = weaponOption;
                     secondaryWeapon = Instantiate(weaponOption.weapon);
                     secondaryRuntimeAnimatorController = weaponOption.animationController;
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
