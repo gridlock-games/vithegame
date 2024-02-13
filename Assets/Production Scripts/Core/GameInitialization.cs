@@ -23,7 +23,6 @@ namespace Vi.Core
         {
             AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);;
             yield return new WaitUntil(() => downloadSize.IsDone);
-            Debug.Log(downloadSize.Result);
 
             if (downloadSize.Result > 0)
             {
