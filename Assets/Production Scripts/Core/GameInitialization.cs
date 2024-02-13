@@ -23,8 +23,6 @@ namespace Vi.Core
 
         private IEnumerator LoadScenes()
         {
-            Caching.ClearCache();
-
             AsyncOperationHandle<long> baseDownloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);
             yield return new WaitUntil(() => baseDownloadSize.IsDone);
 
@@ -59,7 +57,6 @@ namespace Vi.Core
 
                 Addressables.Release(downloadHandle);
             }
-            Addressables.Release(baseDownloadSize);
 
             if (mainMenuDownloadSize.Result > 0)
             {
@@ -95,6 +92,7 @@ namespace Vi.Core
             downloadProgressBarText.text = "All Downloads Complete";
 
             Addressables.Release(mainMenuDownloadSize);
+            Addressables.Release(baseDownloadSize);
 
             yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
             SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
