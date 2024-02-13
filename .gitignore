@@ -1,6 +1,3 @@
-# Ignore server data folder for remote addressables
-ServerData/
-
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
@@ -103,3 +100,8 @@ Assets/Samples/Visual Effect Graph/12.1.7/VisualEffectGraph Additions/Subgraphs/
 Assets/Samples/Visual Effect Graph/12.1.7/VisualEffectGraph Additions/Subgraphs/Blocks/Set stripProgress Attribute.vfxblock
 
 Assets/Samples/Visual Effect Graph/12.1.7/VisualEffectGraph Additions/Subgraphs/Blocks/Vortex.vfxblock
+
+# Ignore proper addressables related directories and files
+ServerData/
+Assets/AddressableAssetsData/link.xml
+Assets/AddressableAssetsData/link.xml.meta
