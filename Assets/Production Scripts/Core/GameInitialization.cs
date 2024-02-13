@@ -20,9 +20,10 @@ namespace Vi.Core
         {
             Debug.Log(baseSceneReference);
 
-            AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);
-            yield return new WaitUntil(() => downloadSize.IsDone);
-            Debug.Log(downloadSize.Result);
+            AsyncOperationHandle downloadSize = Addressables.DownloadDependenciesAsync(baseSceneReference);
+            yield return null;
+            //yield return new WaitUntil(() => downloadSize.IsDone);
+            //Debug.Log(downloadSize.Result);
 
             //yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
             //SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
