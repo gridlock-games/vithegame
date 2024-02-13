@@ -10,16 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: Player Hub
   m_EditorClassIdentifier: 
-  m_GroupName: Default Local Group
+  m_GroupName: Player Hub
   m_Data:
     m_SerializedData: []
-  m_GUID: 6028e44006d16cf439923951af1fa237
-  m_SerializeEntries: []
+  m_GUID: b53886a2fc951a14480180d17bb19b98
+  m_SerializeEntries:
+  - m_GUID: 1b70c5a196b72f24689157d24caacbf0
+    m_Address: Assets/Production/Scenes/Gameplay/Player Hub.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 938993fde43bbf343951d89a1f8f4c5d, type: 2}
-    - {fileID: 11400000, guid: 311c4c7f6ea99b44195200fe69ebb107, type: 2}
+    - {fileID: 11400000, guid: c202884582a517c479eacd6c98002280, type: 2}
+    - {fileID: 11400000, guid: 38f743763ab0c2c448edcfa1a4dc5429, type: 2}

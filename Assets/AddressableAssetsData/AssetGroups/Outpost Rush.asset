@@ -10,16 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: Outpost Rush
   m_EditorClassIdentifier: 
-  m_GroupName: Default Local Group
+  m_GroupName: Outpost Rush
   m_Data:
     m_SerializedData: []
-  m_GUID: 6028e44006d16cf439923951af1fa237
-  m_SerializeEntries: []
+  m_GUID: 1444e96571e328145ac650c78f3dd333
+  m_SerializeEntries:
+  - m_GUID: 00b190a22c34d1445a24beded2f70638
+    m_Address: Assets/Production/Scenes/Gameplay/OutpostRush.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 938993fde43bbf343951d89a1f8f4c5d, type: 2}
-    - {fileID: 11400000, guid: 311c4c7f6ea99b44195200fe69ebb107, type: 2}
+    - {fileID: 11400000, guid: 8b92840e268993f41a63f001a495fc7c, type: 2}
+    - {fileID: 11400000, guid: 40758aeae1c0af045a31859ca8a66908, type: 2}
