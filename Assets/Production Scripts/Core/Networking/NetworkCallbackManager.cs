@@ -29,8 +29,8 @@ namespace Vi.Core
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            Instantiate(networkSceneManagerPrefab.gameObject);
-            Instantiate(playerDataManagerPrefab.gameObject);
+            DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
+            DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
             NetSceneManager.Singleton.LoadScene("Main Menu");
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
