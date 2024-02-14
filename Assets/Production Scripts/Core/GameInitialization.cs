@@ -23,6 +23,10 @@ namespace Vi.Core
 
         private IEnumerator LoadScenes()
         {
+            assetNumberText.text = "";
+            downloadProgressBarImage.fillAmount = 1;
+            downloadProgressBarText.text = "Querying server for updates";
+
             AsyncOperationHandle<long> baseDownloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);
             yield return new WaitUntil(() => baseDownloadSize.IsDone);
 
