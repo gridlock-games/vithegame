@@ -17,6 +17,7 @@ public static class ExternalFileLoaderWeb
       if (request.isNetworkError)
       {
         //Show alt image
+        Debug.Log("Cannot download Image");
       }
       else
       {

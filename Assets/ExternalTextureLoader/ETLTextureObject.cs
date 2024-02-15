@@ -6,6 +6,7 @@ public class ETLTextureObject : MonoBehaviour
 {
   [SerializeField] Renderer objectTarget;
   [SerializeField] int materialID;
+  public string WWWImageSource;
   public string textureName;
   [Header("External Links")]
 
@@ -25,6 +26,6 @@ public class ETLTextureObject : MonoBehaviour
   }
   public void Start()
   {
-    LoadImageFromWeb("https://static.wixstatic.com/media/cf53d3_8094bda33cc54dc7860b13c4cbd83e88~mv2.jpg/v1/fill/w_169,h_169,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/guin_02_edited_edited.jpg");
+    LoadImageFromWeb(WWWImageSource);
   }
 }
