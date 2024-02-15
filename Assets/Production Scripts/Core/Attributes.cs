@@ -14,7 +14,7 @@ namespace Vi.Core
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
-        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).playerName.ToString(); }
+        public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
         public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -127,7 +127,7 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            HP.Value = maxHP;
+            if (IsServer) { HP.Value = maxHP; }
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
@@ -270,9 +270,6 @@ namespace Vi.Core
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
-            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -281,6 +278,19 @@ namespace Vi.Core
             {
                 if (runtimeWeapon) { Debug.LogError("When processing a projectile hit, you shouldn't be passing in a runtime weapon!"); return false; }
             }
+
+            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                AddHP(attack.healAmount);
+                foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
+                {
+                    TryAddStatus(status.status, status.value, status.duration, status.delay);
+                }
+                return false;
+            }
+
+            if (attack.maxHitLimit == 0) { return false; }
 
             if (IsInvincible) { return false; }
             if (isMeleeHit)
@@ -318,7 +328,10 @@ namespace Vi.Core
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
-            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            if (damage != 0)
+            {
+                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+            }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
@@ -382,8 +395,11 @@ namespace Vi.Core
                     }
                 }
 
-                RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
-                AddHP(damage);
+                if (damage != 0)
+                {
+                    RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                    AddHP(damage);
+                }
             }
 
             AddStamina(-attack.staminaDamage);
@@ -551,7 +567,7 @@ namespace Vi.Core
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this); }
+            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this, true); }
             IsRespawning = false;
         }
 

@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private Toggle debugOverlayToggle;
+        [SerializeField] private Button goBackScenesButton;
 
         public void OpenDisplayMenu()
         {
@@ -45,6 +46,16 @@ namespace Vi.UI
         {
             GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
             volumeSlider.value = AudioListener.volume;
+
+            goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
+            goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
+        }
+
+        public void ReturnToCharacterSelect()
+        {
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
         }
     }
 }

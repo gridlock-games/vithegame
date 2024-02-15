@@ -86,13 +86,12 @@ namespace Vi.Player
 
             // Handle gravity
             RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, Physics.gravity.magnitude, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
             bool bHit = false;
             foreach (RaycastHit hit in allHits)
             {
-                if (hit.transform.root == transform) { continue; }
                 gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
                 bHit = true;
                 break;
@@ -117,21 +116,29 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
-            Debug.DrawRay(movementPrediction.CurrentPosition, movement.normalized * 1, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
             // If we hit an object in the direction we are moving, we need to check if it is a stair/climbable
             if (Physics.Raycast(movementPrediction.CurrentPosition, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
             {
-                Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                //Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
                 // Check if we are walking up a ramp
                 if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                 {
                     // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
-                    if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
+                    if (Mathf.Abs(rampHit.distance - lowerHit.distance) < 0.1f)
                     {
                         Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        if (!Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, lowerHit.distance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                        
+                        if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, out RaycastHit upperHit, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
                         {
-                            //Debug.Log(Time.time + " climbing stairs");
+                            //Debug.Log(Time.time + " " + Mathf.Abs(lowerHit.distance - upperHit.distance));
+                            if (Mathf.Abs(lowerHit.distance - upperHit.distance) > 0.1f)
+                            {
+                                movement.y += stairHeight / 2;
+                            }
+                        }
+                        else
+                        {
+                            //Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
                             movement.y += stairHeight / 2;
                         }
                     }
@@ -186,8 +193,21 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
+        private void OnEnable()
+        {
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+        }
+
+        private void OnDisable()
+        {
+            if (IsLocalPlayer)
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+        }
+
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private readonly float minimapCameraOffset = 15;
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -196,15 +216,26 @@ namespace Vi.Player
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 lookInput = Vector2.zero;
-                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                PlayerInput playerInput = GetComponent<PlayerInput>();
+                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
-                    if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
-
-                    foreach (OnScreenStick joystick in joysticks)
+                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                        if (touch.isTap)
                         {
-                            lookInput += touch.delta;
+                            OnInteract();
+                        }
+                        else
+                        {
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+
+                            foreach (OnScreenStick joystick in joysticks)
+                            {
+                                if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                                {
+                                    lookInput += touch.delta;
+                                }
+                            }
                         }
                     }
                 }
@@ -213,18 +244,32 @@ namespace Vi.Player
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            animationHandler.Animator.SetBool("IsGrounded", isGrounded);
+
+            if (minimapCameraInstance)
+            {
+                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
+            }
         }
 
         private float positionStrength = 1;
         //private float rotationStrength = 1;
         void FixedUpdate()
         {
-            Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
-            movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+            if (Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition) > 4)
+            {
+                movementPredictionRigidbody.position = movementPrediction.CurrentPosition;
+            }
+            else
+            {
+                Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
+                movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
-            //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
-            //if (angle > 180.0f) angle -= 360.0f;
-            //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
+                //if (angle > 180.0f) angle -= 360.0f;
+                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+            }
         }
 
         private void UpdateLocomotion()
@@ -240,7 +285,8 @@ namespace Vi.Player
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed;
+            if (weaponHandler.CurrentActionClip != null)
+                animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
@@ -261,12 +307,26 @@ namespace Vi.Player
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
 
-        private void OnDrawGizmos()
+        void OnInteract()
         {
-            if (!Application.isPlaying) { return; }
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
+            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            foreach (RaycastHit hit in allHits)
+            {
+                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                {
+                    networkInteractable.Interact(gameObject);
+                    break;
+                }
+            }
         }
+
+        //private void OnDrawGizmos()
+        //{
+        //    if (!Application.isPlaying) { return; }
+        //    Gizmos.color = Color.green;
+        //    Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
+        //}
     }
 }
 

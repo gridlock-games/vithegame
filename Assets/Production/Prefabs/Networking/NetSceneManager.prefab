@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1225601954596703990}
-  - component: {fileID: 1225601954596703991}
   - component: {fileID: 1352388870817673871}
+  - component: {fileID: 1225601954596703991}
   m_Layer: 0
   m_Name: NetSceneManager
   m_TagString: Untagged
@@ -33,6 +33,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1352388870817673871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1225601954596703992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1445296912
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &1225601954596703991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48,49 +68,105 @@ MonoBehaviour:
   scenePayloads:
   - name: Main Menu
     sceneType: 0
-    sceneNames:
-    - Main Menu
+    sceneReferences:
+    - m_AssetGUID: 85109efbee0684840965d4e59c6bc3f4
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Main Menu
   - name: Character Select
     sceneType: 0
-    sceneNames:
-    - Character Select
+    sceneReferences:
+    - m_AssetGUID: f4ef5f6705c500f44a3be50dd19d8ee6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Character Select
   - name: Training Room
     sceneType: 2
-    sceneNames:
-    - Training Room
+    sceneReferences:
+    - m_AssetGUID: 825e8977e019c1348b14ce9013c03a8a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Training Room
   - name: Player Hub
     sceneType: 2
-    sceneNames:
-    - Player Hub
+    sceneReferences:
+    - m_AssetGUID: 1b70c5a196b72f24689157d24caacbf0
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Player Hub
   - name: Lobby
     sceneType: 1
-    sceneNames:
-    - Lobby
+    sceneReferences:
+    - m_AssetGUID: 5fb7fe9049ad69e48a54d872a6e1ee72
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Lobby
   - name: Free For All
     sceneType: 2
-    sceneNames:
-    - FreeForAll
+    sceneReferences:
+    - m_AssetGUID: 3a544987c4a966b45ad76240e0fdc184
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: FreeForAll
+  - name: Team Elimination
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 013a9e0dc897cd54298a50fd0633462a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: TeamElimination
+  - name: Essence War
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 9e35f561e234d7940826c6c4f419f5da
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: EssenceWar
+  - name: Outpost Rush
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 00b190a22c34d1445a24beded2f70638
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: OutpostRush
   - name: Arena Map A
-    sceneType: 3
-    sceneNames:
-    - Arena Map A
---- !u!114 &1352388870817673871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1225601954596703992}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 85007efd32dfa5d408225ca5da176f5b
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Arena Map A
+  - name: Arena Map B
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 913d56e88d7acc44b9a91e1d51132a39
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Arena Map B
+  - name: Essence War Map A
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 852bc93269781104a87a02ad00fc5cf6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Essence War Map A
+  - name: Essence War Map B
+    sceneType: 2
+    sceneReferences:
+    - m_AssetGUID: 939ad267773fd834299dca72d483fa16
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Essence War Map B

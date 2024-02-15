@@ -15,10 +15,6 @@ namespace Vi.UI
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
-        //[SerializeField] private CharacterSelectElement characterSelectElement;
-        [SerializeField] private Transform characterSelectGridParent;
-        [SerializeField] private Text characterNameText;
-        [SerializeField] private Text characterRoleText;
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
         [SerializeField] private Button lockCharacterButton;
@@ -29,13 +25,16 @@ namespace Vi.UI
         [SerializeField] private Text gameModeText;
         [SerializeField] private Text mapText;
         [SerializeField] private Button roomSettingsButton;
+        [SerializeField] private Image primaryWeaponIcon;
+        [SerializeField] private Text primaryWeaponText;
+        [SerializeField] private Image secondaryWeaponIcon;
+        [SerializeField] private Text secondaryWeaponText;
+        [SerializeField] private Button[] loadoutPresetButtons;
+        [SerializeField] private Button spectateButton;
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
         [SerializeField] private TMP_Dropdown teamDropdown;
-
-        private readonly float size = 200;
-        private readonly int height = 2;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -75,24 +74,6 @@ namespace Vi.UI
             int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
             gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
             ChangeGameMode();
-
-            // Player models
-            CharacterReference.PlayerModelOption[] playerModelOptions = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            Quaternion rotation = Quaternion.Euler(0, 0, -45);
-            int characterIndex = 0;
-            for (int x = 0; x < playerModelOptions.Length; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (characterIndex >= playerModelOptions.Length) { return; }
-
-                    Vector3 pos = new Vector3(x * size - size, y * size, 0);
-                    //GameObject g = Instantiate(characterSelectElement.gameObject, characterSelectGridParent);
-                    //g.transform.localPosition = rotation * pos;
-                    //g.GetComponent<CharacterSelectElement>().Initialize(this, playerModelOptions[characterIndex].characterImage, characterIndex, 0);
-                    characterIndex++;
-                }
-            }
         }
 
         public static string FromCamelCase(string inputString)
@@ -115,7 +96,26 @@ namespace Vi.UI
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
 
-            if (IsClient) { StartCoroutine(WaitForPlayerDataToUpdatePreview()); }
+            if (IsClient)
+            {
+                StartCoroutine(UpdateCharacterPreview());
+                StartCoroutine(InitializeLoadoutButtons());
+            }
+        }
+
+        private IEnumerator InitializeLoadoutButtons()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
+            {
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+            }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
         public override void OnNetworkDespawn()
@@ -123,13 +123,6 @@ namespace Vi.UI
             characterLockTimer.OnValueChanged -= OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged -= OnStartGameTimerChange;
             lockedClients.OnListChanged -= OnLockedClientListChange;
-        }
-
-        private IEnumerator WaitForPlayerDataToUpdatePreview()
-        {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-            UpdateCharacterPreview(playerData.characterIndex, playerData.skinIndex);
         }
 
         private void OnCharacterLockTimerChange(float prev, float current)
@@ -146,19 +139,54 @@ namespace Vi.UI
             {
                 if (prev > 0 & current <= 0)
                 {
-                    NetSceneManager.Singleton.LoadScene("Free For All");
+                    switch (PlayerDataManager.Singleton.GetGameMode())
+                    {
+                        case PlayerDataManager.GameMode.FreeForAll:
+                            NetSceneManager.Singleton.LoadScene("Free For All");
+                            break;
+                        case PlayerDataManager.GameMode.TeamElimination:
+                            NetSceneManager.Singleton.LoadScene("Team Elimination");
+                            break;
+                        case PlayerDataManager.GameMode.EssenceWar:
+                            NetSceneManager.Singleton.LoadScene("Essence War");
+                            break;
+                        case PlayerDataManager.GameMode.OutputRush:
+                            NetSceneManager.Singleton.LoadScene("Outpost Rush");
+                            break;
+                        default:
+                            Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
+                            break;
+                    }
+
+                    NetSceneManager.Singleton.LoadScene(PlayerDataManager.Singleton.GetMapName());
                 }
             }
         }
 
+        public void SwitchToSpectate()
+        {
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            if (playerData.team == PlayerDataManager.Team.Spectator)
+            {
+                playerData.team = PlayerDataManager.Team.Competitor;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+            else
+            {
+                playerData.team = PlayerDataManager.Team.Spectator;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+        }
+
+        private string lastPlayersString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
-
+            
             // Timer logic
-            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataList();
+            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             bool startingGame = playerDataList.Count != 0;
             foreach (PlayerDataManager.PlayerData playerData in playerDataList)
             {
@@ -172,7 +200,8 @@ namespace Vi.UI
                 }
             }
 
-            bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
+            //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
+            bool canCountDown = playerDataList.Count >= 2;
             if (IsServer)
             {
                 if (canCountDown)
@@ -186,30 +215,67 @@ namespace Vi.UI
                     startGameTimer.Value = 5;
                 }
             }
-            characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+
+            //characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+            if (startingGame & canCountDown)
+            {
+                characterLockTimeText.text = "Starting game in " + startGameTimer.Value.ToString("F0");
+            }
+            else if (!canCountDown)
+            {
+                characterLockTimeText.text = "Need 2 or more players to play";
+            }
+            else
+            {
+                characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
+            }
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
+            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
+            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
 
-            foreach (Transform child in leftTeamParent.transformParent)
+            string playersString = "";
+            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
-                Destroy(child.gameObject);
+                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString();
             }
 
-            foreach (Transform child in rightTeamParent.transformParent)
+            if (lastPlayersString != playersString)
             {
-                Destroy(child.gameObject);
-            }
-
-            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataList())
-            {
-                if (teamParentDict.ContainsKey(playerData.team))
+                foreach (Transform child in leftTeamParent.transformParent)
                 {
-                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                    accountCard.Initialize(playerData.id);
+                    Destroy(child.gameObject);
+                }
+
+                foreach (Transform child in rightTeamParent.transformParent)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                {
+                    if (teamParentDict.ContainsKey(playerData.team))
+                    {
+                        AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                        accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+                    }
                 }
             }
+            lastPlayersString = playersString;
 
+            if (IsClient)
+            {
+                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                {
+                    spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
+                }
+                else
+                {
+                    spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
+                }
+            }
+            
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
                 // Player account card display logic
@@ -226,6 +292,12 @@ namespace Vi.UI
                         possibleTeams[0] = localTeam;
                     }
                 }
+
+                leftTeamParent.teamTitleText.text = "";
+                rightTeamParent.teamTitleText.text = "";
+                leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+                rightTeamParent.addBotButton.onClick.RemoveAllListeners();
+                
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
                     if (i == 0)
@@ -233,7 +305,6 @@ namespace Vi.UI
                         leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
                         leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else if (i == 1)
@@ -241,8 +312,7 @@ namespace Vi.UI
                         rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.RemoveAllListeners();
-                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     }
                     else
                     {
@@ -292,15 +362,25 @@ namespace Vi.UI
         }
 
         private GameObject previewObject;
-        public void UpdateCharacterPreview(int characterIndex, int skinIndex)
+        private IEnumerator UpdateCharacterPreview()
         {
-            if (previewObject) { Destroy(previewObject); }
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
-            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-            previewObject = Instantiate(playerModelOption.playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
-            previewObject.GetComponent<AnimationHandler>().SetCharacter(characterIndex, skinIndex);
-            characterNameText.text = playerModelOption.name;
-            characterRoleText.text = playerModelOption.role;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.LocalClientId).character;
+
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
+
+            if (previewObject) { Destroy(previewObject); }
+            // Instantiate the player model
+            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+
+            previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
+            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyDefaultEquipment(character.raceAndGender));
         }
 
         private new void OnDestroy()
@@ -323,9 +403,37 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            int characterIndex = 0;
-            int skinIndex = 0;
-            PlayerDataManager.Singleton.AddBotData(characterIndex, skinIndex, team);
+            PlayerDataManager.Singleton.AddBotData(team);
+        }
+
+        private void ChooseLoadoutPreset(Button button, int loadoutSlot)
+        {
+            foreach (Button b in loadoutPresetButtons)
+            {
+                b.interactable = button != b;
+            }
+
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+
+            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
+
+            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
+
+            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon1ItemId).itemId);
+            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon2ItemId).itemId);
+
+            primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+            primaryWeaponText.text = primaryOption.name;
+            secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+            secondaryWeaponText.text = secondaryOption.name;
+
+            if (previewObject)
+            {
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+            }
         }
 
         public void ChangeGameMode()
@@ -356,7 +464,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataList())
+                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (playerData.id >= 0)
                     {
@@ -369,13 +477,7 @@ namespace Vi.UI
         private void LockCharacterLocal()
         {
             lockCharacterButton.interactable = false;
-            foreach (Transform child in characterSelectGridParent)
-            {
-                //if (child.TryGetComponent(out CharacterSelectElement characterSelectElement))
-                //{
-                //    characterSelectElement.SetButtonInteractability(false);
-                //}
-            }
+            spectateButton.interactable = false;
         }
 
         private NetworkList<ulong> lockedClients;

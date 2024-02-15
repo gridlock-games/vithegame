@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Multiplayer.Tools.NetStatsMonitor;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
 {
+    [SerializeField] private bool enableDisplay;
+
     private bool ignoreInfo;
     private bool ignoreWarnings;
     private bool ignoreErrors;
@@ -14,7 +17,6 @@ public class DebugOverlay : MonoBehaviour
     static string myLog = "";
     private string output;
     private string stack;
-    private bool enableDisplay;
 
     private RuntimeNetStatsMonitor runtimeNetStatsMonitor;
 
@@ -25,9 +27,8 @@ public class DebugOverlay : MonoBehaviour
 
     private void Start()
     {
-        DontDestroyOnLoad(gameObject);
         runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
-        UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
+        DebugManager.instance.enableRuntimeUI = false;
     }
 
     void OnEnable()
@@ -64,7 +65,12 @@ public class DebugOverlay : MonoBehaviour
     void OnGUI()
     {
         if (!enableDisplay) { return; }
-        GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
+
+        if (!Application.isEditor)
+        {
+            GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
+        }
+        
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.yellow;
         style.fontSize = 24;
@@ -74,6 +80,8 @@ public class DebugOverlay : MonoBehaviour
 
     private void Update()
     {
+        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
+
         if (Input.GetKeyDown(KeyCode.BackQuote) | Keyboard.current[Key.Backquote].wasPressedThisFrame)
         {
             enableDisplay = !enableDisplay;

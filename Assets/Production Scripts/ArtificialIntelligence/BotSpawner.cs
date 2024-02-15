@@ -6,23 +6,27 @@ using Unity.Netcode;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class BotSpawner : NetworkBehaviour
+    public class BotSpawner : MonoBehaviour
     {
         [SerializeField] private BotDefinition[] botDefinitions;
 
         private void Start()
         {
+            StartCoroutine(SpawnBots());
+        }
+
+        private IEnumerator SpawnBots()
+        {
+            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer());
             foreach (BotDefinition botDefinition in botDefinitions)
             {
-                PlayerDataManager.Singleton.AddBotData(botDefinition.characterIndex, botDefinition.skinIndex, botDefinition.team);
+                PlayerDataManager.Singleton.AddBotData(botDefinition.team);
             }
         }
 
         [System.Serializable]
         private class BotDefinition
         {
-            public int characterIndex;
-            public int skinIndex;
             public PlayerDataManager.Team team;
         }
     }
