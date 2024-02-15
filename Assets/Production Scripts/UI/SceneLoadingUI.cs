@@ -65,6 +65,8 @@ namespace Vi.UI
 
             for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
             {
+                if (!NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.IsValid()) { continue; }
+
                 if (NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
                 {
                     progressBarText.text = (NetSceneManager.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count - i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
