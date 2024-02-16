@@ -11,10 +11,12 @@ namespace Vi.UI
 {
     public class ContentManager : Menu
     {
+        [SerializeField] private DownloadGroup downloadGroup;
+        [SerializeField] private Transform downloadGroupParent;
         [SerializeField] private DownloadableAssetGroup[] assetGroups;
 
         [System.Serializable]
-        private struct DownloadableAssetGroup
+        public struct DownloadableAssetGroup
         {
             public string name;
             public AssetReference defaultAssetToDownload;
@@ -22,10 +24,20 @@ namespace Vi.UI
         }
 
         [System.Serializable]
-        private struct DownloadableAsset
+        public struct DownloadableAsset
         {
             public string name;
             public AssetReference assetReference;
+            public Sprite buttonIcon;
+        }
+
+        private void Start()
+        {
+            foreach (DownloadableAssetGroup downloadableAssetGroup in assetGroups)
+            {
+                DownloadGroup group = Instantiate(downloadGroup.gameObject, downloadGroupParent).GetComponent<DownloadGroup>();
+                group.Initialize(downloadableAssetGroup);
+            }
         }
     }
 }

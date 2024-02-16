@@ -1275,7 +1275,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &3203541222728216427
 MonoBehaviour:
@@ -1329,8 +1329,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97161208c61ac1e488d8a9b86bec80d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  downloadGroup: {fileID: 5134330636814350863, guid: 00b2869fe6b8937488140a7512372153,
+    type: 3}
+  downloadGroupParent: {fileID: 4556377508304521768}
   assetGroups:
-  - name: Free For All
+  - name: FREE FOR ALL
     defaultAssetToDownload:
       m_AssetGUID: 3a544987c4a966b45ad76240e0fdc184
       m_SubObjectName: 
@@ -1343,13 +1346,15 @@ MonoBehaviour:
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
+      buttonIcon: {fileID: 21300000, guid: 6ffa1d7f1f9cd85458e2e78c300e365e, type: 3}
     - name: Arena Map B
       assetReference:
         m_AssetGUID: 913d56e88d7acc44b9a91e1d51132a39
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
-  - name: Team Elimination
+      buttonIcon: {fileID: 21300000, guid: 3de980d6f3d326e40b754f4798fd911d, type: 3}
+  - name: TEAM ELIMINATION
     defaultAssetToDownload:
       m_AssetGUID: 013a9e0dc897cd54298a50fd0633462a
       m_SubObjectName: 
@@ -1362,13 +1367,15 @@ MonoBehaviour:
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
+      buttonIcon: {fileID: 21300000, guid: 6ffa1d7f1f9cd85458e2e78c300e365e, type: 3}
     - name: Arena Map B
       assetReference:
         m_AssetGUID: 913d56e88d7acc44b9a91e1d51132a39
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
-  - name: Essence War
+      buttonIcon: {fileID: 21300000, guid: 3de980d6f3d326e40b754f4798fd911d, type: 3}
+  - name: ESSENCE WAR
     defaultAssetToDownload:
       m_AssetGUID: 9e35f561e234d7940826c6c4f419f5da
       m_SubObjectName: 
@@ -1381,12 +1388,14 @@ MonoBehaviour:
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
+      buttonIcon: {fileID: 21300000, guid: 42d05ecb47aace24a90cd27c1ae59ac8, type: 3}
     - name: Essence War Map B
       assetReference:
         m_AssetGUID: 939ad267773fd834299dca72d483fa16
         m_SubObjectName: 
         m_SubObjectType: 
         m_EditorAssetChanged: 0
+      buttonIcon: {fileID: 21300000, guid: b0ff3d6789193044bb5140e434118123, type: 3}
 --- !u!1 &3452126741262682421
 GameObject:
   m_ObjectHideFlags: 0
