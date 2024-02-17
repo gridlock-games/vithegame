@@ -97,15 +97,18 @@ namespace Vi.Core
                 Addressables.Release(downloadHandle);
             }
 
-            assetNumberText.text = "";
+            assetNumberText.text = downloadsSuccessful ? "" : "Servers Offline or Your Connection is Bad";
             downloadProgressBarImage.fillAmount = 1;
             downloadProgressBarText.text = downloadsSuccessful ? "All Downloads Complete" : "Downloads Unsuccessful";
 
             Addressables.Release(mainMenuDownloadSize);
             Addressables.Release(baseDownloadSize);
 
-            yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-            SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            if (downloadsSuccessful)
+            {
+                yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
+                SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            }
         }
     }
 }
