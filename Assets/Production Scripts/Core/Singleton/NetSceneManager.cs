@@ -164,7 +164,6 @@ namespace Vi.Core
             {
                 AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!handle.IsValid()) { continue; }
-                Debug.Log("Unloading " + scene.SceneName);
                 LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
                 sceneHandles.Remove(handle);
             }
@@ -285,13 +284,11 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
-                Debug.Log("Added " + scenePayloads[networkListEvent.Value].name);
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
-                Debug.Log("Removed " + scenePayloads[networkListEvent.Value].name);
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
             }
