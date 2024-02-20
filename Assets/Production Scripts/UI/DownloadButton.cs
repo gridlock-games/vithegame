@@ -49,12 +49,14 @@ namespace Vi.UI
         private IEnumerator Init()
         {
             AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(AssetReference);
+            AsyncOperationHandle<long> defaultAssetDownloadSize = Addressables.GetDownloadSizeAsync(defaultAssetReference);
             yield return new WaitUntil(() => downloadSize.IsDone);
-
+            yield return new WaitUntil(() => defaultAssetDownloadSize.IsDone);
+            
             button.onClick.RemoveAllListeners();
-            if (downloadSize.Result > 0)
+            if (downloadSize.Result > 0 | defaultAssetDownloadSize.Result > 0)
             {
-                progressBarText.text = (downloadSize.Result * 0.000001f).ToString("F2") + " MB";
+                progressBarText.text = ((downloadSize.Result + defaultAssetDownloadSize.Result) * 0.000001f).ToString("F2") + " MB";
                 progressBarImage.fillAmount = 1;
                 button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
                 downloadIcon.gameObject.SetActive(true);
