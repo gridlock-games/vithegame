@@ -19,6 +19,8 @@ namespace Vi.UI
         [SerializeField] private Text spawningPlayerObjectText;
 
         private float lastTextChangeTime;
+        private float lastDownloadChangeTime;
+        private float lastBytesAmount;
         private void Update()
         {
             if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
@@ -63,7 +65,29 @@ namespace Vi.UI
 
             for (int i = 0; i < NetSceneManager.Singleton.LoadingOperations.Count; i++)
             {
-                progressBarText.text = (NetSceneManager.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count-i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                if (!NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.IsValid()) { continue; }
+
+                if (NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
+                {
+                    progressBarText.text = (NetSceneManager.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + NetSceneManager.Singleton.LoadingOperations[i].sceneName + " | " + (NetSceneManager.Singleton.LoadingOperations.Count - i) + (NetSceneManager.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                }
+                else // If this scene has not been downloaded
+                {
+                    float downloadRate = 0;
+                    float totalMB = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes * 0.000001f;
+
+                    float downloadedMB = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().DownloadedBytes * 0.000001f;
+
+                    if (Time.time - lastDownloadChangeTime >= 1)
+                    {
+                        downloadRate = downloadedMB - lastBytesAmount;
+                        lastBytesAmount = downloadedMB;
+                        lastDownloadChangeTime = Time.time;
+                    }
+
+                    progressBarText.text = downloadedMB.ToString("F2") + " MB / " + totalMB.ToString("F2") + " MB" + " (" + downloadRate.ToString("F2") + "Mbps)";
+                }
+
                 progressBarImage.fillAmount = NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.IsDone ? 1 : NetSceneManager.Singleton.LoadingOperations[i].asyncOperation.PercentComplete;
             }
         }

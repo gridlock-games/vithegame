@@ -23,6 +23,12 @@ namespace Vi.Core
 
         private IEnumerator LoadScenes()
         {
+            bool downloadsSuccessful = true;
+
+            assetNumberText.text = "";
+            downloadProgressBarImage.fillAmount = 1;
+            downloadProgressBarText.text = "Querying server for updates";
+
             AsyncOperationHandle<long> baseDownloadSize = Addressables.GetDownloadSizeAsync(baseSceneReference);
             yield return new WaitUntil(() => baseDownloadSize.IsDone);
 
@@ -55,6 +61,8 @@ namespace Vi.Core
                     yield return null;
                 }
 
+                downloadsSuccessful = downloadHandle.Status == AsyncOperationStatus.Succeeded & downloadsSuccessful;
+
                 Addressables.Release(downloadHandle);
             }
 
@@ -84,18 +92,23 @@ namespace Vi.Core
                     yield return null;
                 }
 
+                downloadsSuccessful = downloadHandle.Status == AsyncOperationStatus.Succeeded & downloadsSuccessful;
+
                 Addressables.Release(downloadHandle);
             }
 
-            assetNumberText.text = "";
+            assetNumberText.text = downloadsSuccessful ? "" : "Servers Offline or Your Connection is Bad";
             downloadProgressBarImage.fillAmount = 1;
-            downloadProgressBarText.text = "All Downloads Complete";
+            downloadProgressBarText.text = downloadsSuccessful ? "All Downloads Complete" : "Downloads Unsuccessful";
 
             Addressables.Release(mainMenuDownloadSize);
             Addressables.Release(baseDownloadSize);
 
-            yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-            SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            if (downloadsSuccessful)
+            {
+                yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
+                SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            }
         }
     }
 }

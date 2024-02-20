@@ -14,6 +14,7 @@ namespace Vi.UI
     public class MainMenuUI : MonoBehaviour
     {
         [SerializeField] private PauseMenu pauseMenu;
+        [SerializeField] private ContentManager contentManager;
         [SerializeField] private GameObject initialParent;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
@@ -140,6 +141,11 @@ namespace Vi.UI
         public void OpenSettingsMenu()
         {
             Instantiate(pauseMenu.gameObject);
+        }
+
+        public void OpenContentManager()
+        {
+            Instantiate(contentManager.gameObject);
         }
 
         public IEnumerator CreateAccount()

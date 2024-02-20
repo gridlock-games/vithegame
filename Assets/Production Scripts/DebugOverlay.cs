@@ -27,6 +27,7 @@ public class DebugOverlay : MonoBehaviour
 
     private void Start()
     {
+        DontDestroyOnLoad(gameObject);
         runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
         DebugManager.instance.enableRuntimeUI = false;
     }
