@@ -539,12 +539,9 @@ namespace Vi.Core
 
         private IEnumerator ReturnToCharacterSelect()
         {
-            Debug.Log(NetSceneManager.Singleton.IsBusyLoadingScenes());
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
-            Debug.Log("Not busy");
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
-                Debug.Log("Loading character select");
                 NetSceneManager.Singleton.LoadScene("Character Select");
             }
         }

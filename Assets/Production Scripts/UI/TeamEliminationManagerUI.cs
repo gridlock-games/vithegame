@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] protected Text roundTimerText;
         [SerializeField] protected Text gameEndText;
         [SerializeField] protected Text roundResultText;
+        [SerializeField] protected Text roundWinThresholdText;
 
         protected TeamEliminationManager teamEliminationManager;
 
@@ -24,6 +25,8 @@ namespace Vi.UI
 
             leftScoreText.text = "Your Team: ";
             rightScoreText.text = "Enemy Team: ";
+
+            roundWinThresholdText.text = "Rounds To Win Game: " + teamEliminationManager.GetNumberOfRoundsWinsToWinGame().ToString();
         }
 
         protected void Update()

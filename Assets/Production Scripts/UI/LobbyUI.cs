@@ -74,6 +74,17 @@ namespace Vi.UI
             int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
             gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
             ChangeGameMode();
+
+            StartCoroutine(Init());
+        }
+
+        private IEnumerator Init()
+        {
+            spectateButton.interactable = false;
+            lockCharacterButton.interactable = false;
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+            lockCharacterButton.interactable = true;
+            spectateButton.interactable = true;
         }
 
         public static string FromCamelCase(string inputString)
@@ -238,7 +249,7 @@ namespace Vi.UI
             string playersString = "";
             foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
-                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString();
+                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString();
             }
 
             if (lastPlayersString != playersString)

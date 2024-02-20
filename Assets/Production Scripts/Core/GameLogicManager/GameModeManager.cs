@@ -18,6 +18,8 @@ namespace Vi.Core.GameModeManagers
         [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private float respawnTime = 5;
 
+        public int GetNumberOfRoundsWinsToWinGame() { return numberOfRoundsWinsToWinGame; }
+
         public float GetRespawnTime() { return respawnTime; }
 
         protected NetworkVariable<float> roundTimer = new NetworkVariable<float>();

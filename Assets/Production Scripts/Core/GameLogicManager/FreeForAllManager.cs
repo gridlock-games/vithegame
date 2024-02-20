@@ -11,6 +11,8 @@ namespace Vi.Core.GameModeManagers
         [Header("Free for all specific")]
         [SerializeField] private int killsToWinRound = 2;
 
+        public int GetKillsToWinRound() { return killsToWinRound; }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
