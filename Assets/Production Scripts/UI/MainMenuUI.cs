@@ -187,22 +187,13 @@ namespace Vi.UI
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
-                bool isHubInBuild = SceneUtility.GetBuildIndexByScenePath("Player Hub") != -1;
-                bool isLobbyInBuild = SceneUtility.GetBuildIndexByScenePath("Lobby") != -1;
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | !(isHubInBuild & isLobbyInBuild))
+                if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
                 {
-                    if (isHubInBuild & isLobbyInBuild)
-                    {
-                        //StoreClient("Headless Client");
-                    }
-                    else if (isHubInBuild)
-                    {
-                        StartHubServer();
-                    }
-                    else if (isLobbyInBuild)
-                    {
-                        StartLobbyServer();
-                    }
+                    StartHubServer();
+                }
+                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
+                {
+                    StartLobbyServer();
                 }
             }
             

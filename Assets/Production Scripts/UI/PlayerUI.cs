@@ -49,7 +49,7 @@ namespace Vi.UI
         [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
 
         [System.Serializable]
-        private struct PlatformUIDefinition
+        public struct PlatformUIDefinition
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
@@ -57,7 +57,7 @@ namespace Vi.UI
         }
 
         [System.Serializable]
-        private struct MoveUIDefinition
+        public struct MoveUIDefinition
         {
             public GameObject gameObjectToMove;
             public Vector2 newAnchoredPosition;

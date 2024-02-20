@@ -106,6 +106,13 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
+                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
                 Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
             }
             putRequest.Dispose();
@@ -124,6 +131,13 @@ namespace Vi.Core
             UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
@@ -203,12 +217,18 @@ namespace Vi.Core
 
             UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
             deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
-
             deleteRequest.SetRequestHeader("Content-Type", "application/json");
-
             deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
-
             yield return deleteRequest.SendWebRequest();
+
+            if (deleteRequest.result != UnityWebRequest.Result.Success)
+            {
+                deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
+                deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+                deleteRequest.SetRequestHeader("Content-Type", "application/json");
+                deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+                yield return deleteRequest.SendWebRequest();
+            }
 
             if (deleteRequest.result != UnityWebRequest.Result.Success)
             {
@@ -313,7 +333,14 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
+                postRequest = new UnityWebRequest(APIURL + "auth/users/create", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CreateAccount() " + postRequest.error);
             }
             else
             {
@@ -399,6 +426,13 @@ namespace Vi.Core
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
@@ -607,6 +641,13 @@ namespace Vi.Core
 
                 if (putRequest.result != UnityWebRequest.Result.Success)
                 {
+                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+                    putRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return putRequest.SendWebRequest();
+                }
+
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
                     Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
                 }
                 putRequest.Dispose();
@@ -658,6 +699,13 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
+                postRequest = new UnityWebRequest(APIURL + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
             }
 
@@ -704,6 +752,13 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
@@ -719,6 +774,13 @@ namespace Vi.Core
             UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
@@ -757,6 +819,13 @@ namespace Vi.Core
                 UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
                 postRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                    postRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return postRequest.SendWebRequest();
+                }
 
                 if (postRequest.result != UnityWebRequest.Result.Success)
                 {
@@ -808,6 +877,13 @@ namespace Vi.Core
                 UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
+
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
+                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+                    putRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return putRequest.SendWebRequest();
+                }
 
                 if (putRequest.result != UnityWebRequest.Result.Success)
                 {
@@ -1313,6 +1389,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (!IsLoggingIn) { StartCoroutine(Login("LightPat", "patrick11")); }
+
             if (thisServerCreated)
             {
                 if (!IsRefreshingServers)
@@ -1383,6 +1461,13 @@ namespace Vi.Core
 
                 if (postRequest.result != UnityWebRequest.Result.Success)
                 {
+                    postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                    postRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return postRequest.SendWebRequest();
+                }
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
                     Debug.LogError("Post request error in WebRequestManager.CreateItems()" + postRequest.error);
                 }
 
@@ -1414,6 +1499,13 @@ namespace Vi.Core
                 UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
                 postRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return postRequest.SendWebRequest();
+
+                if (postRequest.result != UnityWebRequest.Result.Success)
+                {
+                    postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                    postRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return postRequest.SendWebRequest();
+                }
 
                 if (postRequest.result != UnityWebRequest.Result.Success)
                 {
@@ -1548,6 +1640,13 @@ namespace Vi.Core
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {

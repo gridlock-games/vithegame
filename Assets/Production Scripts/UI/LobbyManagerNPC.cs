@@ -107,18 +107,16 @@ namespace Vi.UI
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Lobby Build\VitheGame.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Build\VitheGame.exe";
             }
             else
             {
                 path = Application.dataPath;
                 path = path.Substring(0, path.LastIndexOf('/'));
-                path = path.Substring(0, path.LastIndexOf('/'));
-                path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
             }
 
-            System.Diagnostics.Process.Start(path);
+            System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
             Debug.Log("Waiting for server count change: " + originalServerCount);
             yield return new WaitUntil(() => WebRequestManager.Singleton.LobbyServers.Length != originalServerCount);
             Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);

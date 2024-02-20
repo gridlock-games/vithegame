@@ -17,7 +17,7 @@ namespace Vi.UI
         public Image deleteIcon;
 
         public AssetReference AssetReference { get; private set; }
-
+        private AssetReference defaultAssetReference;
         private List<DownloadButton> mimicDownloadButtons = new List<DownloadButton>();
         public void AddMimicDownloadButtons(DownloadButton downloadButton)
         {
@@ -37,9 +37,10 @@ namespace Vi.UI
             }
         }
 
-        public void Initialize(ContentManager.DownloadableAsset downloadableAsset)
+        public void Initialize(ContentManager.DownloadableAsset downloadableAsset, AssetReference defaultAssetReference)
         {
             AssetReference = downloadableAsset.assetReference;
+            this.defaultAssetReference = defaultAssetReference;
             StartCoroutine(Init());
             iconImage.sprite = downloadableAsset.buttonIcon;
             itemText.text = downloadableAsset.name;
@@ -48,12 +49,14 @@ namespace Vi.UI
         private IEnumerator Init()
         {
             AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(AssetReference);
+            AsyncOperationHandle<long> defaultAssetDownloadSize = Addressables.GetDownloadSizeAsync(defaultAssetReference);
             yield return new WaitUntil(() => downloadSize.IsDone);
-
+            yield return new WaitUntil(() => defaultAssetDownloadSize.IsDone);
+            
             button.onClick.RemoveAllListeners();
-            if (downloadSize.Result > 0)
+            if (downloadSize.Result > 0 | defaultAssetDownloadSize.Result > 0)
             {
-                progressBarText.text = (downloadSize.Result * 0.000001f).ToString("F2") + " MB";
+                progressBarText.text = ((downloadSize.Result + defaultAssetDownloadSize.Result) * 0.000001f).ToString("F2") + " MB";
                 progressBarImage.fillAmount = 1;
                 button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
                 downloadIcon.gameObject.SetActive(true);
@@ -85,16 +88,17 @@ namespace Vi.UI
             button.interactable = false;
             downloadIcon.gameObject.SetActive(false);
             AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(AssetReference);
+            AsyncOperationHandle defaultDownloadHandle = Addressables.DownloadDependenciesAsync(defaultAssetReference);
             MimicButtons();
 
             float lastRateTime = -1;
             float downloadRate = 0;
             float lastBytesAmount = 0;
-            float totalMB = downloadHandle.GetDownloadStatus().TotalBytes * 0.000001f;
-            while (!downloadHandle.IsDone)
+            float totalMB = (downloadHandle.GetDownloadStatus().TotalBytes + defaultDownloadHandle.GetDownloadStatus().TotalBytes) * 0.000001f;
+            while (!downloadHandle.IsDone | !defaultDownloadHandle.IsDone)
             {
-                progressBarImage.fillAmount = downloadHandle.GetDownloadStatus().Percent;
-                float downloadedMB = downloadHandle.GetDownloadStatus().DownloadedBytes * 0.000001f;
+                progressBarImage.fillAmount = (downloadHandle.GetDownloadStatus().Percent + defaultDownloadHandle.GetDownloadStatus().Percent) / 2;
+                float downloadedMB = (downloadHandle.GetDownloadStatus().DownloadedBytes + defaultDownloadHandle.GetDownloadStatus().TotalBytes) * 0.000001f;
                 if (Time.time - lastRateTime >= 1)
                 {
                     downloadRate = downloadedMB - lastBytesAmount;
@@ -115,6 +119,7 @@ namespace Vi.UI
 
             MimicButtons();
             Addressables.Release(downloadHandle);
+            Addressables.Release(defaultDownloadHandle);
         }
 
         private IEnumerator DeleteAsset()
