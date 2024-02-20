@@ -20,7 +20,7 @@ namespace Vi.UI
             foreach (ContentManager.DownloadableAsset downloadableAsset in downloadableAssetGroup.assetReferences)
             {
                 DownloadButton button = Instantiate(downloadButton.gameObject, buttonParent).GetComponent<DownloadButton>();
-                button.Initialize(downloadableAsset);
+                button.Initialize(downloadableAsset, downloadableAssetGroup.defaultAssetToDownload);
                 downloadButtons.Add(button);
             }
         }

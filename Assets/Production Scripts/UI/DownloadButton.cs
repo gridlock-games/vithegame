@@ -17,7 +17,7 @@ namespace Vi.UI
         public Image deleteIcon;
 
         public AssetReference AssetReference { get; private set; }
-
+        private AssetReference defaultAssetReference;
         private List<DownloadButton> mimicDownloadButtons = new List<DownloadButton>();
         public void AddMimicDownloadButtons(DownloadButton downloadButton)
         {
@@ -37,9 +37,10 @@ namespace Vi.UI
             }
         }
 
-        public void Initialize(ContentManager.DownloadableAsset downloadableAsset)
+        public void Initialize(ContentManager.DownloadableAsset downloadableAsset, AssetReference defaultAssetReference)
         {
             AssetReference = downloadableAsset.assetReference;
+            this.defaultAssetReference = defaultAssetReference;
             StartCoroutine(Init());
             iconImage.sprite = downloadableAsset.buttonIcon;
             itemText.text = downloadableAsset.name;
@@ -85,16 +86,17 @@ namespace Vi.UI
             button.interactable = false;
             downloadIcon.gameObject.SetActive(false);
             AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(AssetReference);
+            AsyncOperationHandle defaultDownloadHandle = Addressables.DownloadDependenciesAsync(defaultAssetReference);
             MimicButtons();
 
             float lastRateTime = -1;
             float downloadRate = 0;
             float lastBytesAmount = 0;
-            float totalMB = downloadHandle.GetDownloadStatus().TotalBytes * 0.000001f;
-            while (!downloadHandle.IsDone)
+            float totalMB = (downloadHandle.GetDownloadStatus().TotalBytes + defaultDownloadHandle.GetDownloadStatus().TotalBytes) * 0.000001f;
+            while (!downloadHandle.IsDone | !defaultDownloadHandle.IsDone)
             {
-                progressBarImage.fillAmount = downloadHandle.GetDownloadStatus().Percent;
-                float downloadedMB = downloadHandle.GetDownloadStatus().DownloadedBytes * 0.000001f;
+                progressBarImage.fillAmount = (downloadHandle.GetDownloadStatus().Percent + defaultDownloadHandle.GetDownloadStatus().Percent) / 2;
+                float downloadedMB = (downloadHandle.GetDownloadStatus().DownloadedBytes + defaultDownloadHandle.GetDownloadStatus().TotalBytes) * 0.000001f;
                 if (Time.time - lastRateTime >= 1)
                 {
                     downloadRate = downloadedMB - lastBytesAmount;
@@ -115,6 +117,7 @@ namespace Vi.UI
 
             MimicButtons();
             Addressables.Release(downloadHandle);
+            Addressables.Release(defaultDownloadHandle);
         }
 
         private IEnumerator DeleteAsset()
