@@ -106,6 +106,13 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
+                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
                 Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
             }
             putRequest.Dispose();
@@ -124,6 +131,13 @@ namespace Vi.Core
             UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
@@ -627,6 +641,13 @@ namespace Vi.Core
 
                 if (putRequest.result != UnityWebRequest.Result.Success)
                 {
+                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+                    putRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return putRequest.SendWebRequest();
+                }
+
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
                     Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
                 }
                 putRequest.Dispose();
@@ -731,6 +752,13 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
@@ -746,6 +774,13 @@ namespace Vi.Core
             UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
@@ -842,6 +877,13 @@ namespace Vi.Core
                 UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
+
+                if (putRequest.result != UnityWebRequest.Result.Success)
+                {
+                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+                    putRequest.SetRequestHeader("Content-Type", "application/json");
+                    yield return putRequest.SendWebRequest();
+                }
 
                 if (putRequest.result != UnityWebRequest.Result.Success)
                 {
