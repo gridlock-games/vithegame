@@ -118,7 +118,7 @@ namespace Vi.UI
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
             }
 
-            System.Diagnostics.Process.Start(path);
+            System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
             Debug.Log("Waiting for server count change: " + originalServerCount);
             yield return new WaitUntil(() => WebRequestManager.Singleton.LobbyServers.Length != originalServerCount);
             Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
