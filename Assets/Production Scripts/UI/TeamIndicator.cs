@@ -29,7 +29,13 @@ namespace Vi.UI
                 {
                     if (mat.HasProperty("_Glow"))
                     {
-                        mat.color = attributes.GetRelativeTeamColor();
+                        //mat.color = attributes.GetRelativeTeamColor();
+                        
+                        if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
+                            mat.color = PlayerDataManager.GetTeamColor(attributes.GetTeam());
+                        else
+                            mat.color = Color.black;
+
                         mat.SetFloat("_Glow", glowAmount);
                         mat.SetFloat("_Transparency", mat.color == Color.black ? 0 : 1);
                     }

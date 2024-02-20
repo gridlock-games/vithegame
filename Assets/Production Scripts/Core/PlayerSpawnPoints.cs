@@ -55,6 +55,8 @@ namespace Vi.Core
             TransformData spawnPoint = new TransformData();
             if (possibleSpawnPoints.Count != 0)
                 spawnPoint = possibleSpawnPoints[randomIndex];
+
+            Debug.Log(spawnPoint.position + " " + spawnPoint.rotation.eulerAngles);
             return spawnPoint;
         }
 
