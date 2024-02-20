@@ -19,7 +19,6 @@ namespace Vi.Core.GameModeManagers
             // TODO Change this to check if all players on the victim's team are dead
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
 
-            Debug.Log(victim.GetTeam() + " " + PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam()).TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death));
             if (PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam()).TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
             {
                 List<Attributes> killerTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());

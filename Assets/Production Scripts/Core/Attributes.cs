@@ -325,7 +325,6 @@ namespace Vi.Core
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
             }
 
             if (damage != 0)
@@ -356,7 +355,11 @@ namespace Vi.Core
 
                         ailmentChangedOnThisAttack = ailment.Value != attackAilment;
                         ailment.Value = attackAilment;
-                        if (ailment.Value == ActionClip.Ailment.Death) { SetKiller(attacker); }
+                        if (ailment.Value == ActionClip.Ailment.Death)
+                        {
+                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                            SetKiller(attacker);
+                        }
                     }
                     else // If this attack's ailment is none
                     {
