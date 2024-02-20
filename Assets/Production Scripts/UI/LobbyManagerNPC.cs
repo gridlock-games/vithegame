@@ -113,8 +113,6 @@ namespace Vi.UI
             {
                 path = Application.dataPath;
                 path = path.Substring(0, path.LastIndexOf('/'));
-                path = path.Substring(0, path.LastIndexOf('/'));
-                path = Path.Join(path, new DirectoryInfo(System.Array.Find(Directory.GetDirectories(path), a => a.ToLower().Contains("lobby"))).Name);
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
             }
 
