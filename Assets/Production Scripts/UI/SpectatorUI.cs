@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Vi.Core;
 using Vi.Player;
@@ -8,13 +9,37 @@ namespace Vi.UI
 {
     public class SpectatorUI : MonoBehaviour
     {
+        [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private PlayerCard[] leftPlayerCards;
         [SerializeField] private PlayerCard[] rightPlayerCards;
+
+        [SerializeField] private PlayerUI.PlatformUIDefinition[] platformUIDefinitions;
 
         private Spectator spectator;
         private void Start()
         {
             spectator = GetComponentInParent<Spectator>();
+
+            foreach (PlayerUI.PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (PlayerUI.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+            }
+        }
+
+        public void OpenPauseMenu()
+        {
+            Instantiate(pauseMenu.gameObject);
         }
 
         private void Update()
