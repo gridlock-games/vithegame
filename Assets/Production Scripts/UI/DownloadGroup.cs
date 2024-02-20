@@ -12,6 +12,8 @@ namespace Vi.UI
         [SerializeField] private Transform buttonParent;
         [SerializeField] private Text headerText;
 
+        public List<DownloadButton> downloadButtons { get; private set; } = new List<DownloadButton>();
+
         public void Initialize(ContentManager.DownloadableAssetGroup downloadableAssetGroup)
         {
             headerText.text = downloadableAssetGroup.name;
@@ -19,6 +21,7 @@ namespace Vi.UI
             {
                 DownloadButton button = Instantiate(downloadButton.gameObject, buttonParent).GetComponent<DownloadButton>();
                 button.Initialize(downloadableAsset);
+                downloadButtons.Add(button);
             }
         }
     }
