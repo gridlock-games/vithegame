@@ -43,7 +43,6 @@ namespace Vi.UI
             }
 
             List<DownloadButton> buttonList = new List<DownloadButton>();
-
             foreach (DownloadGroup group in groupList)
             {
                 foreach (DownloadButton button in group.downloadButtons)
