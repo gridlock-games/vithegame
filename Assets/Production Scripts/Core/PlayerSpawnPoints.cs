@@ -55,8 +55,9 @@ namespace Vi.Core
             TransformData spawnPoint = new TransformData();
             if (possibleSpawnPoints.Count != 0)
                 spawnPoint = possibleSpawnPoints[randomIndex];
+            else
+                Debug.LogError("Possible Spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team);
 
-            Debug.Log(spawnPoint.position + " " + spawnPoint.rotation.eulerAngles);
             return spawnPoint;
         }
 
