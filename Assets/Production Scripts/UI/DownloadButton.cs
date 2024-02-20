@@ -33,7 +33,7 @@ namespace Vi.UI
                 button.progressBarText.text = progressBarText.text;
                 button.downloadIcon.gameObject.SetActive(downloadIcon.gameObject.activeSelf);
                 button.deleteIcon.gameObject.SetActive(deleteIcon.gameObject.activeSelf);
-                button.Button.interactable = Button.interactable;
+                button.button.interactable = this.button.interactable;
             }
         }
 
@@ -50,39 +50,39 @@ namespace Vi.UI
             AsyncOperationHandle<long> downloadSize = Addressables.GetDownloadSizeAsync(AssetReference);
             yield return new WaitUntil(() => downloadSize.IsDone);
 
-            Button.onClick.RemoveAllListeners();
+            button.onClick.RemoveAllListeners();
             if (downloadSize.Result > 0)
             {
                 progressBarText.text = (downloadSize.Result * 0.000001f).ToString("F2") + " MB";
                 progressBarImage.fillAmount = 1;
-                Button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
+                button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
                 downloadIcon.gameObject.SetActive(true);
             }
             else // We already have this asset downloaded
             {
                 progressBarText.text = "Downloaded";
                 progressBarImage.fillAmount = 1;
-                Button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
+                button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
                 deleteIcon.gameObject.SetActive(true);
             }
 
-            Button.interactable = true;
+            button.interactable = true;
         }
 
-        public Button Button { get; private set; }
+        public Button button { get; private set; }
         private void Awake()
         {
             downloadIcon.gameObject.SetActive(false);
             deleteIcon.gameObject.SetActive(false);
 
-            Button = GetComponent<Button>();
-            Button.interactable = false;
+            button = GetComponent<Button>();
+            button.interactable = false;
             progressBarText.text = "";
         }
 
         private IEnumerator DownloadAsset()
         {
-            Button.interactable = false;
+            button.interactable = false;
             downloadIcon.gameObject.SetActive(false);
             AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(AssetReference);
             MimicButtons();
@@ -108,10 +108,10 @@ namespace Vi.UI
 
             progressBarText.text = "Downloaded";
 
-            Button.onClick.RemoveAllListeners();
-            Button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
             deleteIcon.gameObject.SetActive(true);
-            Button.interactable = true;
+            button.interactable = true;
 
             MimicButtons();
             Addressables.Release(downloadHandle);
@@ -119,7 +119,7 @@ namespace Vi.UI
 
         private IEnumerator DeleteAsset()
         {
-            Button.interactable = false;
+            button.interactable = false;
             deleteIcon.gameObject.SetActive(false);
             AsyncOperationHandle<bool> clearCacheHandle = Addressables.ClearDependencyCacheAsync(AssetReference, false);
             MimicButtons();
@@ -136,10 +136,10 @@ namespace Vi.UI
             yield return new WaitUntil(() => downloadSize.IsDone);
             progressBarText.text = (downloadSize.Result * 0.000001f).ToString("F2") + " MB";
 
-            Button.onClick.RemoveAllListeners();
-            Button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(delegate { StartCoroutine(DownloadAsset()); });
             downloadIcon.gameObject.SetActive(true);
-            Button.interactable = true;
+            button.interactable = true;
 
             MimicButtons();
             Addressables.Release(clearCacheHandle);
