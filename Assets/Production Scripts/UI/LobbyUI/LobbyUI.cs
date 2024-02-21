@@ -44,6 +44,14 @@ namespace Vi.UI
         {
             public PlayerDataManager.GameMode gameMode;
             public Transform parent;
+            public CustomSettingsInputField[] inputFields;
+
+            [System.Serializable]
+            public struct CustomSettingsInputField
+            {
+                public string key;
+                public InputField inputField;
+            }
         }
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
@@ -82,6 +90,14 @@ namespace Vi.UI
                 StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));
 
                 if (first) { PlayerDataManager.Singleton.SetGameMode(gameMode); first = false; }
+            }
+
+            foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
+            {
+                foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in customSettingsParent.inputFields)
+                {
+                    customSettingsInputField.inputField.onValueChanged.AddListener(delegate { ValidateInputAsInt(customSettingsInputField.inputField); });
+                }
             }
 
             StartCoroutine(Init());
@@ -230,6 +246,11 @@ namespace Vi.UI
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
+        }
+
+        public void ValidateInputAsInt(InputField inputField)
+        {
+            inputField.text = Regex.Replace(inputField.text, @"[^0-9]", "");
         }
 
         private string lastPlayersString;
