@@ -10,15 +10,32 @@ namespace Vi.UI
     {
         [SerializeField] private Text gameModeText;
 
-        public void Initialize(PlayerDataManager.GameMode gameMode)
+        private PlayerDataManager.GameMode gameMode;
+
+        public IEnumerator Initialize(PlayerDataManager.GameMode gameMode, Sprite gameModeIcon)
         {
-            gameModeText.text = gameMode.ToString();
+            this.gameMode = gameMode;
+            gameModeText.text = LobbyUI.FromCamelCase(gameMode.ToString());
+            GetComponent<Image>().sprite = gameModeIcon;
+
+            yield return new WaitUntil(() => PlayerDataManager.Singleton);
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.IsSpawned);
+
+            GetComponent<Button>().onClick.AddListener(delegate { PlayerDataManager.Singleton.SetGameMode(gameMode); });
         }
 
-        private Image image;
+        private Button button;
         private void Awake()
         {
-            image = GetComponent<Image>();
+            button = GetComponent<Button>();
+        }
+
+        private void Update()
+        {
+            if (!PlayerDataManager.Singleton) { button.interactable = false; return; }
+            if (!PlayerDataManager.Singleton.IsSpawned) { button.interactable = false; return; }
+
+            button.interactable = PlayerDataManager.Singleton.GetGameMode() != gameMode;
         }
     }
 }

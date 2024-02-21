@@ -44,6 +44,13 @@ namespace Vi.Core
             }
         }
 
+        public Sprite GetSceneGroupIcon(string sceneGroupName)
+        {
+            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
+            if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return null; }
+            return scenePayloads[sceneGroupIndex].scenePreviewIcon;
+        }
+
         public struct AsyncOperationUI : System.IEquatable<AsyncOperationUI>
         {
             public string sceneName;
@@ -307,6 +314,7 @@ namespace Vi.Core
         {
             public string name;
             public SceneType sceneType;
+            public Sprite scenePreviewIcon;
             public SceneReference[] sceneReferences;
         }
     }

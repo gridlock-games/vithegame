@@ -21,6 +21,7 @@ namespace Vi.Core
         public struct GameModeInfo
         {
             public GameMode gameMode;
+            public Sprite gameModeIcon;
             public Team[] possibleTeams;
             public string[] possibleMapSceneGroupNames;
         }
@@ -28,6 +29,8 @@ namespace Vi.Core
         public CharacterReference GetCharacterReference() { return characterReference; }
 
         public GameModeInfo GetGameModeInfo() { return gameModeInfos.Find(item => item.gameMode == gameMode.Value); }
+
+        public Sprite GetGameModeIcon(GameMode gameMode) { return gameModeInfos.Find(item => item.gameMode == gameMode).gameModeIcon; }
 
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }

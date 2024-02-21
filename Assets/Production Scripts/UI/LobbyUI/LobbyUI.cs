@@ -33,10 +33,10 @@ namespace Vi.UI
         [SerializeField] private Button spectateButton;
         [Header("Room Settings Assignments")]
         [SerializeField] private GameModeOption gameModeOptionPrefab;
+        [SerializeField] private Transform gameModeOptionParent;
         [SerializeField] private MapOption mapOptionPrefab;
+        [SerializeField] private Transform mapOptionParent;
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
-        [SerializeField] private TMP_Dropdown gameModeDropdown;
-        [SerializeField] private TMP_Dropdown mapDropdown;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -65,21 +65,35 @@ namespace Vi.UI
             CloseRoomSettings();
 
             // Game modes
-            gameModeDropdown.ClearOptions();
-            List<TMP_Dropdown.OptionData> gameModeOptions = new List<TMP_Dropdown.OptionData>();
-            List<PlayerDataManager.GameMode> gameModeList = new List<PlayerDataManager.GameMode>();
+            bool first = true;
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
                 if (gameMode == PlayerDataManager.GameMode.None) { continue; }
-                gameModeList.Add(gameMode);
-                gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
+
+                GameModeOption option = Instantiate(gameModeOptionPrefab.gameObject, gameModeOptionParent).GetComponent<GameModeOption>();
+                StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));
+
+                if (first) { PlayerDataManager.Singleton.SetGameMode(gameMode); first = false; }
             }
-            gameModeDropdown.AddOptions(gameModeOptions);
-            int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
-            gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
-            ChangeGameMode();
 
             StartCoroutine(Init());
+        }
+
+        private void RefreshMapOptions()
+        {
+            foreach (Transform child in mapOptionParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            bool first = true;
+            foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
+            {
+                MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
+                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
+
+                if (first) { PlayerDataManager.Singleton.SetMap(mapName); first = false; }
+            }
         }
 
         private IEnumerator Init()
@@ -232,8 +246,7 @@ namespace Vi.UI
                 }
             }
 
-            //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
-            bool canCountDown = playerDataList.Count >= 2;
+            bool canCountDown = false;
             string cannotCountDownMessage = "";
             switch (PlayerDataManager.Singleton.GetGameMode())
             {
@@ -407,18 +420,7 @@ namespace Vi.UI
                 rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
 
                 // Maps
-                mapDropdown.ClearOptions();
-                List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
-                List<string> mapList = new List<string>();
-                foreach (string map in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
-                {
-                    mapList.Add(map);
-                    mapOptions.Add(new TMP_Dropdown.OptionData(map));
-                }
-                mapDropdown.AddOptions(mapOptions);
-                int mapIndex = mapList.IndexOf(mapDropdown.options[mapDropdown.value].text);
-                mapDropdown.SetValueWithoutNotify(mapIndex != -1 ? mapIndex : 0);
-                ChangeMap();
+                RefreshMapOptions();
 
                 // Teams
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
@@ -522,14 +524,14 @@ namespace Vi.UI
             }
         }
 
-        public void ChangeGameMode()
+        public void ChangeGameMode(PlayerDataManager.GameMode gameMode)
         {
-            PlayerDataManager.Singleton.SetGameMode(System.Enum.Parse<PlayerDataManager.GameMode>(gameModeDropdown.options[gameModeDropdown.value].text.Replace(" ", "")));
+            PlayerDataManager.Singleton.SetGameMode(gameMode);
         }
 
-        public void ChangeMap()
+        public void ChangeMap(string map)
         {
-            PlayerDataManager.Singleton.SetMap(mapDropdown.options[mapDropdown.value].text);
+            PlayerDataManager.Singleton.SetMap(map);
         }
 
         public void ChangeTeam(PlayerDataManager.Team team)
