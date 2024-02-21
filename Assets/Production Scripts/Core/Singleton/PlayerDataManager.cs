@@ -82,6 +82,30 @@ namespace Vi.Core
             SetMap(map);
         }
 
+        private NetworkVariable<FixedString512Bytes> gameModeSettings = new NetworkVariable<FixedString512Bytes>();
+
+        public string GetGameModeSettings() { return gameModeSettings.Value.ToString(); }
+
+        public void SetGameModeSettings(string gameModeSettings)
+        {
+            if (gameModeSettings == this.gameModeSettings.Value) { return; }
+
+            if (IsServer)
+            {
+                this.gameModeSettings.Value = gameModeSettings;
+            }
+            else
+            {
+                SetGameModeSettingsServerRpc(gameModeSettings);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetGameModeSettingsServerRpc(string gameModeSettings)
+        {
+            SetGameModeSettings(gameModeSettings);
+        }
+
         public bool IsLobbyLeader()
         {
             if (IsServer) { return true; }

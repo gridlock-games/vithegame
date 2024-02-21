@@ -322,11 +322,13 @@ namespace Vi.UI
             bool roomSettingsParsedProperly = true;
             if (PlayerDataManager.Singleton.IsLobbyLeader())
             {
+                string gameModeSettings = "";
                 foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
                 {
                     if (int.TryParse(customSettingsInputField.inputField.text, out int result))
                     {
                         roomSettingsParsedProperly = result > 0 & roomSettingsParsedProperly;
+                        gameModeSettings += customSettingsInputField.key + ":" + result.ToString() + "|";
                         if (!roomSettingsParsedProperly) { cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
                     }
                     else
@@ -335,6 +337,11 @@ namespace Vi.UI
                         roomSettingsParsedProperly = false & roomSettingsParsedProperly;
                         break;
                     }
+                }
+
+                if (roomSettingsParsedProperly) // customSettingsInputField.key
+                {
+                    PlayerDataManager.Singleton.SetGameModeSettings(gameModeSettings);
                 }
             }
 
