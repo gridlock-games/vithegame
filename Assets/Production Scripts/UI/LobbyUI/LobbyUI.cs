@@ -339,7 +339,7 @@ namespace Vi.UI
                     }
                 }
 
-                if (roomSettingsParsedProperly) // customSettingsInputField.key
+                if (roomSettingsParsedProperly & !IsServer)
                 {
                     PlayerDataManager.Singleton.SetGameModeSettings(gameModeSettings);
                 }
