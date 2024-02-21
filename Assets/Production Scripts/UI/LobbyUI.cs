@@ -240,7 +240,6 @@ namespace Vi.UI
 
                     if (!(team1List.Count > 0 & team2List.Count > 0)) { cannotCountDownMessage = "Need 2 or more players to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
-                    else { cannotCountDownMessage = "Not sure why we can't count down team elimination"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
                     canCountDown = false;
