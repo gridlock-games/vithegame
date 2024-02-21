@@ -189,6 +189,13 @@ namespace Vi.UI
             }
         }
 
+        public void ReturnToCharacterSelect()
+        {
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
+        }
+
         private string lastPlayersString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -243,8 +250,8 @@ namespace Vi.UI
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
-            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
-            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
+            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
+            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
             string playersString = "";
             foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
@@ -363,6 +370,20 @@ namespace Vi.UI
                     int teamIndex = teamList.IndexOf(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team);
                     teamDropdown.SetValueWithoutNotify(teamIndex != -1 ? teamIndex : 0);
                     ChangeTeam();
+                }
+
+                if (IsServer)
+                {
+                    List<int> botClientIds = new List<int>();
+                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                    {
+                        if (playerData.id < 0) { botClientIds.Add(playerData.id); }
+                    }
+
+                    foreach (int clientId in botClientIds)
+                    {
+                        PlayerDataManager.Singleton.KickPlayer(clientId);
+                    }
                 }
             }
 
