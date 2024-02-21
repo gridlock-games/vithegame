@@ -34,7 +34,6 @@ namespace Vi.UI
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
-        [SerializeField] private TMP_Dropdown teamDropdown;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -45,12 +44,14 @@ namespace Vi.UI
             public Text teamTitleText;
             public Transform transformParent;
             public Button addBotButton;
+            public Button joinTeamButton;
 
             public void SetActive(bool isActive)
             {
                 teamTitleText.gameObject.SetActive(isActive);
                 transformParent.gameObject.SetActive(isActive);
                 addBotButton.gameObject.SetActive(isActive);
+                joinTeamButton.gameObject.SetActive(isActive);
             }
         }
 
@@ -80,11 +81,21 @@ namespace Vi.UI
 
         private IEnumerator Init()
         {
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = false;
+            }
             spectateButton.interactable = false;
             lockCharacterButton.interactable = false;
+            
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-            lockCharacterButton.interactable = true;
+            
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = true;
+            }
             spectateButton.interactable = true;
+            lockCharacterButton.interactable = true;
         }
 
         public static string FromCamelCase(string inputString)
@@ -179,7 +190,7 @@ namespace Vi.UI
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
             if (playerData.team == PlayerDataManager.Team.Spectator)
             {
-                playerData.team = PlayerDataManager.Team.Competitor;
+                playerData.team = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0];
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
             else
@@ -187,6 +198,13 @@ namespace Vi.UI
                 playerData.team = PlayerDataManager.Team.Spectator;
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
+        }
+
+        public void ReturnToCharacterSelect()
+        {
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
         private string lastPlayersString;
@@ -213,6 +231,40 @@ namespace Vi.UI
 
             //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
             bool canCountDown = playerDataList.Count >= 2;
+            string cannotCountDownMessage = "";
+            switch (PlayerDataManager.Singleton.GetGameMode())
+            {
+                case PlayerDataManager.GameMode.None:
+                    Debug.LogError("Why the fuck is the game mode set to none");
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for game mode none"; }
+                    break;
+                case PlayerDataManager.GameMode.FreeForAll:
+                    canCountDown = playerDataList.Count >= 2;
+
+                    if (!canCountDown) { cannotCountDownMessage = "Need 2 or more players to play"; }
+                    break;
+                case PlayerDataManager.GameMode.TeamElimination:
+                    List<PlayerDataManager.PlayerData> team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    List<PlayerDataManager.PlayerData> team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    canCountDown = team1List.Count > 0 & team2List.Count > 0 & team1List.Count == team2List.Count;
+
+                    if (!(team1List.Count > 0 & team2List.Count > 0)) { cannotCountDownMessage = "Need 2 or more players to play"; }
+                    else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
+                    break;
+                case PlayerDataManager.GameMode.EssenceWar:
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
+                    break;
+                case PlayerDataManager.GameMode.OutputRush:
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
+                    break;
+                default:
+                    Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());
+                    break;
+            }
+
             if (IsServer)
             {
                 if (canCountDown)
@@ -234,7 +286,7 @@ namespace Vi.UI
             }
             else if (!canCountDown)
             {
-                characterLockTimeText.text = "Need 2 or more players to play";
+                characterLockTimeText.text = cannotCountDownMessage;
             }
             else
             {
@@ -243,8 +295,8 @@ namespace Vi.UI
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
-            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
-            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
+            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
+            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
             string playersString = "";
             foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
@@ -264,14 +316,25 @@ namespace Vi.UI
                     Destroy(child.gameObject);
                 }
 
+                bool leftTeamJoinInteractable = false;
+                bool rightTeamJoinInteractable = false;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (teamParentDict.ContainsKey(playerData.team))
                     {
                         AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
                         accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+
+                        if (playerData.id == (int)NetworkManager.LocalClientId)
+                        {
+                            leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
+                            rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
+                        }
                     }
                 }
+
+                leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
+                rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
             }
             lastPlayersString = playersString;
 
@@ -286,7 +349,7 @@ namespace Vi.UI
                     spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
                 }
             }
-            
+
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
                 // Player account card display logic
@@ -306,9 +369,13 @@ namespace Vi.UI
 
                 leftTeamParent.teamTitleText.text = "";
                 rightTeamParent.teamTitleText.text = "";
+                
                 leftTeamParent.addBotButton.onClick.RemoveAllListeners();
                 rightTeamParent.addBotButton.onClick.RemoveAllListeners();
                 
+                leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+                rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
                     if (i == 0)
@@ -317,6 +384,7 @@ namespace Vi.UI
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        leftTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                     }
                     else if (i == 1)
                     {
@@ -324,6 +392,7 @@ namespace Vi.UI
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        rightTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                     }
                     else
                     {
@@ -349,20 +418,23 @@ namespace Vi.UI
                 ChangeMap();
 
                 // Teams
-                teamDropdown.ClearOptions();
-                List<TMP_Dropdown.OptionData> teamOptions = new List<TMP_Dropdown.OptionData>();
-                List<PlayerDataManager.Team> teamList = new List<PlayerDataManager.Team>();
-                foreach (PlayerDataManager.Team team in PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams)
-                {
-                    teamList.Add(team);
-                    teamOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(team.ToString())));
-                }
-                teamDropdown.AddOptions(teamOptions);
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
                 {
-                    int teamIndex = teamList.IndexOf(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team);
-                    teamDropdown.SetValueWithoutNotify(teamIndex != -1 ? teamIndex : 0);
-                    ChangeTeam();
+                    leftTeamParent.joinTeamButton.onClick.Invoke();
+                }
+
+                if (IsServer)
+                {
+                    List<int> botClientIds = new List<int>();
+                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                    {
+                        if (playerData.id < 0) { botClientIds.Add(playerData.id); }
+                    }
+
+                    foreach (int clientId in botClientIds)
+                    {
+                        PlayerDataManager.Singleton.KickPlayer(clientId);
+                    }
                 }
             }
 
@@ -457,12 +529,12 @@ namespace Vi.UI
             PlayerDataManager.Singleton.SetMap(mapDropdown.options[mapDropdown.value].text);
         }
 
-        public void ChangeTeam()
+        public void ChangeTeam(PlayerDataManager.Team team)
         {
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-                playerData.team = System.Enum.Parse<PlayerDataManager.Team>(teamDropdown.options[teamDropdown.value].text.Replace(" ", ""));
+                playerData.team = team;
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
         }
@@ -489,6 +561,10 @@ namespace Vi.UI
         {
             lockCharacterButton.interactable = false;
             spectateButton.interactable = false;
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = false;
+            }
         }
 
         private NetworkList<ulong> lockedClients;
