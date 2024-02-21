@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using static UnityEngine.AddressableAssets.Addressables;
 
 //This handles all download and Checks for Content Update
 public class CDNDownloadAndCheck : MonoBehaviour
@@ -18,8 +20,8 @@ public class CDNDownloadAndCheck : MonoBehaviour
   public UnityEvent<bool> FailureEvent;
 
   private bool completeDownloadSuccess = false;
-  
-  public (bool checkSuccessful,List<string> toDownload, float totalFileSize) CheckingForUpdate(List<string> key)
+
+  public (bool checkSuccessful, List<string> toDownload, float totalFileSize) CheckingForUpdate(List<string> key)
   {
     float totalBytes = 0;
     bool successfulUpdateCheck = true;
@@ -44,7 +46,7 @@ public class CDNDownloadAndCheck : MonoBehaviour
     //If there content on downlist as well totalBytes is > 0 then report that the game need updating.
     // if successful Update check is false then the checks failed and required game restarts
     return (successfulUpdateCheck, downloadList, totalBytes);
-    }
+  }
 
   public (bool checkingResult, long downloadSize) CheckDownloadSize(string key)
   {
@@ -128,5 +130,63 @@ public class CDNDownloadAndCheck : MonoBehaviour
         break;
     }
     Addressables.Release(downloadHandle); //Release the operation handle
+  }
+
+  public IEnumerator DownloadExternalFiles(List<IResourceLocation> locations)
+  {
+    AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(locations, false);
+    while (downloadHandle.Status == AsyncOperationStatus.None)
+    {
+      float percentageComplete = downloadHandle.GetDownloadStatus().Percent;
+      float progress = 0;
+      if (percentageComplete > progress * 1.1) // Report at most every 10% or so
+      {
+        progress = percentageComplete; // More accurate %
+        ProgressEvent.Invoke(progress);
+      }
+      if (downloadHandle.Status == AsyncOperationStatus.Failed)
+      {
+        FailureEvent.Invoke(true);
+      }
+      if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
+      {
+        completeDownloadSuccess = true;
+      }
+      yield return null;
+    }
+    Addressables.Release(downloadHandle);
+    if (completeDownloadSuccess == true)
+    {
+      CompletionEvent.Invoke(true);
+    }
+  }
+
+  public IEnumerator DownloadExternalFiles(IEnumerable keys, MergeMode mode)
+  {
+    AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(keys, mode);
+    while (downloadHandle.Status == AsyncOperationStatus.None)
+    {
+      float percentageComplete = downloadHandle.GetDownloadStatus().Percent;
+      float progress = 0;
+      if (percentageComplete > progress * 1.1) // Report at most every 10% or so
+      {
+        progress = percentageComplete; // More accurate %
+        ProgressEvent.Invoke(progress);
+      }
+      if (downloadHandle.Status == AsyncOperationStatus.Failed)
+      {
+        FailureEvent.Invoke(true);
+      }
+      if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
+      {
+        completeDownloadSuccess = true;
+      }
+      yield return null;
+    }
+    Addressables.Release(downloadHandle);
+    if (completeDownloadSuccess == true)
+    {
+      CompletionEvent.Invoke(true);
+    }
   }
 }

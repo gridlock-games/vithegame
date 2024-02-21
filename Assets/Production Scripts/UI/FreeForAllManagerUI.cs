@@ -13,6 +13,8 @@ namespace Vi.UI
         [SerializeField] protected Text roundTimerText;
         [SerializeField] protected Text gameEndText;
         [SerializeField] protected Text roundResultText;
+        [SerializeField] protected Text roundWinThresholdText;
+        [SerializeField] protected Text killsToWinRoundThresholdText;
 
         protected FreeForAllManager freeForAllManager;
 
@@ -24,6 +26,9 @@ namespace Vi.UI
 
             leftScoreText.text = "Your Team: ";
             rightScoreText.text = "Enemy Team: ";
+
+            roundWinThresholdText.text = "Rounds To Win Game: " + freeForAllManager.GetNumberOfRoundsWinsToWinGame().ToString();
+            killsToWinRoundThresholdText.text = "Kills To Win Round: " + freeForAllManager.GetKillsToWinRound();
         }
 
         protected void Update()

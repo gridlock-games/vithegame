@@ -178,6 +178,8 @@ namespace Vi.ArtificialIntelligence
         private void Update()
         {
             if (!CanMove()) { return; }
+            if (!IsSpawned) { return; }
+
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
