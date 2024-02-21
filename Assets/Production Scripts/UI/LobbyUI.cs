@@ -45,12 +45,14 @@ namespace Vi.UI
             public Text teamTitleText;
             public Transform transformParent;
             public Button addBotButton;
+            public Button joinTeamButton;
 
             public void SetActive(bool isActive)
             {
                 teamTitleText.gameObject.SetActive(isActive);
                 transformParent.gameObject.SetActive(isActive);
                 addBotButton.gameObject.SetActive(isActive);
+                joinTeamButton.gameObject.SetActive(isActive);
             }
         }
 
@@ -189,7 +191,7 @@ namespace Vi.UI
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
             if (playerData.team == PlayerDataManager.Team.Spectator)
             {
-                playerData.team = PlayerDataManager.Team.Competitor;
+                playerData.team = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0];
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
             else
@@ -315,14 +317,25 @@ namespace Vi.UI
                     Destroy(child.gameObject);
                 }
 
+                bool leftTeamJoinInteractable = false;
+                bool rightTeamJoinInteractable = false;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (teamParentDict.ContainsKey(playerData.team))
                     {
                         AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
                         accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+
+                        if (playerData.id == (int)NetworkManager.LocalClientId)
+                        {
+                            leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
+                            rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
+                        }
                     }
                 }
+
+                leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
+                rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
             }
             lastPlayersString = playersString;
 
@@ -337,7 +350,7 @@ namespace Vi.UI
                     spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
                 }
             }
-            
+
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
                 // Player account card display logic
