@@ -461,6 +461,7 @@ Canvas:
   m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 1
@@ -618,6 +619,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textToConformTo: {fileID: 7095846274158110464}
+  horizontalPadding: 10
+  verticalPadding: 10
 --- !u!1 &8926663323046437284
 GameObject:
   m_ObjectHideFlags: 0
