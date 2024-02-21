@@ -220,6 +220,41 @@ namespace Vi.UI
 
             //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
             bool canCountDown = playerDataList.Count >= 2;
+            string cannotCountDownMessage = "";
+            switch (PlayerDataManager.Singleton.GetGameMode())
+            {
+                case PlayerDataManager.GameMode.None:
+                    Debug.LogError("Why the fuck is the game mode set to none");
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for game mode none"; }
+                    break;
+                case PlayerDataManager.GameMode.FreeForAll:
+                    canCountDown = playerDataList.Count >= 2;
+
+                    if (!canCountDown) { cannotCountDownMessage = "Need 2 or more players to play"; }
+                    break;
+                case PlayerDataManager.GameMode.TeamElimination:
+                    List<PlayerDataManager.PlayerData> team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    List<PlayerDataManager.PlayerData> team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    canCountDown = team1List.Count > 0 & team2List.Count > 0 & team1List.Count == team2List.Count;
+
+                    if (!(team1List.Count > 0 & team2List.Count > 0)) { cannotCountDownMessage = "Need 2 or more players to play"; }
+                    else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
+                    else { cannotCountDownMessage = "Not sure why we can't count down team elimination"; }
+                    break;
+                case PlayerDataManager.GameMode.EssenceWar:
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
+                    break;
+                case PlayerDataManager.GameMode.OutputRush:
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
+                    break;
+                default:
+                    Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());
+                    break;
+            }
+
             if (IsServer)
             {
                 if (canCountDown)
@@ -241,7 +276,7 @@ namespace Vi.UI
             }
             else if (!canCountDown)
             {
-                characterLockTimeText.text = "Need 2 or more players to play";
+                characterLockTimeText.text = cannotCountDownMessage;
             }
             else
             {
