@@ -80,11 +80,21 @@ namespace Vi.UI
 
         private IEnumerator Init()
         {
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = false;
+            }
             spectateButton.interactable = false;
             lockCharacterButton.interactable = false;
+            
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-            lockCharacterButton.interactable = true;
+            
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = true;
+            }
             spectateButton.interactable = true;
+            lockCharacterButton.interactable = true;
         }
 
         public static string FromCamelCase(string inputString)
@@ -544,6 +554,10 @@ namespace Vi.UI
         {
             lockCharacterButton.interactable = false;
             spectateButton.interactable = false;
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = false;
+            }
         }
 
         private NetworkList<ulong> lockedClients;
