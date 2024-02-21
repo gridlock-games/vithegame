@@ -32,6 +32,9 @@ namespace Vi.UI
         [SerializeField] private Button[] loadoutPresetButtons;
         [SerializeField] private Button spectateButton;
         [Header("Room Settings Assignments")]
+        [SerializeField] private GameModeOption gameModeOptionPrefab;
+        [SerializeField] private MapOption mapOptionPrefab;
+        [SerializeField] private Text gameModeSpecificSettingsTitleText;
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
 
