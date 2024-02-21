@@ -34,7 +34,6 @@ namespace Vi.UI
         [Header("Room Settings Assignments")]
         [SerializeField] private TMP_Dropdown gameModeDropdown;
         [SerializeField] private TMP_Dropdown mapDropdown;
-        [SerializeField] private TMP_Dropdown teamDropdown;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -370,9 +369,13 @@ namespace Vi.UI
 
                 leftTeamParent.teamTitleText.text = "";
                 rightTeamParent.teamTitleText.text = "";
+                
                 leftTeamParent.addBotButton.onClick.RemoveAllListeners();
                 rightTeamParent.addBotButton.onClick.RemoveAllListeners();
                 
+                leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+                rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+
                 for (int i = 0; i < possibleTeams.Length; i++)
                 {
                     if (i == 0)
@@ -381,6 +384,7 @@ namespace Vi.UI
                         teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        leftTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                     }
                     else if (i == 1)
                     {
@@ -388,6 +392,7 @@ namespace Vi.UI
                         teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                         PlayerDataManager.Team teamValue = possibleTeams[i];
                         rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                        rightTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                     }
                     else
                     {
@@ -413,20 +418,9 @@ namespace Vi.UI
                 ChangeMap();
 
                 // Teams
-                teamDropdown.ClearOptions();
-                List<TMP_Dropdown.OptionData> teamOptions = new List<TMP_Dropdown.OptionData>();
-                List<PlayerDataManager.Team> teamList = new List<PlayerDataManager.Team>();
-                foreach (PlayerDataManager.Team team in PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams)
-                {
-                    teamList.Add(team);
-                    teamOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(team.ToString())));
-                }
-                teamDropdown.AddOptions(teamOptions);
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
                 {
-                    int teamIndex = teamList.IndexOf(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team);
-                    teamDropdown.SetValueWithoutNotify(teamIndex != -1 ? teamIndex : 0);
-                    ChangeTeam();
+                    leftTeamParent.joinTeamButton.onClick.Invoke();
                 }
 
                 if (IsServer)
@@ -535,12 +529,12 @@ namespace Vi.UI
             PlayerDataManager.Singleton.SetMap(mapDropdown.options[mapDropdown.value].text);
         }
 
-        public void ChangeTeam()
+        public void ChangeTeam(PlayerDataManager.Team team)
         {
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
-                playerData.team = System.Enum.Parse<PlayerDataManager.Team>(teamDropdown.options[teamDropdown.value].text.Replace(" ", ""));
+                playerData.team = team;
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
         }
