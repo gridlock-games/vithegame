@@ -150,6 +150,8 @@ namespace Vi.UI
             //Add a space between 2 upper case characters when the second one is followed by a lower space character
             returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
 
+            if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
+
             return returnValue;
         }
 
@@ -317,6 +319,27 @@ namespace Vi.UI
                     break;
             }
 
+            bool roomSettingsParsedProperly = true;
+            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            {
+                foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
+                {
+                    if (int.TryParse(customSettingsInputField.inputField.text, out int result))
+                    {
+                        roomSettingsParsedProperly = result > 0 & roomSettingsParsedProperly;
+                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
+                    }
+                    else
+                    {
+                        cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
+                        roomSettingsParsedProperly = false & roomSettingsParsedProperly;
+                        break;
+                    }
+                }
+            }
+
+            canCountDown &= roomSettingsParsedProperly;
+            
             if (IsServer)
             {
                 if (canCountDown)

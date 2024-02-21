@@ -687,7 +687,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 125.58942}
-  m_SizeDelta: {x: 2000, y: 100}
+  m_SizeDelta: {x: 3840, y: 100}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1787791375931903531
 CanvasRenderer:
@@ -2524,7 +2524,7 @@ MonoBehaviour:
   - gameMode: 1
     parent: {fileID: 8641949660546775772}
     inputFields:
-    - key: roundsToWin
+    - key: numberOfRoundsWinsToWinGame
       inputField: {fileID: 1841306553275494551}
     - key: roundDuration
       inputField: {fileID: 6791070161133503750}
@@ -2533,7 +2533,7 @@ MonoBehaviour:
   - gameMode: 2
     parent: {fileID: 7734583627670661028}
     inputFields:
-    - key: roundsToWin
+    - key: numberOfRoundsWinsToWinGame
       inputField: {fileID: 4880804187666111676}
     - key: roundDuration
       inputField: {fileID: 4285212312600046377}
@@ -2818,7 +2818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8641949660546775772
 RectTransform:
   m_ObjectHideFlags: 0
