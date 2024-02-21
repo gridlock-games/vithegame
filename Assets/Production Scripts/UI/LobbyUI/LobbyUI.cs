@@ -37,6 +37,14 @@ namespace Vi.UI
         [SerializeField] private MapOption mapOptionPrefab;
         [SerializeField] private Transform mapOptionParent;
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
+        [SerializeField] private CustomSettingsParent[] customSettingsParents;
+
+        [System.Serializable]
+        private struct CustomSettingsParent
+        {
+            public PlayerDataManager.GameMode gameMode;
+            public Transform parent;
+        }
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -189,7 +197,7 @@ namespace Vi.UI
                         case PlayerDataManager.GameMode.EssenceWar:
                             NetSceneManager.Singleton.LoadScene("Essence War");
                             break;
-                        case PlayerDataManager.GameMode.OutputRush:
+                        case PlayerDataManager.GameMode.OutpostRush:
                             NetSceneManager.Singleton.LoadScene("Outpost Rush");
                             break;
                         default:
@@ -231,6 +239,13 @@ namespace Vi.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
             
+            foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
+            {
+                customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
+            }
+
+            gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+
             // Timer logic
             List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             bool startingGame = playerDataList.Count != 0;
@@ -272,7 +287,7 @@ namespace Vi.UI
                     canCountDown = false;
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
                     break;
-                case PlayerDataManager.GameMode.OutputRush:
+                case PlayerDataManager.GameMode.OutpostRush:
                     canCountDown = false;
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
                     break;
