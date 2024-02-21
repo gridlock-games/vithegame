@@ -28,6 +28,11 @@ public class MessageNotificationObject : MonoBehaviour
   public UnityEvent onButton3Action;
   public UnityEvent onButton4Action;
 
+  //Planning to convert to Generic Action
+  //public event Action<string> onButton1Action;
+  //public event Action<string> onButton2Action;
+  //public event Action<string> onButton3Action;
+  //public event Action<string> onButton4Action;
 
   public void ShowDialogueBox(string message, string button1Text, UnityEvent forButton1Action)
   {
@@ -88,14 +93,14 @@ public class MessageNotificationObject : MonoBehaviour
 
   public void onButton1Pressed()
   {
-    onButton1Action.Invoke();
+    onButton1Action?.Invoke();
   }
   public void onButton2Pressed()
-  {  onButton2Action.Invoke(); }
+  {  onButton2Action?.Invoke(); }
   public void onButton3Pressed()
-  {  onButton3Action.Invoke(); }
+  {  onButton3Action?.Invoke(); }
   public void onButton4Pressed()
-  {  onButton4Action.Invoke(); }
+  {  onButton4Action?.Invoke(); }
 
   public void closeDialogue()
   {

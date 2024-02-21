@@ -7,6 +7,8 @@ using UnityEngine.Events;
 public class CDNDownloadManager : MonoBehaviour
 {
   CDNDownloadAndCheck dac = new CDNDownloadAndCheck();
+  StorageCheck sc = new StorageCheck();
+
   [SerializeField]
   MessageNotificationObject mno;
 
@@ -32,6 +34,10 @@ public class CDNDownloadManager : MonoBehaviour
         
     }
 
+  void beginCheck()
+  {
+
+  }
   void FailureNotification(string message)
   {
 
