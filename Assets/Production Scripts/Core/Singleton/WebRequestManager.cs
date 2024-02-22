@@ -1389,8 +1389,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (!IsLoggingIn) { StartCoroutine(Login("LightPat", "patrick11")); }
-
             if (thisServerCreated)
             {
                 if (!IsRefreshingServers)
