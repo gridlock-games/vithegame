@@ -75,11 +75,15 @@ namespace Vi.Player
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
+            Debug.Log(value.isPressed + " " + ExternalUI);
+
             if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (minimapInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
+
+            Debug.Log("Scoreboard reached");
 
             if (value.isPressed)
             {

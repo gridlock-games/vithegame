@@ -59,64 +59,173 @@ namespace Vi.Player
             isDescending = value.isPressed;
         }
 
+        private bool shouldViewEnvironment;
+        private Vector3 environmentViewPosition;
+        private Quaternion environmentViewRotation;
+        private bool shouldViewEnvironmentModifier;
+        void OnEnvironmentViewModifier(InputValue value)
+        {
+            shouldViewEnvironmentModifier = value.isPressed;
+        }
+
         void OnFollowPlayer1()
         {
-            if (0 >= playerList.Count) { return; }
-            followTarget = playerList[0];
+            int index = 0;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer2()
         {
-            if (1 >= playerList.Count) { return; }
-            followTarget = playerList[1];
+            int index = 1;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer3()
         {
-            if (2 >= playerList.Count) { return; }
-            followTarget = playerList[2];
+            int index = 2;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer4()
         {
-            if (3 >= playerList.Count) { return; }
-            followTarget = playerList[3];
+            int index = 3;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer5()
         {
-            if (4 >= playerList.Count) { return; }
-            followTarget = playerList[4];
+            int index = 4;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer6()
         {
-            if (5 >= playerList.Count) { return; }
-            followTarget = playerList[5];
+            int index = 5;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer7()
         {
-            if (6 >= playerList.Count) { return; }
-            followTarget = playerList[6];
+            int index = 6;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer8()
         {
-            if (7 >= playerList.Count) { return; }
-            followTarget = playerList[7];
+            int index = 7;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer9()
         {
-            if (8 >= playerList.Count) { return; }
-            followTarget = playerList[8];
+            int index = 8;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnFollowPlayer10()
         {
-            if (9 >= playerList.Count) { return; }
-            followTarget = playerList[9];
+            int index = 9;
+            if (shouldViewEnvironmentModifier)
+            {
+                if (PlayerDataManager.Singleton.GetEnvironmentViewPoints().Length > index)
+                {
+                    shouldViewEnvironment = true;
+                    environmentViewPosition = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].position;
+                    environmentViewRotation = PlayerDataManager.Singleton.GetEnvironmentViewPoints()[index].rotation;
+                }
+            }
+            if (index >= playerList.Count) { return; }
+            followTarget = playerList[index];
         }
 
         void OnIncrementFollowPlayer()
@@ -173,9 +282,22 @@ namespace Vi.Player
         {
             if (!IsLocalPlayer) { return; }
 
-            if (moveInput != Vector2.zero) { followTarget = null; }
+            if (moveInput != Vector2.zero)
+            {
+                shouldViewEnvironment = false;
+                environmentViewPosition = Vector3.zero;
+                environmentViewRotation = Quaternion.identity;
+                followTarget = null;
+            }
 
-            if (followTarget)
+            if (shouldViewEnvironment)
+            {
+                transform.position = Vector3.Lerp(transform.position, environmentViewPosition, Time.deltaTime * 8);
+                transform.rotation = Quaternion.Slerp(transform.rotation, environmentViewRotation, Time.deltaTime * 8);
+
+                targetPosition = transform.position;
+            }
+            else if (followTarget)
             {
                 Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * new Vector3(0, 3, -3);
                 Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position - transform.position);

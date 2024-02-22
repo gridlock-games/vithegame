@@ -387,6 +387,19 @@ namespace Vi.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
+        public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetEnvironmentViewPoints();
+            }
+            else
+            {
+                Debug.LogWarning("Trying to access environment view points when there is no player spawn points object");
+                return new PlayerSpawnPoints.TransformData[0];
+            }
+        }
+
         private PlayerSpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
@@ -409,8 +422,6 @@ namespace Vi.Core
 
         void OnSceneUnload(Scene scene)
         {
-            playerSpawnPoints = null;
-
             if (IsServer)
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer())

@@ -873,6 +873,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "EnvironmentViewModifier",
+                    "type": "Value",
+                    "id": "2d5eb47f-3248-4d98-8011-c708e9d899c3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -1291,6 +1300,17 @@
                     "processors": "",
                     "groups": "Touchscreen",
                     "action": "DecrementFollowPlayer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "64e4a88a-4eea-468c-87b3-d417c802bad8",
+                    "path": "<Keyboard>/leftAlt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "EnvironmentViewModifier",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

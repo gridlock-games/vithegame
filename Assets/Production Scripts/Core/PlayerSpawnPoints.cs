@@ -7,8 +7,12 @@ namespace Vi.Core
 {
     public class PlayerSpawnPoints : MonoBehaviour
     {
+        [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
+        
+        public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
 
+        [System.Serializable]
         public struct TransformData
         {
             public Vector3 position;
@@ -79,6 +83,14 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
+            foreach (TransformData transformData in environmentViewPoints)
+            {
+                Gizmos.color = Color.white;
+                Gizmos.DrawSphere(transformData.position, 2);
+                Gizmos.color = Color.black;
+                Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward * 5);
+            }
+
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)
             {
                 Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
