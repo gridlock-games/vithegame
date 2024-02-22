@@ -20,7 +20,7 @@ namespace Vi.Core
             else
             {
                 WaitingForActionToPlay = true;
-                Debug.Log(actionClip.name);
+                Debug.Log(IsSpawned + " " + actionClip.name);
                 PlayActionServerRpc(actionClip.name);
             }
         }
