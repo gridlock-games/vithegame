@@ -119,6 +119,48 @@ namespace Vi.Player
             followTarget = playerList[9];
         }
 
+        void OnIncrementFollowPlayer()
+        {
+            if (followTarget == null)
+            {
+                if (playerList.Count > 0) { followTarget = playerList[0]; }
+            }
+            else
+            {
+                int index = playerList.IndexOf(followTarget);
+                index += 1;
+                if (index >= 0 & index < playerList.Count)
+                {
+                    followTarget = playerList[index];
+                }
+                else if (playerList.Count > 0)
+                {
+                    followTarget = playerList[0];
+                }
+            }
+        }
+
+        void OnDecrementFollowPlayer()
+        {
+            if (followTarget == null)
+            {
+                if (playerList.Count > 0) { followTarget = playerList[^1]; }
+            }
+            else
+            {
+                int index = playerList.IndexOf(followTarget);
+                index -= 1;
+                if (index >= 0 & index < playerList.Count)
+                {
+                    followTarget = playerList[index];
+                }
+                else if (playerList.Count > 0)
+                {
+                    followTarget = playerList[^1];
+                }
+            }
+        }
+
         private Vector3 targetPosition;
         protected new void Start()
         {
