@@ -212,7 +212,13 @@ namespace Vi.Core
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
-            if (team == Team.Competitor | team == Team.Peaceful) { return attributesList; }
+
+            // If the attributes to exclude is on competitor or peaceful teams, we don't want to return any teammates for this attributes
+            if (attributesToExclude)
+            {
+                if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return attributesList; }
+            }
+
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
                 if (kvp.Value == attributesToExclude) { continue; }
