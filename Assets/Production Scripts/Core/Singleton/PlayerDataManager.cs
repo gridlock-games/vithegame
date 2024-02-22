@@ -108,8 +108,6 @@ namespace Vi.Core
 
         public bool IsLobbyLeader()
         {
-            if (IsServer) { return true; }
-
             List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
@@ -117,7 +115,7 @@ namespace Vi.Core
             if (playerDataList.Count > 0)
                 return playerDataList[0].id == (int)NetworkManager.LocalClientId;
             else
-                return false;
+                return IsServer;
         }
 
         public PlayerData GetLobbyLeader()
