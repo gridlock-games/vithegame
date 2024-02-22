@@ -53,6 +53,7 @@ namespace Vi.UI
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
+            public GameObject[] gameObjectsToDestroy;
             public MoveUIDefinition[] objectsToMove;
         }
 
@@ -132,6 +133,11 @@ namespace Vi.UI
                     {
                         moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
+                }
+
+                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
                 }
             }
 

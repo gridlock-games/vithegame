@@ -34,7 +34,21 @@ namespace Vi.UI
                         moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
                 }
+
+                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                }
             }
+
+            List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
+            List<PlayerCard> rightPlayerCardsTemp = rightPlayerCards.ToList();
+
+            leftPlayerCardsTemp.RemoveAll(item => item == null);
+            rightPlayerCardsTemp.RemoveAll(item => item == null);
+
+            leftPlayerCards = leftPlayerCardsTemp.ToArray();
+            rightPlayerCards = rightPlayerCardsTemp.ToArray();
         }
 
         public void OpenPauseMenu()
