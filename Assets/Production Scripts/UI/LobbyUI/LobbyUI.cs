@@ -32,8 +32,27 @@ namespace Vi.UI
         [SerializeField] private Button[] loadoutPresetButtons;
         [SerializeField] private Button spectateButton;
         [Header("Room Settings Assignments")]
-        [SerializeField] private TMP_Dropdown gameModeDropdown;
-        [SerializeField] private TMP_Dropdown mapDropdown;
+        [SerializeField] private GameModeOption gameModeOptionPrefab;
+        [SerializeField] private Transform gameModeOptionParent;
+        [SerializeField] private MapOption mapOptionPrefab;
+        [SerializeField] private Transform mapOptionParent;
+        [SerializeField] private Text gameModeSpecificSettingsTitleText;
+        [SerializeField] private CustomSettingsParent[] customSettingsParents;
+
+        [System.Serializable]
+        private struct CustomSettingsParent
+        {
+            public PlayerDataManager.GameMode gameMode;
+            public Transform parent;
+            public CustomSettingsInputField[] inputFields;
+
+            [System.Serializable]
+            public struct CustomSettingsInputField
+            {
+                public string key;
+                public InputField inputField;
+            }
+        }
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
         private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
@@ -62,21 +81,43 @@ namespace Vi.UI
             CloseRoomSettings();
 
             // Game modes
-            gameModeDropdown.ClearOptions();
-            List<TMP_Dropdown.OptionData> gameModeOptions = new List<TMP_Dropdown.OptionData>();
-            List<PlayerDataManager.GameMode> gameModeList = new List<PlayerDataManager.GameMode>();
+            bool first = true;
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
                 if (gameMode == PlayerDataManager.GameMode.None) { continue; }
-                gameModeList.Add(gameMode);
-                gameModeOptions.Add(new TMP_Dropdown.OptionData(FromCamelCase(gameMode.ToString())));
+
+                GameModeOption option = Instantiate(gameModeOptionPrefab.gameObject, gameModeOptionParent).GetComponent<GameModeOption>();
+                StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));
+
+                if (first) { PlayerDataManager.Singleton.SetGameMode(gameMode); first = false; }
             }
-            gameModeDropdown.AddOptions(gameModeOptions);
-            int gameModeIndex = gameModeList.IndexOf(PlayerDataManager.Singleton.GetGameMode());
-            gameModeDropdown.SetValueWithoutNotify(gameModeIndex != -1 ? gameModeIndex : 0);
-            ChangeGameMode();
+
+            foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
+            {
+                foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in customSettingsParent.inputFields)
+                {
+                    customSettingsInputField.inputField.onValueChanged.AddListener(delegate { ValidateInputAsInt(customSettingsInputField.inputField); });
+                }
+            }
 
             StartCoroutine(Init());
+        }
+
+        private void RefreshMapOptions()
+        {
+            foreach (Transform child in mapOptionParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            bool first = true;
+            foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
+            {
+                MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
+                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
+
+                if (first) { PlayerDataManager.Singleton.SetMap(mapName); first = false; }
+            }
         }
 
         private IEnumerator Init()
@@ -108,6 +149,8 @@ namespace Vi.UI
             returnValue = Regex.Replace(returnValue, "([a-z])([A-Z])", "$1 $2").Trim();
             //Add a space between 2 upper case characters when the second one is followed by a lower space character
             returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
+
+            if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
 
             return returnValue;
         }
@@ -172,7 +215,7 @@ namespace Vi.UI
                         case PlayerDataManager.GameMode.EssenceWar:
                             NetSceneManager.Singleton.LoadScene("Essence War");
                             break;
-                        case PlayerDataManager.GameMode.OutputRush:
+                        case PlayerDataManager.GameMode.OutpostRush:
                             NetSceneManager.Singleton.LoadScene("Outpost Rush");
                             break;
                         default:
@@ -207,6 +250,11 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
+        public void ValidateInputAsInt(InputField inputField)
+        {
+            inputField.text = Regex.Replace(inputField.text, @"[^0-9]", "");
+        }
+
         private string lastPlayersString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -214,6 +262,13 @@ namespace Vi.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
             
+            foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
+            {
+                customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
+            }
+
+            gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+
             // Timer logic
             List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             bool startingGame = playerDataList.Count != 0;
@@ -229,8 +284,7 @@ namespace Vi.UI
                 }
             }
 
-            //bool canCountDown = playerDataList.Count > 0 & playerDataList.Count % 2 == 0;
-            bool canCountDown = playerDataList.Count >= 2;
+            bool canCountDown = false;
             string cannotCountDownMessage = "";
             switch (PlayerDataManager.Singleton.GetGameMode())
             {
@@ -256,7 +310,7 @@ namespace Vi.UI
                     canCountDown = false;
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
                     break;
-                case PlayerDataManager.GameMode.OutputRush:
+                case PlayerDataManager.GameMode.OutpostRush:
                     canCountDown = false;
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
                     break;
@@ -265,6 +319,34 @@ namespace Vi.UI
                     break;
             }
 
+            bool roomSettingsParsedProperly = true;
+            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            {
+                string gameModeSettings = "";
+                foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
+                {
+                    if (int.TryParse(customSettingsInputField.inputField.text, out int result))
+                    {
+                        roomSettingsParsedProperly = result > 0 & roomSettingsParsedProperly;
+                        gameModeSettings += customSettingsInputField.key + ":" + result.ToString() + "|";
+                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
+                    }
+                    else
+                    {
+                        cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
+                        roomSettingsParsedProperly = false & roomSettingsParsedProperly;
+                        break;
+                    }
+                }
+
+                if (roomSettingsParsedProperly & !IsServer)
+                {
+                    PlayerDataManager.Singleton.SetGameModeSettings(gameModeSettings);
+                }
+            }
+
+            canCountDown &= roomSettingsParsedProperly;
+            
             if (IsServer)
             {
                 if (canCountDown)
@@ -404,18 +486,7 @@ namespace Vi.UI
                 rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
 
                 // Maps
-                mapDropdown.ClearOptions();
-                List<TMP_Dropdown.OptionData> mapOptions = new List<TMP_Dropdown.OptionData>();
-                List<string> mapList = new List<string>();
-                foreach (string map in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
-                {
-                    mapList.Add(map);
-                    mapOptions.Add(new TMP_Dropdown.OptionData(map));
-                }
-                mapDropdown.AddOptions(mapOptions);
-                int mapIndex = mapList.IndexOf(mapDropdown.options[mapDropdown.value].text);
-                mapDropdown.SetValueWithoutNotify(mapIndex != -1 ? mapIndex : 0);
-                ChangeMap();
+                RefreshMapOptions();
 
                 // Teams
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
@@ -519,14 +590,14 @@ namespace Vi.UI
             }
         }
 
-        public void ChangeGameMode()
+        public void ChangeGameMode(PlayerDataManager.GameMode gameMode)
         {
-            PlayerDataManager.Singleton.SetGameMode(System.Enum.Parse<PlayerDataManager.GameMode>(gameModeDropdown.options[gameModeDropdown.value].text.Replace(" ", "")));
+            PlayerDataManager.Singleton.SetGameMode(gameMode);
         }
 
-        public void ChangeMap()
+        public void ChangeMap(string map)
         {
-            PlayerDataManager.Singleton.SetMap(mapDropdown.options[mapDropdown.value].text);
+            PlayerDataManager.Singleton.SetMap(map);
         }
 
         public void ChangeTeam(PlayerDataManager.Team team)

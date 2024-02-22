@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 2204792836
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -70,23 +70,30 @@ MonoBehaviour:
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
   gameModeInfos:
   - gameMode: 0
+    gameModeIcon: {fileID: 21300000, guid: abc64bd776c8a644aaa023cb2d83c152, type: 3}
     possibleTeams: 02000000
     possibleMapSceneGroupNames: []
   - gameMode: 1
+    gameModeIcon: {fileID: 21300000, guid: b4f0f2c0e7e974944bc032b71cb14117, type: 3}
     possibleTeams: 02000000
     possibleMapSceneGroupNames:
     - Arena Map A
+    - Arena Map B
   - gameMode: 2
+    gameModeIcon: {fileID: 21300000, guid: a383926873fce4d12b3e10c099f43e83, type: 3}
     possibleTeams: 0300000007000000
     possibleMapSceneGroupNames:
     - Arena Map A
-    - Essence War Map A
+    - Arena Map B
   - gameMode: 3
+    gameModeIcon: {fileID: 21300000, guid: abc64bd776c8a644aaa023cb2d83c152, type: 3}
     possibleTeams: 0300000007000000
     possibleMapSceneGroupNames:
     - Essence War Map A
+    - Essence War Map B
   - gameMode: 4
+    gameModeIcon: {fileID: 21300000, guid: abc64bd776c8a644aaa023cb2d83c152, type: 3}
     possibleTeams: 0300000007000000
     possibleMapSceneGroupNames:
-    - Arena Map A
     - Essence War Map A
+    - Essence War Map B

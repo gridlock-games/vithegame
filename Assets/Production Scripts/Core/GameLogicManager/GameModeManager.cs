@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Collections;
 using System.Collections.Generic;
 using System.Collections;
+using System.Reflection;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -12,7 +13,7 @@ namespace Vi.Core.GameModeManagers
         protected static GameModeManager _singleton;
 
         [SerializeField] private GameObject UIPrefab;
-        [SerializeField] private int numberOfRoundsWinsToWinGame = 2;
+        [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         [SerializeField] private float nextGameActionDuration = 5;
         [Header("Leave respawn time as 0 to disable respawns")]
@@ -224,6 +225,39 @@ namespace Vi.Core.GameModeManagers
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
+
+            foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
+            {
+                string[] propertySplit = propertyString.Split(":");
+                string propertyName = "";
+                int value = 0;
+                for (int i = 0; i < propertySplit.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        propertyName = propertySplit[i];
+                    }
+                    else if (i == 1)
+                    {
+                        value = int.Parse(propertySplit[i]);
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to parse game mode property string " + propertyString);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(propertyName)) { continue; }
+
+                try
+                {
+                    GetType().GetField(propertyName, BindingFlags.NonPublic | BindingFlags.Instance).SetValue(this, value);
+                }
+                catch
+                {
+                    Debug.LogError("Error whiel setting value for field: " + propertyName);
+                }
+            }
         }
 
         private GameObject UIInstance;
