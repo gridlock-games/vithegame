@@ -767,6 +767,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Scoreboard",
+                    "type": "Value",
+                    "id": "6298a398-9e92-4174-9522-8ba4ab9451c8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "FollowPlayer1",
                     "type": "Button",
                     "id": "a28c48f5-93a9-4f83-a27d-6359062b449c",
@@ -1311,6 +1320,61 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "EnvironmentViewModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d5ae84b0-c7a1-498a-b85a-288f503bb9fb",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "EnvironmentViewModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d04346d3-4b65-4f43-b1ef-73b29a437bf4",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touchscreen",
+                    "action": "EnvironmentViewModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "986facc5-2a54-4afc-902c-c2f6956dc751",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "32bb415d-076e-4851-9e67-89cc784f9e86",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9084cb9a-b47c-4b9b-91a8-8f5b568d3ac2",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touchscreen",
+                    "action": "Scoreboard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
