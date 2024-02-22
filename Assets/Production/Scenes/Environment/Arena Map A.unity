@@ -1871,6 +1871,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoints:
   - gameModes: 000000000100000002000000
+    teams: 01000000
+    spawnPositions:
+    - {x: 0, y: 3, z: 0}
+    spawnRotations:
+    - {x: 0, y: 90, z: 0}
+  - gameModes: 000000000100000002000000
     teams: 020000000300000007000000
     spawnPositions:
     - {x: -9, y: -3, z: 0}
