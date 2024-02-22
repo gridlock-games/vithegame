@@ -199,6 +199,7 @@ namespace Vi.ArtificialIntelligence
                     foreach (Attributes player in activePlayers)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                        if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
                         targetAttributes = player;
                         break;
                     }
