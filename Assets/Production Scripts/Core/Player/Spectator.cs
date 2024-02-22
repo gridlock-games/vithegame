@@ -177,10 +177,13 @@ namespace Vi.Player
 
             if (followTarget)
             {
-                transform.position = followTarget.transform.position + followTarget.transform.rotation * new Vector3(0, 3, -3);
-                transform.LookAt(followTarget.transform);
+                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * new Vector3(0, 3, -3);
+                Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position - transform.position);
 
-                targetPosition = transform.position;
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8);
+                
+                this.targetPosition = transform.position;
             }
             else
             {
