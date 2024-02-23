@@ -61,6 +61,11 @@ namespace Vi.Core.GameModeManagers
                 gameItemSpawnIndexTracker.Clear();
                 possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
             }
+            else if (possibleSpawnPoints.Count == 0)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
 
             int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
             gameItemSpawnIndexTracker.Add(randomIndex);

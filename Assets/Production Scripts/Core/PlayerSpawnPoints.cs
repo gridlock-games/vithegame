@@ -56,6 +56,11 @@ namespace Vi.Core
                 ResetSpawnTracker();
                 possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
             }
+            else if (possibleSpawnPoints.Count == 0)
+            {
+                ResetSpawnTracker();
+                possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
+            }
 
             int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
             spawnIndexTracker.Add(randomIndex);
