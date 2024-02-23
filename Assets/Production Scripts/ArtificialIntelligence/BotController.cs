@@ -186,28 +186,32 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
-                Attributes targetAttributes = null;
-                foreach (Attributes player in activePlayers)
-                {
-                    if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
-                    targetAttributes = player;
-                    break;
-                }
-
                 UpdateLocomotion();
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
 
-                if (targetAttributes)
+                if (IsOwner)
                 {
-                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
-                    
-                    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                    List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+                    activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+                    Attributes targetAttributes = null;
+                    foreach (Attributes player in activePlayers)
                     {
-                        weaponHandler.SendMessage("OnLightAttack");
+                        if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                        if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
+                        targetAttributes = player;
+                        break;
+                    }
+
+                    if (targetAttributes)
+                    {
+                        if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+
+                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                        {
+                            weaponHandler.SendMessage("OnLightAttack");
+                        }
                     }
                 }
             }

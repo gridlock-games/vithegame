@@ -108,8 +108,6 @@ namespace Vi.Core
 
         public bool IsLobbyLeader()
         {
-            if (IsServer) { return true; }
-
             List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
@@ -117,7 +115,7 @@ namespace Vi.Core
             if (playerDataList.Count > 0)
                 return playerDataList[0].id == (int)NetworkManager.LocalClientId;
             else
-                return false;
+                return IsServer;
         }
 
         public PlayerData GetLobbyLeader()
@@ -214,7 +212,13 @@ namespace Vi.Core
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
             List<Attributes> attributesList = new List<Attributes>();
-            if (team == Team.Competitor | team == Team.Peaceful) { return attributesList; }
+
+            // If the attributes to exclude is on competitor or peaceful teams, we don't want to return any teammates for this attributes
+            if (attributesToExclude)
+            {
+                if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return attributesList; }
+            }
+
             foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
             {
                 if (kvp.Value == attributesToExclude) { continue; }
@@ -383,6 +387,19 @@ namespace Vi.Core
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
+        public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetEnvironmentViewPoints();
+            }
+            else
+            {
+                Debug.LogWarning("Trying to access environment view points when there is no player spawn points object");
+                return new PlayerSpawnPoints.TransformData[0];
+            }
+        }
+
         private PlayerSpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
@@ -405,8 +422,6 @@ namespace Vi.Core
 
         void OnSceneUnload(Scene scene)
         {
-            playerSpawnPoints = null;
-
             if (IsServer)
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
