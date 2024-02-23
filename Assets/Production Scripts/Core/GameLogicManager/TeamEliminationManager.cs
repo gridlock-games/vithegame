@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.AI;
 
 namespace Vi.Core.GameModeManagers
 {
     public class TeamEliminationManager : GameModeManager
     {
         [Header("Team Elimination Specific")]
-        [SerializeField] private GameObject damageCirclePrefab;
+        [SerializeField] private DamageCircle damageCirclePrefab;
+        [SerializeField] private TeamEliminationViEssence viEssencePrefab;
 
         public override void OnNetworkSpawn()
         {
@@ -22,7 +24,8 @@ namespace Vi.Core.GameModeManagers
             // TODO Change this to check if all players on the victim's team are dead
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
 
-            if (PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam()).TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
             {
                 List<Attributes> killerTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
                 List<int> winningPlayerIds = new List<int>();
@@ -31,6 +34,18 @@ namespace Vi.Core.GameModeManagers
                     winningPlayerIds.Add(attributes.GetPlayerDataId());
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
+            }
+            else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1) // If we are in a 1vX situation
+            {
+                float walkRadius = 5;
+                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                randomDirection += transform.position;
+                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                Vector3 finalPosition = hit.position;
+
+                Debug.Log("Creating vi essence at " + finalPosition);
+
+                Instantiate(viEssencePrefab.gameObject, finalPosition, Quaternion.identity);
             }
         }
 
