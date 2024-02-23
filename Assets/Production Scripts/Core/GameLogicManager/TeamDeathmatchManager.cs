@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace Vi.Core.GameModeManagers
 {
-    public class TeamEliminationManager : GameModeManager
+    public class TeamDeathmatchManager : GameModeManager
     {
-        [Header("Team Elimination Specific")]
-        [SerializeField] private GameObject damageCirclePrefab;
+        [Header("Team Deathmatch Specific")]
+        [SerializeField] private int killsToWinRound = 21;
 
         public override void OnNetworkSpawn()
         {
@@ -65,7 +65,7 @@ namespace Vi.Core.GameModeManagers
 
             int highestDeaths = deathCountByTeam.Max(item => item.Value);
             PlayerDataManager.Team[] winningTeams = deathCountByTeam.Where(item => item.Value != highestDeaths).Select(item => item.Key).ToArray();
-            
+
             if (winningTeams.Length == 1)
             {
                 List<Attributes> winningTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeams[0]);
