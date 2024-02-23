@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,38 +19,54 @@ public class BatteryIndicator : MonoBehaviour
   public TextMeshProUGUI batteryMessageObject;
   public string lowBatteryWarningmessage = "Low Battery";
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        //Check if device has battery
-        if
-    }
+  public float batteryCheckinterval = 5.00f;
 
-    // Update is called once per frame
-    void Update()
+  // Start is called before the first frame update
+  private void Start()
+  {
+    if (SystemInfo.batteryStatus != BatteryStatus.Unknown)
     {
-        
+      StartCoroutine("BatteryCheckCycle");
     }
+  }
+
+  // Update is called once per frame
+  private void Update()
+  {
+  }
 
   //Handles Check if the battery low
-    public bool LowBatteryCheck()
+  public bool LowBatteryCheck()
   {
-        if (requiredMinimumPercentage == true)
-        {
-            if (GetBatteryPercentage() <= minimumPlayPercentage && SystemInfo.batteryStatus == BatteryStatus.Charging)
-            {
-          return false;
-            }
-            else
-            {
+    if (requiredMinimumPercentage == true)
+    {
+      if (GetBatteryPercentage() <= minimumPlayPercentage && SystemInfo.batteryStatus == BatteryStatus.Discharging)
+      {
+        return false;
+      }
+      else
+      {
         return true;
-            }
-        }
-        else
-        {
-      return true;
-        }
+      }
     }
+    else
+    {
+      return true;
+    }
+  }
+
+  public void UpdateBatteryUI()
+  {
+    batteryIconBackground.fillAmount = SystemInfo.batteryLevel;
+    if (LowBatteryCheck())
+    {
+      changeUIColor(normalBetteryColor);
+    }
+    else
+    {
+      changeUIColor(lowBetteryColor);
+    }
+  }
 
   public float GetBatteryPercentage()
   {
@@ -65,5 +80,20 @@ public class BatteryIndicator : MonoBehaviour
     batteryIconBackground.color = newColor;
   }
 
-
+  private IEnumerator BatteryCheckCycle()
+  {
+    while (true)
+    {
+      UpdateBatteryUI();
+      if (LowBatteryCheck() && SystemInfo.batteryStatus == BatteryStatus.Discharging)
+      {
+        batteryNotificationBG.SetActive(true);
+      }
+      else
+      {
+        batteryNotificationBG.SetActive(false);
+      }
+      yield return new WaitForSeconds(batteryCheckinterval);
+    }
+  }
 }
