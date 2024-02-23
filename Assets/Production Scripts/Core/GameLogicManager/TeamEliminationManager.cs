@@ -18,14 +18,15 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnNetworkSpawn();
             roundResultMessage.Value = "Team elimination starting! ";
+
+            if (IsServer)
+            {
+                damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
+                damageCircleInstance.NetworkObject.Spawn();
+            }
         }
 
-        private new void Start()
-        {
-            base.Start();
-            damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
-        }
-
+        private TeamEliminationViEssence viEssenceInstance;
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
@@ -41,12 +42,13 @@ namespace Vi.Core.GameModeManagers
                 {
                     winningPlayerIds.Add(attributes.GetPlayerDataId());
                 }
+
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
             else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1) // If we are in a 1vX situation
             {
-                TeamEliminationViEssence viEssence = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
-                viEssence.Initialize(victim.GetTeam(), killer.GetTeam(), damageCircleInstance);
+                viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
+                viEssenceInstance.Initialize(damageCircleInstance);
             }
         }
 
@@ -60,6 +62,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
+            if (viEssenceInstance) { Destroy(viEssenceInstance.gameObject); }
             if (gameOver) { return; }
             string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
             roundResultMessage.Value = message;

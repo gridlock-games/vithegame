@@ -40,6 +40,8 @@ namespace Vi.Core.GameModeManagers
         private List<int> gameItemSpawnIndexTracker = new List<int>();
         protected GameItem SpawnGameItem(GameItem gameItemPrefab)
         {
+            if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
+
             List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
 
             bool shouldResetSpawnTracker = false;
@@ -161,6 +163,14 @@ namespace Vi.Core.GameModeManagers
             }
             //roundTimer.Value = roundDuration;
             nextGameActionTimer.Value = nextGameActionDuration;
+
+            #if UNITY_EDITOR
+            if (!IsClient)
+            {
+                gameObject.AddComponent<AudioListener>();
+                AudioListener.volume = 0;
+            }
+            #endif
         }
 
         public override void OnNetworkDespawn()
@@ -268,14 +278,6 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
-            #if UNITY_EDITOR
-            if (!IsClient)
-            {
-                gameObject.AddComponent<AudioListener>();
-                AudioListener.volume = 0;
-            }
-            #endif
-
             scoreList = new NetworkList<PlayerScore>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
