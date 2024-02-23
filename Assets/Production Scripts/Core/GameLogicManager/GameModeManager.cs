@@ -78,7 +78,7 @@ namespace Vi.Core.GameModeManagers
                 Debug.LogError("Possible spawn point count is 0! Game item - " + gameItemPrefab);
 
             GameItem gameItemInstance = Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
-            gameItemInstance.NetworkObject.Spawn();
+            gameItemInstance.NetworkObject.Spawn(true);
             return gameItemInstance;
         }
 

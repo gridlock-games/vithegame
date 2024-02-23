@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
+using System.Linq;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -25,13 +25,16 @@ namespace Vi.Core.GameModeManagers
 
             if (other.transform.root.TryGetComponent(out Attributes attributes))
             {
-                if (PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam()).Count == 1)
+                List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam());
+                if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1)
                 {
-                    Debug.Log(Time.time + " Revive");
+                    PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
+                    NetworkObject.Despawn(true);
                 }
                 else if (attributes.GetComponent<WeaponHandler>().IsAttacking)
                 {
                     damageCircle.Shrink();
+                    NetworkObject.Despawn(true);
                 }
             }
         }
