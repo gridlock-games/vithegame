@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2204792836
+  GlobalObjectIdHash: 2411525076
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -97,3 +97,9 @@ MonoBehaviour:
     possibleMapSceneGroupNames:
     - Essence War Map A
     - Essence War Map B
+  - gameMode: 5
+    gameModeIcon: {fileID: 21300000, guid: abc64bd776c8a644aaa023cb2d83c152, type: 3}
+    possibleTeams: 0300000007000000
+    possibleMapSceneGroupNames:
+    - Arena Map A
+    - Arena Map B

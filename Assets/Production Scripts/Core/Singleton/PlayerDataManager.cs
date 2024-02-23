@@ -175,7 +175,8 @@ namespace Vi.Core
             FreeForAll,
             TeamElimination,
             EssenceWar,
-            OutpostRush
+            OutpostRush,
+            TeamDeathmatch
         }
 
         public enum Team
