@@ -4,6 +4,7 @@ using Unity.Collections;
 using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
+using System.Linq;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -35,6 +36,42 @@ namespace Vi.Core.GameModeManagers
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
         protected NetworkList<PlayerScore> scoreList;
+
+        private List<int> gameItemSpawnIndexTracker = new List<int>();
+        protected GameItem SpawnGameItem(GameItem gameItemPrefab)
+        {
+            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+
+            bool shouldResetSpawnTracker = false;
+            foreach (int index in gameItemSpawnIndexTracker)
+            {
+                try
+                {
+                    possibleSpawnPoints.RemoveAt(index);
+                }
+                catch
+                {
+                    shouldResetSpawnTracker = true;
+                    break;
+                }
+            }
+
+            if (shouldResetSpawnTracker)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
+
+            int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
+            gameItemSpawnIndexTracker.Add(randomIndex);
+            PlayerSpawnPoints.TransformData spawnPoint = new PlayerSpawnPoints.TransformData();
+            if (possibleSpawnPoints.Count != 0)
+                spawnPoint = possibleSpawnPoints[randomIndex];
+            else
+                Debug.LogError("Possible spawn point count is 0! Game item - " + gameItemPrefab);
+
+            return Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
+        }
 
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
@@ -224,6 +261,14 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
+            #if UNITY_EDITOR
+            if (!IsClient)
+            {
+                gameObject.AddComponent<AudioListener>();
+                AudioListener.volume = 0;
+            }
+            #endif
+
             scoreList = new NetworkList<PlayerScore>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))

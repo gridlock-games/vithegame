@@ -401,6 +401,19 @@ namespace Vi.Core
             }
         }
 
+        public PlayerSpawnPoints.TransformData[] GetGameItemSpawnPoints()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetGameItemSpawnPoints();
+            }
+            else
+            {
+                Debug.LogWarning("Trying to access game item spawn points when there is no player spawn points object");
+                return new PlayerSpawnPoints.TransformData[0];
+            }
+        }
+
         private PlayerSpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {

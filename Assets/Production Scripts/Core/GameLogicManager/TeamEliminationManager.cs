@@ -12,10 +12,18 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private DamageCircle damageCirclePrefab;
         [SerializeField] private TeamEliminationViEssence viEssencePrefab;
 
+        private DamageCircle damageCircleInstance;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             roundResultMessage.Value = "Team elimination starting! ";
+        }
+
+        private new void Start()
+        {
+            base.Start();
+            damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
         }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)
@@ -37,15 +45,8 @@ namespace Vi.Core.GameModeManagers
             }
             else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1) // If we are in a 1vX situation
             {
-                float walkRadius = 5;
-                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                randomDirection += transform.position;
-                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                Vector3 finalPosition = hit.position;
-
-                Debug.Log("Creating vi essence at " + finalPosition);
-
-                Instantiate(viEssencePrefab.gameObject, finalPosition, Quaternion.identity);
+                TeamEliminationViEssence viEssence = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
+                viEssence.Initialize(victim.GetTeam(), killer.GetTeam(), damageCircleInstance);
             }
         }
 

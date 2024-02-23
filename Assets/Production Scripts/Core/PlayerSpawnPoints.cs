@@ -8,9 +8,12 @@ namespace Vi.Core
     public class PlayerSpawnPoints : MonoBehaviour
     {
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
+        [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
         
         public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
+
+        public TransformData[] GetGameItemSpawnPoints() { return gameItemSpawnPoints; }
 
         [System.Serializable]
         public struct TransformData
@@ -60,7 +63,7 @@ namespace Vi.Core
             if (possibleSpawnPoints.Count != 0)
                 spawnPoint = possibleSpawnPoints[randomIndex];
             else
-                Debug.LogError("Possible Spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team);
+                Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team);
 
             return spawnPoint;
         }
@@ -89,6 +92,13 @@ namespace Vi.Core
                 Gizmos.DrawSphere(transformData.position, 2);
                 Gizmos.color = Color.black;
                 Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward * 5);
+            }
+
+            foreach (TransformData transformData in gameItemSpawnPoints)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(transformData.position, 0.5f);
+                Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward);
             }
 
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)

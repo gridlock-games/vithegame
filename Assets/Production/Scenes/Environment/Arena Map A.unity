@@ -1878,6 +1878,21 @@ MonoBehaviour:
     rotation: {x: 0.060871404, y: 0.92236763, z: -0.1627213, w: 0.34504268}
   - position: {x: -12.8, y: 24.4, z: -5.4}
     rotation: {x: 0.48135203, y: 0.5057841, z: -0.41991016, w: 0.5797914}
+  gameItemSpawnPoints:
+  - position: {x: 25, y: 2, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -25, y: 2, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: 2, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: 2, z: 18}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: 2, z: -18}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -5, y: -4, z: -10}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 5, y: -4, z: 10}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
   - gameModes: 000000000100000002000000
     teams: 01000000
