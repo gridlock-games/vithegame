@@ -515,9 +515,15 @@ namespace Vi.Core
             Vector3 spawnPosition = transformData.position;
             Quaternion spawnRotation = transformData.rotation;
 
-            attributesToRespawn.ResetStats(false);
+            attributesToRespawn.ResetStats(1, false);
             attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions();
             attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+        }
+
+        public void RevivePlayer(Attributes attributesToRevive)
+        {
+            attributesToRevive.ResetStats(0.5f, false);
+            attributesToRevive.GetComponent<AnimationHandler>().CancelAllActions();
         }
 
         public void RespawnAllPlayers()

@@ -63,9 +63,9 @@ namespace Vi.Core
         public float GetDefense() { return defense.Value; }
         public float GetRage() { return rage.Value; }
 
-        public void ResetStats(bool resetRage)
+        public void ResetStats(float hpPercentage, bool resetRage)
         {
-            HP.Value = maxHP;
+            HP.Value = maxHP * hpPercentage;
             defense.Value = 0;
             stamina.Value = 0;
             if (resetRage)

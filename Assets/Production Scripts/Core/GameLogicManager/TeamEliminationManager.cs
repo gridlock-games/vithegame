@@ -33,6 +33,7 @@ namespace Vi.Core.GameModeManagers
             // TODO Change this to check if all players on the victim's team are dead
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
 
+            List<Attributes> killerTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
             List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
             {
@@ -45,8 +46,9 @@ namespace Vi.Core.GameModeManagers
 
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1) // If we are in a 1vX situation
+            else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1 & killerTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1) // If we are in a 1vX situation
             {
+                Debug.Log("Spawning vi essence");
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(damageCircleInstance);
             }

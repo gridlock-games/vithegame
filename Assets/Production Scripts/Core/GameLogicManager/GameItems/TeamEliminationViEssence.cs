@@ -14,6 +14,11 @@ namespace Vi.Core.GameModeManagers
             this.damageCircle = damageCircle;
         }
 
+        public override void OnNetworkSpawn()
+        {
+            Debug.Log(Time.time + " vi essence spawned " + transform.position);
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (!IsServer) { return; }
