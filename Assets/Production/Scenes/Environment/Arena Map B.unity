@@ -258,6 +258,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  environmentViewPoints:
+  - position: {x: -12.8, y: 24.4, z: -5.4}
+    rotation: {x: 0.48135203, y: 0.5057841, z: -0.41991016, w: 0.5797914}
+  gameItemSpawnPoints:
+  - position: {x: 25, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -25, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: -4, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -5, y: -4, z: -10}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 5, y: -4, z: 10}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
   - gameModes: 000000000100000002000000
     teams: 01000000
@@ -277,6 +291,9 @@ MonoBehaviour:
     - {x: 0, y: 270, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
+  damageCircleMaxScale: {x: 100, y: 200, z: 100}
+  damageCircleMinScale: {x: 5, y: 200, z: 5}
+  shrinkSize: 20
 --- !u!4 &603580834
 Transform:
   m_ObjectHideFlags: 0

@@ -63,9 +63,9 @@ namespace Vi.Core
         public float GetDefense() { return defense.Value; }
         public float GetRage() { return rage.Value; }
 
-        public void ResetStats(bool resetRage)
+        public void ResetStats(float hpPercentage, bool resetRage)
         {
-            HP.Value = maxHP;
+            HP.Value = maxHP * hpPercentage;
             defense.Value = 0;
             stamina.Value = 0;
             if (resetRage)
@@ -248,6 +248,8 @@ namespace Vi.Core
                 ailment.Value = ActionClip.Ailment.Death;
                 killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             RenderHitGlowOnly();
             AddHP(damage);

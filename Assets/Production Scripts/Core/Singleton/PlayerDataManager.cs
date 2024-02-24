@@ -175,7 +175,8 @@ namespace Vi.Core
             FreeForAll,
             TeamElimination,
             EssenceWar,
-            OutpostRush
+            OutpostRush,
+            TeamDeathmatch
         }
 
         public enum Team
@@ -400,6 +401,73 @@ namespace Vi.Core
             }
         }
 
+        public PlayerSpawnPoints.TransformData[] GetGameItemSpawnPoints()
+        {
+            if (playerSpawnPoints)
+            {
+                float distanceThreshold = 8;
+                List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = new List<PlayerSpawnPoints.TransformData>();
+                List<Attributes> localPlayerList = localPlayers.Values.ToList();
+                foreach (PlayerSpawnPoints.TransformData transformData in playerSpawnPoints.GetGameItemSpawnPoints())
+                {
+                    if (localPlayerList.TrueForAll(item => Vector3.Distance(item.transform.position, transformData.position) > distanceThreshold))
+                    {
+                        possibleSpawnPoints.Add(transformData);
+                    }
+                }
+                return possibleSpawnPoints.ToArray();
+            }
+            else
+            {
+                Debug.LogWarning("Trying to access game item spawn points when there is no player spawn points object");
+                return new PlayerSpawnPoints.TransformData[0];
+            }
+        }
+
+        public bool PlayerSpawnPoints()
+        {
+            return playerSpawnPoints;
+        }
+
+        public Vector3 GetDamageCircleMaxScale()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleMaxScale();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle max scale without a player spawn points object");
+                return default;
+            }
+        }
+
+        public Vector3 GetDamageCircleMinScale()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleMinScale();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle min scale without a player spawn points object");
+                return default;
+            }
+        }
+
+        public float GetDamageCircleShrinkSize()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleShrinkSize();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle shrink size without a player spawn points object");
+                return default;
+            }
+        }
+
         private PlayerSpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
@@ -501,9 +569,15 @@ namespace Vi.Core
             Vector3 spawnPosition = transformData.position;
             Quaternion spawnRotation = transformData.rotation;
 
-            attributesToRespawn.ResetStats(false);
+            attributesToRespawn.ResetStats(1, false);
             attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions();
             attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+        }
+
+        public void RevivePlayer(Attributes attributesToRevive)
+        {
+            attributesToRevive.ResetStats(0.5f, false);
+            attributesToRevive.GetComponent<AnimationHandler>().CancelAllActions();
         }
 
         public void RespawnAllPlayers()

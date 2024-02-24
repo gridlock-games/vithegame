@@ -4,6 +4,7 @@ using Unity.Collections;
 using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
+using System.Linq;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -36,6 +37,51 @@ namespace Vi.Core.GameModeManagers
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
         protected NetworkList<PlayerScore> scoreList;
 
+        private List<int> gameItemSpawnIndexTracker = new List<int>();
+        protected GameItem SpawnGameItem(GameItem gameItemPrefab)
+        {
+            if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
+
+            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+
+            bool shouldResetSpawnTracker = false;
+            foreach (int index in gameItemSpawnIndexTracker)
+            {
+                try
+                {
+                    possibleSpawnPoints.RemoveAt(index);
+                }
+                catch
+                {
+                    shouldResetSpawnTracker = true;
+                    break;
+                }
+            }
+
+            if (shouldResetSpawnTracker)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
+            else if (possibleSpawnPoints.Count == 0)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
+
+            int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
+            gameItemSpawnIndexTracker.Add(randomIndex);
+            PlayerSpawnPoints.TransformData spawnPoint = new PlayerSpawnPoints.TransformData();
+            if (possibleSpawnPoints.Count != 0)
+                spawnPoint = possibleSpawnPoints[randomIndex];
+            else
+                Debug.LogError("Possible spawn point count is 0! Game item - " + gameItemPrefab);
+
+            GameItem gameItemInstance = Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
+            gameItemInstance.NetworkObject.Spawn(true);
+            return gameItemInstance;
+        }
+
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
             if (nextGameActionTimer.Value <= 0)
@@ -45,6 +91,17 @@ namespace Vi.Core.GameModeManagers
                 killerScore.kills += 1;
                 scoreList[killerIndex] = killerScore;
 
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.deaths += 1;
+                scoreList[victimIndex] = victimScore;
+            }
+        }
+
+        public virtual void OnEnvironmentKill(Attributes victim)
+        {
+            if (nextGameActionTimer.Value <= 0)
+            {
                 int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
                 PlayerScore victimScore = scoreList[victimIndex];
                 victimScore.deaths += 1;
@@ -117,6 +174,14 @@ namespace Vi.Core.GameModeManagers
             }
             //roundTimer.Value = roundDuration;
             nextGameActionTimer.Value = nextGameActionDuration;
+
+            #if UNITY_EDITOR
+            if (!IsClient)
+            {
+                gameObject.AddComponent<AudioListener>();
+                AudioListener.volume = 0;
+            }
+            #endif
         }
 
         public override void OnNetworkDespawn()

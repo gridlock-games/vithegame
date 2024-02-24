@@ -8,16 +8,34 @@ namespace Vi.Core
     public class DamageCircle : NetworkBehaviour
     {
         public bool canShrink = true;
-        public float shrinkSpeed = 5;
+        public float shrinkSpeed = 10;
         public float healthDeductionRate = 3;
 
         private List<Attributes> attributesToDamage = new List<Attributes>();
 
+        public void Shrink()
+        {
+            targetScale = Vector3.MoveTowards(targetScale, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
+        }
+
+        public void ResetDamageCircle()
+        {
+            transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
+            targetScale = transform.localScale;
+        }
+
+        private void Start()
+        {
+            transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
+            targetScale = transform.localScale;
+        }
+
+        private Vector3 targetScale;
         private void Update()
         {
             if (!IsServer) { return; }
-
-            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(5, transform.localScale.y, 5), Time.deltaTime * shrinkSpeed); }
+            
+            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, Time.deltaTime * shrinkSpeed); }
             
             foreach (Attributes attributes in attributesToDamage)
             {

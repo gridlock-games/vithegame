@@ -439,7 +439,7 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
 
                 IsLoggedIn = false;
-                currentlyLoggedInUserId = default;
+                currentlyLoggedInUserId = "";
             }
             else
             {
@@ -481,7 +481,7 @@ namespace Vi.Core
         public void Logout()
         {
             IsLoggedIn = false;
-            currentlyLoggedInUserId = default;
+            currentlyLoggedInUserId = "";
             LogInErrorText = default;
         }
 
