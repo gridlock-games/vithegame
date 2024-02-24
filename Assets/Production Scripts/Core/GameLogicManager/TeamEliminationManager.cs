@@ -46,12 +46,40 @@ namespace Vi.Core.GameModeManagers
 
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (victimTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1 & killerTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1) // If we are in a 1vX situation
+            else if (CanSpawnViEssence()) // If we are in a 1vX situation
             {
                 Debug.Log("Spawning vi essence");
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
-                viEssenceInstance.Initialize(damageCircleInstance);
+                viEssenceInstance.Initialize(this, damageCircleInstance);
             }
+            else // If we cannot spawn vi essence, destroy it if it exists
+            {
+                if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+                if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
+            }
+        }
+
+        private Coroutine viEssenceSpawningCoroutine;
+        public void OnViEssenceActivation()
+        {
+            if (CanSpawnViEssence()) { viEssenceSpawningCoroutine = StartCoroutine(SpawnNewViEssenceAfterDelay()); }
+        }
+
+        private IEnumerator SpawnNewViEssenceAfterDelay()
+        {
+            yield return new WaitForSeconds(5);
+
+            viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
+            viEssenceInstance.Initialize(this, damageCircleInstance);
+        }
+
+        private bool CanSpawnViEssence()
+        {
+            List<Attributes> redTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
+            List<Attributes> blueTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
+
+            return (redTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1 & blueTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1)
+                | (redTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1 & blueTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1);
         }
 
         protected override void OnGameEnd(int[] winningPlayersDataIds)
@@ -64,7 +92,8 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
-            if (viEssenceInstance) { Destroy(viEssenceInstance.gameObject); }
+            if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+            if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             if (gameOver) { return; }
             string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
             roundResultMessage.Value = message;

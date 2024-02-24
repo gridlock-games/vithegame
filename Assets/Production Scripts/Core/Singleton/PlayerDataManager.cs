@@ -405,7 +405,17 @@ namespace Vi.Core
         {
             if (playerSpawnPoints)
             {
-                return playerSpawnPoints.GetGameItemSpawnPoints();
+                float distanceThreshold = 8;
+                List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = new List<PlayerSpawnPoints.TransformData>();
+                List<Attributes> localPlayerList = localPlayers.Values.ToList();
+                foreach (PlayerSpawnPoints.TransformData transformData in playerSpawnPoints.GetGameItemSpawnPoints())
+                {
+                    if (localPlayerList.TrueForAll(item => Vector3.Distance(item.transform.position, transformData.position) > distanceThreshold))
+                    {
+                        possibleSpawnPoints.Add(transformData);
+                    }
+                }
+                return possibleSpawnPoints.ToArray();
             }
             else
             {
