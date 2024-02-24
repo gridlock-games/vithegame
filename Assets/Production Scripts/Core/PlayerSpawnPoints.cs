@@ -10,10 +10,19 @@ namespace Vi.Core
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
-        
+        [SerializeField] private Vector3 damageCircleMaxScale = new Vector3(100, 200, 100);
+        [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);
+        [SerializeField] private float shrinkSize = 20;
+
         public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
 
         public TransformData[] GetGameItemSpawnPoints() { return gameItemSpawnPoints; }
+
+        public Vector3 GetDamageCircleMaxScale() { return damageCircleMaxScale; }
+
+        public Vector3 GetDamageCircleMinScale() { return damageCircleMinScale; }
+
+        public float GetDamageCircleShrinkSize() { return shrinkSize; }
 
         [System.Serializable]
         public struct TransformData
@@ -118,6 +127,12 @@ namespace Vi.Core
                     Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
                 }
             }
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(Vector3.zero, damageCircleMaxScale.x / 2);
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
         }
 
         [System.Serializable]

@@ -21,9 +21,15 @@ namespace Vi.Core.GameModeManagers
 
             if (IsServer)
             {
-                damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
-                damageCircleInstance.NetworkObject.Spawn();
+                StartCoroutine(CreateDamageCircle());
             }
+        }
+
+        private IEnumerator CreateDamageCircle()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.PlayerSpawnPoints());
+            damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
+            damageCircleInstance.NetworkObject.Spawn();
         }
 
         private TeamEliminationViEssence viEssenceInstance;

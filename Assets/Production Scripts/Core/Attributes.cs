@@ -248,6 +248,8 @@ namespace Vi.Core
                 ailment.Value = ActionClip.Ailment.Death;
                 killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(null, this); }
             }
             RenderHitGlowOnly();
             AddHP(damage);

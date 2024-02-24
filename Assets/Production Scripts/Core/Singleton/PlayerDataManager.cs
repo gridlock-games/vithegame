@@ -424,6 +424,50 @@ namespace Vi.Core
             }
         }
 
+        public bool PlayerSpawnPoints()
+        {
+            return playerSpawnPoints;
+        }
+
+        public Vector3 GetDamageCircleMaxScale()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleMaxScale();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle max scale without a player spawn points object");
+                return default;
+            }
+        }
+
+        public Vector3 GetDamageCircleMinScale()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleMinScale();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle min scale without a player spawn points object");
+                return default;
+            }
+        }
+
+        public float GetDamageCircleShrinkSize()
+        {
+            if (playerSpawnPoints)
+            {
+                return playerSpawnPoints.GetDamageCircleShrinkSize();
+            }
+            else
+            {
+                Debug.LogError("Trying to get damage circle shrink size without a player spawn points object");
+                return default;
+            }
+        }
+
         private PlayerSpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
