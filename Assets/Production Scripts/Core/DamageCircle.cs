@@ -16,7 +16,12 @@ namespace Vi.Core
         public void Shrink()
         {
             targetScale = Vector3.MoveTowards(targetScale, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
-            Debug.Log(Time.time + " Shrink " + targetScale);
+        }
+
+        public void ResetDamageCircle()
+        {
+            transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
+            targetScale = transform.localScale;
         }
 
         private void Start()

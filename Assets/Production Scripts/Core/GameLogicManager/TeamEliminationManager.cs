@@ -130,6 +130,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
+            damageCircleInstance.ResetDamageCircle();
             if (viEssenceInstance & IsServer) { if (viEssenceInstance.IsSpawned) { viEssenceInstance.NetworkObject.Despawn(true); } }
             if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             if (gameOver) { return; }
