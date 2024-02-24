@@ -155,5 +155,10 @@ namespace LightPat.UI
                 returnButton.onClick.AddListener(ReturnToHub);
             }
         }
+
+        private void OnEnable()
+        {
+            Debug.Log(Screen.currentResolution.width + " * " + Screen.currentResolution.height + " " + Screen.currentResolution.refreshRate + " - " + Application.targetFrameRate);
+        }
     }
 }
