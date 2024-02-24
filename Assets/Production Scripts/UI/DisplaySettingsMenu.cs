@@ -27,12 +27,14 @@ namespace Vi.UI
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
 
-            int currentResIndex = 0;
+            int currentResIndex = -1;
             for (int i = 0; i < Screen.resolutions.Length; i++)
             {
                 // If the resolution is 16:9
-                if ((Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                // (Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & 
+                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
                 {
+                    Debug.Log("Added resolution to options");
                     resolutionOptions.Add(Screen.resolutions[i].ToString());
                     supportedResolutions.Add(Screen.resolutions[i]);
                 }
@@ -71,7 +73,7 @@ namespace Vi.UI
             graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
 
             // Display Current Config
-            currentResolutionDisplay.SetText("Current Resolution: " + resolutionDropdown.options[currentResIndex].text);
+            currentResolutionDisplay.SetText("Current Resolution: " + (currentResIndex == -1 ? "Unknown" : resolutionDropdown.options[currentResIndex].text));
             currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fsModeIndex].text);
             currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
         }

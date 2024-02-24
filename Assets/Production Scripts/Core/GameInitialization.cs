@@ -16,6 +16,15 @@ namespace Vi.Core
         [SerializeField] private Text downloadProgressBarText;
         [SerializeField] private Image downloadProgressBarImage;
 
+        private void Awake()
+        {
+            //if (Application.platform == RuntimePlatform.IPhonePlayer | Application.platform == RuntimePlatform.Android)
+            //{
+            //    Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
+            //    Application.targetFrameRate = 60;
+            //}
+        }
+
         private void Start()
         {
             StartCoroutine(LoadScenes());
