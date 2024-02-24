@@ -82,7 +82,6 @@ namespace Vi.Core.GameModeManagers
             }
             else if (CanSpawnViEssence()) // If we are in a 1vX situation
             {
-                Debug.Log("Spawning vi essence");
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(this, damageCircleInstance);
             }
@@ -103,12 +102,17 @@ namespace Vi.Core.GameModeManagers
         {
             yield return new WaitForSeconds(5);
 
-            viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
-            viEssenceInstance.Initialize(this, damageCircleInstance);
+            if (CanSpawnViEssence())
+            {
+                viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
+                viEssenceInstance.Initialize(this, damageCircleInstance);
+            }
         }
 
         private bool CanSpawnViEssence()
         {
+            if (viEssenceInstance) { return false; }
+
             List<Attributes> redTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
             List<Attributes> blueTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
 
@@ -126,7 +130,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
-            if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+            if (viEssenceInstance & IsServer) { if (viEssenceInstance.IsSpawned) { viEssenceInstance.NetworkObject.Despawn(true); } }
             if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             if (gameOver) { return; }
             string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
