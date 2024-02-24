@@ -98,6 +98,17 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public virtual void OnEnvironmentKill(Attributes victim)
+        {
+            if (nextGameActionTimer.Value <= 0)
+            {
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.deaths += 1;
+                scoreList[victimIndex] = victimScore;
+            }
+        }
+
         protected bool gameOver;
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {

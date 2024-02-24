@@ -249,7 +249,7 @@ namespace Vi.Core
                 killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(null, this); }
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             RenderHitGlowOnly();
             AddHP(damage);

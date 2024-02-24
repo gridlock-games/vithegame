@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using UnityEngine.AI;
+using UnityEngine;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -32,11 +31,40 @@ namespace Vi.Core.GameModeManagers
             damageCircleInstance.NetworkObject.Spawn();
         }
 
+        public override void OnEnvironmentKill(Attributes victim)
+        {
+            base.OnEnvironmentKill(victim);
+
+            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Red ? PlayerDataManager.Team.Blue : PlayerDataManager.Team.Red;
+            List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            {
+                List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
+                List<int> winningPlayerIds = new List<int>();
+                foreach (Attributes attributes in opposingTeamPlayers)
+                {
+                    winningPlayerIds.Add(attributes.GetPlayerDataId());
+                }
+
+                OnRoundEnd(winningPlayerIds.ToArray());
+            }
+            else if (CanSpawnViEssence()) // If we are in a 1vX situation
+            {
+                Debug.Log("Spawning vi essence");
+                viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
+                viEssenceInstance.Initialize(this, damageCircleInstance);
+            }
+            else // If we cannot spawn vi essence, destroy it if it exists
+            {
+                if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+                if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
+            }
+        }
+
         private TeamEliminationViEssence viEssenceInstance;
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
-            // TODO Change this to check if all players on the victim's team are dead
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
 
             List<Attributes> killerTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
