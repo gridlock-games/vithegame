@@ -5,6 +5,8 @@ using TMPro;
 using System;
 using System.Linq;
 using Vi.Core;
+using UnityEngine.UI;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.UI
 {
@@ -18,20 +20,32 @@ namespace Vi.UI
         public TextMeshProUGUI currentResolutionDisplay;
         public TextMeshProUGUI currentFullscreenModeDisplay;
         public TextMeshProUGUI currentGraphicsQualityDisplay;
+        [Header("URP Settings")]
+        public Slider renderScaleSlider;
 
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
+        public void SetRenderScale()
+        {
+            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+            pipeline.renderScale = renderScaleSlider.value;
+        }
+
         private void Start()
         {
+            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+            renderScaleSlider.value = pipeline.renderScale;
+
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
 
-            int currentResIndex = 0;
+            int currentResIndex = -1;
             for (int i = 0; i < Screen.resolutions.Length; i++)
             {
                 // If the resolution is 16:9
-                if ((Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                // (Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & 
+                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
                 {
                     resolutionOptions.Add(Screen.resolutions[i].ToString());
                     supportedResolutions.Add(Screen.resolutions[i]);
@@ -55,6 +69,23 @@ namespace Vi.UI
                 }
             }
 
+            //if (supportedResolutions.Count == 1)
+            //{
+            //    float[] downscaleFactors = new float[] { 1.5f, 2 };
+            //    foreach (float downscaleFactor in downscaleFactors)
+            //    {
+            //        Resolution downscaledResolution = new Resolution()
+            //        {
+            //            height = (int)(supportedResolutions[0].height / downscaleFactor),
+            //            width = (int)(supportedResolutions[0].width / downscaleFactor),
+            //            refreshRate = supportedResolutions[0].refreshRate
+            //        };
+
+            //        resolutionOptions.Add(downscaledResolution.ToString());
+            //        supportedResolutions.Add(downscaledResolution);
+            //    }
+            //}
+
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
 
@@ -71,7 +102,7 @@ namespace Vi.UI
             graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
 
             // Display Current Config
-            currentResolutionDisplay.SetText("Current Resolution: " + resolutionDropdown.options[currentResIndex].text);
+            currentResolutionDisplay.SetText("Current Resolution: " + (currentResIndex == -1 ? "Unknown" : resolutionDropdown.options[currentResIndex].text));
             currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fsModeIndex].text);
             currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
         }

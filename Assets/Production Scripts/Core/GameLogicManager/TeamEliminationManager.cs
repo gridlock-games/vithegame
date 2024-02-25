@@ -123,6 +123,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnGameEnd(int[] winningPlayersDataIds)
         {
             base.OnGameEnd(winningPlayersDataIds);
+            damageCircleInstance.NetworkObject.Despawn(true);
             roundResultMessage.Value = "Game over! ";
             gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team wins the match!";
         }

@@ -11,21 +11,6 @@ namespace Vi.Core
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
 
-        private void Awake()
-        {
-            if (Application.platform == RuntimePlatform.IPhonePlayer | Application.platform == RuntimePlatform.Android)
-            {
-                Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
-                Application.targetFrameRate = 60;
-            }
-
-            //if (!Application.isEditor)
-            //{
-            //    Screen.SetResolution(Screen.currentResolution.height * (16 / 9), Screen.currentResolution.height, Screen.fullScreenMode);
-            //    Application.targetFrameRate = Screen.currentResolution.refreshRate;
-            //}
-        }
-
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
