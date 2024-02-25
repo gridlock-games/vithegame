@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using UnityEngine.AddressableAssets;
-using UnityEngine.SceneManagement;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Vi.UI
 {

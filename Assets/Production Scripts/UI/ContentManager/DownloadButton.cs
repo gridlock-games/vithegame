@@ -72,7 +72,7 @@ namespace Vi.UI
             button.interactable = true;
         }
 
-        public Button button { get; private set; }
+        private Button button;
         private void Awake()
         {
             downloadIcon.gameObject.SetActive(false);
@@ -110,11 +110,19 @@ namespace Vi.UI
                 yield return null;
             }
 
-            progressBarText.text = "Downloaded";
+            if (downloadHandle.Status == AsyncOperationStatus.Succeeded & defaultDownloadHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                progressBarText.text = "Downloaded";
 
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
-            deleteIcon.gameObject.SetActive(true);
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(delegate { StartCoroutine(DeleteAsset()); });
+                deleteIcon.gameObject.SetActive(true);
+            }
+            else
+            {
+                progressBarText.text = "Error While Downloading";
+            }
+
             button.interactable = true;
 
             MimicButtons();
