@@ -240,7 +240,7 @@ namespace Vi.UI
             
             renderScaleSlider.value = pipeline.renderScale;
             renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
-            vsyncToggle.interactable = false;
+            vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
