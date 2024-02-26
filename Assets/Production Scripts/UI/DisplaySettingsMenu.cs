@@ -16,12 +16,10 @@ namespace Vi.UI
         public TMP_Dropdown resolutionDropdown;
         public TMP_Dropdown fullscreenModeDropdown;
         public TMP_Dropdown graphicsQualityDropdown;
-        [Header("Config Labels")]
-        public TextMeshProUGUI currentResolutionDisplay;
-        public TextMeshProUGUI currentFullscreenModeDisplay;
-        public TextMeshProUGUI currentGraphicsQualityDisplay;
         [Header("URP Settings")]
         public Slider renderScaleSlider;
+
+        [SerializeField] private PlayerUI.PlatformUIDefinition[] platformUIDefinitions;
 
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
@@ -32,8 +30,29 @@ namespace Vi.UI
             pipeline.renderScale = renderScaleSlider.value;
         }
 
-        private void Start()
+        private void Awake()
         {
+            foreach (PlayerUI.PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (PlayerUI.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+
+                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                }
+            }
+
             UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
             renderScaleSlider.value = pipeline.renderScale;
 
@@ -69,23 +88,6 @@ namespace Vi.UI
                 }
             }
 
-            //if (supportedResolutions.Count == 1)
-            //{
-            //    float[] downscaleFactors = new float[] { 1.5f, 2 };
-            //    foreach (float downscaleFactor in downscaleFactors)
-            //    {
-            //        Resolution downscaledResolution = new Resolution()
-            //        {
-            //            height = (int)(supportedResolutions[0].height / downscaleFactor),
-            //            width = (int)(supportedResolutions[0].width / downscaleFactor),
-            //            refreshRate = supportedResolutions[0].refreshRate
-            //        };
-
-            //        resolutionOptions.Add(downscaledResolution.ToString());
-            //        supportedResolutions.Add(downscaledResolution);
-            //    }
-            //}
-
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
 
@@ -98,13 +100,10 @@ namespace Vi.UI
             fullscreenModeDropdown.value = fsModeIndex;
 
             // Graphics Quality dropdown
-            graphicsQualityDropdown.AddOptions(QualitySettings.names.ToList());
+            List<string> graphicsQualityOptions = QualitySettings.names.ToList();
+            graphicsQualityOptions.Add("Custom");
+            graphicsQualityDropdown.AddOptions(graphicsQualityOptions);
             graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
-
-            // Display Current Config
-            currentResolutionDisplay.SetText("Current Resolution: " + (currentResIndex == -1 ? "Unknown" : resolutionDropdown.options[currentResIndex].text));
-            currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fsModeIndex].text);
-            currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
         }
 
         public void ApplyChanges()
@@ -119,10 +118,6 @@ namespace Vi.UI
             QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
 
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
-
-            currentResolutionDisplay.SetText("Current Resolution: " + resolutionDropdown.options[resolutionDropdown.value].text);
-            currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fullscreenModeDropdown.value].text);
-            currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
         }
     }
 }
