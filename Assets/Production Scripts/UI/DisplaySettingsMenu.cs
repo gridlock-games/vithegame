@@ -15,7 +15,6 @@ namespace Vi.UI
         [Header("Dropdowns")]
         public TMP_Dropdown resolutionDropdown;
         public TMP_Dropdown fullscreenModeDropdown;
-        public TMP_Dropdown graphicsQualityDropdown;
         [Header("URP Settings")]
         public Slider renderScaleSlider;
         [Header("Buttons")]
@@ -28,7 +27,6 @@ namespace Vi.UI
 
         private FullScreenMode originalFullScreenMode;
         private Resolution originalResolution;
-        private int originalQualityLevel;
         private float originalRenderScaleValue;
         private void Awake()
         {
@@ -81,19 +79,13 @@ namespace Vi.UI
             int fsModeIndex = Array.IndexOf(fsModes, Screen.fullScreenMode);
             fullscreenModeDropdown.value = fsModeIndex;
 
-            // Graphics Quality dropdown
-            List<string> graphicsQualityOptions = QualitySettings.names.ToList();
-            //graphicsQualityOptions.Add("Custom");
-            graphicsQualityDropdown.AddOptions(graphicsQualityOptions);
-            graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
-
             SetOriginalVariables();
         }
 
         private void Update()
         {
             bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
-                | originalQualityLevel != graphicsQualityDropdown.value
+                //| originalQualityLevel != graphicsQualityDropdown.value
                 | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
                 | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
@@ -106,7 +98,6 @@ namespace Vi.UI
         private void SetOriginalVariables()
         {
             originalFullScreenMode = Screen.fullScreenMode;
-            originalQualityLevel = QualitySettings.GetQualityLevel();
             originalResolution = supportedResolutions[resolutionDropdown.value];
             originalRenderScaleValue = pipeline.renderScale;
         }
@@ -120,7 +111,7 @@ namespace Vi.UI
             // Options are assigned automatically in OpenSettingsMenu()
             Resolution res = supportedResolutions[resolutionDropdown.value];
 
-            QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
+            //QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
 
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
 
@@ -134,7 +125,7 @@ namespace Vi.UI
             renderScaleSlider.value = pipeline.renderScale;
 
             fullscreenModeDropdown.value = Array.IndexOf(fsModes, originalFullScreenMode);
-            graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
+            //graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
 
             int currentResIndex = -1;
             List<string> resolutionOptions = new List<string>();
