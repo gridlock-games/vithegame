@@ -184,6 +184,8 @@ namespace Vi.UI
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
             pipeline.supportsHDR = hdrToggle.isOn;
+            
+            vsyncToggle.interactable = true;
 
             SetOriginalVariables();
         }
@@ -226,6 +228,19 @@ namespace Vi.UI
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
             renderScaleSlider.value = pipeline.renderScale;
             renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
+            vsyncToggle.interactable = true;
+            vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
+            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+            hdrToggle.isOn = pipeline.supportsHDR;
+        }
+
+        public void OnQualitySettingsDropdownChange()
+        {
+            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
+            
+            renderScaleSlider.value = pipeline.renderScale;
+            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
+            vsyncToggle.interactable = false;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
