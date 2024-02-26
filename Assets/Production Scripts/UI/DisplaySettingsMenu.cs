@@ -22,18 +22,20 @@ namespace Vi.UI
         public Button applyChangesButton;
         public Button discardChangesButton;
 
+        private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
         private FullScreenMode originalFullScreenMode;
         private Resolution originalResolution;
         private int originalQualityLevel;
+        private float originalRenderScaleValue;
         private void Awake()
         {
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
 
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
             renderScaleSlider.value = pipeline.renderScale;
 
             // Resolution Dropdown
@@ -94,7 +96,8 @@ namespace Vi.UI
                 | originalQualityLevel != graphicsQualityDropdown.value
                 | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
-                | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate;
+                | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
+                | originalRenderScaleValue != renderScaleSlider.value;
 
             applyChangesButton.interactable = changesPresent;
             discardChangesButton.interactable = changesPresent;
@@ -105,6 +108,7 @@ namespace Vi.UI
             originalFullScreenMode = Screen.fullScreenMode;
             originalQualityLevel = QualitySettings.GetQualityLevel();
             originalResolution = Screen.currentResolution;
+            originalRenderScaleValue = pipeline.renderScale;
         }
 
         public void ApplyChanges()
@@ -120,7 +124,6 @@ namespace Vi.UI
 
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
 
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
             pipeline.renderScale = renderScaleSlider.value;
 
             SetOriginalVariables();
@@ -128,7 +131,39 @@ namespace Vi.UI
 
         public void DiscardChanges()
         {
-            Awake();
+            renderScaleSlider.value = pipeline.renderScale;
+
+            fullscreenModeDropdown.value = Array.IndexOf(fsModes, originalFullScreenMode);
+            graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
+
+            int currentResIndex = -1;
+            List<string> resolutionOptions = new List<string>();
+            for (int i = 0; i < Screen.resolutions.Length; i++)
+            {
+                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                {
+                    resolutionOptions.Add(Screen.resolutions[i].ToString());
+                    supportedResolutions.Add(Screen.resolutions[i]);
+                }
+
+                if (Screen.fullScreenMode == FullScreenMode.Windowed)
+                {
+                    if (Screen.resolutions[i].width == Screen.width & Screen.resolutions[i].height == Screen.height
+                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                    {
+                        currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
+                    }
+                }
+                else
+                {
+                    if (Screen.resolutions[i].width == Screen.currentResolution.width & Screen.resolutions[i].height == Screen.currentResolution.height
+                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                    {
+                        currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
+                    }
+                }
+            }
+            resolutionDropdown.value = currentResIndex;
         }
     }
 }

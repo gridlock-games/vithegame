@@ -12,6 +12,7 @@ public class ConvertSelectFieldToDropdown : MonoBehaviour
     private Text dropdownLabelText;
     private TMP_Dropdown dropdown;
 
+    private bool startCalled;
     private void Start()
     {
         selectField = GetComponentInChildren<UISelectField>();
@@ -24,11 +25,33 @@ public class ConvertSelectFieldToDropdown : MonoBehaviour
             selectField.AddOption(option.text);
         }
         selectField.value = dropdown.options[dropdown.value].text;
+
+        startCalled = true;
     }
 
     public void UpdateDropdownValue()
     {
+        StartCoroutine(UpdateDropdownAfterStart());
+    }
+
+    private IEnumerator UpdateDropdownAfterStart()
+    {
+        yield return new WaitUntil(() => startCalled);
+
         dropdown.value = selectField.options.IndexOf(selectField.value);
+        dropdownLabelText.text = selectField.value;
+    }
+
+    public void UpdateSelectFieldValue()
+    {
+        StartCoroutine(UpdateSelectFieldAfterStart());
+    }
+
+    private IEnumerator UpdateSelectFieldAfterStart()
+    {
+        yield return new WaitUntil(() => startCalled);
+
+        selectField.value = dropdown.options[dropdown.value].text;
         dropdownLabelText.text = selectField.value;
     }
 }
