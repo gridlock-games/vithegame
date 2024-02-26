@@ -107,7 +107,7 @@ namespace Vi.UI
         {
             originalFullScreenMode = Screen.fullScreenMode;
             originalQualityLevel = QualitySettings.GetQualityLevel();
-            originalResolution = Screen.currentResolution;
+            originalResolution = supportedResolutions[resolutionDropdown.value];
             originalRenderScaleValue = pipeline.renderScale;
         }
 
