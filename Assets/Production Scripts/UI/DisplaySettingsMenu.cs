@@ -12,30 +12,28 @@ namespace Vi.UI
 {
     public class DisplaySettingsMenu : Menu
     {
-        [Header("Dropdowns")]
-        public TMP_Dropdown resolutionDropdown;
-        public TMP_Dropdown fullscreenModeDropdown;
-        public TMP_Dropdown graphicsQualityDropdown;
-        [Header("Config Labels")]
-        public TextMeshProUGUI currentResolutionDisplay;
-        public TextMeshProUGUI currentFullscreenModeDisplay;
-        public TextMeshProUGUI currentGraphicsQualityDisplay;
-        [Header("URP Settings")]
-        public Slider renderScaleSlider;
+        [Header("Display Settings")]
+        [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
+        [SerializeField] private TMP_Dropdown resolutionDropdown;
+        [Header("Graphics Settings")]
+        [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
+        [SerializeField] private Slider renderScaleSlider;
+        [SerializeField] private TMP_Dropdown renderScalingModeDropdown;
+        [SerializeField] private Toggle vsyncToggle;
+        [SerializeField] private TMP_Dropdown msaaDropdown;
+        [SerializeField] private Toggle hdrToggle;
+        [Header("Action Buttons")]
+        [SerializeField] private Button applyChangesButton;
+        [SerializeField] private Button discardChangesButton;
 
+        private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
-        public void SetRenderScale()
+        private void Awake()
         {
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
-            pipeline.renderScale = renderScaleSlider.value;
-        }
-
-        private void Start()
-        {
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
-            renderScaleSlider.value = pipeline.renderScale;
+            applyChangesButton.interactable = false;
+            discardChangesButton.interactable = false;
 
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
@@ -69,23 +67,6 @@ namespace Vi.UI
                 }
             }
 
-            //if (supportedResolutions.Count == 1)
-            //{
-            //    float[] downscaleFactors = new float[] { 1.5f, 2 };
-            //    foreach (float downscaleFactor in downscaleFactors)
-            //    {
-            //        Resolution downscaledResolution = new Resolution()
-            //        {
-            //            height = (int)(supportedResolutions[0].height / downscaleFactor),
-            //            width = (int)(supportedResolutions[0].width / downscaleFactor),
-            //            refreshRate = supportedResolutions[0].refreshRate
-            //        };
-
-            //        resolutionOptions.Add(downscaledResolution.ToString());
-            //        supportedResolutions.Add(downscaledResolution);
-            //    }
-            //}
-
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
 
@@ -98,31 +79,171 @@ namespace Vi.UI
             fullscreenModeDropdown.value = fsModeIndex;
 
             // Graphics Quality dropdown
-            graphicsQualityDropdown.AddOptions(QualitySettings.names.ToList());
-            graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
+            graphicsPresetDropdown.AddOptions(QualitySettings.names.ToList());
+            graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
 
-            // Display Current Config
-            currentResolutionDisplay.SetText("Current Resolution: " + (currentResIndex == -1 ? "Unknown" : resolutionDropdown.options[currentResIndex].text));
-            currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fsModeIndex].text);
-            currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+            renderScaleSlider.value = pipeline.renderScale;
+
+            renderScalingModeDropdown.ClearOptions();
+            List<string> scalingModeOptions = new List<string>();
+            foreach (UpscalingFilterSelection scalingMode in Enum.GetValues(typeof(UpscalingFilterSelection)))
+            {
+                switch (scalingMode)
+                {
+                    case UpscalingFilterSelection.Auto:
+                        scalingModeOptions.Add("Automatic");
+                        break;
+                    case UpscalingFilterSelection.Linear:
+                        scalingModeOptions.Add("Bilinear");
+                        break;
+                    case UpscalingFilterSelection.Point:
+                        scalingModeOptions.Add("Nearest-Neighbor");
+                        break;
+                    case UpscalingFilterSelection.FSR:
+                        scalingModeOptions.Add("FidelityFX Super Resolution 1.0");
+                        break;
+                }
+            }
+            renderScalingModeDropdown.AddOptions(scalingModeOptions);
+            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
+
+            vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
+
+            msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
+            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+
+            hdrToggle.isOn = pipeline.supportsHDR;
+
+            SetOriginalVariables();
+        }
+
+        private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
+        {
+            { "Disabled", 0 },
+            { "2x", 2 },
+            { "4x", 4 },
+            { "8x", 8 }
+        };
+
+        private void Update()
+        {
+            bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
+                | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
+                | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
+                | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
+                | originalGraphicsPreset != graphicsPresetDropdown.value
+                | originalRenderScaleValue != renderScaleSlider.value
+                | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
+                | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
+                | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
+                | originalHDR != hdrToggle.isOn;
+
+            applyChangesButton.interactable = changesPresent;
+            discardChangesButton.interactable = changesPresent;
+        }
+
+        // Display settings
+        private FullScreenMode originalFullScreenMode;
+        private Resolution originalResolution;
+        // Graphics settings
+        private int originalGraphicsPreset;
+        private float originalRenderScaleValue;
+        private UpscalingFilterSelection originalScalingFilter;
+        private int originalVSyncState;
+        private int originalMSAASampleCount;
+        private bool originalHDR;
+        private void SetOriginalVariables()
+        {
+            originalFullScreenMode = fsModes[fullscreenModeDropdown.value];
+            originalResolution = supportedResolutions[resolutionDropdown.value];
+
+            originalGraphicsPreset = graphicsPresetDropdown.value;
+            originalRenderScaleValue = pipeline.renderScale;
+            originalScalingFilter = pipeline.upscalingFilter;
+            originalVSyncState = QualitySettings.vSyncCount;
+            originalMSAASampleCount = pipeline.msaaSampleCount;
+            originalHDR = pipeline.supportsHDR;
         }
 
         public void ApplyChanges()
         {
+            // Display settings
             // Fullscreen Dropdown
             FullScreenMode fsMode = fsModes[fullscreenModeDropdown.value];
 
             // Resolution Dropdown
             // Options are assigned automatically in OpenSettingsMenu()
             Resolution res = supportedResolutions[resolutionDropdown.value];
-
-            QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
-
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
 
-            currentResolutionDisplay.SetText("Current Resolution: " + resolutionDropdown.options[resolutionDropdown.value].text);
-            currentFullscreenModeDisplay.SetText("Current Fullscreen Mode: " + fullscreenModeDropdown.options[fullscreenModeDropdown.value].text);
-            currentGraphicsQualityDisplay.SetText("Current Graphics Quality: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
+            // Graphics settings
+            if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
+            pipeline.renderScale = renderScaleSlider.value;
+            pipeline.upscalingFilter = (UpscalingFilterSelection)renderScalingModeDropdown.value;
+            QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
+            pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
+            pipeline.supportsHDR = hdrToggle.isOn;
+            
+            vsyncToggle.interactable = true;
+
+            SetOriginalVariables();
+        }
+
+        public void DiscardChanges()
+        {
+            // Display settings
+            fullscreenModeDropdown.value = Array.IndexOf(fsModes, originalFullScreenMode);
+
+            int currentResIndex = -1;
+            List<string> resolutionOptions = new List<string>();
+            for (int i = 0; i < Screen.resolutions.Length; i++)
+            {
+                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                {
+                    resolutionOptions.Add(Screen.resolutions[i].ToString());
+                    supportedResolutions.Add(Screen.resolutions[i]);
+                }
+
+                if (Screen.fullScreenMode == FullScreenMode.Windowed)
+                {
+                    if (Screen.resolutions[i].width == Screen.width & Screen.resolutions[i].height == Screen.height
+                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                    {
+                        currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
+                    }
+                }
+                else
+                {
+                    if (Screen.resolutions[i].width == Screen.currentResolution.width & Screen.resolutions[i].height == Screen.currentResolution.height
+                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                    {
+                        currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
+                    }
+                }
+            }
+            resolutionDropdown.value = currentResIndex;
+
+            // Graphics Settings
+            graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
+            renderScaleSlider.value = pipeline.renderScale;
+            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
+            vsyncToggle.interactable = true;
+            vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
+            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+            hdrToggle.isOn = pipeline.supportsHDR;
+        }
+
+        public void OnQualitySettingsDropdownChange()
+        {
+            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
+            
+            renderScaleSlider.value = pipeline.renderScale;
+            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
+            vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
+            vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
+            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+            hdrToggle.isOn = pipeline.supportsHDR;
         }
     }
 }

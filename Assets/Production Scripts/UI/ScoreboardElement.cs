@@ -33,7 +33,9 @@ namespace Vi.UI
         void UpdateUI()
         {
             GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(attributes.GetPlayerDataId());
-            playerNameText.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            playerNameText.text = playerData.character.name.ToString();
+            playerNameText.color = PlayerDataManager.GetTeamColor(playerData.team) == Color.black ? Color.white : PlayerDataManager.GetTeamColor(playerData.team);
             roundWinsText.text = playerScore.roundWins.ToString();
             killsText.text = playerScore.kills.ToString();
             deathsText.text = playerScore.deaths.ToString();
