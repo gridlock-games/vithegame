@@ -18,40 +18,20 @@ namespace Vi.UI
         public TMP_Dropdown graphicsQualityDropdown;
         [Header("URP Settings")]
         public Slider renderScaleSlider;
-
-        [SerializeField] private PlayerUI.PlatformUIDefinition[] platformUIDefinitions;
+        [Header("Buttons")]
+        public Button applyChangesButton;
+        public Button discardChangesButton;
 
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
-        public void SetRenderScale()
-        {
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
-            pipeline.renderScale = renderScaleSlider.value;
-        }
-
+        private FullScreenMode originalFullScreenMode;
+        private Resolution originalResolution;
+        private int originalQualityLevel;
         private void Awake()
         {
-            foreach (PlayerUI.PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
-            {
-                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
-                {
-                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
-                }
-
-                foreach (PlayerUI.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform))
-                    {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
-                    }
-                }
-
-                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
-                }
-            }
+            applyChangesButton.interactable = false;
+            discardChangesButton.interactable = false;
 
             UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
             renderScaleSlider.value = pipeline.renderScale;
@@ -101,9 +81,30 @@ namespace Vi.UI
 
             // Graphics Quality dropdown
             List<string> graphicsQualityOptions = QualitySettings.names.ToList();
-            graphicsQualityOptions.Add("Custom");
+            //graphicsQualityOptions.Add("Custom");
             graphicsQualityDropdown.AddOptions(graphicsQualityOptions);
             graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
+
+            SetOriginalVariables();
+        }
+
+        private void Update()
+        {
+            bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
+                | originalQualityLevel != graphicsQualityDropdown.value
+                | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
+                | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
+                | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate;
+
+            applyChangesButton.interactable = changesPresent;
+            discardChangesButton.interactable = changesPresent;
+        }
+
+        private void SetOriginalVariables()
+        {
+            originalFullScreenMode = Screen.fullScreenMode;
+            originalQualityLevel = QualitySettings.GetQualityLevel();
+            originalResolution = Screen.currentResolution;
         }
 
         public void ApplyChanges()
@@ -118,6 +119,16 @@ namespace Vi.UI
             QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
 
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
+
+            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+            pipeline.renderScale = renderScaleSlider.value;
+
+            SetOriginalVariables();
+        }
+
+        public void DiscardChanges()
+        {
+            Awake();
         }
     }
 }
