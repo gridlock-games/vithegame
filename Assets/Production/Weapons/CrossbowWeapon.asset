@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
   m_Name: CrossbowWeapon
   m_EditorClassIdentifier: 
+  runSpeed: 5
+  maxHP: 100
+  maxStamina: 100
+  staminaRecoveryRate: 5
+  staminaDelay: 1
+  maxDefense: 100
+  defenseRecoveryRate: 5
+  defenseDelay: 1
+  maxRage: 100
+  rageRecoveryRate: 0
+  shouldUseAmmo: 1
+  maxAmmoCount: 2
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffect: {fileID: 8300000, guid: 267c41f5b671a4541869a15be3f6e889, type: 3}
