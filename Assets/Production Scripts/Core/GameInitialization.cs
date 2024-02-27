@@ -18,6 +18,7 @@ namespace Vi.Core
 
         private void Start()
         {
+            Application.targetFrameRate = Screen.currentResolution.refreshRate;
             StartCoroutine(LoadScenes());
         }
 

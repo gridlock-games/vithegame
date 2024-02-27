@@ -41,6 +41,25 @@ namespace Vi.Core
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
         }
 
+        public void ReloadWeapon(ShooterWeapon shooterWeapon)
+        {
+            StartCoroutine(Reload(shooterWeapon));
+        }
+
+        private IEnumerator Reload(ShooterWeapon shooterWeapon)
+        {
+            Animator.SetBool("Reloading", true);
+            yield return new WaitUntil(() => IsReloading());
+            Animator.SetBool("Reloading", false);
+            yield return new WaitUntil(() => !IsReloading());
+            shooterWeapon.Reload();
+        }
+
+        public bool IsReloading()
+        {
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));

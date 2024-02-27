@@ -15,7 +15,6 @@ namespace Vi.Player
         [SerializeField] private Camera minimapCameraInstance;
 
         [Header("Locomotion Settings")]
-        [SerializeField] private float runSpeed = 5;
         [SerializeField] private float angularSpeed = 540;
         [Header("Animation Settings")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
@@ -101,7 +100,7 @@ namespace Vi.Player
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())
             {
@@ -111,7 +110,7 @@ namespace Vi.Player
             {
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
@@ -286,7 +285,7 @@ namespace Vi.Player
             }
 
             if (weaponHandler.CurrentActionClip != null)
-                animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
+                animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

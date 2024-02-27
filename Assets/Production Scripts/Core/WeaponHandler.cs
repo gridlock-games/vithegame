@@ -51,6 +51,42 @@ namespace Vi.Core
             EquipWeapon();
         }
 
+        public bool ShouldUseAmmo()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.ShouldUseAmmo();
+                }
+            }
+            return false;
+        }
+
+        public int GetAmmoCount()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.GetAmmoCount();
+                }
+            }
+            return 0;
+        }
+
+        public int GetMaxAmmoCount()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.GetMaxAmmoCount();
+                }
+            }
+            return 0;
+        }
+
         private void EquipWeapon()
         {
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
@@ -608,7 +644,14 @@ namespace Vi.Core
 
         void OnReload()
         {
-
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    animationHandler.ReloadWeapon(shooterWeapon);
+                    break;
+                }
+            }
         }
 
         public void SetIsBlocking(bool isBlocking)

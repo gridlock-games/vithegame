@@ -12,6 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
   m_Name: HammerWeapon
   m_EditorClassIdentifier: 
+  runSpeed: 3
+  maxHP: 100
+  maxStamina: 100
+  staminaRecoveryRate: 5
+  staminaDelay: 1
+  maxDefense: 100
+  defenseRecoveryRate: 5
+  defenseDelay: 1
+  maxRage: 100
+  rageRecoveryRate: 1
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffect: {fileID: 8300000, guid: c798fe8bbfc1247fe856b149c1457659, type: 3}
