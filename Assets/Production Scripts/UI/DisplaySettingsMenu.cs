@@ -7,6 +7,7 @@ using System.Linq;
 using Vi.Core;
 using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
+using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
@@ -15,6 +16,7 @@ namespace Vi.UI
         [Header("Display Settings")]
         [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
         [SerializeField] private TMP_Dropdown resolutionDropdown;
+        [SerializeField] private InputField targetFrameRateInput;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
         [SerializeField] private Slider renderScaleSlider;
@@ -69,6 +71,8 @@ namespace Vi.UI
 
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
+
+            targetFrameRateInput.text = Application.targetFrameRate.ToString();
 
             // Full screen mode dropdown
             // Dropdown Options are assigned in inspector since these don't vary
@@ -174,8 +178,11 @@ namespace Vi.UI
 
             // Resolution Dropdown
             // Options are assigned automatically in OpenSettingsMenu()
-            Resolution res = supportedResolutions[resolutionDropdown.value];
-            Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
+            if (supportedResolutions.Count > 1)
+            {
+                Resolution res = supportedResolutions[resolutionDropdown.value];
+                Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
+            }
 
             // Graphics settings
             if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
@@ -244,6 +251,24 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
+        }
+
+        public void ValidateTargetFrameRate()
+        {
+            targetFrameRateInput.text = Regex.Replace(targetFrameRateInput.text, @"[^0-9]", "");
+        }
+
+        public void ChangeTargetFrameRate()
+        {
+            int targetFrameRate = int.Parse(targetFrameRateInput.text);
+
+            if (targetFrameRate < 30)
+            {
+                targetFrameRate = 30;
+                targetFrameRateInput.text = "30";
+            }
+
+            Application.targetFrameRate = targetFrameRate;
         }
     }
 }
