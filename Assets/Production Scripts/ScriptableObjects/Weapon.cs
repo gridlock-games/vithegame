@@ -8,6 +8,10 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "Weapon", menuName = "Production/Weapon")]
     public class Weapon : ScriptableObject
     {
+        [SerializeField] private float runSpeed = 5;
+
+        public float GetRunSpeed() { return runSpeed; }
+
         [System.Serializable]
         private class AttackSoundEffect
         {
