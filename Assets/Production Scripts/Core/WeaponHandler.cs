@@ -648,7 +648,8 @@ namespace Vi.Core
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    shooterWeapon.Reload();
+                    animationHandler.ReloadWeapon(shooterWeapon);
+                    break;
                 }
             }
         }
