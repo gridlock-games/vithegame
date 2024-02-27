@@ -9,8 +9,30 @@ namespace Vi.ScriptableObjects
     public class Weapon : ScriptableObject
     {
         [SerializeField] private float runSpeed = 5;
+        [Header("Health")]
+        [SerializeField] private float maxHP = 100;
+        [Header("Stamina")]
+        [SerializeField] private float maxStamina = 100;
+        [SerializeField] private float staminaRecoveryRate = 5;
+        [SerializeField] private float staminaDelay = 1;
+        [Header("Defense")]
+        [SerializeField] private float maxDefense = 100;
+        [SerializeField] private float defenseRecoveryRate = 5;
+        [SerializeField] private float defenseDelay = 1;
+        [Header("Rage")]
+        [SerializeField] private float maxRage = 100;
+        [SerializeField] private float rageRecoveryRate = 0;
 
         public float GetRunSpeed() { return runSpeed; }
+        public float GetMaxHP() { return maxHP; }
+        public float GetMaxStamina() { return maxStamina; }
+        public float GetMaxDefense() { return maxDefense; }
+        public float GetMaxRage() { return maxRage; }
+        public float GetStaminaDelay() { return staminaDelay; }
+        public float GetDefenseDelay() { return defenseDelay; }
+        public float GetStaminaRecoveryRate() { return staminaRecoveryRate; }
+        public float GetDefenseRecoveryRate() { return defenseRecoveryRate; }
+        public float GetRageRecoveryRate() { return rageRecoveryRate; }
 
         [System.Serializable]
         private class AttackSoundEffect

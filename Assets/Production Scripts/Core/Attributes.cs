@@ -34,24 +34,10 @@ namespace Vi.Core
 
         [SerializeField] private GameObject teamIndicatorPrefab;
 
-        [Header("Health")]
-        [SerializeField] private float maxHP = 100;
-        [Header("Stamina")]
-        [SerializeField] private float maxStamina = 100;
-        [SerializeField] private float staminaRecoveryRate = 5;
-        [SerializeField] private float staminaDelay = 1;
-        [Header("Defense")]
-        [SerializeField] private float maxDefense = 100;
-        [SerializeField] private float defenseRecoveryRate = 5;
-        [SerializeField] private float defenseDelay = 1;
-        [Header("Rage")]
-        [SerializeField] private float maxRage = 100;
-        [SerializeField] private float rageRecoveryRate = 0;
-
-        public float GetMaxHP() { return maxHP; }
-        public float GetMaxStamina() { return maxStamina; }
-        public float GetMaxDefense() { return maxDefense; }
-        public float GetMaxRage() { return maxRage; }
+        public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
+        public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
+        public float GetMaxDefense() { return weaponHandler.GetWeapon().GetMaxDefense(); }
+        public float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
 
         private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<float> stamina = new NetworkVariable<float>();
@@ -65,7 +51,7 @@ namespace Vi.Core
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
-            HP.Value = maxHP * hpPercentage;
+            HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
             defense.Value = 0;
             stamina.Value = 0;
             if (resetRage)
@@ -77,8 +63,8 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > maxHP)
-                HP.Value = maxHP;
+            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP())
+                HP.Value = weaponHandler.GetWeapon().GetMaxHP();
             else if (HP.Value + amount < 0)
                 HP.Value = 0;
             else
@@ -88,10 +74,10 @@ namespace Vi.Core
         public void AddStamina(float amount, bool activateCooldown = true)
         {
             if (activateCooldown)
-                staminaDelayCooldown = staminaDelay;
+                staminaDelayCooldown = weaponHandler.GetWeapon().GetStaminaDelay();
 
-            if (stamina.Value + amount > maxStamina)
-                stamina.Value = maxStamina;
+            if (stamina.Value + amount > weaponHandler.GetWeapon().GetMaxStamina())
+                stamina.Value = weaponHandler.GetWeapon().GetMaxStamina();
             else if (stamina.Value + amount < 0)
                 stamina.Value = 0;
             else
@@ -104,10 +90,10 @@ namespace Vi.Core
             if (amount > 0) { amount *= defenseIncreaseMultiplier; }
 
             if (activateCooldown)
-                defenseDelayCooldown = defenseDelay;
+                defenseDelayCooldown = weaponHandler.GetWeapon().GetDefenseDelay();
 
-            if (defense.Value + amount > maxDefense)
-                defense.Value = maxDefense;
+            if (defense.Value + amount > weaponHandler.GetWeapon().GetMaxDefense())
+                defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
             else if (defense.Value + amount < 0)
                 defense.Value = 0;
             else
@@ -116,8 +102,8 @@ namespace Vi.Core
 
         public void AddRage(float amount)
         {
-            if (rage.Value + amount > maxRage)
-                rage.Value = maxRage;
+            if (rage.Value + amount > weaponHandler.GetWeapon().GetMaxRage())
+                rage.Value = weaponHandler.GetWeapon().GetMaxRage();
             else if (rage.Value + amount < 0)
                 rage.Value = 0;
             else
@@ -127,7 +113,7 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { HP.Value = maxHP; }
+            if (IsServer) { StartCoroutine(InitHP()); }
             HP.OnValueChanged += OnHPChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
@@ -138,6 +124,12 @@ namespace Vi.Core
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+        }
+
+        private IEnumerator InitHP()
+        {
+            yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
+            HP.Value = weaponHandler.GetWeapon().GetMaxHP();
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
@@ -516,7 +508,7 @@ namespace Vi.Core
         {
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
             if (staminaDelayCooldown > 0) { return; }
-            AddStamina(staminaRecoveryRate * Time.deltaTime, false);
+            AddStamina(weaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
         }
 
         private float defenseDelayCooldown;
@@ -526,7 +518,7 @@ namespace Vi.Core
 
             defenseDelayCooldown = Mathf.Max(0, defenseDelayCooldown - Time.deltaTime);
             if (defenseDelayCooldown > 0) return;
-            AddDefense(defenseRecoveryRate * Time.deltaTime, false);
+            AddDefense(weaponHandler.GetWeapon().GetDefenseRecoveryRate() * Time.deltaTime, false);
         }
 
         private float rageDelayCooldown;
@@ -534,7 +526,7 @@ namespace Vi.Core
         {
             rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
             if (rageDelayCooldown > 0) { return; }
-            AddRage(rageRecoveryRate * Time.deltaTime);
+            AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
@@ -763,7 +755,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(maxHP / GetHP() * 10 * statusPayload.value * Time.deltaTime);
+                        AddHP(weaponHandler.GetWeapon().GetMaxHP() / GetHP() * 10 * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
