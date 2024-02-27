@@ -17,6 +17,7 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
+        [SerializeField] private Text ammoText;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -275,7 +276,10 @@ namespace Vi.UI
                         teammatePlayerCards[i].Initialize(null);
                     }
                 }
-                
+
+                ammoText.transform.parent.gameObject.SetActive(weaponHandler.ShouldUseAmmo());
+                ammoText.text = "Ammo: " + weaponHandler.GetAmmoCount().ToString() + " / " + weaponHandler.GetMaxAmmoCount().ToString();
+
                 fadeToBlackImage.color = Color.clear;
                 fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
             }
