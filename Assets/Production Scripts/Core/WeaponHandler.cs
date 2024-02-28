@@ -18,11 +18,13 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             isBlocking.OnValueChanged += OnIsBlockingChange;
+            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterValueChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlocking.OnValueChanged -= OnIsBlockingChange;
+            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterValueChange;
         }
 
         private void OnIsBlockingChange(bool prev, bool current)
@@ -649,6 +651,11 @@ namespace Vi.Core
             }
         }
 
+        private void OnReloadAnimParameterValueChange(bool prev, bool current)
+        {
+            Debug.Log("Value change " + prev + " - " + current);
+        }
+
         void OnReload()
         {
             if (IsServer)
@@ -689,9 +696,8 @@ namespace Vi.Core
         {
             reloadRunning = true;
             animationHandler.Animator.SetBool("Reloading", true);
-            yield return new WaitUntil(() => animationHandler.IsReloading());
+            yield return new WaitUntil(() => animationHandler.IsFinishingReload());
             animationHandler.Animator.SetBool("Reloading", false);
-            yield return new WaitUntil(() => !animationHandler.IsReloading());
             loadoutManager.Reload(weaponInstance);
             reloadRunning = false;
         }
