@@ -18,13 +18,11 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             isBlocking.OnValueChanged += OnIsBlockingChange;
-            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterValueChange;
         }
 
         public override void OnNetworkDespawn()
         {
             isBlocking.OnValueChanged -= OnIsBlockingChange;
-            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterValueChange;
         }
 
         private void OnIsBlockingChange(bool prev, bool current)
@@ -652,11 +650,6 @@ namespace Vi.Core
             {
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
-        }
-
-        private void OnReloadAnimParameterValueChange(bool prev, bool current)
-        {
-            Debug.Log("Value change " + prev + " - " + current);
         }
 
         void OnReload()
