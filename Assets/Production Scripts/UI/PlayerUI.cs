@@ -132,7 +132,7 @@ namespace Vi.UI
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform))
                     {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                        //moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
                 }
 
@@ -252,6 +252,17 @@ namespace Vi.UI
         private string lastControlScheme;
         private void Update()
         {
+            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+            }
+
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
