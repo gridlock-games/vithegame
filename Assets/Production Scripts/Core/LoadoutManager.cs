@@ -81,6 +81,12 @@ namespace Vi.Core
             secondaryWeapon = Instantiate(SecondaryWeaponOption.weapon);
             primaryRuntimeAnimatorController = PrimaryWeaponOption.animationController;
             secondaryRuntimeAnimatorController = SecondaryWeaponOption.animationController;
+
+            if (IsServer)
+            {
+                primaryAmmo.Value = primaryWeapon.ShouldUseAmmo() ? primaryWeapon.GetMaxAmmoCount() : 0;
+                secondaryAmmo.Value = secondaryWeapon.ShouldUseAmmo() ? secondaryWeapon.GetMaxAmmoCount() : 0;
+            }
             EquipPrimaryWeapon();
 
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));
@@ -213,12 +219,14 @@ namespace Vi.Core
                     PrimaryWeaponOption = weaponOption;
                     primaryWeapon = Instantiate(weaponOption.weapon);
                     primaryRuntimeAnimatorController = weaponOption.animationController;
+                    if (IsServer) { primaryAmmo.Value = 0; }
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 case WeaponSlotType.Secondary:
                     SecondaryWeaponOption = weaponOption;
                     secondaryWeapon = Instantiate(weaponOption.weapon);
                     secondaryRuntimeAnimatorController = weaponOption.animationController;
+                    if (IsServer) { secondaryAmmo.Value = 0; }
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 default:

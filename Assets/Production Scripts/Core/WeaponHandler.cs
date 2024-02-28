@@ -75,15 +75,6 @@ namespace Vi.Core
             loadoutManager.UseAmmo(weaponInstance);
         }
 
-        private IEnumerator Reload(ShooterWeapon shooterWeapon)
-        {
-            animationHandler.Animator.SetBool("Reloading", true);
-            yield return new WaitUntil(() => animationHandler.IsReloading());
-            animationHandler.Animator.SetBool("Reloading", false);
-            yield return new WaitUntil(() => !animationHandler.IsReloading());
-            loadoutManager.Reload(weaponInstance);
-        }
-
         private void EquipWeapon()
         {
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
@@ -640,8 +631,49 @@ namespace Vi.Core
             }
         }
 
+        private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
+        private void Update()
+        {
+            if (IsServer)
+            {
+                reloadingAnimParameterValue.Value = animationHandler.Animator.GetBool("Reloading");
+
+                if (ShouldUseAmmo())
+                {
+                    if (GetAmmoCount() == 0) { OnReload(); }
+                }
+            }
+            else
+            {
+                animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
+            }
+        }
+
         void OnReload()
         {
+            if (IsServer)
+            {
+                ReloadOnServer();
+            }
+            else
+            {
+                ReloadServerRpc();
+            }
+        }
+
+        [ServerRpc]
+        private void ReloadServerRpc()
+        {
+            ReloadOnServer();
+        }
+
+        private void ReloadOnServer()
+        {
+            if (reloadRunning) { return; }
+            if (animationHandler.IsReloading()) { return; }
+            if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
+            if (!animationHandler.IsAtRest()) { return; }
+
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
@@ -650,6 +682,18 @@ namespace Vi.Core
                     break;
                 }
             }
+        }
+
+        private bool reloadRunning;
+        private IEnumerator Reload(ShooterWeapon shooterWeapon)
+        {
+            reloadRunning = true;
+            animationHandler.Animator.SetBool("Reloading", true);
+            yield return new WaitUntil(() => animationHandler.IsReloading());
+            animationHandler.Animator.SetBool("Reloading", false);
+            yield return new WaitUntil(() => !animationHandler.IsReloading());
+            loadoutManager.Reload(weaponInstance);
+            reloadRunning = false;
         }
 
         public void SetIsBlocking(bool isBlocking)
