@@ -15,13 +15,37 @@ namespace Vi.Core
             Secondary
         }
 
+        public int GetAmmoCount(Weapon weapon)
+        {
+            if (weapon == primaryWeapon) { return primaryAmmo.Value; }
+            if (weapon == secondaryWeapon) { return secondaryAmmo.Value; }
+            Debug.LogError("Unknown weapon to get ammo count " + weapon);
+            return 0;
+        }
+
+        public void Reload(Weapon weapon)
+        {
+            if (weapon == primaryWeapon) { primaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
+            if (weapon == secondaryWeapon) { secondaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
+            Debug.LogError("Unknown weapon to reload " + weapon);
+        }
+
+        public void UseAmmo(Weapon weapon)
+        {
+            if (weapon == primaryWeapon) { primaryAmmo.Value--; return; }
+            if (weapon == secondaryWeapon) { secondaryAmmo.Value--; return; }
+            Debug.LogError("Unknown weapon to fire " + weapon);
+        }
+
         public CharacterReference.WeaponOption PrimaryWeaponOption { get; private set; }
         private Weapon primaryWeapon;
         private RuntimeAnimatorController primaryRuntimeAnimatorController;
+        private NetworkVariable<int> primaryAmmo = new NetworkVariable<int>();
 
         public CharacterReference.WeaponOption SecondaryWeaponOption { get; private set; }
         private Weapon secondaryWeapon;
         private RuntimeAnimatorController secondaryRuntimeAnimatorController;
+        private NetworkVariable<int> secondaryAmmo = new NetworkVariable<int>();
 
         private NetworkVariable<int> currentEquippedWeapon = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -57,6 +81,12 @@ namespace Vi.Core
             secondaryWeapon = Instantiate(SecondaryWeaponOption.weapon);
             primaryRuntimeAnimatorController = PrimaryWeaponOption.animationController;
             secondaryRuntimeAnimatorController = SecondaryWeaponOption.animationController;
+
+            if (IsServer)
+            {
+                primaryAmmo.Value = primaryWeapon.ShouldUseAmmo() ? primaryWeapon.GetMaxAmmoCount() : 0;
+                secondaryAmmo.Value = secondaryWeapon.ShouldUseAmmo() ? secondaryWeapon.GetMaxAmmoCount() : 0;
+            }
             EquipPrimaryWeapon();
 
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));
@@ -189,12 +219,14 @@ namespace Vi.Core
                     PrimaryWeaponOption = weaponOption;
                     primaryWeapon = Instantiate(weaponOption.weapon);
                     primaryRuntimeAnimatorController = weaponOption.animationController;
+                    if (IsServer) { primaryAmmo.Value = 0; }
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 case WeaponSlotType.Secondary:
                     SecondaryWeaponOption = weaponOption;
                     secondaryWeapon = Instantiate(weaponOption.weapon);
                     secondaryRuntimeAnimatorController = weaponOption.animationController;
+                    if (IsServer) { secondaryAmmo.Value = 0; }
                     OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
                     break;
                 default:
@@ -258,6 +290,7 @@ namespace Vi.Core
             if (weaponHandler.IsAiming()) { return false; }
             if (animationHandler.IsAiming()) { return false; }
             if (!animationHandler.IsAtRest()) { return false; }
+            if (animationHandler.IsReloading()) { return false; }
             return true;
         }
 

@@ -34,12 +34,14 @@ namespace Vi.Core
         private Attributes attributes;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
+        private LoadoutManager loadoutManager;
 
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             movementHandler = GetComponent<MovementHandler>();
+            loadoutManager = GetComponent<LoadoutManager>();
         }
 
         public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
@@ -53,38 +55,24 @@ namespace Vi.Core
 
         public bool ShouldUseAmmo()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
-            {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    return shooterWeapon.ShouldUseAmmo();
-                }
-            }
+            if (weaponInstance != null) { return weaponInstance.ShouldUseAmmo(); }
             return false;
         }
 
         public int GetAmmoCount()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
-            {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    return shooterWeapon.GetAmmoCount();
-                }
-            }
-            return 0;
+            return loadoutManager.GetAmmoCount(weaponInstance);
         }
 
         public int GetMaxAmmoCount()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
-            {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    return shooterWeapon.GetMaxAmmoCount();
-                }
-            }
+            if (weaponInstance != null) { return weaponInstance.GetMaxAmmoCount(); }
             return 0;
+        }
+
+        public void UseAmmo()
+        {
+            loadoutManager.UseAmmo(weaponInstance);
         }
 
         private void EquipWeapon()
@@ -344,6 +332,7 @@ namespace Vi.Core
 
         private void FixedUpdate()
         {
+            if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
@@ -635,23 +624,78 @@ namespace Vi.Core
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
                     CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming, instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), instantAim, animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                     ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming, instantAim);
+                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading(), instantAim);
                 }
+            }
+        }
+
+        private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
+        private void Update()
+        {
+            if (IsServer)
+            {
+                reloadingAnimParameterValue.Value = animationHandler.Animator.GetBool("Reloading");
+
+                if (ShouldUseAmmo())
+                {
+                    if (GetAmmoCount() == 0)
+                    {
+                        if (movementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                    }
+                }
+            }
+            else
+            {
+                animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
         }
 
         void OnReload()
         {
+            if (IsServer)
+            {
+                ReloadOnServer();
+            }
+            else
+            {
+                ReloadServerRpc();
+            }
+        }
+
+        [ServerRpc]
+        private void ReloadServerRpc()
+        {
+            ReloadOnServer();
+        }
+
+        private void ReloadOnServer()
+        {
+            if (reloadRunning) { return; }
+            if (animationHandler.IsReloading()) { return; }
+            if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
+            if (!animationHandler.IsAtRest()) { return; }
+
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
                 {
-                    animationHandler.ReloadWeapon(shooterWeapon);
+                    StartCoroutine(Reload(shooterWeapon));
                     break;
                 }
             }
+        }
+
+        private bool reloadRunning;
+        private IEnumerator Reload(ShooterWeapon shooterWeapon)
+        {
+            reloadRunning = true;
+            animationHandler.Animator.SetBool("Reloading", true);
+            yield return new WaitUntil(() => animationHandler.IsFinishingReload());
+            animationHandler.Animator.SetBool("Reloading", false);
+            loadoutManager.Reload(weaponInstance);
+            reloadRunning = false;
         }
 
         public void SetIsBlocking(bool isBlocking)
@@ -692,6 +736,7 @@ namespace Vi.Core
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
             if (animationHandler.WaitingForActionToPlay) { return null; }
+            if (animationHandler.IsReloading()) { return null; }
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {

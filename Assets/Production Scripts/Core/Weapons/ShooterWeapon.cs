@@ -10,8 +10,6 @@ namespace Vi.Core
     public class ShooterWeapon : RuntimeWeapon
     {
         [Header("Shooter Settings")]
-        [SerializeField] private bool useAmmo;
-        [SerializeField] private int maxAmmoCount;
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Projectile projectile;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
@@ -20,10 +18,6 @@ namespace Vi.Core
         [SerializeField] private Transform offHandGrip;
         [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
         [SerializeField] private List<InverseKinematicsData> IKData = new List<InverseKinematicsData>();
-
-        public bool ShouldUseAmmo() { return useAmmo; }
-        public int GetMaxAmmoCount() { return maxAmmoCount; }
-        public int GetAmmoCount() { return currentAmmoCount; }
 
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
@@ -65,18 +59,6 @@ namespace Vi.Core
             lastProjectileSpawnTime = Mathf.NegativeInfinity;
         }
 
-        public void Reload()
-        {
-            currentAmmoCount = maxAmmoCount;
-        }
-
-        private int currentAmmoCount;
-
-        private void Awake()
-        {
-            currentAmmoCount = maxAmmoCount;
-        }
-
         private float lastProjectileSpawnTime = Mathf.NegativeInfinity;
         private int projectileSpawnCount;
 
@@ -88,10 +70,11 @@ namespace Vi.Core
             if (!parentWeaponHandler.IsAiming(aimHand)) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
-            
-            if (ShouldUseAmmo())
+
+            bool shouldUseAmmo = parentWeaponHandler.ShouldUseAmmo();
+            if (shouldUseAmmo)
             {
-                if (currentAmmoCount <= 0) { return; }
+                if (parentWeaponHandler.GetAmmoCount() <= 0) { return; }
             }
 
             if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)
@@ -103,7 +86,8 @@ namespace Vi.Core
                     projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, parentWeaponHandler.CurrentActionClip, projectileForce);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
-                    currentAmmoCount--;
+
+                    if (shouldUseAmmo) { parentWeaponHandler.UseAmmo(); }
 
                     AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().GetAttackSoundEffect(weaponBone), transform.position);
                 }

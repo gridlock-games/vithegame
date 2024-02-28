@@ -34,6 +34,13 @@ namespace Vi.ScriptableObjects
         public float GetDefenseRecoveryRate() { return defenseRecoveryRate; }
         public float GetRageRecoveryRate() { return rageRecoveryRate; }
 
+        [Header("Shooter Weapon Settings")]
+        [SerializeField] private bool shouldUseAmmo;
+        [SerializeField] private int maxAmmoCount;
+
+        public bool ShouldUseAmmo() { return shouldUseAmmo; }
+        public int GetMaxAmmoCount() { return maxAmmoCount; }
+
         [System.Serializable]
         private class AttackSoundEffect
         {
@@ -41,6 +48,7 @@ namespace Vi.ScriptableObjects
             public AudioClip attackSoundEffect;
         }
 
+        [Header("Rest Of Settings")]
         [SerializeField] private List<AttackSoundEffect> attackSoundEffects = new List<AttackSoundEffect>();
         public AudioClip GetAttackSoundEffect(WeaponBone weaponBone) { return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect; }
 

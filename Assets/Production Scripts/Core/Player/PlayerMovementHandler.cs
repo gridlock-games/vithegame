@@ -104,14 +104,14 @@ namespace Vi.Player
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+                movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : rootMotion;
             }
             else
             {
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
