@@ -740,6 +740,7 @@ namespace Vi.Core
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
             if (animationHandler.WaitingForActionToPlay) { return null; }
+            if (animationHandler.IsReloading()) { return null; }
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
