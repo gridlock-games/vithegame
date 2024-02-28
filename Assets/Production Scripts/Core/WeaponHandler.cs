@@ -642,7 +642,10 @@ namespace Vi.Core
 
                 if (ShouldUseAmmo())
                 {
-                    if (GetAmmoCount() == 0) { OnReload(); }
+                    if (GetAmmoCount() == 0)
+                    {
+                        if (movementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                    }
                 }
             }
             else
