@@ -179,6 +179,7 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
+            Debug.Log("Network Spawn");
             activeSceneGroupIndicies.OnListChanged += OnActiveSceneGroupIndiciesChange;
 
             for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
@@ -189,17 +190,26 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
+            Debug.Log("Network Despawn");
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
-            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
-            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
-            UnloadAllScenePayloadsOfType(SceneType.Environment);
+            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
+            {
+                foreach (SceneReference scene in scenePayload.sceneReferences)
+                {
+                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
+                    if (!handle.IsValid()) { return; }
+                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                    sceneHandles.Remove(handle);
+                }
+            }
 
             activeSceneGroupIndicies.Clear();
         }
 
         private void Awake()
         {
+            Debug.Log("Awake");
             _singleton = this;
 
             SceneManager.sceneLoaded += OnSceneLoad;
@@ -211,20 +221,6 @@ namespace Vi.Core
         private void Update()
         {
             LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
-            {
-                foreach (SceneReference scene in scenePayload.sceneReferences)
-                {
-                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
-                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
-                    sceneHandles.Remove(handle);
-                }
-            }
         }
 
         public bool ShouldSpawnPlayer()
