@@ -10,9 +10,13 @@ namespace Vi.Core
     {
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
+        [Header("Must be less than 60 seconds")]
+        [SerializeField] private float clientConnectTimeoutThreshold = 30;
 
         private void Start()
         {
+            if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
+
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
             DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
@@ -152,7 +156,16 @@ namespace Vi.Core
         private void OnClientStarted()
         {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            //Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            StartCoroutine(ClientConnectTimeout());
+        }
+
+        private IEnumerator ClientConnectTimeout()
+        {
+            yield return new WaitForSeconds(clientConnectTimeoutThreshold);
+            if (NetSceneManager.Singleton.IsSpawned) { yield break; }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
         }
 
         private void OnClientStopped(bool test)
