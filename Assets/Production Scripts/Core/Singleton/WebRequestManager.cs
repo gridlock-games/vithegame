@@ -150,7 +150,7 @@ namespace Vi.Core
         private bool thisServerCreated;
         public IEnumerator ServerPostRequest(ServerPostPayload payload)
         {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server post request from a server!"); yield break; }
 
             if (payload.type == 0)
             {

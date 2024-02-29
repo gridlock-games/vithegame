@@ -120,6 +120,7 @@ namespace Vi.Core
 
         private IEnumerator CreateServerInAPI()
         {
+            if (NetworkManager.Singleton.IsClient) { yield break; }
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 

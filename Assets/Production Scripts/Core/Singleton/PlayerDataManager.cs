@@ -522,7 +522,7 @@ namespace Vi.Core
             gameMode.OnValueChanged -= OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
 
-            playerDataList.Clear();
+            playerDataList = new NetworkList<PlayerData>();
             localPlayers.Clear();
             botClientId = 0;
         }
@@ -659,7 +659,7 @@ namespace Vi.Core
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
-                NetSceneManager.Singleton.LoadScene("Character Select");
+                NetSceneManager.Singleton.LoadScene("Character Select", true);
             }
         }
 
