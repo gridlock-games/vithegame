@@ -64,6 +64,7 @@ namespace Vi.Editor
         private SerializedProperty spAimDuringAttack;
         private SerializedProperty spAimDuringRecovery;
         private SerializedProperty spRequireAmmo;
+        private SerializedProperty spRequiredAmmoAmount;
 
         private void OnEnable()
         {
@@ -118,6 +119,7 @@ namespace Vi.Editor
             spAimDuringAttack = serializedObject.FindProperty("aimDuringAttack");
             spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
             spRequireAmmo = serializedObject.FindProperty("requireAmmo");
+            spRequiredAmmoAmount = serializedObject.FindProperty("requiredAmmoAmount");
         }
 
         public override void OnInspectorGUI()
@@ -177,10 +179,10 @@ namespace Vi.Editor
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
                 if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.Space();
-                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
                     EditorGUILayout.PropertyField(spShouldAimBody);
                     EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
@@ -188,6 +190,10 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
                 EditorGUILayout.PropertyField(spRequireAmmo);
+                if (spRequireAmmo.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spRequiredAmmoAmount);
+                }
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
@@ -224,10 +230,10 @@ namespace Vi.Editor
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
                 if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.Space();
-                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
                     EditorGUILayout.PropertyField(spShouldAimBody);
                     EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
@@ -235,6 +241,10 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
                 EditorGUILayout.PropertyField(spRequireAmmo);
+                if (spRequireAmmo.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spRequiredAmmoAmount);
+                }
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HitReaction)
             {
@@ -285,10 +295,10 @@ namespace Vi.Editor
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
                 if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.Space();
-                    EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
                     EditorGUILayout.PropertyField(spShouldAimBody);
                     EditorGUILayout.PropertyField(spShouldAimOffHand);
                     EditorGUILayout.PropertyField(spAimDuringAnticipation);
@@ -296,6 +306,10 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
                 EditorGUILayout.PropertyField(spRequireAmmo);
+                if (spRequireAmmo.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spRequiredAmmoAmount);
+                }
             }
 
             serializedObject.ApplyModifiedProperties();
