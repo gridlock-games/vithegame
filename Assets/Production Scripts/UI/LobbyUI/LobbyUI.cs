@@ -218,6 +218,9 @@ namespace Vi.UI
                         case PlayerDataManager.GameMode.OutpostRush:
                             NetSceneManager.Singleton.LoadScene("Outpost Rush");
                             break;
+                        case PlayerDataManager.GameMode.TeamDeathmatch:
+                            NetSceneManager.Singleton.LoadScene("Team Deathmatch");
+                            break;
                         default:
                             Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
                             break;

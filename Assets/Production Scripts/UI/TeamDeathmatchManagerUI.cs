@@ -14,34 +14,36 @@ namespace Vi.UI
         [SerializeField] protected Text gameEndText;
         [SerializeField] protected Text roundResultText;
         [SerializeField] protected Text roundWinThresholdText;
+        [SerializeField] protected Text killsToWinRoundThresholdText;
 
-        protected TeamEliminationManager teamEliminationManager;
+        protected TeamDeathmatchManager teamDeathmatchManager;
 
         protected void Start()
         {
-            teamEliminationManager = GetComponentInParent<TeamEliminationManager>();
+            teamDeathmatchManager = GetComponentInParent<TeamDeathmatchManager>();
 
             roundResultText.enabled = false;
 
             leftScoreText.text = "Your Team: ";
             rightScoreText.text = "Enemy Team: ";
 
-            roundWinThresholdText.text = "Rounds To Win Game: " + teamEliminationManager.GetNumberOfRoundsWinsToWinGame().ToString();
+            roundWinThresholdText.text = "Rounds To Win Game: " + teamDeathmatchManager.GetNumberOfRoundsWinsToWinGame().ToString();
+            killsToWinRoundThresholdText.text = "Kills To Win Round: " + teamDeathmatchManager.GetKillsToWinRound();
         }
 
         protected void Update()
         {
-            if (!teamEliminationManager.IsSpawned) { return; }
+            if (!teamDeathmatchManager.IsSpawned) { return; }
 
-            roundTimerText.text = teamEliminationManager.GetRoundTimerDisplayString();
-            roundTimerText.color = teamEliminationManager.IsInOvertime() ? Color.red : Color.white;
-            leftScoreText.text = teamEliminationManager.GetLeftScoreString();
-            rightScoreText.text = teamEliminationManager.GetRightScoreString();
+            roundTimerText.text = teamDeathmatchManager.GetRoundTimerDisplayString();
+            roundTimerText.color = teamDeathmatchManager.IsInOvertime() ? Color.red : Color.white;
+            leftScoreText.text = teamDeathmatchManager.GetLeftScoreString();
+            rightScoreText.text = teamDeathmatchManager.GetRightScoreString();
 
-            roundResultText.enabled = teamEliminationManager.ShouldDisplayNextGameAction();
-            roundResultText.text = teamEliminationManager.GetRoundResultMessage() + teamEliminationManager.GetNextGameActionTimerDisplayString();
+            roundResultText.enabled = teamDeathmatchManager.ShouldDisplayNextGameAction();
+            roundResultText.text = teamDeathmatchManager.GetRoundResultMessage() + teamDeathmatchManager.GetNextGameActionTimerDisplayString();
 
-            gameEndText.text = teamEliminationManager.GetGameEndMessage();
+            gameEndText.text = teamDeathmatchManager.GetGameEndMessage();
         }
     }
 }
