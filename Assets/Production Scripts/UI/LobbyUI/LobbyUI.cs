@@ -89,7 +89,7 @@ namespace Vi.UI
                 GameModeOption option = Instantiate(gameModeOptionPrefab.gameObject, gameModeOptionParent).GetComponent<GameModeOption>();
                 StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));
 
-                if (first) { PlayerDataManager.Singleton.SetGameMode(gameMode); first = false; }
+                if (first & PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None) { PlayerDataManager.Singleton.SetGameMode(gameMode); first = false; }
             }
 
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
