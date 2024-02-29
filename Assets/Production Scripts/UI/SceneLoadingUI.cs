@@ -17,6 +17,19 @@ namespace Vi.UI
         [Header("Player Object Spawning")]
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
+        [SerializeField] private Button cancelConnectingButton;
+
+        private void CancelConnecting()
+        {
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
+        }
+
+        private void Start()
+        {
+            cancelConnectingButton.onClick.AddListener(delegate { CancelConnecting(); });
+        }
 
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
@@ -32,6 +45,7 @@ namespace Vi.UI
             if (spawningPlayerObjectParent.activeSelf)
             {
                 string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                cancelConnectingButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSpawned);
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
 
                 if (Time.time - lastTextChangeTime > 0.5f)

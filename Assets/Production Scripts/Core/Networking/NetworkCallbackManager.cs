@@ -146,7 +146,7 @@ namespace Vi.Core
 
         private void OnServerStopped(bool test)
         {
-            //Debug.Log("Stopped Server " + test);
+            Debug.Log("Stopped Server " + test);
         }
 
         private void OnClientStarted()
@@ -157,7 +157,7 @@ namespace Vi.Core
 
         private void OnClientStopped(bool test)
         {
-            //Debug.Log("Stopped Client " + test);
+            Debug.Log("Stopped Client " + test);
         }
 
         private void OnTransportFailure()

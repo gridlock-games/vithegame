@@ -655,6 +655,7 @@ namespace Vi.Core
             if (IsClient)
             {
                 StartCoroutine(ReturnToCharacterSelect());
+                Debug.Log(NetworkManager.DisconnectReason);
             }
         }
 
