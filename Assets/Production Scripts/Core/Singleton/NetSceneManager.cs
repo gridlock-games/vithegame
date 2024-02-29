@@ -266,6 +266,11 @@ namespace Vi.Core
             return true;
         }
 
+        public bool IsEnvironmentLoaded()
+        {
+            return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Environment).Count > 0;
+        }
+
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             //Debug.Log("Loaded " + scene.name);

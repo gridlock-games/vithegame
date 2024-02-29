@@ -509,6 +509,14 @@ namespace Vi.Core
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
+        private void Update()
+        {
+            if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
+            {
+                playerSpawnPoints = FindObjectOfType<PlayerSpawnPoints>();
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
