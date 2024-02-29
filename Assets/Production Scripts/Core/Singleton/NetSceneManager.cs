@@ -191,9 +191,17 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
-            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
-            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
-            UnloadAllScenePayloadsOfType(SceneType.Environment);
+            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
+            {
+                if (scenePayload.sceneType == SceneType.LocalUI) { continue; }
+                foreach (SceneReference scene in scenePayload.sceneReferences)
+                {
+                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
+                    if (!handle.IsValid()) { return; }
+                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                    sceneHandles.Remove(handle);
+                }
+            }
 
             activeSceneGroupIndicies.Clear();
         }
@@ -211,20 +219,6 @@ namespace Vi.Core
         private void Update()
         {
             LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
-            {
-                foreach (SceneReference scene in scenePayload.sceneReferences)
-                {
-                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
-                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
-                    sceneHandles.Remove(handle);
-                }
-            }
         }
 
         public bool ShouldSpawnPlayer()

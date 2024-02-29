@@ -104,7 +104,7 @@ namespace Vi.Player
             Vector3 movement;
             if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : rootMotion;
+                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
             }
             else
             {
@@ -302,6 +302,7 @@ namespace Vi.Player
 
         void OnDodge()
         {
+            if (animationHandler.IsReloading()) { return; }
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }

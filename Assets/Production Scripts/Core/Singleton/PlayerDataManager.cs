@@ -475,7 +475,7 @@ namespace Vi.Core
             {
                 if (g.TryGetComponent(out playerSpawnPoints)) { break; }
             }
-            Debug.Log(scene.name + " " + playerSpawnPoints);
+            //Debug.Log(scene.name + " " + playerSpawnPoints);
 
             if (IsServer)
             {
