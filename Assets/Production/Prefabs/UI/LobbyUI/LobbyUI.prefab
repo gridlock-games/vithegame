@@ -299,7 +299,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3824273242045348127}
   m_HandleRect: {fileID: 2945351269127081209}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1074,7 +1074,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2603500105970309421}
   m_HandleRect: {fileID: 5893041060653714785}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2504,7 +2504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2418378785
+  GlobalObjectIdHash: 3432423936
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 1
@@ -2586,7 +2586,7 @@ MonoBehaviour:
     parent: {fileID: 2756371424037049052}
     inputFields: []
   - gameMode: 5
-    parent: {fileID: 2756371424037049052}
+    parent: {fileID: 9065658510406477745}
     inputFields:
     - key: numberOfRoundsWinsToWinGame
       inputField: {fileID: 6525926902118914384}
@@ -3004,10 +3004,10 @@ RectTransform:
   m_Father: {fileID: 3584783593542317163}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2394776905426310063
 CanvasRenderer:
@@ -4101,7 +4101,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 90, y: 90}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &3615263445891701076

@@ -314,14 +314,16 @@ namespace Vi.UI
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
                     break;
                 case PlayerDataManager.GameMode.OutpostRush:
+                    canCountDown = false;
+                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
+                    break;
+                case PlayerDataManager.GameMode.TeamDeathmatch:
                     team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
                     team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 2 & team2List.Count >= 2 & team1List.Count == team2List.Count;
 
                     if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 2 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
-                    break;
-                case PlayerDataManager.GameMode.TeamDeathmatch:
                     break;
                 default:
                     Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());

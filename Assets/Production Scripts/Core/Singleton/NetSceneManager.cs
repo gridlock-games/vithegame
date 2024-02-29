@@ -20,6 +20,7 @@ namespace Vi.Core
 
         public void LoadScene(string sceneGroupName)
         {
+            Debug.Log("LOADING " + sceneGroupName);
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return; }
