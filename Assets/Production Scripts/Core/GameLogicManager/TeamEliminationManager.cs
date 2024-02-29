@@ -26,7 +26,7 @@ namespace Vi.Core.GameModeManagers
 
         private IEnumerator CreateDamageCircle()
         {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.PlayerSpawnPoints());
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
             damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
             damageCircleInstance.NetworkObject.Spawn();
         }

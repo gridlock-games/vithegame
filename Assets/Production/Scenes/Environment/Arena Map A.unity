@@ -1894,13 +1894,13 @@ MonoBehaviour:
   - position: {x: 5, y: -4, z: 10}
     rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
-  - gameModes: 000000000100000002000000
+  - gameModes: 00000000010000000200000005000000
     teams: 01000000
     spawnPositions:
     - {x: 0, y: 3, z: 0}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
-  - gameModes: 000000000100000002000000
+  - gameModes: 00000000010000000200000005000000
     teams: 020000000300000007000000
     spawnPositions:
     - {x: -9, y: -3, z: 0}
@@ -1924,7 +1924,7 @@ MonoBehaviour:
     - {x: 0, y: 90, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
-  shrinkSpeed: 20
+  shrinkSize: 20
 --- !u!1001 &1682197536
 PrefabInstance:
   m_ObjectHideFlags: 0

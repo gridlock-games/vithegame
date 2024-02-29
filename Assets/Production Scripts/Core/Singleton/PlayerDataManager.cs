@@ -424,7 +424,7 @@ namespace Vi.Core
             }
         }
 
-        public bool PlayerSpawnPoints()
+        public bool HasPlayerSpawnPoints()
         {
             return playerSpawnPoints;
         }
@@ -617,6 +617,10 @@ namespace Vi.Core
                 PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
+            }
+            else
+            {
+                Debug.LogError("Trying to spawn player without a player spawn points object!");
             }
 
             KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
