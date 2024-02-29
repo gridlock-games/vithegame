@@ -193,6 +193,7 @@ namespace Vi.Core
 
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
             {
+                if (scenePayload.sceneType == SceneType.LocalUI) { continue; }
                 foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
                     AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
