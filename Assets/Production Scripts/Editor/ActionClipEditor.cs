@@ -63,6 +63,7 @@ namespace Vi.Editor
         private SerializedProperty spAimDuringAnticipation;
         private SerializedProperty spAimDuringAttack;
         private SerializedProperty spAimDuringRecovery;
+        private SerializedProperty spRequireAmmo;
 
         private void OnEnable()
         {
@@ -116,6 +117,7 @@ namespace Vi.Editor
             spAimDuringAnticipation = serializedObject.FindProperty("aimDuringAnticipation");
             spAimDuringAttack = serializedObject.FindProperty("aimDuringAttack");
             spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
+            spRequireAmmo = serializedObject.FindProperty("requireAmmo");
         }
 
         public override void OnInspectorGUI()
@@ -185,6 +187,7 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
+                EditorGUILayout.PropertyField(spRequireAmmo);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
@@ -231,6 +234,7 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
+                EditorGUILayout.PropertyField(spRequireAmmo);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HitReaction)
             {
@@ -291,6 +295,7 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spAimDuringAttack);
                     EditorGUILayout.PropertyField(spAimDuringRecovery);
                 }
+                EditorGUILayout.PropertyField(spRequireAmmo);
             }
 
             serializedObject.ApplyModifiedProperties();

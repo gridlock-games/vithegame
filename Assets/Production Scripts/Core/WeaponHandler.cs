@@ -737,15 +737,40 @@ namespace Vi.Core
         {
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
+            
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
-                return SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType);
+                if (ShouldUseAmmo())
+                {
+                    if (actionClip.requireAmmo)
+                    {
+                        if (GetAmmoCount() < actionClip.maxHitLimit)
+                        {
+                            OnReload();
+                            return null;
+                        }
+                    }
+                }
+                return actionClip;
             }
             else if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))) // If we are at rest
             {
                 ResetComboSystem();
-                return SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType);
+                if (ShouldUseAmmo())
+                {
+                    if (actionClip.requireAmmo)
+                    {
+                        if (GetAmmoCount() < actionClip.maxHitLimit)
+                        {
+                            OnReload();
+                            return null;
+                        }
+                    }
+                }
+                return actionClip;
             }
             else // If we are not at rest and not recovering
             {

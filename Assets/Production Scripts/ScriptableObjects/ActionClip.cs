@@ -153,5 +153,6 @@ namespace Vi.ScriptableObjects
         public bool aimDuringRecovery;
         public bool shouldAimBody = true;
         public bool shouldAimOffHand = true;
+        public bool requireAmmo = true;
     }
 }

@@ -132,7 +132,7 @@ namespace Vi.UI
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform))
                     {
-                        //moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
                 }
 
