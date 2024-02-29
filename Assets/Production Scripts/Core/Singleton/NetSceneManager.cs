@@ -179,7 +179,6 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            Debug.Log("Network Spawn");
             activeSceneGroupIndicies.OnListChanged += OnActiveSceneGroupIndiciesChange;
 
             for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
@@ -190,7 +189,6 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
-            Debug.Log("Network Despawn");
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
             foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
@@ -209,7 +207,6 @@ namespace Vi.Core
 
         private void Awake()
         {
-            Debug.Log("Awake");
             _singleton = this;
 
             SceneManager.sceneLoaded += OnSceneLoad;
