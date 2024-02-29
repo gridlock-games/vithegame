@@ -247,7 +247,7 @@ namespace Vi.UI
         {
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
 
-            NetSceneManager.Singleton.LoadScene("Character Select", true);
+            NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
         public void ValidateInputAsInt(InputField inputField)

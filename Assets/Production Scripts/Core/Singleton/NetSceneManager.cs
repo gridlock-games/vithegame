@@ -18,7 +18,7 @@ namespace Vi.Core
 
         private NetworkList<int> activeSceneGroupIndicies;
 
-        public void LoadScene(string sceneGroupName, bool unloadAllOtherScenes = false)
+        public void LoadScene(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             
@@ -28,12 +28,6 @@ namespace Vi.Core
             {
                 case SceneType.LocalUI:
                     LoadScenePayload(scenePayloads[sceneGroupIndex]);
-                    if (unloadAllOtherScenes)
-                    {
-                        UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
-                        UnloadAllScenePayloadsOfType(SceneType.Gameplay);
-                        UnloadAllScenePayloadsOfType(SceneType.Environment);
-                    }
                     break;
                 case SceneType.SynchronizedUI:
                 case SceneType.Gameplay:
@@ -136,30 +130,51 @@ namespace Vi.Core
                 case SceneType.SynchronizedUI:
                     foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
                 case SceneType.Gameplay:
                     foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
                 case SceneType.Environment:
                     foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
@@ -185,9 +200,16 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged += OnActiveSceneGroupIndiciesChange;
 
-            for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
+            if (IsServer)
             {
-                OnActiveSceneGroupIndiciesChange(new NetworkListEvent<int>() { Index = i, PreviousValue = -1, Type = NetworkListEvent<int>.EventType.Add, Value = activeSceneGroupIndicies[i] });
+                activeSceneGroupIndicies.Clear();
+            }
+            else
+            {
+                for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
+                {
+                    OnActiveSceneGroupIndiciesChange(new NetworkListEvent<int>() { Index = i, PreviousValue = -1, Type = NetworkListEvent<int>.EventType.Add, Value = activeSceneGroupIndicies[i] });
+                }
             }
         }
 
@@ -195,13 +217,9 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
-            foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.ToArray())
-            {
-                UnloadScenePayload(scenePayload);
-            }
-
-            Debug.Log("Despawn " + activeSceneGroupIndicies);
-            activeSceneGroupIndicies.Clear();
+            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
+            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
+            UnloadAllScenePayloadsOfType(SceneType.Environment);
         }
 
         private void Awake()
@@ -217,13 +235,6 @@ namespace Vi.Core
         private void Update()
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
-
-            //string debug = "";
-            //foreach (int t in activeSceneGroupIndicies)
-            //{
-            //    debug += scenePayloads[t].name;
-            //}
-            //Debug.Log(debug);
         }
 
         public bool ShouldSpawnPlayer()

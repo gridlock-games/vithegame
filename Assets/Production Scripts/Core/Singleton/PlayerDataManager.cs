@@ -514,6 +514,11 @@ namespace Vi.Core
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick += Tick;
+
+            if (IsServer)
+            {
+                playerDataList.Clear();
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -522,7 +527,6 @@ namespace Vi.Core
             gameMode.OnValueChanged -= OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
 
-            playerDataList = new NetworkList<PlayerData>();
             localPlayers.Clear();
             botClientId = 0;
         }
@@ -540,7 +544,7 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
+                //Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
                 if (IsServer)
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
@@ -561,7 +565,7 @@ namespace Vi.Core
 
         private void OnClientConnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " has connected.");
+            //Debug.Log("Id: " + clientId + " has connected.");
         }
 
         public void RespawnPlayer(Attributes attributesToRespawn, bool findMostPeacefulSpawnPosition)
@@ -642,7 +646,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
@@ -659,7 +663,7 @@ namespace Vi.Core
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
-                NetSceneManager.Singleton.LoadScene("Character Select", true);
+                NetSceneManager.Singleton.LoadScene("Character Select");
             }
         }
 

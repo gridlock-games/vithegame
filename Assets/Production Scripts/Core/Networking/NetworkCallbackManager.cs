@@ -55,7 +55,7 @@ namespace Vi.Core
             response.Pending = false;
 
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
-            Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
+            //Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
             playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId));
         }
@@ -146,18 +146,18 @@ namespace Vi.Core
 
         private void OnServerStopped(bool test)
         {
-            Debug.Log("Stopped Server " + test);
+            //Debug.Log("Stopped Server " + test);
         }
 
         private void OnClientStarted()
         {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            //Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
         }
 
         private void OnClientStopped(bool test)
         {
-            Debug.Log("Stopped Client " + test);
+            //Debug.Log("Stopped Client " + test);
         }
 
         private void OnTransportFailure()
