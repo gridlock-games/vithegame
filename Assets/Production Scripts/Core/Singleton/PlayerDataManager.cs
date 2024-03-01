@@ -576,7 +576,7 @@ namespace Vi.Core
             //Debug.Log("Id: " + clientId + " has connected.");
         }
 
-        public void RespawnPlayer(Attributes attributesToRespawn, bool findMostPeacefulSpawnPosition)
+        public void RespawnPlayer(Attributes attributesToRespawn)
         {
             PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
             Vector3 spawnPosition = transformData.position;
@@ -597,7 +597,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                RespawnPlayer(kvp.Value, false);
+                RespawnPlayer(kvp.Value);
             }
         }
 
