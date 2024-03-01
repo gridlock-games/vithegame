@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private PlayerCard killerCard;
         [SerializeField] private Text respawnTimerText;
         [SerializeField] private Text killedByText;
+        [SerializeField] private Text waitingToFindViableSpawnPointText;
         [SerializeField] private Image fadeToBlackImage;
         [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
@@ -317,6 +318,7 @@ namespace Vi.UI
                 {
                     fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
                     fadeToWhiteImage.color = fadeToBlackImage.color;
+                    waitingToFindViableSpawnPointText.text = attributes.GetRespawnTime() > 0 ? "" : "Waiting for viable spawn point...";
                 }
             }
             UpdateActiveUIElements();

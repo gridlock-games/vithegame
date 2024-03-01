@@ -568,6 +568,7 @@ namespace Vi.Core
             {
                 yield return PlayerDataManager.Singleton.RespawnPlayer(this);
             }
+            yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
         }
 
