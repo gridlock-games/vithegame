@@ -239,6 +239,8 @@ namespace Vi.Core
             return attributesList;
         }
 
+        public List<Attributes> GetAllPlayerObjects() { return localPlayers.Values.ToList(); }
+
         public KeyValuePair<int, Attributes> GetLocalPlayerObject()
         {
             try
@@ -495,7 +497,7 @@ namespace Vi.Core
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
                 {
-                    foreach (Attributes attributes in GetActivePlayerObjects())
+                    foreach (Attributes attributes in GetAllPlayerObjects())
                     {
                         attributes.NetworkObject.Despawn(true);
                     }
