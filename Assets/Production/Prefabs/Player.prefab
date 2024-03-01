@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1977550921
+  GlobalObjectIdHash: 891803348
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -133,7 +133,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraInstance: {fileID: 3945128956232022068}
   minimapCameraInstance: {fileID: 3092678811823459878}
-  runSpeed: 5
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
   movementPredictionRigidbody: {fileID: 3111202478790198839}
@@ -182,15 +181,6 @@ MonoBehaviour:
     type: 3}
   teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
-  maxHP: 100
-  maxStamina: 100
-  staminaRecoveryRate: 50
-  staminaDelay: 1
-  maxDefense: 100
-  defenseRecoveryRate: 5
-  defenseDelay: 1
-  maxRage: 100
-  rageRecoveryRate: 1
 --- !u!114 &1486683922734963072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,6 +343,7 @@ MonoBehaviour:
   positionOffset: {x: 0, y: 0, z: 3}
   aimingTransitionSpeed: 8
   aimingPositionOffset: {x: 0, y: 0, z: 1}
+  collisionPositionOffset: -0.3
 --- !u!1 &3945128957587517371
 GameObject:
   m_ObjectHideFlags: 0
