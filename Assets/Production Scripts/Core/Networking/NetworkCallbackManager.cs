@@ -164,8 +164,13 @@ namespace Vi.Core
 
         private IEnumerator ClientConnectTimeout()
         {
-            yield return new WaitForSeconds(clientConnectTimeoutThreshold);
-            if (NetSceneManager.Singleton.IsSpawned) { yield break; }
+            float startTime = Time.time;
+            while (Time.time - startTime < clientConnectTimeoutThreshold)
+            {
+                if (NetSceneManager.Singleton.IsSpawned) { yield break; }
+                yield return null;
+            }
+
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
             Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
