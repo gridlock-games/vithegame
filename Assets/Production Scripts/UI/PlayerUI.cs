@@ -318,7 +318,7 @@ namespace Vi.UI
                 {
                     fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
                     fadeToWhiteImage.color = fadeToBlackImage.color;
-                    waitingToFindViableSpawnPointText.text = attributes.GetRespawnTimeAsPercentage() > 0 ? "" : "Waiting for viable spawn point...";
+                    waitingToFindViableSpawnPointText.text = attributes.GetRespawnTimeAsPercentage() >= 1 ? "" : "Waiting for viable spawn point...";
                 }
             }
             UpdateActiveUIElements();
