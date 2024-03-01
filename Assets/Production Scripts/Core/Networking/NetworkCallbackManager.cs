@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -12,6 +13,7 @@ namespace Vi.Core
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
         [Header("Must be less than 60 seconds")]
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
+        [SerializeField] private GameObject alertBoxPrefab;
 
         private void Start()
         {
@@ -166,6 +168,7 @@ namespace Vi.Core
             if (NetSceneManager.Singleton.IsSpawned) { yield break; }
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
+            Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
         }
 
         private void OnClientStopped(bool test)
