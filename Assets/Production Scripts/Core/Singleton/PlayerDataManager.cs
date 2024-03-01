@@ -616,6 +616,7 @@ namespace Vi.Core
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
             }
             if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
+            yield return new WaitUntil(() => playerSpawnPoints);
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
