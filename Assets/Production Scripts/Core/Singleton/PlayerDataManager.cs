@@ -483,7 +483,7 @@ namespace Vi.Core
                 {
                     foreach (PlayerData playerData in playerDataList)
                     {
-                        StartCoroutine(SpawnPlayer(playerData));
+                        playersToSpawnQueue.Enqueue(playerData);
                     }
                 }
             }
@@ -558,7 +558,7 @@ namespace Vi.Core
 
         private void Tick()
         {
-            if (playersToSpawnQueue.Count > 0)
+            if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
             {
                 StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
             }
@@ -593,9 +593,15 @@ namespace Vi.Core
             //Debug.Log("Id: " + clientId + " has connected.");
         }
 
-        public void RespawnPlayer(Attributes attributesToRespawn)
+        public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            while (!spawnPointFound)
+            {
+                (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+                yield return null;
+            }
+
             Vector3 spawnPosition = transformData.position;
             Quaternion spawnRotation = transformData.rotation;
 
@@ -614,7 +620,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                RespawnPlayer(kvp.Value);
+                playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
             }
         }
 
@@ -626,13 +632,21 @@ namespace Vi.Core
             }
         }
 
+        private bool spawnPlayerRunning;
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
+            spawnPlayerRunning = true;
             if (playerData.id >= 0)
             {
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
             }
-            if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
+            if (localPlayers.ContainsKey(playerData.id))
+            {
+                //Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id);
+                yield return RespawnPlayer(localPlayers[playerData.id]);
+                spawnPlayerRunning = false;
+                yield break;
+            }
             yield return new WaitUntil(() => playerSpawnPoints);
 
             Vector3 spawnPosition = Vector3.zero;
@@ -640,9 +654,11 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
+
+                if (!spawnPointFound) { Debug.LogError("Could not find a spawn point for this player!"); }
             }
             else
             {
@@ -672,6 +688,9 @@ namespace Vi.Core
                 playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
             else
                 playerObject.GetComponent<NetworkObject>().Spawn(true);
+
+            yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            spawnPlayerRunning = false;
         }
 
         private void OnClientDisconnectCallback(ulong clientId)

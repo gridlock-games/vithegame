@@ -37,49 +37,31 @@ namespace Vi.Core
             }
         }
 
-        public void ResetSpawnTracker()
-        {
-            spawnIndexTracker.Clear();
-        }
-
-        private List<int> spawnIndexTracker = new List<int>();
-        public TransformData GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
+        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
-            bool shouldResetSpawnTracker = false;
-            foreach (int index in spawnIndexTracker)
+            if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
+
+            List<TransformData> verifiedSpawnPoints = new List<TransformData>();
+            foreach (TransformData transformData in possibleSpawnPoints)
             {
-                try
+                bool allAttributesMeetDistanceThreshold = true;
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                 {
-                    possibleSpawnPoints.RemoveAt(index);
+                    if (Vector3.Distance(attributes.transform.position, transformData.position) < 5)
+                    {
+                        allAttributesMeetDistanceThreshold = false;
+                        break;
+                    }
                 }
-                catch
-                {
-                    shouldResetSpawnTracker = true;
-                    break;
-                }
+                if (allAttributesMeetDistanceThreshold) { verifiedSpawnPoints.Add(transformData); }
             }
 
-            if (shouldResetSpawnTracker)
-            {
-                ResetSpawnTracker();
-                possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
-            }
-            else if (possibleSpawnPoints.Count == 0)
-            {
-                ResetSpawnTracker();
-                possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
-            }
-
-            int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
-            spawnIndexTracker.Add(randomIndex);
+            int randomIndex = Random.Range(0, verifiedSpawnPoints.Count);
             TransformData spawnPoint = new TransformData();
-            if (possibleSpawnPoints.Count != 0)
-                spawnPoint = possibleSpawnPoints[randomIndex];
-            else
-                Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team);
+            if (verifiedSpawnPoints.Count > 0) { spawnPoint = verifiedSpawnPoints[randomIndex]; }
 
-            return spawnPoint;
+            return (verifiedSpawnPoints.Count > 0, spawnPoint);
         }
 
         private List<TransformData> GetPossibleSpawnOrientations(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
