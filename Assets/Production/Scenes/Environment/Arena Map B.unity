@@ -261,6 +261,8 @@ MonoBehaviour:
   environmentViewPoints:
   - position: {x: -12.8, y: 24.4, z: -5.4}
     rotation: {x: 0.48135203, y: 0.5057841, z: -0.41991016, w: 0.5797914}
+  - position: {x: 12.8, y: 24.4, z: 5.4}
+    rotation: {x: -0.24805118, y: 0.70901185, z: -0.5886504, w: -0.29877}
   gameItemSpawnPoints:
   - position: {x: 25, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -276,7 +278,7 @@ MonoBehaviour:
   - gameModes: 00000000010000000200000005000000
     teams: 01000000
     spawnPositions:
-    - {x: 0, y: 2, z: 0}
+    - {x: 0, y: 5, z: 0}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
   - gameModes: 00000000010000000200000005000000
@@ -286,11 +288,19 @@ MonoBehaviour:
     - {x: 35, y: 2, z: 0}
     - {x: 0, y: -3, z: 15}
     - {x: 0, y: -3, z: -15}
+    - {x: 17, y: -2, z: -6}
+    - {x: -17, y: -2, z: -6}
+    - {x: -17, y: -2, z: 6}
+    - {x: 17, y: -2, z: 6}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
+    - {x: 0, y: -65, z: 0}
+    - {x: 0, y: 65, z: 0}
+    - {x: 0, y: 110, z: 0}
+    - {x: 0, y: -110, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
