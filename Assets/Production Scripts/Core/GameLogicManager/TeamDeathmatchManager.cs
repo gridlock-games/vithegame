@@ -10,27 +10,34 @@ namespace Vi.Core.GameModeManagers
         [Header("Team Deathmatch Specific")]
         [SerializeField] private int killsToWinRound = 21;
 
+        public int GetKillsToWinRound() { return killsToWinRound; }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Team elimination starting! ";
+            roundResultMessage.Value = "Team deathmatch starting! ";
         }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
-            // TODO Change this to check if all players on the victim's team are dead
-            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
 
-            if (PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam()).TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            List<int> killerTeamIds = new List<int>();
+            foreach (Attributes killerTeamPlayer in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam()))
             {
-                List<Attributes> killerTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
-                List<int> winningPlayerIds = new List<int>();
-                foreach (Attributes attributes in killerTeamPlayers)
-                {
-                    winningPlayerIds.Add(attributes.GetPlayerDataId());
-                }
-                OnRoundEnd(winningPlayerIds.ToArray());
+                killerTeamIds.Add(killerTeamPlayer.GetPlayerDataId());
+            }
+
+            int killerTeamScore = 0;
+            foreach (int killerTeamId in killerTeamIds)
+            {
+                int index = scoreList.IndexOf(new PlayerScore(killerTeamId));
+                killerTeamScore += scoreList[index].kills;
+            }
+
+            if (killerTeamScore >= killsToWinRound)
+            {
+                OnRoundEnd(killerTeamIds.ToArray());
             }
         }
 
@@ -57,14 +64,20 @@ namespace Vi.Core.GameModeManagers
                 if (!uniqueTeamList.Contains(attributes.GetTeam())) { uniqueTeamList.Add(attributes.GetTeam()); }
             }
 
-            Dictionary<PlayerDataManager.Team, int> deathCountByTeam = new Dictionary<PlayerDataManager.Team, int>();
+            Dictionary<PlayerDataManager.Team, int> killCountByTeam = new Dictionary<PlayerDataManager.Team, int>();
             foreach (PlayerDataManager.Team team in uniqueTeamList)
             {
-                deathCountByTeam.Add(team, PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).FindAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death).Count);
+                int killSum = 0;
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team))
+                {
+                    int index = scoreList.IndexOf(new PlayerScore(attributes.GetPlayerDataId()));
+                    killSum += scoreList[index].kills;
+                }
+                killCountByTeam.Add(team, killSum);
             }
 
-            int highestDeaths = deathCountByTeam.Max(item => item.Value);
-            PlayerDataManager.Team[] winningTeams = deathCountByTeam.Where(item => item.Value != highestDeaths).Select(item => item.Key).ToArray();
+            int highestKills = killCountByTeam.Max(item => item.Value);
+            PlayerDataManager.Team[] winningTeams = killCountByTeam.Where(item => item.Value == highestKills).Select(item => item.Key).ToArray();
 
             if (winningTeams.Length == 1)
             {

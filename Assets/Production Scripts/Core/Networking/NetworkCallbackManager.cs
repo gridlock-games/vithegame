@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -10,9 +11,14 @@ namespace Vi.Core
     {
         [SerializeField] private PlayerDataManager playerDataManagerPrefab;
         [SerializeField] private NetSceneManager networkSceneManagerPrefab;
+        [Header("Must be less than 60 seconds")]
+        [SerializeField] private float clientConnectTimeoutThreshold = 30;
+        [SerializeField] private GameObject alertBoxPrefab;
 
         private void Start()
         {
+            if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
+
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
             DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
@@ -55,7 +61,7 @@ namespace Vi.Core
             response.Pending = false;
 
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
-            Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
+            //Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
             playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId));
         }
@@ -120,6 +126,7 @@ namespace Vi.Core
 
         private IEnumerator CreateServerInAPI()
         {
+            if (NetworkManager.Singleton.IsClient) { yield break; }
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 
@@ -152,6 +159,21 @@ namespace Vi.Core
         {
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            StartCoroutine(ClientConnectTimeout());
+        }
+
+        private IEnumerator ClientConnectTimeout()
+        {
+            float startTime = Time.time;
+            while (Time.time - startTime < clientConnectTimeoutThreshold)
+            {
+                if (NetSceneManager.Singleton.IsSpawned) { yield break; }
+                yield return null;
+            }
+
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
+            Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
         }
 
         private void OnClientStopped(bool test)

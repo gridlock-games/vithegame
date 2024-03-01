@@ -76,8 +76,6 @@ namespace Vi.Core
             }
         }
 
-        public List<AsyncOperationUI> LoadingOperations { get; private set; } = new List<AsyncOperationUI>();
-        private List<AsyncOperationHandle<SceneInstance>> sceneHandles = new List<AsyncOperationHandle<SceneInstance>>();
         private void LoadScenePayload(ScenePayload scenePayload)
         {
             switch (scenePayload.sceneType)
@@ -88,8 +86,8 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
-                        sceneHandles.Add(handle);
+                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
+                        PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
                     break;
                 case SceneType.SynchronizedUI:
@@ -102,21 +100,21 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
-                        sceneHandles.Add(handle);
+                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
+                        PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
                     break;
                 case SceneType.Environment:
                     AsyncOperationHandle<SceneInstance> handle2 = Addressables.LoadSceneAsync(scenePayload.sceneReferences[0], LoadSceneMode.Additive);
-                    LoadingOperations.Add(new AsyncOperationUI(scenePayload.sceneReferences[0].SceneName, handle2, AsyncOperationUI.LoadingType.Loading));
-                    sceneHandles.Add(handle2);
+                    PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload.sceneReferences[0].SceneName, handle2, AsyncOperationUI.LoadingType.Loading));
+                    PersistentLocalObjects.Singleton.SceneHandles.Add(handle2);
                     break;
                 default:
                     Debug.LogError("SceneType: " + scenePayload.sceneType + "has not been implemented yet!");
                     break;
             }
             //Debug.Log("Loading " + scenePayload.name);
-            currentlyLoadedScenePayloads.Add(scenePayload);
+            PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Add(scenePayload);
         }
 
         private void UnloadAllScenePayloadsOfType(SceneType sceneType)
@@ -124,38 +122,59 @@ namespace Vi.Core
             switch (sceneType)
             {
                 case SceneType.LocalUI:
-                    foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
+                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
                         UnloadScenePayload(scenePayload);
                     }
                     break;
                 case SceneType.SynchronizedUI:
-                    foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
+                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
                 case SceneType.Gameplay:
-                    foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
+                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
                 case SceneType.Environment:
-                    foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
+                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        if (IsServer)
+                        if (IsSpawned)
                         {
-                            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                            if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            if (IsServer)
+                            {
+                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                            }
+                        }
+                        else
+                        {
+                            UnloadScenePayload(scenePayload);
                         }
                     }
                     break;
@@ -169,21 +188,28 @@ namespace Vi.Core
         {
             foreach (SceneReference scene in scenePayload.sceneReferences)
             {
-                AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
+                AsyncOperationHandle<SceneInstance> handle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!handle.IsValid()) { continue; }
-                LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
-                sceneHandles.Remove(handle);
+                PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                PersistentLocalObjects.Singleton.SceneHandles.Remove(handle);
             }
-            currentlyLoadedScenePayloads.Remove(scenePayload);
+            PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Remove(scenePayload);
         }
 
         public override void OnNetworkSpawn()
         {
             activeSceneGroupIndicies.OnListChanged += OnActiveSceneGroupIndiciesChange;
 
-            for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
+            if (IsServer)
             {
-                OnActiveSceneGroupIndiciesChange(new NetworkListEvent<int>() { Index = i, PreviousValue = -1, Type = NetworkListEvent<int>.EventType.Add, Value = activeSceneGroupIndicies[i] });
+                activeSceneGroupIndicies.Clear();
+            }
+            else
+            {
+                for (int i = 0; i < activeSceneGroupIndicies.Count; i++)
+                {
+                    OnActiveSceneGroupIndiciesChange(new NetworkListEvent<int>() { Index = i, PreviousValue = -1, Type = NetworkListEvent<int>.EventType.Add, Value = activeSceneGroupIndicies[i] });
+                }
             }
         }
 
@@ -191,19 +217,9 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
-            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads)
-            {
-                if (scenePayload.sceneType == SceneType.LocalUI) { continue; }
-                foreach (SceneReference scene in scenePayload.sceneReferences)
-                {
-                    AsyncOperationHandle<SceneInstance> handle = sceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
-                    if (!handle.IsValid()) { return; }
-                    LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
-                    sceneHandles.Remove(handle);
-                }
-            }
-
-            activeSceneGroupIndicies.Clear();
+            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
+            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
+            UnloadAllScenePayloadsOfType(SceneType.Environment);
         }
 
         private void Awake()
@@ -218,13 +234,13 @@ namespace Vi.Core
 
         private void Update()
         {
-            LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
+            PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
         }
 
         public bool ShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
-            foreach (ScenePayload scenePayload in currentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
+            foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
             {
                 foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
@@ -237,7 +253,7 @@ namespace Vi.Core
 
         public bool IsBusyLoadingScenes()
         {
-            return LoadingOperations.Count > 0;
+            return PersistentLocalObjects.Singleton.LoadingOperations.Count > 0;
         }
 
         public bool IsSceneGroupLoaded(string sceneGroupName)
@@ -250,7 +266,11 @@ namespace Vi.Core
             return true;
         }
 
-        private List<ScenePayload> currentlyLoadedScenePayloads = new List<ScenePayload>();
+        public bool IsEnvironmentLoaded()
+        {
+            return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Environment).Count > 0;
+        }
+
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             //Debug.Log("Loaded " + scene.name);

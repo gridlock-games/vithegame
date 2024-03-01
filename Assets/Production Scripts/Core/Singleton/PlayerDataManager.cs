@@ -424,7 +424,7 @@ namespace Vi.Core
             }
         }
 
-        public bool PlayerSpawnPoints()
+        public bool HasPlayerSpawnPoints()
         {
             return playerSpawnPoints;
         }
@@ -509,11 +509,24 @@ namespace Vi.Core
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
+        private void Update()
+        {
+            if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
+            {
+                playerSpawnPoints = FindObjectOfType<PlayerSpawnPoints>();
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick += Tick;
+
+            if (IsServer)
+            {
+                playerDataList.Clear();
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -522,7 +535,6 @@ namespace Vi.Core
             gameMode.OnValueChanged -= OnGameModeChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
 
-            playerDataList.Clear();
             localPlayers.Clear();
             botClientId = 0;
         }
@@ -540,7 +552,7 @@ namespace Vi.Core
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
             {
-                Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
+                //Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
                 if (IsServer)
                 {
                     if (NetSceneManager.Singleton.ShouldSpawnPlayer())
@@ -561,7 +573,7 @@ namespace Vi.Core
 
         private void OnClientConnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " has connected.");
+            //Debug.Log("Id: " + clientId + " has connected.");
         }
 
         public void RespawnPlayer(Attributes attributesToRespawn, bool findMostPeacefulSpawnPosition)
@@ -614,6 +626,10 @@ namespace Vi.Core
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
+            else
+            {
+                Debug.LogError("Trying to spawn player without a player spawn points object!");
+            }
 
             KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
             int characterIndex = kvp.Key;
@@ -642,7 +658,7 @@ namespace Vi.Core
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
@@ -651,6 +667,7 @@ namespace Vi.Core
             if (IsClient)
             {
                 StartCoroutine(ReturnToCharacterSelect());
+                Debug.Log(NetworkManager.DisconnectReason);
             }
         }
 
