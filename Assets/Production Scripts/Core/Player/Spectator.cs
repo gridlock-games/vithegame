@@ -34,6 +34,12 @@ namespace Vi.Player
                 GetComponent<AudioListener>().enabled = false;
                 GetComponent<ActionMapHandler>().enabled = false;
             }
+            PlayerDataManager.Singleton.AddSpectatorInstance(OwnerClientId, NetworkObject);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            PlayerDataManager.Singleton.RemoveSpectatorInstance(OwnerClientId);
         }
 
         void OnLook(InputValue value)

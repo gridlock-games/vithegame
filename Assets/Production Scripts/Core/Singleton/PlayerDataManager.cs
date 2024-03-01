@@ -239,8 +239,6 @@ namespace Vi.Core
             return attributesList;
         }
 
-        public List<Attributes> GetAllPlayerObjects() { return localPlayers.Values.ToList(); }
-
         public KeyValuePair<int, Attributes> GetLocalPlayerObject()
         {
             try
@@ -497,12 +495,29 @@ namespace Vi.Core
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
                 {
-                    foreach (Attributes attributes in GetAllPlayerObjects())
+                    foreach (Attributes attributes in GetActivePlayerObjects())
                     {
                         attributes.NetworkObject.Despawn(true);
                     }
+
+                    foreach (NetworkObject spectator in localSpectators.Values.ToList())
+                    {
+                        spectator.Despawn(true);
+                    }
                 }
             }
+        }
+
+        private Dictionary<ulong, NetworkObject> localSpectators = new Dictionary<ulong, NetworkObject>();
+
+        public void AddSpectatorInstance(ulong clientId, NetworkObject networkObject)
+        {
+            localSpectators.Add(clientId, networkObject);
+        }
+
+        public void RemoveSpectatorInstance(ulong clientId)
+        {
+            localSpectators.Remove(clientId);
         }
 
         private void Start()
