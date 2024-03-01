@@ -152,21 +152,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  environmentViewPoints: []
+  gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 00000000
     teams: 09000000
     spawnPositions:
     - {x: 0, y: 1, z: 0}
-    - {x: 2, y: 1, z: 0}
-    - {x: 4, y: 1, z: 0}
-    - {x: -2, y: 1, z: 0}
-    - {x: -4, y: 1, z: 0}
+    - {x: 5, y: 1, z: 0}
+    - {x: 10, y: 1, z: 0}
+    - {x: -5, y: 1, z: 0}
+    - {x: -10, y: 1, z: 0}
+    - {x: -10, y: 1, z: 7}
+    - {x: 10, y: 1, z: 7}
     spawnRotations:
     - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: -10, z: 0}
+    - {x: 0, y: -35, z: 0}
+    - {x: 0, y: 10, z: 0}
+    - {x: 0, y: 35, z: 0}
+    - {x: 0, y: 60, z: 0}
+    - {x: 0, y: -60, z: 0}
+  damageCircleMaxScale: {x: 100, y: 200, z: 100}
+  damageCircleMinScale: {x: 5, y: 200, z: 5}
+  shrinkSize: 20
 --- !u!4 &38075678
 Transform:
   m_ObjectHideFlags: 0
@@ -180,7 +189,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &567633281
 GameObject:
@@ -275,7 +284,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &567633284
 MonoBehaviour:

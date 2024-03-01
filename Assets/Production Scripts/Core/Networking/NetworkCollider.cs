@@ -45,6 +45,8 @@ namespace Vi.Core
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.green;
+            if (Application.isPlaying) { Gizmos.color = Attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death ? Color.red : Color.green; }
+
             DrawWireCapsule(transform.position + GetComponent<CapsuleCollider>().center - new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),
                 transform.position + GetComponent<CapsuleCollider>().center + new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),
                 GetComponent<CapsuleCollider>().radius);
