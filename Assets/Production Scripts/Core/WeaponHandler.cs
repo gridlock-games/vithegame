@@ -742,14 +742,17 @@ namespace Vi.Core
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
                 ActionClip actionClip = SelectAttack(inputAttackType);
-                if (ShouldUseAmmo())
+                if (actionClip)
                 {
-                    if (actionClip.requireAmmo)
+                    if (ShouldUseAmmo())
                     {
-                        if (GetAmmoCount() < actionClip.maxHitLimit)
+                        if (actionClip.requireAmmo)
                         {
-                            OnReload();
-                            return null;
+                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            {
+                                OnReload();
+                                return null;
+                            }
                         }
                     }
                 }
@@ -759,14 +762,17 @@ namespace Vi.Core
             {
                 ResetComboSystem();
                 ActionClip actionClip = SelectAttack(inputAttackType);
-                if (ShouldUseAmmo())
+                if (actionClip)
                 {
-                    if (actionClip.requireAmmo)
+                    if (ShouldUseAmmo())
                     {
-                        if (GetAmmoCount() < actionClip.maxHitLimit)
+                        if (actionClip.requireAmmo)
                         {
-                            OnReload();
-                            return null;
+                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            {
+                                OnReload();
+                                return null;
+                            }
                         }
                     }
                 }
