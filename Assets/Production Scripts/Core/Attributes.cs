@@ -555,6 +555,7 @@ namespace Vi.Core
         public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
         public bool IsRespawning { get; private set; }
+        public bool isWaitingForSpawnPoint;
         private Coroutine respawnCoroutine;
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()

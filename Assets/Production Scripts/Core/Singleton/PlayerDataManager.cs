@@ -598,9 +598,12 @@ namespace Vi.Core
             (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
             while (!spawnPointFound)
             {
+                attributesToRespawn.isWaitingForSpawnPoint = true;
                 (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
                 yield return null;
             }
+
+            attributesToRespawn.isWaitingForSpawnPoint = false;
 
             Vector3 spawnPosition = transformData.position;
             Quaternion spawnRotation = transformData.rotation;
