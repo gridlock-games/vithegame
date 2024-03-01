@@ -16,6 +16,8 @@ namespace Vi.Player
         [Header("Aiming Settings")]
         [SerializeField] private float aimingTransitionSpeed = 8;
         [SerializeField] private Vector3 aimingPositionOffset = new Vector3(0, 0, 1);
+        [Header("Camera collision settings")]
+        [SerializeField] private float collisionPositionOffset;
 
         private float targetRotationY;
         private float targetRotationX;
@@ -91,13 +93,10 @@ namespace Vi.Player
 
             // Move camera if there is a wall in the way
             Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
-            bool bHit = Physics.SphereCast(cameraInterp.transform.position, 0.5f, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-            //bool bHit = Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-            if (bHit)
+            if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
-                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance);
+                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
             }
         }
     }
 }
-

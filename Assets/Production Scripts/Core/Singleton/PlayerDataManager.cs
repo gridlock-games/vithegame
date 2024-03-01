@@ -499,8 +499,25 @@ namespace Vi.Core
                     {
                         attributes.NetworkObject.Despawn(true);
                     }
+
+                    foreach (NetworkObject spectator in localSpectators.Values.ToList())
+                    {
+                        spectator.Despawn(true);
+                    }
                 }
             }
+        }
+
+        private Dictionary<ulong, NetworkObject> localSpectators = new Dictionary<ulong, NetworkObject>();
+
+        public void AddSpectatorInstance(ulong clientId, NetworkObject networkObject)
+        {
+            localSpectators.Add(clientId, networkObject);
+        }
+
+        public void RemoveSpectatorInstance(ulong clientId)
+        {
+            localSpectators.Remove(clientId);
         }
 
         private void Start()
@@ -576,7 +593,7 @@ namespace Vi.Core
             //Debug.Log("Id: " + clientId + " has connected.");
         }
 
-        public void RespawnPlayer(Attributes attributesToRespawn, bool findMostPeacefulSpawnPosition)
+        public void RespawnPlayer(Attributes attributesToRespawn)
         {
             PlayerSpawnPoints.TransformData transformData = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
             Vector3 spawnPosition = transformData.position;
@@ -597,7 +614,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                RespawnPlayer(kvp.Value, false);
+                RespawnPlayer(kvp.Value);
             }
         }
 
@@ -616,6 +633,7 @@ namespace Vi.Core
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
             }
             if (localPlayers.ContainsKey(playerData.id)) { Debug.LogError("Calling SpawnPlayer() while there is an entry for this local player already! Id: " + playerData.id); yield break; }
+            yield return new WaitUntil(() => playerSpawnPoints);
 
             Vector3 spawnPosition = Vector3.zero;
             Quaternion spawnRotation = Quaternion.identity;
