@@ -119,8 +119,12 @@ namespace Vi.UI
             playerInput = weaponHandler.GetComponent<PlayerInput>();
         }
 
+        private Vector3 moveJoystickOriginalAnchoredPosition;
         private void Start()
         {
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
+
             ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
@@ -254,8 +258,10 @@ namespace Vi.UI
         private string lastControlScheme;
         private void Update()
         {
-            #if UNITY_IOS || UNITY_ANDROID
+            //#if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
+            bool moveJoystickMoving = false;
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
             {
                 if (!touch.isTap)
@@ -263,13 +269,15 @@ namespace Vi.UI
                     //moveJoystick.transform.parent
                     if (touch.startScreenPosition.x < Screen.width / 2f)
                     {
-                        RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+                        rt = (RectTransform)moveJoystick.transform.parent;
                         RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
                         rt.anchoredPosition = localPoint;
+                        moveJoystickMoving = true;
                     }
                 }
             }
-            #endif
+            if (!moveJoystickMoving) { rt.anchoredPosition = moveJoystickOriginalAnchoredPosition; }
+            //#endif
 
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
