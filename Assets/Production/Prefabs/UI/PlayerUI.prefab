@@ -565,7 +565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2362282795293266944
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1076,6 +1076,7 @@ MonoBehaviour:
   fadeToWhiteImage: {fileID: 6233606336427964854}
   deathUIParent: {fileID: 1261820042609325003}
   aliveUIParent: {fileID: 8571122044361422770}
+  moveJoystick: {fileID: 7175629936412190440}
   lightAttackButton: {fileID: 4758944105944543620}
   heavyAttackButton: {fileID: 6005787498088446413}
   lookJoystickImage: {fileID: 7667653797634952869}

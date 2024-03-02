@@ -36,6 +36,7 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
+        [SerializeField] private OnScreenStick moveJoystick;
         [SerializeField] private OnScreenButton lightAttackButton;
         [SerializeField] private OnScreenButton heavyAttackButton;
         [SerializeField] private Image lookJoystickImage;
@@ -253,6 +254,23 @@ namespace Vi.UI
         private string lastControlScheme;
         private void Update()
         {
+            #if UNITY_IOS || UNITY_ANDROID
+            // If on a mobile platform
+            foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+            {
+                if (!touch.isTap)
+                {
+                    //moveJoystick.transform.parent
+                    if (touch.startScreenPosition.x < Screen.width / 2f)
+                    {
+                        RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
+                        rt.anchoredPosition = localPoint;
+                    }
+                }
+            }
+            #endif
+
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
