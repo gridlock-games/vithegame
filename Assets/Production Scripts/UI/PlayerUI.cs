@@ -264,7 +264,7 @@ namespace Vi.UI
                     if (touch.startScreenPosition.x < Screen.width / 2f)
                     {
                         RectTransform rt = (RectTransform)moveJoystick.transform.parent;
-                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
+                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
                         rt.anchoredPosition = localPoint;
                     }
                 }
