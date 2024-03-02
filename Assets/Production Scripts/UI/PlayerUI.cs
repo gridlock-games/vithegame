@@ -119,7 +119,7 @@ namespace Vi.UI
             playerInput = weaponHandler.GetComponent<PlayerInput>();
         }
 
-        private Vector3 moveJoystickOriginalAnchoredPosition;
+        private Vector2 moveJoystickOriginalAnchoredPosition;
         private void Start()
         {
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
@@ -258,27 +258,6 @@ namespace Vi.UI
         private string lastControlScheme;
         private void Update()
         {
-            //#if UNITY_IOS || UNITY_ANDROID
-            // If on a mobile platform
-            bool moveJoystickMoving = false;
-            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
-            foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
-            {
-                if (!touch.isTap)
-                {
-                    //moveJoystick.transform.parent
-                    if (touch.startScreenPosition.x < Screen.width / 2f)
-                    {
-                        rt = (RectTransform)moveJoystick.transform.parent;
-                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
-                        rt.anchoredPosition = localPoint;
-                        moveJoystickMoving = true;
-                    }
-                }
-            }
-            if (!moveJoystickMoving) { rt.anchoredPosition = moveJoystickOriginalAnchoredPosition; }
-            //#endif
-
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
@@ -289,6 +268,29 @@ namespace Vi.UI
                     }
                 }
             }
+
+            //#if UNITY_IOS || UNITY_ANDROID
+            // If on a mobile platform
+            bool moveJoystickMoving = false;
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+            {
+                if (touch.isTap) { continue; }
+
+                if (touch.startScreenPosition.x < Screen.width / 2f)
+                {
+                    rt = (RectTransform)moveJoystick.transform.parent;
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
+                    if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
+                    {
+                        rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
+                    }
+                    moveJoystickMoving = true;
+                    break;
+                }
+            }
+            if (!moveJoystickMoving) { rt.anchoredPosition = moveJoystickOriginalAnchoredPosition; }
+            //#endif
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
