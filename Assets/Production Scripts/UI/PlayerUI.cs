@@ -36,7 +36,7 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
-        [SerializeField] private OnScreenStick moveJoystick;
+        [SerializeField] private RelativeOriginOnScreenStick moveJoystick;
         [SerializeField] private OnScreenButton lightAttackButton;
         [SerializeField] private OnScreenButton heavyAttackButton;
         [SerializeField] private Image lookJoystickImage;
@@ -284,6 +284,10 @@ namespace Vi.UI
                     if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
                     {
                         rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
+                    }
+                    else
+                    {
+                        moveJoystick.OnTouchDown(touch);
                     }
                     moveJoystickMoving = true;
                     break;
