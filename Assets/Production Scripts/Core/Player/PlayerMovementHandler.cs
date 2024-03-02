@@ -233,7 +233,7 @@ namespace Vi.Player
                         {
                             if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
                             {
-                                lookInputToAdd += touch.delta;
+                                lookInputToAdd += touch.delta / 1.5f;
                             }
                         }
                     }
