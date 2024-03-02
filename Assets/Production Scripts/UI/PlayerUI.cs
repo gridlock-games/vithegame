@@ -284,16 +284,21 @@ namespace Vi.UI
                     if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
                     {
                         rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
+                        moveJoystick.OnTouchDown(touch);
                     }
                     else
                     {
-                        moveJoystick.OnTouchDown(touch);
+                        moveJoystick.OnTouchDrag(touch);
                     }
                     moveJoystickMoving = true;
                     break;
                 }
             }
-            if (!moveJoystickMoving) { rt.anchoredPosition = moveJoystickOriginalAnchoredPosition; }
+            if (!moveJoystickMoving)
+            {
+                rt.anchoredPosition = moveJoystickOriginalAnchoredPosition;
+                moveJoystick.OnTouchUp();
+            }
             //#endif
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }

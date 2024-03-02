@@ -31,10 +31,17 @@ namespace Vi.UI
 
         public void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
-            //Debug.Log("On Touch Down " + touch.screenPosition);
-            //BeginInteraction(touch.screenPosition, Camera.main);
-            Debug.Log(touch.screenPosition);
+            BeginInteraction(touch.screenPosition, null);
+        }
+
+        public void OnTouchDrag(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+        {
             MoveStick(touch.screenPosition, null);
+        }
+
+        public void OnTouchUp()
+        {
+            EndInteraction();
         }
 
         /// <summary>
