@@ -9,6 +9,7 @@ using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
 using UnityEngine.InputSystem.OnScreen;
+using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
@@ -256,6 +257,7 @@ namespace Vi.UI
         }
 
         private string lastControlScheme;
+        private int moveTouchId;
         private void Update()
         {
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
@@ -269,7 +271,7 @@ namespace Vi.UI
                 }
             }
 
-            //#if UNITY_IOS || UNITY_ANDROID
+            #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             bool moveJoystickMoving = false;
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
@@ -283,18 +285,25 @@ namespace Vi.UI
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
                     if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
                     {
-                        if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(touch.touchId))
+                        List<RaycastResult> raycastResults = new List<RaycastResult>();
+                        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                        pointerEventData.position = touch.screenPosition;
+
+                        EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+                        raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(moveJoystick.transform.parent));
+
+                        if (raycastResults.Count == 0)
                         {
                             rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
                             moveJoystick.OnTouchDown(touch);
+                            moveTouchId = touch.touchId;
                         }
                     }
-                    else
+                    else if (touch.touchId == moveTouchId)
                     {
                         moveJoystick.OnTouchDrag(touch);
                     }
                     moveJoystickMoving = true;
-                    break;
                 }
             }
             if (!moveJoystickMoving)
@@ -302,7 +311,7 @@ namespace Vi.UI
                 rt.anchoredPosition = moveJoystickOriginalAnchoredPosition;
                 moveJoystick.OnTouchUp();
             }
-            //#endif
+            #endif
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 

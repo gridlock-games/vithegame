@@ -229,7 +229,7 @@ namespace Vi.Player
 
                         foreach (OnScreenStick joystick in joysticks)
                         {
-                            if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                            if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
                             {
                                 lookInput += touch.delta;
                             }
