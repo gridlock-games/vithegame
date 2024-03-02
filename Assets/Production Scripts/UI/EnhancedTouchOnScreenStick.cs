@@ -10,24 +10,9 @@ using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.UI
 {
-    public class RelativeOriginOnScreenStick : OnScreenControl, IPointerDownHandler, IPointerUpHandler, IDragHandler
+    public class EnhancedTouchOnScreenStick : OnScreenControl
     {
         private const string kDynamicOriginClickable = "DynamicOriginClickable";
-
-        /// <summary>
-        /// Callback to handle OnPointerDown UI events.
-        /// </summary>
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (m_UseIsolatedInputActions)
-                return;
-
-            if (eventData == null)
-                throw new System.ArgumentNullException(nameof(eventData));
-
-            //Debug.Log("On Point Down " + eventData.position + " " + eventData.pressEventCamera);
-            //BeginInteraction(eventData.position, eventData.pressEventCamera);
-        }
 
         public void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
@@ -42,33 +27,6 @@ namespace Vi.UI
         public void OnTouchUp()
         {
             EndInteraction();
-        }
-
-        /// <summary>
-        /// Callback to handle OnDrag UI events.
-        /// </summary>
-        public void OnDrag(PointerEventData eventData)
-        {
-            if (m_UseIsolatedInputActions)
-                return;
-
-            if (eventData == null)
-                throw new System.ArgumentNullException(nameof(eventData));
-
-            //Debug.Log("On Drag " + eventData.position);
-            //MoveStick(eventData.position, eventData.pressEventCamera);
-        }
-
-        /// <summary>
-        /// Callback to handle OnPointerUp UI events.
-        /// </summary>
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            if (m_UseIsolatedInputActions)
-                return;
-
-            //Debug.Log("On pointer up " + eventData.position);
-            //EndInteraction();
         }
 
         private void Start()

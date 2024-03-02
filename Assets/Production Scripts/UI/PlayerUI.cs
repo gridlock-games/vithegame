@@ -36,7 +36,7 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
-        [SerializeField] private RelativeOriginOnScreenStick moveJoystick;
+        [SerializeField] private EnhancedTouchOnScreenStick moveJoystick;
         [SerializeField] private OnScreenButton lightAttackButton;
         [SerializeField] private OnScreenButton heavyAttackButton;
         [SerializeField] private Image lookJoystickImage;
@@ -283,8 +283,11 @@ namespace Vi.UI
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
                     if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
                     {
-                        rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
-                        moveJoystick.OnTouchDown(touch);
+                        if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(touch.touchId))
+                        {
+                            rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
+                            moveJoystick.OnTouchDown(touch);
+                        }
                     }
                     else
                     {
