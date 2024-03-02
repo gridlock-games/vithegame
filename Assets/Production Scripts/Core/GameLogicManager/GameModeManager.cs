@@ -82,6 +82,73 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
+        [SerializeField] private Sprite environmentKillFeedIcon;
+        public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
+        {
+            public FixedString32Bytes killerName;
+            public FixedString32Bytes victimName;
+            public FixedString32Bytes weaponName;
+            public KillType killType;
+
+            public KillHistoryElement(Attributes killer, Attributes victim)
+            {
+                killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                killType = KillType.Player;
+            }
+
+            public KillHistoryElement(Attributes victim)
+            {
+                killerName = "";
+                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name.ToString();
+                weaponName = "Environment";
+                killType = KillType.Environment;
+            }
+
+            public Sprite GetKillFeedIcon(KillHistoryElement killHistoryElement)
+            {
+                if (killType == KillType.Player)
+                    return System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString()).killFeedIcon;
+                else if (killType == KillType.Environment)
+                    return Singleton.environmentKillFeedIcon;
+                else
+                    Debug.LogError("Not sure what icon to provide for kill type: " + killHistoryElement.killType);
+                return null;
+            }
+
+            public enum KillType
+            {
+                Player,
+                Environment
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref killerName);
+                serializer.SerializeValue(ref victimName);
+                serializer.SerializeValue(ref weaponName);
+                serializer.SerializeValue(ref killType);
+            }
+
+            public bool Equals(KillHistoryElement other)
+            {
+                return killerName == other.killerName & victimName == other.victimName & weaponName == other.weaponName & killType == other.killType;
+            }
+        }
+
+        private NetworkList<KillHistoryElement> killHistory;
+
+        public List<KillHistoryElement> GetKillHistory()
+        {
+            List<KillHistoryElement> killHistoryList = new List<KillHistoryElement>();
+            foreach (KillHistoryElement ele in killHistory)
+            {
+                killHistoryList.Add(ele);
+            }
+            return killHistoryList;
+        }
+
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
             if (nextGameActionTimer.Value <= 0)
@@ -95,6 +162,8 @@ namespace Vi.Core.GameModeManagers
                 PlayerScore victimScore = scoreList[victimIndex];
                 victimScore.deaths += 1;
                 scoreList[victimIndex] = victimScore;
+
+                killHistory.Add(new KillHistoryElement(killer, victim));
             }
         }
 
@@ -106,6 +175,8 @@ namespace Vi.Core.GameModeManagers
                 PlayerScore victimScore = scoreList[victimIndex];
                 victimScore.deaths += 1;
                 scoreList[victimIndex] = victimScore;
+
+                killHistory.Add(new KillHistoryElement(victim));
             }
         }
 
@@ -126,6 +197,7 @@ namespace Vi.Core.GameModeManagers
             }
             if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
             isFirstRound = false;
+            killHistory.Clear();
         }
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
@@ -290,6 +362,7 @@ namespace Vi.Core.GameModeManagers
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
+            killHistory = new NetworkList<KillHistoryElement>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
             {

@@ -89,6 +89,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   avatarLayer: 1
   transitionTime: 0.05
+  animationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
@@ -97,6 +98,7 @@ MonoBehaviour:
   attackingNormalizedTime: 0
   recoveryNormalizedTime: 1
   damage: 20
+  healAmount: 0
   staminaDamage: 5
   defenseDamage: 5
   maxHitLimit: 1
@@ -115,7 +117,14 @@ MonoBehaviour:
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
+  statusesToApplyToTeammateOnHit: []
   actionVFXList: []
+  previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1

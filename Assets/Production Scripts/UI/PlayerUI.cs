@@ -30,11 +30,13 @@ namespace Vi.UI
         [SerializeField] private PlayerCard killerCard;
         [SerializeField] private Text respawnTimerText;
         [SerializeField] private Text killedByText;
+        [SerializeField] private Text waitingToFindViableSpawnPointText;
         [SerializeField] private Image fadeToBlackImage;
         [SerializeField] private Image fadeToWhiteImage;
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
+        [SerializeField] private OnScreenStick moveJoystick;
         [SerializeField] private OnScreenButton lightAttackButton;
         [SerializeField] private OnScreenButton heavyAttackButton;
         [SerializeField] private Image lookJoystickImage;
@@ -117,8 +119,12 @@ namespace Vi.UI
             playerInput = weaponHandler.GetComponent<PlayerInput>();
         }
 
+        private Vector3 moveJoystickOriginalAnchoredPosition;
         private void Start()
         {
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
+
             ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
@@ -252,6 +258,27 @@ namespace Vi.UI
         private string lastControlScheme;
         private void Update()
         {
+            //#if UNITY_IOS || UNITY_ANDROID
+            // If on a mobile platform
+            bool moveJoystickMoving = false;
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+            {
+                if (!touch.isTap)
+                {
+                    //moveJoystick.transform.parent
+                    if (touch.startScreenPosition.x < Screen.width / 2f)
+                    {
+                        rt = (RectTransform)moveJoystick.transform.parent;
+                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
+                        rt.anchoredPosition = localPoint;
+                        moveJoystickMoving = true;
+                    }
+                }
+            }
+            if (!moveJoystickMoving) { rt.anchoredPosition = moveJoystickOriginalAnchoredPosition; }
+            //#endif
+
             foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
@@ -317,6 +344,19 @@ namespace Vi.UI
                 {
                     fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
                     fadeToWhiteImage.color = fadeToBlackImage.color;
+
+                    if (attributes.isWaitingForSpawnPoint)
+                    {
+                        if (waitingToFindViableSpawnPointText.text == "") { waitingToFindViableSpawnPointText.text = "Waiting for viable spawn point..."; }
+                    }
+                    else
+                    {
+                        waitingToFindViableSpawnPointText.text = "";
+                    }
+                }
+                else
+                {
+                    waitingToFindViableSpawnPointText.text = "";
                 }
             }
             UpdateActiveUIElements();

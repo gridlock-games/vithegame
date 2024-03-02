@@ -18,6 +18,8 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
+            if (text.text == "") { return; }
+
             if (Time.time - lastTextChangeTime > 0.5f)
             {
                 lastTextChangeTime = Time.time;

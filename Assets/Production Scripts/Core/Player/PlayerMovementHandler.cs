@@ -211,35 +211,34 @@ namespace Vi.Player
         {
             if (!IsSpawned) { return; }
 
+            #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            lookInput = Vector2.zero;
+            PlayerInput playerInput = GetComponent<PlayerInput>();
+            if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
             {
-                lookInput = Vector2.zero;
-                PlayerInput playerInput = GetComponent<PlayerInput>();
-                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                 {
-                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                    if (touch.isTap)
                     {
-                        if (touch.isTap)
-                        {
-                            OnInteract();
-                        }
-                        else
-                        {
-                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+                        OnInteract();
+                    }
+                    else
+                    {
+                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
 
-                            foreach (OnScreenStick joystick in joysticks)
+                        foreach (OnScreenStick joystick in joysticks)
+                        {
+                            if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
                             {
-                                if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
-                                {
-                                    lookInput += touch.delta;
-                                }
+                                lookInput += touch.delta;
                             }
                         }
                     }
                 }
             }
-            
+            #endif
+
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));

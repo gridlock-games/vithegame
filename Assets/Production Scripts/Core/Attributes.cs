@@ -555,6 +555,7 @@ namespace Vi.Core
         public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
         public bool IsRespawning { get; private set; }
+        public bool isWaitingForSpawnPoint;
         private Coroutine respawnCoroutine;
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
@@ -564,7 +565,11 @@ namespace Vi.Core
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            if (IsServer) { PlayerDataManager.Singleton.RespawnPlayer(this); }
+            if (IsServer)
+            {
+                yield return PlayerDataManager.Singleton.RespawnPlayer(this);
+            }
+            yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
         }
 

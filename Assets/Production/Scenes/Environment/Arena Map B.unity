@@ -114,8 +114,8 @@ NavMeshSettings:
     ledgeDropHeight: 0
     maxJumpAcrossDistance: 0
     minRegionArea: 2
-    manualCellSize: 0
-    cellSize: 0.25
+    manualCellSize: 1
+    cellSize: 0.1
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -201,6 +201,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: wall_curve_MapB (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bcda2f822cc02fa4caf791e4ef05c392,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bcda2f822cc02fa4caf791e4ef05c392, type: 3}
 --- !u!4 &167457632 stripped
@@ -261,6 +266,8 @@ MonoBehaviour:
   environmentViewPoints:
   - position: {x: -12.8, y: 24.4, z: -5.4}
     rotation: {x: 0.48135203, y: 0.5057841, z: -0.41991016, w: 0.5797914}
+  - position: {x: 12.8, y: 24.4, z: 5.4}
+    rotation: {x: -0.24805118, y: 0.70901185, z: -0.5886504, w: -0.29877}
   gameItemSpawnPoints:
   - position: {x: 25, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -276,7 +283,7 @@ MonoBehaviour:
   - gameModes: 00000000010000000200000005000000
     teams: 01000000
     spawnPositions:
-    - {x: 0, y: 2, z: 0}
+    - {x: 0, y: 5, z: 0}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
   - gameModes: 00000000010000000200000005000000
@@ -286,11 +293,19 @@ MonoBehaviour:
     - {x: 35, y: 2, z: 0}
     - {x: 0, y: -3, z: 15}
     - {x: 0, y: -3, z: -15}
+    - {x: 17, y: -2, z: -6}
+    - {x: -17, y: -2, z: -6}
+    - {x: -17, y: -2, z: 6}
+    - {x: 17, y: -2, z: 6}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
+    - {x: 0, y: -65, z: 0}
+    - {x: 0, y: 65, z: 0}
+    - {x: 0, y: 110, z: 0}
+    - {x: 0, y: -110, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
@@ -375,6 +390,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Prop_Round_Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7958de406fd92724bba3b52ce3980227,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7958de406fd92724bba3b52ce3980227, type: 3}
@@ -591,6 +611,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawnwall_MapB
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 02640b3e3b40bb547ba6fc3e8cbc0aa9,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02640b3e3b40bb547ba6fc3e8cbc0aa9, type: 3}
 --- !u!4 &1423146106 stripped
@@ -727,6 +752,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawnwall_MapB (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 02640b3e3b40bb547ba6fc3e8cbc0aa9,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02640b3e3b40bb547ba6fc3e8cbc0aa9, type: 3}
 --- !u!4 &1767653266 stripped
@@ -816,10 +846,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1332706446460028829, guid: a6de3425be2868846943dabc9b7c2e57,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -135560042468693230, guid: a6de3425be2868846943dabc9b7c2e57,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a6de3425be2868846943dabc9b7c2e57,
         type: 3}
       propertyPath: m_Name
       value: prop_Pillar
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182811174731302053, guid: a6de3425be2868846943dabc9b7c2e57,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7880966398391963515, guid: a6de3425be2868846943dabc9b7c2e57,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6de3425be2868846943dabc9b7c2e57, type: 3}
@@ -975,6 +1025,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: wall_curve_MapB
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bcda2f822cc02fa4caf791e4ef05c392,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bcda2f822cc02fa4caf791e4ef05c392, type: 3}

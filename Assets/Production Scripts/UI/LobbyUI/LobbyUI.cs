@@ -120,6 +120,83 @@ namespace Vi.UI
             }
         }
 
+        private void RefreshGameMode()
+        {
+            // Player account card display logic
+            teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
+            PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
+            // Put the local team into the first index
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
+            {
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                int teamIndex = System.Array.IndexOf(possibleTeams, localTeam);
+                if (teamIndex != -1)
+                {
+                    possibleTeams[teamIndex] = possibleTeams[0];
+                    possibleTeams[0] = localTeam;
+                }
+            }
+
+            leftTeamParent.teamTitleText.text = "";
+            rightTeamParent.teamTitleText.text = "";
+
+            leftTeamParent.addBotButton.onClick.RemoveAllListeners();
+            rightTeamParent.addBotButton.onClick.RemoveAllListeners();
+
+            leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+            rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
+
+            for (int i = 0; i < possibleTeams.Length; i++)
+            {
+                if (i == 0)
+                {
+                    leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
+                    teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
+                    PlayerDataManager.Team teamValue = possibleTeams[i];
+                    leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                    leftTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
+                }
+                else if (i == 1)
+                {
+                    rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
+                    teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
+                    PlayerDataManager.Team teamValue = possibleTeams[i];
+                    rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
+                    rightTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
+                }
+                else
+                {
+                    Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
+                }
+            }
+
+            leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
+            rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
+
+            // Maps
+            RefreshMapOptions();
+
+            // Teams
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
+            {
+                leftTeamParent.joinTeamButton.onClick.Invoke();
+            }
+
+            if (IsServer)
+            {
+                List<int> botClientIds = new List<int>();
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                {
+                    if (playerData.id < 0) { botClientIds.Add(playerData.id); }
+                }
+
+                foreach (int clientId in botClientIds)
+                {
+                    PlayerDataManager.Singleton.KickPlayer(clientId);
+                }
+            }
+        }
+
         private IEnumerator Init()
         {
             foreach (Button button in loadoutPresetButtons)
@@ -137,6 +214,10 @@ namespace Vi.UI
             }
             spectateButton.interactable = true;
             lockCharacterButton.interactable = true;
+
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+
+            RefreshGameMode();
         }
 
         public static string FromCamelCase(string inputString)
@@ -401,7 +482,7 @@ namespace Vi.UI
             string playersString = "";
             foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
-                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString();
+                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString() + PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             }
 
             if (lastPlayersString != playersString)
@@ -452,79 +533,7 @@ namespace Vi.UI
 
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
-                // Player account card display logic
-                teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
-                PlayerDataManager.Team[] possibleTeams = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams;
-                // Put the local team into the first index
-                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
-                {
-                    PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
-                    int teamIndex = System.Array.IndexOf(possibleTeams, localTeam);
-                    if (teamIndex != -1)
-                    {
-                        possibleTeams[teamIndex] = possibleTeams[0];
-                        possibleTeams[0] = localTeam;
-                    }
-                }
-
-                leftTeamParent.teamTitleText.text = "";
-                rightTeamParent.teamTitleText.text = "";
-                
-                leftTeamParent.addBotButton.onClick.RemoveAllListeners();
-                rightTeamParent.addBotButton.onClick.RemoveAllListeners();
-                
-                leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
-                rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
-
-                for (int i = 0; i < possibleTeams.Length; i++)
-                {
-                    if (i == 0)
-                    {
-                        leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
-                        teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
-                        PlayerDataManager.Team teamValue = possibleTeams[i];
-                        leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
-                        leftTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
-                    }
-                    else if (i == 1)
-                    {
-                        rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
-                        teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
-                        PlayerDataManager.Team teamValue = possibleTeams[i];
-                        rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
-                        rightTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
-                    }
-                    else
-                    {
-                        Debug.LogError("Not sure where to parent team " + possibleTeams[i]);
-                    }
-                }
-
-                leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
-                rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
-
-                // Maps
-                RefreshMapOptions();
-
-                // Teams
-                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
-                {
-                    leftTeamParent.joinTeamButton.onClick.Invoke();
-                }
-
-                if (IsServer)
-                {
-                    List<int> botClientIds = new List<int>();
-                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
-                    {
-                        if (playerData.id < 0) { botClientIds.Add(playerData.id); }
-                    }
-
-                    foreach (int clientId in botClientIds)
-                    {
-                        PlayerDataManager.Singleton.KickPlayer(clientId);
-                    }
-                }
+                RefreshGameMode();
             }
 
             gameModeText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
