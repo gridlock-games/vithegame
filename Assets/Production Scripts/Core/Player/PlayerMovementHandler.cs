@@ -211,6 +211,8 @@ namespace Vi.Player
         {
             if (!IsSpawned) { return; }
 
+            Debug.Log(lookInput);
+
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             lookInput = Vector2.zero;
