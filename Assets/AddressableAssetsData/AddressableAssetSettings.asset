@@ -82,7 +82,7 @@ MonoBehaviour:
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
     - m_InheritedParent: 
       m_Id: 3b39310171a85194b91a4a072e6b3e83
-      m_ProfileName: Production
+      m_ProfileName: Windows
       m_Values:
       - m_Id: 86358abe38553274ca708ac167b20032
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
@@ -93,7 +93,21 @@ MonoBehaviour:
       - m_Id: 0f125ed7c8cbb6e499f6f7903bcab5d5
         m_Value: ServerData/[BuildTarget]
       - m_Id: 09a80a15b62b171479e0cfed0b383667
-        m_Value: https://496526029.r.cdn36.com
+        m_Value: http://windowscdn.vi-assets.com/FileServer/
+    - m_InheritedParent: 
+      m_Id: 5c951485297ee414692da52d72c92620
+      m_ProfileName: Android
+      m_Values:
+      - m_Id: 86358abe38553274ca708ac167b20032
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: 3b67796d70eaaf744977edeb6094b0ca
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: ef35075df6960d941b726dbda62f22f3
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: 0f125ed7c8cbb6e499f6f7903bcab5d5
+        m_Value: ServerData/[BuildTarget]
+      - m_Id: 09a80a15b62b171479e0cfed0b383667
+        m_Value: http://androidcdn.vi-assets.com/FileServer/
     m_ProfileEntryNames:
     - m_Id: 86358abe38553274ca708ac167b20032
       m_Name: BuildTarget

@@ -207,13 +207,15 @@ namespace Vi.Player
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private OnScreenStick[] joysticks = new OnScreenStick[0];
         private readonly float minimapCameraOffset = 15;
+        private Vector2 lookInputToSubtract;
         private void Update()
         {
             if (!IsSpawned) { return; }
 
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            lookInput = Vector2.zero;
+            lookInput -= lookInputToSubtract;
+            Vector2 lookInputToAdd = Vector2.zero;
             PlayerInput playerInput = GetComponent<PlayerInput>();
             if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
             {
@@ -229,14 +231,17 @@ namespace Vi.Player
 
                         foreach (OnScreenStick joystick in joysticks)
                         {
-                            if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                            if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
                             {
-                                lookInput += touch.delta;
+                                lookInputToAdd += touch.delta / 1.5f;
                             }
                         }
                     }
                 }
             }
+
+            lookInput += lookInputToAdd;
+            lookInputToSubtract = lookInputToAdd;
             #endif
 
             UpdateLocomotion();
