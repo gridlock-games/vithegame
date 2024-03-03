@@ -108,6 +108,7 @@ namespace Vi.Core
             if (downloadsSuccessful)
             {
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
+                SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
         }
