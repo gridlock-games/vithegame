@@ -7,9 +7,10 @@ namespace Vi.UI
 {
     public class ControlsSettingsMenu : Menu
     {
+        [SerializeField] private Toggle invertLookToggle;
         [SerializeField] private InputField mouseXSensitivityInput;
         [SerializeField] private InputField mouseYSensitivityInput;
-        [SerializeField] private Toggle invertLookToggle;
+        [SerializeField] private InputField zoomMultiplierInput;
 
         private void Start()
         {
@@ -19,28 +20,30 @@ namespace Vi.UI
             ChangeMouseSensitivity();
         }
 
+        public void SetInvertMouse()
+        {
+            PlayerPrefs.SetString("InvertMouse", invertLookToggle.isOn.ToString());
+        }
+
         public void ChangeMouseSensitivity()
         {
-            bool success = float.TryParse(mouseXSensitivityInput.text, out float mouseXSens);
-            if (!success)
-            {
-                mouseXSensitivityInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
-                return;
-            }
-            success = float.TryParse(mouseYSensitivityInput.text, out float mouseYSens);
-            if (!success)
-            {
-                mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
-                return;
-            }
+            mouseXSensitivityInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
+            mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
+
+            float mouseXSens = float.Parse(mouseXSensitivityInput.text);
+            float mouseYSens = float.Parse(mouseYSensitivityInput.text);
             
             PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens);
             PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens);
         }
 
-        public void SetInvertMouse()
+        public void ChangeZoomMultiplier()
         {
-            PlayerPrefs.SetString("InvertMouse", invertLookToggle.isOn.ToString());
+            zoomMultiplierInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
+
+            float zoomMultiplier = float.Parse(zoomMultiplierInput.text);
+
+            PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier);
         }
     }
 }

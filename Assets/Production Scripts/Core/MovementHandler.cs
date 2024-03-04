@@ -19,17 +19,31 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
+        private WeaponHandler weaponHandler;
+        private void Awake()
+        {
+            weaponHandler = GetComponent<WeaponHandler>();
+        }
+
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
+            Vector2 lookSensitivity;
             if (bool.Parse(PlayerPrefs.GetString("InvertMouse")))
             {
-                return lookInput * new Vector2(PlayerPrefs.GetFloat("MouseYSensitivity"), PlayerPrefs.GetFloat("MouseXSensitivity"));
+                lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseYSensitivity"), PlayerPrefs.GetFloat("MouseXSensitivity"));
             }
             else
             {
-                return lookInput * new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
+                lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity"));
             }
+
+            if (weaponHandler)
+            {
+                if (weaponHandler.IsAiming()) { lookSensitivity *= PlayerPrefs.GetFloat("ZoomSensitivityMultiplier"); }
+            }
+
+            return lookInput * lookSensitivity;
         }
 
         public Vector2 GetMoveInput() { return moveInput; }
