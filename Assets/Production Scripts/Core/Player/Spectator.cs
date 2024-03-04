@@ -278,9 +278,8 @@ namespace Vi.Player
         }
 
         private Vector3 targetPosition;
-        protected new void Start()
+        private void Start()
         {
-            base.Start();
             targetPosition = transform.position;
         }
 

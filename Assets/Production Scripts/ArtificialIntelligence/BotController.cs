@@ -47,22 +47,19 @@ namespace Vi.ArtificialIntelligence
         private NavMeshAgent navMeshAgent;
         private Attributes attributes;
         private AnimationHandler animationHandler;
-        private WeaponHandler weaponHandler;
-
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             navMeshAgent = GetComponent<NavMeshAgent>();
-            weaponHandler = GetComponent<WeaponHandler>();
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
         }
 
-        private new void Start()
+        private void Start()
         {
-            base.Start();
             networkColliderRigidbody.transform.SetParent(null, true);
         }
 
