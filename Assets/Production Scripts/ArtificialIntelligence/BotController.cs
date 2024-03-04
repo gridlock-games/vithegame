@@ -60,9 +60,8 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updateUpAxis = false;
         }
 
-        private new void Start()
+        private void Start()
         {
-            base.Start();
             networkColliderRigidbody.transform.SetParent(null, true);
         }
 

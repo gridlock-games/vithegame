@@ -182,9 +182,8 @@ namespace Vi.Player
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private AnimationHandler animationHandler;
-        protected new void Start()
+        private void Start()
         {
-            base.Start();
             movementPredictionRigidbody.transform.SetParent(null, true);
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             weaponHandler = GetComponent<WeaponHandler>();

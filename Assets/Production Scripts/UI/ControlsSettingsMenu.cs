@@ -1,40 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
-using Vi.Player;
 using UnityEngine.UI;
-using Unity.Netcode;
 using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
     public class ControlsSettingsMenu : Menu
     {
-        public InputField mouseXSensitivityInput;
-        public InputField mouseYSensitivityInput;
-
-        private MovementHandler movementHandler;
+        [SerializeField] private InputField mouseXSensitivityInput;
+        [SerializeField] private InputField mouseYSensitivityInput;
+        [SerializeField] private Toggle invertLookToggle;
 
         private void Start()
         {
-            if (NetworkManager.Singleton.LocalClient.PlayerObject)
-            {
-                movementHandler = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<MovementHandler>();
-
-                mouseXSensitivityInput.text = movementHandler.GetLookSensitivity().x.ToString();
-                mouseYSensitivityInput.text = movementHandler.GetLookSensitivity().y.ToString();
-            }
-            else if (PlayerPrefs.HasKey("MouseXSensitivity") & PlayerPrefs.HasKey("MouseYSensitivity"))
-            {
-                mouseXSensitivityInput.text = PlayerPrefs.GetFloat("MouseXSensitivity").ToString();
-                mouseYSensitivityInput.text = PlayerPrefs.GetFloat("MouseYSensitivity").ToString();
-            }
-            else
-            {
-                mouseXSensitivityInput.text = "0.2";
-                mouseYSensitivityInput.text = "0.2";
-            }
+            mouseXSensitivityInput.text = PlayerPrefs.GetFloat("MouseXSensitivity").ToString();
+            mouseYSensitivityInput.text = PlayerPrefs.GetFloat("MouseYSensitivity").ToString();
+            invertLookToggle.isOn = bool.Parse(PlayerPrefs.GetString("InvertMouse"));
             ChangeMouseSensitivity();
         }
 
@@ -52,10 +33,14 @@ namespace Vi.UI
                 mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
                 return;
             }
-            if (movementHandler) { movementHandler.SetLookSensitivity(new Vector2(mouseXSens, mouseYSens)); }
             
             PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens);
             PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens);
+        }
+
+        public void SetInvertMouse()
+        {
+            PlayerPrefs.SetString("InvertMouse", invertLookToggle.isOn.ToString());
         }
     }
 }

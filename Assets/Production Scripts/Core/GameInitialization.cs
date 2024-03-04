@@ -20,6 +20,14 @@ namespace Vi.Core
         {
             Application.targetFrameRate = Screen.currentResolution.refreshRate;
             StartCoroutine(LoadScenes());
+            InitializePlayerPrefs();
+        }
+
+        private void InitializePlayerPrefs()
+        {
+            if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
+            if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
+            if (!PlayerPrefs.HasKey("InvertMouse")) { PlayerPrefs.SetString("InvertMouse", false.ToString()); }
         }
 
         private IEnumerator LoadScenes()
