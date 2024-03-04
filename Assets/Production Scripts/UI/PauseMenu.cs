@@ -49,6 +49,8 @@ namespace Vi.UI
 
             goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
             goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
+
+            goBackScenesButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
         }
 
         public void ReturnToCharacterSelect()
