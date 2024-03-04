@@ -51,7 +51,7 @@ namespace Vi.UI
 
         public void ChangeZoomMultiplier()
         {
-            zoomMultiplierInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
+            zoomMultiplierInput.text = Regex.Replace(zoomMultiplierInput.text, @"[^0-9|.]", "");
             float zoomMultiplier = float.Parse(zoomMultiplierInput.text);
             PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier);
         }
