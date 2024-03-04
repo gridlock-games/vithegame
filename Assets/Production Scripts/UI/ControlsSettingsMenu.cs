@@ -4,11 +4,13 @@ using UnityEngine.UI;
 using System.Text.RegularExpressions;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 namespace Vi.UI
 {
     public class ControlsSettingsMenu : Menu
     {
+        [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private Toggle invertLookToggle;
         [SerializeField] private InputField mouseXSensitivityInput;
         [SerializeField] private InputField mouseYSensitivityInput;
