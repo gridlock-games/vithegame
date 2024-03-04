@@ -211,32 +211,34 @@ namespace Vi.Player
 
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            lookInput -= lookInputToSubtract;
-            Vector2 lookInputToAdd = Vector2.zero;
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+            if (IsLocalPlayer)
             {
-                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                lookInput -= lookInputToSubtract;
+                Vector2 lookInputToAdd = Vector2.zero;
+                PlayerInput playerInput = GetComponent<PlayerInput>();
+                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
-                    if (touch.isTap)
+                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        OnInteract();
-                    }
-                    else
-                    {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
-
-                        foreach (OnScreenStick joystick in joysticks)
+                        if (touch.isTap)
                         {
-                            if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                            OnInteract();
+                        }
+                        else
+                        {
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+
+                            foreach (OnScreenStick joystick in joysticks)
                             {
-                                lookInputToAdd += touch.delta / 1.5f;
+                                if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                                {
+                                    lookInputToAdd += touch.delta / 1.5f;
+                                }
                             }
                         }
                     }
                 }
             }
-
             lookInput += lookInputToAdd;
             lookInputToSubtract = lookInputToAdd;
             #endif
