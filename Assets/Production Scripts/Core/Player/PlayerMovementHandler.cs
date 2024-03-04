@@ -238,9 +238,9 @@ namespace Vi.Player
                         }
                     }
                 }
-            }
             lookInput += lookInputToAdd;
             lookInputToSubtract = lookInputToAdd;
+            }
             #endif
 
             UpdateLocomotion();
