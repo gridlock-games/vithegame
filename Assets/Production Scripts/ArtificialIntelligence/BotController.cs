@@ -47,9 +47,9 @@ namespace Vi.ArtificialIntelligence
         private NavMeshAgent navMeshAgent;
         private Attributes attributes;
         private AnimationHandler animationHandler;
-
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             navMeshAgent = GetComponent<NavMeshAgent>();

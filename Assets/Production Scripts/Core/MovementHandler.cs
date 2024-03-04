@@ -20,7 +20,7 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
         protected WeaponHandler weaponHandler;
-        private void Awake()
+        protected void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
         }
