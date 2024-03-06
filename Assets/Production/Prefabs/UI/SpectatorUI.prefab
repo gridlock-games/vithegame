@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 6114019404356350462}
   - component: {fileID: 6114019404356350463}
   - component: {fileID: 318619431775699751}
+  - component: {fileID: 8147565166783601869}
   m_Layer: 0
   m_Name: SpectatorUI
   m_TagString: Untagged
@@ -313,6 +314,32 @@ MonoBehaviour:
   - {fileID: 1369910035427326952}
   - {fileID: 1698408757453066957}
   - {fileID: 6415869456383228131}
+  platformUIDefinitions:
+  - platforms: 080000000b000000
+    gameObjectsToEnable:
+    - {fileID: 3144451764282779984}
+    gameObjectsToDestroy:
+    - {fileID: 1982527543365779000}
+    - {fileID: 2097671688540077757}
+    - {fileID: 3622361814003049589}
+    - {fileID: 8997484398386368091}
+    objectsToMove:
+    - gameObjectToMove: {fileID: 6114019403561036632}
+      newAnchoredPosition: {x: 0, y: 85}
+    - gameObjectToMove: {fileID: 6114019404567166531}
+      newAnchoredPosition: {x: 0, y: 85}
+--- !u!114 &8147565166783601869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6114019404356350461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   platformUIDefinitions:
   - platforms: 080000000b000000
     gameObjectsToEnable:
