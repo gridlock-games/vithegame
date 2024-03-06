@@ -4447,8 +4447,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5769415177699500259}
   m_HandleRect: {fileID: 7176835145930708437}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9096387
+  m_Value: 1.0000008
+  m_Size: 0.9089983
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5261,23 +5261,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
         type: 3}
-      propertyPath: m_Options.m_Options.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
-        type: 3}
-      propertyPath: m_Options.m_Options.Array.data[0].m_Text
-      value: HOLD
-      objectReference: {fileID: 0}
-    - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
-        type: 3}
-      propertyPath: m_Options.m_Options.Array.data[1].m_Text
-      value: TOGGLE
-      objectReference: {fileID: 0}
-    - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
-        type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
         type: 3}
@@ -5297,7 +5282,7 @@ PrefabInstance:
     - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
         type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: ChangeZoomMultiplier
+      value: ChangeZoomMode
       objectReference: {fileID: 0}
     - target: {fileID: 6142405872673997950, guid: 2bf5899b79348f6429c3a3895d2691d1,
         type: 3}
