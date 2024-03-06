@@ -41,7 +41,7 @@ namespace Vi.UI
             rightScoreText.text = teamDeathmatchManager.GetRightScoreString();
 
             roundResultText.enabled = teamDeathmatchManager.ShouldDisplayNextGameAction();
-            roundResultText.text = teamDeathmatchManager.GetRoundResultMessage() + teamDeathmatchManager.GetNextGameActionTimerDisplayString();
+            roundResultText.text = teamDeathmatchManager.AreAllPlayersConnected() ? teamDeathmatchManager.GetRoundResultMessage() + teamDeathmatchManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
 
             gameEndText.text = teamDeathmatchManager.GetGameEndMessage();
         }

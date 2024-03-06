@@ -39,7 +39,7 @@ namespace Vi.UI
             rightScoreText.text = teamEliminationManager.GetRightScoreString();
 
             roundResultText.enabled = teamEliminationManager.ShouldDisplayNextGameAction();
-            roundResultText.text = teamEliminationManager.GetRoundResultMessage() + teamEliminationManager.GetNextGameActionTimerDisplayString();
+            roundResultText.text = teamEliminationManager.AreAllPlayersConnected() ? teamEliminationManager.GetRoundResultMessage() + teamEliminationManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
 
             gameEndText.text = teamEliminationManager.GetGameEndMessage();
         }
