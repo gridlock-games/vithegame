@@ -74,8 +74,6 @@ namespace Vi.ArtificialIntelligence
         [SerializeField] private float runAnimationTransitionSpeed = 5;
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
-        [SerializeField] private float stairHeight = 0.5f;
-        [SerializeField] private float rampCheckHeight = 0.1f;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>();
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
@@ -139,26 +137,24 @@ namespace Vi.ArtificialIntelligence
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
-            Debug.DrawRay(currentPosition.Value, movement.normalized * 1, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            // If we hit an object in the direction we are moving, we need to check if it is a stair/climbable
-            if (Physics.Raycast(currentPosition.Value, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+            float stairMovement = 0;
+            float yOffset = 0.2f;
+            Vector3 startPos = currentPosition.Value;
+            startPos.y += yOffset;
+            Debug.DrawRay(startPos, movement.normalized, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
-                Debug.DrawRay(currentPosition.Value + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                // Check if we are walking up a ramp
-                if (Physics.Raycast(currentPosition.Value + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                startPos.y += yOffset;
+                stairMovement = startPos.y - currentPosition.Value.y - yOffset;
+
+                if (stairMovement > 0.5f)
                 {
-                    // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
-                    if (Mathf.Approximately(rampHit.distance, lowerHit.distance))
-                    {
-                        Debug.DrawRay(currentPosition.Value + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        if (!Physics.Raycast(currentPosition.Value + transform.up * stairHeight, movement.normalized, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
-                        {
-                            //Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
-                            movement.y += stairHeight / 2;
-                        }
-                    }
+                    stairMovement = 0;
+                    break;
                 }
             }
+            movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
