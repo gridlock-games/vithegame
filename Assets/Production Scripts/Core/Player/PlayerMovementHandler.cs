@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.OnScreen;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Player
 {
@@ -117,9 +118,13 @@ namespace Vi.Player
             float yOffset = 0.2f;
             Vector3 startPos = movementPrediction.CurrentPosition;
             startPos.y += yOffset;
-            Debug.DrawRay(startPos, movement.normalized, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
+                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                {
+                    break;
+                }
+
                 Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
                 startPos.y += yOffset;
                 stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
@@ -130,6 +135,7 @@ namespace Vi.Player
                     break;
                 }
             }
+
             movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));

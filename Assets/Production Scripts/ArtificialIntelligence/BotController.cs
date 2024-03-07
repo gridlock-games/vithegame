@@ -141,9 +141,13 @@ namespace Vi.ArtificialIntelligence
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
             startPos.y += yOffset;
-            Debug.DrawRay(startPos, movement.normalized, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
+                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                {
+                    break;
+                }
+
                 Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
@@ -154,7 +158,6 @@ namespace Vi.ArtificialIntelligence
                     break;
                 }
             }
-            movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
@@ -197,15 +200,15 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    if (targetAttributes)
-                    {
-                        if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+                    //if (targetAttributes)
+                    //{
+                    //    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
 
-                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                        {
-                            weaponHandler.SendMessage("OnLightAttack");
-                        }
-                    }
+                    //    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                    //    {
+                    //        weaponHandler.SendMessage("OnLightAttack");
+                    //    }
+                    //}
                 }
             }
         }
