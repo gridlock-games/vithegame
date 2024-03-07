@@ -38,22 +38,28 @@ namespace Vi.UI
         public void ChangeMouseXSensitivity()
         {
             mouseXSensitivityInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
-            float mouseXSens = float.Parse(mouseXSensitivityInput.text);
-            PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens);
+            if (float.TryParse(mouseXSensitivityInput.text, out float mouseXSens))
+            {
+                if (mouseXSens > 0) { PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens); }
+            }
         }
 
         public void ChangeMouseYSensitivity()
         {
             mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
-            float mouseYSens = float.Parse(mouseYSensitivityInput.text);
-            PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens);
+            if (float.TryParse(mouseYSensitivityInput.text, out float mouseYSens))
+            {
+                if (mouseYSens > 0) { PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens); }
+            }
         }
 
         public void ChangeZoomMultiplier()
         {
             zoomMultiplierInput.text = Regex.Replace(zoomMultiplierInput.text, @"[^0-9|.]", "");
-            float zoomMultiplier = float.Parse(zoomMultiplierInput.text);
-            PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier);
+            if (float.TryParse(zoomMultiplierInput.text, out float zoomMultiplier))
+            {
+                if (zoomMultiplier > 0) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier); }
+            }
         }
 
         public void ChangeZoomMode()

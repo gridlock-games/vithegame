@@ -9,7 +9,6 @@ using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
 using UnityEngine.InputSystem.OnScreen;
-using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
@@ -49,24 +48,6 @@ namespace Vi.UI
         [SerializeField] private Image secondaryWeaponButton;
         [SerializeField] private Button switchAttackTypeButton;
         [SerializeField] private Image aimButton;
-
-        [SerializeField] private PlatformUIDefinition[] platformUIDefinitions;
-
-        [System.Serializable]
-        public struct PlatformUIDefinition
-        {
-            public RuntimePlatform[] platforms;
-            public GameObject[] gameObjectsToEnable;
-            public GameObject[] gameObjectsToDestroy;
-            public MoveUIDefinition[] objectsToMove;
-        }
-
-        [System.Serializable]
-        public struct MoveUIDefinition
-        {
-            public GameObject gameObjectToMove;
-            public Vector2 newAnchoredPosition;
-        }
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -128,26 +109,6 @@ namespace Vi.UI
 
             ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
-            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
-            {
-                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
-                {
-                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
-                }
-
-                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform))
-                    {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
-                    }
-                }
-
-                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
-                }
-            }
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
@@ -260,17 +221,6 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
-            foreach (PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
-            {
-                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform))
-                    {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
-                    }
-                }
-            }
-
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             bool moveJoystickMoving = false;

@@ -54,8 +54,10 @@ namespace Vi.UI
             }
         }
 
+        private Vector3 originalScale;
         private void Start()
         {
+            originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UI.gameObject.SetActive(false);
         }
@@ -64,7 +66,7 @@ namespace Vi.UI
         private const float rotationSpeed = 15;
         private void Update()
         {
-            worldSpaceLabel.transform.localScale = Vector3.Lerp(worldSpaceLabel.transform.localScale, localPlayerInRange ? Vector3.one : Vector3.zero, Time.deltaTime * scalingSpeed);
+            worldSpaceLabel.transform.localScale = Vector3.Lerp(worldSpaceLabel.transform.localScale, localPlayerInRange ? originalScale : Vector3.zero, Time.deltaTime * scalingSpeed);
 
             if (Camera.main)
             {

@@ -472,16 +472,20 @@ namespace Vi.Core
                     return;
                 }
             }
-
+            
             if (CanAim)
             {
-                if (toggleAim)
+                if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
                 {
                     if (isPressed) { aiming.Value = !aiming.Value; }
                 }
-                else
+                else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
                 {
                     aiming.Value = isPressed;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
                 }
             }
             else if (isPressed)

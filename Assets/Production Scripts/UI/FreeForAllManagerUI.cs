@@ -41,7 +41,7 @@ namespace Vi.UI
             rightScoreText.text = freeForAllManager.GetRightScoreString();
 
             roundResultText.enabled = freeForAllManager.ShouldDisplayNextGameAction();
-            roundResultText.text = freeForAllManager.GetRoundResultMessage() + freeForAllManager.GetNextGameActionTimerDisplayString();
+            roundResultText.text = freeForAllManager.AreAllPlayersConnected() ? freeForAllManager.GetRoundResultMessage() + freeForAllManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
 
             gameEndText.text = freeForAllManager.GetGameEndMessage();
         }

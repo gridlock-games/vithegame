@@ -404,9 +404,13 @@ namespace Vi.Core.GameModeManagers
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
+        public bool AreAllPlayersConnected() { return PlayerDataManager.Singleton.GetActivePlayerObjects().TrueForAll(item => item.IsSpawnedOnOwnerInstance()); }
+
         protected void Update()
         {
             if (!IsServer) { return; }
+            if (!AreAllPlayersConnected()) { return; }
+
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
             {
                 nextGameActionTimer.Value = 0;
