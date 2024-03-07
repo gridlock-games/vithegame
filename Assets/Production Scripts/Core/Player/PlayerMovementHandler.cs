@@ -83,19 +83,36 @@ namespace Vi.Player
             }
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
+            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity,
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
-            foreach (RaycastHit hit in allHits)
+            foreach (RaycastHit gravityHit in allHits)
             {
-                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }
-            if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
-            isGrounded = bHit;
+
+            if (bHit)
+            {
+                isGrounded = true;
+            }
+            else // If no sphere cast hit
+            {
+                if (Physics.Raycast(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                {
+                    isGrounded = true;
+                }
+                else
+                {
+                    isGrounded = false;
+                    gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity;
+                }
+            }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement

@@ -105,19 +105,36 @@ namespace Vi.ArtificialIntelligence
                 newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
+            RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity,
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
-            foreach (RaycastHit hit in allHits)
+            foreach (RaycastHit gravityHit in allHits)
             {
-                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }
-            if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
-            if (IsServer) { isGrounded.Value = bHit; }
+
+            if (bHit)
+            {
+                isGrounded.Value = true;
+            }
+            else // If no sphere cast hit
+            {
+                if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
+                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                {
+                    isGrounded.Value = true;
+                }
+                else
+                {
+                    isGrounded.Value = false;
+                    gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity;
+                }
+            }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
@@ -200,15 +217,15 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    //if (targetAttributes)
-                    //{
-                    //    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+                    if (targetAttributes)
+                    {
+                        if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
 
-                    //    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                    //    {
-                    //        weaponHandler.SendMessage("OnLightAttack");
-                    //    }
-                    //}
+                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                        {
+                            weaponHandler.SendMessage("OnLightAttack");
+                        }
+                    }
                 }
             }
         }
