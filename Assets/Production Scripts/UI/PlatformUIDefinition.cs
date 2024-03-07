@@ -77,30 +77,33 @@ namespace Vi.UI
                 }
             }
 
-            Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
-            if (localPlayer)
+            if (PlayerDataManager.Singleton)
             {
-                if (localPlayer.TryGetComponent(out PlayerInput playerInput))
+                Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+                if (localPlayer)
                 {
-                    foreach (ControlSchemeTextDefinition controlSchemeTextDefinition in controlSchemeTextDefinitions)
+                    if (localPlayer.TryGetComponent(out PlayerInput playerInput))
                     {
-                        if (controlSchemeTextDefinition.platforms.Contains(Application.platform))
+                        foreach (ControlSchemeTextDefinition controlSchemeTextDefinition in controlSchemeTextDefinitions)
                         {
-                            InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
-
-                            foreach (InputBinding binding in playerInput.actions[controlSchemeTextDefinition.action].bindings)
+                            if (controlSchemeTextDefinition.platforms.Contains(Application.platform))
                             {
-                                bool shouldBreak = false;
-                                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                                InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+
+                                foreach (InputBinding binding in playerInput.actions[controlSchemeTextDefinition.action].bindings)
                                 {
-                                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                                    bool shouldBreak = false;
+                                    foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                                     {
-                                        controlSchemeTextDefinition.textElement.text = controlSchemeTextDefinition.stringBeforeBinding.Replace("\\n", "\n") + binding.ToDisplayString() + controlSchemeTextDefinition.stringAfterBinding.Replace("\\n", "\n");
-                                        shouldBreak = true;
-                                        break;
+                                        if (binding.path.ToLower().Contains(device.name.ToLower()))
+                                        {
+                                            controlSchemeTextDefinition.textElement.text = controlSchemeTextDefinition.stringBeforeBinding.Replace("\\n", "\n") + binding.ToDisplayString() + controlSchemeTextDefinition.stringAfterBinding.Replace("\\n", "\n");
+                                            shouldBreak = true;
+                                            break;
+                                        }
                                     }
+                                    if (shouldBreak) { break; }
                                 }
-                                if (shouldBreak) { break; }
                             }
                         }
                     }
