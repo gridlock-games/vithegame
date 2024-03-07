@@ -87,7 +87,8 @@ namespace Vi.Core
                 primaryAmmo.Value = primaryWeapon.ShouldUseAmmo() ? primaryWeapon.GetMaxAmmoCount() : 0;
                 secondaryAmmo.Value = secondaryWeapon.ShouldUseAmmo() ? secondaryWeapon.GetMaxAmmoCount() : 0;
             }
-            EquipPrimaryWeapon();
+            
+            OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
 
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));
         }

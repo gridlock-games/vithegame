@@ -13,33 +13,10 @@ namespace Vi.UI
         [SerializeField] private PlayerCard[] leftPlayerCards;
         [SerializeField] private PlayerCard[] rightPlayerCards;
 
-        [SerializeField] private PlayerUI.PlatformUIDefinition[] platformUIDefinitions;
-
         private Spectator spectator;
         private void Start()
         {
             spectator = GetComponentInParent<Spectator>();
-
-            foreach (PlayerUI.PlatformUIDefinition platformUIDefinition in platformUIDefinitions)
-            {
-                foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
-                {
-                    g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
-                }
-
-                foreach (PlayerUI.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform))
-                    {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
-                    }
-                }
-
-                foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
-                }
-            }
 
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
             List<PlayerCard> rightPlayerCardsTemp = rightPlayerCards.ToList();
