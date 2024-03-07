@@ -48,8 +48,6 @@ namespace Vi.Player
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
-        [SerializeField] private float stairHeight = 0.5f;
-        [SerializeField] private float rampCheckHeight = 0.1f;
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded = true;
@@ -115,34 +113,24 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
-            // If we hit an object in the direction we are moving, we need to check if it is a stair/climbable
-            if (Physics.Raycast(movementPrediction.CurrentPosition, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+            float stairMovement = 0;
+            float yOffset = 0.2f;
+            Vector3 startPos = movementPrediction.CurrentPosition;
+            startPos.y += yOffset;
+            Debug.DrawRay(startPos, movement.normalized, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
-                //Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                // Check if we are walking up a ramp
-                if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * rampCheckHeight, movement.normalized, out RaycastHit rampHit, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                startPos.y += yOffset;
+                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
+
+                if (stairMovement > 0.5f)
                 {
-                    // If the distances of the lowerHit and rampHit are the same, that means we are climbing a stairs
-                    if (Mathf.Abs(rampHit.distance - lowerHit.distance) < 0.1f)
-                    {
-                        Debug.DrawRay(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized * lowerHit.distance, Color.black, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                        
-                        if (Physics.Raycast(movementPrediction.CurrentPosition + transform.up * stairHeight, movement.normalized, out RaycastHit upperHit, lowerHit.distance + 0.1f, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore))
-                        {
-                            //Debug.Log(Time.time + " " + Mathf.Abs(lowerHit.distance - upperHit.distance));
-                            if (Mathf.Abs(lowerHit.distance - upperHit.distance) > 0.1f)
-                            {
-                                movement.y += stairHeight / 2;
-                            }
-                        }
-                        else
-                        {
-                            //Debug.Log(Time.time + " climbing stairs " + lowerHit.collider.name + " " + rampHit.collider.name);
-                            movement.y += stairHeight / 2;
-                        }
-                    }
+                    stairMovement = 0;
+                    break;
                 }
             }
+            movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)

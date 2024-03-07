@@ -16,6 +16,11 @@ namespace Vi.Core
         [SerializeField] private Text downloadProgressBarText;
         [SerializeField] private Image downloadProgressBarImage;
 
+        public void ExitGame()
+        {
+            Application.Quit();
+        }
+
         private void Start()
         {
             Application.targetFrameRate = Screen.currentResolution.refreshRate;
@@ -45,7 +50,7 @@ namespace Vi.Core
 
             AsyncOperationHandle<long> mainMenuDownloadSize = Addressables.GetDownloadSizeAsync(mainMenuSceneReference);
             yield return new WaitUntil(() => mainMenuDownloadSize.IsDone);
-
+            
             if (baseDownloadSize.Result > 0)
             {
                 AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(baseSceneReference);
