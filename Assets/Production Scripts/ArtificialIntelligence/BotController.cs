@@ -105,19 +105,36 @@ namespace Vi.ArtificialIntelligence
                 newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity
-            RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                                            gravitySphereCastRadius, Physics.gravity, gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             Vector3 gravity = Vector3.zero;
+            RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity,
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
-            foreach (RaycastHit hit in allHits)
+            foreach (RaycastHit gravityHit in allHits)
             {
-                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(hit.distance) * Physics.gravity;
+                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }
-            if (!bHit) { gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity; }
-            if (IsServer) { isGrounded.Value = bHit; }
+
+            if (bHit)
+            {
+                isGrounded.Value = true;
+            }
+            else // If no sphere cast hit
+            {
+                if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
+                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                {
+                    isGrounded.Value = true;
+                }
+                else
+                {
+                    isGrounded.Value = false;
+                    gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity;
+                }
+            }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
@@ -141,9 +158,13 @@ namespace Vi.ArtificialIntelligence
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
             startPos.y += yOffset;
-            Debug.DrawRay(startPos, movement.normalized, Color.red, 1f / NetworkManager.NetworkTickSystem.TickRate);
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit lowerHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
             {
+                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                {
+                    break;
+                }
+
                 Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
@@ -154,7 +175,6 @@ namespace Vi.ArtificialIntelligence
                     break;
                 }
             }
-            movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
