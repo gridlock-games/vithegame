@@ -9,8 +9,6 @@ using Vi.ScriptableObjects;
 using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine.SceneManagement;
-using Firebase;
-using Firebase.Auth;
 
 namespace Vi.Core
 {
@@ -26,39 +24,10 @@ namespace Vi.Core
             }
         }
 
-        //public DependencyStatus dependencyStatus;
-        //private void Awake()
-        //{
-        //    _singleton = this;
-
-        //    // Check that all of the necessary dependencies for firebase are present on the system
-        //    FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        //    {
-        //        dependencyStatus = task.Result;
-
-        //        if (dependencyStatus == DependencyStatus.Available)
-        //        {
-        //            InitializeFirebase();
-        //        }
-        //        else
-        //        {
-        //            Debug.LogError("Could not resolve all firebase dependencies: " + dependencyStatus);
-        //        }
-        //    });
-        //}
-
-        //public FirebaseAuth auth;
-        //public FirebaseUser user;
-        //void InitializeFirebase()
-        //{
-        //    //Set the default instance object
-        //    auth = FirebaseAuth.DefaultInstance;
-
-        //    auth.StateChanged += AuthStateChanged;
-        //    AuthStateChanged(this, null);
-        //}
-
-
+        private void Awake()
+        {
+            _singleton = this;
+        }
 
         public bool PlayingOffine { get; private set; }
 
