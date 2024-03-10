@@ -4,10 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using Unity.Netcode;
 using UnityEngine.UI;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 using System.Net;
-using System.IO;
 
 namespace Vi.UI
 {
