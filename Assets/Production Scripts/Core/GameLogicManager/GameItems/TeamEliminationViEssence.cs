@@ -7,6 +7,8 @@ namespace Vi.Core.GameModeManagers
 {
     public class TeamEliminationViEssence : GameItem
     {
+        [SerializeField] private AudioClip spawnSound;
+
         private TeamEliminationManager teamEliminationManager;
         private DamageCircle damageCircle;
 
@@ -19,6 +21,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             Debug.Log(Time.time + " vi essence spawned " + transform.position);
+            AudioManager.Singleton.PlayClipAtPoint(spawnSound, transform.position);
         }
 
         private void OnTriggerEnter(Collider other)
