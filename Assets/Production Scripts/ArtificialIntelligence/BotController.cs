@@ -217,15 +217,15 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    //if (targetAttributes)
-                    //{
-                    //    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+                    if (targetAttributes)
+                    {
+                        if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
 
-                    //    if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                    //    {
-                    //        weaponHandler.SendMessage("OnLightAttack");
-                    //    }
-                    //}
+                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                        {
+                            weaponHandler.SendMessage("OnLightAttack");
+                        }
+                    }
                 }
             }
         }
