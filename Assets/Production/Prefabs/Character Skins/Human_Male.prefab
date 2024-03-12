@@ -2428,6 +2428,30 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!1 &835634195977579469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -650864807906968731, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 9038563066095030440}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9106368110657241312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835634195977579469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a07a06dd3ff6b040a7ed92ddbb674ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footStepSounds:
+  - {fileID: 8300000, guid: 15a5a7411a2075b4c8a19b3f59034c84, type: 3}
+  - {fileID: 8300000, guid: 8f17f9a2374181d4a90db86c50be7cd5, type: 3}
+  - {fileID: 8300000, guid: 7407bab63949a7044973fefba6f88e47, type: 3}
+  - {fileID: 8300000, guid: 48f3c03fb493b174398ef5f059a8e096, type: 3}
+  volume: 1
 --- !u!4 &1450975002032335795 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1635498069567685861, guid: b8e1729aa66c4542b0dfb77c151371ff,
