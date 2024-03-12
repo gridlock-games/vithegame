@@ -119,8 +119,6 @@ namespace Vi.Core
             if (rightHandReachRig) { RightHandFollowTarget = rightHandReachRig.GetComponentInChildren<FollowTarget>(); }
             if (leftHandReachRig) { LeftHandFollowTarget = leftHandReachRig.GetComponentInChildren<FollowTarget>(); }
 
-            if (rightLegRig) { rightLegFollowTarget = rightLegRig.GetComponentInChildren<FollowTarget>(); }
-
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
 
@@ -137,7 +135,7 @@ namespace Vi.Core
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
-        [Header("Upper Body IK Settings")]
+        [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
         [SerializeField] private MultiAimConstraint rightHandAimBodyConstraint;
@@ -149,10 +147,6 @@ namespace Vi.Core
         [SerializeField] private MultiAimConstraint leftHandAimConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
-        [Header("Lower Body IK Settings")]
-        [SerializeField] private RigWeightTarget rightLegRig;
-
-        private FollowTarget rightLegFollowTarget;
 
         public enum BodyAimType
         {
