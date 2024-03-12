@@ -6,7 +6,15 @@ namespace Vi.Core
 {
     public class AudioManager : MonoBehaviour
     {
-        public GameObject audioSourcePrefab;
+        [SerializeField] private GameObject audioSourcePrefab;
+        [SerializeField] private MusicClip[] musicClips;
+
+        [System.Serializable]
+        private struct MusicClip
+        {
+            public string sceneNameToPlay;
+            public AudioClip song;
+        }
 
         private static List<AudioSource> audioSources = new List<AudioSource>();
         private static AudioManager _singleton;

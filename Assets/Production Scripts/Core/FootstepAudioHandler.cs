@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -9,15 +10,36 @@ namespace Vi.Core
         [SerializeField] private AudioClip[] footStepSounds;
         [SerializeField] private float volume = 1;
 
-        Vector3 lastFootstepPosition;
-        private void OnCollisionEnter(Collision collision)
+        NetworkObject networkObject;
+        private void Awake()
         {
-            if (collision.transform.root == transform.root) { return; }
-            if (collision.relativeVelocity.magnitude < 1) { return; }
-            if (Vector3.Distance(collision.GetContact(0).point, lastFootstepPosition) < 1) { return; }
+            networkObject = GetComponentInParent<NetworkObject>();
+        }
 
-            AudioManager.Singleton.PlayClipAtPoint(footStepSounds[Random.Range(0, footStepSounds.Length)], collision.GetContact(0).point, volume);
-            lastFootstepPosition = collision.GetContact(0).point;
+        private bool footRaised;
+        private void LateUpdate()
+        {
+            if (!networkObject.IsSpawned) { return; }
+
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            {
+                if (footRaised)
+                {
+                    if (hit.distance <= 0.15f)
+                    {
+                        AudioManager.Singleton.PlayClipAtPoint(footStepSounds[Random.Range(0, footStepSounds.Length)], transform.position, volume);
+                        footRaised = false;
+                    }
+                }
+                else
+                {
+                    footRaised = hit.distance > 0.15f;
+                }
+            }
+            else
+            {
+                footRaised = true;
+            }
         }
     }
 }

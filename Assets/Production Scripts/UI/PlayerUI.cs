@@ -9,6 +9,7 @@ using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
 using UnityEngine.InputSystem.OnScreen;
+using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
