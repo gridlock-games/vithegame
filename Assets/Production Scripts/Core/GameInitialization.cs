@@ -25,14 +25,15 @@ namespace Vi.Core
 
         private void Start()
         {
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
-            {
-                FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-            });
-
             Application.targetFrameRate = Screen.currentResolution.refreshRate;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
+
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
+            {
+                FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
+                Debug.Log("Firebase Loading Complete");
+            });
         }
 
         private void InitializePlayerPrefs()
