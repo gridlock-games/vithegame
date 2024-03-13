@@ -5,6 +5,8 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
+using Firebase;
+using Firebase.Analytics;
 
 namespace Vi.Core
 {
@@ -23,6 +25,11 @@ namespace Vi.Core
 
         private void Start()
         {
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
+            {
+                FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
+            });
+
             Application.targetFrameRate = Screen.currentResolution.refreshRate;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
