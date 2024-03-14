@@ -5,6 +5,7 @@ using Vi.Core;
 using Unity.Netcode;
 using UnityEngine.UI;
 using System.Net;
+using Firebase.Auth;
 
 namespace Vi.UI
 {
@@ -12,7 +13,9 @@ namespace Vi.UI
     {
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private ContentManager contentManager;
+        [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
+        [SerializeField] private Button googleSignInButton;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
@@ -164,10 +167,41 @@ namespace Vi.UI
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
         }
 
+        private string googleWebClientId = "583444002427-2496ljq7in3noe48o0nrllktt9e5r2ti.apps.googleusercontent.com";
+
+        public IEnumerator LoginWithGoogle()
+        {
+            Debug.Log("Attempting login with google");
+
+            //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
+            Credential credential = GoogleAuthProvider.GetCredential(null, googleWebClientId);
+            auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task => {
+                if (task.IsCanceled)
+                {
+                    Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+                    return;
+                }
+
+                Firebase.Auth.AuthResult result = task.Result;
+                Debug.LogFormat("User signed in successfully: {0} ({1})",
+                    result.User.DisplayName, result.User.UserId);
+            });
+
+
+            yield return null;
+        }
+
         public void Logout()
         {
             WebRequestManager.Singleton.Logout();
         }
+
+        private FirebaseAuth auth;
 
         private void Start()
         {
@@ -175,6 +209,9 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
+
+            googleSignInButton.onClick.AddListener(() => StartCoroutine(LoginWithGoogle()));
+            auth = FirebaseAuth.DefaultInstance;
         }
 
         private void Update()
