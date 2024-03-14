@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using System.Net;
 using Firebase.Auth;
+using Vi.UI.SimpleGoogleSignIn;
 
 namespace Vi.UI
 {
@@ -168,30 +169,63 @@ namespace Vi.UI
         }
 
         private string googleWebClientId = "583444002427-2496ljq7in3noe48o0nrllktt9e5r2ti.apps.googleusercontent.com";
+        private string googleWebSecretId = "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";
 
         public IEnumerator LoginWithGoogle()
         {
             Debug.Log("Attempting login with google");
 
-            //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
-            Credential credential = GoogleAuthProvider.GetCredential(null, googleWebClientId);
-            auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task => {
-                if (task.IsCanceled)
-                {
-                    Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
-                    return;
-                }
-                if (task.IsFaulted)
-                {
-                    Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
-                    return;
-                }
+            GoogleAuth.Auth(googleWebClientId, googleWebSecretId, (success, error, info) =>
+            {
+                Debug.Log(success);
+                Debug.Log(error);
+                Debug.Log(info);
 
-                Firebase.Auth.AuthResult result = task.Result;
-                Debug.LogFormat("User signed in successfully: {0} ({1})",
-                    result.User.DisplayName, result.User.UserId);
+                //if (success)
+                //{
+                //    //Check if data already exist in firebase. data equal to null post new data.
+                //    RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
+                //    {
+                //        var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
+                //        if (data == null)
+                //        {
+                //            data = new UserModel
+                //            {
+                //                account_name = info.name,
+                //                email = info.email,
+                //                display_picture = info.picture,
+                //                date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
+                //                last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+                //            };
+                //            datamanager.PostUserdata(data);
+                //            return;
+                //        }
+                //        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+                //        datamanager.PostUserdata(data);
+                //    });
+                //}
+                //if Google login fail
+                //Debug.LogError(error);
             });
 
+            //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
+            //Credential credential = GoogleAuthProvider.GetCredential(null, googleWebClientId);
+            //auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task => {
+            //    if (task.IsCanceled)
+            //    {
+            //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+            //        return;
+            //    }
+            //    if (task.IsFaulted)
+            //    {
+            //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+            //        return;
+            //    }
+
+            //    AuthResult result = task.Result;
+            //    Debug.LogFormat("User signed in successfully: {0} ({1})",
+            //        result.User.DisplayName, result.User.UserId);
+            //});
 
             yield return null;
         }
