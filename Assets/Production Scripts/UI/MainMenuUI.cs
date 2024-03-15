@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Net;
 using Firebase.Auth;
 using Vi.UI.SimpleGoogleSignIn;
+using Proyecto26;
 
 namespace Vi.UI
 {
@@ -168,64 +169,80 @@ namespace Vi.UI
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
         }
 
-        private string googleWebClientId = "583444002427-2496ljq7in3noe48o0nrllktt9e5r2ti.apps.googleusercontent.com";
-        private string googleWebSecretId = "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";
+        //private string googleWebClientId = "583444002427-2496ljq7in3noe48o0nrllktt9e5r2ti.apps.googleusercontent.com";
+        //private string googleWebSecretId = "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";
 
+        private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
+        private const string googleSignInSecretId = "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";
+
+        private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
         public IEnumerator LoginWithGoogle()
         {
             Debug.Log("Attempting login with google");
 
-            GoogleAuth.Auth(googleWebClientId, googleWebSecretId, (success, error, info) =>
+            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, info, tokenExchangeResponse) =>
             {
-                Debug.Log(success);
-                Debug.Log(error);
-                Debug.Log(info);
+                //Debug.Log(tokenExchangeResponse.access_token);
+                //Debug.Log(tokenExchangeResponse.expires_in);
+                //Debug.Log(tokenExchangeResponse.refresh_token);
+                //Debug.Log(tokenExchangeResponse.scope);
+                //Debug.Log(tokenExchangeResponse.token_type);
 
-                //if (success)
-                //{
-                //    //Check if data already exist in firebase. data equal to null post new data.
-                //    RestClient.Get($"{datamanager.firebaseURL}.json", (exception, helper) =>
-                //    {
-                //        var data = AuthHelper.GetUserData(helper.Text, info.email, datamanager.secretId);
-                //        if (data == null)
-                //        {
-                //            data = new UserModel
-                //            {
-                //                account_name = info.name,
-                //                email = info.email,
-                //                display_picture = info.picture,
-                //                date_created = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
-                //                last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
-                //            };
-                //            datamanager.PostUserdata(data);
-                //            return;
-                //        }
-                //        data.last_login = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
-                //        datamanager.PostUserdata(data);
-                //    });
-                //}
-                //if Google login fail
-                //Debug.LogError(error);
+                if (success)
+                {
+                    //var token = tokenExchangeResponse.refresh_token;
+                    //var providerId = "google.com";
+
+                    //var payLoad = $"{{\"postBody\":\"id_token={token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
+                    //RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payLoad).Then(
+                    //    response =>
+                    //    {
+                    //        // You now have the userId (localId) and the idToken of the user!
+                    //        Debug.Log(response.Text);
+                    //    }).Catch(Debug.Log);
+
+                    //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
+                    // , tokenExchangeResponse.access_token
+                    //Credential credential = GoogleAuthProvider.GetCredential(tokenExchangeResponse.refresh_token, null);
+                    //auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
+                    //{
+                    //    if (task.IsCanceled)
+                    //    {
+                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+                    //        return;
+                    //    }
+                    //    if (task.IsFaulted)
+                    //    {
+                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+                    //        return;
+                    //    }
+
+                    //    Debug.Log("Successful sign in");
+                    //});
+
+                    //auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
+                    //{
+                    //    if (task.IsCanceled)
+                    //    {
+                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+                    //        return;
+                    //    }
+                    //    if (task.IsFaulted)
+                    //    {
+                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+                    //        return;
+                    //    }
+
+                    //    AuthResult result = task.Result;
+                    //    Debug.LogFormat("User signed in successfully: {0} ({1})",
+                    //        result.User.DisplayName, result.User.UserId);
+                    //});
+                }
+                else
+                {
+                    Debug.LogError("Google sign in error - " + error);
+                }
             });
-
-            //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
-            //Credential credential = GoogleAuthProvider.GetCredential(null, googleWebClientId);
-            //auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task => {
-            //    if (task.IsCanceled)
-            //    {
-            //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
-            //        return;
-            //    }
-            //    if (task.IsFaulted)
-            //    {
-            //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
-            //        return;
-            //    }
-
-            //    AuthResult result = task.Result;
-            //    Debug.LogFormat("User signed in successfully: {0} ({1})",
-            //        result.User.DisplayName, result.User.UserId);
-            //});
 
             yield return null;
         }
@@ -264,7 +281,7 @@ namespace Vi.UI
                     StartLobbyServer();
                 }
             }
-            
+
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
 
             if (!initialParent.activeSelf)
@@ -277,7 +294,7 @@ namespace Vi.UI
                 authenticationParent.SetActive(false);
                 playParent.SetActive(false);
             }
-            
+
             welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }

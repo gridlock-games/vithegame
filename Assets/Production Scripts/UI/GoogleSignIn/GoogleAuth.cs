@@ -2,6 +2,8 @@
 using System.Collections.Specialized;
 using UnityEngine;
 using UnityEngine.Networking;
+using Proyecto26;
+using System.Collections.Generic;
 
 namespace Vi.UI.SimpleGoogleSignIn
 {
@@ -20,11 +22,11 @@ namespace Vi.UI.SimpleGoogleSignIn
         private static string _redirectUri;
         private static string _state;
         private static string _codeVerifier;
-        private static Action<bool, string, UserInfo> _callback;
+        private static Action<bool, string, UserInfo, TokenExchangeResponse> _callback;
 
         #if UNITY_STANDALONE || UNITY_EDITOR
 
-        public static void Auth(string clientId, string clientSecret, Action<bool, string, UserInfo> callback)
+        public static void Auth(string clientId, string clientSecret, Action<bool, string, UserInfo, TokenExchangeResponse> callback)
         {
             _clientId = clientId;
             _clientSecret = clientSecret;
@@ -127,7 +129,7 @@ namespace Vi.UI.SimpleGoogleSignIn
             var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);
             var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
 
-            Debug.Log("authorizationRequest=" + authorizationRequest);
+            //Debug.Log("authorizationRequest=" + authorizationRequest);
             Application.OpenURL(authorizationRequest);
         }
 
@@ -137,7 +139,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
             if (error != null)
             {
-                _callback?.Invoke(false, error, null);
+                _callback?.Invoke(false, error, null, null);
                 return;
             }
 
@@ -177,48 +179,102 @@ namespace Vi.UI.SimpleGoogleSignIn
             {
                 if (request.error == null)
                 {
-                    Debug.Log("CodeExchange=" + request.downloadHandler.text);
+                    //Debug.Log("CodeExchange=" + request.downloadHandler.text);
 
                     var exchangeResponse = JsonUtility.FromJson<TokenExchangeResponse>(request.downloadHandler.text);
                     var accessToken = exchangeResponse.access_token;
 
-                    RequestUserInfo(accessToken, _callback);
+                    RequestUserInfo(exchangeResponse, _callback);
                 }
                 else
                 {
-                    _callback(false, request.error, null);
+                    _callback(false, request.error, null, null);
                 }
             };
+
+            RestClient.Request(new RequestHelper
+            {
+                Method = "POST",
+                Uri = "https://oauth2.googleapis.com/token",
+                Params = new Dictionary<string, string>
+            {
+                {"client_id", _clientId},
+                {"client_secret", _clientSecret},
+                {"code", code},
+                {"code_verifier", codeVerifier},
+                {"grant_type","authorization_code"},
+                {"redirect_uri", _redirectUri}
+            }
+            }).Then(
+            response =>
+            {
+                //Debug.Log(response.Text);
+
+                GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleIdTokenResponse>(response.Text);
+                //Debug.Log(data.id_token);
+                //var data = StringSerializationAPI.Deserialize(typeof(GoogleIdTokenResponse), response.Text) as GoogleIdTokenResponse;
+                //callback(data.id_token);
+
+                var token = data.id_token;
+                var providerId = "google.com";
+
+                var payLoad =
+            $"{{\"postBody\":\"id_token={token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
+                RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payLoad).Then(
+                    response =>
+                    {
+                    // You now have the userId (localId) and the idToken of the user!
+                    Debug.Log(response.Text);
+                    }).Catch(Debug.LogError);
+
+            }).Catch(Debug.LogError);
+
         }
 
-        internal class TokenExchangeResponse
+        private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
+
+        /// <summary>
+        /// Response object to exchanging the Google Auth Code with the Id Token
+        /// </summary>
+        [Serializable]
+        public class GoogleIdTokenResponse
         {
             public string access_token;
-            //public int expires_in;
-            //public string refresh_token;
-            //public string scope;
-            //public string token_type;
+            public int expires_in;
+            public string id_token;
+            public string refresh_token;
+            public string scope;
+            public string token_type;
+        }
+
+        public class TokenExchangeResponse
+        {
+            public string access_token;
+            public int expires_in;
+            public string refresh_token;
+            public string scope;
+            public string token_type;
         }
 
         /// <summary>
         /// You can move this function to your backend for more security.
         /// </summary>
-        public static void RequestUserInfo(string accessToken, Action<bool, string, UserInfo> callback)
+        public static void RequestUserInfo(TokenExchangeResponse tokenExchangeResponse, Action<bool, string, UserInfo, TokenExchangeResponse> callback)
         {
             var request = UnityWebRequest.Get(UserInfoEndpoint);
 
-            request.SetRequestHeader("Authorization", $"Bearer {accessToken}");
+            request.SetRequestHeader("Authorization", $"Bearer {tokenExchangeResponse.access_token}");
             request.SendWebRequest().completed += _ =>
             {
                 if (request.error == null)
                 {
                     var userInfo = JsonUtility.FromJson<UserInfo>(request.downloadHandler.text);
 
-                    callback(true, null, userInfo);
+                    callback(true, null, userInfo, tokenExchangeResponse);
                 }
                 else
                 {
-                    callback(false, request.error, null);
+                    callback(false, request.error, null, tokenExchangeResponse);
                 }
             };
         }

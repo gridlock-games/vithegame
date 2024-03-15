@@ -46,7 +46,7 @@ namespace Vi.UI.SimpleGoogleSignIn
             #endif
         }
 
-        private void AuthCallback(bool success, string error, UserInfo userInfo)
+        private void AuthCallback(bool success, string error, UserInfo userInfo, GoogleAuth.TokenExchangeResponse accessToken)
         {
             if (success)
             {
