@@ -184,20 +184,20 @@ namespace Vi.UI
             {
                 if (success)
                 {
-                    string providerId = "google.com";
-                    string payload = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
-                    Debug.Log(payload);
+                    //string providerId = "google.com";
+                    //string payload = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
+                    //Debug.Log(payload);
 
-                    RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payload).Then(
-                        response =>
-                        {
-                            // You now have the userId (localId) and the idToken of the user!
-                            Debug.Log(response.Text);
-                        }).Catch(Debug.LogError);
-                    
+                    //RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payload).Then(
+                    //    response =>
+                    //    {
+                    //        // You now have the userId (localId) and the idToken of the user!
+                    //        Debug.Log(response.Text);
+                    //    }).Catch(Debug.LogError);
+
 
                     //Debug.Log(tokenData.id_token);
-                    //Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+                    Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
                     //auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
                     //{
                     //    if (task.IsCanceled)
@@ -214,29 +214,28 @@ namespace Vi.UI
                     //    Debug.Log("Successful sign in");
                     //});
 
-                    //auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
-                    //{
-                    //    if (task.IsCanceled)
-                    //    {
-                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
-                    //        return;
-                    //    }
-                    //    if (task.IsFaulted)
-                    //    {
-                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
-                    //        return;
-                    //    }
+                    auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
+                    {
+                        if (task.IsCanceled)
+                        {
+                            Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+                            return;
+                        }
+                        if (task.IsFaulted)
+                        {
+                            Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+                            return;
+                        }
 
-                    //    AuthResult result = task.Result;
-                    //    Debug.LogFormat("User signed in successfully: {0} ({1})",
-                    //        result.User.DisplayName, result.User.UserId);
-                    //});
+                        AuthResult result = task.Result;
+                        Debug.LogFormat("User signed in successfully: {0} ({1})",
+                            result.User.DisplayName, result.User.UserId);
+                    });
                 }
                 else
                 {
                     Debug.LogError("Google sign in error - " + error);
                 }
-                Debug.Log("Callback finished");
             });
 
             yield return null;
