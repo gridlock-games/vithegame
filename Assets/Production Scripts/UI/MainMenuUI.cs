@@ -17,7 +17,7 @@ namespace Vi.UI
         [SerializeField] private ContentManager contentManager;
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
-        [SerializeField] private Button googleSignInButton;
+        [SerializeField] private Text initialErrorText;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
@@ -87,7 +87,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
-        public void PlayOnline()
+        public void LoginWithVi()
         {
             if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
             if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
@@ -95,7 +95,6 @@ namespace Vi.UI
             viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
-            WebRequestManager.Singleton.SetPlayingOffline(false);
 
             emailInput.gameObject.SetActive(false);
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
@@ -113,19 +112,12 @@ namespace Vi.UI
             viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
-            WebRequestManager.Singleton.SetPlayingOffline(false);
 
             emailInput.gameObject.SetActive(true);
             loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
 
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
-        }
-
-        public void PlayOffline()
-        {
-            WebRequestManager.Singleton.SetPlayingOffline(true);
-            GoToCharacterSelect();
         }
 
         public void ReturnToInitialElements()
@@ -169,51 +161,17 @@ namespace Vi.UI
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
         }
 
-        //private string googleWebClientId = "583444002427-2496ljq7in3noe48o0nrllktt9e5r2ti.apps.googleusercontent.com";
-        //private string googleWebSecretId = "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";
-
         private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
         private const string googleSignInSecretId = "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";
 
-        private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
-        public IEnumerator LoginWithGoogle()
+        //private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
+        public void LoginWithGoogle()
         {
-            Debug.Log("Attempting login with google");
-
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, info, tokenData) =>
             {
                 if (success)
                 {
-                    //string providerId = "google.com";
-                    //string payload = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
-                    //Debug.Log(payload);
-
-                    //RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payload).Then(
-                    //    response =>
-                    //    {
-                    //        // You now have the userId (localId) and the idToken of the user!
-                    //        Debug.Log(response.Text);
-                    //    }).Catch(Debug.LogError);
-
-
-                    //Debug.Log(tokenData.id_token);
                     Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
-                    //auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
-                    //{
-                    //    if (task.IsCanceled)
-                    //    {
-                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
-                    //        return;
-                    //    }
-                    //    if (task.IsFaulted)
-                    //    {
-                    //        Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
-                    //        return;
-                    //    }
-
-                    //    Debug.Log("Successful sign in");
-                    //});
-
                     auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
                     {
                         if (task.IsCanceled)
@@ -237,8 +195,16 @@ namespace Vi.UI
                     Debug.LogError("Google sign in error - " + error);
                 }
             });
+        }
 
-            yield return null;
+        public void LoginWithFacebook()
+        {
+            initialErrorText.text = "Facebook not implemented yet";
+        }
+
+        public void LoginWithApple()
+        {
+            initialErrorText.text = "Apple not implemented yet";
         }
 
         public void Logout()
@@ -254,9 +220,8 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
-
-            googleSignInButton.onClick.AddListener(() => StartCoroutine(LoginWithGoogle()));
             auth = FirebaseAuth.DefaultInstance;
+            initialErrorText.text = "";
         }
 
         private void Update()

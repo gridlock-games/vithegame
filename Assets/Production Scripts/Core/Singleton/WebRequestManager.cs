@@ -29,14 +29,6 @@ namespace Vi.Core
             _singleton = this;
         }
 
-        public bool PlayingOffine { get; private set; }
-
-        public void SetPlayingOffline(bool shouldBeOffline)
-        {
-            if (!SceneManager.GetSceneByName("Main Menu").isLoaded) { Debug.LogError("You are calling WebRequestManager.SetPlayingOffline() when the main menu scene isn't loaded!"); return; }
-            PlayingOffine = shouldBeOffline;
-        }
-
         private const string APIURL = "154.90.35.191/";
 
         public bool IsRefreshingServers { get; private set; }
@@ -533,50 +525,39 @@ namespace Vi.Core
         public void RefreshCharacters() { StartCoroutine(CharacterGetRequest()); }
         private IEnumerator CharacterGetRequest()
         {
-            if (PlayingOffine)
-            {
-                Characters.Clear();
-                if (PlayerPrefs.HasKey("OfflineCharacter"))
-                {
-                    Characters.Add(JsonConvert.DeserializeObject<CharacterJson>(PlayerPrefs.GetString("OfflineCharacter")).ToCharacter());
-                }
-            }
-            else
-            {
-                if (IsRefreshingCharacters) { yield break; }
-                IsRefreshingCharacters = true;
-                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
-                yield return getRequest.SendWebRequest();
+            if (IsRefreshingCharacters) { yield break; }
+            IsRefreshingCharacters = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
+            yield return getRequest.SendWebRequest();
 
-                Characters.Clear();
-                if (getRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
-                    getRequest.Dispose();
-                    yield break;
-                }
-                string json = getRequest.downloadHandler.text;
-                try
-                {
-                    foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
-                    {
-                        Characters.Add(jsonStruct.ToCharacter());
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError(e);
-                }
-
+            Characters.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
                 getRequest.Dispose();
-
-                foreach (Character character in Characters)
-                {
-                    yield return GetCharacterInventory(character._id.ToString());
-                }
-
-                IsRefreshingCharacters = false;
+                yield break;
             }
+            string json = getRequest.downloadHandler.text;
+            try
+            {
+                foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                {
+                    Characters.Add(jsonStruct.ToCharacter());
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(e);
+            }
+
+            getRequest.Dispose();
+
+            foreach (Character character in Characters)
+            {
+                yield return GetCharacterInventory(character._id.ToString());
+            }
+
+            IsRefreshingCharacters = false;
         }
 
         public bool IsGettingCharacterById { get; private set; }
@@ -585,73 +566,58 @@ namespace Vi.Core
 
         private IEnumerator CharacterByIdGetRequest(string characterId)
         {
-            if (PlayingOffine)
-            {
-                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(PlayerPrefs.GetString("OfflineCharacter")).ToCharacter();
-            }
-            else
-            {
-                if (IsGettingCharacterById) { yield break; }
-                IsGettingCharacterById = true;
-                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
-                yield return getRequest.SendWebRequest();
+            if (IsGettingCharacterById) { yield break; }
+            IsGettingCharacterById = true;
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
+            yield return getRequest.SendWebRequest();
 
-                if (getRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
-                    getRequest.Dispose();
-                    yield break;
-                }
-                string json = getRequest.downloadHandler.text;
-                try
-                {
-                    CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
-                }
-                catch
-                {
-                    CharacterById = GetDefaultCharacter();
-                }
-
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
                 getRequest.Dispose();
-
-                yield return GetCharacterInventory(CharacterById._id.ToString());
-
-                IsGettingCharacterById = false;
+                yield break;
             }
+            string json = getRequest.downloadHandler.text;
+            try
+            {
+                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
+            }
+            catch
+            {
+                CharacterById = GetDefaultCharacter();
+            }
+
+            getRequest.Dispose();
+
+            yield return GetCharacterInventory(CharacterById._id.ToString());
+
+            IsGettingCharacterById = false;
         }
 
         public IEnumerator UpdateCharacterCosmetics(Character character)
         {
-            if (PlayingOffine)
-            {
-                character._id = "OfflineCharacter";
-                PlayerPrefs.SetString("OfflineCharacter", JsonConvert.SerializeObject(ToCharacterJson(character)));
-            }
-            else
-            {
-                CharacterCosmeticPutPayload payload = new CharacterCosmeticPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
-                character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
+            CharacterCosmeticPutPayload payload = new CharacterCosmeticPutPayload(character._id.ToString(), character.slot, character.eyeColor.ToString(), character.hair.ToString(),
+            character.bodyColor.ToString(), character.beard.ToString(), character.brows.ToString(), character.name.ToString(), character.model.ToString());
 
-                string json = JsonUtility.ToJson(payload);
-                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-                UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
-
-                if (putRequest.result != UnityWebRequest.Result.Success)
-                {
-                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
-                    putRequest.SetRequestHeader("Content-Type", "application/json");
-                    yield return putRequest.SendWebRequest();
-                }
-
-                if (putRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
-                }
-                putRequest.Dispose();
             }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterCosmetics()" + putRequest.error);
+            }
+            putRequest.Dispose();
         }
 
         //public List<InventoryItem> InventoryItems { get; private set; } = new List<InventoryItem>();
@@ -804,93 +770,78 @@ namespace Vi.Core
 
         public IEnumerator CharacterPostRequest(Character character)
         {
-            if (PlayingOffine)
-            {
-                character._id = "OfflineCharacter";
-                PlayerPrefs.SetString("OfflineCharacter", JsonConvert.SerializeObject(ToCharacterJson(character)));
-            }
-            else
-            {
-                CharacterPostPayload payload = new CharacterPostPayload(character);
+            CharacterPostPayload payload = new CharacterPostPayload(character);
 
-                string json = JsonConvert.SerializeObject(payload);
-                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
                 postRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return postRequest.SendWebRequest();
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                    postRequest.SetRequestHeader("Content-Type", "application/json");
-                    yield return postRequest.SendWebRequest();
-                }
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
-                }
-
-                yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
-                Loadout defaultLoadout = GetDefaultLoadout();
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.helmGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.shouldersGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.chestArmorGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.glovesGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.beltGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.robeGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.bootsGearItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon1ItemId.ToString()); }
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon2ItemId.ToString()); }
-
-                yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
-                defaultLoadout.loadoutSlot = "2";
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
-                defaultLoadout.loadoutSlot = "3";
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
-                defaultLoadout.loadoutSlot = "4";
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
-
-                yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
-
-                postRequest.Dispose();
             }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+            }
+
+            yield return GetCharacterInventory(postRequest.downloadHandler.text);
+
+            Loadout defaultLoadout = GetDefaultLoadout();
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.helmGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.shouldersGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.chestArmorGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.glovesGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.beltGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.robeGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.bootsGearItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon1ItemId.ToString()); }
+            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon2ItemId.ToString()); }
+
+            yield return GetCharacterInventory(postRequest.downloadHandler.text);
+
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+            defaultLoadout.loadoutSlot = "2";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+            defaultLoadout.loadoutSlot = "3";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+            defaultLoadout.loadoutSlot = "4";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout);
+
+            yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
+
+            postRequest.Dispose();
         }
 
         public IEnumerator CharacterDisableRequest(string characterId)
         {
-            if (PlayingOffine)
-            {
-                PlayerPrefs.DeleteKey("OfflineCharacter");
-            }
-            else
-            {
-                CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
+            CharacterDisablePayload payload = new CharacterDisablePayload(characterId);
 
-                string json = JsonUtility.ToJson(payload);
-                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-                UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
-
-                if (putRequest.result != UnityWebRequest.Result.Success)
-                {
-                    putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
-                    putRequest.SetRequestHeader("Content-Type", "application/json");
-                    yield return putRequest.SendWebRequest();
-                }
-
-                if (putRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
-                }
-                putRequest.Dispose();
             }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.CharacterDisableRequest()" + putRequest.error);
+            }
+            putRequest.Dispose();
         }
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout(), GetDefaultLoadout(), GetDefaultLoadout(), GetDefaultLoadout(), CharacterReference.RaceAndGender.HumanMale); }

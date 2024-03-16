@@ -73,7 +73,7 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
@@ -94,7 +94,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            addCharacterButton.interactable = WebRequestManager.Singleton.PlayingOffine ? WebRequestManager.Singleton.Characters.Count < 1 : WebRequestManager.Singleton.Characters.Count < 5;
+            addCharacterButton.interactable = WebRequestManager.Singleton.Characters.Count < 5;
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
@@ -307,7 +307,7 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & !WebRequestManager.Singleton.PlayingOffine;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
@@ -363,7 +363,6 @@ namespace Vi.UI
         private GameObject previewObject;
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
-            selectCharacterButton.interactable = !WebRequestManager.Singleton.PlayingOffine;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
