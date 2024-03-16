@@ -231,12 +231,12 @@ namespace Vi.UI
 
         public void LoginWithFacebook()
         {
-            initialErrorText.text = "Facebook not implemented yet";
+            initialErrorText.text = "Facebook sign in not implemented yet";
         }
 
         public void LoginWithApple()
         {
-            initialErrorText.text = "Apple not implemented yet";
+            initialErrorText.text = "Apple sign in not implemented yet";
         }
 
         public void Logout()
