@@ -46,16 +46,16 @@ namespace Vi.UI.SimpleGoogleSignIn
             #endif
         }
 
-        private void AuthCallback(bool success, string error, UserInfo userInfo, GoogleAuth.GoogleIdTokenResponse accessToken)
+        private void AuthCallback(bool success, string error, GoogleAuth.GoogleIdTokenResponse accessToken)
         {
-            if (success)
-            {
-                Output.text = $"Hello, {userInfo.name}!";
-            }
-            else
-            {
-                Output.text = error;
-            }
+            //if (success)
+            //{
+            //    Output.text = $"Hello, {userInfo.name}!";
+            //}
+            //else
+            //{
+            //    Output.text = error;
+            //}
         }
 
         public void Navigate(string url)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
 using UnityEngine;
-using UnityEngine.Networking;
 using Proyecto26;
 using System.Collections.Generic;
 
@@ -13,8 +12,6 @@ namespace Vi.UI.SimpleGoogleSignIn
     public static partial class GoogleAuth
     {
         private const string AuthorizationEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
-        private const string TokenEndpoint = "https://www.googleapis.com/oauth2/v4/token";
-        private const string UserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
         private const string AccessScope = "openid email profile";
 
         private static string _clientId;
@@ -22,11 +19,9 @@ namespace Vi.UI.SimpleGoogleSignIn
         private static string _redirectUri;
         private static string _state;
         private static string _codeVerifier;
-        private static Action<bool, string, UserInfo, GoogleIdTokenResponse> _callback;
+        private static Action<bool, string, GoogleIdTokenResponse> _callback;
 
-        #if UNITY_STANDALONE || UNITY_EDITOR
-
-        public static void Auth(string clientId, string clientSecret, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
+        public static void Auth(string clientId, string clientSecret, Action<bool, string, GoogleIdTokenResponse> callback)
         {
             _clientId = clientId;
             _clientSecret = clientSecret;
@@ -72,55 +67,6 @@ namespace Vi.UI.SimpleGoogleSignIn
             HandleAuthResponse(context.Request.QueryString);
         }
 
-#elif UNITY_WSA || UNITY_ANDROID || UNITY_IOS
-
-        static GoogleAuth()
-        {
-            Application.deepLinkActivated += deepLink =>
-            {
-                Debug.Log("Application.deepLinkActivated=" + deepLink);
-                HandleAuthResponse(Utils.ParseQueryString(deepLink));
-            };
-        }
-
-        public static void Auth(string clientId, string protocol, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
-        {
-#if UNITY_EDITOR
-
-            Debug.LogWarning("Deep links don't work inside Editor.");
-
-#endif
-
-            _clientId = clientId;
-            _callback = callback;
-            _redirectUri = $"{protocol}:/oauth2callback";
-            
-            Auth();
-        }
-
-#elif UNITY_WEBGL
-
-        public static void Auth(string clientId, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
-        {
-            _clientId = clientId;
-            _callback = callback;
-            _redirectUri = Application.absoluteURL;
-
-            var accessToken = Utils.ParseQueryString(Application.absoluteURL).Get("access_token");
-
-            if (accessToken == null)
-            {
-                Application.OpenURL($"{AuthorizationEndpoint}?response_type=token&scope={AccessScope}&redirect_uri={_redirectUri}&client_id={_clientId}");
-            }
-            else
-            {
-                Debug.Log($"Access token extracted from Application.absoluteURL: {accessToken}");
-                RequestUserInfo(accessToken, callback);
-            }
-        }
-
-#endif
-
         private static void Auth()
         {
             _state = Guid.NewGuid().ToString();
@@ -139,7 +85,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
             if (error != null)
             {
-                _callback?.Invoke(false, error, null, null);
+                _callback?.Invoke(false, error, null);
                 return;
             }
 
@@ -161,37 +107,6 @@ namespace Vi.UI.SimpleGoogleSignIn
 
         private static void PerformCodeExchange(string code, string codeVerifier)
         {
-            var form = new WWWForm();
-
-            form.AddField("code", code);
-            form.AddField("redirect_uri", _redirectUri);
-            form.AddField("client_id", _clientId);
-            form.AddField("code_verifier", codeVerifier);
-
-            if (_clientSecret != null) form.AddField("client_secret", _clientSecret);
-
-            form.AddField("scope", AccessScope);
-            form.AddField("grant_type", "authorization_code");
-
-            var request = UnityWebRequest.Post(TokenEndpoint, form);
-
-            //request.SendWebRequest().completed += _ =>
-            //{
-            //    if (request.error == null)
-            //    {
-            //        //Debug.Log("CodeExchange=" + request.downloadHandler.text);
-
-            //        var exchangeResponse = JsonUtility.FromJson<TokenExchangeResponse>(request.downloadHandler.text);
-            //        var accessToken = exchangeResponse.access_token;
-
-            //        RequestUserInfo(exchangeResponse, _callback);
-            //    }
-            //    else
-            //    {
-            //        _callback(false, request.error, null, null);
-            //    }
-            //};
-
             RestClient.Request(new RequestHelper
             {
                 Method = "POST",
@@ -209,13 +124,9 @@ namespace Vi.UI.SimpleGoogleSignIn
             response =>
             {
                 GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleIdTokenResponse>(response.Text);
-                _callback(true, null, null, data);
-
+                _callback(true, null, data);
             }).Catch(Debug.LogError);
-
         }
-
-        private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
 
         /// <summary>
         /// Response object to exchanging the Google Auth Code with the Id Token
@@ -229,38 +140,6 @@ namespace Vi.UI.SimpleGoogleSignIn
             public string refresh_token;
             public string scope;
             public string token_type;
-        }
-
-        public class TokenExchangeResponse
-        {
-            public string access_token;
-            public int expires_in;
-            public string refresh_token;
-            public string scope;
-            public string token_type;
-        }
-
-        /// <summary>
-        /// You can move this function to your backend for more security.
-        /// </summary>
-        public static void RequestUserInfo(TokenExchangeResponse tokenExchangeResponse, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
-        {
-            var request = UnityWebRequest.Get(UserInfoEndpoint);
-
-            request.SetRequestHeader("Authorization", $"Bearer {tokenExchangeResponse.access_token}");
-            request.SendWebRequest().completed += _ =>
-            {
-                if (request.error == null)
-                {
-                    var userInfo = JsonUtility.FromJson<UserInfo>(request.downloadHandler.text);
-
-                    callback(true, null, userInfo, null);
-                }
-                else
-                {
-                    callback(false, request.error, null, null);
-                }
-            };
         }
     }
 }

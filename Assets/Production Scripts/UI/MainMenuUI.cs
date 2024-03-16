@@ -164,10 +164,9 @@ namespace Vi.UI
         private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
         private const string googleSignInSecretId = "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";
 
-        //private const string ApiKey = "AIzaSyCE3jLUaLV1v3lAxzuPofS0oRDh_Ly9-s0";
         public void LoginWithGoogle()
         {
-            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, info, tokenData) =>
+            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
                 {
@@ -176,12 +175,13 @@ namespace Vi.UI
                     {
                         if (task.IsCanceled)
                         {
-                            Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
+                            loginErrorText.text = "Login with google was cancelled.";
                             return;
                         }
+
                         if (task.IsFaulted)
                         {
-                            Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
+                            loginErrorText.text = "Login with google encountered an error.";
                             return;
                         }
 
