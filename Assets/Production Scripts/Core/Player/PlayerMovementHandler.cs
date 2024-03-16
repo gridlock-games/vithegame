@@ -173,12 +173,21 @@ namespace Vi.Player
                 minimapCameraInstance.enabled = true;
                 GetComponent<PlayerInput>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
                 Destroy(cameraInstance.gameObject);
                 Destroy(minimapCameraInstance.gameObject);
                 GetComponent<PlayerInput>().enabled = false;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsLocalPlayer)
+            {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
             }
         }
 
@@ -200,18 +209,6 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
-        private void OnEnable()
-        {
-            if (IsLocalPlayer)
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-        }
-
-        private void OnDisable()
-        {
-            if (IsLocalPlayer)
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
-        }
-
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private OnScreenStick[] joysticks = new OnScreenStick[0];
         private readonly float minimapCameraOffset = 15;
@@ -222,7 +219,7 @@ namespace Vi.Player
 
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (IsLocalPlayer)
+            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
                 lookInput -= lookInputToSubtract;
                 Vector2 lookInputToAdd = Vector2.zero;
