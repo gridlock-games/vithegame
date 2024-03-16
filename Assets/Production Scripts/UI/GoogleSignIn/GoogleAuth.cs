@@ -22,11 +22,11 @@ namespace Vi.UI.SimpleGoogleSignIn
         private static string _redirectUri;
         private static string _state;
         private static string _codeVerifier;
-        private static Action<bool, string, UserInfo, TokenExchangeResponse> _callback;
+        private static Action<bool, string, UserInfo, GoogleIdTokenResponse> _callback;
 
         #if UNITY_STANDALONE || UNITY_EDITOR
 
-        public static void Auth(string clientId, string clientSecret, Action<bool, string, UserInfo, TokenExchangeResponse> callback)
+        public static void Auth(string clientId, string clientSecret, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
         {
             _clientId = clientId;
             _clientSecret = clientSecret;
@@ -175,22 +175,22 @@ namespace Vi.UI.SimpleGoogleSignIn
 
             var request = UnityWebRequest.Post(TokenEndpoint, form);
 
-            request.SendWebRequest().completed += _ =>
-            {
-                if (request.error == null)
-                {
-                    //Debug.Log("CodeExchange=" + request.downloadHandler.text);
+            //request.SendWebRequest().completed += _ =>
+            //{
+            //    if (request.error == null)
+            //    {
+            //        //Debug.Log("CodeExchange=" + request.downloadHandler.text);
 
-                    var exchangeResponse = JsonUtility.FromJson<TokenExchangeResponse>(request.downloadHandler.text);
-                    var accessToken = exchangeResponse.access_token;
+            //        var exchangeResponse = JsonUtility.FromJson<TokenExchangeResponse>(request.downloadHandler.text);
+            //        var accessToken = exchangeResponse.access_token;
 
-                    RequestUserInfo(exchangeResponse, _callback);
-                }
-                else
-                {
-                    _callback(false, request.error, null, null);
-                }
-            };
+            //        RequestUserInfo(exchangeResponse, _callback);
+            //    }
+            //    else
+            //    {
+            //        _callback(false, request.error, null, null);
+            //    }
+            //};
 
             RestClient.Request(new RequestHelper
             {
@@ -208,24 +208,8 @@ namespace Vi.UI.SimpleGoogleSignIn
             }).Then(
             response =>
             {
-                //Debug.Log(response.Text);
-
                 GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleIdTokenResponse>(response.Text);
-                //Debug.Log(data.id_token);
-                //var data = StringSerializationAPI.Deserialize(typeof(GoogleIdTokenResponse), response.Text) as GoogleIdTokenResponse;
-                //callback(data.id_token);
-
-                var token = data.id_token;
-                var providerId = "google.com";
-
-                var payLoad =
-            $"{{\"postBody\":\"id_token={token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
-                RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payLoad).Then(
-                    response =>
-                    {
-                    // You now have the userId (localId) and the idToken of the user!
-                    Debug.Log(response.Text);
-                    }).Catch(Debug.LogError);
+                _callback(true, null, null, data);
 
             }).Catch(Debug.LogError);
 
@@ -259,7 +243,7 @@ namespace Vi.UI.SimpleGoogleSignIn
         /// <summary>
         /// You can move this function to your backend for more security.
         /// </summary>
-        public static void RequestUserInfo(TokenExchangeResponse tokenExchangeResponse, Action<bool, string, UserInfo, TokenExchangeResponse> callback)
+        public static void RequestUserInfo(TokenExchangeResponse tokenExchangeResponse, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
         {
             var request = UnityWebRequest.Get(UserInfoEndpoint);
 
@@ -270,11 +254,11 @@ namespace Vi.UI.SimpleGoogleSignIn
                 {
                     var userInfo = JsonUtility.FromJson<UserInfo>(request.downloadHandler.text);
 
-                    callback(true, null, userInfo, tokenExchangeResponse);
+                    callback(true, null, userInfo, null);
                 }
                 else
                 {
-                    callback(false, request.error, null, tokenExchangeResponse);
+                    callback(false, request.error, null, null);
                 }
             };
         }

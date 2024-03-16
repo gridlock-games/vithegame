@@ -180,30 +180,20 @@ namespace Vi.UI
         {
             Debug.Log("Attempting login with google");
 
-            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, info, tokenExchangeResponse) =>
+            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, info, tokenData) =>
             {
-                //Debug.Log(tokenExchangeResponse.access_token);
-                //Debug.Log(tokenExchangeResponse.expires_in);
-                //Debug.Log(tokenExchangeResponse.refresh_token);
-                //Debug.Log(tokenExchangeResponse.scope);
-                //Debug.Log(tokenExchangeResponse.token_type);
-
                 if (success)
                 {
-                    //var token = tokenExchangeResponse.refresh_token;
-                    //var providerId = "google.com";
+                    var payLoad = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={"google.com"}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
+                    RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payLoad).Then(
+                        response =>
+                        {
+                            // You now have the userId (localId) and the idToken of the user!
+                            Debug.Log(response.Text);
+                        }).Catch(Debug.LogError);
 
-                    //var payLoad = $"{{\"postBody\":\"id_token={token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
-                    //RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payLoad).Then(
-                    //    response =>
-                    //    {
-                    //        // You now have the userId (localId) and the idToken of the user!
-                    //        Debug.Log(response.Text);
-                    //    }).Catch(Debug.Log);
-
-                    //Credential credential = GoogleAuthProvider.GetCredential(googleIdToken, googleAccessToken);
-                    // , tokenExchangeResponse.access_token
-                    //Credential credential = GoogleAuthProvider.GetCredential(tokenExchangeResponse.refresh_token, null);
+                    //Debug.Log(tokenData.id_token);
+                    //Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
                     //auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
                     //{
                     //    if (task.IsCanceled)
@@ -242,6 +232,7 @@ namespace Vi.UI
                 {
                     Debug.LogError("Google sign in error - " + error);
                 }
+                Debug.Log("Callback finished");
             });
 
             yield return null;
