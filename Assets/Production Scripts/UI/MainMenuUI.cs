@@ -195,6 +195,9 @@ namespace Vi.UI
 
         public void LoginWithGoogle()
         {
+            initialErrorText.text = "Google sign in not implemented yet";
+            return;
+
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
