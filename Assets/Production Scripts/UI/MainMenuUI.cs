@@ -25,6 +25,7 @@ namespace Vi.UI
         [SerializeField] private InputField emailInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
+        [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
         [Header("Online Play Menu")]
         [SerializeField] private GameObject playParent;
@@ -101,6 +102,9 @@ namespace Vi.UI
 
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(Login);
+
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
 
         public void OpenCreateAccount()
@@ -118,6 +122,30 @@ namespace Vi.UI
 
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
+
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "LOGIN";
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenViLogin);
+        }
+
+        public void OpenViLogin()
+        {
+            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
+            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+
+            viLogo.enabled = false;
+            initialParent.SetActive(false);
+            authenticationParent.SetActive(true);
+
+            emailInput.gameObject.SetActive(false);
+            loginButton.GetComponentInChildren<Text>().text = "LOGIN";
+
+            loginButton.onClick.RemoveAllListeners();
+            loginButton.onClick.AddListener(Login);
+
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
 
         public void ReturnToInitialElements()
@@ -125,6 +153,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.ResetLogInErrorText();
             initialParent.SetActive(true);
             viLogo.enabled = true;
+            initialErrorText.text = "";
         }
 
         public void GoToCharacterSelect()
@@ -186,8 +215,8 @@ namespace Vi.UI
                         }
 
                         AuthResult result = task.Result;
-                        Debug.LogFormat("User signed in successfully: {0} ({1})",
-                            result.User.DisplayName, result.User.UserId);
+                        Debug.Log("User signed in successfully: " + result.User.DisplayName + " (" + result.User.UserId + ")");
+                        initialErrorText.text = "Successful google sign in";
                     });
                 }
                 else
