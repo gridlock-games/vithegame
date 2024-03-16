@@ -184,7 +184,8 @@ namespace Vi.UI
             {
                 if (success)
                 {
-                    string payload = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={"google.com"}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
+                    string providerId = "google.com";
+                    string payload = $"{{\"postBody\":\"id_token={tokenData.id_token}&providerId={providerId}\",\"requestUri\":\"http://localhost\",\"returnIdpCredential\":true,\"returnSecureToken\":true}}";
                     Debug.Log(payload);
 
                     RestClient.Post($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={ApiKey}", payload).Then(
@@ -194,6 +195,7 @@ namespace Vi.UI
                             Debug.Log(response.Text);
                         }).Catch(Debug.LogError);
                     
+
                     //Debug.Log(tokenData.id_token);
                     //Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
                     //auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
