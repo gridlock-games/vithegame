@@ -30,6 +30,27 @@ namespace Vi.UI.SimpleGoogleSignIn
 
             Auth();
             Listen();
+
+            //if (Application.platform == RuntimePlatform.Android)
+            //{
+            //    clientSecret = "google.auth";
+
+            //    _clientId = clientId;
+            //    _callback = callback;
+            //    _redirectUri = $"{clientSecret}:/oauth2callback";
+
+            //    Auth();
+            //}
+            //else
+            //{
+            //    _clientId = clientId;
+            //    _clientSecret = clientSecret;
+            //    _callback = callback;
+            //    _redirectUri = $"http://localhost:{Utils.GetRandomUnusedPort()}/";
+
+            //    Auth();
+            //    Listen();
+            //}
         }
 
         private static void Listen()
