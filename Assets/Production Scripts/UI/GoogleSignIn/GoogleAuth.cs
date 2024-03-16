@@ -72,7 +72,7 @@ namespace Vi.UI.SimpleGoogleSignIn
             HandleAuthResponse(context.Request.QueryString);
         }
 
-        #elif UNITY_WSA || UNITY_ANDROID || UNITY_IOS
+#elif UNITY_WSA || UNITY_ANDROID || UNITY_IOS
 
         static GoogleAuth()
         {
@@ -83,13 +83,13 @@ namespace Vi.UI.SimpleGoogleSignIn
             };
         }
 
-        public static void Auth(string clientId, string protocol, Action<bool, string, UserInfo> callback)
+        public static void Auth(string clientId, string protocol, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
 
             Debug.LogWarning("Deep links don't work inside Editor.");
 
-            #endif
+#endif
 
             _clientId = clientId;
             _callback = callback;
@@ -98,9 +98,9 @@ namespace Vi.UI.SimpleGoogleSignIn
             Auth();
         }
 
-        #elif UNITY_WEBGL
+#elif UNITY_WEBGL
 
-        public static void Auth(string clientId, Action<bool, string, UserInfo> callback)
+        public static void Auth(string clientId, Action<bool, string, UserInfo, GoogleIdTokenResponse> callback)
         {
             _clientId = clientId;
             _callback = callback;
@@ -119,7 +119,7 @@ namespace Vi.UI.SimpleGoogleSignIn
             }
         }
 
-        #endif
+#endif
 
         private static void Auth()
         {
