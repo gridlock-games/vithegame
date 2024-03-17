@@ -456,7 +456,6 @@ namespace Vi.Core
             shouldRepeatLightAttack = value.isPressed;
         }
 
-        private bool toggleAim = true;
         public bool CanAim { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
