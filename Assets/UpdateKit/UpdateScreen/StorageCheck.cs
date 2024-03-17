@@ -39,19 +39,16 @@ public class StorageCheck : MonoBehaviour
 
   public float GetDeviceFreeStorage()
   {
-#if UNITY_ANDROID
-    AndroidJavaObject statFs = new AndroidJavaObject("android.os.StatFs", Application.persistentDataPath);
-    long freeBytes = statFs.Call<long>("getAvailableBytes");
-    return (float)freeBytes;
 
-#endif
-#if UNITY_IOS
-    return 1000.0f;
-
-#endif
-#if UNITY_EDITOR_WIN && !(UNITY_ANDROID || UNITY_IOS)
-        return 1000.0f;
-#endif
+//#if UNITY_ANDROID
+//        AndroidJavaObject statFs = new AndroidJavaObject("android.os.StatFs", Application.persistentDataPath);
+//        long freeBytes = statFs.Call<long>("getAvailableBytes");
+//        return (float)freeBytes;
+//#endif
+//#if UNITY_IOS
+//        return 1000.0f;
+//#endif
+    return 100000000f;
   }
 
   private void NotifyUser()
