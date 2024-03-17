@@ -418,9 +418,6 @@ namespace Vi.Core
                 IsInRecovery = false;
             }
 
-            if (IsLocalPlayer)
-                Debug.Log(Time.time + " " + IsAttacking);
-
             if (IsInAnticipation)
             {
                 Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
