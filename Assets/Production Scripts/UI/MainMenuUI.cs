@@ -5,6 +5,9 @@ using Vi.Core;
 using Unity.Netcode;
 using UnityEngine.UI;
 using System.Net;
+using Firebase.Auth;
+using Vi.UI.SimpleGoogleSignIn;
+using Proyecto26;
 
 namespace Vi.UI
 {
@@ -12,7 +15,9 @@ namespace Vi.UI
     {
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private ContentManager contentManager;
+        [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
+        [SerializeField] private Text initialErrorText;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
@@ -20,6 +25,7 @@ namespace Vi.UI
         [SerializeField] private InputField emailInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
+        [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
         [Header("Online Play Menu")]
         [SerializeField] private GameObject playParent;
@@ -82,7 +88,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
-        public void PlayOnline()
+        public void LoginWithVi()
         {
             if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
             if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
@@ -90,13 +96,15 @@ namespace Vi.UI
             viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
-            WebRequestManager.Singleton.SetPlayingOffline(false);
 
             emailInput.gameObject.SetActive(false);
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
 
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(Login);
+
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
 
         public void OpenCreateAccount()
@@ -108,19 +116,36 @@ namespace Vi.UI
             viLogo.enabled = false;
             initialParent.SetActive(false);
             authenticationParent.SetActive(true);
-            WebRequestManager.Singleton.SetPlayingOffline(false);
 
             emailInput.gameObject.SetActive(true);
             loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
 
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
+
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "LOGIN";
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenViLogin);
         }
 
-        public void PlayOffline()
+        public void OpenViLogin()
         {
-            WebRequestManager.Singleton.SetPlayingOffline(true);
-            GoToCharacterSelect();
+            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
+            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+
+            viLogo.enabled = false;
+            initialParent.SetActive(false);
+            authenticationParent.SetActive(true);
+
+            emailInput.gameObject.SetActive(false);
+            loginButton.GetComponentInChildren<Text>().text = "LOGIN";
+
+            loginButton.onClick.RemoveAllListeners();
+            loginButton.onClick.AddListener(Login);
+
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
+            switchLoginFormButton.onClick.RemoveAllListeners();
+            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
 
         public void ReturnToInitialElements()
@@ -128,6 +153,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.ResetLogInErrorText();
             initialParent.SetActive(true);
             viLogo.enabled = true;
+            initialErrorText.text = "";
         }
 
         public void GoToCharacterSelect()
@@ -164,10 +190,61 @@ namespace Vi.UI
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
         }
 
+        private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
+        private const string googleSignInSecretId = "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";
+
+        public void LoginWithGoogle()
+        {
+            initialErrorText.text = "Google sign in not implemented yet";
+            return;
+
+            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
+            {
+                if (success)
+                {
+                    Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+                    auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
+                    {
+                        if (task.IsCanceled)
+                        {
+                            loginErrorText.text = "Login with google was cancelled.";
+                            return;
+                        }
+
+                        if (task.IsFaulted)
+                        {
+                            loginErrorText.text = "Login with google encountered an error.";
+                            return;
+                        }
+
+                        AuthResult result = task.Result;
+                        Debug.Log("User signed in successfully: " + result.User.DisplayName + " (" + result.User.UserId + ")");
+                        initialErrorText.text = "Successful google sign in";
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Google sign in error - " + error);
+                }
+            });
+        }
+
+        public void LoginWithFacebook()
+        {
+            initialErrorText.text = "Facebook sign in not implemented yet";
+        }
+
+        public void LoginWithApple()
+        {
+            initialErrorText.text = "Apple sign in not implemented yet";
+        }
+
         public void Logout()
         {
             WebRequestManager.Singleton.Logout();
         }
+
+        private FirebaseAuth auth;
 
         private void Start()
         {
@@ -175,6 +252,8 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
+            auth = FirebaseAuth.DefaultInstance;
+            initialErrorText.text = "";
         }
 
         private void Update()
@@ -193,7 +272,7 @@ namespace Vi.UI
                     StartLobbyServer();
                 }
             }
-            
+
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
 
             if (!initialParent.activeSelf)
@@ -206,7 +285,7 @@ namespace Vi.UI
                 authenticationParent.SetActive(false);
                 playParent.SetActive(false);
             }
-            
+
             welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }
