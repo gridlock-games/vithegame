@@ -284,8 +284,21 @@ namespace Vi.Core
             }
             else
             {
-                playerDataList.Add(playerData);
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.AddPlayerScore(playerData.id); }
+                if (playerDataList.Contains(playerData)) { Debug.LogError("Player score with id: " + playerData.id + " has already been added!"); return; }
+
+                int index = disconnectedPlayerDataList.IndexOf(new DisconnectedPlayerData(playerData));
+                if (index == -1)
+                {
+                    playerDataList.Add(playerData);
+                }
+                else
+                {
+                    playerData.team = disconnectedPlayerDataList[index].playerData.team;
+                    playerDataList.Add(playerData);
+                    disconnectedPlayerDataList.RemoveAt(index);
+                }
+
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.AddPlayerScore(playerData.id, playerData.character._id); }
             }
         }
 
@@ -374,8 +387,8 @@ namespace Vi.Core
             if (index == -1) { Debug.LogError("Could not find player data to remove for id: " + clientId); return; }
             if (GameModeManager.Singleton)
             {
-                disconnectedPlayerDataList.Add(playerDataList[index]);
-                GameModeManager.Singleton.RemovePlayerScore(clientId);
+                disconnectedPlayerDataList.Add(new DisconnectedPlayerData(playerDataList[index]));
+                GameModeManager.Singleton.RemovePlayerScore(clientId, playerDataList[index].character._id);
             }
             playerDataList.RemoveAt(index);
         }
@@ -390,7 +403,7 @@ namespace Vi.Core
         {
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
-            disconnectedPlayerDataList = new NetworkList<PlayerData>();
+            disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
             SceneManager.sceneLoaded += OnSceneLoad;
             SceneManager.sceneUnloaded += OnSceneUnload;
         }
@@ -535,6 +548,12 @@ namespace Vi.Core
 
         private void Update()
         {
+            Debug.Log(disconnectedPlayerDataList.Count);
+            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            {
+                Debug.Log(disconnectedPlayerData.playerData.character._id);
+            }
+
             if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
             {
                 playerSpawnPoints = FindObjectOfType<PlayerSpawnPoints>();
@@ -749,7 +768,7 @@ namespace Vi.Core
         }
 
         private NetworkList<PlayerData> playerDataList;
-        private NetworkList<PlayerData> disconnectedPlayerDataList;
+        private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
         [System.Serializable]
         private struct TeamDefinition
@@ -788,6 +807,26 @@ namespace Vi.Core
                 serializer.SerializeValue(ref id);
                 serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
+            }
+        }
+
+        public struct DisconnectedPlayerData : INetworkSerializable, System.IEquatable<DisconnectedPlayerData>
+        {
+            public PlayerData playerData;
+
+            public DisconnectedPlayerData(PlayerData playerData)
+            {
+                this.playerData = playerData;
+            }
+
+            public bool Equals(DisconnectedPlayerData other)
+            {
+                return playerData.character._id == other.playerData.character._id;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeNetworkSerializable(ref playerData);
             }
         }
     }
