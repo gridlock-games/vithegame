@@ -400,9 +400,13 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        if (weaponInstances[weaponBone].GetComponent<ColliderWeapon>())
+                        if (weaponInstances[weaponBone])
                         {
-                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), weaponInstances[weaponBone].transform.position);
+                        }
+                        else
+                        {
+                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
                         }
                     }
                 }
@@ -413,6 +417,9 @@ namespace Vi.Core
                 IsAttacking = false;
                 IsInRecovery = false;
             }
+
+            if (IsLocalPlayer)
+                Debug.Log(Time.time + " " + IsAttacking);
 
             if (IsInAnticipation)
             {

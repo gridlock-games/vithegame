@@ -32,7 +32,6 @@ namespace Vi.Core
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
             {
                 FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-                Debug.Log("Firebase Loading Complete");
             });
         }
 
