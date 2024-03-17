@@ -74,13 +74,10 @@ namespace Vi.UI
             }
 
             int lobbyPort = hubPort - 1;
-            portList.Sort();
-            portList.Reverse();
-            foreach (int port in portList)
+            while (lobbyPort > 0)
             {
-                lobbyPort = port - 1;
-                if (!portList.Contains(lobbyPort))
-                    break;
+                if (!portList.Contains(lobbyPort)) { break; }
+                lobbyPort--;
             }
 
             networkTransport.ConnectionData.Port = (ushort)lobbyPort;
