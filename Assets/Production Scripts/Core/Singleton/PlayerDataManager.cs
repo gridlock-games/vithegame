@@ -372,9 +372,12 @@ namespace Vi.Core
         {
             int index = playerDataList.IndexOf(new PlayerData(clientId));
             if (index == -1) { Debug.LogError("Could not find player data to remove for id: " + clientId); return; }
-            disconnectedPlayerDataList.Add(playerDataList[index]);
+            if (GameModeManager.Singleton)
+            {
+                disconnectedPlayerDataList.Add(playerDataList[index]);
+                GameModeManager.Singleton.RemovePlayerScore(clientId);
+            }
             playerDataList.RemoveAt(index);
-            if (GameModeManager.Singleton) { GameModeManager.Singleton.RemovePlayerScore(clientId); }
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -387,6 +390,7 @@ namespace Vi.Core
         {
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
+            disconnectedPlayerDataList = new NetworkList<PlayerData>();
             SceneManager.sceneLoaded += OnSceneLoad;
             SceneManager.sceneUnloaded += OnSceneUnload;
         }

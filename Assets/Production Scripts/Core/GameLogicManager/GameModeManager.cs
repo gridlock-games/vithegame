@@ -36,6 +36,7 @@ namespace Vi.Core.GameModeManagers
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
         protected NetworkList<PlayerScore> scoreList;
+        private NetworkList<PlayerScore> disconnectedScoreList;
 
         private List<int> gameItemSpawnIndexTracker = new List<int>();
         protected GameItem SpawnGameItem(GameItem gameItemPrefab)
@@ -273,8 +274,19 @@ namespace Vi.Core.GameModeManagers
             }
             else
             {
-                if (scoreList.Contains(new PlayerScore(id))) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
-                scoreList.Add(new PlayerScore(id));
+                PlayerScore playerScore = new PlayerScore(id);
+                if (scoreList.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
+
+                int index = disconnectedScoreList.IndexOf(playerScore);
+                if (index == -1)
+                {
+                    scoreList.Add(playerScore);
+                }
+                else
+                {
+                    scoreList.Add(disconnectedScoreList[index]);
+                    disconnectedScoreList.RemoveAt(index);
+                }
             }
         }
 
@@ -288,7 +300,10 @@ namespace Vi.Core.GameModeManagers
 
         public void RemovePlayerScore(int id)
         {
-            scoreList.Remove(new PlayerScore(id));
+            int index = scoreList.IndexOf(new PlayerScore(id));
+            if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
+            disconnectedScoreList.Add(scoreList[index]);
+            scoreList.RemoveAt(index);
         }
 
         private void OnRoundTimerChange(float prev, float current)
@@ -362,6 +377,7 @@ namespace Vi.Core.GameModeManagers
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
+            disconnectedScoreList = new NetworkList<PlayerScore>();
             killHistory = new NetworkList<KillHistoryElement>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
