@@ -370,7 +370,10 @@ namespace Vi.Core
 
         public void RemovePlayerData(int clientId)
         {
-            playerDataList.Remove(new PlayerData(clientId));
+            int index = playerDataList.IndexOf(new PlayerData(clientId));
+            if (index == -1) { Debug.LogError("Could not find player data to remove for id: " + clientId); return; }
+            disconnectedPlayerDataList.Add(playerDataList[index]);
+            playerDataList.RemoveAt(index);
             if (GameModeManager.Singleton) { GameModeManager.Singleton.RemovePlayerScore(clientId); }
         }
 
@@ -742,6 +745,7 @@ namespace Vi.Core
         }
 
         private NetworkList<PlayerData> playerDataList;
+        private NetworkList<PlayerData> disconnectedPlayerDataList;
 
         [System.Serializable]
         private struct TeamDefinition

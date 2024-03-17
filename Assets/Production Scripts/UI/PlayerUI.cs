@@ -278,17 +278,20 @@ namespace Vi.UI
                     statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(new ActionClip.StatusPayload(statusIcon.Status, 0, 0, 0)));
                 }
 
-                // Order player cards by distance
-                List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
-                for (int i = 0; i < teammatePlayerCards.Length; i++)
+                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
-                    if (i < teammateAttributes.Count)
+                    // Order player cards by distance
+                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
-                        teammatePlayerCards[i].Initialize(teammateAttributes[i]);
-                    }
-                    else
-                    {
-                        teammatePlayerCards[i].Initialize(null);
+                        if (i < teammateAttributes.Count)
+                        {
+                            teammatePlayerCards[i].Initialize(teammateAttributes[i]);
+                        }
+                        else
+                        {
+                            teammatePlayerCards[i].Initialize(null);
+                        }
                     }
                 }
 
