@@ -38,7 +38,7 @@ namespace Vi.Player
 
             // TODO link to player input
 
-            InputState.Change(virtualMouse.position, cursorTransform.anchoredPosition);
+            InputState.Change(virtualMouse.position, new Vector2(Screen.width / 2, Screen.height / 2));
 
             InputSystem.onAfterUpdate += UpdateMotion;
         }
@@ -51,7 +51,12 @@ namespace Vi.Player
 
         private void UpdateMotion()
         {
-            if (virtualMouse == null || Gamepad.current == null) { return; }
+            if (virtualMouse == null || Gamepad.current == null)
+            {
+                cursorTransform.gameObject.SetActive(false);
+                return;
+            }
+            cursorTransform.gameObject.SetActive(true);
 
             // Delta position
             Vector2 deltaValue = Gamepad.current.leftStick.ReadValue();
