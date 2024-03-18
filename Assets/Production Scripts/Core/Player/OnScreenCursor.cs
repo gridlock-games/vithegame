@@ -94,16 +94,6 @@ namespace Vi.Player
             }
             cursorTransform.gameObject.SetActive(isCursorOn);
 
-            //if (cursorTransform.gameObject.activeSelf)
-            //{
-            //    if (!virtualMouse.added) { InputSystem.AddDevice(virtualMouse); }
-            //}
-            //else // If UI cursor is not active
-            //{
-            //    if (virtualMouse.added) { InputSystem.RemoveDevice(virtualMouse); }
-            //    return;
-            //}
-
             // Delta position
             Vector2 deltaValue = Gamepad.current.leftStick.ReadValue();
             deltaValue *= cursorSpeed * Time.deltaTime;
