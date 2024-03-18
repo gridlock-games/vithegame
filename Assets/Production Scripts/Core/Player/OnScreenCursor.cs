@@ -30,7 +30,6 @@ namespace Vi.Player
         }
 
         private Mouse virtualMouse;
-        private bool previousMouseState;
 
         private void OnEnable()
         {
@@ -62,6 +61,7 @@ namespace Vi.Player
         }
 
         private bool wasUsingMainPlayerInput;
+        private bool wasPressingButtonSouth;
         private void UpdateMotion()
         {
             PlayerInput mainPlayerInput = null;
@@ -75,8 +75,6 @@ namespace Vi.Player
             {
                 controllerCursorPlayerInput.enabled = !mainPlayerInput;
                 if (mainPlayerInput) { StartCoroutine(ReEnablePlayerInput(mainPlayerInput)); }
-                Debug.LogWarning("Player input change - " + mainPlayerInput);
-
                 wasUsingMainPlayerInput = mainPlayerInput;
             }
 
@@ -125,14 +123,22 @@ namespace Vi.Player
             InputState.Change(virtualMouse.delta, deltaValue);
             InputState.Change(virtualMouse.scroll, deltaScroll);
 
-            bool aButtonIsPressed = Gamepad.current.aButton.IsPressed();
-            if (previousMouseState != aButtonIsPressed)
+            bool isPressingButtonSouth = Gamepad.current.buttonSouth.IsPressed();
+            if (isPressingButtonSouth & !wasPressingButtonSouth)
             {
-                virtualMouse.CopyState(out MouseState mouseState);
-                mouseState.WithButton(MouseButton.Left, aButtonIsPressed);
-                InputState.Change(virtualMouse, mouseState);
-                previousMouseState = aButtonIsPressed;
+                List<RaycastResult> raycastResults = new List<RaycastResult>();
+                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                pointerEventData.position = newPosition;
+
+                EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+                raycastResults.RemoveAll(item => !item.gameObject.GetComponent<Selectable>());
+
+                if (raycastResults.Count > 0)
+                {
+                    raycastResults[0].gameObject.GetComponent<Selectable>().Select();
+                }
             }
+            wasPressingButtonSouth = isPressingButtonSouth;
 
             AnchorCursor(newPosition);
         }
