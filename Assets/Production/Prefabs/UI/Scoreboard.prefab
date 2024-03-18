@@ -779,6 +779,7 @@ MonoBehaviour:
   scoreboardElementPrefab: {fileID: 2967113721175319822, guid: ffcbec10a251f5d438b9d75cf3a194e5,
     type: 3}
   scoreboardElementParent: {fileID: 2317930313414592966}
+  scoreboardHeaderText: {fileID: 829940591078920580}
 --- !u!1 &2794714456179010273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1708,8 +1709,8 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 1
-  m_CellSize: {x: 1400, y: 60}
-  m_Spacing: {x: 0, y: 10}
+  m_CellSize: {x: 1400, y: 50}
+  m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1 &8416457143334786118
@@ -1868,9 +1869,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Scoreboard
-
-'
+  m_Text: Scoreboard
 --- !u!114 &4356846421767124621
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -548,12 +548,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            Debug.Log(disconnectedPlayerDataList.Count);
-            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
-            {
-                Debug.Log(disconnectedPlayerData.playerData.character._id);
-            }
-
             if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
             {
                 playerSpawnPoints = FindObjectOfType<PlayerSpawnPoints>();

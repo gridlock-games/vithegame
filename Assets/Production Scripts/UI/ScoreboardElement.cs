@@ -14,28 +14,35 @@ namespace Vi.UI
         [SerializeField] private Text killsText;
         [SerializeField] private Text deathsText;
         [SerializeField] private Text kdRatioText;
+        [SerializeField] private Image[] backgroundImagesToColor = new Image[0];
 
-        private Attributes attributes;
+        public Attributes Attributes { get; private set; }
 
         public void Initialize(Attributes attributes)
         {
-            this.attributes = attributes;
+            this.Attributes = attributes;
             UpdateUI();
             gameObject.SetActive(attributes);
         }
 
         private void Update()
         {
-            if (!attributes) { gameObject.SetActive(false); return; }
+            if (!Attributes) { gameObject.SetActive(false); return; }
             UpdateUI();
         }
 
         void UpdateUI()
         {
-            GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(attributes.GetPlayerDataId());
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(Attributes.GetPlayerDataId());
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(Attributes.GetPlayerDataId());
+            for (int i = 0; i < backgroundImagesToColor.Length; i++)
+            {
+                if (i % 2 == 0)
+                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                else
+                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team) + new Color(50 / 255, 50 / 255, 50 / 255, 255 / 255);
+            }
             playerNameText.text = playerData.character.name.ToString();
-            playerNameText.color = PlayerDataManager.GetTeamColor(playerData.team) == Color.black ? Color.white : PlayerDataManager.GetTeamColor(playerData.team);
             roundWinsText.text = playerScore.roundWins.ToString();
             killsText.text = playerScore.kills.ToString();
             deathsText.text = playerScore.deaths.ToString();
