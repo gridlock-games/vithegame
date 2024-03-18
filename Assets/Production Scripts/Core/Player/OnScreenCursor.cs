@@ -94,12 +94,19 @@ namespace Vi.Player
             }
             cursorTransform.gameObject.SetActive(isCursorOn);
 
-            // Delta position
-            Vector2 deltaValue = Gamepad.current.leftStick.ReadValue();
-            deltaValue *= cursorSpeed * Time.deltaTime;
-
-            Vector2 currentPosition = virtualMouse.position.ReadValue();
-            Vector2 newPosition = currentPosition + deltaValue;
+            Vector2 deltaValue;
+            Vector2 newPosition;
+            if (isCursorOn)
+            {
+                deltaValue = Gamepad.current.leftStick.ReadValue();
+                deltaValue *= cursorSpeed * Time.deltaTime;
+                newPosition = virtualMouse.position.ReadValue() + deltaValue;
+            }
+            else // center cursor if it's not on
+            {
+                newPosition = new Vector2(Screen.width / 2, Screen.height / 2);
+                deltaValue = newPosition - virtualMouse.position.ReadValue();
+            }
 
             newPosition.x = Mathf.Clamp(newPosition.x, 0, Screen.width); // TODO - add padding
             newPosition.y = Mathf.Clamp(newPosition.y, 0, Screen.height);
