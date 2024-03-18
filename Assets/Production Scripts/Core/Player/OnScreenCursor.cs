@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Users;
+using UnityEngine.EventSystems;
 
 namespace Vi.Player
 {
@@ -37,6 +39,10 @@ namespace Vi.Player
             }
 
             // TODO link to player input
+            if (EventSystem.current.TryGetComponent(out PlayerInput playerInput))
+            {
+                InputUser.PerformPairingWithDevice(virtualMouse, playerInput.user);
+            }
 
             InputState.Change(virtualMouse.position, new Vector2(Screen.width / 2, Screen.height / 2));
 
