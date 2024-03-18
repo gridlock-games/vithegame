@@ -73,11 +73,26 @@ namespace Vi.Player
             if (mainPlayerInput != lastMainPlayerInput)
             {
                 controllerCursorPlayerInput.enabled = !mainPlayerInput;
-                if (mainPlayerInput) { StartCoroutine(ReEnablePlayerInput(mainPlayerInput)); }
+                if (mainPlayerInput)
+                {
+                    StartCoroutine(ReEnablePlayerInput(mainPlayerInput));
+                }
                 lastMainPlayerInput = mainPlayerInput;
             }
 
-            cursorTransform.gameObject.SetActive(mainPlayerInput ? mainPlayerInput.currentControlScheme == "Gamepad" : controllerCursorPlayerInput.currentControlScheme == "Gamepad");
+            bool isCursorOn = controllerCursorPlayerInput.currentControlScheme == "Gamepad";
+            if (mainPlayerInput)
+            {
+                if (mainPlayerInput.currentActionMap == null)
+                {
+                    isCursorOn = false;
+                }
+                else
+                {
+                    isCursorOn = mainPlayerInput.currentControlScheme == "Gamepad" & mainPlayerInput.currentActionMap.name == "UI";
+                }
+            }
+            cursorTransform.gameObject.SetActive(isCursorOn);
 
             //if (cursorTransform.gameObject.activeSelf)
             //{
