@@ -17,6 +17,7 @@ namespace Vi.Core
         }
 
         private bool footRaised;
+        private const float footRaisedDistanceThreshold = 0.2f;
         private void LateUpdate()
         {
             if (!networkObject.IsSpawned) { return; }
@@ -25,7 +26,7 @@ namespace Vi.Core
             {
                 if (footRaised)
                 {
-                    if (hit.distance <= 0.15f)
+                    if (hit.distance <= footRaisedDistanceThreshold)
                     {
                         AudioManager.Singleton.PlayClipAtPoint(footStepSounds[Random.Range(0, footStepSounds.Length)], transform.position, volume);
                         footRaised = false;
@@ -33,7 +34,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    footRaised = hit.distance > 0.15f;
+                    footRaised = hit.distance > footRaisedDistanceThreshold;
                 }
             }
             else
