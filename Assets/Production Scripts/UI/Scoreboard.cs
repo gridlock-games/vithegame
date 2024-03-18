@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class Scoreboard : MonoBehaviour
     {
+        [SerializeField] private GameObject teamDividerScoreboardLine;
         [SerializeField] private ScoreboardElement scoreboardElementPrefab;
         [SerializeField] private Transform scoreboardElementParent;
         [SerializeField] private Text scoreboardHeaderText;
@@ -36,10 +37,30 @@ namespace Vi.UI
                 }
             }
 
-            elementList.Sort((x,y) => PlayerDataManager.Singleton.GetPlayerData(x.Attributes.GetPlayerDataId()).team.CompareTo(PlayerDataManager.Singleton.GetPlayerData(y.Attributes.GetPlayerDataId()).team));
+            elementList.Sort((x, y) => x.Attributes.GetTeam().CompareTo(y.Attributes.GetTeam()));
             for (int i = 0; i < elementList.Count; i++)
             {
                 elementList[i].transform.SetSiblingIndex(i);
+            }
+
+            int dividerCounter = 0;
+            PlayerDataManager.Team lastTeam = PlayerDataManager.Team.Environment;
+            for (int i = 0; i < elementList.Count; i++)
+            {
+                PlayerDataManager.Team team = elementList[i].Attributes.GetTeam();
+                if (team != lastTeam)
+                {
+                    if (PlayerDataManager.GetTeamColor(team) != Color.black)
+                    {
+                        GameObject dividerLine = Instantiate(teamDividerScoreboardLine, scoreboardElementParent);
+                        dividerLine.GetComponentInChildren<Image>().color = PlayerDataManager.GetTeamColor(team);
+                        dividerLine.GetComponentInChildren<Text>().text = team + " Team";
+                        dividerLine.transform.SetSiblingIndex(i + dividerCounter);
+                        dividerCounter++;
+                        lastTeam = team;
+                    }
+                }
+                elementList[i].transform.SetSiblingIndex(i + dividerCounter);
             }
         }
     }
