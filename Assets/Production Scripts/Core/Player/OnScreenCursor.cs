@@ -97,12 +97,16 @@ namespace Vi.Player
             Vector2 newPosition;
             if (isCursorOn)
             {
+                if (Cursor.visible) { Cursor.visible = false; }
+
                 deltaValue = Gamepad.current.leftStick.ReadValue();
                 deltaValue *= cursorSpeed * Time.deltaTime;
                 newPosition = virtualMouse.position.ReadValue() + deltaValue;
             }
-            else // center cursor if it's not on
+            else // Center cursor if it's not on
             {
+                if (!Cursor.visible & Cursor.lockState == CursorLockMode.None) { Cursor.visible = true; }
+
                 newPosition = new Vector2(Screen.width / 2, Screen.height / 2);
                 deltaValue = newPosition - virtualMouse.position.ReadValue();
             }
