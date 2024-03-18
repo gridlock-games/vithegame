@@ -7,6 +7,8 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.EventSystems;
+using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.Player
 {
@@ -17,11 +19,13 @@ namespace Vi.Player
         private const float cursorSpeed = 1000;
 
         private RectTransform canvasRectTransform;
+        private PlayerInput controllerCursorPlayerInput;
 
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
             canvasRectTransform = (RectTransform)transform;
+            controllerCursorPlayerInput = GetComponent<PlayerInput>();
         }
 
         private Mouse virtualMouse;
@@ -38,12 +42,6 @@ namespace Vi.Player
                 InputSystem.AddDevice(virtualMouse);
             }
 
-            // TODO link to player input
-            if (EventSystem.current.TryGetComponent(out PlayerInput playerInput))
-            {
-                InputUser.PerformPairingWithDevice(virtualMouse, playerInput.user);
-            }
-
             InputState.Change(virtualMouse.position, new Vector2(Screen.width / 2, Screen.height / 2));
 
             InputSystem.onAfterUpdate += UpdateMotion;
@@ -51,18 +49,45 @@ namespace Vi.Player
 
         private void OnDisable()
         {
-            InputSystem.RemoveDevice(virtualMouse);
             InputSystem.onAfterUpdate -= UpdateMotion;
+            InputSystem.RemoveDevice(virtualMouse);
         }
 
+        private IEnumerator ReEnablePlayerInput(PlayerInput playerInput)
+        {
+            playerInput.enabled = false;
+            yield return null;
+            playerInput.enabled = true;
+        }
+
+        PlayerInput lastMainPlayerInput;
         private void UpdateMotion()
         {
-            if (virtualMouse == null || Gamepad.current == null)
+            PlayerInput mainPlayerInput = null;
+            if (PlayerDataManager.Singleton)
             {
-                cursorTransform.gameObject.SetActive(false);
-                return;
+                var kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                if (kvp.Value) { mainPlayerInput = kvp.Value.GetComponent<PlayerInput>(); }
             }
-            cursorTransform.gameObject.SetActive(true);
+
+            if (mainPlayerInput != lastMainPlayerInput)
+            {
+                controllerCursorPlayerInput.enabled = !mainPlayerInput;
+                if (mainPlayerInput) { StartCoroutine(ReEnablePlayerInput(mainPlayerInput)); }
+                lastMainPlayerInput = mainPlayerInput;
+            }
+
+            cursorTransform.gameObject.SetActive(mainPlayerInput ? mainPlayerInput.currentControlScheme == "Gamepad" : controllerCursorPlayerInput.currentControlScheme == "Gamepad");
+
+            //if (cursorTransform.gameObject.activeSelf)
+            //{
+            //    if (!virtualMouse.added) { InputSystem.AddDevice(virtualMouse); }
+            //}
+            //else // If UI cursor is not active
+            //{
+            //    if (virtualMouse.added) { InputSystem.RemoveDevice(virtualMouse); }
+            //    return;
+            //}
 
             // Delta position
             Vector2 deltaValue = Gamepad.current.leftStick.ReadValue();

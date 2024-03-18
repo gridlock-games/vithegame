@@ -27,7 +27,7 @@ namespace Vi.Player
                 Cursor.lockState = CursorLockMode.None;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
-                playerInput.SwitchCurrentActionMap("Menu");
+                playerInput.SwitchCurrentActionMap("UI");
             }
             else
             {
@@ -133,7 +133,7 @@ namespace Vi.Player
                 if (spectatorUIInstance)
                     spectatorUIInstance.SetActive(false);
                 pauseInstance = Instantiate(pausePrefab, transform);
-                playerInput.SwitchCurrentActionMap("Menu");
+                playerInput.SwitchCurrentActionMap("UI");
             }
         }
 
@@ -165,7 +165,7 @@ namespace Vi.Player
                 if (spectatorUIInstance)
                     spectatorUIInstance.SetActive(false);
                 inventoryInstance = Instantiate(inventoryPrefab, transform);
-                playerInput.SwitchCurrentActionMap("Menu");
+                playerInput.SwitchCurrentActionMap("UI");
             }
         }
 
