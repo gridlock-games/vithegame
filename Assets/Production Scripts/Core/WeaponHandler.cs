@@ -400,9 +400,13 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        if (weaponInstances[weaponBone].GetComponent<ColliderWeapon>())
+                        if (weaponInstances[weaponBone])
                         {
-                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), transform.position);
+                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), weaponInstances[weaponBone].transform.position);
+                        }
+                        else
+                        {
+                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
                         }
                     }
                 }
@@ -452,7 +456,6 @@ namespace Vi.Core
             shouldRepeatLightAttack = value.isPressed;
         }
 
-        private bool toggleAim = true;
         public bool CanAim { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);

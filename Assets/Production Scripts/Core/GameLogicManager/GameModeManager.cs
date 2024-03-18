@@ -36,6 +36,7 @@ namespace Vi.Core.GameModeManagers
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
         protected NetworkList<PlayerScore> scoreList;
+        private NetworkList<DisconnectedPlayerScore> disconnectedScoreList;
 
         private List<int> gameItemSpawnIndexTracker = new List<int>();
         protected GameItem SpawnGameItem(GameItem gameItemPrefab)
@@ -241,7 +242,7 @@ namespace Vi.Core.GameModeManagers
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
-                    AddPlayerScore(playerData.id);
+                    AddPlayerScore(playerData.id, playerData.character._id);
                 }
             }
             //roundTimer.Value = roundDuration;
@@ -265,30 +266,47 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public void AddPlayerScore(int id)
+        public void AddPlayerScore(int id, FixedString32Bytes characterId)
         {
             if (!IsSpawned)
             {
-                StartCoroutine(WaitForSpawnToAddPlayerData(id));
+                StartCoroutine(WaitForSpawnToAddPlayerData(id, characterId));
             }
             else
             {
-                if (scoreList.Contains(new PlayerScore(id))) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
-                scoreList.Add(new PlayerScore(id));
+                PlayerScore playerScore = new PlayerScore(id);
+                if (scoreList.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
+
+                int index = disconnectedScoreList.IndexOf(new DisconnectedPlayerScore(characterId, playerScore));
+                if (index == -1)
+                {
+                    scoreList.Add(playerScore);
+                }
+                else
+                {
+                    playerScore.kills = disconnectedScoreList[index].playerScore.kills;
+                    playerScore.deaths = disconnectedScoreList[index].playerScore.deaths;
+                    playerScore.roundWins = disconnectedScoreList[index].playerScore.roundWins;
+                    scoreList.Add(playerScore);
+                    disconnectedScoreList.RemoveAt(index);
+                }
             }
         }
 
-        private IEnumerator WaitForSpawnToAddPlayerData(int id)
+        private IEnumerator WaitForSpawnToAddPlayerData(int id, FixedString32Bytes characterId)
         {
             yield return new WaitUntil(() => IsSpawned);
-            AddPlayerScore(id);
+            AddPlayerScore(id, characterId);
         }
 
         public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
 
-        public void RemovePlayerScore(int id)
+        public void RemovePlayerScore(int id, FixedString32Bytes characterId)
         {
-            scoreList.Remove(new PlayerScore(id));
+            int index = scoreList.IndexOf(new PlayerScore(id));
+            if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
+            disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index]));
+            scoreList.RemoveAt(index);
         }
 
         private void OnRoundTimerChange(float prev, float current)
@@ -362,6 +380,7 @@ namespace Vi.Core.GameModeManagers
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
+            disconnectedScoreList = new NetworkList<DisconnectedPlayerScore>();
             killHistory = new NetworkList<KillHistoryElement>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
@@ -408,6 +427,12 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
+            //Debug.Log(disconnectedScoreList.Count);
+            //foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+            //{
+            //    Debug.Log(disconnectedPlayerScore.characterId);
+            //}
+
             if (!IsServer) { return; }
             if (!AreAllPlayersConnected()) { return; }
 
@@ -458,6 +483,29 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeValue(ref kills);
                 serializer.SerializeValue(ref deaths);
                 serializer.SerializeValue(ref roundWins);
+            }
+        }
+
+        private struct DisconnectedPlayerScore : INetworkSerializable, System.IEquatable<DisconnectedPlayerScore>
+        {
+            public FixedString32Bytes characterId;
+            public PlayerScore playerScore;
+
+            public DisconnectedPlayerScore(FixedString32Bytes characterId, PlayerScore playerScore)
+            {
+                this.characterId = characterId;
+                this.playerScore = playerScore;
+            }
+
+            public bool Equals(DisconnectedPlayerScore other)
+            {
+                return characterId == other.characterId;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref characterId);
+                serializer.SerializeNetworkSerializable(ref playerScore);
             }
         }
     }

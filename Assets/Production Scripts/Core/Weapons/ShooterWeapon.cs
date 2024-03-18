@@ -86,10 +86,7 @@ namespace Vi.Core
                     projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, parentWeaponHandler.CurrentActionClip, projectileForce);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
-
                     if (shouldUseAmmo) { parentWeaponHandler.UseAmmo(); }
-
-                    AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().GetAttackSoundEffect(weaponBone), transform.position);
                 }
             }
         }
