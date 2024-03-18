@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.Users;
 using UnityEngine.EventSystems;
-using Unity.Netcode;
 using Vi.Core;
 
 namespace Vi.Player
@@ -131,11 +128,11 @@ namespace Vi.Player
                 pointerEventData.position = newPosition;
 
                 EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                raycastResults.RemoveAll(item => !item.gameObject.GetComponent<Selectable>());
+                raycastResults.RemoveAll(item => !item.gameObject.GetComponentInParent<Selectable>());
 
                 if (raycastResults.Count > 0)
                 {
-                    raycastResults[0].gameObject.GetComponent<Selectable>().Select();
+                    (raycastResults[0].gameObject.GetComponentInParent<Selectable>() as IPointerClickHandler).OnPointerClick(new PointerEventData(EventSystem.current));
                 }
             }
             wasPressingButtonSouth = isPressingButtonSouth;
