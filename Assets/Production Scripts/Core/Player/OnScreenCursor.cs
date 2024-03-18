@@ -60,7 +60,7 @@ namespace Vi.Player
             playerInput.enabled = true;
         }
 
-        PlayerInput lastMainPlayerInput;
+        private bool wasUsingMainPlayerInput;
         private void UpdateMotion()
         {
             PlayerInput mainPlayerInput = null;
@@ -70,14 +70,13 @@ namespace Vi.Player
                 if (kvp.Value) { mainPlayerInput = kvp.Value.GetComponent<PlayerInput>(); }
             }
 
-            if (mainPlayerInput != lastMainPlayerInput)
+            if (mainPlayerInput != wasUsingMainPlayerInput)
             {
                 controllerCursorPlayerInput.enabled = !mainPlayerInput;
-                if (mainPlayerInput)
-                {
-                    StartCoroutine(ReEnablePlayerInput(mainPlayerInput));
-                }
-                lastMainPlayerInput = mainPlayerInput;
+                if (mainPlayerInput) { StartCoroutine(ReEnablePlayerInput(mainPlayerInput)); }
+                Debug.LogWarning("Player input change - " + mainPlayerInput);
+
+                wasUsingMainPlayerInput = mainPlayerInput;
             }
 
             bool isCursorOn = controllerCursorPlayerInput.currentControlScheme == "Gamepad";
