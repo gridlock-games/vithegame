@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Vi.Core;
 
 public class ETLImageObject : MonoBehaviour
 {
+  public string itemID;
   [SerializeField] Image imageTarget;
   public string WWWImageSource;
   [Header("External Links")]
+  public bool cacheable;
 
   public bool imageClickable;
   public string webLink;
@@ -19,13 +22,20 @@ public class ETLImageObject : MonoBehaviour
     imageTarget.sprite = netSprite;
   }
 
-  public void LoadImageFromWeb(string url)
+  public void LoadImageFromWeb()
   {
-    StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequest(url, ChangeImageFile));
-  }
+        if (cacheable)
+        {
+      StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequestCacheables(itemID, cacheable, ChangeImageFile));
+    }
+        else
+        {
+      StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequest(WWWImageSource, ChangeImageFile));
+    }
+    }
   public void Start()
   {
-    LoadImageFromWeb(WWWImageSource);
+    LoadImageFromWeb();
   }
 
 
