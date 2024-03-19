@@ -196,6 +196,13 @@ namespace Vi.Core.GameModeManagers
                 PlayerScore playerScore = scoreList[i];
                 scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
             }
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
+            {
+                FixedString32Bytes charId = disconnectedScoreList[i].characterId;
+                PlayerScore playerScore = disconnectedScoreList[i].playerScore;
+                playerScore = new PlayerScore(playerScore.id, playerScore.roundWins);
+                disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
+            }
             if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
             isFirstRound = false;
             killHistory.Clear();
@@ -449,12 +456,6 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
-            //Debug.Log(disconnectedScoreList.Count);
-            //foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
-            //{
-            //    Debug.Log(disconnectedPlayerScore.characterId);
-            //}
-
             if (!IsServer) { return; }
             if (!AreAllPlayersConnected()) { return; }
 
