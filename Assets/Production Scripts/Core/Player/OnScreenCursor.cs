@@ -120,23 +120,28 @@ namespace Vi.Player
             InputState.Change(virtualMouse.delta, deltaValue);
             InputState.Change(virtualMouse.scroll, deltaScroll);
 
-            bool isPressingButtonSouth = Gamepad.current.buttonSouth.IsPressed();
-            if (isPressingButtonSouth & !wasPressingButtonSouth)
+            if (isCursorOn)
             {
-                List<RaycastResult> raycastResults = new List<RaycastResult>();
-                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-                pointerEventData.position = newPosition;
-
-                EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                raycastResults.RemoveAll(item => !item.gameObject.GetComponentInParent<Selectable>());
-
-                if (raycastResults.Count > 0)
+                bool isPressingButtonSouth = Gamepad.current.buttonSouth.IsPressed();
+                if (isPressingButtonSouth & !wasPressingButtonSouth)
                 {
-                    (raycastResults[0].gameObject.GetComponentInParent<Selectable>() as IPointerClickHandler).OnPointerClick(new PointerEventData(EventSystem.current));
-                }
-            }
-            wasPressingButtonSouth = isPressingButtonSouth;
+                    List<RaycastResult> raycastResults = new List<RaycastResult>();
+                    PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                    pointerEventData.position = newPosition;
 
+                    EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+                    raycastResults.RemoveAll(item => !item.gameObject.GetComponentInParent<Selectable>());
+
+                    if (raycastResults.Count > 0)
+                    {
+                        Debug.Log("Invoking: " + raycastResults[0].gameObject.GetComponentInParent<Selectable>().name);
+                        raycastResults[0].gameObject.GetComponentInParent<Selectable>().Select();
+                        //(raycastResults[0].gameObject.GetComponentInParent<Selectable>() as IPointerClickHandler).OnPointerClick(new PointerEventData(EventSystem.current));
+                    }
+                }
+                wasPressingButtonSouth = isPressingButtonSouth;
+            }
+            
             AnchorCursor(newPosition);
         }
 
