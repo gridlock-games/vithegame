@@ -58,7 +58,7 @@ namespace Vi.Player
         }
 
         private bool wasUsingMainPlayerInput;
-        private bool wasPressingButtonSouth;
+        private bool lastIsPressingButtonSouth;
         private void UpdateMotion()
         {
             PlayerInput mainPlayerInput = null;
@@ -133,12 +133,6 @@ namespace Vi.Player
             }
             
             AnchorCursor(newPosition);
-        }
-
-        private bool lastIsPressingButtonSouth;
-        private void Update()
-        {
-            
         }
 
         private void AnchorCursor(Vector2 position)
