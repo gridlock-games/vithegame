@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.IO;
@@ -43,7 +42,6 @@ public static class ExternalFileLoaderWeb
   {
     DateTime dt = File.GetLastWriteTime(fileLocation);
 
-
     //insert code from API
     int result = DateTime.Compare(dt, DateTime.Now);
     if (result == 0)
@@ -52,7 +50,7 @@ public static class ExternalFileLoaderWeb
     }
     else if (result < 0)
     {
-      return true;  
+      return true;
     }
     else
     {
@@ -75,8 +73,6 @@ public static class ExternalFileLoaderWeb
         callback(texture);
       }
     }
-
-
     else
     {
       GameExternalAssets assetsInfo = RetreveAPIData(itemID);
@@ -145,4 +141,24 @@ public static class ExternalFileLoaderWeb
     }
   }
 
+  public static IEnumerator DoTextWebRequestID(string itemID, System.Action<String> callback)
+  {
+    //Call API to retreve Data
+    GameExternalAssets assetsInfo = RetreveAPIData(itemID);
+    var url = assetsInfo.url;
+
+    using (UnityWebRequest request = UnityWebRequest.Get(url))
+    {
+      yield return request.SendWebRequest();
+      if (request.isNetworkError)
+      {
+        callback("There was an error retrieving the file");
+      }
+
+      else
+      {
+        callback(request.downloadHandler.text);
+      }
+    }
+  }
 }
