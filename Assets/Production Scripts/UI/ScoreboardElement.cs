@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class ScoreboardElement : MonoBehaviour
     {
+        [SerializeField] private Image disconnectedPlayerIcon;
         [SerializeField] private Text playerNameText;
         [SerializeField] private Text roundWinsText;
         [SerializeField] private Text killsText;
