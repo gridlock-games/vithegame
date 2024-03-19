@@ -49,7 +49,8 @@ public class TACMenu : MonoBehaviour
 
   private void startFileRetreval()
   {
-    ExternalFileLoaderWeb.DoTextWebRequestID(termsID, updateTermsData);
+    Debug.Log("sfr");
+    StartCoroutine(ExternalFileLoaderWeb.DoTextWebRequestID(termsID, updateTermsData));
   }
 
   private void assignButtons()
@@ -61,6 +62,7 @@ public class TACMenu : MonoBehaviour
 
   private void updateTermsData(string terms)
   {
+    Debug.Log("testing File Retreval");
     termsTitle.text = "Vi Terms and condition";
     termsField.text = terms;
   }

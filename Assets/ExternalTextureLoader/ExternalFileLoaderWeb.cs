@@ -35,6 +35,7 @@ public static class ExternalFileLoaderWeb
   //todo: Impletement API code
   public static GameExternalAssets RetreveAPIData(string itemID)
   {
+    Debug.Log(itemID);
     return WebRequestManager.Singleton.getExternalAssets(itemID);
   }
 
@@ -143,6 +144,7 @@ public static class ExternalFileLoaderWeb
 
   public static IEnumerator DoTextWebRequestID(string itemID, System.Action<String> callback)
   {
+    Debug.Log("Doing Web loading");
     //Call API to retreve Data
     GameExternalAssets assetsInfo = RetreveAPIData(itemID);
     var url = assetsInfo.url;
@@ -157,6 +159,7 @@ public static class ExternalFileLoaderWeb
 
       else
       {
+        
         callback(request.downloadHandler.text);
       }
     }
