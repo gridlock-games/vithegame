@@ -123,7 +123,6 @@ namespace Vi.Player
             if (isCursorOn)
             {
                 bool isPressingButtonSouth = Gamepad.current.buttonSouth.IsPressed();
-
                 if (isPressingButtonSouth != lastIsPressingButtonSouth)
                 {
                     virtualMouse.CopyState(out MouseState mouseState);
@@ -131,25 +130,6 @@ namespace Vi.Player
                     InputState.Change(virtualMouse, mouseState);
                     lastIsPressingButtonSouth = isPressingButtonSouth;
                 }
-
-                /*
-                if (isPressingButtonSouth & !wasPressingButtonSouth)
-                {
-                    List<RaycastResult> raycastResults = new List<RaycastResult>();
-                    PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-                    pointerEventData.position = newPosition;
-
-                    EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                    raycastResults.RemoveAll(item => !item.gameObject.GetComponentInParent<Selectable>());
-
-                    if (raycastResults.Count > 0)
-                    {
-                        Debug.Log("Invoking: " + raycastResults[0].gameObject.GetComponentInParent<Selectable>().name);
-                        raycastResults[0].gameObject.GetComponentInParent<Selectable>().Select();
-                        //(raycastResults[0].gameObject.GetComponentInParent<Selectable>() as IPointerClickHandler).OnPointerClick(new PointerEventData(EventSystem.current));
-                    }
-                }
-                wasPressingButtonSouth = isPressingButtonSouth;*/
             }
             
             AnchorCursor(newPosition);
