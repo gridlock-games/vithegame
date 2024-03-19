@@ -208,11 +208,33 @@ namespace Vi.Core.GameModeManagers
             foreach (int id in winningPlayersDataIds)
             {
                 int index = scoreList.IndexOf(new PlayerScore(id));
-                PlayerScore score = scoreList[index];
-                score.roundWins += 1;
-                scoreList[index] = score;
 
-                if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                if (index == -1)
+                {
+                    List<DisconnectedPlayerScore> cachedList = new List<DisconnectedPlayerScore>();
+                    foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+                    {
+                        cachedList.Add(disconnectedPlayerScore);
+                    }
+
+                    int disconnectedIndex = cachedList.FindIndex(item => item.playerScore.id == id);
+                    if (disconnectedIndex == -1) { continue; }
+
+                    PlayerScore score = disconnectedScoreList[disconnectedIndex].playerScore;
+                    FixedString32Bytes charId = disconnectedScoreList[disconnectedIndex].characterId;
+                    score.roundWins += 1;
+                    disconnectedScoreList[disconnectedIndex] = new DisconnectedPlayerScore(charId, score);
+
+                    if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                }
+                else
+                {
+                    PlayerScore score = scoreList[index];
+                    score.roundWins += 1;
+                    scoreList[index] = score;
+
+                    if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                }
             }
             
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
