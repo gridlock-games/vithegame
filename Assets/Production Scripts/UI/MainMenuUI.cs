@@ -26,6 +26,7 @@ namespace Vi.UI
         [SerializeField] private InputField emailInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
+        [SerializeField] private Button returnButton;
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
         [Header("Play Menu")]
@@ -91,9 +92,7 @@ namespace Vi.UI
             if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
             if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
 
-            viLogo.enabled = false;
             initialParent.SetActive(false);
-            authenticationParent.SetActive(true);
 
             emailInput.gameObject.SetActive(false);
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
@@ -112,9 +111,7 @@ namespace Vi.UI
             passwordInput.text = "";
             emailInput.text = "";
 
-            viLogo.enabled = false;
             initialParent.SetActive(false);
-            authenticationParent.SetActive(true);
 
             emailInput.gameObject.SetActive(true);
             loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
@@ -184,6 +181,7 @@ namespace Vi.UI
 
         public void Login()
         {
+            PlayerPrefs.SetString("LastSignInType", "Vi");
             PlayerPrefs.SetString("username", usernameInput.text);
             PlayerPrefs.SetString("password", passwordInput.text);
             StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
@@ -194,9 +192,6 @@ namespace Vi.UI
 
         public void LoginWithGoogle()
         {
-            initialErrorText.text = "Google sign in not implemented yet";
-            return;
-
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
@@ -230,13 +225,13 @@ namespace Vi.UI
             }
 
             AuthResult authResult = task.Result;
-            Debug.Log("User signed in successfully: " + authResult.User.DisplayName + " (" + authResult.User.UserId + ")");
-
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
+                PlayerPrefs.SetString("LastSignInType", "Google");
+                PlayerPrefs.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
             else
             {
@@ -257,6 +252,7 @@ namespace Vi.UI
         public void Logout()
         {
             WebRequestManager.Singleton.Logout();
+            initialParent.SetActive(true);
         }
 
         private FirebaseAuth auth;
@@ -275,21 +271,33 @@ namespace Vi.UI
 
         private IEnumerator AutomaticallyAttemptLogin()
         {
-            if (PlayerPrefs.HasKey("username") & PlayerPrefs.HasKey("password"))
+            if (PlayerPrefs.HasKey("LastSignInType"))
             {
-                usernameInput.text = PlayerPrefs.GetString("username");
-                passwordInput.text = PlayerPrefs.GetString("password");
-                Login();
-
-                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsLoggingIn);
-
-                if (WebRequestManager.Singleton.IsLoggedIn)
+                switch (PlayerPrefs.GetString("LastSignInType"))
                 {
-                    initialParent.SetActive(false);
-                }
-                else
-                {
-                    initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                    case "Vi":
+                        usernameInput.text = PlayerPrefs.GetString("username");
+                        passwordInput.text = PlayerPrefs.GetString("password");
+                        Login();
+
+                        yield return new WaitUntil(() => !WebRequestManager.Singleton.IsLoggingIn);
+
+                        if (WebRequestManager.Singleton.IsLoggedIn)
+                        {
+                            initialParent.SetActive(false);
+                        }
+                        else
+                        {
+                            initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                        }
+                        break;
+                    case "Google":
+                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PlayerPrefs.GetString("GoogleIdTokenResponse")));
+
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle last sign in type " + PlayerPrefs.GetString("LastSignInType"));
+                        break;
                 }
             }
         }
@@ -312,6 +320,8 @@ namespace Vi.UI
             }
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            switchLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
                 button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
