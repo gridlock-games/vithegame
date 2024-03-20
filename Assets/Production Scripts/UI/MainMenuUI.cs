@@ -98,7 +98,7 @@ namespace Vi.UI
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
 
             loginButton.onClick.RemoveAllListeners();
-            loginButton.onClick.AddListener(Login);
+            loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
             switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
             switchLoginFormButton.onClick.RemoveAllListeners();
@@ -137,7 +137,7 @@ namespace Vi.UI
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
 
             loginButton.onClick.RemoveAllListeners();
-            loginButton.onClick.AddListener(Login);
+            loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
             switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
             switchLoginFormButton.onClick.RemoveAllListeners();
@@ -179,12 +179,19 @@ namespace Vi.UI
             }
         }
 
-        public void Login()
+        public IEnumerator Login()
         {
             PlayerPrefs.SetString("LastSignInType", "Vi");
             PlayerPrefs.SetString("username", usernameInput.text);
             PlayerPrefs.SetString("password", passwordInput.text);
-            StartCoroutine(WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text));
+            usernameInput.interactable = false;
+            passwordInput.interactable = false;
+
+            yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
+
+            welcomeUserText.text = "Welcome " + PlayerPrefs.GetString("username");
+            usernameInput.interactable = true;
+            passwordInput.interactable = true;
         }
 
         private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
@@ -230,6 +237,7 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
+                welcomeUserText.text = authResult.User.DisplayName;
                 PlayerPrefs.SetString("LastSignInType", "Google");
                 PlayerPrefs.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
@@ -278,9 +286,7 @@ namespace Vi.UI
                     case "Vi":
                         usernameInput.text = PlayerPrefs.GetString("username");
                         passwordInput.text = PlayerPrefs.GetString("password");
-                        Login();
-
-                        yield return new WaitUntil(() => !WebRequestManager.Singleton.IsLoggingIn);
+                        yield return Login();
 
                         if (WebRequestManager.Singleton.IsLoggedIn)
                         {
@@ -339,8 +345,6 @@ namespace Vi.UI
             }
 
             viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
-
-            welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }
     }
