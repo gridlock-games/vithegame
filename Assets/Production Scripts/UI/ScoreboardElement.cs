@@ -46,7 +46,6 @@ namespace Vi.UI
 
         void UpdateUI()
         {
-            Debug.Log(playerDataId + " " + PlayerDataManager.Singleton.ContainsId(playerDataId) + " " + PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId));
             if (PlayerDataManager.Singleton.ContainsId(playerDataId))
             {
                 disconnectedPlayerIcon.enabled = false;
