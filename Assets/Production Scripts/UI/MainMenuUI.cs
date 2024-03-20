@@ -237,7 +237,7 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
-                welcomeUserText.text = authResult.User.DisplayName;
+                welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
                 PlayerPrefs.SetString("LastSignInType", "Google");
                 PlayerPrefs.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
