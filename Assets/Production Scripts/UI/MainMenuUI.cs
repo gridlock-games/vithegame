@@ -18,6 +18,7 @@ namespace Vi.UI
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
         [SerializeField] private Text initialErrorText;
+        [SerializeField] private Button[] authenticationButtons;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
@@ -27,7 +28,7 @@ namespace Vi.UI
         [SerializeField] private Button loginButton;
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
-        [Header("Online Play Menu")]
+        [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
         [SerializeField] private Text welcomeUserText;
         [Header("Editor Only")]
@@ -100,6 +101,7 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(Login);
 
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
             switchLoginFormButton.onClick.RemoveAllListeners();
             switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
@@ -120,7 +122,7 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "LOGIN";
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "GO TO LOGIN";
             switchLoginFormButton.onClick.RemoveAllListeners();
             switchLoginFormButton.onClick.AddListener(OpenViLogin);
         }
@@ -199,31 +201,47 @@ namespace Vi.UI
             {
                 if (success)
                 {
-                    Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
-                    auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
-                    {
-                        if (task.IsCanceled)
-                        {
-                            loginErrorText.text = "Login with google was cancelled.";
-                            return;
-                        }
-
-                        if (task.IsFaulted)
-                        {
-                            loginErrorText.text = "Login with google encountered an error.";
-                            return;
-                        }
-
-                        AuthResult result = task.Result;
-                        Debug.Log("User signed in successfully: " + result.User.DisplayName + " (" + result.User.UserId + ")");
-                        initialErrorText.text = "Successful google sign in";
-                    });
+                    StartCoroutine(WaitForGoogleAuth(tokenData));
                 }
                 else
                 {
                     Debug.LogError("Google sign in error - " + error);
                 }
             });
+        }
+
+        private IEnumerator WaitForGoogleAuth(GoogleAuth.GoogleIdTokenResponse tokenData)
+        {
+            Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+            System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
+
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.IsCanceled)
+            {
+                loginErrorText.text = "Login with google was cancelled.";
+                yield break;
+            }
+
+            if (task.IsFaulted)
+            {
+                loginErrorText.text = "Login with google encountered an error.";
+                yield break;
+            }
+
+            AuthResult authResult = task.Result;
+            Debug.Log("User signed in successfully: " + authResult.User.DisplayName + " (" + authResult.User.UserId + ")");
+
+            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+
+            if (WebRequestManager.Singleton.IsLoggedIn)
+            {
+                initialParent.SetActive(false);
+            }
+            else
+            {
+                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+            }
         }
 
         public void LoginWithFacebook()
@@ -251,6 +269,29 @@ namespace Vi.UI
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
             auth = FirebaseAuth.DefaultInstance;
             initialErrorText.text = "";
+
+            StartCoroutine(AutomaticallyAttemptLogin());
+        }
+
+        private IEnumerator AutomaticallyAttemptLogin()
+        {
+            if (PlayerPrefs.HasKey("username") & PlayerPrefs.HasKey("password"))
+            {
+                usernameInput.text = PlayerPrefs.GetString("username");
+                passwordInput.text = PlayerPrefs.GetString("password");
+                Login();
+
+                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsLoggingIn);
+
+                if (WebRequestManager.Singleton.IsLoggedIn)
+                {
+                    initialParent.SetActive(false);
+                }
+                else
+                {
+                    initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                }
+            }
         }
 
         private void Update()
@@ -271,6 +312,10 @@ namespace Vi.UI
             }
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            foreach (Button button in authenticationButtons)
+            {
+                button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            }
 
             if (!initialParent.activeSelf)
             {
@@ -282,6 +327,8 @@ namespace Vi.UI
                 authenticationParent.SetActive(false);
                 playParent.SetActive(false);
             }
+
+            viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
 
             welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
