@@ -171,7 +171,16 @@ namespace Vi.UI
         {
             PlayerPrefs.SetString("username", usernameInput.text);
             PlayerPrefs.SetString("password", passwordInput.text);
+
+            emailInput.interactable = false;
+            usernameInput.interactable = false;
+            passwordInput.interactable = false;
+
             yield return WebRequestManager.Singleton.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
+
+            emailInput.interactable = true;
+            usernameInput.interactable = true;
+            passwordInput.interactable = true;
 
             if (string.IsNullOrEmpty(WebRequestManager.Singleton.LogInErrorText))
             {
