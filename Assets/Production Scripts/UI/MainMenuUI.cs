@@ -18,6 +18,7 @@ namespace Vi.UI
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
         [SerializeField] private Text initialErrorText;
+        [SerializeField] private Button[] authenticationButtons;
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
         [SerializeField] private GameObject authenticationParent;
@@ -27,7 +28,7 @@ namespace Vi.UI
         [SerializeField] private Button loginButton;
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
-        [Header("Online Play Menu")]
+        [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
         [SerializeField] private Text welcomeUserText;
         [Header("Editor Only")]
@@ -193,9 +194,6 @@ namespace Vi.UI
 
         public void LoginWithGoogle()
         {
-            initialErrorText.text = "Google sign in not implemented yet";
-            return;
-
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
@@ -252,6 +250,29 @@ namespace Vi.UI
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
             auth = FirebaseAuth.DefaultInstance;
             initialErrorText.text = "";
+
+            StartCoroutine(AutomaticallyAttemptLogin());
+        }
+
+        private IEnumerator AutomaticallyAttemptLogin()
+        {
+            if (PlayerPrefs.HasKey("username") & PlayerPrefs.HasKey("password"))
+            {
+                usernameInput.text = PlayerPrefs.GetString("username");
+                passwordInput.text = PlayerPrefs.GetString("password");
+                Login();
+
+                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsLoggingIn);
+
+                if (WebRequestManager.Singleton.IsLoggedIn)
+                {
+                    initialParent.SetActive(false);
+                }
+                else
+                {
+                    initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                }
+            }
         }
 
         private void Update()
@@ -272,18 +293,23 @@ namespace Vi.UI
             }
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            foreach (Button button in authenticationButtons)
+            {
+                button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            }
 
             if (!initialParent.activeSelf)
             {
                 authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
                 playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
-                viLogo.enabled = playParent.activeSelf;
             }
             else
             {
                 authenticationParent.SetActive(false);
                 playParent.SetActive(false);
             }
+
+            viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
 
             welcomeUserText.text = "Welcome " + usernameInput.text;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
