@@ -442,7 +442,6 @@ namespace Vi.Core
                 if (!IsLoggedIn)
                 {
                     LogInErrorText = "Invalid Username or Password";
-
                     if (postRequest.downloadHandler.text.Contains("isVerified"))
                     {
                         LogInErrorText = "Verify Your Email";
@@ -475,7 +474,6 @@ namespace Vi.Core
             IsLoggingIn = true;
             LogInErrorText = "";
             LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
-            Debug.Log(email + " " + firebaseUserId);
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -506,8 +504,7 @@ namespace Vi.Core
 
                 if (!IsLoggedIn)
                 {
-                    LogInErrorText = "Unable to login";
-
+                    LogInErrorText = "Login Failed";
                     if (postRequest.downloadHandler.text.Contains("isVerified"))
                     {
                         LogInErrorText = "Verify Your Email";
