@@ -470,6 +470,71 @@ namespace Vi.Core
             IsLoggingIn = false;
         }
 
+        public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
+        {
+            IsLoggingIn = true;
+            LogInErrorText = "";
+            LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
+            Debug.Log(email + " " + firebaseUserId);
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/firebaseAuth", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "auth/users/firebaseAuth", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
+
+                IsLoggedIn = false;
+                currentlyLoggedInUserId = "";
+            }
+            else
+            {
+                LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
+                IsLoggedIn = loginResultPayload.login;
+                currentlyLoggedInUserId = loginResultPayload.userId;
+
+                if (!IsLoggedIn)
+                {
+                    LogInErrorText = "Unable to login";
+
+                    if (postRequest.downloadHandler.text.Contains("isVerified"))
+                    {
+                        LogInErrorText = "Verify Your Email";
+                    }
+                }
+            }
+
+            switch (postRequest.result)
+            {
+                case UnityWebRequest.Result.InProgress:
+                    LogInErrorText = "Request in Progress";
+                    break;
+                case UnityWebRequest.Result.ConnectionError:
+                    LogInErrorText = "Server Offline";
+                    break;
+                case UnityWebRequest.Result.ProtocolError:
+                    LogInErrorText = "Protocol Error";
+                    break;
+                case UnityWebRequest.Result.DataProcessingError:
+                    LogInErrorText = "Data Processing Error";
+                    break;
+            }
+
+            postRequest.Dispose();
+            IsLoggingIn = false;
+        }
+
         public void Logout()
         {
             IsLoggedIn = false;
@@ -500,6 +565,18 @@ namespace Vi.Core
                 this.userId = userId;
                 this.login = login;
                 this.isPlayer = isPlayer;
+            }
+        }
+
+        private struct LoginWithFirebaseUserIdPayload
+        {
+            public string email;
+            public string firebaseUserId;
+
+            public LoginWithFirebaseUserIdPayload(string email, string firebaseUserId)
+            {
+                this.email = email;
+                this.firebaseUserId = firebaseUserId;
             }
         }
 

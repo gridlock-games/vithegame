@@ -194,35 +194,54 @@ namespace Vi.UI
 
         public void LoginWithGoogle()
         {
+            initialErrorText.text = "Google sign in not implemented yet";
+            return;
+
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
                 {
-                    Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
-                    auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
-                    {
-                        if (task.IsCanceled)
-                        {
-                            loginErrorText.text = "Login with google was cancelled.";
-                            return;
-                        }
-
-                        if (task.IsFaulted)
-                        {
-                            loginErrorText.text = "Login with google encountered an error.";
-                            return;
-                        }
-
-                        AuthResult result = task.Result;
-                        Debug.Log("User signed in successfully: " + result.User.DisplayName + " (" + result.User.UserId + ")");
-                        initialErrorText.text = "Successful google sign in";
-                    });
+                    StartCoroutine(WaitForGoogleAuth(tokenData));
                 }
                 else
                 {
                     Debug.LogError("Google sign in error - " + error);
                 }
             });
+        }
+
+        private IEnumerator WaitForGoogleAuth(GoogleAuth.GoogleIdTokenResponse tokenData)
+        {
+            Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+            System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
+
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.IsCanceled)
+            {
+                loginErrorText.text = "Login with google was cancelled.";
+                yield break;
+            }
+
+            if (task.IsFaulted)
+            {
+                loginErrorText.text = "Login with google encountered an error.";
+                yield break;
+            }
+
+            AuthResult authResult = task.Result;
+            Debug.Log("User signed in successfully: " + authResult.User.DisplayName + " (" + authResult.User.UserId + ")");
+
+            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+
+            if (WebRequestManager.Singleton.IsLoggedIn)
+            {
+                initialParent.SetActive(false);
+            }
+            else
+            {
+                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+            }
         }
 
         public void LoginWithFacebook()
