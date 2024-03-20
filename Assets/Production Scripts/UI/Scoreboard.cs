@@ -22,13 +22,25 @@ namespace Vi.UI
                 scoreboardHeaderText.text = LobbyUI.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " | " + PlayerDataManager.Singleton.GetMapName();
 
             List<ScoreboardElement> elementList = new List<ScoreboardElement>();
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
             {
                 GameObject instance = Instantiate(scoreboardElementPrefab.gameObject, scoreboardElementParent);
-
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
-                    scoreboardElement.Initialize(attributes);
+                    scoreboardElement.Initialize(playerData.id);
+                    elementList.Add(scoreboardElement);
+                }
+                else
+                {
+                    Debug.LogError("Scoreboard element prefab doesn't have a ScoreboardElement component!");
+                }
+            }
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetDisconnectedPlayerDataList())
+            {
+                GameObject instance = Instantiate(scoreboardElementPrefab.gameObject, scoreboardElementParent);
+                if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
+                {
+                    scoreboardElement.Initialize(playerData.id);
                     elementList.Add(scoreboardElement);
                 }
                 else
@@ -37,7 +49,7 @@ namespace Vi.UI
                 }
             }
 
-            elementList.Sort((x, y) => x.Attributes.GetTeam().CompareTo(y.Attributes.GetTeam()));
+            elementList.Sort((x, y) => x.GetTeam().CompareTo(y.GetTeam()));
             for (int i = 0; i < elementList.Count; i++)
             {
                 elementList[i].transform.SetSiblingIndex(i);
@@ -47,7 +59,7 @@ namespace Vi.UI
             PlayerDataManager.Team lastTeam = PlayerDataManager.Team.Environment;
             for (int i = 0; i < elementList.Count; i++)
             {
-                PlayerDataManager.Team team = elementList[i].Attributes.GetTeam();
+                PlayerDataManager.Team team = elementList[i].GetTeam();
                 if (team != lastTeam)
                 {
                     if (PlayerDataManager.GetTeamColor(team) != Color.black)

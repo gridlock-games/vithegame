@@ -100,6 +100,7 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(Login);
 
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
             switchLoginFormButton.onClick.RemoveAllListeners();
             switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
@@ -120,7 +121,7 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "LOGIN";
+            switchLoginFormButton.GetComponentInChildren<Text>().text = "GO TO LOGIN";
             switchLoginFormButton.onClick.RemoveAllListeners();
             switchLoginFormButton.onClick.AddListener(OpenViLogin);
         }
@@ -276,6 +277,7 @@ namespace Vi.UI
             {
                 authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
                 playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
+                viLogo.enabled = playParent.activeSelf;
             }
             else
             {

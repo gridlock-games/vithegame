@@ -253,6 +253,15 @@ namespace Vi.Core
 
         public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
 
+        public bool ContainsDisconnectedPlayerData(int clientId)
+        {
+            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            {
+                if (disconnectedPlayerData.playerData.id == clientId) { return true; }
+            }
+            return false;
+        }
+
         private int botClientId = 0;
         public void AddBotData(Team team)
         {
@@ -318,6 +327,16 @@ namespace Vi.Core
                 }
             }
             Debug.LogError("Could not find player data with ID: " + clientId);
+            return new PlayerData();
+        }
+
+        public PlayerData GetDisconnectedPlayerData(int clientId)
+        {
+            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            {
+                if (clientId == disconnectedPlayerData.playerData.id) { return disconnectedPlayerData.playerData; }
+            }
+            Debug.LogError("Could not find disconnected player data with ID: " + clientId);
             return new PlayerData();
         }
 
@@ -757,6 +776,16 @@ namespace Vi.Core
             {
                 if (playerData.team == Team.Spectator) { continue; }
                 playerDatas.Add(playerData);
+            }
+            return playerDatas;
+        }
+
+        public List<PlayerData> GetDisconnectedPlayerDataList()
+        {
+            List<PlayerData> playerDatas = new List<PlayerData>();
+            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            {
+                playerDatas.Add(disconnectedPlayerData.playerData);
             }
             return playerDatas;
         }

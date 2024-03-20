@@ -330,6 +330,15 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
 
+        public PlayerScore GetDisconnectedPlayerScore(int id)
+        {
+            foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+            {
+                if (disconnectedPlayerScore.playerScore.id == id) { return disconnectedPlayerScore.playerScore; }
+            }
+            return new PlayerScore();
+        }
+
         public void RemovePlayerScore(int id, FixedString32Bytes characterId)
         {
             int index = scoreList.IndexOf(new PlayerScore(id));

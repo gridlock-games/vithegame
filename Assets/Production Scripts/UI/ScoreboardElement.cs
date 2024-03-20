@@ -17,37 +17,70 @@ namespace Vi.UI
         [SerializeField] private Text kdRatioText;
         [SerializeField] private Image[] backgroundImagesToColor = new Image[0];
 
-        public Attributes Attributes { get; private set; }
+        public int playerDataId;
+        private bool initialized;
 
-        public void Initialize(Attributes attributes)
+        public void Initialize(int playerDataId)
         {
-            this.Attributes = attributes;
+            this.playerDataId = playerDataId;
             UpdateUI();
-            gameObject.SetActive(attributes);
+            initialized = true;
+        }
+
+        public PlayerDataManager.Team GetTeam()
+        {
+            return PlayerDataManager.Singleton.GetPlayerData(playerDataId).team;
+        }
+
+        private void Start()
+        {
+            disconnectedPlayerIcon.enabled = false;
         }
 
         private void Update()
         {
-            if (!Attributes) { gameObject.SetActive(false); return; }
+            if (!initialized) { return; }
+
             UpdateUI();
         }
 
         void UpdateUI()
         {
-            GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(Attributes.GetPlayerDataId());
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(Attributes.GetPlayerDataId());
-            for (int i = 0; i < backgroundImagesToColor.Length; i++)
+            Debug.Log(playerDataId + " " + PlayerDataManager.Singleton.ContainsId(playerDataId) + " " + PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId));
+            if (PlayerDataManager.Singleton.ContainsId(playerDataId))
             {
-                if (i % 2 == 0)
+                disconnectedPlayerIcon.enabled = false;
+                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(playerDataId);
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+                for (int i = 0; i < backgroundImagesToColor.Length; i++)
+                {
                     backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
-                else
-                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team) + new Color(50 / 255, 50 / 255, 50 / 255, 255 / 255);
+                }
+                playerNameText.text = playerData.character.name.ToString();
+                roundWinsText.text = playerScore.roundWins.ToString();
+                killsText.text = playerScore.kills.ToString();
+                deathsText.text = playerScore.deaths.ToString();
+                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
             }
-            playerNameText.text = playerData.character.name.ToString();
-            roundWinsText.text = playerScore.roundWins.ToString();
-            killsText.text = playerScore.kills.ToString();
-            deathsText.text = playerScore.deaths.ToString();
-            kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+            else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
+            {
+                disconnectedPlayerIcon.enabled = true;
+                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetDisconnectedPlayerScore(playerDataId);
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId);
+                for (int i = 0; i < backgroundImagesToColor.Length; i++)
+                {
+                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                }
+                playerNameText.text = playerData.character.name.ToString();
+                roundWinsText.text = playerScore.roundWins.ToString();
+                killsText.text = playerScore.kills.ToString();
+                deathsText.text = playerScore.deaths.ToString();
+                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+            }
+            else
+            {
+                Debug.LogError("Scoreboard element doesn't have a player data element to reference " + playerDataId);
+            }
         }
     }
 }
