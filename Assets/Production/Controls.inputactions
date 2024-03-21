@@ -650,13 +650,13 @@
             ]
         },
         {
-            "name": "Menu",
-            "id": "3afa2bf8-0efa-4636-8b13-a17487f534fa",
+            "name": "UI",
+            "id": "9e1fbe52-b476-424a-85b4-805b2e2fd8d2",
             "actions": [
                 {
                     "name": "Pause",
                     "type": "Button",
-                    "id": "30fda946-e623-4688-b7be-64ab355a68b5",
+                    "id": "d849a84c-a16c-404f-b664-c13e9ef20835",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -665,7 +665,7 @@
                 {
                     "name": "Inventory",
                     "type": "Button",
-                    "id": "fdd0257c-bb6d-4466-81bc-26359cf7bca3",
+                    "id": "87a36c8f-aa56-43d7-a170-5b2890e9a685",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -675,18 +675,7 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "ee243912-d149-442a-a422-ac3494a3322d",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "Pause",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3f34a50b-e5bf-4797-924e-39db72e2d3b7",
+                    "id": "50a1165a-3d46-44e7-8c9f-403951196990",
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
@@ -697,22 +686,33 @@
                 },
                 {
                     "name": "",
-                    "id": "861c61f1-bd11-46fd-ab2b-e1ff8dbbf04d",
-                    "path": "<Keyboard>/i",
+                    "id": "279ce17a-ce39-46d7-9193-eabb8df16ebc",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "906cf4cc-3e6d-4b93-a48e-2d11b6b36d5c",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "515aa903-1aa4-4cf9-ad9f-e5e0ca5de1e8",
-                    "path": "<Gamepad>/select",
+                    "id": "924e16c2-cf27-4a20-9596-107d07028aa2",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "Keyboard & Mouse",
                     "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1416,6 +1416,11 @@
                 {
                     "devicePath": "<Gamepad>",
                     "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<VirtualMouse>",
+                    "isOptional": true,
                     "isOR": false
                 }
             ]

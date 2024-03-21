@@ -196,6 +196,13 @@ namespace Vi.Core.GameModeManagers
                 PlayerScore playerScore = scoreList[i];
                 scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
             }
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
+            {
+                FixedString32Bytes charId = disconnectedScoreList[i].characterId;
+                PlayerScore playerScore = disconnectedScoreList[i].playerScore;
+                playerScore = new PlayerScore(playerScore.id, playerScore.roundWins);
+                disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
+            }
             if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
             isFirstRound = false;
             killHistory.Clear();
@@ -208,11 +215,33 @@ namespace Vi.Core.GameModeManagers
             foreach (int id in winningPlayersDataIds)
             {
                 int index = scoreList.IndexOf(new PlayerScore(id));
-                PlayerScore score = scoreList[index];
-                score.roundWins += 1;
-                scoreList[index] = score;
 
-                if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                if (index == -1)
+                {
+                    List<DisconnectedPlayerScore> cachedList = new List<DisconnectedPlayerScore>();
+                    foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+                    {
+                        cachedList.Add(disconnectedPlayerScore);
+                    }
+
+                    int disconnectedIndex = cachedList.FindIndex(item => item.playerScore.id == id);
+                    if (disconnectedIndex == -1) { continue; }
+
+                    PlayerScore score = disconnectedScoreList[disconnectedIndex].playerScore;
+                    FixedString32Bytes charId = disconnectedScoreList[disconnectedIndex].characterId;
+                    score.roundWins += 1;
+                    disconnectedScoreList[disconnectedIndex] = new DisconnectedPlayerScore(charId, score);
+
+                    if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                }
+                else
+                {
+                    PlayerScore score = scoreList[index];
+                    score.roundWins += 1;
+                    scoreList[index] = score;
+
+                    if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
+                }
             }
             
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
@@ -300,6 +329,15 @@ namespace Vi.Core.GameModeManagers
         }
 
         public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
+
+        public PlayerScore GetDisconnectedPlayerScore(int id)
+        {
+            foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+            {
+                if (disconnectedPlayerScore.playerScore.id == id) { return disconnectedPlayerScore.playerScore; }
+            }
+            return new PlayerScore();
+        }
 
         public void RemovePlayerScore(int id, FixedString32Bytes characterId)
         {
@@ -427,12 +465,6 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
-            //Debug.Log(disconnectedScoreList.Count);
-            //foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
-            //{
-            //    Debug.Log(disconnectedPlayerScore.characterId);
-            //}
-
             if (!IsServer) { return; }
             if (!AreAllPlayersConnected()) { return; }
 
