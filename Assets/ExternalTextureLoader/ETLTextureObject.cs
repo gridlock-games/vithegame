@@ -22,7 +22,7 @@ public class ETLTextureObject : MonoBehaviour
 
   public void LoadImageFromWeb(string url)
   {
-    StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequest(url, ChangeImageFile));
+    StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(url, ChangeImageFile));
   }
   public void Start()
   {
