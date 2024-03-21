@@ -1,14 +1,47 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using Vi.Core;
-using static Vi.Core.WebRequestManager;
+using static ExternalFileLoaderWeb;
+using static GameCreator.Behavior.Behavior;
 
-public static class ExternalFileLoaderWeb
+public class ExternalFileLoaderWeb : MonoBehaviour
 {
-  public static void CreateDirectory(string savePath)
+  private static ExternalFileLoaderWeb _singleton;
+
+  public static ExternalFileLoaderWeb Singleton
+  {
+    get
+    {
+      return _singleton;
+    }
+  }
+
+  private void Awake()
+  {
+    _singleton = this;
+  }
+  public WebExternalAssets webExternalAssets { get; private set; }
+
+  private class ExternalAssets
+  {
+    public WebExternalAssets webExternalAssets;
+  }
+
+  public class WebExternalAssets
+  {
+    public string key;
+    public string url;
+    public string dateModified;
+  }
+
+
+  private const string APIURL = "154.90.35.191/";
+
+  public void CreateDirectory(string savePath)
   {
     if (!Directory.Exists(savePath))
     {
@@ -16,7 +49,7 @@ public static class ExternalFileLoaderWeb
     }
   }
 
-  private static void SaveImage(byte[] rawImageData, string itemID)
+  private void SaveImage(byte[] rawImageData, string itemID)
   {
     Debug.Log("saving file");
     string savePath = Application.persistentDataPath + "/cache";
@@ -32,19 +65,12 @@ public static class ExternalFileLoaderWeb
     }
   }
 
-  //todo: Impletement API code
-  public static GameExternalAssets RetreveAPIData(string itemID)
-  {
-    Debug.Log(itemID);
-    return WebRequestManager.Singleton.getExternalAssets(itemID);
-  }
-
-  private static bool checkIfLatestCopy(string fileLocation, string itemID)
+  private bool checkIfLatestCopy(string fileLocation, string itemID, string LatestDateModify)
   {
     DateTime dt = File.GetLastWriteTime(fileLocation);
-
+    DateTime ldt = DateTime.Parse(LatestDateModify);
     //insert code from API
-    int result = DateTime.Compare(dt, DateTime.Now);
+    int result = DateTime.Compare(dt, ldt);
     if (result == 0)
     {
       return true;
@@ -59,55 +85,80 @@ public static class ExternalFileLoaderWeb
     }
   }
 
-  public static IEnumerator DoImageWebRequestCacheables(string itemID, bool chaceable, System.Action<Texture2D> callback)
+  public IEnumerator DoImageWebRequestCacheables(string itemID, bool chaceable, System.Action<Texture2D> callback)
   {
+    UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/getAsset/" + itemID);
+    yield return getRequest.SendWebRequest();
+
+    if (getRequest.result != UnityWebRequest.Result.Success)
+    {
+      Debug.LogError("Get Request Error in WebRequestManager.ExternalAssetsGetAssets() " + getRequest.error + APIURL + "game/getAsset/" + itemID);
+      getRequest.Dispose();
+      yield break;
+    }
+
+    WebExternalAssets gea = JsonConvert.DeserializeObject<WebExternalAssets>(getRequest.downloadHandler.text);
+    getRequest.Dispose();
+
     string savePath = Application.persistentDataPath + "/cache";
-    //Check if its chaceable
+
+    //Check if its cached and uptodate
     if (File.Exists(savePath + '/' + itemID + ".png"))
     {
-      if (checkIfLatestCopy(savePath + '/' + itemID + ".png", itemID))
+      if (checkIfLatestCopy(savePath + '/' + itemID + ".png", itemID, gea.dateModified))
       {
         Debug.Log("item exist");
         byte[] bytes = File.ReadAllBytes(savePath + '/' + itemID + ".png");
         Texture2D texture = new Texture2D(1, 1);
         texture.LoadImage(bytes);
         callback(texture);
+        yield break;
       }
     }
-    else
-    {
-      GameExternalAssets assetsInfo = RetreveAPIData(itemID);
-      var url = assetsInfo.url;
-      //Call Image downloader to retreve data, save it to storage then callback as texture
-      using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
-      {
-        Debug.Log("Getting from Network");
-        yield return request.SendWebRequest();
 
-        if (request.isNetworkError)
+    var url = gea.url;
+    //Call Image downloader to retreve data, save it to storage then callback as texture
+    using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+    {
+      Debug.Log("Getting from Network");
+      yield return request.SendWebRequest();
+
+      if (request.isNetworkError)
+      {
+        //Show alt image
+        Debug.Log("Cannot download Image");
+      }
+      else
+      {
+        if (chaceable)
         {
-          //Show alt image
-          Debug.Log("Cannot download Image");
+          CreateDirectory(savePath);
+          byte[] results = request.downloadHandler.data;
+          SaveImage(results, itemID);
         }
-        else
-        {
-          if (chaceable)
-          {
-            CreateDirectory(savePath);
-            byte[] results = request.downloadHandler.data;
-            SaveImage(results, itemID);
-          }
-          callback(((DownloadHandlerTexture)request.downloadHandler).texture);
-        }
+        callback(((DownloadHandlerTexture)request.downloadHandler).texture);
       }
     }
   }
 
-  public static IEnumerator DoImageWebRequestID(string itemID, System.Action<Texture2D> callback)
+  public IEnumerator DoImageWebRequestID(string itemID, System.Action<Texture2D> callback)
   {
-    //Call API to retreve Data
-    GameExternalAssets assetsInfo = RetreveAPIData(itemID);
-    var url = assetsInfo.url;
+    Debug.Log("Getting Request");
+    UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/getAsset/" + itemID);
+    yield return getRequest.SendWebRequest();
+
+    if (getRequest.result != UnityWebRequest.Result.Success)
+    {
+      Debug.LogError("Get Request Error in WebRequestManager.ExternalAssetsGetAssets() " + getRequest.error + APIURL + "game/getAsset/" + itemID);
+      getRequest.Dispose();
+      //yield break;
+    }
+
+    WebExternalAssets gea = JsonConvert.DeserializeObject<WebExternalAssets>(getRequest.downloadHandler.text);
+    webExternalAssets = gea;
+    getRequest.Dispose();
+
+    var url = gea.url;
 
     using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
     {
@@ -125,7 +176,7 @@ public static class ExternalFileLoaderWeb
     }
   }
 
-  public static IEnumerator DoImageWebRequest(string url, System.Action<Texture2D> callback)
+  public IEnumerator DoImageWebRequest(string url, System.Action<Texture2D> callback)
   {
     using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
     {
@@ -142,12 +193,26 @@ public static class ExternalFileLoaderWeb
     }
   }
 
-  public static IEnumerator DoTextWebRequestID(string itemID, System.Action<String> callback)
+  public IEnumerator DoTextWebRequestID(string itemID, System.Action<String> callback)
   {
+    Debug.Log("Getting Request");
+    UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/getAsset/" + itemID);
+    yield return getRequest.SendWebRequest();
+
+    if (getRequest.result != UnityWebRequest.Result.Success)
+    {
+      Debug.LogError("Get Request Error in WebRequestManager.ExternalAssetsGetAssets() " + getRequest.error + APIURL + "game/getAsset/" + itemID);
+      callback("There was an error retrieving the file");
+      getRequest.Dispose();
+      yield break;
+    }
+
+    WebExternalAssets gea = JsonConvert.DeserializeObject<WebExternalAssets>(getRequest.downloadHandler.text);
+    getRequest.Dispose();
+
     Debug.Log("Doing Web loading");
     //Call API to retreve Data
-    GameExternalAssets assetsInfo = RetreveAPIData(itemID);
-    var url = assetsInfo.url;
+    var url = gea.url;
 
     using (UnityWebRequest request = UnityWebRequest.Get(url))
     {
@@ -156,12 +221,29 @@ public static class ExternalFileLoaderWeb
       {
         callback("There was an error retrieving the file");
       }
-
       else
       {
-        
         callback(request.downloadHandler.text);
       }
     }
   }
 }
+
+
+//private IEnumerable ExternalAssetsGetAssets(string key)
+//{
+//  Debug.Log("Getting Request");
+//  UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/getAsset/" + key);
+//  yield return getRequest.SendWebRequest();
+
+//  if (getRequest.result != UnityWebRequest.Result.Success)
+//  {
+//    Debug.LogError("Get Request Error in WebRequestManager.ExternalAssetsGetAssets() " + getRequest.error + APIURL + "game/getAsset/" + key);
+//    getRequest.Dispose();
+//    //yield break;
+//  }
+
+//  WebExternalAssets gea = JsonConvert.DeserializeObject<WebExternalAssets>(getRequest.downloadHandler.text);
+//  webExternalAssets = gea;
+//  getRequest.Dispose();
+//}

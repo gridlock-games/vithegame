@@ -6,8 +6,10 @@ using System.Text.RegularExpressions;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 using Vi.ScriptableObjects;
+using static Vi.Core.WebRequestManager;
 
 namespace Vi.Core
 {
@@ -1679,35 +1681,6 @@ namespace Vi.Core
       public GameVersion gameversion;
     }
 
-    public class GameExternalAssets
-    {
-      public string key;
-      public string url;
-      public string dateModified;
-    }
 
-    public GameExternalAssets getExternalAssets(string key)
-    {
-      return ExternalAssetsGetAssets(key);
-    }
-
-    private GameExternalAssets ExternalAssetsGetAssets(string key)
-    {
-      Debug.Log("Getting Request");
-      UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/getAsset/" + key);
-      //yield return getRequest.SendWebRequest();
-
-      if (getRequest.result != UnityWebRequest.Result.Success)
-      {
-        Debug.LogError("Get Request Error in WebRequestManager.ExternalAssetsGetAssets() " + getRequest.error + APIURL + "game/getAsset/" + key);
-        getRequest.Dispose();
-        //yield break;
-      }
-
-      GameExternalAssets gea = JsonConvert.DeserializeObject<GameExternalAssets>(getRequest.downloadHandler.text);
-
-      getRequest.Dispose();
-      return gea;
-    }
   }
 }

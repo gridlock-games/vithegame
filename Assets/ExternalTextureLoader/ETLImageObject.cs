@@ -26,11 +26,11 @@ public class ETLImageObject : MonoBehaviour
   {
         if (cacheable)
         {
-      StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequestCacheables(itemID, cacheable, ChangeImageFile));
+      StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequestCacheables(itemID, cacheable, ChangeImageFile));
     }
         else
         {
-      StartCoroutine(ExternalFileLoaderWeb.DoImageWebRequest(WWWImageSource, ChangeImageFile));
+      StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(WWWImageSource, ChangeImageFile));
     }
     }
   public void Start()

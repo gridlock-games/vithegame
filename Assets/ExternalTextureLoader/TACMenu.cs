@@ -50,7 +50,7 @@ public class TACMenu : MonoBehaviour
   private void startFileRetreval()
   {
     Debug.Log("sfr");
-    StartCoroutine(ExternalFileLoaderWeb.DoTextWebRequestID(termsID, updateTermsData));
+    StartCoroutine(ExternalFileLoaderWeb.Singleton.DoTextWebRequestID(termsID, updateTermsData));
   }
 
   private void assignButtons()
