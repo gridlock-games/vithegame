@@ -42,6 +42,7 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
+            if (!PlayerPrefs.HasKey("DebugOverlayEnabled")) { PlayerPrefs.SetString("DebugOverlayEnabled", false.ToString()); }
         }
 
         private IEnumerator LoadScenes()

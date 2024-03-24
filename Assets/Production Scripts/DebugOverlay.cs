@@ -4,11 +4,13 @@ using UnityEngine;
 using Unity.Multiplayer.Tools.NetStatsMonitor;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
 {
-    [SerializeField] private bool enableDisplay;
+    [SerializeField] private GameObject debugCanvas;
+    [SerializeField] private Text fpsText;
 
     private bool ignoreInfo;
     private bool ignoreWarnings;
@@ -18,17 +20,10 @@ public class DebugOverlay : MonoBehaviour
     private string output;
     private string stack;
 
-    private RuntimeNetStatsMonitor runtimeNetStatsMonitor;
-
-    void ToggleDebugOverlay(bool status)
-    {
-        enableDisplay = status;
-    }
-
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-        runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
+        debugCanvas.SetActive(false);
         DebugManager.instance.enableRuntimeUI = false;
     }
 
@@ -63,32 +58,37 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
-    void OnGUI()
-    {
-        if (!enableDisplay) { return; }
-
-        if (!Application.isEditor)
-        {
-            GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
-        }
-        
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.yellow;
-        style.fontSize = 24;
-        GUI.Label(new Rect(0, Screen.height - 25, 100, 10), "FPS: " + Mathf.RoundToInt(frameCount).ToString(), style);
-        GUI.UnfocusWindow();
-    }
-
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
-        if (Input.GetKeyDown(KeyCode.BackQuote) | Keyboard.current[Key.Backquote].wasPressedThisFrame)
+        bool enableDisplay = bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"));
+        if (Input.GetKeyDown(KeyCode.BackQuote))
         {
-            enableDisplay = !enableDisplay;
+            PlayerPrefs.SetString("DebugOverlayEnabled", (!enableDisplay).ToString());
             myLog = "";
         }
-        runtimeNetStatsMonitor.Visible = enableDisplay & Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer;
+
+        debugCanvas.SetActive(enableDisplay);
+
+        if (enableDisplay)
+        {
+            fpsText.text = "FPS: " + Mathf.RoundToInt(frameCount).ToString();
+            Color fpsTextColor = Color.white;
+            if (frameCount >= Screen.currentResolution.refreshRate)
+            {
+                fpsTextColor = Color.green;
+            }
+            else if (frameCount >= Screen.currentResolution.refreshRate / 2)
+            {
+                fpsTextColor = Color.yellow;
+            }
+            else
+            {
+                fpsTextColor = Color.red;
+            }
+            fpsText.color = fpsTextColor;
+        }
     }
 
     private Coroutine fpsCounterCoroutine;
