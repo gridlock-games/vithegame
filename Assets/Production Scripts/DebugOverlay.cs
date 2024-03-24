@@ -11,6 +11,7 @@ public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] private GameObject debugCanvas;
     [SerializeField] private Text fpsText;
+    [SerializeField] private Text consoleLogText;
 
     private bool ignoreInfo;
     private bool ignoreWarnings;
@@ -24,6 +25,7 @@ public class DebugOverlay : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         debugCanvas.SetActive(false);
+        consoleLogText.text = myLog;
         DebugManager.instance.enableRuntimeUI = false;
     }
 
@@ -56,6 +58,8 @@ public class DebugOverlay : MonoBehaviour
         {
             myLog = myLog.Substring(0, 1000);
         }
+
+        consoleLogText.text = myLog;
     }
 
     private void Update()
