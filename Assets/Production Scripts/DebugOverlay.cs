@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] private GameObject debugCanvas;
-    [SerializeField] private Text fpsText;
     [SerializeField] private Text consoleLogText;
-
-    private bool ignoreInfo;
-    private bool ignoreWarnings;
-    private bool ignoreErrors;
+    [SerializeField] private Text fpsText;
+    [SerializeField] private Text dividerText;
+    [SerializeField] private Text pingText;
 
     static string myLog = "";
     private string output;
@@ -24,6 +23,10 @@ public class DebugOverlay : MonoBehaviour
         debugCanvas.SetActive(false);
         consoleLogText.text = myLog;
         DebugManager.instance.enableRuntimeUI = false;
+
+        fpsText.text = "";
+        dividerText.text = "";
+        pingText.text = "";
     }
 
     void OnEnable()
@@ -39,10 +42,6 @@ public class DebugOverlay : MonoBehaviour
 
     public void Log(string logString, string stackTrace, LogType type)
     {
-        if (ignoreInfo) { if (type == LogType.Log) { return; } }
-        if (ignoreWarnings) { if (type == LogType.Warning) { return; } }
-        if (ignoreErrors) { if (type == LogType.Error) { return; } }
-
         output = logString;
         stack = stackTrace;
 
@@ -75,7 +74,7 @@ public class DebugOverlay : MonoBehaviour
         if (enableDisplay)
         {
             fpsText.text = "FPS: " + Mathf.RoundToInt(frameCount).ToString();
-            Color fpsTextColor = Color.white;
+            Color fpsTextColor;
             if (frameCount >= Screen.currentResolution.refreshRate)
             {
                 fpsTextColor = Color.green;
@@ -89,6 +88,39 @@ public class DebugOverlay : MonoBehaviour
                 fpsTextColor = Color.red;
             }
             fpsText.color = fpsTextColor;
+
+            bool pingTextEvaluated = false;
+            if (NetworkManager.Singleton)
+            {
+                if (NetworkManager.Singleton.IsConnectedClient)
+                {
+                    ulong ping = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(NetworkManager.Singleton.LocalClientId);
+                    pingText.text = ping.ToString() + "ms";
+                    dividerText.text = "|";
+                    Color pingTextColor;
+                    if (ping >= 80)
+                    {
+                        pingTextColor = Color.red;
+                    }
+                    else if (ping >= 50)
+                    {
+                        pingTextColor = Color.yellow;
+                    }
+                    else
+                    {
+                        pingTextColor = Color.green;
+                    }
+                    pingText.color = pingTextColor;
+                    pingTextEvaluated = true;
+                }
+            }
+
+            if (!pingTextEvaluated)
+            {
+                pingText.text = "";
+                dividerText.text = "";
+                pingText.color = Color.green;
+            }
         }
     }
 
