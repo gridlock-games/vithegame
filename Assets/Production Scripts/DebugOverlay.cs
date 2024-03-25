@@ -73,7 +73,7 @@ public class DebugOverlay : MonoBehaviour
 
         if (enableDisplay)
         {
-            fpsText.text = "FPS: " + Mathf.RoundToInt(frameCount).ToString();
+            fpsText.text = Mathf.RoundToInt(frameCount).ToString() + "FPS";
             Color fpsTextColor;
             if (frameCount >= Screen.currentResolution.refreshRate)
             {
