@@ -39,12 +39,12 @@ namespace Vi.UI
 
         public void SetDebugOverlay()
         {
-            GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
+            PlayerPrefs.SetString("DebugOverlayEnabled", (!bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"))).ToString());
         }
 
         private void Start()
         {
-            GameObject.Find("DebugOverlay").SendMessage("ToggleDebugOverlay", debugOverlayToggle.isOn);
+            debugOverlayToggle.SetIsOnWithoutNotify(bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled")));
             volumeSlider.value = AudioListener.volume;
 
             goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });

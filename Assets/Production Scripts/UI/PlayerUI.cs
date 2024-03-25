@@ -130,6 +130,8 @@ namespace Vi.UI
         private Weapon lastWeapon;
         private void UpdateWeapon(bool forceRefresh)
         {
+            if (playerInput.currentControlScheme == null) { return; }
+
             if (!forceRefresh)
             {
                 if (lastWeapon == weaponHandler.GetWeapon())

@@ -1,35 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Multiplayer.Tools.NetStatsMonitor;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
+using Unity.Netcode;
+using Vi.Core;
 
-[RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
 {
-    [SerializeField] private bool enableDisplay;
-
-    private bool ignoreInfo;
-    private bool ignoreWarnings;
-    private bool ignoreErrors;
+    [SerializeField] private GameObject debugCanvas;
+    [SerializeField] private Text consoleLogText;
+    [SerializeField] private Text fpsText;
+    [SerializeField] private Text dividerText;
+    [SerializeField] private Text pingText;
 
     static string myLog = "";
     private string output;
     private string stack;
 
-    private RuntimeNetStatsMonitor runtimeNetStatsMonitor;
-
-    void ToggleDebugOverlay(bool status)
-    {
-        enableDisplay = status;
-    }
-
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-        runtimeNetStatsMonitor = GetComponent<RuntimeNetStatsMonitor>();
+        debugCanvas.SetActive(false);
+        consoleLogText.text = myLog;
         DebugManager.instance.enableRuntimeUI = false;
+
+        fpsText.text = "";
+        dividerText.text = "";
+        pingText.text = "";
     }
 
     void OnEnable()
@@ -45,10 +43,6 @@ public class DebugOverlay : MonoBehaviour
 
     public void Log(string logString, string stackTrace, LogType type)
     {
-        if (ignoreInfo) { if (type == LogType.Log) { return; } }
-        if (ignoreWarnings) { if (type == LogType.Warning) { return; } }
-        if (ignoreErrors) { if (type == LogType.Error) { return; } }
-
         output = logString;
         stack = stackTrace;
 
@@ -61,34 +55,75 @@ public class DebugOverlay : MonoBehaviour
         {
             myLog = myLog.Substring(0, 1000);
         }
-    }
 
-    void OnGUI()
-    {
-        if (!enableDisplay) { return; }
-
-        if (!Application.isEditor)
-        {
-            GUI.TextArea(new Rect(10, 10, Screen.width / 3 - 10, Screen.height / 3 - 10), myLog);
-        }
-        
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.yellow;
-        style.fontSize = 24;
-        GUI.Label(new Rect(0, Screen.height - 25, 100, 10), "FPS: " + Mathf.RoundToInt(frameCount).ToString(), style);
-        GUI.UnfocusWindow();
+        consoleLogText.text = myLog;
     }
 
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
-        if (Input.GetKeyDown(KeyCode.BackQuote) | Keyboard.current[Key.Backquote].wasPressedThisFrame)
+        bool enableDisplay = bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"));
+        if (Input.GetKeyDown(KeyCode.BackQuote))
         {
-            enableDisplay = !enableDisplay;
+            PlayerPrefs.SetString("DebugOverlayEnabled", (!enableDisplay).ToString());
             myLog = "";
         }
-        runtimeNetStatsMonitor.Visible = enableDisplay & Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer;
+
+        debugCanvas.SetActive(enableDisplay);
+
+        if (enableDisplay)
+        {
+            fpsText.text = Mathf.RoundToInt(frameCount).ToString() + "FPS";
+            Color fpsTextColor;
+            if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate)
+            {
+                fpsTextColor = Color.green;
+            }
+            else if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate / 2)
+            {
+                fpsTextColor = Color.yellow;
+            }
+            else
+            {
+                fpsTextColor = Color.red;
+            }
+            fpsText.color = fpsTextColor;
+
+            bool pingTextEvaluated = false;
+            if (PlayerDataManager.Singleton)
+            {
+                KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                if (kvp.Value)
+                {
+                    ulong ping = kvp.Value.GetRoundTripTime();
+                    pingText.text = ping.ToString() + "ms";
+                    dividerText.text = "|";
+                    Color pingTextColor;
+                    if (ping >= 80)
+                    {
+                        pingTextColor = Color.red;
+                    }
+                    else if (ping >= 50)
+                    {
+                        pingTextColor = Color.yellow;
+                    }
+                    else
+                    {
+                        pingTextColor = Color.green;
+                    }
+                    pingText.color = pingTextColor;
+                    pingTextEvaluated = true;
+                }
+            }
+
+            if (!pingTextEvaluated)
+            {
+                pingText.text = "";
+                dividerText.text = "";
+                pingText.color = Color.green;
+            }
+        }
     }
 
     private Coroutine fpsCounterCoroutine;
