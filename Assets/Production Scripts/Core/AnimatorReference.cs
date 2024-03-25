@@ -31,6 +31,7 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
+            return;
             if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
             {
                 CharacterReference.CharacterMaterial headMaterial = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(characterMaterial.raceAndGender).Find(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head & characterMaterial.material.name.Contains(string.Concat(item.material.name.Where(char.IsDigit))));
@@ -47,6 +48,7 @@ namespace Vi.Core
         private Dictionary<CharacterReference.EquipmentType, GameObject> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, GameObject>();
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
+            return;
             if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
             {
                 if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType])
