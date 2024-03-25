@@ -170,7 +170,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 221783993}
-  - component: {fileID: 221783992}
   - component: {fileID: 221783991}
   m_Layer: 0
   m_Name: DebugOverlay
@@ -196,30 +195,6 @@ MonoBehaviour:
   fpsText: {fileID: 1045652831}
   dividerText: {fileID: 1347858558}
   pingText: {fileID: 392511871}
---- !u!114 &221783992
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 221783990}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17737e0516da2445b9b0077ae2bd9b4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Visible: 1
-  m_MaxRefreshRate: 30
-  <CustomStyleSheet>k__BackingField: {fileID: 7433441132597879392, guid: f176f5541db8d2a44965c79fc193be0d,
-    type: 3}
-  <PanelSettingsOverride>k__BackingField: {fileID: 11400000, guid: 06831bb81162d1b4a87b1d2f51fe22a4,
-    type: 2}
-  <Position>k__BackingField:
-    <OverridePosition>k__BackingField: 1
-    m_PositionLeftToRight: 1
-    m_PositionTopToBottom: 1
-  <Configuration>k__BackingField: {fileID: 11400000, guid: 9d22f20dbf4039543b4ee2adc50a85de,
-    type: 2}
 --- !u!4 &221783993
 Transform:
   m_ObjectHideFlags: 0

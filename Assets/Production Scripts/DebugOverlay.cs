@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Unity.Netcode;
+using Vi.Core;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -75,11 +76,11 @@ public class DebugOverlay : MonoBehaviour
         {
             fpsText.text = Mathf.RoundToInt(frameCount).ToString() + "FPS";
             Color fpsTextColor;
-            if (frameCount >= Screen.currentResolution.refreshRate)
+            if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate)
             {
                 fpsTextColor = Color.green;
             }
-            else if (frameCount >= Screen.currentResolution.refreshRate / 2)
+            else if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate / 2)
             {
                 fpsTextColor = Color.yellow;
             }
@@ -90,11 +91,12 @@ public class DebugOverlay : MonoBehaviour
             fpsText.color = fpsTextColor;
 
             bool pingTextEvaluated = false;
-            if (NetworkManager.Singleton)
+            if (PlayerDataManager.Singleton)
             {
-                if (NetworkManager.Singleton.IsConnectedClient)
+                KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                if (kvp.Value)
                 {
-                    ulong ping = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(NetworkManager.Singleton.LocalClientId);
+                    ulong ping = kvp.Value.GetRoundTripTime();
                     pingText.text = ping.ToString() + "ms";
                     dividerText.text = "|";
                     Color pingTextColor;
