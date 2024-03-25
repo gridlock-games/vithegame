@@ -20,6 +20,7 @@ namespace Vi.Core
             if (other.isTrigger) { return; }
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
+            if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
             
             if (other.TryGetComponent(out NetworkCollider networkCollider))

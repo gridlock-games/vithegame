@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Multiplayer.Tools.NetStatsMonitor;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(RuntimeNetStatsMonitor))]
 public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] private GameObject debugCanvas;
