@@ -12,7 +12,7 @@ namespace Vi.UI
         [SerializeField] private Text victimText;
         [SerializeField] private Image causeOfDeathImage;
 
-        private float initializationTime;
+        private float initializationTime = Mathf.NegativeInfinity;
         public void Initialize(GameModeManager.KillHistoryElement killHistoryElement)
         {
             if (killHistoryElement.killType == GameModeManager.KillHistoryElement.KillType.Player)

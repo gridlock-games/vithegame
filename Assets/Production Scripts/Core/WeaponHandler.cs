@@ -739,6 +739,12 @@ namespace Vi.Core
             }
         }
 
+        void OnDisableBots()
+        {
+            if (!Application.isEditor) { return; }
+            PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+        }
+
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {

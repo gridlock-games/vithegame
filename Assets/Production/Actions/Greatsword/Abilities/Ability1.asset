@@ -89,6 +89,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   avatarLayer: 0
   transitionTime: 0.15
+  animationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 0
@@ -97,6 +98,7 @@ MonoBehaviour:
   attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 0.4
   damage: 3
+  healAmount: 0
   staminaDamage: 0
   defenseDamage: 1
   maxHitLimit: 1
@@ -111,10 +113,14 @@ MonoBehaviour:
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
   canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 1
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: cef828562819f4440b7dc31bd1d29e36, type: 3}
   abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
+  statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 7369619493490930291, guid: b600ca06c379db0449e6b2289c9147df, type: 3}
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
@@ -125,3 +131,5 @@ MonoBehaviour:
   aimDuringRecovery: 0
   shouldAimBody: 1
   shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1
