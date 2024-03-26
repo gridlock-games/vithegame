@@ -119,7 +119,14 @@ namespace Vi.Core
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
-                    if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+
+                    // If the last clip was an ability that can't be cancelled, don't play this clip
+                    if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
+                        | !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                        | !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                    }
                 }
             }
 
