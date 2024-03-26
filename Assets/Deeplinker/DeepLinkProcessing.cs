@@ -30,7 +30,6 @@ public class DeepLinkProcessing : MonoBehaviour
 
   private void onDeepLinkActivated(string url)
   {
-    // Update DeepLink Manager global variable, so URL can be accessed from anywhere.
     deeplinkURL = url;
 
     // Pass the data to whatever it is needed
