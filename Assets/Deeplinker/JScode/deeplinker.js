@@ -11,6 +11,7 @@ switch (deviceOS) {
     default:
         break;
 }
+location.href = finalLink;
 
 function getOS()
 {
