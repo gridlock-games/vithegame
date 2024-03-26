@@ -75,6 +75,8 @@ namespace Vi.UI.SimpleGoogleSignIn
 
             // Send an HTTP response to the browser to notify the user to close the browser.
             var response = context.Response;
+
+
             var buffer = System.Text.Encoding.UTF8.GetBytes($"Success! Please close the browser tab and return to {Application.productName}.");
 
             response.ContentLength64 = buffer.Length;
