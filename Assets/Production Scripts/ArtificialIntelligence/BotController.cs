@@ -20,7 +20,7 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
-        private const float collisionPushDampeningFactor = 1;
+        [SerializeField] private float collisionPushDampeningFactor = 1;
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {

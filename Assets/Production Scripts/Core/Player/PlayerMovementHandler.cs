@@ -35,7 +35,8 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
-        private const float collisionPushDampeningFactor = 1;
+        [Header("Collision Settings")]
+        [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (collision.collider.GetComponent<NetworkCollider>())
