@@ -745,6 +745,15 @@ namespace Vi.Core
         {
             if (!Application.isEditor) { return; }
             PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+
+            if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+            {
+                Debug.Log("Disabled Bot AI");
+            }
+            else
+            {
+                Debug.Log("Enabled Bot AI");
+            }
         }
 
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
