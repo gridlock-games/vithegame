@@ -134,7 +134,7 @@ namespace Vi.Core
 
             if (downloadsSuccessful)
             {
-                headerText.text = "Loading base scene";
+                headerText.text = "Loading Main Menu";
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
