@@ -235,6 +235,10 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
                 }
+                else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                {
+                    navMeshAgent.destination = currentPosition.Value;
+                }
             }
         }
 
