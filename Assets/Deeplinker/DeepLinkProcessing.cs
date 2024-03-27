@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DeepLinkProcessing : MonoBehaviour
@@ -31,8 +32,18 @@ public class DeepLinkProcessing : MonoBehaviour
   private void onDeepLinkActivated(string url)
   {
     deeplinkURL = url;
+    demotest();
+  }
 
+  private void demotest()
+  {
     // Pass the data to whatever it is needed
+    DemoDeepLinkPassthru ddlp = this.GetComponent<DemoDeepLinkPassthru>();
+    if (ddlp != null)
+    {
+      Debug.Log("Detected File: " + deeplinkURL);
+      ddlp.updateOutputText(deeplinkURL);
+    }
 
   }
 }
