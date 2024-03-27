@@ -182,6 +182,8 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
+            movement.y += stairMovement;
+
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
