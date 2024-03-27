@@ -20,27 +20,31 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
+        private const float collisionPushDampeningFactor = 1;
+        private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-
             if (collision.collider.GetComponent<NetworkCollider>())
             {
-                networkColliderRigidbody.AddForce(-collision.relativeVelocity, ForceMode.VelocityChange);
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
             }
-
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-
             if (collision.collider.GetComponent<NetworkCollider>())
             {
-                networkColliderRigidbody.AddForce(-collision.relativeVelocity, ForceMode.VelocityChange);
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
             }
-
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
@@ -100,6 +104,7 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
                 navMeshAgent.nextPosition = currentPosition.Value;
+                lastMovement = Vector3.zero;
                 return;
             }
 
@@ -206,6 +211,7 @@ namespace Vi.ArtificialIntelligence
             currentPosition.Value += movement + gravity;
             currentRotation.Value = newRotation;
             navMeshAgent.nextPosition = currentPosition.Value;
+            lastMovement = movement;
         }
 
         private void Update()
