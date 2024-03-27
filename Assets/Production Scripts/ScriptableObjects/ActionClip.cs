@@ -136,6 +136,10 @@ namespace Vi.ScriptableObjects
         public bool canCancelHeavyAttacks;
         public bool canCancelAbilities;
 
+        public bool canBeCancelledByLightAttacks;
+        public bool canBeCancelledByHeavyAttacks;
+        public bool canBeCancelledByAbilities;
+
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
 

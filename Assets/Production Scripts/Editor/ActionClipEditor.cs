@@ -43,9 +43,14 @@ namespace Vi.Editor
         private SerializedProperty spAilmentDuration;
         private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
+
         private SerializedProperty spCanCancelLightAttacks;
         private SerializedProperty spCanCancelHeavyAttacks;
         private SerializedProperty spCanCancelAbilities;
+
+        private SerializedProperty spCanBeCancelledByLightAttacks;
+        private SerializedProperty spCanBeCancelledByHeavyAttacks;
+        private SerializedProperty spCanBeCancelledByAbilities;
 
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
@@ -99,11 +104,16 @@ namespace Vi.Editor
             spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
+            spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
+            spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
+
             spCanCancelLightAttacks = serializedObject.FindProperty("canCancelLightAttacks");
             spCanCancelHeavyAttacks = serializedObject.FindProperty("canCancelHeavyAttacks");
             spCanCancelAbilities = serializedObject.FindProperty("canCancelAbilities");
-            spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
-            spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
+
+            spCanBeCancelledByLightAttacks = serializedObject.FindProperty("canBeCancelledByLightAttacks");
+            spCanBeCancelledByHeavyAttacks = serializedObject.FindProperty("canBeCancelledByHeavyAttacks");
+            spCanBeCancelledByAbilities = serializedObject.FindProperty("canBeCancelledByAbilities");
 
             spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
@@ -285,6 +295,9 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
                 EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanCancelAbilities);
+                EditorGUILayout.PropertyField(spCanBeCancelledByLightAttacks);
+                EditorGUILayout.PropertyField(spCanBeCancelledByHeavyAttacks);
+                EditorGUILayout.PropertyField(spCanBeCancelledByAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.PropertyField(spPreviewActionVFX);

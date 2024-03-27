@@ -130,6 +130,7 @@ namespace Vi.Core
             leftHandAimBodyInvertedConstraint.weight = 0;
             rightHandReachRig.weight = 0;
             leftHandReachRig.weight = 0;
+            meleeVerticalAimRig.weight = 0;
         }
 
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
@@ -147,6 +148,19 @@ namespace Vi.Core
         [SerializeField] private MultiAimConstraint leftHandAimConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
+        [SerializeField] private RigWeightTarget meleeVerticalAimRig;
+        [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
+
+        public void SetMeleeVerticalAimConstraintOffset(float zAngle)
+        {
+            zAngle = Mathf.Clamp(zAngle, -30, 30);
+            meleeVerticalAimConstraint.data.offset = new Vector3(0, 0, zAngle);
+        }
+
+        public void SetMeleeVerticalAimEnabled(bool isEnabled)
+        {
+            meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
+        }
 
         public enum BodyAimType
         {

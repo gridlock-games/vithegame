@@ -54,14 +54,14 @@ namespace Vi.Core
                     Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
                 }
 
-                if (wearableEquipmentOption.GetModel(raceAndGender))
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender).gameObject, transform);
+                if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
+                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform);
                 else
                     wearableEquipmentInstances.Remove(wearableEquipmentOption.equipmentType);
             }
-            else if (wearableEquipmentOption.GetModel(raceAndGender))
+            else if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender).gameObject, transform));
+                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform));
             }
 
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);

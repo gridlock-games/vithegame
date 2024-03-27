@@ -135,6 +135,8 @@ namespace Vi.Core
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
+            animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
+
             weaponInstances = instances;
         }
 
@@ -739,16 +741,22 @@ namespace Vi.Core
             }
         }
 
+        void OnDisableBots()
+        {
+            if (!Application.isEditor) { return; }
+            PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+        }
+
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
-            
+
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
-                ActionClip actionClip = SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())
@@ -763,12 +771,36 @@ namespace Vi.Core
                         }
                     }
                 }
+                else // If action clip is null
+                {
+                    if (CurrentActionClip.canBeCancelledByLightAttacks & inputAttackType == Weapon.InputAttackType.LightAttack)
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+
+                    if (CurrentActionClip.canBeCancelledByHeavyAttacks & inputAttackType == Weapon.InputAttackType.HeavyAttack)
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+
+                    if (CurrentActionClip.canBeCancelledByAbilities &
+                        (inputAttackType == Weapon.InputAttackType.Ability1
+                        | inputAttackType == Weapon.InputAttackType.Ability2
+                        | inputAttackType == Weapon.InputAttackType.Ability3
+                        | inputAttackType == Weapon.InputAttackType.Ability4))
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+                }
                 return actionClip;
             }
-            else if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))) // If we are at rest
+            else if (animationHandler.IsAtRest()) // If we are at rest
             {
                 ResetComboSystem();
-                ActionClip actionClip = SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())
@@ -796,7 +828,7 @@ namespace Vi.Core
             inputHistory.Clear();
         }
 
-        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType)
+        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
             switch (inputAttackType)
             {

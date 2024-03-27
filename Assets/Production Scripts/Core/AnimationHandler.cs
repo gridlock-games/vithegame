@@ -119,7 +119,14 @@ namespace Vi.Core
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
-                    if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+
+                    // If the last clip was an ability that can't be cancelled, don't play this clip
+                    if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
+                        & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                        & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                    }
                 }
             }
 
@@ -320,11 +327,11 @@ namespace Vi.Core
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.beard);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
             ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.brows);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
             ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.hair);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
             ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
@@ -348,6 +355,8 @@ namespace Vi.Core
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        [SerializeField] private Transform cameraPivot;
 
         private void Update()
         {
@@ -356,29 +365,11 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                //bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-                //if (bHit)
-                //{
-                //    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else if (hit.transform.root != transform.root)
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else
-                //    {
-                //        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //    }
-                //}
-                //else
-                //{
-                //    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //}
                 aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                meleeVerticalAimConstraintOffset.Value = (cameraPivot.position.y - aimPoint.Value.y) * 6;
             }
 
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(meleeVerticalAimConstraintOffset.Value);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }

@@ -186,6 +186,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "DisableBots",
+                    "type": "Button",
+                    "id": "788e612b-1b33-4ef0-ba01-1b9fe58a4d25",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "TimeScaleChange",
                     "type": "Button",
                     "id": "278c55b5-e282-4818-8540-62980d72c28e",
@@ -644,6 +653,17 @@
                     "processors": "",
                     "groups": "Gamepad;Touchscreen",
                     "action": "Weapon2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c164bc4-cb67-4967-b518-63e813fa52e9",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DisableBots",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
