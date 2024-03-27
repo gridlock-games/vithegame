@@ -92,6 +92,12 @@ namespace Vi.ArtificialIntelligence
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
+
+            if (Vector3.Distance(navMeshAgent.nextPosition, currentPosition.Value) < 0.1f)
+            {
+                inputDir = Vector3.zero;
+            }
+            //Debug.Log(Vector3.Distance(navMeshAgent.nextPosition, currentPosition.Value));
             
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
@@ -223,7 +229,7 @@ namespace Vi.ArtificialIntelligence
 
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                         {
-                            weaponHandler.SendMessage("OnLightAttack");
+                            //weaponHandler.SendMessage("OnLightAttack");
                         }
                     }
                 }
