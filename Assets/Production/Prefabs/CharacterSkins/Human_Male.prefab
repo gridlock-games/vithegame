@@ -212,7 +212,7 @@ Transform:
   m_Children:
   - {fileID: 7549122300994463253}
   m_Father: {fileID: 5804354747909585976}
-  m_RootOrder: 18
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8245541889614684380
 MonoBehaviour:
@@ -448,7 +448,7 @@ Transform:
   - {fileID: 7243966310285713638}
   - {fileID: 3954491899294613613}
   m_Father: {fileID: 5804354747909585976}
-  m_RootOrder: 17
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2915051537018460153
 MonoBehaviour:
@@ -510,7 +510,7 @@ Transform:
   m_Children:
   - {fileID: 5435350528436861901}
   m_Father: {fileID: 5804354747909585976}
-  m_RootOrder: 19
+  m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7696682009090650848
 MonoBehaviour:
@@ -592,6 +592,68 @@ MonoBehaviour:
   tipMultiplier: 1
   offset: {x: 0, y: 0, z: 0}
   debugLines: 0
+--- !u!1 &5555953369981882589
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1828833822474906190}
+  - component: {fileID: 2154144891541030212}
+  - component: {fileID: 928111209206620082}
+  m_Layer: 0
+  m_Name: MeleeVerticalAimRig
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1828833822474906190
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555953369981882589}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1814980477383057197}
+  m_Father: {fileID: 5804354747909585976}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2154144891541030212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555953369981882589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 0
+  m_Effectors: []
+--- !u!114 &928111209206620082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5555953369981882589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f43ee48155ea45c4aa1eb4049bf3adbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &5765524325395512490
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,7 +942,7 @@ Transform:
   - {fileID: 4972201464068008165}
   - {fileID: 477320462350512250}
   m_Father: {fileID: 5804354747909585976}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7380025813079815408
 MonoBehaviour:
@@ -1131,6 +1193,85 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!1 &9176414353596352794
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1814980477383057197}
+  - component: {fileID: 8577034352154996663}
+  m_Layer: 0
+  m_Name: VerticalAimRotationConstraint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1814980477383057197
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9176414353596352794}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1828833822474906190}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8577034352154996663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9176414353596352794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb90b913935e644baaa86c076d788e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Data:
+    m_ConstrainedObject: {fileID: 4808333191175075164}
+    m_SourceObjects:
+      m_Length: 1
+      m_Item0:
+        transform: {fileID: 1814980477383057197}
+        weight: 0.00001
+      m_Item1:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item2:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item3:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item4:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item5:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item6:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item7:
+        transform: {fileID: 0}
+        weight: 0
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_ConstrainedAxes:
+      x: 1
+      y: 1
+      z: 1
+    m_MaintainOffset: 0
 --- !u!1001 &6271135618739067859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1907,6 +2048,8 @@ MonoBehaviour:
   leftHandAimConstraint: {fileID: 2842214034934143423}
   rightHandReachRig: {fileID: 3227059422155854706}
   leftHandReachRig: {fileID: 2634057710867190123}
+  meleeVerticalAimRig: {fileID: 928111209206620082}
+  meleeVerticalAimConstraint: {fileID: 8577034352154996663}
 --- !u!114 &3131407962465346050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1955,7 +2098,17 @@ MonoBehaviour:
     m_Active: 1
   - m_Rig: {fileID: 7696682009090650848}
     m_Active: 1
-  m_Effectors: []
+  - m_Rig: {fileID: 2154144891541030212}
+    m_Active: 1
+  m_Effectors:
+  - m_Transform: {fileID: 3354788472555931755}
+    m_Style:
+      shape: {fileID: 4300000, guid: e050c2b16fe384bd994474655a4b4968, type: 2}
+      color: {r: 1, g: 0, b: 1, a: 0.5}
+      size: 0.25
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+    m_Visible: 1
 --- !u!114 &4994110318372811990
 MonoBehaviour:
   m_ObjectHideFlags: 0

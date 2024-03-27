@@ -355,6 +355,8 @@ namespace Vi.Core
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        [SerializeField] private Transform cameraPivot;
 
         private void Update()
         {
@@ -363,29 +365,11 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                //bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-                //if (bHit)
-                //{
-                //    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else if (hit.transform.root != transform.root)
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else
-                //    {
-                //        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //    }
-                //}
-                //else
-                //{
-                //    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //}
                 aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                meleeVerticalAimConstraintOffset.Value = (cameraPivot.position.y - aimPoint.Value.y) * 6;
             }
 
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(meleeVerticalAimConstraintOffset.Value);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }

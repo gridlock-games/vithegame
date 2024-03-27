@@ -135,6 +135,8 @@ namespace Vi.Core
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
+            animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
+
             weaponInstances = instances;
         }
 
