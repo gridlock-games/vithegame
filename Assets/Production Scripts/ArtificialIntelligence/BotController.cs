@@ -23,12 +23,24 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
+
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                networkColliderRigidbody.AddForce(-collision.relativeVelocity, ForceMode.VelocityChange);
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
+
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                networkColliderRigidbody.AddForce(-collision.relativeVelocity, ForceMode.VelocityChange);
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
@@ -92,13 +104,13 @@ namespace Vi.ArtificialIntelligence
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
-
-            if (Vector3.Distance(navMeshAgent.nextPosition, currentPosition.Value) < 0.1f)
+            
+            if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
             {
                 inputDir = Vector3.zero;
             }
-            //Debug.Log(Vector3.Distance(navMeshAgent.nextPosition, currentPosition.Value));
-            
+            //Debug.Log(Vector3.Distance(navMeshAgent.destination, currentPosition.Value));
+
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
