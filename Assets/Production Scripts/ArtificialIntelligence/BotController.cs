@@ -249,7 +249,7 @@ namespace Vi.ArtificialIntelligence
 
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                         {
-                            //weaponHandler.SendMessage("OnLightAttack");
+                            weaponHandler.SendMessage("OnLightAttack");
                         }
                     }
                 }
