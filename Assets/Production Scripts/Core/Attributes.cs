@@ -272,11 +272,10 @@ namespace Vi.Core
             return (Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration) & shouldShake;
         }
 
-        public const float ShakeAmount = 0;
+        public const float ShakeAmount = 10;
 
         private float hitFreezeStartTime = Mathf.NegativeInfinity;
         private bool shouldShake;
-        //public const float HitFreezeEffectDuration = 0.1f;
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (attacker.ShouldPlayHitStop() | ShouldPlayHitStop()) { return false; }

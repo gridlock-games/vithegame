@@ -123,7 +123,7 @@ namespace Vi.ScriptableObjects
         public float ailmentDuration = 2;
         public float grabDistance = 3;
 
-        public const float HitStopEffectDuration = 2;
+        public const float HitStopEffectDuration = 0.1f;
         public float GetTimeBetweenHits()
         {
             return timeBetweenHits + HitStopEffectDuration;
