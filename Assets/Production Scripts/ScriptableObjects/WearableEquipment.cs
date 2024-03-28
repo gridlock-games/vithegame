@@ -14,7 +14,6 @@ namespace Vi.ScriptableObjects
         {
             Transform target = GetComponentInParent<Animator>().transform;
             FindRootBone(ref target, target);
-            Debug.Log(target);
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
