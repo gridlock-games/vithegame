@@ -35,13 +35,30 @@ namespace Vi.Player
             cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
         }
 
+        [Header("Collision Settings")]
+        [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
+        private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
@@ -61,6 +78,7 @@ namespace Vi.Player
                     moveForwardTarget.Value = 0;
                     moveSidesTarget.Value = 0;
                 }
+                lastMovement = Vector3.zero;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
             }
 
@@ -161,6 +179,7 @@ namespace Vi.Player
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
+            lastMovement = movement;
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition + movement + gravity, newRotation);
         }
 

@@ -20,15 +20,31 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
+        [SerializeField] private float collisionPushDampeningFactor = 1;
+        private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
@@ -88,11 +104,18 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
                 navMeshAgent.nextPosition = currentPosition.Value;
+                lastMovement = Vector3.zero;
                 return;
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
             
+            if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
+            {
+                inputDir = Vector3.zero;
+            }
+            //Debug.Log(Vector3.Distance(navMeshAgent.destination, currentPosition.Value));
+
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
@@ -150,7 +173,6 @@ namespace Vi.ArtificialIntelligence
                 Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                targetDirection = Vector3.zero;
                 movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
@@ -177,6 +199,8 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
+            movement.y += stairMovement;
+
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
@@ -187,6 +211,7 @@ namespace Vi.ArtificialIntelligence
             currentPosition.Value += movement + gravity;
             currentRotation.Value = newRotation;
             navMeshAgent.nextPosition = currentPosition.Value;
+            lastMovement = movement;
         }
 
         private void Update()
@@ -227,6 +252,10 @@ namespace Vi.ArtificialIntelligence
                             weaponHandler.SendMessage("OnLightAttack");
                         }
                     }
+                }
+                else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                {
+                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
                 }
             }
         }
