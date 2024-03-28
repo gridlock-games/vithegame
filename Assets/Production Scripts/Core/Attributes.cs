@@ -278,8 +278,6 @@ namespace Vi.Core
         private bool shouldShake;
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
-            if (attacker.ShouldPlayHitStop() | ShouldPlayHitStop()) { return false; }
-
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
