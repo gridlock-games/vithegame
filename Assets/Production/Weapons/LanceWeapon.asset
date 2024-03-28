@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
   m_Name: LanceWeapon
   m_EditorClassIdentifier: 
+  runSpeed: 5
+  maxHP: 100
+  maxStamina: 100
+  staminaRecoveryRate: 5
+  staminaDelay: 1
+  maxDefense: 100
+  defenseRecoveryRate: 5
+  defenseDelay: 1
+  maxRage: 100
+  rageRecoveryRate: 0
+  shouldUseAmmo: 0
+  maxAmmoCount: 0
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
@@ -29,11 +41,11 @@ MonoBehaviour:
   - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
+    - weaponPrefab: {fileID: 8233962304293885144, guid: bc30ff30053a8eb45906debad5bc4872,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
-      weaponRotationOffset: {x: 92.96701, y: -147.181, z: -167.978}
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
