@@ -90,9 +90,9 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     newRotation = attributes.GetAilmentRotation();
-                if (weaponHandler.IsAiming())
+                if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
-                else
+                else if (!attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.RotateTowards(inputPayload.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
             }
             else
@@ -311,12 +311,18 @@ namespace Vi.Player
             else
             {
                 Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
+
+                if (attributes.ShouldShake())
+                {
+                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                }
+
                 transform.position += movement;
             }
 
             if (weaponHandler.CurrentActionClip != null)
             {
-                if (Time.time - attributes.HitFreezeStartTime < Attributes.HitFreezeEffectDuration)
+                if (attributes.ShouldPlayHitStop())
                 {
                     animationHandler.Animator.speed = 0;
                 }
@@ -325,7 +331,7 @@ namespace Vi.Player
                     animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
                 }
             }
-            
+
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
             else if (weaponHandler.IsAiming())

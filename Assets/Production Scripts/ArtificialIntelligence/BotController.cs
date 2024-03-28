@@ -289,12 +289,18 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (currentPosition.Value - transform.position);
+
+                if (attributes.ShouldShake())
+                {
+                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                }
+
                 transform.position += movement;
             }
-            
+
             if (weaponHandler.CurrentActionClip != null)
             {
-                if (Time.time - attributes.HitFreezeStartTime < Attributes.HitFreezeEffectDuration)
+                if (attributes.ShouldPlayHitStop())
                 {
                     animationHandler.Animator.speed = 0;
                 }
