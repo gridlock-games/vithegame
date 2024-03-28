@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4024358980
+  GlobalObjectIdHash: 3799388084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -77,8 +77,6 @@ MonoBehaviour:
   runAnimationTransitionSpeed: 5
   gravitySphereCastRadius: 0.75
   gravitySphereCastPositionOffset: {x: 0, y: 0.75, z: 0}
-  stairHeight: 0.6
-  rampCheckHeight: 0.1
 --- !u!114 &1564116883212529234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,15 +105,7 @@ MonoBehaviour:
     type: 3}
   teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
-  maxHP: 100
-  maxStamina: 100
-  staminaRecoveryRate: 5
-  staminaDelay: 1
-  maxDefense: 100
-  defenseRecoveryRate: 5
-  defenseDelay: 1
-  maxRage: 100
-  rageRecoveryRate: 0
+  isWaitingForSpawnPoint: 0
 --- !u!114 &1564116883212529237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,6 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraPivot: {fileID: 0}
 --- !u!114 &-8539089533449040199
 MonoBehaviour:
   m_ObjectHideFlags: 0

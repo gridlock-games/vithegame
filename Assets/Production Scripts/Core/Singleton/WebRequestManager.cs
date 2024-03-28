@@ -929,7 +929,7 @@ namespace Vi.Core
                         armorOptions.Find(item => item.name == "Empty Chest").itemWebId,
                         armorOptions.Find(item => item.name == "Empty Gloves").itemWebId,
                         armorOptions.Find(item => item.name == "Empty Belt").itemWebId,
-                        armorOptions.Find(item => item.name == "Empty Robe").itemWebId,
+                        armorOptions.Find(item => item.name == "Empty Pants").itemWebId,
                         armorOptions.Find(item => item.name == "Empty Boots").itemWebId,
                         System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                         System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
