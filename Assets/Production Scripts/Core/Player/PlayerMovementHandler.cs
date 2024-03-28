@@ -136,7 +136,11 @@ namespace Vi.Player
             // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
-            if (animationHandler.ShouldApplyRootMotion())
+            if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
+            }
+            else if (animationHandler.ShouldApplyRootMotion())
             {
                 movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
             }
