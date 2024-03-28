@@ -115,13 +115,19 @@ namespace Vi.ScriptableObjects
         public float staminaDamage = 0;
         public float defenseDamage = 0;
         public int maxHitLimit = 1;
-        public float timeBetweenHits = 1;
+        [SerializeField] private float timeBetweenHits = 1;
         public bool isBlockable = true;
         public bool isUninterruptable;
         public bool isInvincible;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
         public float grabDistance = 3;
+
+        public const float HitStopEffectDuration = 2;
+        public float GetTimeBetweenHits()
+        {
+            return timeBetweenHits + HitStopEffectDuration;
+        }
 
         public enum DodgeLock
         {

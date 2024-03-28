@@ -119,12 +119,12 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
-            Quaternion newRotation;
+            Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
-            if (weaponHandler.IsAiming())
+            if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
-            else
+            else if (!attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity

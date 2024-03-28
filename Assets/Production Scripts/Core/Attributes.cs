@@ -264,22 +264,23 @@ namespace Vi.Core
 
         public bool ShouldPlayHitStop()
         {
-            return Time.time - hitFreezeStartTime < HitFreezeEffectDuration;
+            return Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration;
         }
 
         public bool ShouldShake()
         {
-            return (Time.time - hitFreezeStartTime < HitFreezeEffectDuration) & shouldShake;
+            return (Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration) & shouldShake;
         }
 
         public const float ShakeAmount = 0;
-        private const float HitFreezeEffectDuration = 2;
 
         private float hitFreezeStartTime = Mathf.NegativeInfinity;
         private bool shouldShake;
         //public const float HitFreezeEffectDuration = 0.1f;
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
+            if (attacker.ShouldPlayHitStop() | ShouldPlayHitStop()) { return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -386,7 +387,7 @@ namespace Vi.Core
 
         private IEnumerator EvaluateAfterHitStop(ActionClip hitReaction, Vector3 impactPosition, float damage, ActionClip.Ailment attackAilment, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
         {
-            yield return new WaitForSeconds(HitFreezeEffectDuration);
+            yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
             // Ailments
             if (attackAilment != ailment.Value)
@@ -399,7 +400,6 @@ namespace Vi.Core
                     startPos.y = 0;
                     endPos.y = 0;
                     ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
-                    Debug.Log(name + " Ailment rotation set");
 
                     ailmentChangedOnThisAttack = ailment.Value != attackAilment;
                     ailment.Value = attackAilment;
