@@ -153,7 +153,7 @@ namespace Vi.Core
 
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)
         {
-            zAngle = Mathf.Clamp(zAngle, -30, 30);
+            zAngle = Mathf.Clamp(zAngle, -35, 35);
             meleeVerticalAimConstraint.data.offset = new Vector3(0, 0, zAngle);
         }
 
