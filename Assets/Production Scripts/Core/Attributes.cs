@@ -262,6 +262,8 @@ namespace Vi.Core
                 return null;
         }
 
+        public float HitFreezeStartTime { get; private set; } = Mathf.NegativeInfinity;
+        public const int HitFreezeEffectDuration = 5;
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
@@ -327,6 +329,9 @@ namespace Vi.Core
             }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
+
+            HitFreezeStartTime = Time.time;
+            attacker.HitFreezeStartTime = Time.time;
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {

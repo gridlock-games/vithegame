@@ -315,8 +315,17 @@ namespace Vi.Player
             }
 
             if (weaponHandler.CurrentActionClip != null)
-                animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
-
+            {
+                if (Time.time - attributes.HitFreezeStartTime < Attributes.HitFreezeEffectDuration)
+                {
+                    animationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+                }
+            }
+            
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();
             else if (weaponHandler.IsAiming())
