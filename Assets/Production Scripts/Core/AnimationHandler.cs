@@ -176,6 +176,15 @@ namespace Vi.Core
                 attributes.AddDefense(-actionClip.agentDefenseCost);
                 attributes.AddRage(-actionClip.agentRageCost);
             }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            {
+                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
+                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
+                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaCost);
+                attributes.AddDefense(-actionClip.agentDefenseCost);
+                attributes.AddRage(-actionClip.agentRageCost);
+            }
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
