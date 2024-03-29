@@ -367,7 +367,7 @@ namespace Vi.Core
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
             attacker.AddRage(2);
-            Debug.Log(attacker.name + " attacked " + name + " with " + attack.name + " " + attacker.weaponHandler.GetWeapon().name);
+
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
                 if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { continue; }
