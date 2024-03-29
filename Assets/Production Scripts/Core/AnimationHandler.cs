@@ -178,7 +178,7 @@ namespace Vi.Core
             }
 
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // Play the action clip based on its type
@@ -191,7 +191,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionStateName);
+            PlayActionClientRpc(actionStateName, weaponHandler.GetWeapon().name);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
         }
@@ -224,9 +224,15 @@ namespace Vi.Core
 
         // Remote Procedure Call method for playing the action on the client
         [ClientRpc]
-        private void PlayActionClientRpc(string actionStateName)
+        private void PlayActionClientRpc(string actionStateName, string weaponName)
         {
             if (IsServer) { return; }
+            StartCoroutine(PlayActionOnClient(actionStateName, weaponName));
+        }
+
+        private IEnumerator PlayActionOnClient(string actionStateName, string weaponName)
+        {
+            yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
@@ -241,7 +247,7 @@ namespace Vi.Core
             }
 
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine

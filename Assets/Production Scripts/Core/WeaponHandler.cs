@@ -157,10 +157,12 @@ namespace Vi.Core
         }
 
         public ActionClip CurrentActionClip { get; private set; }
+        private string currentActionClipWeapon;
 
-        public void SetActionClip(ActionClip actionClip)
+        public void SetActionClip(ActionClip actionClip, string weaponName)
         {
             CurrentActionClip = actionClip;
+            currentActionClipWeapon = weaponName;
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
             {
                 weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
@@ -377,7 +379,13 @@ namespace Vi.Core
             }
 
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
-            if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
+            if (currentActionClipWeapon != weaponInstance.name)
+            {
+                IsInAnticipation = false;
+                IsAttacking = false;
+                IsInRecovery = false;
+            }
+            else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
                 if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
@@ -468,9 +476,11 @@ namespace Vi.Core
 
         [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
 
+        private NetworkVariable<bool> canActivateFlashSwitch = new NetworkVariable<bool>();
+
         public bool CanActivateFlashSwitch()
         {
-            return Time.time - lastMeleeHitTime < 0.5f;
+            return canActivateFlashSwitch.Value;
         }
 
         void OnLightAttack()
@@ -682,6 +692,8 @@ namespace Vi.Core
                         if (movementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
+
+                canActivateFlashSwitch.Value = Time.time - lastMeleeHitTime < 0.5f;
             }
             else
             {
