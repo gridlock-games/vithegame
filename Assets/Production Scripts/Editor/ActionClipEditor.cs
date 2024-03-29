@@ -500,7 +500,7 @@ namespace Vi.Editor
                                 animationClip,
                                 curves[i]
                             );
-                            curve = this.ProcessRootCurve(curve);
+                            curve = ProcessRootCurve(curve);
                             spDebugSidesMotion.animationCurveValue = curve;
                         }
 
@@ -510,7 +510,7 @@ namespace Vi.Editor
                                 animationClip,
                                 curves[i]
                             );
-                            curve = this.ProcessRootCurve(curve);
+                            curve = ProcessRootCurve(curve);
                             spDebugForwardMotion.animationCurveValue = curve;
                         }
 
@@ -520,7 +520,7 @@ namespace Vi.Editor
                                 animationClip,
                                 curves[i]
                             );
-                            curve = this.ProcessRootCurve(curve);
+                            curve = ProcessRootCurve(curve);
                             spDebugVerticalMotion.animationCurveValue = curve;
                         }
                     }
