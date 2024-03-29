@@ -303,10 +303,17 @@ namespace Vi.Core
             }
             else
             {
-                if (weaponHandler.CanActivateFlashSwitch() & primaryWeapon.GetFlashAttack())
+                ActionClip flashAttack = primaryWeapon.GetFlashAttack();
+                if (flashAttack)
                 {
-                    FlashAttackServerRpc(1);
-                    currentEquippedWeapon.Value = 1;
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
+                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
+                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        FlashAttackServerRpc(1);
+                        currentEquippedWeapon.Value = 1;
+                    }
                 }
             }
         }
@@ -319,10 +326,17 @@ namespace Vi.Core
             }
             else
             {
-                if (weaponHandler.CanActivateFlashSwitch() & secondaryWeapon.GetFlashAttack())
+                ActionClip flashAttack = secondaryWeapon.GetFlashAttack();
+                if (flashAttack)
                 {
-                    FlashAttackServerRpc(2);
-                    currentEquippedWeapon.Value = 2;
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
+                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
+                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        FlashAttackServerRpc(2);
+                        currentEquippedWeapon.Value = 2;
+                    }
                 }
             }
         }
