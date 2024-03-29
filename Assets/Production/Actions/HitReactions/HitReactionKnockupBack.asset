@@ -14,13 +14,120 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipType: 3
   hitReactionType: 0
-  agentStaminaDamage: 20
-  weaponBone: 0
+  shouldApplyRootMotion: 1
+  rootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  avatarLayer: 0
+  transitionTime: 0.15
+  animationSpeed: 1
+  agentStaminaCost: 20
+  agentDefenseCost: 0
+  agentRageCost: 50
+  effectedWeaponBones: 
+  mustBeAiming: 0
   attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.75
   damage: 20
+  healAmount: 0
   staminaDamage: 0
   defenseDamage: 0
   maxHitLimit: 1
+  timeBetweenHits: 1
   isBlockable: 1
+  isUninterruptable: 0
+  isInvincible: 0
   ailment: 2
+  ailmentDuration: 2
+  grabDistance: 3
+  dodgeLock: 0
+  canCancelLightAttacks: 0
+  canCancelHeavyAttacks: 0
+  canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 0
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
+  abilityImageIcon: {fileID: 0}
+  abilityCooldownTime: 5
+  statusesToApplyToSelfOnActivate: []
+  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTeammateOnHit: []
+  actionVFXList: []
+  previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  aimDuringAnticipation: 0
+  aimDuringAttack: 0
+  aimDuringRecovery: 0
+  shouldAimBody: 1
+  shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1
