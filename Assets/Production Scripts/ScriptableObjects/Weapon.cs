@@ -400,7 +400,7 @@ namespace Vi.ScriptableObjects
                 }
             }
 
-            Debug.LogError("Action clip Not Found: " + clipName);
+            if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
             return null;
         }
     }
