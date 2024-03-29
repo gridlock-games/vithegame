@@ -182,6 +182,11 @@ namespace Vi.Core
             {
                 inputHistory.Add(Weapon.InputAttackType.LightAttack);
             }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            {
+                ResetComboSystem();
+                inputHistory.Add(Weapon.InputAttackType.LightAttack);
+            }
             else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
                 inputHistory.Add(Weapon.InputAttackType.HeavyAttack);
@@ -353,9 +358,6 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
-
-            if (IsLocalPlayer)
-                Debug.Log(CurrentActionClip);
 
             if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
