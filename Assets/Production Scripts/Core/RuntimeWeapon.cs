@@ -21,6 +21,8 @@ namespace Vi.Core
 
         protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
 
+        public Dictionary<Attributes, HitCounterData> GetHitCounter() { return hitCounter; }
+
         public void AddHit(Attributes attributes)
         {
             if (!hitCounter.ContainsKey(attributes))
