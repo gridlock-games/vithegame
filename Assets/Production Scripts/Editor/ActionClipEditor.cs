@@ -530,7 +530,6 @@ namespace Vi.Editor
 
         private AnimationCurve ProcessRootCurve(AnimationCurve source)
         {
-            ActionClip meleeClip = this.target as ActionClip;
             float value = source.Evaluate(0f);
             float duration = source.keys[source.length - 1].time;
             AnimationCurve result = new AnimationCurve();
