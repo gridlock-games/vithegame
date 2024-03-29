@@ -137,27 +137,23 @@ namespace Vi.Core
 
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
-            if (IsServer)
+            weaponInstances = instances;
+        }
+
+        public void PlayFlashAttack()
+        {
+            ActionClip flashAttack = weaponInstance.GetFlashAttack();
+            if (flashAttack != null)
             {
-                Debug.Log(CanActivateFlashSwitch() + " " + weaponInstance);
-                if (CanActivateFlashSwitch())
+                if (flashAttack.GetClipType() == ActionClip.ClipType.FlashAttack)
                 {
-                    ActionClip flashAttack = weaponInstance.GetFlashAttack();
-                    if (flashAttack != null)
-                    {
-                        if (flashAttack.GetClipType() == ActionClip.ClipType.FlashAttack)
-                        {
-                            animationHandler.PlayAction(flashAttack);
-                        }
-                        else
-                        {
-                            Debug.LogError("Attempting to play a flash attack, but the clip isn't set to be a flash attack! " + flashAttack);
-                        }
-                    }
+                    animationHandler.PlayAction(flashAttack);
+                }
+                else
+                {
+                    Debug.LogError("Attempting to play a flash attack, but the clip isn't set to be a flash attack! " + flashAttack);
                 }
             }
-            
-            weaponInstances = instances;
         }
 
         public ActionClip CurrentActionClip { get; private set; }
