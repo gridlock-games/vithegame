@@ -446,17 +446,20 @@ namespace Vi.Core
                 // If we stopped attacking on this fixedUpdate
                 if (!IsAttacking & lastIsAttacking)
                 {
-                    bool wasThereAHit = false;
-                    foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                    if (IsServer)
                     {
-                        wasThereAHit = weaponInstances[weaponBone].GetComponent<RuntimeWeapon>().GetHitCounter().Count > 0;
-                        if (wasThereAHit) { break; }
-                    }
+                        bool wasThereAHit = false;
+                        foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                        {
+                            wasThereAHit = weaponInstances[weaponBone].GetComponent<RuntimeWeapon>().GetHitCounter().Count > 0;
+                            if (wasThereAHit) { break; }
+                        }
 
-                    if (CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack & !wasThereAHit)
-                    {
-                        attributes.AddStamina(Mathf.NegativeInfinity);
-                        attributes.AddRage(Mathf.NegativeInfinity);
+                        if (CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack & !wasThereAHit)
+                        {
+                            attributes.AddStamina(Mathf.NegativeInfinity);
+                            attributes.AddRage(Mathf.NegativeInfinity);
+                        }
                     }
                 }
             }
