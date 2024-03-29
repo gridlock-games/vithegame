@@ -324,6 +324,57 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spRequiredAmmoAmount);
                 }
             }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.FlashAttack)
+            {
+                EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spMustBeAiming);
+                EditorGUILayout.PropertyField(spAgentStaminaCost);
+                EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
+                EditorGUILayout.PropertyField(spStaminaDamage);
+                EditorGUILayout.PropertyField(spDefenseDamage);
+                EditorGUILayout.PropertyField(spMaxHitLimit);
+                if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
+                EditorGUILayout.PropertyField(spIsBlockable);
+                EditorGUILayout.PropertyField(spIsUninterruptable);
+                EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spAilment);
+
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
+                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                }
+                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
+                {
+                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDistance);
+                }
+                EditorGUILayout.PropertyField(spDodgeLock);
+                EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
+                spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
+                spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
+                if (!spMustBeAiming.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spShouldAimBody);
+                    EditorGUILayout.PropertyField(spShouldAimOffHand);
+                    EditorGUILayout.PropertyField(spAimDuringAnticipation);
+                    EditorGUILayout.PropertyField(spAimDuringAttack);
+                    EditorGUILayout.PropertyField(spAimDuringRecovery);
+                }
+                EditorGUILayout.PropertyField(spRequireAmmo);
+                if (spRequireAmmo.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spRequiredAmmoAmount);
+                }
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

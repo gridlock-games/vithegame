@@ -137,6 +137,26 @@ namespace Vi.Core
 
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
+            if (IsServer)
+            {
+                Debug.Log(CanActivateFlashSwitch() + " " + weaponInstance);
+                if (CanActivateFlashSwitch())
+                {
+                    ActionClip flashAttack = weaponInstance.GetFlashAttack();
+                    if (flashAttack != null)
+                    {
+                        if (flashAttack.GetClipType() == ActionClip.ClipType.FlashAttack)
+                        {
+                            animationHandler.PlayAction(flashAttack);
+                        }
+                        else
+                        {
+                            Debug.LogError("Attempting to play a flash attack, but the clip isn't set to be a flash attack! " + flashAttack);
+                        }
+                    }
+                }
+            }
+            
             weaponInstances = instances;
         }
 
@@ -338,6 +358,9 @@ namespace Vi.Core
             if (!animationHandler.Animator) { return; }
             if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
+            if (IsLocalPlayer)
+                Debug.Log(CurrentActionClip);
+
             if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
             {
@@ -355,7 +378,7 @@ namespace Vi.Core
                 IsBlocking = false;
             }
 
-            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability };
+            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
             if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
@@ -443,6 +466,13 @@ namespace Vi.Core
 
             if (shouldRepeatLightAttack) { OnLightAttack(); }
             if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
+        }
+
+        [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
+
+        public bool CanActivateFlashSwitch()
+        {
+            return Time.time - lastMeleeHitTime < 0.5f;
         }
 
         void OnLightAttack()

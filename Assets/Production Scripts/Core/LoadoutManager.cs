@@ -297,14 +297,26 @@ namespace Vi.Core
 
         void OnWeapon1()
         {
-            if (!CanSwapWeapons()) { return; }
-            currentEquippedWeapon.Value = 1;
+            if (CanSwapWeapons())
+            {
+                currentEquippedWeapon.Value = 1;
+            }
+            else
+            {
+                if (weaponHandler.CanActivateFlashSwitch() & primaryWeapon.GetFlashAttack()) { currentEquippedWeapon.Value = 1; }
+            }
         }
 
         void OnWeapon2()
         {
-            if (!CanSwapWeapons()) { return; }
-            currentEquippedWeapon.Value = 2;
+            if (CanSwapWeapons())
+            {
+                currentEquippedWeapon.Value = 2;
+            }
+            else
+            {
+                if (weaponHandler.CanActivateFlashSwitch() & secondaryWeapon.GetFlashAttack()) { currentEquippedWeapon.Value = 2; }
+            }
         }
     }
 }

@@ -37,7 +37,11 @@ namespace Vi.Core
                     parentAttributes.transform.position
                 );
 
-                if (bHit) { hitsOnThisPhysicsUpdate.Add(networkCollider.Attributes); }
+                if (bHit)
+                {
+                    hitsOnThisPhysicsUpdate.Add(networkCollider.Attributes);
+                    parentWeaponHandler.lastMeleeHitTime = Time.time;
+                }
             }
         }
 

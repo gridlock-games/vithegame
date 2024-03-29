@@ -184,7 +184,7 @@ namespace Vi.Core
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
@@ -234,7 +234,7 @@ namespace Vi.Core
             // Play the action clip on the client side based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));

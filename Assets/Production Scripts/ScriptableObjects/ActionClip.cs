@@ -14,7 +14,8 @@ namespace Vi.ScriptableObjects
             LightAttack,
             HeavyAttack,
             HitReaction,
-            Ability
+            Ability,
+            FlashAttack
         }
 
         public enum HitReactionType
