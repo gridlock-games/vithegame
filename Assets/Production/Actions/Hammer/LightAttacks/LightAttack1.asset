@@ -97,7 +97,7 @@ MonoBehaviour:
   mustBeAiming: 0
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.4
-  damage: 7
+  damage: 1
   healAmount: 0
   staminaDamage: 0
   defenseDamage: 1
@@ -113,6 +113,9 @@ MonoBehaviour:
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 0
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
@@ -126,3 +129,5 @@ MonoBehaviour:
   aimDuringRecovery: 0
   shouldAimBody: 1
   shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1
