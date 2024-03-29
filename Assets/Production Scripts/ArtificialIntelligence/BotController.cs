@@ -119,12 +119,12 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
-            Quaternion newRotation;
+            Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
-            if (weaponHandler.IsAiming())
+            if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
-            else
+            else if (!attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity
@@ -163,7 +163,11 @@ namespace Vi.ArtificialIntelligence
             // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
-            if (animationHandler.ShouldApplyRootMotion())
+            if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
+            }
+            else if (animationHandler.ShouldApplyRootMotion())
             {
                 movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
             }
@@ -289,10 +293,26 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (currentPosition.Value - transform.position);
+
+                if (attributes.ShouldShake())
+                {
+                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                }
+
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
+            if (weaponHandler.CurrentActionClip != null)
+            {
+                if (attributes.ShouldPlayHitStop())
+                {
+                    animationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+                }
+            }
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

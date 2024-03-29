@@ -90,9 +90,9 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     newRotation = attributes.GetAilmentRotation();
-                if (weaponHandler.IsAiming())
+                if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
-                else
+                else if (!attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.RotateTowards(inputPayload.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
             }
             else
@@ -136,7 +136,11 @@ namespace Vi.Player
             // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
-            if (animationHandler.ShouldApplyRootMotion())
+            if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
+            }
+            else if (animationHandler.ShouldApplyRootMotion())
             {
                 movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
             }
@@ -311,11 +315,26 @@ namespace Vi.Player
             else
             {
                 Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
+
+                if (attributes.ShouldShake())
+                {
+                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                }
+
                 transform.position += movement;
             }
 
             if (weaponHandler.CurrentActionClip != null)
-                animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+            {
+                if (attributes.ShouldPlayHitStop())
+                {
+                    animationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+                }
+            }
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

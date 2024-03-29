@@ -179,10 +179,22 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAtRest()
+        {
+            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            {
+                return animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+            else
+            {
+                return animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+        }
+
         public bool ShouldApplyRootMotion()
         {
             if (!weaponHandler.CurrentActionClip) { return false; }
-            return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
         }
 
         private void OnAnimatorMove()

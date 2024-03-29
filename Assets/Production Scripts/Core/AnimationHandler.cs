@@ -26,14 +26,7 @@ namespace Vi.Core
 
         public bool IsAtRest()
         {
-            if (Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
-            {
-                return Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
-            }
-            else
-            {
-                return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
-            }
+            return animatorReference.IsAtRest();
         }
 
         public bool IsAiming()

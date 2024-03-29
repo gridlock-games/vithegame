@@ -262,6 +262,20 @@ namespace Vi.Core
                 return null;
         }
 
+        public bool ShouldPlayHitStop()
+        {
+            return Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration;
+        }
+
+        public bool ShouldShake()
+        {
+            return (Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration) & shouldShake;
+        }
+
+        public const float ShakeAmount = 10;
+
+        private float hitFreezeStartTime = Mathf.NegativeInfinity;
+        private bool shouldShake;
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
@@ -328,6 +342,12 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
+
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
@@ -335,62 +355,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                // Ailments
-                if (attackAilment != ailment.Value)
-                {
-                    bool ailmentChangedOnThisAttack = false;
-                    if (attackAilment != ActionClip.Ailment.None)
-                    {
-                        Vector3 startPos = transform.position;
-                        Vector3 endPos = hitSourcePosition;
-                        startPos.y = 0;
-                        endPos.y = 0;
-                        ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
-
-                        ailmentChangedOnThisAttack = ailment.Value != attackAilment;
-                        ailment.Value = attackAilment;
-                        if (ailment.Value == ActionClip.Ailment.Death)
-                        {
-                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-                            SetKiller(attacker);
-                        }
-                    }
-                    else // If this attack's ailment is none
-                    {
-                        if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
-                        {
-                            ailment.Value = ActionClip.Ailment.None;
-                        }
-                    }
-
-                    // If we started a new ailment on this attack, we want to start a reset coroutine
-                    if (ailmentChangedOnThisAttack)
-                    {
-                        switch (ailment.Value)
-                        {
-                            case ActionClip.Ailment.Knockdown:
-                                ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, true));
-                                break;
-                            case ActionClip.Ailment.Knockup:
-                                ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
-                                break;
-                            case ActionClip.Ailment.Stun:
-                                ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
-                                break;
-                            case ActionClip.Ailment.Stagger:
-                                ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
-                                break;
-                            case ActionClip.Ailment.Pull:
-                                ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
-                                break;
-                            case ActionClip.Ailment.Death:
-                                break;
-                            default:
-                                Debug.LogWarning(attackAilment + " has not been implemented yet!");
-                                break;
-                        }
-                    }
-                }
+                StartCoroutine(EvaluateAfterHitStop(hitReaction, impactPosition, damage, attackAilment, hitSourcePosition, attacker, attack));
 
                 if (damage != 0)
                 {
@@ -415,6 +380,68 @@ namespace Vi.Core
             }
 
             return true;
+        }
+
+        private IEnumerator EvaluateAfterHitStop(ActionClip hitReaction, Vector3 impactPosition, float damage, ActionClip.Ailment attackAilment, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
+        {
+            yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
+
+            // Ailments
+            if (attackAilment != ailment.Value)
+            {
+                bool ailmentChangedOnThisAttack = false;
+                if (attackAilment != ActionClip.Ailment.None)
+                {
+                    Vector3 startPos = transform.position;
+                    Vector3 endPos = hitSourcePosition;
+                    startPos.y = 0;
+                    endPos.y = 0;
+                    ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
+
+                    ailmentChangedOnThisAttack = ailment.Value != attackAilment;
+                    ailment.Value = attackAilment;
+                    if (ailment.Value == ActionClip.Ailment.Death)
+                    {
+                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                        SetKiller(attacker);
+                    }
+                }
+                else // If this attack's ailment is none
+                {
+                    if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
+                    {
+                        ailment.Value = ActionClip.Ailment.None;
+                    }
+                }
+
+                // If we started a new ailment on this attack, we want to start a reset coroutine
+                if (ailmentChangedOnThisAttack)
+                {
+                    switch (ailment.Value)
+                    {
+                        case ActionClip.Ailment.Knockdown:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, true));
+                            break;
+                        case ActionClip.Ailment.Knockup:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
+                            break;
+                        case ActionClip.Ailment.Stun:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
+                            break;
+                        case ActionClip.Ailment.Stagger:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
+                            break;
+                        case ActionClip.Ailment.Pull:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
+                            break;
+                        case ActionClip.Ailment.Death:
+                            break;
+                        default:
+                            Debug.LogWarning(attackAilment + " has not been implemented yet!");
+                            break;
+                    }
+                }
+            }
         }
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
