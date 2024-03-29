@@ -270,6 +270,10 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        [SerializeField] private ActionClip flashAttack;
+
+        public ActionClip GetFlashAttack() { return flashAttack; }
+
         public List<Attack> GetAttackList() { return attackList; }
         [SerializeField] private List<Attack> attackList = new List<Attack>();
 

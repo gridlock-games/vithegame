@@ -297,14 +297,67 @@ namespace Vi.Core
 
         void OnWeapon1()
         {
-            if (!CanSwapWeapons()) { return; }
-            currentEquippedWeapon.Value = 1;
+            if (CanSwapWeapons())
+            {
+                currentEquippedWeapon.Value = 1;
+            }
+            else
+            {
+                ActionClip flashAttack = primaryWeapon.GetFlashAttack();
+                if (flashAttack)
+                {
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
+                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
+                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        FlashAttackServerRpc(1);
+                        currentEquippedWeapon.Value = 1;
+                    }
+                }
+            }
         }
 
         void OnWeapon2()
         {
-            if (!CanSwapWeapons()) { return; }
-            currentEquippedWeapon.Value = 2;
+            if (CanSwapWeapons())
+            {
+                currentEquippedWeapon.Value = 2;
+            }
+            else
+            {
+                ActionClip flashAttack = secondaryWeapon.GetFlashAttack();
+                if (flashAttack)
+                {
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
+                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
+                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        FlashAttackServerRpc(2);
+                        currentEquippedWeapon.Value = 2;
+                    }
+                }
+            }
+        }
+
+        [ServerRpc]
+        private void FlashAttackServerRpc(int weaponSlotToSwapTo)
+        {
+            StartCoroutine(WaitForWeaponSwapThenFlashAttack(weaponSlotToSwapTo));
+        }
+
+        private IEnumerator WaitForWeaponSwapThenFlashAttack(int weaponSlotToSwapTo)
+        {
+            if (weaponSlotToSwapTo == 1)
+            {
+                yield return new WaitUntil(() => weaponHandler.GetWeapon() == primaryWeapon);
+            }
+            else if (weaponSlotToSwapTo == 2)
+            {
+                yield return new WaitUntil(() => weaponHandler.GetWeapon() == secondaryWeapon);
+            }
+            weaponHandler.PlayFlashAttack();
         }
     }
 }
