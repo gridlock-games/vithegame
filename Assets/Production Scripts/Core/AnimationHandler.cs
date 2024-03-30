@@ -374,10 +374,10 @@ namespace Vi.Core
             if (IsLocalPlayer)
             {
                 aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                meleeVerticalAimConstraintOffset.Value = weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
+                meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
             }
 
-            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsAttacking ? meleeVerticalAimConstraintOffset.Value : 0);
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? meleeVerticalAimConstraintOffset.Value : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }
