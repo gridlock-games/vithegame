@@ -87,6 +87,25 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  debugForwardMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugSidesMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugVerticalMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  YAngleRotationOffset: 15
   avatarLayer: 0
   transitionTime: 0.15
   animationSpeed: 1
@@ -97,7 +116,7 @@ MonoBehaviour:
   mustBeAiming: 0
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.5
-  damage: 1
+  damage: 20
   healAmount: 0
   staminaDamage: 5
   defenseDamage: 5
