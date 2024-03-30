@@ -99,6 +99,12 @@ namespace Vi.ScriptableObjects
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        [SerializeField] private AnimationCurve debugForwardMotion;
+        [SerializeField] private AnimationCurve debugSidesMotion;
+        [SerializeField] private AnimationCurve debugVerticalMotion;
+
+        public float YAngleRotationOffset = 0;
+
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
         public float animationSpeed = 1;
@@ -166,9 +172,5 @@ namespace Vi.ScriptableObjects
         public bool shouldAimOffHand = true;
         public bool requireAmmo;
         public int requiredAmmoAmount = 1;
-
-        [SerializeField] private AnimationCurve debugForwardMotion;
-        [SerializeField] private AnimationCurve debugSidesMotion;
-        [SerializeField] private AnimationCurve debugVerticalMotion;
     }
 }
