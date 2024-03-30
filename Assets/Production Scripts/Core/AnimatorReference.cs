@@ -214,12 +214,12 @@ namespace Vi.Core
                     normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
                 }
 
-                Vector3 worldSpaceRootMotion = transform.TransformDirection(animator.deltaPosition);
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime);
                 worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime);
                 worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime);
-                Vector3 curveAdjustedLocalRootMotion = transform.InverseTransformDirection(worldSpaceRootMotion);
-                
+                Vector3 curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+
                 networkRootMotion += curveAdjustedLocalRootMotion;
                 localRootMotion += curveAdjustedLocalRootMotion;
             }
