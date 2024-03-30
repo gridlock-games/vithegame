@@ -166,5 +166,9 @@ namespace Vi.ScriptableObjects
         public bool shouldAimOffHand = true;
         public bool requireAmmo;
         public int requiredAmmoAmount = 1;
+
+        [SerializeField] private AnimationCurve debugForwardMotion;
+        [SerializeField] private AnimationCurve debugSidesMotion;
+        [SerializeField] private AnimationCurve debugVerticalMotion;
     }
 }

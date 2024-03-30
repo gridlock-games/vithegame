@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using UnityEditor;
+using System.IO;
 
 namespace Vi.Editor
 {
@@ -71,6 +72,10 @@ namespace Vi.Editor
         private SerializedProperty spRequireAmmo;
         private SerializedProperty spRequiredAmmoAmount;
 
+        private SerializedProperty spDebugForwardMotion;
+        private SerializedProperty spDebugSidesMotion;
+        private SerializedProperty spDebugVerticalMotion;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -130,8 +135,15 @@ namespace Vi.Editor
             spAimDuringRecovery = serializedObject.FindProperty("aimDuringRecovery");
             spRequireAmmo = serializedObject.FindProperty("requireAmmo");
             spRequiredAmmoAmount = serializedObject.FindProperty("requiredAmmoAmount");
+
+            spDebugForwardMotion = serializedObject.FindProperty("debugForwardMotion");
+            spDebugSidesMotion = serializedObject.FindProperty("debugSidesMotion");
+            spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
         }
 
+        private Weapon weapon;
+        private AnimatorOverrideController animatorOverrideController;
+        private AnimationClip animationClip;
         public override void OnInspectorGUI()
         {
             EditorGUILayout.PropertyField(spClipType);
@@ -143,10 +155,63 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spAvatarLayer);
             if (spShouldApplyRootMotion.boolValue)
             {
-                EditorGUILayout.LabelField("Curves should start at 0 and end at 1", EditorStyles.whiteLabel);
+                EditorGUILayout.LabelField("Curves are MULTIPLIERS of what is baked into the animation", EditorStyles.whiteLabel);
                 EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
                 EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
                 EditorGUILayout.PropertyField(spRootMotionVerticalMultiplier);
+
+                Rect buttonRect = GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.button);
+                buttonRect = new Rect(
+                    buttonRect.x + EditorGUIUtility.labelWidth,
+                    buttonRect.y,
+                    buttonRect.width - EditorGUIUtility.labelWidth,
+                    buttonRect.height
+                );
+
+                if (animationClip)
+                {
+                    if (GUI.Button(buttonRect, "Copy Key Positions To Mutliplier Curves"))
+                    {
+                        AnimationCurve newAnimationCurve = spRootMotionForwardMultiplier.animationCurveValue;
+                        foreach (Keyframe keyframe in spDebugForwardMotion.animationCurveValue.keys)
+                        {
+                            newAnimationCurve.AddKey(keyframe.time, 1);
+                        }
+                        spRootMotionForwardMultiplier.animationCurveValue = newAnimationCurve;
+
+                        newAnimationCurve = spRootMotionSidesMultiplier.animationCurveValue;
+                        foreach (Keyframe keyframe in spDebugSidesMotion.animationCurveValue.keys)
+                        {
+                            newAnimationCurve.AddKey(keyframe.time, 1);
+                        }
+                        spRootMotionSidesMultiplier.animationCurveValue = newAnimationCurve;
+
+                        newAnimationCurve = spRootMotionVerticalMultiplier.animationCurveValue;
+                        foreach (Keyframe keyframe in spDebugVerticalMotion.animationCurveValue.keys)
+                        {
+                            newAnimationCurve.AddKey(keyframe.time, 1);
+                        }
+                        spRootMotionVerticalMultiplier.animationCurveValue = newAnimationCurve;
+                    }
+
+                    EditorGUILayout.LabelField("Weapon Name: " + weapon.name, EditorStyles.whiteMiniLabel);
+                    EditorGUILayout.LabelField("Animator Override Controller Name: " + animatorOverrideController.name, EditorStyles.whiteMiniLabel);
+                    EditorGUILayout.LabelField("Animation Clip Name: " + animationClip.name, EditorStyles.whiteMiniLabel);
+
+                    ExtractRootMotion();
+
+                    EditorGUILayout.PropertyField(spDebugForwardMotion);
+                    EditorGUILayout.PropertyField(spDebugSidesMotion);
+                    EditorGUILayout.PropertyField(spDebugVerticalMotion);
+                }
+                else
+                {
+                    // Analyze root motion of original animation
+                    if (GUI.Button(buttonRect, "Analyze Baked Root Motion Of Animation"))
+                    {
+                        (weapon, animatorOverrideController, animationClip) = FindAnimationClip();
+                    }
+                }
             }
             EditorGUILayout.Space();
 
@@ -378,6 +443,110 @@ namespace Vi.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private (Weapon, AnimatorOverrideController, AnimationClip) FindAnimationClip()
+        {
+            string[] filepaths = Directory.GetFiles(@"Assets\Production\Weapons", "*.asset", SearchOption.AllDirectories);
+            Weapon targetWeapon = null;
+            foreach (string filepath in filepaths)
+            {
+                Weapon weapon = AssetDatabase.LoadAssetAtPath<Weapon>(filepath);
+                ActionClip thisActionClip = serializedObject.targetObject as ActionClip;
+                ActionClip weaponClip = weapon.GetActionClipByName(serializedObject.targetObject.name);
+
+                if (weaponClip == thisActionClip)
+                {
+                    targetWeapon = weapon;
+                    break;
+                }
+            }
+
+            if (!targetWeapon) { Debug.LogError("Could not find target weapon for " + serializedObject.targetObject.name); return (null, null, null); }
+
+            filepaths = Directory.GetFiles(@"Assets\Production\AnimationControllers", "*.overrideController", SearchOption.AllDirectories);
+            foreach (string filepath in filepaths)
+            {
+                if (Path.GetFileNameWithoutExtension(filepath) != targetWeapon.name.Replace("Weapon", "")) { continue; }
+
+                AnimatorOverrideController animatorOverrideController = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(filepath);
+
+                List<KeyValuePair<AnimationClip, AnimationClip>> animationOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+                animatorOverrideController.GetOverrides(animationOverrides);
+                foreach (var kvp in animationOverrides)
+                {
+                    if (kvp.Key.name == serializedObject.targetObject.name)
+                    {
+                        return (targetWeapon, animatorOverrideController, kvp.Value);
+                    }
+                }
+            }
+            Debug.LogError("Could not find target animation clip");
+            return (null, null, null);
+        }
+
+        private void ExtractRootMotion()
+        {
+            if (animationClip != null)
+            {
+                if (animationClip.hasRootCurves)
+                {
+                    EditorCurveBinding[] curves = AnimationUtility.GetCurveBindings(animationClip);
+                    for (int i = 0; i < curves.Length; ++i)
+                    {
+                        if (curves[i].propertyName == "RootT.x")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+                            curve = ProcessRootCurve(curve);
+                            spDebugSidesMotion.animationCurveValue = curve;
+                        }
+
+                        if (curves[i].propertyName == "RootT.y")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+                            curve = ProcessRootCurve(curve);
+                            spDebugForwardMotion.animationCurveValue = curve;
+                        }
+
+                        if (curves[i].propertyName == "RootT.z")
+                        {
+                            AnimationCurve curve = AnimationUtility.GetEditorCurve(
+                                animationClip,
+                                curves[i]
+                            );
+                            curve = ProcessRootCurve(curve);
+                            spDebugVerticalMotion.animationCurveValue = curve;
+                        }
+                    }
+                }
+            }
+        }
+
+        private AnimationCurve ProcessRootCurve(AnimationCurve source)
+        {
+            float value = source.Evaluate(0f);
+            float duration = source.keys[source.length - 1].time;
+            AnimationCurve result = new AnimationCurve();
+
+            for (int i = 0; i < source.keys.Length; ++i)
+            {
+                result.AddKey(new Keyframe(
+                    source.keys[i].time / duration,
+                    source.keys[i].value - value,
+                    source.keys[i].inTangent,
+                    source.keys[i].outTangent,
+                    source.keys[i].inWeight,
+                    source.keys[i].outWeight
+                ));
+            }
+
+            return result;
         }
     }
 }
