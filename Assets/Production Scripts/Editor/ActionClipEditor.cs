@@ -23,9 +23,16 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionForwardMultiplier;
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
+
+        private SerializedProperty spDebugForwardMotion;
+        private SerializedProperty spDebugSidesMotion;
+        private SerializedProperty spDebugVerticalMotion;
+
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
         private SerializedProperty spAnimationSpeed;
+
+        private SerializedProperty spYAngleRotationOffset;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
@@ -71,10 +78,6 @@ namespace Vi.Editor
         private SerializedProperty spAimDuringRecovery;
         private SerializedProperty spRequireAmmo;
         private SerializedProperty spRequiredAmmoAmount;
-
-        private SerializedProperty spDebugForwardMotion;
-        private SerializedProperty spDebugSidesMotion;
-        private SerializedProperty spDebugVerticalMotion;
 
         private void OnEnable()
         {
@@ -139,6 +142,8 @@ namespace Vi.Editor
             spDebugForwardMotion = serializedObject.FindProperty("debugForwardMotion");
             spDebugSidesMotion = serializedObject.FindProperty("debugSidesMotion");
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
+
+            spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
         }
 
         private Weapon weapon;
@@ -147,12 +152,13 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             EditorGUILayout.PropertyField(spClipType);
-
-            EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
-            EditorGUILayout.PropertyField(spShouldApplyRootMotion);
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.PropertyField(spAnimationSpeed);
             EditorGUILayout.PropertyField(spAvatarLayer);
+            spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
+
+            EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.PropertyField(spShouldApplyRootMotion);
             if (spShouldApplyRootMotion.boolValue)
             {
                 EditorGUILayout.LabelField("Curves are MULTIPLIERS of what is baked into the animation", EditorStyles.whiteLabel);

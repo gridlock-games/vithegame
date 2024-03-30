@@ -150,17 +150,23 @@ namespace Vi.Core
         [SerializeField] private RigWeightTarget leftHandReachRig;
         [SerializeField] private RigWeightTarget meleeVerticalAimRig;
         [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
+        [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
 
-        private const float meleeVerticalAimTransitionSpeed = 12;
+        private const float rotationConstraintOffsetSpeed = 12;
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)
         {
             zAngle = Mathf.Clamp(zAngle, -35, 35);
-            meleeVerticalAimConstraint.data.offset = Vector3.Lerp(meleeVerticalAimConstraint.data.offset, new Vector3(0, 0, zAngle), Time.deltaTime * meleeVerticalAimTransitionSpeed);
+            meleeVerticalAimConstraint.data.offset = Vector3.Lerp(meleeVerticalAimConstraint.data.offset, new Vector3(0, 0, zAngle), Time.deltaTime * rotationConstraintOffsetSpeed);
         }
 
         public void SetMeleeVerticalAimEnabled(bool isEnabled)
         {
             meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
+        }
+
+        public void SetRotationOffset(float zAngle)
+        {
+            rotationOffsetConstraint.data.offset = Vector3.Lerp(rotationOffsetConstraint.data.offset, new Vector3(0, 0, zAngle), Time.deltaTime * rotationConstraintOffsetSpeed);
         }
 
         public enum BodyAimType

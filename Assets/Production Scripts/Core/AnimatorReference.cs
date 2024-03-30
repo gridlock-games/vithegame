@@ -197,13 +197,16 @@ namespace Vi.Core
             return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
         }
 
+        private void Update()
+        {
+            limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
+        }
+
         private void OnAnimatorMove()
         {
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
-                //networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
-                //localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
                 float normalizedTime = 0;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
