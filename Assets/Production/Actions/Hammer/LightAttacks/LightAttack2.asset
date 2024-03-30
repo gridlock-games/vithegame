@@ -28,6 +28,15 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
+      time: 0.3662508
+      value: 1.5
+      inSlope: 0.025776317
+      outSlope: 0.025776317
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.10144202
+    - serializedVersion: 3
       time: 1
       value: 1
       inSlope: 0
@@ -89,14 +98,16 @@ MonoBehaviour:
     m_RotationOrder: 4
   avatarLayer: 0
   transitionTime: 0.15
+  animationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.5
-  damage: 7
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.4
+  damage: 1
+  healAmount: 0
   staminaDamage: 0
   defenseDamage: 1
   maxHitLimit: 1
@@ -111,14 +122,39 @@ MonoBehaviour:
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 0
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
+  statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
   shouldAimBody: 1
   shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1
+  debugForwardMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugSidesMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugVerticalMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
