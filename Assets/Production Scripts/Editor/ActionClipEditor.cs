@@ -447,7 +447,7 @@ namespace Vi.Editor
 
         private (Weapon, AnimatorOverrideController, AnimationClip) FindAnimationClip()
         {
-            string[] filepaths = Directory.GetFiles(@"Assets\Production\Weapons", "*.asset", SearchOption.AllDirectories);
+            string[] filepaths = Directory.GetFiles(@"Assets/Production/Weapons", "*.asset", SearchOption.AllDirectories);
             Weapon targetWeapon = null;
             foreach (string filepath in filepaths)
             {
@@ -464,7 +464,7 @@ namespace Vi.Editor
 
             if (!targetWeapon) { Debug.LogError("Could not find target weapon for " + serializedObject.targetObject.name); return (null, null, null); }
 
-            filepaths = Directory.GetFiles(@"Assets\Production\AnimationControllers", "*.overrideController", SearchOption.AllDirectories);
+            filepaths = Directory.GetFiles(@"Assets/Production/AnimationControllers", "*.overrideController", SearchOption.AllDirectories);
             foreach (string filepath in filepaths)
             {
                 if (Path.GetFileNameWithoutExtension(filepath) != targetWeapon.name.Replace("Weapon", "")) { continue; }
