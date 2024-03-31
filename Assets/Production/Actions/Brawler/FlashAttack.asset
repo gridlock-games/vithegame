@@ -1457,7 +1457,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.1
+  transitionTime: 0.25
   animationSpeed: 1
   agentStaminaCost: 10
   agentDefenseCost: 0
@@ -1479,10 +1479,11 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
+  canFlashAttack: 0
   ailment: 2
   ailmentDuration: 2
   grabDistance: 3
-  dodgeLock: 0
+  dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
