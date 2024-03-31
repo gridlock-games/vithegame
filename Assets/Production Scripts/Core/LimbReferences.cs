@@ -152,7 +152,7 @@ namespace Vi.Core
         [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
 
-        private const float rotationConstraintOffsetSpeed = 12;
+        public const float rotationConstraintOffsetSpeed = 12;
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)
         {
             zAngle = Mathf.Clamp(zAngle, -35, 35);
