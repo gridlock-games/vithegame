@@ -297,6 +297,8 @@ namespace Vi.Core
 
         void OnWeapon1()
         {
+            if (currentEquippedWeapon.Value == 1) { return; }
+
             if (CanSwapWeapons())
             {
                 currentEquippedWeapon.Value = 1;
@@ -320,6 +322,8 @@ namespace Vi.Core
 
         void OnWeapon2()
         {
+            if (currentEquippedWeapon.Value == 2) { return; }
+
             if (CanSwapWeapons())
             {
                 currentEquippedWeapon.Value = 2;
@@ -346,48 +350,46 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!IsLocalPlayer) { return; }
 
-            //if (currentEquippedWeapon.Value == 1)
-            //{
-            //    bool canFlashAttack = false;
-            //    ActionClip flashAttack = primaryWeapon.GetFlashAttack();
-            //    if (flashAttack)
-            //    {
-            //        if (weaponHandler.CanActivateFlashSwitch())
-            //        {
-            //            if (flashAttack.agentStaminaCost > attributes.GetStamina())
-            //                canFlashAttack = false;
-            //            else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-            //                canFlashAttack = false;
-            //            else if (flashAttack.agentRageCost > attributes.GetRage())
-            //                canFlashAttack = false;
-            //            else
-            //                canFlashAttack = true;
-            //        }
-            //    }
-            //    attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
-            //}
-            //else if (currentEquippedWeapon.Value == 2)
-            //{
-            //    bool canFlashAttack = false;
-            //    ActionClip flashAttack = secondaryWeapon.GetFlashAttack();
-            //    if (flashAttack)
-            //    {
-            //        if (weaponHandler.CanActivateFlashSwitch())
-            //        {
-            //            if (flashAttack.agentStaminaCost > attributes.GetStamina())
-            //                canFlashAttack = false;
-            //            else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-            //                canFlashAttack = false;
-            //            else if (flashAttack.agentRageCost > attributes.GetRage())
-            //                canFlashAttack = false;
-            //            else
-            //                canFlashAttack = true;
-            //        }
-            //    }
-            //    attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
-            //}
-
-            attributes.GlowRenderer.RenderFlashAttack(weaponHandler.CanActivateFlashSwitch());
+            if (currentEquippedWeapon.Value == 1)
+            {
+                bool canFlashAttack = false;
+                ActionClip flashAttack = secondaryWeapon.GetFlashAttack();
+                if (flashAttack)
+                {
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
+                            canFlashAttack = false;
+                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
+                            canFlashAttack = false;
+                        else if (flashAttack.agentRageCost > attributes.GetRage())
+                            canFlashAttack = false;
+                        else
+                            canFlashAttack = true;
+                    }
+                }
+                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+            }
+            else if (currentEquippedWeapon.Value == 2)
+            {
+                bool canFlashAttack = false;
+                ActionClip flashAttack = primaryWeapon.GetFlashAttack();
+                if (flashAttack)
+                {
+                    if (weaponHandler.CanActivateFlashSwitch())
+                    {
+                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
+                            canFlashAttack = false;
+                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
+                            canFlashAttack = false;
+                        else if (flashAttack.agentRageCost > attributes.GetRage())
+                            canFlashAttack = false;
+                        else
+                            canFlashAttack = true;
+                    }
+                }
+                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+            }
         }
 
         [ServerRpc]
