@@ -358,7 +358,7 @@ namespace Vi.Player
                 {
                     if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes.transform.root != transform.root)
+                        if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
                         {
                             Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - animationHandler.Animator.transform.position, Vector3.up);
                             if (Quaternion.Angle(transform.rotation, targetRot) > maximumRotationAngle) { continue; }
