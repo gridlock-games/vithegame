@@ -458,8 +458,10 @@ namespace Vi.Core
 
                         if (!wasThereAHit)
                         {
-                            attributes.AddStamina(Mathf.NegativeInfinity);
-                            attributes.AddRage(Mathf.NegativeInfinity);
+                            attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
+                            attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
+                            attributes.AddDefense(-CurrentActionClip.defensePenaltyOnMiss);
+                            attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
                 }
@@ -498,11 +500,9 @@ namespace Vi.Core
 
         [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
 
-        private NetworkVariable<bool> canActivateFlashSwitch = new NetworkVariable<bool>();
-
         public bool CanActivateFlashSwitch()
         {
-            return canActivateFlashSwitch.Value;
+            return (IsInAnticipation | IsAttacking | IsInRecovery) & CurrentActionClip.canFlashAttack;
         }
 
         void OnLightAttack()
@@ -714,8 +714,6 @@ namespace Vi.Core
                         if (movementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
-
-                canActivateFlashSwitch.Value = Time.time - lastMeleeHitTime < 0.5f;
             }
             else
             {

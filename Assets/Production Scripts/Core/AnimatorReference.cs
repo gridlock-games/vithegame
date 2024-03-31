@@ -55,13 +55,25 @@ namespace Vi.Core
                 }
 
                 if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
+                {
                     wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform);
+                    SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+                    foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                    {
+                        glowRenderer.RegisterNewRenderer(smr);
+                    }
+                }
                 else
                     wearableEquipmentInstances.Remove(wearableEquipmentOption.equipmentType);
             }
             else if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
             {
                 wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform));
+                SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                {
+                    glowRenderer.RegisterNewRenderer(smr);
+                }
             }
 
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
@@ -75,8 +87,6 @@ namespace Vi.Core
                         if (equipmentSkinnedMeshRenderers.Length > 1)
                             equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
                         wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !wearableEquipmentInstances[wearableEquipmentOption.equipmentType];
-
-                        glowRenderer.RegisterNewRenderer(equipmentSkinnedMeshRenderers[i]);
                     }
                     else
                     {

@@ -121,11 +121,16 @@ namespace Vi.ScriptableObjects
         public float healAmount = 0;
         public float staminaDamage = 0;
         public float defenseDamage = 0;
+        public float healthPenaltyOnMiss = 0;
+        public float staminaPenaltyOnMiss = 0;
+        public float defensePenaltyOnMiss = 0;
+        public float ragePenaltyOnMiss = 0;
         public int maxHitLimit = 1;
         [SerializeField] private float timeBetweenHits = 1;
         public bool isBlockable = true;
         public bool isUninterruptable;
         public bool isInvincible;
+        public bool canFlashAttack;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
         public float grabDistance = 3;

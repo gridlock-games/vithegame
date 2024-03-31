@@ -162,14 +162,14 @@ namespace Vi.Core
             }
             else if (current > prev)
             {
-                glowRenderer.RenderHeal();
+                GlowRenderer.RenderHeal();
             }
         }
 
-        private GlowRenderer glowRenderer;
+        public GlowRenderer GlowRenderer { get; private set; }
         private void OnTransformChildrenChanged()
         {
-            glowRenderer = GetComponentInChildren<GlowRenderer>();
+            GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
         private WeaponHandler weaponHandler;
@@ -450,7 +450,7 @@ namespace Vi.Core
             
             if (!IsClient)
             {
-                glowRenderer.RenderHit();
+                GlowRenderer.RenderHit();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
                 AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
@@ -462,7 +462,7 @@ namespace Vi.Core
         [ClientRpc]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
-            glowRenderer.RenderHit();
+            GlowRenderer.RenderHit();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
@@ -474,7 +474,7 @@ namespace Vi.Core
 
             if (!IsClient)
             {
-                glowRenderer.RenderHit();
+                GlowRenderer.RenderHit();
             }
 
             RenderHitGlowOnlyClientRpc();
@@ -483,7 +483,7 @@ namespace Vi.Core
         [ClientRpc]
         private void RenderHitGlowOnlyClientRpc()
         {
-            glowRenderer.RenderHit();
+            GlowRenderer.RenderHit();
         }
 
         private void RenderBlock(Vector3 impactPosition)
@@ -492,7 +492,7 @@ namespace Vi.Core
 
             if (!IsClient)
             {
-                glowRenderer.RenderBlock();
+                GlowRenderer.RenderBlock();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
@@ -502,7 +502,7 @@ namespace Vi.Core
 
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
-            glowRenderer.RenderBlock();
+            GlowRenderer.RenderBlock();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
@@ -515,8 +515,8 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
 
-            glowRenderer.RenderInvincible(IsInvincible);
-            glowRenderer.RenderUninterruptable(IsUninterruptable);
+            GlowRenderer.RenderInvincible(IsInvincible);
+            GlowRenderer.RenderUninterruptable(IsUninterruptable);
 
             if (!IsServer) { return; }
 
@@ -733,7 +733,7 @@ namespace Vi.Core
                     float elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
@@ -743,7 +743,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
@@ -753,7 +753,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
