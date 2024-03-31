@@ -87,8 +87,28 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  debugForwardMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugSidesMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debugVerticalMotion:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
+  animationSpeed: 1
   agentStaminaCost: 16
   agentDefenseCost: 0
   agentRageCost: 0
@@ -97,6 +117,7 @@ MonoBehaviour:
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.7
   damage: 20
+  healAmount: 0
   staminaDamage: 0
   defenseDamage: 0
   maxHitLimit: 1
@@ -104,17 +125,21 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  ailment: 4
+  ailment: 1
   ailmentDuration: 2
   grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 0
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 7601e10f958babe478c3d5a5dadf41af, type: 3}
   abilityCooldownTime: 6
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
+  statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 5283648585088115846, guid: 14e6fbcf1ef903b4a93ab22a667aa59f, type: 3}
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
@@ -125,3 +150,5 @@ MonoBehaviour:
   aimDuringRecovery: 0
   shouldAimBody: 1
   shouldAimOffHand: 1
+  requireAmmo: 0
+  requiredAmmoAmount: 1

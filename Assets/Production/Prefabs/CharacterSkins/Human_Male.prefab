@@ -525,6 +525,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weight: 0
   instantWeight: 1
+--- !u!1 &3191117865598644356
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1302933758742146360}
+  - component: {fileID: 5339729242939634275}
+  m_Layer: 0
+  m_Name: RotationOffsetRig
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1302933758742146360
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3191117865598644356}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6697019033288155823}
+  m_Father: {fileID: 5804354747909585976}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5339729242939634275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3191117865598644356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Effectors: []
 --- !u!1 &3397542500030426662
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,7 +634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weight: 0
   instantWeight: 1
---- !u!1 &3434721478452300502
+--- !u!1 &3597475324256507524
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -595,8 +642,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5454251649085792394}
-  - component: {fileID: 6930646654865520576}
+  - component: {fileID: 6697019033288155823}
+  - component: {fileID: 4279257392001951054}
   m_Layer: 0
   m_Name: RotationOffsetConstraint
   m_TagString: Untagged
@@ -604,28 +651,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5454251649085792394
+--- !u!4 &6697019033288155823
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3434721478452300502}
+  m_GameObject: {fileID: 3597475324256507524}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8751194630014503809}
+  m_Father: {fileID: 1302933758742146360}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6930646654865520576
+--- !u!114 &4279257392001951054
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3434721478452300502}
+  m_GameObject: {fileID: 3597475324256507524}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fdb90b913935e644baaa86c076d788e0, type: 3}
@@ -637,7 +684,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 5454251649085792394}
+        transform: {fileID: 6697019033288155823}
         weight: 0.00001
       m_Item1:
         transform: {fileID: 0}
@@ -2926,7 +2973,7 @@ MonoBehaviour:
   leftHandReachRig: {fileID: 2634057710867190123}
   meleeVerticalAimRig: {fileID: 928111209206620082}
   meleeVerticalAimConstraint: {fileID: 8577034352154996663}
-  rotationOffsetConstraint: {fileID: 6930646654865520576}
+  rotationOffsetConstraint: {fileID: 4279257392001951054}
 --- !u!114 &3131407962465346050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2977,7 +3024,7 @@ MonoBehaviour:
     m_Active: 1
   - m_Rig: {fileID: 2154144891541030212}
     m_Active: 1
-  - m_Rig: {fileID: 4880550592084271637}
+  - m_Rig: {fileID: 5339729242939634275}
     m_Active: 1
   m_Effectors:
   - m_Transform: {fileID: 3354788472555931755}
