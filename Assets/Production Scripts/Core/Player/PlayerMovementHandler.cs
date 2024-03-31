@@ -385,6 +385,8 @@ namespace Vi.Player
                         if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
                         {
                             Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - animationHandler.Animator.transform.position, Vector3.up);
+                            targetRot = Quaternion.Euler(0, targetRot.eulerAngles.y, 0);
+                            
                             if (Quaternion.Angle(transform.rotation, targetRot) > maximumRotationAngle) { continue; }
 
                             animationHandler.Animator.transform.rotation = Quaternion.Slerp(animationHandler.Animator.transform.rotation, targetRot, Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed);
