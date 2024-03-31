@@ -142,7 +142,31 @@ namespace Vi.Player
             }
             else if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+                if (attributes.IsRooted())
+                {
+                    movement = Vector3.zero;
+                }
+                else
+                {
+                    movement = rootMotion;
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + boxCastOriginPositionOffset, boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, boxCastDistance, Color.blue);
+                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | weaponHandler.IsInRecovery)
+                    {
+                        allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + boxCastOriginPositionOffset, boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                        foreach (RaycastHit hit in allHits)
+                        {
+                            if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                            {
+                                if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
+                                {
+                                    movement = Vector3.ClampMagnitude(movement, hit.distance);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             else
             {
