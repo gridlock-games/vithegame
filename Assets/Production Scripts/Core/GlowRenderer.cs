@@ -196,7 +196,7 @@ namespace Vi.Core
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
                     glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(1, 128 / 255, 0);
+                    glowMaterialInstance.color = new Color(1, (float)128 / 255, 0);
                 }
                 return;
             }
