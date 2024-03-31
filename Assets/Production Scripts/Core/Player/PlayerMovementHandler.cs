@@ -373,10 +373,10 @@ namespace Vi.Player
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
             bool shouldReturnToOriginalRotation = true;
-            ExtDebug.DrawBoxCastBox(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, cameraInstance.transform.forward, cameraInstance.transform.rotation, boxCastDistance, Color.yellow);
+            ExtDebug.DrawBoxCastBox(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, transform.forward, transform.rotation, boxCastDistance, Color.yellow);
             if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
             {
-                RaycastHit[] allHits = Physics.BoxCastAll(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, cameraInstance.transform.forward, cameraInstance.transform.rotation, boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.BoxCastAll(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, transform.forward, transform.rotation, boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                 foreach (RaycastHit hit in allHits)
                 {
