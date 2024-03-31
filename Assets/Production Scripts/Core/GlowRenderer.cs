@@ -24,12 +24,6 @@ namespace Vi.Core
             lastHealTime = Time.time;
         }
 
-        private float lastUninterruptable = -5;
-        public void RenderUninterruptable()
-        {
-            lastUninterruptable = Time.time;
-        }
-
         private bool isInvincible;
         public void RenderInvincible(bool isInvincible)
         {
@@ -42,11 +36,16 @@ namespace Vi.Core
             this.isUninterruptable = isUninterruptable;
         }
 
-
         private float lastBlockTime = -5;
         public void RenderBlock()
         {
             lastBlockTime = Time.time;
+        }
+
+        private bool canFlashAttack;
+        public void RenderFlashAttack(bool canFlashAttack)
+        {
+            this.canFlashAttack = canFlashAttack;
         }
 
         private List<Material> glowMaterialInstances = new List<Material>();
@@ -62,6 +61,8 @@ namespace Vi.Core
         public void RegisterNewRenderer(Renderer renderer)
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
+
+            if (netObj.IsLocalPlayer) { Debug.Log(renderer.gameObject); }
 
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
             {
@@ -191,13 +192,13 @@ namespace Vi.Core
                 }
             }
 
-            // Uninterruptable
-            if (Time.time - lastUninterruptable < 0.25f)
+            // Flash Attack
+            if (canFlashAttack)
             {
                 foreach (Material glowMaterialInstance in glowMaterialInstances)
                 {
                     glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(1, 1, 1);
+                    glowMaterialInstance.color = new Color(1, 128 / 255, 0);
                 }
                 return;
             }

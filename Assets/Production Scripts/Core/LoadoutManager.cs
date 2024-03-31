@@ -341,6 +341,55 @@ namespace Vi.Core
             }
         }
 
+        private void Update()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsLocalPlayer) { return; }
+
+            //if (currentEquippedWeapon.Value == 1)
+            //{
+            //    bool canFlashAttack = false;
+            //    ActionClip flashAttack = primaryWeapon.GetFlashAttack();
+            //    if (flashAttack)
+            //    {
+            //        if (weaponHandler.CanActivateFlashSwitch())
+            //        {
+            //            if (flashAttack.agentStaminaCost > attributes.GetStamina())
+            //                canFlashAttack = false;
+            //            else if (flashAttack.agentDefenseCost > attributes.GetDefense())
+            //                canFlashAttack = false;
+            //            else if (flashAttack.agentRageCost > attributes.GetRage())
+            //                canFlashAttack = false;
+            //            else
+            //                canFlashAttack = true;
+            //        }
+            //    }
+            //    attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+            //}
+            //else if (currentEquippedWeapon.Value == 2)
+            //{
+            //    bool canFlashAttack = false;
+            //    ActionClip flashAttack = secondaryWeapon.GetFlashAttack();
+            //    if (flashAttack)
+            //    {
+            //        if (weaponHandler.CanActivateFlashSwitch())
+            //        {
+            //            if (flashAttack.agentStaminaCost > attributes.GetStamina())
+            //                canFlashAttack = false;
+            //            else if (flashAttack.agentDefenseCost > attributes.GetDefense())
+            //                canFlashAttack = false;
+            //            else if (flashAttack.agentRageCost > attributes.GetRage())
+            //                canFlashAttack = false;
+            //            else
+            //                canFlashAttack = true;
+            //        }
+            //    }
+            //    attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+            //}
+
+            attributes.GlowRenderer.RenderFlashAttack(weaponHandler.CanActivateFlashSwitch());
+        }
+
         [ServerRpc]
         private void FlashAttackServerRpc(int weaponSlotToSwapTo)
         {
