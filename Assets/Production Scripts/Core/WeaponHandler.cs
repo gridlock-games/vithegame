@@ -458,8 +458,10 @@ namespace Vi.Core
 
                         if (!wasThereAHit)
                         {
-                            attributes.AddStamina(Mathf.NegativeInfinity);
-                            attributes.AddRage(Mathf.NegativeInfinity);
+                            attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
+                            attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
+                            attributes.AddDefense(-CurrentActionClip.defensePenaltyOnMiss);
+                            attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
                 }

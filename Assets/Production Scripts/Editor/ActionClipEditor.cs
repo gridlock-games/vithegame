@@ -42,6 +42,10 @@ namespace Vi.Editor
         private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
         private SerializedProperty spDefenseDamage;
+        private SerializedProperty spHealthPenaltyOnMiss;
+        private SerializedProperty spStaminaPenaltyOnMiss;
+        private SerializedProperty spDefensePenaltyOnMiss;
+        private SerializedProperty spRagePenaltyOnMiss;
         private SerializedProperty spMaxHitLimit;
         private SerializedProperty spTimeBetweenHits;
         private SerializedProperty spIsBlockable;
@@ -103,6 +107,10 @@ namespace Vi.Editor
             spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spDefenseDamage = serializedObject.FindProperty("defenseDamage");
+            spHealthPenaltyOnMiss = serializedObject.FindProperty("healthPenaltyOnMiss");
+            spStaminaPenaltyOnMiss = serializedObject.FindProperty("staminaPenaltyOnMiss");
+            spDefensePenaltyOnMiss = serializedObject.FindProperty("defensePenaltyOnMiss");
+            spRagePenaltyOnMiss = serializedObject.FindProperty("ragePenaltyOnMiss");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
             spTimeBetweenHits = serializedObject.FindProperty("timeBetweenHits");
             spIsBlockable = serializedObject.FindProperty("isBlockable");
@@ -337,6 +345,10 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
+                EditorGUILayout.PropertyField(spHealthPenaltyOnMiss);
+                EditorGUILayout.PropertyField(spStaminaPenaltyOnMiss);
+                EditorGUILayout.PropertyField(spDefensePenaltyOnMiss);
+                EditorGUILayout.PropertyField(spRagePenaltyOnMiss);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
                 EditorGUILayout.PropertyField(spIsBlockable);

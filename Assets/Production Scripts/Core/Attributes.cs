@@ -733,7 +733,7 @@ namespace Vi.Core
                     float elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
@@ -743,7 +743,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
@@ -753,7 +753,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration)
                     {
-                        AddHP(GetHP() * -statusPayload.value * Time.deltaTime);
+                        ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         yield return null;
                     }
