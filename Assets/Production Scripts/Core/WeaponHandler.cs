@@ -443,10 +443,11 @@ namespace Vi.Core
                     }
                 }
 
-                // If we stopped attacking on this fixedUpdate
-                if (!IsAttacking & lastIsAttacking)
+                // Check if flash attack had no hits
+                if (IsServer & CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                 {
-                    if (IsServer)
+                    // If we stopped attacking on this fixedUpdate
+                    if (!IsAttacking & lastIsAttacking & IsInRecovery)
                     {
                         bool wasThereAHit = false;
                         foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
@@ -455,7 +456,7 @@ namespace Vi.Core
                             if (wasThereAHit) { break; }
                         }
 
-                        if (CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack & !wasThereAHit)
+                        if (!wasThereAHit)
                         {
                             attributes.AddStamina(Mathf.NegativeInfinity);
                             attributes.AddRage(Mathf.NegativeInfinity);
