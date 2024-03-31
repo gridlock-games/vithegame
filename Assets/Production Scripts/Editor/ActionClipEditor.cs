@@ -51,6 +51,7 @@ namespace Vi.Editor
         private SerializedProperty spIsBlockable;
         private SerializedProperty spIsUninterruptable;
         private SerializedProperty spIsInvincible;
+        private SerializedProperty spCanFlashAttack;
         private SerializedProperty spAilment;
         private SerializedProperty spAilmentDuration;
         private SerializedProperty spGrabDistance;
@@ -116,6 +117,7 @@ namespace Vi.Editor
             spIsBlockable = serializedObject.FindProperty("isBlockable");
             spIsUninterruptable = serializedObject.FindProperty("isUninterruptable");
             spIsInvincible = serializedObject.FindProperty("isInvincible");
+            spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spAilment = serializedObject.FindProperty("ailment");
             spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
@@ -248,6 +250,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spCanFlashAttack);
                 EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
@@ -298,6 +301,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spCanFlashAttack);
                 EditorGUILayout.PropertyField(spAilment);
 
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
@@ -354,6 +358,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spCanFlashAttack);
                 EditorGUILayout.PropertyField(spAilment);
 
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
@@ -413,6 +418,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spCanFlashAttack);
                 EditorGUILayout.PropertyField(spAilment);
 
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
