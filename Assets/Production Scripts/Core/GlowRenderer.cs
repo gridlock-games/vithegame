@@ -62,8 +62,6 @@ namespace Vi.Core
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
 
-            if (netObj.IsLocalPlayer) { Debug.Log(renderer.gameObject); }
-
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
             {
                 skinnedMeshRenderer.updateWhenOffscreen = netObj.IsLocalPlayer;
