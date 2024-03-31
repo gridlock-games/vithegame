@@ -355,11 +355,11 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(hitReaction, impactPosition, damage, attackAilment, hitSourcePosition, attacker, attack));
+                StartCoroutine(EvaluateAfterHitStop(attackAilment, hitSourcePosition, attacker, attack));
 
                 if (damage != 0)
                 {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, ailment.Value == ActionClip.Ailment.Knockdown);
+                    RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
                     AddHP(damage);
                 }
             }
@@ -382,7 +382,7 @@ namespace Vi.Core
             return true;
         }
 
-        private IEnumerator EvaluateAfterHitStop(ActionClip hitReaction, Vector3 impactPosition, float damage, ActionClip.Ailment attackAilment, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
+        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
