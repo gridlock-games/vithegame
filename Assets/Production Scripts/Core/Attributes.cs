@@ -313,7 +313,7 @@ namespace Vi.Core
             }
 
             // Combination ailment logic here
-            bool assignAilmentRegardless = false;
+            bool applyAilmentRegardless = false;
             ActionClip.Ailment attackAilment = attack.ailment == ActionClip.Ailment.Grab ? ActionClip.Ailment.None : attack.ailment;
             if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
@@ -322,7 +322,7 @@ namespace Vi.Core
 
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
-            if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; assignAilmentRegardless = true; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
@@ -357,7 +357,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(attackAilment, assignAilmentRegardless, hitSourcePosition, attacker, attack));
+                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack));
 
                 if (damage != 0)
                 {
@@ -384,14 +384,14 @@ namespace Vi.Core
             return true;
         }
 
-        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool assignAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
+        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
             // Ailments
-            if (attackAilment != ailment.Value)
+            bool shouldApplyAilment = attackAilment != ailment.Value | applyAilmentRegardless;
+            if (shouldApplyAilment)
             {
-                bool ailmentChangedOnThisAttack = false;
                 if (attackAilment != ActionClip.Ailment.None)
                 {
                     Vector3 startPos = transform.position;
@@ -400,7 +400,7 @@ namespace Vi.Core
                     endPos.y = 0;
                     ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
-                    ailmentChangedOnThisAttack = ailment.Value != attackAilment | assignAilmentRegardless;
+                    shouldApplyAilment = true;
                     ailment.Value = attackAilment;
                     if (ailment.Value == ActionClip.Ailment.Death)
                     {
@@ -417,7 +417,7 @@ namespace Vi.Core
                 }
 
                 // If we started a new ailment on this attack, we want to start a reset coroutine
-                if (ailmentChangedOnThisAttack)
+                if (shouldApplyAilment)
                 {
                     switch (ailment.Value)
                     {
