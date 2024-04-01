@@ -169,6 +169,13 @@ namespace Vi.ScriptableObjects
         public ActionVFX previewActionVFX;
         public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
 
+        public bool useRotationalTargetingSystem = true;
+        public bool limitAttackMotionBasedOnTarget = true;
+        public Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
+        public Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
+        public float boxCastDistance = 5;
+        public float maximumTargetingRotationAngle = 60;
+
         // Only for shooter characters
         public bool aimDuringAnticipation;
         public bool aimDuringAttack;

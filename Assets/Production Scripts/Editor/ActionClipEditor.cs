@@ -76,6 +76,13 @@ namespace Vi.Editor
         private SerializedProperty spPreviewActionVFX;
         private SerializedProperty spPreviewActionVFXScale;
 
+        private SerializedProperty spUseRotationalTargetingSystem;
+        private SerializedProperty spLimitAttackMotionBasedOnTarget;
+        private SerializedProperty spBoxCastOriginPositionOffset;
+        private SerializedProperty spBoxCastHalfExtents;
+        private SerializedProperty spBoxCastDistance;
+        private SerializedProperty spMaximumTargetingRotationAngle;
+
         private SerializedProperty spShouldAimBody;
         private SerializedProperty spShouldAimOffHand;
         private SerializedProperty spAimDuringAnticipation;
@@ -140,6 +147,13 @@ namespace Vi.Editor
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
             spPreviewActionVFXScale = serializedObject.FindProperty("previewActionVFXScale");
+
+            spUseRotationalTargetingSystem = serializedObject.FindProperty("useRotationalTargetingSystem");
+            spLimitAttackMotionBasedOnTarget = serializedObject.FindProperty("limitAttackMotionBasedOnTarget");
+            spBoxCastOriginPositionOffset = serializedObject.FindProperty("boxCastOriginPositionOffset");
+            spBoxCastHalfExtents = serializedObject.FindProperty("boxCastHalfExtents");
+            spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
+            spMaximumTargetingRotationAngle = serializedObject.FindProperty("maximumTargetingRotationAngle");
 
             spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
             spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
@@ -241,16 +255,33 @@ namespace Vi.Editor
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spMustBeAiming);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                    EditorGUILayout.PropertyField(spBoxCastDistance);
+                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                }
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
@@ -291,6 +322,8 @@ namespace Vi.Editor
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spMustBeAiming);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
@@ -298,12 +331,26 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spIsBlockable);
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
-                EditorGUILayout.PropertyField(spAilment);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                    EditorGUILayout.PropertyField(spBoxCastDistance);
+                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
@@ -342,13 +389,19 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.FlashAttack)
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
                 EditorGUILayout.PropertyField(spDefenseDamage);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spHealthPenaltyOnMiss);
                 EditorGUILayout.PropertyField(spStaminaPenaltyOnMiss);
                 EditorGUILayout.PropertyField(spDefensePenaltyOnMiss);
@@ -359,8 +412,20 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
-                EditorGUILayout.PropertyField(spAilment);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                    EditorGUILayout.PropertyField(spBoxCastDistance);
+                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
@@ -404,11 +469,14 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Ability)
             {
                 EditorGUILayout.PropertyField(spAbilityImageIcon);
-
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -419,8 +487,20 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
-                EditorGUILayout.PropertyField(spAilment);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                    EditorGUILayout.PropertyField(spBoxCastDistance);
+                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
                     | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
