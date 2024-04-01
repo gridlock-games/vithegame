@@ -2622,11 +2622,16 @@ MonoBehaviour:
   healAmount: 0
   staminaDamage: 5
   defenseDamage: 5
+  healthPenaltyOnMiss: 0
+  staminaPenaltyOnMiss: 0
+  defensePenaltyOnMiss: 0
+  ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 1
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
+  canFlashAttack: 1
   ailment: 0
   ailmentDuration: 2
   grabDistance: 3

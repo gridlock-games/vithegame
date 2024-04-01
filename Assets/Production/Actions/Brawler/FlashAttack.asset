@@ -1457,12 +1457,12 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.25
+  transitionTime: 0.1
   animationSpeed: 1
   agentStaminaCost: 10
   agentDefenseCost: 0
   agentRageCost: 10
-  effectedWeaponBones: 0600000005000000
+  effectedWeaponBones: 11000000
   mustBeAiming: 0
   attackingNormalizedTime: 0.15
   recoveryNormalizedTime: 0.5
@@ -1474,13 +1474,13 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 50
   ragePenaltyOnMiss: 0
-  maxHitLimit: 2
+  maxHitLimit: 1
   timeBetweenHits: 0.4
   isBlockable: 1
-  isUninterruptable: 0
+  isUninterruptable: 1
   isInvincible: 0
   canFlashAttack: 0
-  ailment: 2
+  ailment: 3
   ailmentDuration: 2
   grabDistance: 3
   dodgeLock: 1
