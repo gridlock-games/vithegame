@@ -388,8 +388,6 @@ namespace Vi.Core
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
-            if (applyAilmentRegardless) { Debug.Log("Resetting " + attackAilment); }
-
             // Ailments
             if (attackAilment != ailment.Value | applyAilmentRegardless)
             {
