@@ -17,6 +17,13 @@ namespace AssetDevTools
             return lookInput * sensitivity;
         }
 
+        private Rigidbody rb;
+        private void Awake()
+        {
+            targetPosition = transform.position;
+            rb = GetComponent<Rigidbody>();
+        }
+
         private void Update()
         {
             lookInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
@@ -28,7 +35,18 @@ namespace AssetDevTools
                 Debug.Log("Updating sensitivity " + sensitivity);
             }
             
-            ProcessMovement();
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            Debug.Log("Test player colliding with: " + collision.collider);
+            targetPosition = rb.position;
+        }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            Debug.Log("Test player colliding with: " + collision.collider);
+            targetPosition = rb.position;
         }
 
         private const float movementSpeed = 5;
@@ -41,7 +59,7 @@ namespace AssetDevTools
         {
             Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
             camDirection.Scale(Vi.Core.MovementHandler.HORIZONTAL_PLANE);
-            Quaternion newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * angularSpeed);
+            Quaternion newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.fixedDeltaTime * angularSpeed);
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
@@ -52,7 +70,7 @@ namespace AssetDevTools
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
             {
-                gravity += Time.deltaTime * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
+                gravity += Time.fixedDeltaTime * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
                 bHit = true;
                 break;
             }
@@ -72,21 +90,21 @@ namespace AssetDevTools
                 else
                 {
                     isGrounded = false;
-                    gravity += Time.deltaTime * Physics.gravity;
+                    gravity += Time.fixedDeltaTime * Physics.gravity;
                 }
             }
 
             Vector2 inputVector = Vector2.zero;
-            if (Input.GetKey(KeyCode.W)) { inputVector.y = 1; }
-            if (Input.GetKey(KeyCode.A)) { inputVector.x = -1; }
-            if (Input.GetKey(KeyCode.S)) { inputVector.y = -1; }
-            if (Input.GetKey(KeyCode.D)) { inputVector.x = 1; }
+            if (Input.GetKey(KeyCode.W)) { inputVector.y += 1; }
+            if (Input.GetKey(KeyCode.A)) { inputVector.x += -1; }
+            if (Input.GetKey(KeyCode.S)) { inputVector.y += -1; }
+            if (Input.GetKey(KeyCode.D)) { inputVector.x += 1; }
             inputVector = inputVector.normalized;
 
             Vector3 targetDirection = newRotation * new Vector3(inputVector.x, 0, inputVector.y);
             targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, Vi.Core.MovementHandler.HORIZONTAL_PLANE), 1);
             targetDirection *= isGrounded ? 1 : 0;
-            Vector3 movement = targetDirection * Time.deltaTime * movementSpeed;
+            Vector3 movement = targetDirection * Time.fixedDeltaTime * movementSpeed;
             Vector3 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
 
             float stairMovement = 0;
@@ -100,7 +118,7 @@ namespace AssetDevTools
                     break;
                 }
 
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, Time.deltaTime);
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, Time.fixedDeltaTime);
                 startPos.y += yOffset;
                 stairMovement = startPos.y - transform.position.y - yOffset;
 
@@ -112,15 +130,39 @@ namespace AssetDevTools
             }
 
             movement.y += stairMovement;
+            if (stairMovement != 0) { Debug.Log("Detected stair, moving up by a factor of " + stairMovement); }
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
 
-            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z, Time.deltaTime * runAnimationTransitionSpeed));
-            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x, Time.deltaTime * runAnimationTransitionSpeed));
+            animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), animDir.z, Time.fixedDeltaTime * runAnimationTransitionSpeed));
+            animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), animDir.x, Time.fixedDeltaTime * runAnimationTransitionSpeed));
 
             transform.rotation = newRotation;
 
-            transform.position += movement + gravity;
+            targetPosition += movement + gravity;
+        }
+
+        private Vector3 targetPosition;
+
+        private float positionStrength = 1;
+        //private float rotationStrength = 1;
+        void FixedUpdate()
+        {
+            ProcessMovement();
+
+            if (Vector3.Distance(rb.position, targetPosition) > 4)
+            {
+                rb.position = targetPosition;
+            }
+            else
+            {
+                Vector3 deltaPos = targetPosition - rb.position;
+                rb.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+
+                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
+                //if (angle > 180.0f) angle -= 360.0f;
+                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
+            }
         }
     }
 }
