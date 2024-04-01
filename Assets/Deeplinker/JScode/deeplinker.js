@@ -5,13 +5,14 @@ const deviceOS = getOS();
 switch (deviceOS) {
     case 'ios':
         finalLink = "vigamegridlock://" + window.location.search;
+        window.open(finalLink, "_blank");
         break;
     case 'Android':
         finalLink = "vigamegridlock://" + window.location.search;
+        window.open(finalLink, "_blank");
     default:
         break;
 }
-location.href = finalLink;
 
 function getOS()
 {
