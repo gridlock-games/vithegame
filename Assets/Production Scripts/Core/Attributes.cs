@@ -388,10 +388,12 @@ namespace Vi.Core
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
+            if (applyAilmentRegardless) { Debug.Log("Resetting " + attackAilment); }
+
             // Ailments
-            bool shouldApplyAilment = attackAilment != ailment.Value | applyAilmentRegardless;
-            if (shouldApplyAilment)
+            if (attackAilment != ailment.Value | applyAilmentRegardless)
             {
+                bool shouldApplyAilment = false;
                 if (attackAilment != ActionClip.Ailment.None)
                 {
                     Vector3 startPos = transform.position;
