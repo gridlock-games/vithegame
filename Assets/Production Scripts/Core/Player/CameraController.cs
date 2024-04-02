@@ -19,6 +19,8 @@ namespace Vi.Player
         [Header("Camera collision settings")]
         [SerializeField] private float collisionPositionOffset;
 
+        public GameObject CameraPositionClone { get; private set; }
+
         private float targetRotationY;
         private float targetRotationX;
         private Vector3 _velocityPosition;
@@ -38,6 +40,7 @@ namespace Vi.Player
 
         public void AddRotation(float rotationX, float rotationY)
         {
+            Debug.Log(rotationX + " " + rotationY);
             targetRotationX += rotationX;
             targetRotationY += rotationY;
         }
@@ -51,12 +54,14 @@ namespace Vi.Player
             weaponHandler = movementHandler.GetComponent<WeaponHandler>();
             transform.SetParent(null, true);
             cameraInterp = new GameObject("Camera Interp");
+            CameraPositionClone = new GameObject("Empty Camera Position Clone");
             currentPositionOffset = positionOffset;
         }
 
         private void OnDestroy()
         {
             Destroy(cameraInterp);
+            Destroy(CameraPositionClone);
         }
 
         private void Update()
@@ -84,7 +89,7 @@ namespace Vi.Player
                    cameraPivot.TransformPoint(Vector3.zero),
                    ref _velocityPosition,
                    smoothTime
-               );
+                );
 
                 Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
                 eulers.z = 0;
@@ -96,6 +101,10 @@ namespace Vi.Player
             // Update camera transform itself
             transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             transform.LookAt(cameraInterp.transform);
+
+            // Do the same thing for the clone transform
+            CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+            CameraPositionClone.transform.LookAt(cameraInterp.transform);
 
             // Move camera if there is a wall in the way
             Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
