@@ -21,6 +21,8 @@ namespace Vi.Core
 
         protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
 
+        public Dictionary<Attributes, HitCounterData> GetHitCounter() { return hitCounter; }
+
         public void AddHit(Attributes attributes)
         {
             if (!hitCounter.ContainsKey(attributes))
@@ -43,7 +45,7 @@ namespace Vi.Core
             if (hitCounter.ContainsKey(attributes))
             {
                 if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
-                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.timeBetweenHits) { return false; }
+                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits()) { return false; }
             }
             return true;
         }

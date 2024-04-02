@@ -12,7 +12,8 @@ namespace Vi.ScriptableObjects
 
         private void Start()
         {
-            Transform target = GetComponentInParent<Animator>().GetComponentInChildren<SkinnedMeshRenderer>().rootBone;
+            Transform target = GetComponentInParent<Animator>().transform;
+            FindRootBone(ref target, target);
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
@@ -39,6 +40,21 @@ namespace Vi.ScriptableObjects
                 srenderer.bones = newBones;
                 srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
                 srenderer.updateWhenOffscreen = true;
+            }
+        }
+
+        private void FindRootBone(ref Transform target, Transform start)
+        {
+            if (start.gameObject.layer != LayerMask.NameToLayer("Character")) { return; }
+
+            foreach (Transform child in start)
+            {
+                if (child.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                {
+                    target = skinnedMeshRenderer.rootBone;
+                    return;
+                }
+                FindRootBone(ref target, child);
             }
         }
 

@@ -26,14 +26,7 @@ namespace Vi.Core
 
         public bool IsAtRest()
         {
-            if (Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
-            {
-                return Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
-            }
-            else
-            {
-                return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty");
-            }
+            return animatorReference.IsAtRest();
         }
 
         public bool IsAiming()
@@ -119,7 +112,14 @@ namespace Vi.Core
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
-                    if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+
+                    // If the last clip was an ability that can't be cancelled, don't play this clip
+                    if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
+                        & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                        & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                    }
                 }
             }
 
@@ -138,7 +138,7 @@ namespace Vi.Core
                     {
                         if (networkCollider.Attributes == attributes) { return; }
 
-                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
+                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.grabDuration, 0);
                     }
                     bHit = true;
                     break;
@@ -176,22 +176,31 @@ namespace Vi.Core
                 attributes.AddDefense(-actionClip.agentDefenseCost);
                 attributes.AddRage(-actionClip.agentRageCost);
             }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            {
+                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
+                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
+                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaCost);
+                attributes.AddDefense(-actionClip.agentDefenseCost);
+                attributes.AddRage(-actionClip.agentRageCost);
+            }
 
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionStateName);
+            PlayActionClientRpc(actionStateName, weaponHandler.GetWeapon().name);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
         }
@@ -224,9 +233,15 @@ namespace Vi.Core
 
         // Remote Procedure Call method for playing the action on the client
         [ClientRpc]
-        private void PlayActionClientRpc(string actionStateName)
+        private void PlayActionClientRpc(string actionStateName, string weaponName)
         {
             if (IsServer) { return; }
+            StartCoroutine(PlayActionOnClient(actionStateName, weaponName));
+        }
+
+        private IEnumerator PlayActionOnClient(string actionStateName, string weaponName)
+        {
+            yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
@@ -234,14 +249,14 @@ namespace Vi.Core
             // Play the action clip on the client side based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
             }
 
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip);
+            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
@@ -320,11 +335,11 @@ namespace Vi.Core
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.beard);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
             ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.brows);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
             ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender).name == character.hair);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
             ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
@@ -348,6 +363,8 @@ namespace Vi.Core
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        [SerializeField] private Transform cameraPivot;
 
         private void Update()
         {
@@ -356,29 +373,11 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                //bool bHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10, ~LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-                //if (bHit)
-                //{
-                //    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else if (hit.transform.root != transform.root)
-                //    {
-                //        aimPoint.Value = hit.point;
-                //    }
-                //    else
-                //    {
-                //        aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //    }
-                //}
-                //else
-                //{
-                //    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                //}
                 aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
             }
 
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? meleeVerticalAimConstraintOffset.Value : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }

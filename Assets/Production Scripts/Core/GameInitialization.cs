@@ -17,6 +17,7 @@ namespace Vi.Core
         [SerializeField] private Text assetNumberText;
         [SerializeField] private Text downloadProgressBarText;
         [SerializeField] private Image downloadProgressBarImage;
+        [SerializeField] private Text headerText;
 
         public void ExitGame()
         {
@@ -33,6 +34,8 @@ namespace Vi.Core
             {
                 FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
             });
+
+            headerText.text = "Preparing Your Vi Experience";
         }
 
         private void InitializePlayerPrefs()
@@ -43,6 +46,7 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
             if (!PlayerPrefs.HasKey("DebugOverlayEnabled")) { PlayerPrefs.SetString("DebugOverlayEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
         }
 
         private IEnumerator LoadScenes()
@@ -130,9 +134,40 @@ namespace Vi.Core
 
             if (downloadsSuccessful)
             {
+                headerText.text = "Loading Main Menu";
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+            }
+            else
+            {
+                headerText.text = "Restart The Game To Try Again";
+            }
+        }
+
+        private float lastTextChangeTime;
+        private void Update()
+        {
+            if (headerText.text == "Restart The Game To Try Again") { return; }
+
+            if (Time.time - lastTextChangeTime > 0.5f)
+            {
+                lastTextChangeTime = Time.time;
+                switch (headerText.text.Split(".").Length)
+                {
+                    case 1:
+                        headerText.text = headerText.text.Replace(".", "") + ".";
+                        break;
+                    case 2:
+                        headerText.text = headerText.text.Replace(".", "") + "..";
+                        break;
+                    case 3:
+                        headerText.text = headerText.text.Replace(".", "") + "...";
+                        break;
+                    case 4:
+                        headerText.text = headerText.text.Replace(".", "");
+                        break;
+                }
             }
         }
     }

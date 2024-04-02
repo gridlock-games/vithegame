@@ -135,11 +135,13 @@ MonoBehaviour:
   minimapCameraInstance: {fileID: 3092678811823459878}
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
+  collisionPushDampeningFactor: 1
   movementPredictionRigidbody: {fileID: 3111202478790198839}
-  gravitySphereCastPositionOffset: {x: 0, y: 0.75, z: 0}
-  gravitySphereCastRadius: 0.75
-  stairHeight: 0.6
-  rampCheckHeight: 0.1
+  gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
+  gravitySphereCastRadius: 0.6
+  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
+  boxCastHalfExtents: {x: 2, y: 1, z: 1}
+  boxCastDistance: 5
 --- !u!114 &3945128955595459581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastMeleeHitTime: -Infinity
 --- !u!114 &3945128955595459583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,6 +184,7 @@ MonoBehaviour:
     type: 3}
   teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
+  isWaitingForSpawnPoint: 0
 --- !u!114 &1486683922734963072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraPivot: {fileID: 3945128957587517370}
 --- !u!114 &3476549382923866366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,7 +440,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.75
+  m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}

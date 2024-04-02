@@ -14,7 +14,8 @@ namespace Vi.ScriptableObjects
             LightAttack,
             HeavyAttack,
             HitReaction,
-            Ability
+            Ability,
+            FlashAttack
         }
 
         public enum HitReactionType
@@ -98,6 +99,12 @@ namespace Vi.ScriptableObjects
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        [SerializeField] private AnimationCurve debugForwardMotion;
+        [SerializeField] private AnimationCurve debugSidesMotion;
+        [SerializeField] private AnimationCurve debugVerticalMotion;
+
+        public float YAngleRotationOffset = 0;
+
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
         public float animationSpeed = 1;
@@ -114,14 +121,26 @@ namespace Vi.ScriptableObjects
         public float healAmount = 0;
         public float staminaDamage = 0;
         public float defenseDamage = 0;
+        public float healthPenaltyOnMiss = 0;
+        public float staminaPenaltyOnMiss = 0;
+        public float defensePenaltyOnMiss = 0;
+        public float ragePenaltyOnMiss = 0;
         public int maxHitLimit = 1;
-        public float timeBetweenHits = 1;
+        [SerializeField] private float timeBetweenHits = 1;
         public bool isBlockable = true;
         public bool isUninterruptable;
         public bool isInvincible;
+        public bool canFlashAttack;
+        public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
-        public float ailmentDuration = 2;
+        public float grabDuration = 2;
         public float grabDistance = 3;
+
+        public const float HitStopEffectDuration = 0.1f;
+        public float GetTimeBetweenHits()
+        {
+            return timeBetweenHits + HitStopEffectDuration;
+        }
 
         public enum DodgeLock
         {
@@ -136,6 +155,10 @@ namespace Vi.ScriptableObjects
         public bool canCancelHeavyAttacks;
         public bool canCancelAbilities;
 
+        public bool canBeCancelledByLightAttacks;
+        public bool canBeCancelledByHeavyAttacks;
+        public bool canBeCancelledByAbilities;
+
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
 
@@ -146,6 +169,13 @@ namespace Vi.ScriptableObjects
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
         public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
+
+        public bool useRotationalTargetingSystem = true;
+        public bool limitAttackMotionBasedOnTarget = true;
+        public Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
+        public Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
+        public float boxCastDistance = 5;
+        public float maximumTargetingRotationAngle = 60;
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

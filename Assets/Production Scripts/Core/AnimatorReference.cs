@@ -54,14 +54,26 @@ namespace Vi.Core
                     Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
                 }
 
-                if (wearableEquipmentOption.GetModel(raceAndGender))
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender).gameObject, transform);
+                if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
+                {
+                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform);
+                    SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+                    foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                    {
+                        glowRenderer.RegisterNewRenderer(smr);
+                    }
+                }
                 else
                     wearableEquipmentInstances.Remove(wearableEquipmentOption.equipmentType);
             }
-            else if (wearableEquipmentOption.GetModel(raceAndGender))
+            else if (wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()))
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender).gameObject, transform));
+                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform));
+                SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                {
+                    glowRenderer.RegisterNewRenderer(smr);
+                }
             }
 
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
@@ -75,8 +87,6 @@ namespace Vi.Core
                         if (equipmentSkinnedMeshRenderers.Length > 1)
                             equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
                         wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !wearableEquipmentInstances[wearableEquipmentOption.equipmentType];
-
-                        glowRenderer.RegisterNewRenderer(equipmentSkinnedMeshRenderers[i]);
                     }
                     else
                     {
@@ -179,10 +189,27 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAtRest()
+        {
+            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            {
+                return animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+            else
+            {
+                return animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            }
+        }
+
         public bool ShouldApplyRootMotion()
         {
             if (!weaponHandler.CurrentActionClip) { return false; }
-            return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+            return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
+        }
+
+        private void Update()
+        {
+            limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
         }
 
         private void OnAnimatorMove()
@@ -190,8 +217,6 @@ namespace Vi.Core
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
-                //networkRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
-                //localRootMotion += animator.deltaPosition * weaponHandler.CurrentActionClip.rootMotionMulitplier;
                 float normalizedTime = 0;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
@@ -202,12 +227,12 @@ namespace Vi.Core
                     normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
                 }
 
-                Vector3 worldSpaceRootMotion = transform.TransformDirection(animator.deltaPosition);
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime);
                 worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime);
                 worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime);
-                Vector3 curveAdjustedLocalRootMotion = transform.InverseTransformDirection(worldSpaceRootMotion);
-                
+                Vector3 curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+
                 networkRootMotion += curveAdjustedLocalRootMotion;
                 localRootMotion += curveAdjustedLocalRootMotion;
             }

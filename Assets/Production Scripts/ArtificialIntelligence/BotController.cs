@@ -20,15 +20,31 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
+        [SerializeField] private float collisionPushDampeningFactor = 1;
+        private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
+            if (collision.collider.GetComponent<NetworkCollider>())
+            {
+                if (collision.relativeVelocity.magnitude > 1)
+                {
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                }
+            }
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
@@ -88,20 +104,27 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
                 navMeshAgent.nextPosition = currentPosition.Value;
+                lastMovement = Vector3.zero;
                 return;
             }
 
             Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
             
+            if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
+            {
+                inputDir = Vector3.zero;
+            }
+            //Debug.Log(Vector3.Distance(navMeshAgent.destination, currentPosition.Value));
+
             Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
-            Quaternion newRotation;
+            Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
-            if (weaponHandler.IsAiming())
+            if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
-            else
+            else if (!attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
 
             // Handle gravity
@@ -140,7 +163,11 @@ namespace Vi.ArtificialIntelligence
             // Apply movement
             Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
-            if (animationHandler.ShouldApplyRootMotion())
+            if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
+            }
+            else if (animationHandler.ShouldApplyRootMotion())
             {
                 movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
             }
@@ -176,6 +203,8 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
+            movement.y += stairMovement;
+
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
@@ -186,6 +215,7 @@ namespace Vi.ArtificialIntelligence
             currentPosition.Value += movement + gravity;
             currentRotation.Value = newRotation;
             navMeshAgent.nextPosition = currentPosition.Value;
+            lastMovement = movement;
         }
 
         private void Update()
@@ -204,7 +234,7 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
 
-                if (IsOwner)
+                if (IsOwner & !bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
                     List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
@@ -226,6 +256,10 @@ namespace Vi.ArtificialIntelligence
                             weaponHandler.SendMessage("OnLightAttack");
                         }
                     }
+                }
+                else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                {
+                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
                 }
             }
         }
@@ -259,10 +293,26 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (currentPosition.Value - transform.position);
+
+                if (attributes.ShouldShake())
+                {
+                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                }
+
                 transform.position += movement;
             }
 
-            animationHandler.Animator.speed = (Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / runSpeed * weaponHandler.CurrentActionClip.animationSpeed;
+            if (weaponHandler.CurrentActionClip != null)
+            {
+                if (attributes.ShouldPlayHitStop())
+                {
+                    animationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+                }
+            }
 
             if (attributes.ShouldApplyAilmentRotation())
                 transform.rotation = attributes.GetAilmentRotation();

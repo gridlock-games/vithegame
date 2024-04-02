@@ -135,14 +135,34 @@ namespace Vi.Core
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
+            animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
+
             weaponInstances = instances;
         }
 
-        public ActionClip CurrentActionClip { get; private set; }
+        public void PlayFlashAttack()
+        {
+            ActionClip flashAttack = weaponInstance.GetFlashAttack();
+            if (flashAttack != null)
+            {
+                if (flashAttack.GetClipType() == ActionClip.ClipType.FlashAttack)
+                {
+                    animationHandler.PlayAction(flashAttack);
+                }
+                else
+                {
+                    Debug.LogError("Attempting to play a flash attack, but the clip isn't set to be a flash attack! " + flashAttack);
+                }
+            }
+        }
 
-        public void SetActionClip(ActionClip actionClip)
+        public ActionClip CurrentActionClip { get; private set; }
+        private string currentActionClipWeapon;
+
+        public void SetActionClip(ActionClip actionClip, string weaponName)
         {
             CurrentActionClip = actionClip;
+            currentActionClipWeapon = weaponName;
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
             {
                 weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
@@ -162,6 +182,11 @@ namespace Vi.Core
             }
             else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.LightAttack)
             {
+                inputHistory.Add(Weapon.InputAttackType.LightAttack);
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            {
+                ResetComboSystem();
                 inputHistory.Add(Weapon.InputAttackType.LightAttack);
             }
             else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
@@ -353,8 +378,14 @@ namespace Vi.Core
                 IsBlocking = false;
             }
 
-            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability };
-            if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
+            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
+            if (currentActionClipWeapon != weaponInstance.name)
+            {
+                IsInAnticipation = false;
+                IsAttacking = false;
+                IsInRecovery = false;
+            }
+            else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
                 if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
@@ -396,6 +427,7 @@ namespace Vi.Core
                     IsInRecovery = false;
                 }
 
+                // If we started attacking on this fixedUpdate
                 if (IsAttacking & !lastIsAttacking)
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
@@ -407,6 +439,29 @@ namespace Vi.Core
                         else
                         {
                             Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                        }
+                    }
+                }
+
+                // Check if flash attack had no hits
+                if (IsServer & CurrentActionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+                {
+                    // If we stopped attacking on this fixedUpdate
+                    if (!IsAttacking & lastIsAttacking & IsInRecovery)
+                    {
+                        bool wasThereAHit = false;
+                        foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
+                        {
+                            wasThereAHit = weaponInstances[weaponBone].GetComponent<RuntimeWeapon>().GetHitCounter().Count > 0;
+                            if (wasThereAHit) { break; }
+                        }
+
+                        if (!wasThereAHit)
+                        {
+                            attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
+                            attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
+                            attributes.AddDefense(-CurrentActionClip.defensePenaltyOnMiss);
+                            attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
                 }
@@ -441,6 +496,13 @@ namespace Vi.Core
 
             if (shouldRepeatLightAttack) { OnLightAttack(); }
             if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
+        }
+
+        [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
+
+        public bool CanActivateFlashSwitch()
+        {
+            return (IsInAnticipation | IsAttacking | IsInRecovery) & CurrentActionClip.canFlashAttack;
         }
 
         void OnLightAttack()
@@ -739,16 +801,31 @@ namespace Vi.Core
             }
         }
 
+        void OnDisableBots()
+        {
+            if (!Application.isEditor) { return; }
+            PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+
+            if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+            {
+                Debug.Log("Disabled Bot AI");
+            }
+            else
+            {
+                Debug.Log("Enabled Bot AI");
+            }
+        }
+
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
-            
+
             // If we are in recovery, and not transitioning to a different action
             if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
             {
-                ActionClip actionClip = SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())
@@ -763,12 +840,36 @@ namespace Vi.Core
                         }
                     }
                 }
+                else // If action clip is null
+                {
+                    if (CurrentActionClip.canBeCancelledByLightAttacks & inputAttackType == Weapon.InputAttackType.LightAttack)
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+
+                    if (CurrentActionClip.canBeCancelledByHeavyAttacks & inputAttackType == Weapon.InputAttackType.HeavyAttack)
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+
+                    if (CurrentActionClip.canBeCancelledByAbilities &
+                        (inputAttackType == Weapon.InputAttackType.Ability1
+                        | inputAttackType == Weapon.InputAttackType.Ability2
+                        | inputAttackType == Weapon.InputAttackType.Ability3
+                        | inputAttackType == Weapon.InputAttackType.Ability4))
+                    {
+                        actionClip = SelectAttack(inputAttackType, new List<Weapon.InputAttackType>());
+                        if (actionClip != null) { ResetComboSystem(); }
+                    }
+                }
                 return actionClip;
             }
-            else if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))) // If we are at rest
+            else if (animationHandler.IsAtRest()) // If we are at rest
             {
                 ResetComboSystem();
-                ActionClip actionClip = SelectAttack(inputAttackType);
+                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())
@@ -796,7 +897,7 @@ namespace Vi.Core
             inputHistory.Clear();
         }
 
-        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType)
+        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
             switch (inputAttackType)
             {

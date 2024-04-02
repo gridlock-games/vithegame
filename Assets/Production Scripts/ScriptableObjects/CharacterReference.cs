@@ -13,8 +13,11 @@ namespace Vi.ScriptableObjects
     {
         [SerializeField] private PlayerModelOption[] playerModelOptions;
         [SerializeField] private WeaponOption[] weaponOptions;
+        [SerializeField] private WearableEquipment emptyWearableEquipment;
         [SerializeField] private List<WearableEquipmentOption> equipmentOptions;
         [SerializeField] private List<CharacterMaterial> characterMaterialOptions;
+
+        public WearableEquipment GetEmptyWearableEquipment() { return emptyWearableEquipment; }
 
         [System.Serializable]
         public class PlayerModelOption
@@ -161,10 +164,10 @@ namespace Vi.ScriptableObjects
             [SerializeField] private RaceAndGender[] raceAndGenders = new RaceAndGender[0];
             [SerializeField] private WearableEquipment[] wearableEquipmentOptions = new WearableEquipment[0];
 
-            public WearableEquipment GetModel(RaceAndGender raceAndGender)
+            public WearableEquipment GetModel(RaceAndGender raceAndGender, WearableEquipment emptyWearableEquipment)
             {
                 int index = System.Array.IndexOf(raceAndGenders, raceAndGender);
-                if (index == -1) { return null; }
+                if (index == -1) { return emptyWearableEquipment; }
                 return wearableEquipmentOptions[index];
             }
 
@@ -275,7 +278,7 @@ namespace Vi.ScriptableObjects
 
         public List<WearableEquipmentOption> GetArmorEquipmentOptions() { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType)); }
 
-        public List<WearableEquipmentOption> GetCharacterEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender) != null); }
+        public List<WearableEquipmentOption> GetCharacterEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender, GetEmptyWearableEquipment()) != null); }
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 

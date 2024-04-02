@@ -83,7 +83,7 @@ namespace Vi.Core
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)
@@ -121,7 +121,7 @@ namespace Vi.Core
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.timeBetweenHits) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)

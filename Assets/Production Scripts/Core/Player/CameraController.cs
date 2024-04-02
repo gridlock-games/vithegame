@@ -36,6 +36,12 @@ namespace Vi.Player
             cameraInterp.transform.rotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
         }
 
+        public void AddRotation(float rotationX, float rotationY)
+        {
+            targetRotationX += rotationX;
+            targetRotationY += rotationY;
+        }
+
         private void Start()
         {
             targetRotationX = 0;
