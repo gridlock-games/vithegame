@@ -424,13 +424,14 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
+                            knockupHitCounter = 0;
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(attack.ailmentDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
@@ -446,7 +447,25 @@ namespace Vi.Core
                     }
                 }
             }
+
+            if (ailment.Value == ActionClip.Ailment.Knockup)
+            {
+                knockupHitCounter++;
+                if (knockupHitCounter >= knockupHitLimit)
+                {
+                    if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer);
+                    ailment.Value = ActionClip.Ailment.None;
+                }
+            }
         }
+
+        private int knockupHitCounter;
+        private const int knockupHitLimit = 5;
+
+        private const float stunDuration = 2;
+        private const float knockdownDuration = 2;
+        private const float knockupDuration = 4;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {

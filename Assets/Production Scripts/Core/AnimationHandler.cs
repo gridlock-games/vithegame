@@ -138,7 +138,7 @@ namespace Vi.Core
                     {
                         if (networkCollider.Attributes == attributes) { return; }
 
-                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.ailmentDuration, 0);
+                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.grabDuration, 0);
                     }
                     bHit = true;
                     break;

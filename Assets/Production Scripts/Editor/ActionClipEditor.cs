@@ -54,7 +54,7 @@ namespace Vi.Editor
         private SerializedProperty spCanFlashAttack;
         private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
-        private SerializedProperty spAilmentDuration;
+        private SerializedProperty spGrabDuration;
         private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
 
@@ -128,7 +128,7 @@ namespace Vi.Editor
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
-            spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
+            spGrabDuration = serializedObject.FindProperty("grabDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
@@ -286,15 +286,9 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
-                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
-                }
-                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
-                {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDuration);
                     EditorGUILayout.PropertyField(spGrabDistance);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
@@ -355,15 +349,9 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
-                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
-                }
-                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
-                {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDuration);
                     EditorGUILayout.PropertyField(spGrabDistance);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
@@ -431,15 +419,9 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
-                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
-                }
-                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
-                {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDuration);
                     EditorGUILayout.PropertyField(spGrabDistance);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
@@ -507,15 +489,9 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
-                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockdown
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Knockup
-                    | (ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Stun)
+                if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
-                }
-                else if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
-                {
-                    EditorGUILayout.PropertyField(spAilmentDuration);
+                    EditorGUILayout.PropertyField(spGrabDuration);
                     EditorGUILayout.PropertyField(spGrabDistance);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
