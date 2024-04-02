@@ -329,6 +329,8 @@ namespace Vi.Player
             }
         }
 
+        private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
+
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
@@ -381,7 +383,7 @@ namespace Vi.Player
                         {
                             if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(hit.point - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
                                 angleList.Add((networkCollider,
                                     Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
                                     hit));
@@ -392,8 +394,7 @@ namespace Vi.Player
                     angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
                     foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
                     {
-                        Quaternion targetRot = Quaternion.LookRotation(hit.point - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                        //Debug.Log(angle + " " + weaponHandler.CurrentActionClip.maximumTargetingRotationAngle);
+                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
                         if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
                         {
                             cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
