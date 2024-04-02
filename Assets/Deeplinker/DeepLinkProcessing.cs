@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Vi.UI.SimpleGoogleSignIn;
 
 public class DeepLinkProcessing : MonoBehaviour
 {
@@ -33,8 +34,18 @@ public class DeepLinkProcessing : MonoBehaviour
   {
     deeplinkURL = url;
     demotest();
+
+    loginVerification();
   }
 
+  private void loginVerification()
+  {
+    Debug.Log("LOGIN VERIFYABLE");
+    string loginData = deeplinkURL.Split('?')[1];
+    Debug.Log(loginData);
+    string fullLoginData = "?" + loginData;
+    GoogleAuth.deeplinkListener(fullLoginData);
+  }
   private void demotest()
   {
     // Pass the data to whatever it is needed
