@@ -378,10 +378,11 @@ namespace Vi.Player
                     {
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - cameraInstance.transform.position, Vector3.up);
-                                cameraInstance.GetComponent<CameraController>().AddRotation(0, Mathf.Clamp((targetRot.eulerAngles.y - cameraInstance.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
+                                CameraController cameraController = cameraInstance.GetComponent<CameraController>();
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                                cameraController.AddRotation(0, Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
                                 break;
                             }
                         }
