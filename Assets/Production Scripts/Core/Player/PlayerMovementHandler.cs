@@ -371,20 +371,31 @@ namespace Vi.Player
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                 {
-                    ExtDebug.DrawBoxCastBox(animationHandler.Animator.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
-                    RaycastHit[] allHits = Physics.BoxCastAll(animationHandler.Animator.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    CameraController cameraController = cameraInstance.GetComponent<CameraController>();
+                    ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
+                    RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    List<KeyValuePair<NetworkCollider, float>> angleList = new List<KeyValuePair<NetworkCollider, float>>();
                     foreach (RaycastHit hit in allHits)
                     {
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
                             {
-                                CameraController cameraController = cameraInstance.GetComponent<CameraController>();
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                                cameraController.AddRotation(0, Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
-                                break;
+                                angleList.Add(new KeyValuePair<NetworkCollider, float>(networkCollider, targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y));
                             }
+                        }
+                    }
+
+                    angleList.Sort((x, y) => Mathf.Abs(x.Value).CompareTo(Mathf.Abs(y.Value)));
+                    foreach (var kvp in angleList)
+                    {
+                        Quaternion targetRot = Quaternion.LookRotation(kvp.Key.transform.position - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                        if (Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                        {
+                            Debug.Log(Time.time + " Targeting - " + kvp.Key.Attributes.name);
+                            cameraController.AddRotation(0, Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
+                            break;
                         }
                     }
                 }
