@@ -453,6 +453,7 @@ namespace Vi.Core
                 knockupHitCounter++;
                 if (knockupHitCounter >= knockupHitLimit)
                 {
+                    if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
                     SetInviniciblity(recoveryTimeInvincibilityBuffer);
                     ailment.Value = ActionClip.Ailment.None;
                 }
