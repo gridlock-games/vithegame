@@ -367,7 +367,6 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            bool shouldReturnToOriginalRotation = true;
             if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem)
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
@@ -381,20 +380,14 @@ namespace Vi.Player
                         {
                             if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - animationHandler.Animator.transform.position, Vector3.up);
-                                targetRot = Quaternion.Euler(0, targetRot.eulerAngles.y, 0);
-
-                                if (Quaternion.Angle(transform.rotation, targetRot) > weaponHandler.CurrentActionClip.maximumTargetingRotationAngle) { continue; }
-
-                                animationHandler.Animator.transform.rotation = Quaternion.Slerp(animationHandler.Animator.transform.rotation, targetRot, Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed);
-                                shouldReturnToOriginalRotation = false;
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - cameraInstance.transform.position, Vector3.up);
+                                cameraInstance.GetComponent<CameraController>().AddRotation(0, Mathf.Clamp((targetRot.eulerAngles.y - cameraInstance.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
                                 break;
                             }
                         }
                     }
                 }
             }
-            if (shouldReturnToOriginalRotation) { animationHandler.Animator.transform.localRotation = Quaternion.Slerp(animationHandler.Animator.transform.localRotation, Quaternion.identity, Time.deltaTime * 8); }
         }
 
         void OnLook(InputValue value)
