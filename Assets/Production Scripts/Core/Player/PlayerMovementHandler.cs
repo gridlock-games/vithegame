@@ -371,8 +371,8 @@ namespace Vi.Player
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                 {
-                    ExtDebug.DrawBoxCastBox(animationHandler.Animator.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
-                    RaycastHit[] allHits = Physics.BoxCastAll(animationHandler.Animator.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    ExtDebug.DrawBoxCastBox(transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
+                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, transform.forward, transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                     foreach (RaycastHit hit in allHits)
                     {
