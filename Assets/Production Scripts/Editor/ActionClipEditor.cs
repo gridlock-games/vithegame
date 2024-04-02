@@ -52,6 +52,7 @@ namespace Vi.Editor
         private SerializedProperty spIsUninterruptable;
         private SerializedProperty spIsInvincible;
         private SerializedProperty spCanFlashAttack;
+        private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
         private SerializedProperty spAilmentDuration;
         private SerializedProperty spGrabDistance;
@@ -125,6 +126,7 @@ namespace Vi.Editor
             spIsUninterruptable = serializedObject.FindProperty("isUninterruptable");
             spIsInvincible = serializedObject.FindProperty("isInvincible");
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
+            spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
             spAilmentDuration = serializedObject.FindProperty("ailmentDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
@@ -269,6 +271,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
+                EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
@@ -337,6 +340,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
+                EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
@@ -412,6 +416,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
+                EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
@@ -487,6 +492,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsUninterruptable);
                 EditorGUILayout.PropertyField(spIsInvincible);
                 EditorGUILayout.PropertyField(spCanFlashAttack);
+                EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);

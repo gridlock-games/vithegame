@@ -131,6 +131,7 @@ namespace Vi.ScriptableObjects
         public bool isUninterruptable;
         public bool isInvincible;
         public bool canFlashAttack;
+        public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
         public float ailmentDuration = 2;
         public float grabDistance = 3;
