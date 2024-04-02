@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
 
-namespace Vi.Player
+namespace AssetDevTools
 {
-    public class CameraController : MonoBehaviour
+    public class TestCameraController : MonoBehaviour
     {
         [Header("Camera Settings")]
         [SerializeField] private Transform cameraPivot;
@@ -22,8 +21,7 @@ namespace Vi.Player
         private float targetRotationY;
         private float targetRotationX;
         private Vector3 _velocityPosition;
-        private PlayerMovementHandler movementHandler;
-        private WeaponHandler weaponHandler;
+        private TestPlayerController movementHandler;
         private GameObject cameraInterp;
         private Vector3 currentPositionOffset;
 
@@ -36,19 +34,12 @@ namespace Vi.Player
             cameraInterp.transform.rotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
         }
 
-        public void AddRotation(float rotationX, float rotationY)
-        {
-            targetRotationX += rotationX;
-            targetRotationY += rotationY;
-        }
-
         private void Start()
         {
             targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
-            movementHandler = GetComponentInParent<PlayerMovementHandler>();
-            weaponHandler = movementHandler.GetComponent<WeaponHandler>();
+            movementHandler = GetComponentInParent<TestPlayerController>();
             transform.SetParent(null, true);
             cameraInterp = new GameObject("Camera Interp");
             currentPositionOffset = positionOffset;
@@ -72,26 +63,18 @@ namespace Vi.Player
 
             Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
-            if (weaponHandler.IsAiming())
-            {
-                cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
-                cameraInterp.transform.rotation = targetRotation;
-            }
-            else
-            {
-                cameraInterp.transform.position = Vector3.SmoothDamp(
+            cameraInterp.transform.position = Vector3.SmoothDamp(
                    cameraInterp.transform.position,
                    cameraPivot.TransformPoint(Vector3.zero),
                    ref _velocityPosition,
                    smoothTime
                );
 
-                Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
-                eulers.z = 0;
-                cameraInterp.transform.eulerAngles = eulers;
-            }
+            Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
+            eulers.z = 0;
+            cameraInterp.transform.eulerAngles = eulers;
 
-            currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
+            currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, positionOffset, Time.deltaTime * aimingTransitionSpeed);
 
             // Update camera transform itself
             transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
