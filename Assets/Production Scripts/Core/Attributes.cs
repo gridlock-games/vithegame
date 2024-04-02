@@ -427,6 +427,7 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
+                            knockupHitCounter = 0;
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
@@ -446,7 +447,20 @@ namespace Vi.Core
                     }
                 }
             }
+
+            if (ailment.Value == ActionClip.Ailment.Knockup)
+            {
+                knockupHitCounter++;
+                if (knockupHitCounter >= knockupHitLimit)
+                {
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer);
+                    ailment.Value = ActionClip.Ailment.None;
+                }
+            }
         }
+
+        private int knockupHitCounter;
+        private const int knockupHitLimit = 5;
 
         private const float stunDuration = 2;
         private const float knockdownDuration = 2;
