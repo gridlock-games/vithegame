@@ -40,7 +40,6 @@ namespace Vi.Player
 
         public void AddRotation(float rotationX, float rotationY)
         {
-            Debug.Log(rotationX + " " + rotationY);
             targetRotationX += rotationX;
             targetRotationY += rotationY;
         }
