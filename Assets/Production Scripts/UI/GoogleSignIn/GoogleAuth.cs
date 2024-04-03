@@ -20,7 +20,11 @@ namespace Vi.UI.SimpleGoogleSignIn
     private static string _redirectUri;
     private static string _state;
     private static string _codeVerifier;
+
+    private static string _redirectUriLocalhost;
+
     private static Action<bool, string, GoogleIdTokenResponse> _callback;
+
 
     public static void Auth(string clientId, string clientSecret, Action<bool, string, GoogleIdTokenResponse> callback)
     {
@@ -28,11 +32,16 @@ namespace Vi.UI.SimpleGoogleSignIn
       _clientSecret = clientSecret;
       _callback = callback;
       //_redirectUri = $"http://localhost:{Utils.GetRandomUnusedPort()}/";
-      //_redirectUri = $"http://localhost:7750/";
       _redirectUri = $"https://authentication.vi-assets.com";
 
+      //This can be ignored
+      _redirectUriLocalhost = $"http://localhost:7750/";
+
       Auth();
-      Listen();
+
+      //Not needed for mobile version/used on windows version
+      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
+      { Listen(); }
 
       //if (Application.platform == RuntimePlatform.Android)
       //{
@@ -56,11 +65,12 @@ namespace Vi.UI.SimpleGoogleSignIn
       //}
     }
 
+    //Not needed for mobile version - please 
     private static void Listen()
     {
       var httpListener = new System.Net.HttpListener();
 
-      httpListener.Prefixes.Add(_redirectUri);
+      httpListener.Prefixes.Add(_redirectUriLocalhost);
       httpListener.Start();
 
       var context = System.Threading.SynchronizationContext.Current;
@@ -179,7 +189,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static string webpageHTML()
     {
-      string htmlStuff = "<!--Vi Deeplink web tool MJM-->\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n\r\n<head>\r\n    <title>Vi Content Server</title>\r\n    <link rel=\"stylesheet\" href=\"https://unpkg.com/plain-css@latest/dist/plain.min.css\">\r\n\r\n    <style>\r\n        body {\r\n            background-image: url(\"http://vi-assets.com/vibackground.png\");\r\n            background-size: cover;\r\n        }\r\n\r\n        .centerizedA {\r\n            height: auto;\r\n            width: auto;\r\n            position: relative;\r\n        }\r\n\r\n        .centerizedB {\r\n\r\n            border: 2px solid gray;\r\n            border-radius: 5px;\r\n            text-align: center;\r\n            padding-right: 15px;\r\n            padding-left: 15px;\r\n            margin-right: auto;\r\n            margin-left: auto;\r\n            position: relative;\r\n            background-color: white;\r\n            padding-bottom: 15px;\r\n            padding-top: 15px;\r\n            width: 50%;\r\n\r\n            top: 50%;\r\n            transform: translate(0, -50%);\r\n        }\r\n    </style>\r\n    <script>\r\n        var endPath = window.location.search;\r\n        var finalLink = \"vigamegridlock://\"\r\n        const deviceOS = getOS();\r\n\r\n        switch (deviceOS) {\r\n            case 'ios':\r\n                finalLink = \"vigamegridlock://\" + window.location.search;\r\n                window.open(finalLink, \"_blank\");\r\n                break;\r\n            case 'Android':\r\n                finalLink = \"vigamegridlock://\" + window.location.search;\r\n                window.open(finalLink, \"_blank\");\r\n            default:\r\n                break;\r\n        }\r\n\r\n        function getOS() {\r\n            const userAgent = window.navigator.userAgent;\r\n            if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) || userAgent.match(/iPod/i)) {\r\n                return 'iOS';\r\n            }\r\n            else if (userAgent.match(/Android/i)) {\r\n                return 'Android';\r\n            }\r\n        }\r\n    </script>\r\n</head>\r\n\r\n<body>\r\n    <div class=\"centerizedB\">\r\n        <h1 class=\" display:inline;\">Login Successful</h1>\r\n        <p>you should be redirected to the app</p>\r\n    </div>\r\n</body>\r\n\r\n\r\n</html>";
+      string htmlStuff = "<!--Vi authentication page MJM-->\r\n<!--DO NOT ADD THE AUTHENTICATION JAVASCRIPT ON THIS PAGE - USED FOR THE LOCALHOST BASED AUTHENTICATION-->\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n\r\n<head>\r\n    <title>Vi Content Server</title>\r\n    <link rel=\"stylesheet\" href=\"https://unpkg.com/plain-css@latest/dist/plain.min.css\">\r\n\r\n    <style>\r\n        body {\r\n            background-image: url(\"https://vi-assets.com/vibackground.png\");\r\n            background-size: cover;\r\n        }\r\n\r\n        .centerizedA {\r\n            height: auto;\r\n            width: auto;\r\n            position: relative;\r\n        }\r\n\r\n        .centerizedB {\r\n\r\n            border: 2px solid gray;\r\n            border-radius: 5px;\r\n            text-align: center;\r\n            padding-right: 15px;\r\n            padding-left: 15px;\r\n            margin-right: auto;\r\n            margin-left: auto;\r\n            position: relative;\r\n            background-color: white;\r\n            padding-bottom: 15px;\r\n            padding-top: 15px;\r\n            width: 50%;\r\n\r\n            top: 50%;\r\n            transform: translate(0, -50%);\r\n        }\r\n    </style>\r\n\r\n</head>\r\n\r\n<body>\r\n    <div class=\"centerizedB\">\r\n        <img src=\"https://vi-assets.com/vilogo.jpg\" alt=\"Vi Game Logo\" style=\"width:184px;height:184px;\" class=\"floating_element\" />\r\n        <h1 id=\"titleText\" class=\" display:inline;\">Logging in...</h1>\r\n        <p id=\"subtitleText\">please wait.</p>\r\n    </div>\r\n</body>\r\n\r\n\r\n</html>";
 
       return htmlStuff;
     }
