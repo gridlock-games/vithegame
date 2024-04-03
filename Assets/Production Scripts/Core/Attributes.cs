@@ -119,6 +119,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
             statuses.OnListChanged += OnStatusChange;
+            comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
@@ -145,6 +146,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
             statuses.OnListChanged -= OnStatusChange;
+            comboCounter.OnValueChanged -= OnComboCounterChange;
 
             if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
@@ -276,6 +278,19 @@ namespace Vi.Core
 
         private float hitFreezeStartTime = Mathf.NegativeInfinity;
         private bool shouldShake;
+
+        private const float comboCounterResetTime = 3;
+
+        private NetworkVariable<int> comboCounter = new NetworkVariable<int>();
+        private float lastComboCounterChangeTime;
+
+        private void OnComboCounterChange(int prev, int current)
+        {
+            lastComboCounterChangeTime = Time.time;
+        }
+
+        public int GetComboCounter() { return comboCounter.Value; }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
@@ -368,9 +383,11 @@ namespace Vi.Core
                 }
             }
 
+            attacker.comboCounter.Value += 1;
+
             AddStamina(-attack.staminaDamage);
             AddDefense(-attack.defenseDamage);
-            attacker.AddRage(2);
+            attacker.AddRage(rageToBeAddedOnHit);
 
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
@@ -466,6 +483,7 @@ namespace Vi.Core
         private const float stunDuration = 2;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
+        private const float rageToBeAddedOnHit = 2;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
@@ -537,6 +555,8 @@ namespace Vi.Core
         private void Update()
         {
             if (!IsSpawned) { return; }
+
+            if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
 
             GlowRenderer.RenderInvincible(IsInvincible);
             GlowRenderer.RenderUninterruptable(IsUninterruptable);

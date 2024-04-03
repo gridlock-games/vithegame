@@ -63,6 +63,12 @@ namespace Vi.Core
             parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
         }
 
+        protected bool isStowed;
+        public void SetIsStowed(bool isStowed)
+        {
+            this.isStowed = isStowed;
+        }
+
         //private void OnEnable()
         //{
         //    AudioManager.Singleton.PlayClipAtPoint(parentWeaponHandler.GetWeapon().drawSoundEffect, transform.position, 0.5f);
