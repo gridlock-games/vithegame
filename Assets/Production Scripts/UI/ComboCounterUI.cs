@@ -27,7 +27,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            comboCounterText.text = attributes.GetComboCounter().ToString();
+            if (attributes.GetComboCounter() > 0) { comboCounterText.text = attributes.GetComboCounter().ToString(); }
 
             if (attributes.GetComboCounter() == 0)
             {
