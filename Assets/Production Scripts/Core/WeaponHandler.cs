@@ -70,6 +70,7 @@ namespace Vi.Core
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
                         GameObject instance = Instantiate(modelData.weaponPrefab, animationHandler.LimbReferences.GetStowedWeaponParent(), true);
+                        instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
                         stowedWeaponInstances.Add(instance);

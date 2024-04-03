@@ -86,7 +86,7 @@ namespace Vi.Core
         {
             if (weaponTrail == null) { return; }
 
-            if (parentWeaponHandler.IsAttacking)
+            if (parentWeaponHandler.IsAttacking & !isStowed)
             {
                 weaponTrail.Activate();
             }
@@ -100,6 +100,14 @@ namespace Vi.Core
         {
             if (weaponTrail == null) { return; }
             weaponTrail.Tick(transform.TransformPoint(weaponTrailPointA), transform.TransformPoint(weaponTrailPointB));
+        }
+
+        private void OnDestroy()
+        {
+            if (weaponTrail != null)
+            {
+                if (weaponTrail.Trail) { Destroy(weaponTrail.Trail); }
+            }
         }
 
         private void OnDrawGizmos()
@@ -212,7 +220,7 @@ namespace Vi.Core
         private List<Data> points;
         private Mesh mesh;
         private Renderer render;
-        private GameObject trail;
+        public GameObject Trail { get; private set; }
 
         private bool isActive = false;
         private float deactiveTime;
@@ -239,18 +247,18 @@ namespace Vi.Core
             mesh = new Mesh();
             mesh.MarkDynamic();
 
-            trail = new GameObject("Trail");
-            trail.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            Trail = new GameObject("Trail");
+            Trail.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
-            MeshFilter meshFilter = trail.AddComponent<MeshFilter>();
-            render = trail.AddComponent<MeshRenderer>();
+            MeshFilter meshFilter = Trail.AddComponent<MeshFilter>();
+            render = Trail.AddComponent<MeshRenderer>();
 
             meshFilter.mesh = mesh;
             render.material = this.material;
             render.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             render.receiveShadows = false;
 
-            trail.hideFlags = HideFlags.HideInHierarchy;
+            Trail.hideFlags = HideFlags.HideInHierarchy;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
