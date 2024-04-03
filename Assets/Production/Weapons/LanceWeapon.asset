@@ -44,8 +44,10 @@ MonoBehaviour:
     - weaponPrefab: {fileID: 8233962304293885144, guid: bc30ff30053a8eb45906debad5bc4872,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponPositionOffset: {x: 0.00101, y: -0.00039, z: -0.00005}
+      weaponRotationOffset: {x: 4.915, y: 13.722, z: -0.334}
+      stowedWeaponPositionOffset: {x: 0.00006, y: 0.0019, z: 0.00002}
+      stowedWeaponRotationOffset: {x: -2.675, y: 113.37, z: 89.899}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
@@ -54,6 +56,8 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.0905, y: -0.0224, z: 0.009}
       weaponRotationOffset: {x: 81.825, y: 25.117, z: 4.348}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
       type: 3}
     data:
@@ -62,6 +66,8 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
       weaponRotationOffset: {x: 92.96701, y: -147.181, z: -167.978}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 3053794231721553574, guid: 0bd975ac38fa2ef478d9b5cd810a7824,
       type: 3}
     data:
@@ -70,6 +76,8 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.0905, y: -0.0224, z: 0.009}
       weaponRotationOffset: {x: 81.825, y: 25.117, z: 4.348}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -129,6 +137,7 @@ MonoBehaviour:
   ability2: {fileID: 11400000, guid: e3eec0f0a6624d24dab78d5e18643ca0, type: 2}
   ability3: {fileID: 11400000, guid: ad50822199722684e9882e57fae4eb8a, type: 2}
   ability4: {fileID: 11400000, guid: 56ba2c47a1006da409e0fc6b3fdd8080, type: 2}
+  flashAttack: {fileID: 0}
   attackList:
   - inputs: 00000000
     comboCondition: 0
