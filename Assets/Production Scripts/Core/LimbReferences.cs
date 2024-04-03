@@ -136,6 +136,8 @@ namespace Vi.Core
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
+        public Transform GetStowedWeaponParent() { return stowedWeaponParent; }
+
         [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
@@ -151,6 +153,8 @@ namespace Vi.Core
         [SerializeField] private RigWeightTarget meleeVerticalAimRig;
         [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
+        [Header("Weapon Swapping")]
+        [SerializeField] private Transform stowedWeaponParent;
 
         public const float rotationConstraintOffsetSpeed = 12;
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)

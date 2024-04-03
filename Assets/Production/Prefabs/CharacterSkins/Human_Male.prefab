@@ -2726,6 +2726,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6271135618739067859}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &6174404207658052272 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -9031846494388391581, guid: 72306590017a9544eaaab841eafbdd56,
+    type: 3}
+  m_PrefabInstance: {fileID: 6271135618739067859}
+  m_PrefabAsset: {fileID: 0}
 --- !u!137 &6192920081046813868 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 213393895794435967, guid: 72306590017a9544eaaab841eafbdd56,
@@ -2927,6 +2933,7 @@ MonoBehaviour:
   meleeVerticalAimRig: {fileID: 928111209206620082}
   meleeVerticalAimConstraint: {fileID: 8577034352154996663}
   rotationOffsetConstraint: {fileID: 6930646654865520576}
+  stowedWeaponParent: {fileID: 6174404207658052272}
 --- !u!114 &3131407962465346050
 MonoBehaviour:
   m_ObjectHideFlags: 0
