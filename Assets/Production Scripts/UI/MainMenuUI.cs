@@ -332,7 +332,6 @@ namespace Vi.UI
             }
         }
 
-
         private void Update()
         {
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
