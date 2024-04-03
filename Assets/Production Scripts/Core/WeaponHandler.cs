@@ -527,7 +527,7 @@ namespace Vi.Core
 
         public bool CanActivateFlashSwitch()
         {
-            return (IsInAnticipation | IsAttacking | IsInRecovery) & CurrentActionClip.canFlashAttack;
+            return IsInRecovery & CurrentActionClip.canFlashAttack;
         }
 
         void OnLightAttack()
