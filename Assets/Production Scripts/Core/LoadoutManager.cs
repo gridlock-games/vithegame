@@ -263,9 +263,11 @@ namespace Vi.Core
             {
                 case 1:
                     weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
+                    weaponHandler.SetStowedWeapon(secondaryWeapon);
                     break;
                 case 2:
                     weaponHandler.SetNewWeapon(secondaryWeapon, secondaryRuntimeAnimatorController);
+                    weaponHandler.SetStowedWeapon(primaryWeapon);
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");
@@ -278,11 +280,13 @@ namespace Vi.Core
             if (primaryWeapon)
             {
                 weaponHandler.SetNewWeapon(primaryWeapon, primaryRuntimeAnimatorController);
+                weaponHandler.SetStowedWeapon(secondaryWeapon);
             }
             else
             {
                 CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions()[0];
                 weaponHandler.SetNewWeapon(Instantiate(weaponOption.weapon), weaponOption.animationController);
+                weaponHandler.SetStowedWeapon(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions()[1].weapon);
             }
         }
 

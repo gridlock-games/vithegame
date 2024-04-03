@@ -89,6 +89,8 @@ namespace Vi.ScriptableObjects
                 public WeaponBone weaponBone = WeaponBone.RightHand;
                 public Vector3 weaponPositionOffset;
                 public Vector3 weaponRotationOffset;
+                public Vector3 stowedWeaponPositionOffset;
+                public Vector3 stowedWeaponRotationOffset;
             }
         }
 
