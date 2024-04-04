@@ -175,6 +175,11 @@ namespace Vi.UI
             Instantiate(contentManager.gameObject);
         }
 
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
+
         public IEnumerator CreateAccount()
         {
             PlayerPrefs.SetString("username", usernameInput.text);

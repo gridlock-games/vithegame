@@ -9,6 +9,7 @@ using Vi.Core;
 public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] private GameObject debugCanvas;
+    [SerializeField] private GameObject consoleParent;
     [SerializeField] private Text consoleLogText;
     [SerializeField] private Text fpsText;
     [SerializeField] private Text dividerText;
@@ -63,16 +64,21 @@ public class DebugOverlay : MonoBehaviour
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
-        bool enableDisplay = bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"));
-        if (Input.GetKeyDown(KeyCode.BackQuote))
-        {
-            PlayerPrefs.SetString("DebugOverlayEnabled", (!enableDisplay).ToString());
-            myLog = "";
-        }
+        bool consoleEnabled = bool.Parse(PlayerPrefs.GetString("ConsoleEnabled"));
+        bool fpsEnabled = bool.Parse(PlayerPrefs.GetString("FPSEnabled"));
+        bool pingEnabled = bool.Parse(PlayerPrefs.GetString("PingEnabled"));
 
-        debugCanvas.SetActive(enableDisplay);
+        //if (Input.GetKeyDown(KeyCode.BackQuote))
+        //{
+        //    PlayerPrefs.SetString("DebugOverlayEnabled", (!enableDisplay).ToString());
+        //    myLog = "";
+        //}
 
-        if (enableDisplay)
+        debugCanvas.SetActive(consoleEnabled | fpsEnabled | pingEnabled);
+
+        consoleParent.SetActive(consoleEnabled);
+
+        if (fpsEnabled)
         {
             fpsText.text = Mathf.RoundToInt(frameCount).ToString() + "FPS";
             Color fpsTextColor;
@@ -89,7 +95,14 @@ public class DebugOverlay : MonoBehaviour
                 fpsTextColor = Color.red;
             }
             fpsText.color = fpsTextColor;
+        }
+        else
+        {
+            fpsText.text = "";
+        }
 
+        if (pingEnabled)
+        {
             bool pingTextEvaluated = false;
             if (PlayerDataManager.Singleton)
             {
@@ -98,7 +111,7 @@ public class DebugOverlay : MonoBehaviour
                 {
                     ulong ping = kvp.Value.GetRoundTripTime();
                     pingText.text = ping.ToString() + "ms";
-                    dividerText.text = "|";
+                    dividerText.text = fpsEnabled ? "|" : "";
                     Color pingTextColor;
                     if (ping >= 80)
                     {
@@ -123,6 +136,11 @@ public class DebugOverlay : MonoBehaviour
                 dividerText.text = "";
                 pingText.color = Color.green;
             }
+        }
+        else
+        {
+            pingText.text = "";
+            dividerText.text = "";
         }
     }
 

@@ -26,7 +26,7 @@ namespace Vi.Core
 
         private void Start()
         {
-            Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
 
@@ -45,8 +45,21 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
-            if (!PlayerPrefs.HasKey("DebugOverlayEnabled")) { PlayerPrefs.SetString("DebugOverlayEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
+
+            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
+
+            if (!PlayerPrefs.HasKey("MasterVolume"))
+            {
+                PlayerPrefs.SetFloat("MasterVolume", 0.75f);
+                AudioListener.volume = 0.75f;
+            }
+            else
+            {
+                AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume");
+            }
         }
 
         private IEnumerator LoadScenes()
