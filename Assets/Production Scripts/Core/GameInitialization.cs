@@ -26,7 +26,7 @@ namespace Vi.Core
 
         private void Start()
         {
-            Application.targetFrameRate = Screen.currentResolution.refreshRate;
+            Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
 
