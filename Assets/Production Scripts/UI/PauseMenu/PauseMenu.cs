@@ -13,7 +13,6 @@ namespace Vi.UI
         [SerializeField] private AudioSettingsMenu audioSettingsMenu;
         [SerializeField] private GameSettingsMenu gameSettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
-        [SerializeField] private Slider volumeSlider;
         [SerializeField] private Toggle debugOverlayToggle;
         [SerializeField] private Button goBackScenesButton;
 
@@ -49,12 +48,6 @@ namespace Vi.UI
             gameObject.SetActive(false);
         }
 
-        public void ChangeMasterVolume()
-        {
-            AudioListener.volume = volumeSlider.value;
-            PlayerPrefs.SetFloat("MasterVolume", AudioListener.volume);
-        }
-
         public void SetDebugOverlay()
         {
             PlayerPrefs.SetString("DebugOverlayEnabled", (!bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"))).ToString());
@@ -63,7 +56,6 @@ namespace Vi.UI
         private void Start()
         {
             debugOverlayToggle.SetIsOnWithoutNotify(bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled")));
-            volumeSlider.value = AudioListener.volume;
 
             goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
             goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
