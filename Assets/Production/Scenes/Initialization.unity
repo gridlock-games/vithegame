@@ -788,6 +788,12 @@ MonoBehaviour:
   - platforms: 080000000b000000
     gameObjectsToEnable:
     - {fileID: 1863482480}
+    gameObjectsToDestroy:
+    - {fileID: 2096573338}
+    objectsToMove: []
+  - platforms: 000000000100000002000000070000000d00000010000000
+    gameObjectsToEnable:
+    - {fileID: 2096573338}
     gameObjectsToDestroy: []
     objectsToMove: []
   controlSchemeTextDefinitions: []
