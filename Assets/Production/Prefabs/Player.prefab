@@ -139,9 +139,6 @@ MonoBehaviour:
   movementPredictionRigidbody: {fileID: 3111202478790198839}
   gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
   gravitySphereCastRadius: 0.6
-  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
-  boxCastHalfExtents: {x: 2, y: 1, z: 1}
-  boxCastDistance: 5
 --- !u!114 &3945128955595459581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,7 +434,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7758667554989270931}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
