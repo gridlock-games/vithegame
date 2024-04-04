@@ -47,6 +47,7 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
             if (!PlayerPrefs.HasKey("DebugOverlayEnabled")) { PlayerPrefs.SetString("DebugOverlayEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
+            if (!PlayerPrefs.HasKey("MasterVolume")) { PlayerPrefs.SetFloat("MasterVolume", 0.75f); AudioListener.volume = 0.75f; }
         }
 
         private IEnumerator LoadScenes()

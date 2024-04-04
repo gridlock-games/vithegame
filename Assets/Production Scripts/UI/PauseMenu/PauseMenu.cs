@@ -9,15 +9,33 @@ namespace Vi.UI
 {
     public class PauseMenu : Menu
     {
-        [SerializeField] private DisplaySettingsMenu displaySettingsMenu;
+        [SerializeField] private VideoSettingsMenu displaySettingsMenu;
+        [SerializeField] private AudioSettingsMenu audioSettingsMenu;
+        [SerializeField] private GameSettingsMenu gameSettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private Toggle debugOverlayToggle;
         [SerializeField] private Button goBackScenesButton;
 
-        public void OpenDisplayMenu()
+        public void OpenVideoMenu()
         {
             GameObject _settings = Instantiate(displaySettingsMenu.gameObject);
+            _settings.GetComponent<Menu>().SetLastMenu(gameObject);
+            childMenu = _settings;
+            gameObject.SetActive(false);
+        }
+
+        public void OpenAudioMenu()
+        {
+            GameObject _settings = Instantiate(audioSettingsMenu.gameObject);
+            _settings.GetComponent<Menu>().SetLastMenu(gameObject);
+            childMenu = _settings;
+            gameObject.SetActive(false);
+        }
+
+        public void OpenGameMenu()
+        {
+            GameObject _settings = Instantiate(gameSettingsMenu.gameObject);
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
             gameObject.SetActive(false);
@@ -34,7 +52,7 @@ namespace Vi.UI
         public void ChangeMasterVolume()
         {
             AudioListener.volume = volumeSlider.value;
-            PlayerPrefs.SetFloat("masterVolume", AudioListener.volume);
+            PlayerPrefs.SetFloat("MasterVolume", AudioListener.volume);
         }
 
         public void SetDebugOverlay()
