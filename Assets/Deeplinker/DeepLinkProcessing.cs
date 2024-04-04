@@ -33,11 +33,33 @@ public class DeepLinkProcessing : MonoBehaviour
   private void onDeepLinkActivated(string url)
   {
     deeplinkURL = url;
-    demotest();
-
-    loginVerification();
+    deepLinkTypeProcessing();
   }
+  private void deepLinkTypeProcessing()
+  {
+    string deeplinkID = deeplinkURL.Split('?')[0];
+    //Remove "vigamegridlock://"
+    deeplinkID = deeplinkID.Replace("vigamegridlock://", "");
+    deeplinkID = deeplinkID.Replace("/", "");
+    Debug.Log(deeplinkID);
 
+    //Add a check if user is login or not
+    switch (deeplinkID)
+    {
+      case "authentication":
+        Debug.Log("Access Login System Deeplink");
+        loginVerification();
+        return;
+      case "profile":
+        Debug.Log("Access Profile Deeplink");
+        return;
+      case "gift":
+        Debug.Log("Access gift code system");
+        return;
+      default:
+        return;
+    }
+  }
   private void loginVerification()
   {
     Debug.Log("LOGIN VERIFYABLE");
@@ -45,6 +67,9 @@ public class DeepLinkProcessing : MonoBehaviour
     Debug.Log(loginData);
     string fullLoginData = "?" + loginData;
     GoogleAuth.deeplinkListener(fullLoginData);
+
+    //Sentitive item - Erase Deeplink after use
+    deeplinkURL = "[none]"; 
   }
   private void demotest()
   {
