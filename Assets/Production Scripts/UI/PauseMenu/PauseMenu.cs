@@ -13,7 +13,6 @@ namespace Vi.UI
         [SerializeField] private AudioSettingsMenu audioSettingsMenu;
         [SerializeField] private GameSettingsMenu gameSettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
-        [SerializeField] private Toggle debugOverlayToggle;
         [SerializeField] private Button goBackScenesButton;
 
         public void OpenVideoMenu()
@@ -48,15 +47,8 @@ namespace Vi.UI
             gameObject.SetActive(false);
         }
 
-        public void SetDebugOverlay()
-        {
-            PlayerPrefs.SetString("DebugOverlayEnabled", (!bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled"))).ToString());
-        }
-
         private void Start()
         {
-            debugOverlayToggle.SetIsOnWithoutNotify(bool.Parse(PlayerPrefs.GetString("DebugOverlayEnabled")));
-
             goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
             goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
 

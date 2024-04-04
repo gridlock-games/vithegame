@@ -45,9 +45,12 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
-            if (!PlayerPrefs.HasKey("DebugOverlayEnabled")) { PlayerPrefs.SetString("DebugOverlayEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
-            
+
+            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
+
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {
                 PlayerPrefs.SetFloat("MasterVolume", 0.75f);
