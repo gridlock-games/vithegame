@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -29,6 +30,7 @@ namespace Vi.UI
             public string overrideActionName;
             public ActionGroup actionGroup;
             public InputActionReference[] inputActionReferences;
+            public RuntimePlatform[] applicablePlatforms;
         }
 
         public enum ActionGroup
@@ -78,26 +80,30 @@ namespace Vi.UI
 
             foreach (ActionGroup actionGroup in System.Enum.GetValues(typeof(ActionGroup)))
             {
-                Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
-                
-                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
-                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
-
-                foreach (RebindableAction rebindableAction in System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup))
+                RebindableAction[] rebindableActionGroup = System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup & item.applicablePlatforms.Contains(Application.platform));
+                if (rebindableActionGroup.Length > 0)
                 {
-                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
-                    {
-                        InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
-                        foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
-                        {
-                            if (binding.path.ToLower().Contains(device.name.ToLower()))
-                            {
-                                RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                                rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+                    Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
 
-                                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
-                                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
-                                break;
+                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
+                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
+
+                    foreach (RebindableAction rebindableAction in rebindableActionGroup)
+                    {
+                        for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
+                        {
+                            InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
+                            foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                            {
+                                if (binding.path.ToLower().Contains(device.name.ToLower()))
+                                {
+                                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
+                                    rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+
+                                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
+                                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                                    break;
+                                }
                             }
                         }
                     }
