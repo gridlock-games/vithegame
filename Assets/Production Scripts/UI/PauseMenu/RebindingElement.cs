@@ -43,12 +43,12 @@ namespace Vi.UI
         public void SetIsRebinding()
         {
             Button.interactable = false;
+            bindingDisplayText.text = "[Waiting For Input]";
         }
 
         public void SetFinishedRebinding()
         {
             Button.interactable = true;
-
             Initialize(rebindableAction, controlScheme);
         }
 
