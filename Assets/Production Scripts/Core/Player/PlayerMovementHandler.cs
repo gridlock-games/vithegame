@@ -134,7 +134,7 @@ namespace Vi.Player
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -173,7 +173,7 @@ namespace Vi.Player
             {
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
+                targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
                 movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
@@ -205,8 +205,16 @@ namespace Vi.Player
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
             if (IsOwner)
             {
-                moveForwardTarget.Value = animDir.z;
-                moveSidesTarget.Value = animDir.x;
+                if (weaponHandler.GetWeapon().IsWalking(weaponHandler.IsBlocking))
+                {
+                    moveForwardTarget.Value = animDir.z / 2;
+                    moveSidesTarget.Value = animDir.x / 2;
+                }
+                else
+                {
+                    moveForwardTarget.Value = animDir.z;
+                    moveSidesTarget.Value = animDir.x;
+                }
             }
             lastMovement = movement;
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition + movement + gravity, newRotation);
@@ -358,7 +366,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * weaponHandler.CurrentActionClip.animationSpeed;
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) * weaponHandler.CurrentActionClip.animationSpeed;
                 }
             }
 

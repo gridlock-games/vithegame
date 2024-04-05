@@ -87,7 +87,7 @@ namespace Vi.UI
                 {
                     RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
                     rebindingElement.Initialize(rebindableAction, controlScheme);
-                    rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
+                    //rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
 
                     rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                     scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
@@ -113,7 +113,6 @@ namespace Vi.UI
             rebindingElement.SetIsRebinding();
 
             rebindingOperation = rebindableAction.inputActionReference.action.PerformInteractiveRebinding()
-                .OnMatchWaitForAnother(0.1f)
                 .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
                 .Start();
         }
