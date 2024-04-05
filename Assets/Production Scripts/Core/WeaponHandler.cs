@@ -53,6 +53,32 @@ namespace Vi.Core
             EquipWeapon();
         }
 
+        private List<GameObject> stowedWeaponInstances = new List<GameObject>();
+        public void SetStowedWeapon(Weapon weapon)
+        {
+            if (!weapon) { return; }
+            foreach (GameObject g in stowedWeaponInstances)
+            {
+                Destroy(g);
+            }
+            stowedWeaponInstances.Clear();
+
+            foreach (Weapon.WeaponModelData data in weapon.GetWeaponModelData())
+            {
+                if (data.skinPrefab.name == animationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                {
+                    foreach (Weapon.WeaponModelData.Data modelData in data.data)
+                    {
+                        GameObject instance = Instantiate(modelData.weaponPrefab, animationHandler.LimbReferences.GetStowedWeaponParent(), true);
+                        instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
+                        instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
+                        instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
+                        stowedWeaponInstances.Add(instance);
+                    }
+                }
+            }
+        }
+
         public bool ShouldUseAmmo()
         {
             if (weaponInstance != null) { return weaponInstance.ShouldUseAmmo(); }
@@ -502,7 +528,7 @@ namespace Vi.Core
 
         public bool CanActivateFlashSwitch()
         {
-            return (IsInAnticipation | IsAttacking | IsInRecovery) & CurrentActionClip.canFlashAttack;
+            return IsInRecovery & CurrentActionClip.canFlashAttack;
         }
 
         void OnLightAttack()
@@ -537,7 +563,7 @@ namespace Vi.Core
                     return;
                 }
             }
-            
+
             if (CanAim)
             {
                 if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")

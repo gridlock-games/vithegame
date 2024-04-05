@@ -48,11 +48,15 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.00099, y: -0.00047, z: 0.00009}
       weaponRotationOffset: {x: 4.6802106, y: 16.330914, z: 76.437965}
+      stowedWeaponPositionOffset: {x: -0.00176, y: 0.0018, z: 0.00071}
+      stowedWeaponRotationOffset: {x: 0, y: 106.1, z: 95.8}
     - weaponPrefab: {fileID: 6393463382022712343, guid: fa40f58342ff4a39b1af7f2843d7209a,
         type: 3}
       weaponBone: 15
       weaponPositionOffset: {x: -0.00263, y: 0.00022, z: 0.00028}
       weaponRotationOffset: {x: 275.93893, y: 60.637478, z: 191.01381}
+      stowedWeaponPositionOffset: {x: 0.00019, y: 0.0018, z: 0.00005}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 90}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
@@ -61,11 +65,15 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.0604, y: -0.0273, z: -0.0521}
       weaponRotationOffset: {x: 3.075497, y: 22.15016, z: 62.85931}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
     - weaponPrefab: {fileID: 7136312059910720320, guid: 6ca70f6ba01e3df449fa7b9bd2dfd717,
         type: 3}
       weaponBone: 15
       weaponPositionOffset: {x: -0.2009, y: 0.0366, z: 0.0469}
       weaponRotationOffset: {x: 32.62893, y: 174.7569, z: 85.55447}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
       type: 3}
     data:
@@ -74,11 +82,15 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.075, y: -0.039, z: -0.012}
       weaponRotationOffset: {x: 3.075497, y: 22.15016, z: 62.85931}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
     - weaponPrefab: {fileID: 7136312059910720320, guid: 6ca70f6ba01e3df449fa7b9bd2dfd717,
         type: 3}
       weaponBone: 15
       weaponPositionOffset: {x: -0.2009, y: 0.0366, z: 0.0469}
       weaponRotationOffset: {x: 32.62893, y: 174.7569, z: 85.55447}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 3053794231721553574, guid: 0bd975ac38fa2ef478d9b5cd810a7824,
       type: 3}
     data:
@@ -87,11 +99,15 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.0604, y: -0.0273, z: -0.0521}
       weaponRotationOffset: {x: 3.075497, y: 22.15016, z: 62.85931}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
     - weaponPrefab: {fileID: 7136312059910720320, guid: 6ca70f6ba01e3df449fa7b9bd2dfd717,
         type: 3}
       weaponBone: 15
       weaponPositionOffset: {x: -0.2009, y: 0.0366, z: 0.0469}
       weaponRotationOffset: {x: 32.62893, y: 174.7569, z: 85.55447}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}

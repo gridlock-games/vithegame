@@ -78,7 +78,6 @@ namespace Vi.Core
             {
                 RegisterAudioSource(audioSouce);
             }
-            AudioListener.volume = PlayerPrefs.HasKey("masterVolume") ? PlayerPrefs.GetFloat("masterVolume") : 1;
 
             // This is for music
             if (TryGetComponent(out AudioSource audioSource))

@@ -1,13 +1,12 @@
+using Firebase.Auth;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Vi.Core;
-using Unity.Netcode;
-using UnityEngine.UI;
 using System.Net;
-using Firebase.Auth;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.UI;
+using Vi.Core;
 using Vi.UI.SimpleGoogleSignIn;
-using Proyecto26;
 
 namespace Vi.UI
 {
@@ -15,12 +14,16 @@ namespace Vi.UI
     {
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private ContentManager contentManager;
+
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
+
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
+
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
+
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -29,15 +32,20 @@ namespace Vi.UI
         [SerializeField] private Button returnButton;
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
+
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
+
         [SerializeField] private Text welcomeUserText;
+
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
+
         [SerializeField] private Button startLobbyServerButton;
 
         private bool startServerCalled;
         private const int hubPort = 7777;
+
         public void StartHubServer()
         {
             if (startServerCalled) { return; }
@@ -167,6 +175,11 @@ namespace Vi.UI
             Instantiate(contentManager.gameObject);
         }
 
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
+
         public IEnumerator CreateAccount()
         {
             PlayerPrefs.SetString("username", usernameInput.text);
@@ -203,11 +216,16 @@ namespace Vi.UI
             passwordInput.interactable = true;
         }
 
-        private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
-        private const string googleSignInSecretId = "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";
+        //private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
+        //private const string googleSignInSecretId = "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";
+
+
+        private const string googleSignInClientId = "583444002427-p8hrsdv9p38migp7db30mch3qeluodda.apps.googleusercontent.com";
+        private const string googleSignInSecretId = "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";
 
         public void LoginWithGoogle()
         {
+            Debug.Log("Logging in with Google");
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
@@ -306,10 +324,12 @@ namespace Vi.UI
                             initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
                         }
                         break;
+
                     case "Google":
                         yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PlayerPrefs.GetString("GoogleIdTokenResponse")));
 
                         break;
+
                     default:
                         Debug.LogError("Not sure how to handle last sign in type " + PlayerPrefs.GetString("LastSignInType"));
                         break;
@@ -358,4 +378,3 @@ namespace Vi.UI
         }
     }
 }
-

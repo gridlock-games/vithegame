@@ -142,7 +142,32 @@ namespace Vi.Player
             }
             else if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+                if (attributes.IsRooted())
+                {
+                    movement = Vector3.zero;
+                }
+                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking))
+                {
+                    movement = rootMotion;
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.blue);
+                    allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
+                            {
+                                movement = Vector3.ClampMagnitude(movement, hit.distance);
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    movement = rootMotion;
+                }
             }
             else
             {
@@ -304,11 +329,7 @@ namespace Vi.Player
             }
         }
 
-        [Header("Auto targeting system")]
-        [SerializeField] private Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
-        [SerializeField] private Vector3 boxCastHalfExtents = new Vector3(1, 1, 1);
-        [SerializeField] private float boxCastDistance = 10;
-        [SerializeField] private float maximumRotationAngle = 60;
+        private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
         private void UpdateLocomotion()
         {
@@ -348,29 +369,41 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            bool shouldReturnToOriginalRotation = true;
-            ExtDebug.DrawBoxCastBox(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, cameraInstance.transform.forward, cameraInstance.transform.rotation, boxCastDistance, Color.yellow);
-            if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
+            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance)
             {
-                RaycastHit[] allHits = Physics.BoxCastAll(animationHandler.Animator.transform.position + boxCastOriginPositionOffset, boxCastHalfExtents, cameraInstance.transform.forward, cameraInstance.transform.rotation, boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-                foreach (RaycastHit hit in allHits)
+                if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                 {
-                    if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                    CameraController cameraController = cameraInstance.GetComponent<CameraController>();
+                    ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
+                    RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                    foreach (RaycastHit hit in allHits)
                     {
-                        if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
+                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.Attributes.transform.root.position - animationHandler.Animator.transform.position, Vector3.up);
-                            if (Quaternion.Angle(transform.rotation, targetRot) > maximumRotationAngle) { continue; }
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                            {
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                                angleList.Add((networkCollider,
+                                    Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
+                                    hit));
+                            }
+                        }
+                    }
 
-                            animationHandler.Animator.transform.rotation = Quaternion.Slerp(animationHandler.Animator.transform.rotation, targetRot, Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed);
-                            shouldReturnToOriginalRotation = false;
+                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                    {
+                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                        if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                        {
+                            cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
+                                Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
                             break;
                         }
                     }
                 }
             }
-            if (shouldReturnToOriginalRotation) { animationHandler.Animator.transform.localRotation = Quaternion.Slerp(animationHandler.Animator.transform.localRotation, Quaternion.identity, Time.deltaTime * 8); }
         }
 
         void OnLook(InputValue value)

@@ -131,8 +131,9 @@ namespace Vi.ScriptableObjects
         public bool isUninterruptable;
         public bool isInvincible;
         public bool canFlashAttack;
+        public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
-        public float ailmentDuration = 2;
+        public float grabDuration = 2;
         public float grabDistance = 3;
 
         public const float HitStopEffectDuration = 0.1f;
@@ -168,6 +169,13 @@ namespace Vi.ScriptableObjects
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
         public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
+
+        public bool useRotationalTargetingSystem = true;
+        public bool limitAttackMotionBasedOnTarget = true;
+        public Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
+        public Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
+        public float boxCastDistance = 5;
+        public float maximumTargetingRotationAngle = 60;
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

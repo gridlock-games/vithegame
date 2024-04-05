@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
-    public class DisplaySettingsMenu : Menu
+    public class VideoSettingsMenu : Menu
     {
         [Header("Display Settings")]
         [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
