@@ -950,16 +950,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = movementHandler.GetMoveInput().y == 1;
+                        conditionMet = movementHandler.GetMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = movementHandler.GetMoveInput().y == -1;
+                        conditionMet = movementHandler.GetMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = movementHandler.GetMoveInput().x == -1;
+                        conditionMet = movementHandler.GetMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = movementHandler.GetMoveInput().x == 1;
+                        conditionMet = movementHandler.GetMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");
