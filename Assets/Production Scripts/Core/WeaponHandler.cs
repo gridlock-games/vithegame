@@ -965,7 +965,6 @@ namespace Vi.Core
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");
                         break;
                 }
-                Debug.Log(movementHandler.GetMoveInput() + " " + conditionMet);
 
                 if (conditionMet)
                 {
