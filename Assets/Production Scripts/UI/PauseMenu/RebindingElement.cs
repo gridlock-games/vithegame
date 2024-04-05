@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using System.Text.RegularExpressions;
 
 namespace Vi.UI
 {
@@ -18,36 +19,63 @@ namespace Vi.UI
         private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
         private int bindingIndex = -1;
 
-        public void Initialize(ControlsSettingsMenu.RebindableAction rebindableAction, InputControlScheme controlScheme)
+        public void Initialize(ControlsSettingsMenu.RebindableAction rebindableAction, InputControlScheme controlScheme, int bindingIndex)
         {
-            inputActionDisplayText.text = rebindableAction.inputActionReference.action.name;
-            bindingDisplayText.text = "";
-            //rebindableAction.inputActionReference.action.expectedControlType;
-            for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReference.action.bindings.Count; bindingIndex++)
+            if (string.IsNullOrWhiteSpace(rebindableAction.overrideActionName))
             {
-                InputBinding binding = rebindableAction.inputActionReference.action.bindings[bindingIndex];
-                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                inputActionDisplayText.text = rebindableAction.inputActionReference[0].action.name;
+            }
+            else
+            {
+                inputActionDisplayText.text = rebindableAction.overrideActionName;
+            }
+
+            bindingDisplayText.text = "Not Bound";
+
+            InputBinding binding = rebindableAction.inputActionReference[0].action.bindings[bindingIndex];
+            if (!string.IsNullOrWhiteSpace(binding.name))
+            {
+                switch (binding.name)
                 {
-                    if (binding.path.ToLower().Contains(device.name.ToLower()))
-                    {
-                        if (bindingDisplayText.text == "")
-                        {
-                            this.bindingIndex = bindingIndex;
-                            bindingDisplayText.text += binding.ToDisplayString();
-                        }
-                        else
-                        {
-                            bindingDisplayText.text += " - " + binding.ToDisplayString();
-                        }
+                    case "up":
+                        inputActionDisplayText.text += " Forward";
                         break;
+                    case "down":
+                        inputActionDisplayText.text += " Backward";
+                        break;
+                    case "left":
+                        inputActionDisplayText.text += " Left";
+                        break;
+                    case "right":
+                        inputActionDisplayText.text += " Right";
+                        break;
+                    default:
+                        Debug.Log("Unsure what to display for binding name " + binding.name);
+                        break;
+                }
+            }
+
+            foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+            {
+                if (binding.path.ToLower().Contains(device.name.ToLower()))
+                {
+                    if (bindingDisplayText.text == "Not Bound")
+                    {
+                        bindingDisplayText.text += binding.ToDisplayString();
                     }
+                    else
+                    {
+                        bindingDisplayText.text += " - " + binding.ToDisplayString();
+                    }
+                    break;
                 }
             }
 
             this.rebindableAction = rebindableAction;
             this.controlScheme = controlScheme;
+            this.bindingIndex = bindingIndex;
 
-            Button.onClick.AddListener(delegate { StartRebind(rebindableAction, controlScheme); });
+            Button.onClick.AddListener(delegate { StartRebind(); });
         }
 
         public void SetIsRebinding()
@@ -59,7 +87,9 @@ namespace Vi.UI
         public void SetFinishedRebinding()
         {
             Button.interactable = true;
-            Initialize(rebindableAction, controlScheme);
+            Initialize(rebindableAction, controlScheme, bindingIndex);
+
+            rebindingOperation.Dispose();
         }
 
         private void Awake()
@@ -67,11 +97,11 @@ namespace Vi.UI
             Button = GetComponentInChildren<Button>();
         }
 
-        private void StartRebind(ControlsSettingsMenu.RebindableAction rebindableAction, InputControlScheme controlScheme)
+        private void StartRebind()
         {
             SetIsRebinding();
 
-            rebindingOperation = rebindableAction.inputActionReference.action.PerformInteractiveRebinding(bindingIndex)
+            rebindingOperation = rebindableAction.inputActionReference[0].action.PerformInteractiveRebinding(bindingIndex)
                 .OnComplete(operation => SetFinishedRebinding())
                 .Start();
         }

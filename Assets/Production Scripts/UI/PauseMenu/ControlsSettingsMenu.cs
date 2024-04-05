@@ -26,8 +26,9 @@ namespace Vi.UI
         [System.Serializable]
         public struct RebindableAction
         {
+            public string overrideActionName;
             public ActionGroup actionGroup;
-            public InputActionReference inputActionReference;
+            public InputActionReference[] inputActionReference;
         }
 
         public enum ActionGroup
@@ -85,12 +86,23 @@ namespace Vi.UI
 
                 foreach (RebindableAction rebindableAction in System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup))
                 {
-                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                    rebindingElement.Initialize(rebindableAction, controlScheme);
-                    //rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
+                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReference[0].action.bindings.Count; bindingIndex++)
+                    {
+                        InputBinding binding = rebindableAction.inputActionReference[0].action.bindings[bindingIndex];
+                        foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                        {
+                            if (binding.path.ToLower().Contains(device.name.ToLower()))
+                            {
+                                RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
+                                rebindingElement.Initialize(rebindableAction, controlScheme, bindingIndex);
+                                //rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
 
-                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
-                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
+                                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -108,25 +120,25 @@ namespace Vi.UI
             lastControlScheme = playerInput.currentControlScheme;
         }
 
-        private void StartRebind(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        {
-            rebindingElement.SetIsRebinding();
+        //private void StartRebind(RebindingElement rebindingElement, RebindableAction rebindableAction)
+        //{
+        //    rebindingElement.SetIsRebinding();
 
-            rebindingOperation = rebindableAction.inputActionReference.action.PerformInteractiveRebinding()
-                .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
-                .Start();
-        }
+        //    rebindingOperation = rebindableAction.inputActionReference[0].action.PerformInteractiveRebinding()
+        //        .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
+        //        .Start();
+        //}
 
-        private void OnRebindComplete(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        {
-            rebindingElement.SetFinishedRebinding();
+        //private void OnRebindComplete(RebindingElement rebindingElement, RebindableAction rebindableAction)
+        //{
+        //    rebindingElement.SetFinishedRebinding();
 
-            //InputControlPath.ToHumanReadableString(rebindableAction.inputActionReference.action.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
+        //    //InputControlPath.ToHumanReadableString(rebindableAction.inputActionReference.action.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
 
-            rebindingOperation.Dispose();
+        //    rebindingOperation.Dispose();
 
-            RegenerateInputBindingMenu();
-        }
+        //    RegenerateInputBindingMenu();
+        //}
 
         public void SetInvertMouse()
         {
