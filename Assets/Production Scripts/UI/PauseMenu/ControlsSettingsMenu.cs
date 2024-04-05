@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private GridLayoutGroup scrollViewContentGrid;
         [SerializeField] private RectTransform rebindingElementParent;
         [SerializeField] private RebindingElement rebindingElementPrefab;
+        [SerializeField] private GameObject rebindingSectionHeaderPrefab;
         [SerializeField] private RebindableAction[] rebindableActions;
 
         [System.Serializable]
@@ -84,14 +85,22 @@ namespace Vi.UI
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
-            foreach (RebindableAction rebindableAction in rebindableActions)
+            foreach (ActionGroup actionGroup in System.Enum.GetValues(typeof(ActionGroup)))
             {
-                RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                rebindingElement.Initialize(rebindableAction, controlScheme);
-                rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction.inputActionReference.action); });
+                Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
+                
+                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
+                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
 
-                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
-                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                foreach (RebindableAction rebindableAction in System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup))
+                {
+                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
+                    rebindingElement.Initialize(rebindableAction, controlScheme);
+                    rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction.inputActionReference.action); });
+
+                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
+                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                }
             }
         }
 
