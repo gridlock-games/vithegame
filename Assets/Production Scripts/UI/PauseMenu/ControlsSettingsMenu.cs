@@ -28,7 +28,7 @@ namespace Vi.UI
         {
             public string overrideActionName;
             public ActionGroup actionGroup;
-            public InputActionReference[] inputActionReference;
+            public InputActionReference[] inputActionReferences;
         }
 
         public enum ActionGroup
@@ -41,7 +41,6 @@ namespace Vi.UI
 
         private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
 
-        private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
         private PlayerInput playerInput;
 
         private void Start()
@@ -86,16 +85,15 @@ namespace Vi.UI
 
                 foreach (RebindableAction rebindableAction in System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup))
                 {
-                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReference[0].action.bindings.Count; bindingIndex++)
+                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
                     {
-                        InputBinding binding = rebindableAction.inputActionReference[0].action.bindings[bindingIndex];
+                        InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
                         foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                         {
                             if (binding.path.ToLower().Contains(device.name.ToLower()))
                             {
                                 RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                                rebindingElement.Initialize(rebindableAction, controlScheme, bindingIndex);
-                                //rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
+                                rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
 
                                 rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                                 scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
@@ -119,26 +117,6 @@ namespace Vi.UI
 
             lastControlScheme = playerInput.currentControlScheme;
         }
-
-        //private void StartRebind(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        //{
-        //    rebindingElement.SetIsRebinding();
-
-        //    rebindingOperation = rebindableAction.inputActionReference[0].action.PerformInteractiveRebinding()
-        //        .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
-        //        .Start();
-        //}
-
-        //private void OnRebindComplete(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        //{
-        //    rebindingElement.SetFinishedRebinding();
-
-        //    //InputControlPath.ToHumanReadableString(rebindableAction.inputActionReference.action.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
-
-        //    rebindingOperation.Dispose();
-
-        //    RegenerateInputBindingMenu();
-        //}
 
         public void SetInvertMouse()
         {

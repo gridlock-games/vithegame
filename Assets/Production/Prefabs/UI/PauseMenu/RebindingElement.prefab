@@ -53,22 +53,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputActionDisplayText: {fileID: 3866023767049295513}
   bindingDisplayText: {fileID: 220179220617916973}
-  m_Action: {fileID: 0}
-  m_BindingId: 
-  m_DisplayStringOptions: 0
-  m_ActionLabel: {fileID: 0}
-  m_BindingText: {fileID: 0}
-  m_RebindOverlay: {fileID: 0}
-  m_RebindText: {fileID: 0}
-  m_UpdateBindingUIEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_RebindStartEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_RebindStopEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &6681796731108601335
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,6 +180,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: KEY
+      objectReference: {fileID: 0}
+    - target: {fileID: 114959980075803386, guid: 9b2e79df0bd3aea41bed1326ea8c8e6a,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 36
       objectReference: {fileID: 0}
     - target: {fileID: 224263963862697650, guid: 9b2e79df0bd3aea41bed1326ea8c8e6a,
         type: 3}

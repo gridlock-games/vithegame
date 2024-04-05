@@ -141,12 +141,6 @@ namespace Vi.UI
                 }
             }
 
-            Debug.Log("Ability1 bindings");
-            foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
-            {
-                Debug.Log(binding.ToDisplayString());
-            }
-
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();

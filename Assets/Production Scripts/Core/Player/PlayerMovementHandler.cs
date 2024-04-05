@@ -227,7 +227,12 @@ namespace Vi.Player
                 cameraInstance.GetComponent<AudioListener>().enabled = true;
                 cameraInstance.enabled = true;
                 minimapCameraInstance.enabled = true;
-                GetComponent<PlayerInput>().enabled = true;
+
+                PlayerInput playerInput = GetComponent<PlayerInput>();
+                playerInput.enabled = true;
+                string rebinds = PlayerPrefs.GetString("Rebinds");
+                playerInput.actions.LoadBindingOverridesFromJson(rebinds);
+
                 GetComponent<ActionMapHandler>().enabled = true;
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
