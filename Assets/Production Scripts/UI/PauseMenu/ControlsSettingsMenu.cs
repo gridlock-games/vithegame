@@ -20,6 +20,13 @@ namespace Vi.UI
         [SerializeField] private GridLayoutGroup scrollViewContentGrid;
         [SerializeField] private RectTransform rebindingElementParent;
         [SerializeField] private RebindingElement rebindingElementPrefab;
+        [SerializeField] private RebindableAction[] rebindableActions;
+
+        [System.Serializable]
+        private struct RebindableAction
+        {
+            public InputActionReference inputAction;
+        }
 
         private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
 
