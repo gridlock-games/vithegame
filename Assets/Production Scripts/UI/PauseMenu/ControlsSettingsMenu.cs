@@ -23,9 +23,18 @@ namespace Vi.UI
         [SerializeField] private RebindableAction[] rebindableActions;
 
         [System.Serializable]
-        private struct RebindableAction
+        public struct RebindableAction
         {
-            public InputActionReference inputAction;
+            public ActionGroup actionGroup;
+            public InputActionReference inputActionReference;
+        }
+
+        public enum ActionGroup
+        {
+            Movement,
+            Combat,
+            Spectator,
+            UI
         }
 
         private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
@@ -75,29 +84,14 @@ namespace Vi.UI
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
-            foreach (InputAction inputAction in playerInput.actions)
+            foreach (RebindableAction rebindableAction in rebindableActions)
             {
                 RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                rebindingElement.Initialize(controlScheme, inputAction);
-                rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, inputAction); });
+                rebindingElement.Initialize(rebindableAction, controlScheme);
+                rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction.inputActionReference.action); });
 
                 rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                 scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
-
-                //foreach (InputBinding binding in inputAction.bindings)
-                //{
-                //    bool shouldBreak = false;
-                //    foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
-                //    {
-                //        if (binding.path.ToLower().Contains(device.name.ToLower()))
-                //        {
-                //            Debug.Log(inputAction.name + " " + binding.ToDisplayString());
-                //            shouldBreak = true;
-                //            break;
-                //        }
-                //    }
-                //    if (shouldBreak) { break; }
-                //}
             }
         }
 

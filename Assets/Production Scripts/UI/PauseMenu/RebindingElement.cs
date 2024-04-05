@@ -13,12 +13,12 @@ namespace Vi.UI
 
         public Button Button { get; private set; }
 
-        public void Initialize(InputControlScheme controlScheme, InputAction inputAction)
+        public void Initialize(ControlsSettingsMenu.RebindableAction rebindableAction, InputControlScheme controlScheme)
         {
-            inputActionDisplayText.text = inputAction.name;
+            inputActionDisplayText.text = rebindableAction.inputActionReference.action.name;
             bindingDisplayText.text = "";
 
-            foreach (InputBinding binding in inputAction.bindings)
+            foreach (InputBinding binding in rebindableAction.inputActionReference.action.bindings)
             {
                 bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
