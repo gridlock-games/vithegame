@@ -13,25 +13,43 @@ namespace Vi.UI
 
         public Button Button { get; private set; }
 
+        private ControlsSettingsMenu.RebindableAction rebindableAction;
+        private InputControlScheme controlScheme;
+
         public void Initialize(ControlsSettingsMenu.RebindableAction rebindableAction, InputControlScheme controlScheme)
         {
             inputActionDisplayText.text = rebindableAction.inputActionReference.action.name;
             bindingDisplayText.text = "";
-
+            //rebindableAction.inputActionReference.action.expectedControlType;
             foreach (InputBinding binding in rebindableAction.inputActionReference.action.bindings)
             {
-                bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
                     if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
-                        bindingDisplayText.text = binding.ToDisplayString();
-                        shouldBreak = true;
+                        if (bindingDisplayText.text == "")
+                            bindingDisplayText.text += binding.ToDisplayString();
+                        else
+                            bindingDisplayText.text += " - " + binding.ToDisplayString();
                         break;
                     }
                 }
-                if (shouldBreak) { break; }
             }
+
+            this.rebindableAction = rebindableAction;
+            this.controlScheme = controlScheme;
+        }
+
+        public void SetIsRebinding()
+        {
+            Button.interactable = false;
+        }
+
+        public void SetFinishedRebinding()
+        {
+            Button.interactable = true;
+
+            Initialize(rebindableAction, controlScheme);
         }
 
         private void Awake()

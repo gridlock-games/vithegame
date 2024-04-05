@@ -60,15 +60,6 @@ namespace Vi.UI
             originalRebindingParentSizeDelta = rebindingElementParent.sizeDelta;
 
             originalScrollViewGridLayoutSize = scrollViewContentGrid.cellSize;
-
-            //foreach (InputAction inputAction in controlsAsset.FindActionMap("Base").actions)
-            //{
-            //    rebindingOperation = inputAction.PerformInteractiveRebinding()
-            //        .WithControlsExcluding("Mouse")
-            //        .OnMatchWaitForAnother(0.1f)
-            //        .OnComplete(operation => OnRebindComplete(inputAction))
-            //        .Start();
-            //}
         }
 
         private Vector2 originalScrollViewGridLayoutSize;
@@ -96,7 +87,7 @@ namespace Vi.UI
                 {
                     RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
                     rebindingElement.Initialize(rebindableAction, controlScheme);
-                    rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction.inputActionReference.action); });
+                    rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
 
                     rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                     scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
@@ -117,16 +108,25 @@ namespace Vi.UI
             lastControlScheme = playerInput.currentControlScheme;
         }
 
-        private void StartRebind(RebindingElement rebindingElement, InputAction inputAction)
+        private void StartRebind(RebindingElement rebindingElement, RebindableAction rebindableAction)
         {
+            rebindingElement.SetIsRebinding();
 
+            rebindingOperation = rebindableAction.inputActionReference.action.PerformInteractiveRebinding()
+                .OnMatchWaitForAnother(0.1f)
+                .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
+                .Start();
         }
 
-        private void OnRebindComplete(InputAction inputAction)
+        private void OnRebindComplete(RebindingElement rebindingElement, RebindableAction rebindableAction)
         {
-            InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
+            rebindingElement.SetFinishedRebinding();
+
+            //InputControlPath.ToHumanReadableString(rebindableAction.inputActionReference.action.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
 
             rebindingOperation.Dispose();
+
+            RegenerateInputBindingMenu();
         }
 
         public void SetInvertMouse()

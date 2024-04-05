@@ -414,53 +414,6 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
---- !u!1 &2513702673759356041
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8751194630014503809}
-  - component: {fileID: 4880550592084271637}
-  m_Layer: 0
-  m_Name: RotationOffsetRig
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8751194630014503809
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2513702673759356041}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5454251649085792394}
-  m_Father: {fileID: 5804354747909585976}
-  m_RootOrder: 16
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4880550592084271637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2513702673759356041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Weight: 1
-  m_Effectors: []
 --- !u!1 &3123719639371539911
 GameObject:
   m_ObjectHideFlags: 0
@@ -2979,7 +2932,7 @@ MonoBehaviour:
   leftHandReachRig: {fileID: 2634057710867190123}
   meleeVerticalAimRig: {fileID: 928111209206620082}
   meleeVerticalAimConstraint: {fileID: 8577034352154996663}
-  rotationOffsetConstraint: {fileID: 6930646654865520576}
+  rotationOffsetConstraint: {fileID: 4279257392001951054}
   stowedWeaponParent: {fileID: 6174404207658052272}
 --- !u!114 &3131407962465346050
 MonoBehaviour:
@@ -3021,6 +2974,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RigLayers:
+  - m_Rig: {fileID: 5339729242939634275}
+    m_Active: 1
+  - m_Rig: {fileID: 2154144891541030212}
+    m_Active: 1
   - m_Rig: {fileID: 7380025813079815408}
     m_Active: 1
   - m_Rig: {fileID: 2915051537018460153}
@@ -3028,10 +2985,6 @@ MonoBehaviour:
   - m_Rig: {fileID: 8245541889614684380}
     m_Active: 1
   - m_Rig: {fileID: 7696682009090650848}
-    m_Active: 1
-  - m_Rig: {fileID: 2154144891541030212}
-    m_Active: 1
-  - m_Rig: {fileID: 5339729242939634275}
     m_Active: 1
   m_Effectors:
   - m_Transform: {fileID: 3354788472555931755}
