@@ -30,7 +30,7 @@ namespace Vi.UI
             public string overrideActionName;
             public ActionGroup actionGroup;
             public InputActionReference[] inputActionReferences;
-            public RuntimePlatform[] applicablePlatforms;
+            public string[] excludedControlSchemes;
         }
 
         public enum ActionGroup
@@ -80,7 +80,7 @@ namespace Vi.UI
 
             foreach (ActionGroup actionGroup in System.Enum.GetValues(typeof(ActionGroup)))
             {
-                RebindableAction[] rebindableActionGroup = System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup & item.applicablePlatforms.Contains(Application.platform));
+                RebindableAction[] rebindableActionGroup = System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup & !item.excludedControlSchemes.Contains(playerInput.currentControlScheme));
                 if (rebindableActionGroup.Length > 0)
                 {
                     Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();

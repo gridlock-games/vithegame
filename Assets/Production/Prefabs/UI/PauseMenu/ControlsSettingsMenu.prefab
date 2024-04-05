@@ -1204,25 +1204,29 @@ MonoBehaviour:
     actionGroup: 1
     inputActionReferences:
     - {fileID: 6916536625684554248, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    applicablePlatforms: 000000000100000002000000070000000d00000010000000
+    excludedControlSchemes:
+    - Touchscreen
   - overrideActionName: 
     actionGroup: 0
     inputActionReferences:
     - {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     - {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    applicablePlatforms: 000000000100000002000000070000000d00000010000000
+    excludedControlSchemes:
+    - 
   - overrideActionName: Primary Weapon
     actionGroup: 1
     inputActionReferences:
     - {fileID: 6323030998958668391, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    applicablePlatforms: 000000000100000002000000070000000d00000010000000
+    excludedControlSchemes:
+    - Touchscreen
   - overrideActionName: 
     actionGroup: 3
     inputActionReferences:
     - {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     - {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     - {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    applicablePlatforms: 000000000100000002000000070000000d00000010000000
+    excludedControlSchemes:
+    - Touchscreen
 --- !u!1 &2485291495824565969
 GameObject:
   m_ObjectHideFlags: 0
