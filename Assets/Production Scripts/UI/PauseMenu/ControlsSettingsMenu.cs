@@ -111,6 +111,34 @@ namespace Vi.UI
             }
         }
 
+        public void ResetBindingsToDefaults()
+        {
+            InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+            RebindableAction[] rebindableControlGroup = System.Array.FindAll(rebindableActions, item => !item.excludedControlSchemes.Contains(playerInput.currentControlScheme));
+            foreach (RebindableAction rebindableAction in rebindableControlGroup)
+            {
+                for (int i = 0; i < rebindableAction.inputActionReferences.Length; i++)
+                {
+                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[i].action.bindings.Count; bindingIndex++)
+                    {
+                        InputBinding binding = rebindableAction.inputActionReferences[i].action.bindings[bindingIndex];
+                        foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                        {
+                            if (binding.path.ToLower().Contains(device.name.ToLower()))
+                            {
+                                playerInput.actions.FindAction(rebindableAction.inputActionReferences[i].action.id).RemoveBindingOverride(bindingIndex);
+                            }
+                        }
+                    }
+                }
+            }
+
+            string rebinds = playerInput.actions.SaveBindingOverridesAsJson();
+            PlayerPrefs.SetString("Rebinds", rebinds);
+
+            RegenerateInputBindingMenu();
+        }
+
         private string lastControlScheme;
         private void Update()
         {
