@@ -13256,15 +13256,29 @@ MonoBehaviour:
   - position: {x: 12.8, y: 24.4, z: 5.4}
     rotation: {x: -0.24805118, y: 0.70901185, z: -0.5886504, w: -0.29877}
   gameItemSpawnPoints:
-  - position: {x: 25, y: 0, z: 0}
+  - position: {x: -10, y: 2, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  - position: {x: -25, y: 0, z: 0}
+  - position: {x: 10, y: 2, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  - position: {x: 0, y: -4, z: 0}
+  - position: {x: 25, y: 2, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  - position: {x: -5, y: -4, z: -10}
+  - position: {x: -25, y: 2, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  - position: {x: 5, y: -4, z: 10}
+  - position: {x: -20, y: 2, z: 20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 20, y: 2, z: 20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: 2, z: 20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 20, y: 2, z: -20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -20, y: 2, z: -20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 0, y: 2, z: -20}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 9.5, y: -3.5, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -9.5, y: -3.5, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
   - gameModes: 00000000010000000200000005000000
@@ -13276,24 +13290,30 @@ MonoBehaviour:
   - gameModes: 00000000010000000200000005000000
     teams: 020000000300000007000000
     spawnPositions:
-    - {x: -35, y: 2, z: 0}
-    - {x: 35, y: 2, z: 0}
-    - {x: 0, y: -3, z: 15}
-    - {x: 0, y: -3, z: -15}
-    - {x: 17, y: -2, z: -6}
-    - {x: -17, y: -2, z: -6}
-    - {x: -17, y: -2, z: 6}
-    - {x: 17, y: -2, z: 6}
+    - {x: 0, y: 2, z: 0}
+    - {x: 16, y: 2, z: 0}
+    - {x: -16, y: 2, z: 0}
+    - {x: -2, y: 2, z: -18}
+    - {x: 2, y: 2, z: 18}
+    - {x: -21, y: 2, z: 15}
+    - {x: 21, y: 2, z: -15}
+    - {x: -5, y: -4, z: -11}
+    - {x: 5, y: -4, z: 11}
+    - {x: 21, y: 2, z: 15}
+    - {x: -22, y: 2, z: -15}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
-    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 90, z: 0}
     - {x: 0, y: 0, z: 0}
-    - {x: 0, y: -65, z: 0}
-    - {x: 0, y: 65, z: 0}
-    - {x: 0, y: 110, z: 0}
-    - {x: 0, y: -110, z: 0}
-  damageCircleMaxScale: {x: 100, y: 200, z: 100}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 210, z: 0}
+    - {x: 0, y: 25, z: 0}
+    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 160, z: 0}
+    - {x: 0, y: -5, z: 0}
+  damageCircleMaxScale: {x: 70, y: 200, z: 70}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
 --- !u!1001 &1631713600
