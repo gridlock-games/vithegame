@@ -23,7 +23,7 @@ MonoBehaviour:
   maxRage: 100
   rageRecoveryRate: 0
   shouldUseAmmo: 1
-  maxAmmoCount: 2
+  maxAmmoCount: 5
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffect: {fileID: 8300000, guid: 267c41f5b671a4541869a15be3f6e889, type: 3}
@@ -41,13 +41,13 @@ MonoBehaviour:
   - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 3178962258874356211, guid: 5719c2a3be9bd474d98734c2e57af0d1,
+    - weaponPrefab: {fileID: 2860689685286978219, guid: 2df1e2b48b02e3345b89a3fb27ba68c2,
         type: 3}
-      weaponBone: 18
-      weaponPositionOffset: {x: 0.000968, y: -0.000497, z: -0.000066}
-      weaponRotationOffset: {x: -83.354, y: 10.667, z: 171.962}
-      stowedWeaponPositionOffset: {x: -0.00119, y: 0.00207, z: 0.00079}
-      stowedWeaponRotationOffset: {x: 0.296, y: -158.504, z: 21.633}
+      weaponBone: 17
+      weaponPositionOffset: {x: -0.00093, y: 0.00038, z: 0.00034}
+      weaponRotationOffset: {x: 359.63223, y: 197.11702, z: 79.11581}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
