@@ -8,7 +8,18 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "Weapon", menuName = "Production/Weapon")]
     public class Weapon : ScriptableObject
     {
+        [Header("Locomotion")]
         [SerializeField] private float runSpeed = 5;
+        [SerializeField] private float walkSpeed = 2.5f;
+        [SerializeField] private BlockingLocomotion blockingLocomotion = BlockingLocomotion.CanRun;
+        
+        public enum BlockingLocomotion
+        {
+            NoMovement,
+            CanWalk,
+            CanRun
+        }
+
         [Header("Health")]
         [SerializeField] private float maxHP = 100;
         [Header("Stamina")]
@@ -23,7 +34,28 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
 
-        public float GetRunSpeed() { return runSpeed; }
+        public bool IsWalking(bool isBlocking)
+        {
+            if (blockingLocomotion == BlockingLocomotion.CanWalk & isBlocking) { return true; }
+            return false;
+        }
+
+        public float GetMovementSpeed(bool isBlocking)
+        {
+            switch (blockingLocomotion)
+            {
+                case BlockingLocomotion.NoMovement:
+                    return isBlocking ? 0 : runSpeed;
+                case BlockingLocomotion.CanWalk:
+                    return isBlocking ? walkSpeed : runSpeed;
+                case BlockingLocomotion.CanRun:
+                    return runSpeed;
+                default:
+                    Debug.LogError("Unsure how to handle blocking locomotion type - " + blockingLocomotion);
+                    break;
+            }
+            return runSpeed;
+        }
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
         public float GetMaxDefense() { return maxDefense; }

@@ -1084,6 +1084,7 @@ GameObject:
   - component: {fileID: 2367944742497944292}
   - component: {fileID: 2367944742497944293}
   - component: {fileID: 760765561020720752}
+  - component: {fileID: 7378572487374824778}
   m_Layer: 5
   m_Name: ControlsSettingsMenu
   m_TagString: Untagged
@@ -1200,126 +1201,257 @@ MonoBehaviour:
   rebindingSectionHeaderPrefab: {fileID: 6143946943025144434, guid: d4699cc84171e854bbbdcf2e2a65336b,
     type: 3}
   rebindableActions:
-  - actionGroup: 1
-    inputActionReference: {fileID: 6916536625684554248, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -5038717820958107051, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: 4515516360362214105, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -2013674324404209891, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -3073957792324674350, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -4895871817904562169, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: 3855856810217455150, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: 7500517785045450566, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -8365810465465610074, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: 1466368605225409598, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -6165872021668447691, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 0
-    inputActionReference: {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -4942588444766842868, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: 6323030998958668391, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 1
-    inputActionReference: {fileID: -2829945742728114018, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 5304234536181186105, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -7939484115188895425, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 2555118930296445826, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 4010522318726611473, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -7103627180512043578, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 5147967608157037885, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -1189835552163759953, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 6665943985039168211, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -1369703491976155950, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -7006894354886886491, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 4652540119691910013, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 8979544820950716431, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 3360090477999853096, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 6399690150165955535, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: -9119437012531945337, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 2
-    inputActionReference: {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-  - actionGroup: 3
-    inputActionReference: {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
+  - overrideActionName: Ability 1
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 6916536625684554248, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 2
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -5038717820958107051, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 3
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 4515516360362214105, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 4
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2013674324404209891, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -3073957792324674350, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Heavy Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -4895871817904562169, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Heavy Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 3855856810217455150, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Keyboard & Mouse
+  - overrideActionName: 
+    actionGroup: 0
+    inputActionReferences:
+    - {fileID: 7500517785045450566, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Light Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -8365810465465610074, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Light Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 1466368605225409598, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Keyboard & Mouse
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -6165872021668447691, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 0
+    inputActionReferences:
+    - {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -4942588444766842868, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Primary Weapon
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 6323030998958668391, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Secondary Weapon
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2829945742728114018, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 5304234536181186105, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Follow Previous Player
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7939484115188895425, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2555118930296445826, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Environment View Toggle
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 4010522318726611473, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Follow Player 1
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7103627180512043578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 2
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 5147967608157037885, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 3
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -1189835552163759953, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 4
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 6665943985039168211, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 5
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -1369703491976155950, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 6
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7006894354886886491, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 7
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 4652540119691910013, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 8
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 8979544820950716431, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 9
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 3360090477999853096, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 10
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 6399690150165955535, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Next Player
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -9119437012531945337, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Increase Move Speed
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+--- !u!114 &7378572487374824778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2367944742497944294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
+    type: 3}
+  platformUIDefinitions:
+  - platforms: 0b00000008000000
+    gameObjectsToEnable: []
+    gameObjectsToDestroy:
+    - {fileID: 5678641210177998209}
+    objectsToMove: []
+  controlSchemeTextDefinitions: []
 --- !u!1 &2485291495824565969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1444,6 +1576,7 @@ RectTransform:
   m_Children:
   - {fileID: 7377010089808881060}
   - {fileID: 6182764046060275593}
+  - {fileID: 5608739548295338077}
   - {fileID: 2961820423823200211}
   m_Father: {fileID: 2367944742497944290}
   m_RootOrder: 0
@@ -3961,7 +4094,7 @@ RectTransform:
   - {fileID: 686175769054923725}
   - {fileID: 1660359431230393993}
   m_Father: {fileID: 6092972652359681316}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4637,7 +4770,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5769415177699500259}
   m_HandleRect: {fileID: 7176835145930708437}
   m_Direction: 2
-  m_Value: 0.99999917
+  m_Value: 1
   m_Size: 0.9089983
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5437,6 +5570,193 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &5677805582959920203
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6092972652359681316}
+    m_Modifications:
+    - target: {fileID: 1416172713249226, guid: 1afcacfa529facd4d802e5aec9a9c51d, type: 3}
+      propertyPath: m_Name
+      value: Reset Defaults
+      objectReference: {fileID: 0}
+    - target: {fileID: 114262661715936384, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: e0c5aaa1ebff34551b330cf62fe29f26,
+        type: 3}
+    - target: {fileID: 114262661715936384, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114262661715936384, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114262661715936384, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 760765561020720752}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetBindingsToDefaults
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Vi.UI.ControlsSettingsMenu, Vi.UI
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940368986717668, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 140
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 114942150474071848, guid: 1afcacfa529facd4d802e5aec9a9c51d, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 1afcacfa529facd4d802e5aec9a9c51d, type: 3}
+--- !u!224 &5608739548295338077 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+    type: 3}
+  m_PrefabInstance: {fileID: 5677805582959920203}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5678641210177998209 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1416172713249226, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+    type: 3}
+  m_PrefabInstance: {fileID: 5677805582959920203}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7297529282452170329
 PrefabInstance:
   m_ObjectHideFlags: 0

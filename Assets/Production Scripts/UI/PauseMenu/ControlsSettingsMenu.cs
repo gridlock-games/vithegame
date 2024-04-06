@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -26,13 +27,15 @@ namespace Vi.UI
         [System.Serializable]
         public struct RebindableAction
         {
+            public string overrideActionName;
             public ActionGroup actionGroup;
-            public InputActionReference inputActionReference;
+            public InputActionReference[] inputActionReferences;
+            public string[] excludedControlSchemes;
         }
 
         public enum ActionGroup
         {
-            Movement,
+            Navigation,
             Combat,
             Spectator,
             UI
@@ -40,7 +43,6 @@ namespace Vi.UI
 
         private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
 
-        private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
         private PlayerInput playerInput;
 
         private void Start()
@@ -78,21 +80,78 @@ namespace Vi.UI
 
             foreach (ActionGroup actionGroup in System.Enum.GetValues(typeof(ActionGroup)))
             {
-                Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
-                
-                rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
-                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
-
-                foreach (RebindableAction rebindableAction in System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup))
+                RebindableAction[] rebindableActionGroup = System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup & !item.excludedControlSchemes.Contains(playerInput.currentControlScheme));
+                if (rebindableActionGroup.Length > 0)
                 {
-                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
-                    rebindingElement.Initialize(rebindableAction, controlScheme);
-                    rebindingElement.Button.onClick.AddListener(delegate { StartRebind(rebindingElement, rebindableAction); });
+                    Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
 
-                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
-                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
+                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
+
+                    foreach (RebindableAction rebindableAction in rebindableActionGroup)
+                    {
+                        bool bindingFound = false;
+                        bool shouldBreak = false;
+                        for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
+                        {
+                            InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
+                            foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                            {
+                                string deviceName = device.name.ToLower();
+                                deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                                if (binding.path.ToLower().Contains(deviceName.ToLower()))
+                                {
+                                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
+                                    rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+                                    bindingFound = true;
+                                    shouldBreak = !binding.isPartOfComposite;
+                                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
+                                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                                    break;
+                                }
+                            }
+                            if (shouldBreak) { break; }
+                        }
+                        if (!bindingFound) { Debug.LogError("No binding found for " + rebindableAction.inputActionReferences[0].action.name); }
+                    }
                 }
             }
+        }
+
+        public void ResetBindingsToDefaults()
+        {
+            InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+            RebindableAction[] rebindableControlGroup = System.Array.FindAll(rebindableActions, item => !item.excludedControlSchemes.Contains(playerInput.currentControlScheme));
+            foreach (RebindableAction rebindableAction in rebindableControlGroup)
+            {
+                for (int i = 0; i < rebindableAction.inputActionReferences.Length; i++)
+                {
+                    bool shouldBreak = false;
+                    for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[i].action.bindings.Count; bindingIndex++)
+                    {
+                        InputBinding binding = rebindableAction.inputActionReferences[i].action.bindings[bindingIndex];
+                        foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                        {
+                            string deviceName = device.name.ToLower();
+                            deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                            if (binding.path.ToLower().Contains(deviceName.ToLower()))
+                            {
+                                playerInput.actions.FindAction(rebindableAction.inputActionReferences[i].action.id).RemoveBindingOverride(bindingIndex);
+                                rebindableAction.inputActionReferences[i].action.RemoveBindingOverride(bindingIndex);
+                            }
+                        }
+                        if (shouldBreak) { break; }
+                    }
+                }
+            }
+
+            string rebinds = playerInput.actions.SaveBindingOverridesAsJson();
+            PlayerPrefs.SetString("Rebinds", rebinds);
+
+            RegenerateInputBindingMenu();
+
+            PlayerUI playerUI = playerInput.GetComponentInChildren<PlayerUI>(true);
+            if (playerUI) { playerUI.OnRebinding(); }
         }
 
         private string lastControlScheme;
@@ -106,27 +165,6 @@ namespace Vi.UI
             }
 
             lastControlScheme = playerInput.currentControlScheme;
-        }
-
-        private void StartRebind(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        {
-            rebindingElement.SetIsRebinding();
-
-            rebindingOperation = rebindableAction.inputActionReference.action.PerformInteractiveRebinding()
-                .OnMatchWaitForAnother(0.1f)
-                .OnComplete(operation => OnRebindComplete(rebindingElement, rebindableAction))
-                .Start();
-        }
-
-        private void OnRebindComplete(RebindingElement rebindingElement, RebindableAction rebindableAction)
-        {
-            rebindingElement.SetFinishedRebinding();
-
-            //InputControlPath.ToHumanReadableString(rebindableAction.inputActionReference.action.bindings[0].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice);
-
-            rebindingOperation.Dispose();
-
-            RegenerateInputBindingMenu();
         }
 
         public void SetInvertMouse()

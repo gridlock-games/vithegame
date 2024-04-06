@@ -127,6 +127,11 @@ namespace Vi.UI
             }
         }
 
+        public void OnRebinding()
+        {
+            UpdateWeapon(true);
+        }
+
         private Weapon lastWeapon;
         private void UpdateWeapon(bool forceRefresh)
         {
@@ -149,7 +154,9 @@ namespace Vi.UI
                 bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability1.UpdateCard(abilities[0], binding.ToDisplayString());
                         shouldBreak = true;
@@ -164,7 +171,9 @@ namespace Vi.UI
                 bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability2.UpdateCard(abilities[1], binding.ToDisplayString());
                         shouldBreak = true;
@@ -179,7 +188,9 @@ namespace Vi.UI
                 bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability3.UpdateCard(abilities[2], binding.ToDisplayString());
                         shouldBreak = true;
@@ -194,7 +205,9 @@ namespace Vi.UI
                 bool shouldBreak = false;
                 foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability4.UpdateCard(abilities[3], binding.ToDisplayString());
                         shouldBreak = true;
