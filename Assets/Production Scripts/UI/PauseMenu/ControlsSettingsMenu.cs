@@ -144,6 +144,9 @@ namespace Vi.UI
             PlayerPrefs.SetString("Rebinds", rebinds);
 
             RegenerateInputBindingMenu();
+
+            PlayerUI playerUI = playerInput.GetComponentInChildren<PlayerUI>(true);
+            if (playerUI) { playerUI.OnRebinding(); }
         }
 
         private string lastControlScheme;

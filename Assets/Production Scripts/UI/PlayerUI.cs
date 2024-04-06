@@ -127,6 +127,11 @@ namespace Vi.UI
             }
         }
 
+        public void OnRebinding()
+        {
+            UpdateWeapon(true);
+        }
+
         private Weapon lastWeapon;
         private void UpdateWeapon(bool forceRefresh)
         {

@@ -114,6 +114,9 @@ namespace Vi.UI
             PlayerPrefs.SetString("Rebinds", rebinds);
 
             Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+
+            PlayerUI playerUI = playerInput.GetComponentInChildren<PlayerUI>(true);
+            if (playerUI) { playerUI.OnRebinding(); }
         }
 
         private void Awake()
