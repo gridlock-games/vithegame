@@ -35,7 +35,7 @@ namespace Vi.UI
 
         public enum ActionGroup
         {
-            Movement,
+            Navigation,
             Combat,
             Spectator,
             UI
