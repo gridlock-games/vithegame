@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: HammerWeapon
   m_EditorClassIdentifier: 
   runSpeed: 3
+  walkSpeed: 2.5
+  blockingLocomotion: 2
   maxHP: 100
   maxStamina: 100
   staminaRecoveryRate: 5
@@ -51,13 +53,13 @@ MonoBehaviour:
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 4763046253870307255, guid: cfd0da625bcc0d04e83e657b46a4cd71,
+    - weaponPrefab: {fileID: 6488801974244004234, guid: 9a4b380d6d049bb4389975b5a9155045,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0.0843, y: -0.032, z: -0.0025}
-      weaponRotationOffset: {x: 0, y: 14.53, z: 0}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponPositionOffset: {x: 0.102, y: -0.046, z: 0.027}
+      weaponRotationOffset: {x: 356.96768, y: 6.90903, z: 257.56854}
+      stowedWeaponPositionOffset: {x: 0.15, y: 0.117, z: -0.026}
+      stowedWeaponRotationOffset: {x: 16.55491, y: 102.8175, z: 271.44424}
   - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
       type: 3}
     data:
