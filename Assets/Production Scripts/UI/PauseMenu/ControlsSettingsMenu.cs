@@ -91,6 +91,7 @@ namespace Vi.UI
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {
                         bool bindingFound = false;
+                        bool shouldBreak = false;
                         for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
                         {
                             InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
@@ -103,11 +104,13 @@ namespace Vi.UI
                                     RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
                                     rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
                                     bindingFound = true;
+                                    shouldBreak = !binding.isPartOfComposite;
                                     rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                                     scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
                                     break;
                                 }
                             }
+                            if (shouldBreak) { break; }
                         }
                         if (!bindingFound) { Debug.LogError("No binding found for " + rebindableAction.inputActionReferences[0].action.name); }
                     }
