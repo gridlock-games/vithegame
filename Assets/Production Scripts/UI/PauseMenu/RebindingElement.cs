@@ -31,7 +31,7 @@ namespace Vi.UI
                 inputActionDisplayText.text = rebindableAction.overrideActionName;
             }
 
-            bindingDisplayText.text = "Not Bound";
+            bindingDisplayText.text = "[Not Bound]";
             
             InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
             if (!string.IsNullOrWhiteSpace(binding.name))
@@ -62,7 +62,7 @@ namespace Vi.UI
                 deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                 if (binding.path.ToLower().Contains(deviceName.ToLower()))
                 {
-                    if (bindingDisplayText.text == "Not Bound")
+                    if (bindingDisplayText.text == "[Not Bound]")
                     {
                         bindingDisplayText.text = binding.ToDisplayString();
                     }
