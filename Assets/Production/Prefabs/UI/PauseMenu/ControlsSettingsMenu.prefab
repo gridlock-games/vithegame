@@ -1084,6 +1084,7 @@ GameObject:
   - component: {fileID: 2367944742497944292}
   - component: {fileID: 2367944742497944293}
   - component: {fileID: 760765561020720752}
+  - component: {fileID: 7378572487374824778}
   m_Layer: 5
   m_Name: ControlsSettingsMenu
   m_TagString: Untagged
@@ -1419,6 +1420,27 @@ MonoBehaviour:
     - {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
+--- !u!114 &7378572487374824778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2367944742497944294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
+    type: 3}
+  platformUIDefinitions:
+  - platforms: 0b00000008000000
+    gameObjectsToEnable: []
+    gameObjectsToDestroy:
+    - {fileID: 5678641210177998209}
+    objectsToMove: []
+  controlSchemeTextDefinitions: []
 --- !u!1 &2485291495824565969
 GameObject:
   m_ObjectHideFlags: 0
@@ -5715,6 +5737,12 @@ PrefabInstance:
 --- !u!224 &5608739548295338077 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224512575425633302, guid: 1afcacfa529facd4d802e5aec9a9c51d,
+    type: 3}
+  m_PrefabInstance: {fileID: 5677805582959920203}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5678641210177998209 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1416172713249226, guid: 1afcacfa529facd4d802e5aec9a9c51d,
     type: 3}
   m_PrefabInstance: {fileID: 5677805582959920203}
   m_PrefabAsset: {fileID: 0}
