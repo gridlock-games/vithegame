@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: CrossbowWeapon
   m_EditorClassIdentifier: 
   runSpeed: 5
+  walkSpeed: 2.5
+  blockingLocomotion: 2
   maxHP: 100
   maxStamina: 100
   staminaRecoveryRate: 5
@@ -46,8 +48,8 @@ MonoBehaviour:
       weaponBone: 17
       weaponPositionOffset: {x: -0.00093, y: 0.00038, z: 0.00034}
       weaponRotationOffset: {x: 359.63223, y: 197.11702, z: 79.11581}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponPositionOffset: {x: 0.00024, y: 0.0017, z: -0.0006}
+      stowedWeaponRotationOffset: {x: 347.12637, y: 293.83096, z: 290.7488}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
