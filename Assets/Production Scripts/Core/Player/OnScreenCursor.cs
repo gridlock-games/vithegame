@@ -24,6 +24,9 @@ namespace Vi.Player
             DontDestroyOnLoad(gameObject);
             canvasRectTransform = (RectTransform)transform;
             controllerCursorPlayerInput = GetComponent<PlayerInput>();
+
+            string rebinds = PlayerPrefs.GetString("Rebinds");
+            controllerCursorPlayerInput.actions.LoadBindingOverridesFromJson(rebinds);
         }
 
         private Mouse virtualMouse;

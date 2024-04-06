@@ -51,6 +51,8 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
 
+            if (!PlayerPrefs.HasKey("Rebinds")) { PlayerPrefs.SetString("Rebinds", ""); }
+
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {
                 PlayerPrefs.SetFloat("MasterVolume", 0.75f);
