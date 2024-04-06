@@ -90,22 +90,26 @@ namespace Vi.UI
 
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {
+                        bool bindingFound = false;
                         for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[0].action.bindings.Count; bindingIndex++)
                         {
                             InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
                             foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                             {
-                                if (binding.path.ToLower().Contains(device.name.ToLower()))
+                                string deviceName = device.name.ToLower();
+                                deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                                if (binding.path.ToLower().Contains(deviceName.ToLower()))
                                 {
                                     RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
                                     rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
-
+                                    bindingFound = true;
                                     rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
                                     scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
                                     break;
                                 }
                             }
                         }
+                        if (!bindingFound) { Debug.LogError("No binding found for " + rebindableAction.inputActionReferences[0].action.name); }
                     }
                 }
             }

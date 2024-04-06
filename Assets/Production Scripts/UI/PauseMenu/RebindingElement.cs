@@ -58,7 +58,9 @@ namespace Vi.UI
 
             foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
             {
-                if (binding.path.ToLower().Contains(device.name.ToLower()))
+                string deviceName = device.name.ToLower();
+                deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                if (binding.path.ToLower().Contains(deviceName.ToLower()))
                 {
                     if (bindingDisplayText.text == "Not Bound")
                     {
