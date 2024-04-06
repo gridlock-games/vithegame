@@ -1549,12 +1549,12 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   animationSpeed: 1
-  agentStaminaCost: 30
+  agentStaminaCost: 1
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 11000000
   mustBeAiming: 0
-  attackingNormalizedTime: 1
+  attackingNormalizedTime: 0.5
   recoveryNormalizedTime: 1
   damage: 2
   healAmount: 0
@@ -1582,7 +1582,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: ddaf850384c166f46a44d1388d87be8f, type: 3}
-  abilityCooldownTime: 2
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -1601,5 +1601,5 @@ MonoBehaviour:
   aimDuringRecovery: 1
   shouldAimBody: 1
   shouldAimOffHand: 1
-  requireAmmo: 1
-  requiredAmmoAmount: 2
+  requireAmmo: 0
+  requiredAmmoAmount: 0
