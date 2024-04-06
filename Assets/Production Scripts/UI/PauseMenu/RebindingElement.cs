@@ -96,7 +96,6 @@ namespace Vi.UI
 
             string originalPath = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex].path;
             string overridePath = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex].overridePath;
-            //Debug.Log(originalPath + " " + overridePath);
             for (int i = 0; i < rebindableAction.inputActionReferences.Length; i++)
             {
                 for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[i].action.bindings.Count; bindingIndex++)
@@ -104,8 +103,8 @@ namespace Vi.UI
                     InputBinding binding = rebindableAction.inputActionReferences[i].action.bindings[bindingIndex];
                     if (binding.path == originalPath)
                     {
-                        //Debug.Log(rebindableAction.inputActionReferences[i].action.id + " " + playerInput.actions.FindAction(rebindableAction.inputActionReferences[i].action.id).actionMap.name + " " + binding.overridePath + " " + overridePath);
                         playerInput.actions.FindAction(rebindableAction.inputActionReferences[i].action.id).ApplyBindingOverride(bindingIndex, overridePath);
+                        rebindableAction.inputActionReferences[i].action.ApplyBindingOverride(bindingIndex, overridePath);
                     }
                 }
             }

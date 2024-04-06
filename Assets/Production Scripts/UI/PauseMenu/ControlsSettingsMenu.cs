@@ -126,16 +126,21 @@ namespace Vi.UI
             {
                 for (int i = 0; i < rebindableAction.inputActionReferences.Length; i++)
                 {
+                    bool shouldBreak = false;
                     for (int bindingIndex = 0; bindingIndex < rebindableAction.inputActionReferences[i].action.bindings.Count; bindingIndex++)
                     {
                         InputBinding binding = rebindableAction.inputActionReferences[i].action.bindings[bindingIndex];
                         foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                         {
-                            if (binding.path.ToLower().Contains(device.name.ToLower()))
+                            string deviceName = device.name.ToLower();
+                            deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                            if (binding.path.ToLower().Contains(deviceName.ToLower()))
                             {
                                 playerInput.actions.FindAction(rebindableAction.inputActionReferences[i].action.id).RemoveBindingOverride(bindingIndex);
+                                rebindableAction.inputActionReferences[i].action.RemoveBindingOverride(bindingIndex);
                             }
                         }
+                        if (shouldBreak) { break; }
                     }
                 }
             }
