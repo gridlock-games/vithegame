@@ -941,7 +941,13 @@ namespace Vi.Core
             cachedInputHistory.Add(inputAttackType);
 
             List<Weapon.Attack> potentialAttacks = weaponInstance.GetAttackList().FindAll(item => item.inputs.SequenceEqual(cachedInputHistory));
-            Weapon.Attack selectedAttack = potentialAttacks.Find(item => item.inputs.SequenceEqual(cachedInputHistory) & item.comboCondition == Weapon.ComboCondition.None);
+
+            Weapon.Attack selectedAttack = potentialAttacks.Find(item => item.inputs.SequenceEqual(cachedInputHistory) & item.comboCondition == Weapon.ComboCondition.None & !item.attackClip.mustBeAiming);
+            if (aiming.Value)
+            {
+                selectedAttack = potentialAttacks.Find(item => item.inputs.SequenceEqual(cachedInputHistory) & item.comboCondition == Weapon.ComboCondition.None & item.attackClip.mustBeAiming);
+            }
+
             foreach (Weapon.Attack attack in potentialAttacks)
             {
                 bool conditionMet = false;
