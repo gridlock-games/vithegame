@@ -6,4 +6,4 @@ Assets/Audio/** filter=lfs diff=lfs merge=lfs -text
 UserSettings/  filter= diff=
 UserSettings/EditorUserSettings.asset filter= diff=
 *.bundle filter=lfs diff=lfs merge=lfs -text
-Assets/Scenes/Arena Map A/LightingData.lighting filter=lfs diff=lfs merge=lfs -text
+LightingData.* filter=lfs diff=lfs merge=lfs -text
