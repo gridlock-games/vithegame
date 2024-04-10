@@ -73,15 +73,6 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.2020148
-      value: 2
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
       time: 0.32
       value: 1
       inSlope: 0
@@ -2091,8 +2082,8 @@ MonoBehaviour:
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
   canCancelAbilities: 0
-  canBeCancelledByLightAttacks: 0
-  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByLightAttacks: 1
+  canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 674b0afeb4b9de743930aa2b08cde859, type: 3}
   abilityCooldownTime: 0
