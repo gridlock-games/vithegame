@@ -260,6 +260,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponTrailMaterial: {fileID: 0}
+  weaponTrailGranularity: 60
+  weaponTrailDuration: 0.5
+  weaponTrailFadeTime: 0.25
 --- !u!65 &8697175391807734052
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -271,5 +275,5 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.096969575, y: 0.8224254, z: 0.6808735}
-  m_Center: {x: 0.07943325, y: -0.04279968, z: 0.0006968379}
+  m_Size: {x: 0.19912736, y: 0.9356718, z: 0.85613513}
+  m_Center: {x: 0.10246055, y: -0.039096694, z: 0}
