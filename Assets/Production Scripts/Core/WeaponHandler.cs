@@ -13,7 +13,11 @@ namespace Vi.Core
     {
         private Dictionary<Weapon.WeaponBone, GameObject> weaponInstances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
-        public Weapon GetWeapon() { return weaponInstance; }
+        public Weapon GetWeapon()
+        {
+            if (weaponInstance) { return weaponInstance; }
+            return ScriptableObject.CreateInstance<Weapon>();
+        }
 
         public override void OnNetworkSpawn()
         {
