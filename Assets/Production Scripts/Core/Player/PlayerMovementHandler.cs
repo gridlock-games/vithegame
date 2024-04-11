@@ -299,14 +299,14 @@ namespace Vi.Player
                             bool isTouchingJoystick = false;
                             foreach (OnScreenStick joystick in joysticks)
                             {
-                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                                 {
                                     isTouchingJoystick = true;
                                     break;
                                 }
                             }
 
-                            if (!isTouchingJoystick)
+                            if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
                             {
                                 lookInputToAdd += touch.delta;
                             }
