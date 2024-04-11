@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private JoystickActionType joystickActionType;
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
+        [SerializeField] private float joystickValueMultiplier = 1;
 
         public enum JoystickActionType
         {
@@ -23,7 +24,7 @@ namespace Vi.UI
         public Vector2 GetJoystickValue()
         {
             RectTransform rt = (RectTransform)transform;
-            return Vector2.ClampMagnitude(new Vector2(rt.anchoredPosition.x / movementRange, rt.anchoredPosition.y / movementRange), 1);
+            return Vector2.ClampMagnitude(new Vector2(rt.anchoredPosition.x / movementRange, rt.anchoredPosition.y / movementRange), 1) * joystickValueMultiplier;
         }
 
         private Vector2 joystickParentOriginalAnchoredPosition;
