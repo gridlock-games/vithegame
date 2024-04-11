@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Vi.Core;
+using UnityEngine.InputSystem;
 
 namespace Vi.UI
 {
@@ -13,15 +14,29 @@ namespace Vi.UI
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
 
+        private Vector2 joystickParentOriginalAnchoredPosition;
         private Vector2 joystickOriginalAnchoredPosition;
         private void Start()
         {
             RectTransform rt = (RectTransform)transform.parent;
+            joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
+
+            rt = (RectTransform)transform;
             joystickOriginalAnchoredPosition = rt.anchoredPosition;
         }
 
-        private int interactingTouchId;
-        private void Update()
+        private void OnEnable()
+        {
+            InputSystem.onAfterUpdate += UpdateTouches;
+        }
+
+        private void OnDisable()
+        {
+            InputSystem.onAfterUpdate -= UpdateTouches;
+        }
+
+        private int interactingTouchId = -1;
+        private void UpdateTouches()
         {
             if (EnhancedTouchSupport.enabled)
             {
@@ -29,48 +44,57 @@ namespace Vi.UI
                 RectTransform rt = (RectTransform)transform.parent;
                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                 {
-                    if (touch.isTap) { continue; }
+                    if (interactingTouchId != -1 & touch.touchId != interactingTouchId) { continue; }
 
-                    if (touch.startScreenPosition.x < Screen.width / 2f)
+                    if (shouldReposition)
                     {
-                        if (rt.anchoredPosition == joystickOriginalAnchoredPosition)
+                        if (touch.startScreenPosition.x > Screen.width / 2f) { continue; }
+
+                        if (rt.anchoredPosition == joystickParentOriginalAnchoredPosition)
                         {
-                            if (shouldReposition)
-                            {
-                                List<RaycastResult> raycastResults = new List<RaycastResult>();
-                                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-                                pointerEventData.position = touch.screenPosition;
+                            List<RaycastResult> raycastResults = new List<RaycastResult>();
+                            PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                            pointerEventData.position = touch.screenPosition;
 
-                                EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                                raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(transform.parent));
+                            EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+                            raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(transform.parent));
 
-                                if (raycastResults.Count == 0)
-                                {
-                                    RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
-                                    rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
-                                    OnTouchDown(touch);
-                                    interactingTouchId = touch.touchId;
-                                }
-                            }
-                            else // shouldn't reposition
+                            if (raycastResults.Count == 0)
                             {
-                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition))
-                                {
-                                    OnTouchDown(touch);
-                                    interactingTouchId = touch.touchId;
-                                }
+                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
+                                rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
+                                OnTouchDown(touch);
+                                interactingTouchId = touch.touchId;
                             }
                         }
-                        else if (touch.touchId == interactingTouchId)
+                        else
+                        {
+                            OnTouchDrag(touch);
+                        }
+                        joystickMoving = true;
+                    }
+                    else // should not reposition
+                    {
+                        if (interactingTouchId == -1)
+                        {
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition))
+                            {
+                                OnTouchDown(touch);
+                                interactingTouchId = touch.touchId;
+                            }
+                        }
+                        else
                         {
                             OnTouchDrag(touch);
                         }
                         joystickMoving = true;
                     }
                 }
+
                 if (!joystickMoving)
                 {
-                    rt.anchoredPosition = joystickOriginalAnchoredPosition;
+                    rt.anchoredPosition = joystickParentOriginalAnchoredPosition;
+                    interactingTouchId = -1;
                     OnTouchUp();
                 }
             }
@@ -78,17 +102,22 @@ namespace Vi.UI
 
         private void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
-            
+            RectTransform rt = (RectTransform)transform;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
+            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint, movementRange);
         }
 
         private void OnTouchDrag(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
-
+            RectTransform rt = (RectTransform)transform;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
+            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint, movementRange);
         }
 
         private void OnTouchUp()
         {
-
+            RectTransform rt = (RectTransform)transform;
+            rt.anchoredPosition = joystickOriginalAnchoredPosition;
         }
     }
 }
