@@ -5,29 +5,42 @@ using UnityEngine.Rendering;
 
 public class CustomizableButtonUI : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+  buttonSetupData buttonSetup;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+  //set button Data;
+  public void setNewButtonLocation()
+  {
+
+  }
 }
 
 public class buttonSetupData
 {
+  public string setid;
+
+  //optional Setup
   public string deviceModel;
   public Vector2 deviceResolution;
 
   public List<buttonUIData> buttonList;
+
+  public int findObject(string buttonID)
+  {
+    //find if the button Exist
+    return 0;
+
+  }
+
+  public void setNewButtonLocation(string buttonID, bool enabled, Vector2 newPosition, float newSize)
+  {
+    //find if the button Exist
+    
+  }
 }
 public class buttonUIData
 {
-  public string buttonID;
-  public bool isUserActive;
-  public Vector2 buttonPosition;
+  public string buttonID { get; set; }
+  public bool isUserActive { get; set; }
+  public Vector2 buttonPosition { get; set; }
+  public float buttonSize { get; set; }
 }
