@@ -296,12 +296,19 @@ namespace Vi.Player
                         {
                             if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
 
+                            bool isTouchingJoystick = false;
                             foreach (OnScreenStick joystick in joysticks)
                             {
-                                if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
                                 {
-                                    lookInputToAdd += touch.delta / 1.5f;
+                                    isTouchingJoystick = true;
+                                    break;
                                 }
+                            }
+
+                            if (!isTouchingJoystick)
+                            {
+                                lookInputToAdd += touch.delta;
                             }
                         }
                     }
