@@ -271,7 +271,7 @@ namespace Vi.Player
 
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private readonly float minimapCameraOffset = 15;
-        private Vector2 lookInputToSubtract;
+        //private Vector2 lookInputToSubtract;
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -280,7 +280,7 @@ namespace Vi.Player
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
-                lookInput -= lookInputToSubtract;
+                //lookInput -= lookInputToSubtract;
                 Vector2 lookInputToAdd = Vector2.zero;
                 PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
@@ -313,7 +313,7 @@ namespace Vi.Player
                     }
                 }
             lookInput += lookInputToAdd;
-            lookInputToSubtract = lookInputToAdd;
+            //lookInputToSubtract = lookInputToAdd;
             }
             #endif
 

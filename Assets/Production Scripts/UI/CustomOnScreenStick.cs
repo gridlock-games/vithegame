@@ -5,17 +5,30 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Vi.Core;
-using UnityEngine.InputSystem;
 
 namespace Vi.UI
 {
     public class CustomOnScreenStick : UIDeadZoneElement
     {
+        [SerializeField] private JoystickActionType joystickActionType;
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
 
+        public enum JoystickActionType
+        {
+            Move,
+            Look
+        }
+
+        public Vector2 GetJoystickValue()
+        {
+            RectTransform rt = (RectTransform)transform;
+            return Vector2.ClampMagnitude(new Vector2(rt.anchoredPosition.x / movementRange, rt.anchoredPosition.y / movementRange), 1);
+        }
+
         private Vector2 joystickParentOriginalAnchoredPosition;
         private Vector2 joystickOriginalAnchoredPosition;
+        private MovementHandler movementHandler;
         private void Start()
         {
             RectTransform rt = (RectTransform)transform.parent;
@@ -23,20 +36,12 @@ namespace Vi.UI
 
             rt = (RectTransform)transform;
             joystickOriginalAnchoredPosition = rt.anchoredPosition;
-        }
 
-        private void OnEnable()
-        {
-            InputSystem.onAfterUpdate += UpdateTouches;
-        }
-
-        private void OnDisable()
-        {
-            InputSystem.onAfterUpdate -= UpdateTouches;
+            movementHandler = transform.root.GetComponent<MovementHandler>();
         }
 
         private int interactingTouchId = -1;
-        private void UpdateTouches()
+        private void Update()
         {
             if (EnhancedTouchSupport.enabled)
             {
@@ -96,6 +101,19 @@ namespace Vi.UI
                     rt.anchoredPosition = joystickParentOriginalAnchoredPosition;
                     interactingTouchId = -1;
                     OnTouchUp();
+                }
+
+                switch (joystickActionType)
+                {
+                    case JoystickActionType.Move:
+                        movementHandler.SetMoveInput(GetJoystickValue());
+                        break;
+                    case JoystickActionType.Look:
+                        movementHandler.SetLookInput(GetJoystickValue());
+                        break;
+                    default:
+                        Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);
+                        break;
                 }
             }
         }
