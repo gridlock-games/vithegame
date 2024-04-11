@@ -31,10 +31,39 @@ public class buttonSetupData
 
   }
 
-  public void setNewButtonLocation(string buttonID, bool enabled, Vector2 newPosition, float newSize)
+  public void setNewButtonLocation(string ButtonID, bool enabled, Vector2 newPosition, float newSize)
   {
     //find if the button Exist
-    
+    int idnum = findObject(ButtonID);
+
+        //If not exist create new button
+        if (idnum == -1)
+        {
+      createNewCustomButton(ButtonID, enabled, newPosition, newSize);
+        }
+        //ModifyExistancing
+        else
+        {
+            
+        }
+    }
+
+  public void createNewCustomButton(string ButtonID, bool enabled, Vector2 newPosition, float newSize)
+  {
+    buttonList.Add(new buttonUIData()
+    {
+      buttonID = ButtonID,
+      isUserActive = enabled,
+      buttonPosition = newPosition,
+      buttonSize = newSize
+    });
+  }
+
+  public void modifyCustomButton(int ButtonID, bool enabled, Vector2 newPosition, float newSize)
+  {
+    buttonList[ButtonID].isUserActive = enabled;
+    buttonList[ButtonID].buttonPosition = newPosition;
+    buttonList[ButtonID].buttonSize = newSize;
   }
 }
 public class buttonUIData
