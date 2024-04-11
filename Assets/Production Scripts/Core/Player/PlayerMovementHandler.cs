@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.OnScreen;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using System.Linq;
@@ -270,7 +269,7 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
-        private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private readonly float minimapCameraOffset = 15;
         private Vector2 lookInputToSubtract;
         private void Update()
@@ -294,10 +293,10 @@ namespace Vi.Player
                         }
                         else
                         {
-                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
                             bool isTouchingJoystick = false;
-                            foreach (OnScreenStick joystick in joysticks)
+                            foreach (UIDeadZoneElement joystick in joysticks)
                             {
                                 if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                                 {

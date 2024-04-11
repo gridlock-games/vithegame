@@ -4,20 +4,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
+using Vi.Core;
 
 namespace Vi.UI
 {
-    public class CustomOnScreenStick : MonoBehaviour
+    public class CustomOnScreenStick : UIDeadZoneElement
     {
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
 
-        private PlayerInput playerInput;
         private Vector2 joystickOriginalAnchoredPosition;
         private void Start()
         {
-            playerInput = transform.root.GetComponent<PlayerInput>();
-
             RectTransform rt = (RectTransform)transform.parent;
             joystickOriginalAnchoredPosition = rt.anchoredPosition;
         }
