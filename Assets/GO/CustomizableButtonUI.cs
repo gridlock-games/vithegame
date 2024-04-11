@@ -1,17 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class CustomizableButtonUI : MonoBehaviour
 {
-  buttonSetupData buttonSetup;
+  private List<buttonSetupData> buttonSetup;
 
-  //set button Data;
-  public void setNewButtonLocation()
-  {
-
-  }
 }
 
 public class buttonSetupData
@@ -20,6 +13,7 @@ public class buttonSetupData
 
   //optional Setup
   public string deviceModel;
+
   public Vector2 deviceResolution;
 
   public List<buttonUIData> buttonList;
@@ -28,25 +22,26 @@ public class buttonSetupData
   {
     //find if the button Exist
     return 0;
-
   }
+
+
 
   public void setNewButtonLocation(string ButtonID, bool enabled, Vector2 newPosition, float newSize)
   {
     //find if the button Exist
     int idnum = findObject(ButtonID);
 
-        //If not exist create new button
-        if (idnum == -1)
-        {
+    //If not exist create new button
+    if (idnum == -1)
+    {
       createNewCustomButton(ButtonID, enabled, newPosition, newSize);
-        }
-        //ModifyExistancing
-        else
-        {
-            
-        }
     }
+    //ModifyExistancing
+    else
+    {
+      modifyCustomButton(idnum, enabled, newPosition, newSize);
+    }
+  }
 
   public void createNewCustomButton(string ButtonID, bool enabled, Vector2 newPosition, float newSize)
   {
@@ -66,6 +61,9 @@ public class buttonSetupData
     buttonList[ButtonID].buttonSize = newSize;
   }
 }
+
+
+
 public class buttonUIData
 {
   public string buttonID { get; set; }
