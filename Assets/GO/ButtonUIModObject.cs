@@ -7,24 +7,10 @@ public class ButtonUIModObject : MonoBehaviour
   string buttonID;
   bool active;
 
-  public ButtonUIModObject(string buttonID, bool active)
+  void MoveButtonPosition(Vector2 buttonPosition, float buttonSize)
   {
-
-  }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-  void ReadjustButton()
-  {
-
+    RectTransform rt = this.GetComponent<RectTransform>();
+    rt.position = buttonPosition;
+    rt.localScale = new Vector2(buttonSize, buttonSize);
   }
 }
