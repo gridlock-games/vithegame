@@ -50,7 +50,7 @@ public class DebugOverlay : MonoBehaviour
         if (type == LogType.Error)
             myLog = output + "\n" + stack + "\n" + myLog;
         else
-            myLog = output + "\n" + stack + "\n" + myLog;
+            myLog = output + "\n" + myLog;
 
         if (myLog.Length > 1000)
         {

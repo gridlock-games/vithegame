@@ -38,7 +38,16 @@ namespace Vi.Core
             return lookInput * lookSensitivity;
         }
 
+		public void ResetLookInput()
+        {
+			lookInput = Vector2.zero;
+        }
+
+		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput; }
+
         public Vector2 GetMoveInput() { return moveInput; }
+
+		public void SetMoveInput(Vector2 moveInput) { this.moveInput = moveInput; }
 
         protected Vector2 moveInput;
         void OnMove(InputValue value)
