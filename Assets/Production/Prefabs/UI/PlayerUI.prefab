@@ -1070,6 +1070,7 @@ MonoBehaviour:
   secondaryWeaponButton: {fileID: 8344227605822759988}
   switchAttackTypeButton: {fileID: 4305966019654369716}
   aimButton: {fileID: 5353979728603681489}
+  scoreboardButton: {fileID: 3227792922799834725}
 --- !u!114 &5666987421114583128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5475,6 +5476,18 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114039092108050114, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
+--- !u!114 &3227792922799834725 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 3268625078682554819}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3333497513468805289 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
