@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
-using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.Player
 {
@@ -296,11 +295,10 @@ namespace Vi.Player
         }
 
         private Attributes followTarget;
-        private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private void Update()
         {
             if (!IsLocalPlayer) { return; }
-
 
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
@@ -316,9 +314,9 @@ namespace Vi.Player
                     }
                     else
                     {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
-                        foreach (OnScreenStick joystick in joysticks)
+                        foreach (UIDeadZoneElement joystick in joysticks)
                         {
                             if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
                             {
@@ -328,7 +326,7 @@ namespace Vi.Player
                     }
                 }
             }
-            # endif
+            #endif
 
             if (moveInput != Vector2.zero)
             {
