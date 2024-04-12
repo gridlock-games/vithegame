@@ -298,10 +298,13 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
-            auth = FirebaseAuth.DefaultInstance;
             initialErrorText.text = "";
 
-            StartCoroutine(AutomaticallyAttemptLogin());
+            if (!WebRequestManager.IsServerBuild())
+            {
+                auth = FirebaseAuth.DefaultInstance;
+                StartCoroutine(AutomaticallyAttemptLogin());
+            }
         }
 
         private IEnumerator AutomaticallyAttemptLogin()
