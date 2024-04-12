@@ -700,9 +700,8 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        //public List<InventoryItem> InventoryItems { get; private set; } = new List<InventoryItem>();
         public Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
-        private IEnumerator GetCharacterInventory(string characterId)
+        public IEnumerator GetCharacterInventory(string characterId)
         {
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
             yield return getRequest.SendWebRequest();

@@ -302,6 +302,8 @@ namespace Vi.Core
 
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {
+            yield return WebRequestManager.Singleton.GetCharacterInventory(character._id.ToString());
+
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
