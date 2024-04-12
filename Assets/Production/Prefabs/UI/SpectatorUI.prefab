@@ -314,20 +314,6 @@ MonoBehaviour:
   - {fileID: 1369910035427326952}
   - {fileID: 1698408757453066957}
   - {fileID: 6415869456383228131}
-  platformUIDefinitions:
-  - platforms: 080000000b000000
-    gameObjectsToEnable:
-    - {fileID: 3144451764282779984}
-    gameObjectsToDestroy:
-    - {fileID: 1982527543365779000}
-    - {fileID: 2097671688540077757}
-    - {fileID: 3622361814003049589}
-    - {fileID: 8997484398386368091}
-    objectsToMove:
-    - gameObjectToMove: {fileID: 6114019403561036632}
-      newAnchoredPosition: {x: 0, y: 85}
-    - gameObjectToMove: {fileID: 6114019404567166531}
-      newAnchoredPosition: {x: 0, y: 85}
 --- !u!114 &8147565166783601869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,6 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlsAsset: {fileID: 0}
   platformUIDefinitions:
   - platforms: 080000000b000000
     gameObjectsToEnable:
@@ -354,6 +341,7 @@ MonoBehaviour:
       newAnchoredPosition: {x: 0, y: 85}
     - gameObjectToMove: {fileID: 6114019404567166531}
       newAnchoredPosition: {x: 0, y: 85}
+  controlSchemeTextDefinitions: []
 --- !u!1 &6114019404567166531
 GameObject:
   m_ObjectHideFlags: 0
@@ -433,7 +421,7 @@ GameObject:
   - component: {fileID: 7659353869669627811}
   - component: {fileID: 480512220718420288}
   - component: {fileID: 1383455704916491912}
-  - component: {fileID: 6919569240122347294}
+  - component: {fileID: 7691897003562541}
   m_Layer: 0
   m_Name: MoveJoystick
   m_TagString: Untagged
@@ -456,11 +444,11 @@ RectTransform:
   m_Father: {fileID: 6184979859513668798}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 125}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 150}
-  m_Pivot: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &480512220718420288
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -499,7 +487,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6919569240122347294
+--- !u!114 &7691897003562541
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -508,32 +496,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6747863617797486114}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
+  m_Script: {fileID: 11500000, guid: 87848e8399667a24192aa53b26627467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MovementRange: 125
-  m_DynamicOriginRange: 100
-  m_ControlPath: <Gamepad>/leftStick
-  m_Behaviour: 0
-  m_UseIsolatedInputActions: 0
-  m_PointerDownAction:
-    m_Name: Pointer Down
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 0104007b-a4f6-4274-bf28-785f3e5e7b71
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  m_PointerMoveAction:
-    m_Name: Pointer Move
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: ea6f3425-c7bf-4d40-8893-02c1cd467ab1
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  joystickActionType: 0
+  movementRange: 125
+  shouldReposition: 1
+  joystickValueMultiplier: 1
 --- !u!1 &7452032538359885697
 GameObject:
   m_ObjectHideFlags: 0
@@ -545,7 +514,7 @@ GameObject:
   - component: {fileID: 2242781737944515523}
   - component: {fileID: 3328276752283431858}
   - component: {fileID: 2181146598061015510}
-  - component: {fileID: 8734469455767432134}
+  - component: {fileID: 12020681689512478}
   m_Layer: 0
   m_Name: LookJoystick
   m_TagString: Untagged
@@ -568,11 +537,11 @@ RectTransform:
   m_Father: {fileID: 6306353261998002608}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 125}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 150}
-  m_Pivot: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3328276752283431858
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -611,7 +580,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8734469455767432134
+--- !u!114 &12020681689512478
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -620,32 +589,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7452032538359885697}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
+  m_Script: {fileID: 11500000, guid: 87848e8399667a24192aa53b26627467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MovementRange: 125
-  m_DynamicOriginRange: 100
-  m_ControlPath: <Gamepad>/rightStick
-  m_Behaviour: 0
-  m_UseIsolatedInputActions: 0
-  m_PointerDownAction:
-    m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 3b0cc7bf-8f73-455f-bce5-188a8c86b5d9
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  m_PointerMoveAction:
-    m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 9a091fda-6bd1-49f8-9397-044fcfca43e7
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  joystickActionType: 1
+  movementRange: 125
+  shouldReposition: 0
+  joystickValueMultiplier: 4
 --- !u!1 &8400070427144414092
 GameObject:
   m_ObjectHideFlags: 0

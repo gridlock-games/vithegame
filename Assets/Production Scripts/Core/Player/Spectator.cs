@@ -362,7 +362,8 @@ namespace Vi.Player
                 targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
 
-                float xAngle = transform.eulerAngles.x - GetLookInput().y;
+                Vector2 lookInput = GetLookInput();
+                float xAngle = transform.eulerAngles.x - lookInput.y;
                 if (xAngle > 85 & xAngle < 275)
                 {
                     if (Mathf.Abs(xAngle - 85) > Mathf.Abs(xAngle - 275))
@@ -374,8 +375,9 @@ namespace Vi.Player
                         xAngle = 85;
                     }
                 }
-                transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + GetLookInput().x, 0);
+                transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
+            ResetLookInput();
         }
     }
 }
