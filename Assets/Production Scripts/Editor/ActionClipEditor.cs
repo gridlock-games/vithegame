@@ -274,16 +274,19 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
-
+                
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
@@ -337,14 +340,18 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -407,14 +414,18 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -477,14 +488,18 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();

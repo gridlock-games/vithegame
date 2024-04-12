@@ -388,37 +388,40 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance & bool.Parse(PlayerPrefs.GetString("AutoAim")))
+            if (bool.Parse(PlayerPrefs.GetString("AutoAim")))
             {
-                if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
+                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
-                    CameraController cameraController = cameraInstance.GetComponent<CameraController>();
-                    ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
-                    RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                    foreach (RaycastHit hit in allHits)
+                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                     {
-                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        CameraController cameraController = cameraInstance.GetComponent<CameraController>();
+                        ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
+                        RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                        foreach (RaycastHit hit in allHits)
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                            if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                                angleList.Add((networkCollider,
-                                    Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
-                                    hit));
+                                if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                                {
+                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                                    angleList.Add((networkCollider,
+                                        Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
+                                        hit));
+                                }
                             }
                         }
-                    }
 
-                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
-                    {
-                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                        if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                        angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                        foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
                         {
-                            cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
-                                Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
-                            break;
+                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                            if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                            {
+                                cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
+                                    Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
+                                break;
+                            }
                         }
                     }
                 }
