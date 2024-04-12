@@ -138,6 +138,7 @@ namespace Vi.Core
         private void Awake()
         {
             animator = GetComponent<Animator>();
+            animator.cullingMode = WebRequestManager.IsServerBuild() ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             weaponHandler = GetComponentInParent<WeaponHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
