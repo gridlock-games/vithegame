@@ -15,8 +15,7 @@ namespace Vi.Core
 
         public Weapon GetWeapon()
         {
-            if (weaponInstance) { return weaponInstance; }
-            return ScriptableObject.CreateInstance<Weapon>();
+            return weaponInstance;
         }
 
         public override void OnNetworkSpawn()
