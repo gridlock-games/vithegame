@@ -48,6 +48,8 @@ namespace Vi.UI
             }
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetDisconnectedPlayerDataList())
             {
+                if (playerData.team == PlayerDataManager.Team.Spectator) { continue; }
+
                 GameObject instance = Instantiate(scoreboardElementPrefab.gameObject, scoreboardElementParent);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {

@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.EventSystems;
 using Vi.Core;
+using Unity.Netcode;
 
 namespace Vi.Player
 {
@@ -65,10 +64,13 @@ namespace Vi.Player
         private void UpdateMotion()
         {
             PlayerInput mainPlayerInput = null;
-            if (PlayerDataManager.Singleton)
+            if (NetworkManager.Singleton)
             {
-                var kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                if (kvp.Value) { mainPlayerInput = kvp.Value.GetComponent<PlayerInput>(); }
+                NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
+                if (playerObject)
+                {
+                    mainPlayerInput = playerObject.GetComponent<PlayerInput>();
+                }
             }
 
             if (mainPlayerInput != wasUsingMainPlayerInput)
