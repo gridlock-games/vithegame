@@ -37,7 +37,7 @@ namespace Vi.UI
         [SerializeField] private GameObject deathUIParent;
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
-        [SerializeField] private EnhancedTouchOnScreenStick moveJoystick;
+        [SerializeField] private CustomOnScreenStick moveJoystick;
         [SerializeField] private OnScreenButton lightAttackButton;
         [SerializeField] private OnScreenButton heavyAttackButton;
         [SerializeField] private Image lookJoystickImage;
@@ -237,51 +237,6 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
-            #if UNITY_IOS || UNITY_ANDROID
-            // If on a mobile platform
-            if (attributes.NetworkObject.IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
-            {
-                bool moveJoystickMoving = false;
-                RectTransform rt = (RectTransform)moveJoystick.transform.parent;
-                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
-                {
-                    if (touch.isTap) { continue; }
-
-                    if (touch.startScreenPosition.x < Screen.width / 2f)
-                    {
-                        rt = (RectTransform)moveJoystick.transform.parent;
-                        RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
-                        if (rt.anchoredPosition == moveJoystickOriginalAnchoredPosition)
-                        {
-                            List<RaycastResult> raycastResults = new List<RaycastResult>();
-                            PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-                            pointerEventData.position = touch.screenPosition;
-
-                            EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                            raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(moveJoystick.transform.parent));
-
-                            if (raycastResults.Count == 0)
-                            {
-                                rt.anchoredPosition = localPoint - new Vector2(moveJoystick.movementRange / 2, moveJoystick.movementRange / 2);
-                                moveJoystick.OnTouchDown(touch);
-                                moveTouchId = touch.touchId;
-                            }
-                        }
-                        else if (touch.touchId == moveTouchId)
-                        {
-                            moveJoystick.OnTouchDrag(touch);
-                        }
-                        moveJoystickMoving = true;
-                    }
-                }
-                if (!moveJoystickMoving)
-                {
-                    rt.anchoredPosition = moveJoystickOriginalAnchoredPosition;
-                    moveJoystick.OnTouchUp();
-                }
-            }
-            #endif
-
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
