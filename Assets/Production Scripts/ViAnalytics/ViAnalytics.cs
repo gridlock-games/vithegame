@@ -1,12 +1,32 @@
+using Newtonsoft.Json;
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using static ViNetAnalytics.Deviceinfo;
 
 namespace ViNetAnalytics
 {
   public class ViAnalytics : MonoBehaviour
   {
-    private const string APIURL = "154.90.35.191/";
+    private static ViAnalytics _singleton;
+
+    public static ViAnalytics Singleton
+    {
+      get
+      {
+        return _singleton;
+      }
+    }
+
+    private void Awake()
+    {
+      _singleton = this;
+      StartCoroutine("DoDataCaptureCommunication");
+    }
+
+    private bool alreadyCapture = false;
+    private const string APIURL = "154.90.35.191";
     public Deviceinfo capturedData;
     public bool dataPrivacyAnonymousPermission = true;
 
@@ -17,9 +37,16 @@ namespace ViNetAnalytics
       {
         yield break; //No permission was granted voiding transfer
       }
+      alreadyCapture = Convert.ToBoolean(PlayerPrefs.GetInt("deviceAnalyticsSent"));
+      if (alreadyCapture == true) //Replace with legal stuff
+      {
+        yield break; //No permission was granted voiding transfer
+      }
+
       //Start Capturing
       yield return capturedData = new Deviceinfo()
       {
+        uniqueID = SystemInfo.deviceUniqueIdentifier,
         deviceModel = SystemInfo.deviceModel,
         deviceType = SystemInfo.deviceType,
         OperatingSystem = new DeviceInfoOperatingSystem()
@@ -50,11 +77,35 @@ namespace ViNetAnalytics
         }
       };
 
+      string jsonDataConverted = JsonConvert.SerializeObject(capturedData);
+      Debug.Log(jsonDataConverted);
+
+      Debug.Log("SendingData");
+      //Begin Transfer - Held for Dataprivacy test
+      using (UnityWebRequest sentRequest = UnityWebRequest.Post($"{APIURL}/game/saveDeviceInfo", jsonDataConverted))
+      {
+        yield return sentRequest.SendWebRequest();
+
+        if (sentRequest.result != UnityWebRequest.Result.Success)
+        {
+          Debug.LogError(sentRequest.error);
+        }
+        else
+        {
+          alreadyCapture = true;
+          PlayerPrefs.SetInt("deviceAnalyticsSent", Convert.ToInt32(alreadyCapture));
+          //Mark this send complete and save to localSaveData.
+        }
+        sentRequest.Dispose();
+      }
+
+      yield break;
     }
   }
 
   public class Deviceinfo
   {
+    public string uniqueID;
     public string deviceModel;
     public DeviceType deviceType;
 
