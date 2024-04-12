@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.OnScreen;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using System.Linq;
@@ -270,9 +269,9 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
-        private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private readonly float minimapCameraOffset = 15;
-        private Vector2 lookInputToSubtract;
+        //private Vector2 lookInputToSubtract;
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -281,7 +280,7 @@ namespace Vi.Player
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
-                lookInput -= lookInputToSubtract;
+                //lookInput -= lookInputToSubtract;
                 Vector2 lookInputToAdd = Vector2.zero;
                 PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
@@ -294,20 +293,27 @@ namespace Vi.Player
                         }
                         else
                         {
-                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
-                            foreach (OnScreenStick joystick in joysticks)
+                            bool isTouchingJoystick = false;
+                            foreach (UIDeadZoneElement joystick in joysticks)
                             {
-                                if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition) & touch.startScreenPosition.x > Screen.width / 2f)
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                                 {
-                                    lookInputToAdd += touch.delta / 1.5f;
+                                    isTouchingJoystick = true;
+                                    break;
                                 }
+                            }
+
+                            if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                            {
+                                lookInputToAdd += touch.delta;
                             }
                         }
                     }
                 }
             lookInput += lookInputToAdd;
-            lookInputToSubtract = lookInputToAdd;
+            //lookInputToSubtract = lookInputToAdd;
             }
             #endif
 
