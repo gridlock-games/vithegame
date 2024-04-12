@@ -388,7 +388,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance)
+            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance & bool.Parse(PlayerPrefs.GetString("AutoAim")))
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                 {
