@@ -14,6 +14,11 @@ namespace Vi.UI
         [SerializeField] private Transform scoreboardElementParent;
         [SerializeField] private Text scoreboardHeaderText;
 
+        public void CloseSelf()
+        {
+            Destroy(gameObject);
+        }
+
         private void Start()
         {
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)

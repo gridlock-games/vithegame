@@ -62,6 +62,11 @@ namespace Vi.UI
             attributes.GetComponent<ActionMapHandler>().OnInventory();
         }
 
+        public void OpenScoreboard()
+        {
+            attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
+        }
+
         private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
         public void ToggleAttackType(bool isRefreshing)
         {

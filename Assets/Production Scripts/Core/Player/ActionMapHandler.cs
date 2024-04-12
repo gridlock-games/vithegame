@@ -75,13 +75,23 @@ namespace Vi.Player
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
+            ToggleScoreboard(value.isPressed);
+        }
+
+        public void OpenScoreboard()
+        {
+            ToggleScoreboard(true);
+        }
+
+        private void ToggleScoreboard(bool isOn)
+        {
             if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (minimapInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
 
-            if (value.isPressed)
+            if (isOn)
             {
                 scoreboardInstance = Instantiate(scoreboardPrefab);
             }
@@ -92,9 +102,9 @@ namespace Vi.Player
             }
 
             if (playerUIInstance)
-                playerUIInstance.SetActive(!value.isPressed);
+                playerUIInstance.SetActive(!isOn);
             if (spectatorUIInstance)
-                spectatorUIInstance.SetActive(!value.isPressed);
+                spectatorUIInstance.SetActive(!isOn);
         }
 
         void OnHeavyAttack()
