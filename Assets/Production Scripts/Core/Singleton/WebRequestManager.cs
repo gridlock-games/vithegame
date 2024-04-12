@@ -29,6 +29,12 @@ namespace Vi.Core
             _singleton = this;
         }
 
+        public bool IsServerBuild()
+        {
+            RuntimePlatform[] excludedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
+            return excludedRuntimePlatforms.Contains(Application.platform);
+        }
+
         private const string APIURL = "154.90.35.191/";
 
         public bool IsRefreshingServers { get; private set; }

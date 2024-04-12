@@ -31,8 +31,7 @@ namespace Vi.Core
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
 
-            RuntimePlatform[] excludedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
-            if (!excludedRuntimePlatforms.Contains(Application.platform))
+            if (!WebRequestManager.Singleton.IsServerBuild())
             {
                 FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
                 {
