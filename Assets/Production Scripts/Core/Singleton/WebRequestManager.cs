@@ -29,7 +29,7 @@ namespace Vi.Core
             _singleton = this;
         }
 
-        public bool IsServerBuild()
+        public static bool IsServerBuild()
         {
             RuntimePlatform[] excludedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
             return excludedRuntimePlatforms.Contains(Application.platform);

@@ -31,7 +31,7 @@ namespace Vi.Core
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
 
-            if (!WebRequestManager.Singleton.IsServerBuild())
+            if (!WebRequestManager.IsServerBuild())
             {
                 FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
                 {

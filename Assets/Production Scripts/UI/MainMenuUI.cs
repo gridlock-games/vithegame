@@ -300,7 +300,7 @@ namespace Vi.UI
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
-            if (!WebRequestManager.Singleton.IsServerBuild())
+            if (!WebRequestManager.IsServerBuild())
             {
                 auth = FirebaseAuth.DefaultInstance;
                 StartCoroutine(AutomaticallyAttemptLogin());
