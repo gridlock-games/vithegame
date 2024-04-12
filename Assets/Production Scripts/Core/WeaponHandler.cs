@@ -15,8 +15,7 @@ namespace Vi.Core
 
         public Weapon GetWeapon()
         {
-            if (weaponInstance) { return weaponInstance; }
-            return ScriptableObject.CreateInstance<Weapon>();
+            return weaponInstance;
         }
 
         public override void OnNetworkSpawn()
@@ -46,8 +45,11 @@ namespace Vi.Core
             attributes = GetComponent<Attributes>();
             movementHandler = GetComponent<MovementHandler>();
             loadoutManager = GetComponent<LoadoutManager>();
+            weaponInstance = ScriptableObject.CreateInstance<Weapon>();
+            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
         }
 
+        public bool WeaponInitialized { get; private set; }
         public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
         {
             if (IsOwner & aiming.Value) { aiming.Value = false; return; }
@@ -55,6 +57,7 @@ namespace Vi.Core
             weaponInstance = weapon;
             animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
             EquipWeapon();
+            WeaponInitialized = true;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
@@ -389,7 +392,6 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
-            if (!CurrentActionClip) { CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>(); }
 
             if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
                     | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))

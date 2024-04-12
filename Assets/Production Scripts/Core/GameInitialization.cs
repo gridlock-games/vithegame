@@ -7,6 +7,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using Firebase;
 using Firebase.Analytics;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -30,10 +31,13 @@ namespace Vi.Core
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
 
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
+            if (!WebRequestManager.IsServerBuild())
             {
-                FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-            });
+                FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
+                {
+                    FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
+                });
+            }
 
             headerText.text = "Preparing Your Vi Experience";
         }

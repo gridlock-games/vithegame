@@ -238,6 +238,7 @@ namespace Vi.UI
         private void Update()
         {
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+            if (!weaponHandler.WeaponInitialized) { return; }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
