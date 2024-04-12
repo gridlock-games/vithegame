@@ -157,7 +157,7 @@ namespace Vi.Core
 
         private IEnumerator DisplayRenderersBasedOnEquipment(SkinnedMeshRenderer[] skinnedMeshRenderersToEvaluate)
         {
-            yield return null;
+            yield return new WaitUntil(() => weaponHandler.WeaponInitialized);
             List<SkinnedMeshRenderer> renderersAlreadyEvaluated = new List<SkinnedMeshRenderer>();
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
             {
