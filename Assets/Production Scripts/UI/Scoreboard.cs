@@ -4,6 +4,8 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
+using Unity.Netcode;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -16,7 +18,11 @@ namespace Vi.UI
 
         public void CloseSelf()
         {
-            Destroy(gameObject);
+            KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+            if (kvp.Value)
+            {
+                kvp.Value.GetComponent<ActionMapHandler>().CloseScoreboard();
+            }
         }
 
         private void Start()

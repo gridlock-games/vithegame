@@ -49,6 +49,7 @@ namespace Vi.UI
         [SerializeField] private Image secondaryWeaponButton;
         [SerializeField] private Button switchAttackTypeButton;
         [SerializeField] private Image aimButton;
+        [SerializeField] private Button scoreboardButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -244,6 +245,8 @@ namespace Vi.UI
         {
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
+
+            scoreboardButton.gameObject.SetActive(Core.GameModeManagers.GameModeManager.Singleton);
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {

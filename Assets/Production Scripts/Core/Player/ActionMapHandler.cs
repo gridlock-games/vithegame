@@ -83,6 +83,11 @@ namespace Vi.Player
             ToggleScoreboard(true);
         }
 
+        public void CloseScoreboard()
+        {
+            ToggleScoreboard(false);
+        }
+
         private void ToggleScoreboard(bool isOn)
         {
             if (ExternalUI) { return; }
