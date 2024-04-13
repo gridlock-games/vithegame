@@ -280,7 +280,6 @@ namespace Vi.Player
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
-                //lookInput -= lookInputToSubtract;
                 Vector2 lookInputToAdd = Vector2.zero;
                 PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
@@ -313,7 +312,6 @@ namespace Vi.Player
                     }
                 }
             lookInput += lookInputToAdd;
-            //lookInputToSubtract = lookInputToAdd;
             }
             #endif
 

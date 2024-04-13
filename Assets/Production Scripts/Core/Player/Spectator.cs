@@ -302,29 +302,33 @@ namespace Vi.Player
 
             #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            lookInput = Vector2.zero;
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+            if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
-                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                Vector2 lookInputToAdd = Vector2.zero;
+                PlayerInput playerInput = GetComponent<PlayerInput>();
+                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
-                    if (touch.isTap)
-                    {
-                        // Interact action?
-                    }
-                    else
+                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
                         if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
+                        bool isTouchingJoystick = false;
                         foreach (UIDeadZoneElement joystick in joysticks)
                         {
-                            if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                             {
-                                lookInput += touch.delta;
+                                isTouchingJoystick = true;
+                                break;
                             }
+                        }
+
+                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                        {
+                            lookInputToAdd += touch.delta;
                         }
                     }
                 }
+                lookInput += lookInputToAdd;
             }
             #endif
 
