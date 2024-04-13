@@ -56,6 +56,7 @@ namespace Vi.Core
             {
                 Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
                 getRequest.Dispose();
+                IsRefreshingServers = false;
                 yield break;
             }
             string json = getRequest.downloadHandler.text;
