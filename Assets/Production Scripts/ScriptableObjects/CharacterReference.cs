@@ -161,62 +161,28 @@ namespace Vi.ScriptableObjects
             public EquipmentType equipmentType;
             public Color averageTextureColor;
             public string itemWebId;
-            [SerializeField] private RaceAndGender[] raceAndGenders = new RaceAndGender[0];
-            [SerializeField] private WearableEquipment[] wearableEquipmentOptions = new WearableEquipment[0];
+            [SerializeField] private List<RaceAndGender> raceAndGenders = new List<RaceAndGender>();
+            [SerializeField] private List<WearableEquipment> wearableEquipmentOptions = new List<WearableEquipment>();
 
             public WearableEquipment GetModel(RaceAndGender raceAndGender, WearableEquipment emptyWearableEquipment)
             {
-                int index = System.Array.IndexOf(raceAndGenders, raceAndGender);
+                int index = raceAndGenders.IndexOf(raceAndGender);
                 if (index == -1) { return emptyWearableEquipment; }
                 return wearableEquipmentOptions[index];
             }
 
-            public WearableEquipmentOption(Dictionary<RaceAndGender, WearableEquipment> models, Color averageTextureColor)
+            public WearableEquipmentOption(string name, EquipmentType equipmentType, Color averageTextureColor)
             {
-                equipmentType = GetEquipmentTypeFromFilename(models[RaceAndGender.HumanMale].name);
-
-                if (equipmentTypesThatAreForCharacterCustomization.Contains(equipmentType))
-                {
-                    Debug.LogError("This constructor should only be used for armor types!");
-                }
-
-                string parsedName = models[RaceAndGender.HumanMale].name[^3] == '_' ? models[RaceAndGender.HumanMale].name[0..^3] : models[RaceAndGender.HumanMale].name;
-                name = parsedName.Replace("Hu_M_", "").Replace("_", " ");
-
+                this.name = name;
+                this.equipmentType = equipmentType;
                 this.averageTextureColor = averageTextureColor;
-                raceAndGenders = models.Keys.ToArray();
-                wearableEquipmentOptions = models.Values.ToArray();
             }
 
-            public WearableEquipmentOption(WearableEquipment wearableEquipmentPrefab, Color averageTextureColor)
+            public void AddModel(RaceAndGender raceAndGender, WearableEquipment wearableEquipment)
             {
-                RaceAndGender raceAndGender = GetRaceAndGenderFromFilename(wearableEquipmentPrefab.name);
-
-                equipmentType = GetEquipmentTypeFromFilename(wearableEquipmentPrefab.name);
-
-                if (!equipmentTypesThatAreForCharacterCustomization.Contains(equipmentType))
-                {
-                    Debug.LogError("This constructor should only be used for customization types!");
-                }
-
-                Dictionary<RaceAndGender, WearableEquipment> models = new Dictionary<RaceAndGender, WearableEquipment>();
-                foreach (RaceAndGender rg in System.Enum.GetValues(typeof(RaceAndGender)))
-                {
-                    if (rg == raceAndGender)
-                    {
-                        models.Add(rg, wearableEquipmentPrefab);
-                    }
-                    else
-                    {
-                        models.Add(rg, null);
-                    }
-                }
-
-                name = wearableEquipmentPrefab.name;
-
-                this.averageTextureColor = averageTextureColor;
-                raceAndGenders = models.Keys.ToArray();
-                wearableEquipmentOptions = models.Values.ToArray();
+                if (raceAndGenders.Contains(raceAndGender)) { return; }
+                raceAndGenders.Add(raceAndGender);
+                wearableEquipmentOptions.Add(wearableEquipment);
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)
@@ -289,6 +255,170 @@ namespace Vi.ScriptableObjects
             EditorUtility.SetDirty(this);
         }
 
+        [ContextMenu("Refresh Equipment List")]
+        private void RefreshEquipmentList()
+        {
+            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
+
+            // Clone Folder Structure first
+            string destinationTopFolder = @"Assets\Production\Prefabs\WearableEquipment";
+            foreach (string raceAndGenderFolder in Directory.GetDirectories(@"Assets\PackagedPrefabs\Vi_Character"))
+            {
+                if (raceAndGenderFolder.Contains("CharacterModels")) { continue; }
+
+                RaceAndGender raceAndGender = RaceAndGender.HumanMale;
+                if (raceAndGenderFolder.Contains("HumanMale"))
+                {
+                    raceAndGender = RaceAndGender.HumanMale;
+                }
+                else if (raceAndGenderFolder.Contains("HumanFemale"))
+                {
+                    raceAndGender = RaceAndGender.HumanFemale;
+                }
+                else
+                {
+                    Debug.LogError("Unsure how to handle path - " + raceAndGenderFolder);
+                    continue;
+                }
+
+                foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
+                {
+                    string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\') + 1)..].Replace("_", " ").Replace("Armor", "")[1..].Trim();
+                    Dictionary<string, string> materialDictionary = new Dictionary<string, string>();
+
+                    foreach (string textureFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Texture"), "*.png", SearchOption.TopDirectoryOnly))
+                    {
+                        string materialName = "";
+                        string filename = Path.GetFileNameWithoutExtension(textureFilePath);
+                        if (filename.Contains("Cloth"))
+                        {
+                            materialName = "M_Cloth";
+                        }
+                        else if (filename.Contains("Armor"))
+                        {
+                            materialName = "M_Armor";
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure how to handle texture path - " + filename);
+                            continue;
+                        }
+
+                        if (filename.Contains("Normal"))
+                        {
+                            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(textureFilePath);
+                            importer.textureType = TextureImporterType.NormalMap;
+                            importer.SaveAndReimport();
+                        }
+
+                        string materialFilePath = Path.Join(Path.Join(armorSetFolder, "Texture"), materialName + ".mat");
+
+                        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFilePath);
+
+                        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialFilePath);
+                        bool materialAlreadyExists = material != null;
+                        if (!materialAlreadyExists) { material = new Material(Shader.Find("Universal Render Pipeline/Lit")); }
+
+                        // Render both faces if this is a cloth material
+                        if (materialName == "M_Cloth") { material.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Off); }
+
+                        if (filename.Contains("Albedo"))
+                        {
+                            material.mainTexture = texture;
+                        }
+                        else if (filename.Contains("Emission"))
+                        {
+                            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                            material.SetTexture("_EmissionMap", texture);
+                        }
+                        else if (filename.Contains("Metallic"))
+                        {
+                            material.SetTexture("_MetallicGlossMap", texture);
+                        }
+                        else if (filename.Contains("Normal"))
+                        {
+                            material.SetTexture("_BumpMap", texture);
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure where to assign texture - " + filename);
+                        }
+
+                        if (!materialAlreadyExists) { AssetDatabase.CreateAsset(material, materialFilePath); }
+
+                        if (!materialDictionary.ContainsKey(materialName)) { materialDictionary.Add(materialName, materialFilePath); }
+                    }
+
+                    foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
+                    {
+                        string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                        Directory.CreateDirectory(dest);
+
+                        GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
+                        GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
+
+                        foreach (SkinnedMeshRenderer skinnedMeshRenderer in modelSource.GetComponentsInChildren<SkinnedMeshRenderer>())
+                        {
+                            Material[] newMaterials = new Material[skinnedMeshRenderer.sharedMaterials.Length];
+                            for (int i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++)
+                            {
+                                if (skinnedMeshRenderer.sharedMaterials[i].name.Contains("Cloth"))
+                                {
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Cloth"]);
+                                }
+                                else if (skinnedMeshRenderer.sharedMaterials[i].name.Contains("Armor"))
+                                {
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Armor"]);
+                                }
+                                else
+                                {
+                                    Debug.LogError("Not sure how to handle material - " + skinnedMeshRenderer.sharedMaterials[i]);
+                                    newMaterials[i] = null;
+                                }
+                            }
+                            skinnedMeshRenderer.sharedMaterials = newMaterials;
+                        }
+
+                        WearableEquipment wearableEquipment = modelSource.AddComponent<WearableEquipment>();
+                        wearableEquipment.equipmentType = System.Enum.Parse<EquipmentType>(modelSource.name);
+
+                        Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                        TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                        if (!importer.isReadable)
+                        {
+                            importer.isReadable = true;
+                            importer.SaveAndReimport();
+                        }
+
+                        Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                        foreach (Transform child in children)
+                        {
+                            child.gameObject.layer = LayerMask.NameToLayer("Character");
+                        }
+
+                        WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType, AverageColorFromTexture(texture2D));
+                        if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
+
+                        string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
+                        PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
+                        DestroyImmediate(modelSource);
+
+                        int index = equipmentOptions.FindIndex(item => item.Equals(wearableEquipmentOption));
+                        if (index == -1)
+                        {
+                            Debug.LogError("Couldn't find wearable equipment option " + wearableEquipmentOption.name);
+                        }
+                        else
+                        {
+                            equipmentOptions[index].AddModel(raceAndGender, AssetDatabase.LoadAssetAtPath<GameObject>(prefabVariantPath).GetComponent<WearableEquipment>());
+                        }
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        /*
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
@@ -529,7 +659,7 @@ namespace Vi.ScriptableObjects
                 }
             }
         }
-
+        */
         private Color32 AverageColorFromTexture(Texture2D tex)
         {
             Color32[] texColors = tex.GetPixels32();
@@ -550,6 +680,6 @@ namespace Vi.ScriptableObjects
 
             return new Color32((byte)(r / total), (byte)(g / total), (byte)(b / total), (byte)(a / total));
         }
-#endif
+        #endif
     }
 }

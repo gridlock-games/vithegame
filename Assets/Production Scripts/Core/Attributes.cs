@@ -556,12 +556,12 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
 
-            if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
-
             GlowRenderer.RenderInvincible(IsInvincible);
             GlowRenderer.RenderUninterruptable(IsUninterruptable);
 
             if (!IsServer) { return; }
+
+            if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
 
             isInvincible.Value = Time.time <= invincibilityEndTime;
             isUninterruptable.Value = Time.time <= uninterruptableEndTime;

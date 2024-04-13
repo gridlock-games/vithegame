@@ -51,6 +51,8 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
 
+            if (!PlayerPrefs.HasKey("AutoAim")) { PlayerPrefs.SetString("AutoAim", true.ToString()); }
+
             if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
