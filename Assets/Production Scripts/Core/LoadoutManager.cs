@@ -249,11 +249,11 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.helmGearItemId).itemId), raceAndGender);
+                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == itemId.ToString()).itemId), raceAndGender);
                 }
                 else
                 {
-                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId.ToString()), raceAndGender);
+                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId.ToString()), raceAndGender);
                 }
             }
         }

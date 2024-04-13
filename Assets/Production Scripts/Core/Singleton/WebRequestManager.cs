@@ -934,18 +934,31 @@ namespace Vi.Core
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            return new Loadout("1", armorOptions.Find(item => item.name == "Arab Helm").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Chest").itemWebId,
+            return new Loadout("1", "",
+                armorOptions.Find(item => item.name == "European Chest").itemWebId,
                 armorOptions.Find(item => item.name == "European Shoulders").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Boots").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Pants").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Belt").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Gloves").itemWebId,
+                armorOptions.Find(item => item.name == "European Boots").itemWebId,
+                armorOptions.Find(item => item.name == "European Pants").itemWebId,
+                armorOptions.Find(item => item.name == "European Belt").itemWebId,
+                armorOptions.Find(item => item.name == "European Gloves").itemWebId,
                 armorOptions.Find(item => item.name == "European Cape").itemWebId,
                 "",
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
+
+            //return new Loadout("1", armorOptions.Find(item => item.name == "Arab Helm").itemWebId,
+            //    armorOptions.Find(item => item.name == "Arab Chest").itemWebId,
+            //    armorOptions.Find(item => item.name == "European Shoulders").itemWebId,
+            //    armorOptions.Find(item => item.name == "Arab Boots").itemWebId,
+            //    armorOptions.Find(item => item.name == "Arab Pants").itemWebId,
+            //    armorOptions.Find(item => item.name == "Arab Belt").itemWebId,
+            //    armorOptions.Find(item => item.name == "Arab Gloves").itemWebId,
+            //    armorOptions.Find(item => item.name == "European Cape").itemWebId,
+            //    "",
+            //    System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
+            //    System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
+            //    true);
 
             //return new Loadout("1", armorOptions.Find(item => item.name == "Empty Helmet").itemWebId,
             //            armorOptions.Find(item => item.name == "Empty Shoulders").itemWebId,
