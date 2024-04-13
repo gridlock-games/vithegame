@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
-using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.Player
 {
@@ -26,6 +25,7 @@ namespace Vi.Player
                 GetComponent<Camera>().enabled = true;
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
@@ -40,6 +40,11 @@ namespace Vi.Player
         public override void OnNetworkDespawn()
         {
             PlayerDataManager.Singleton.RemoveSpectatorInstance(OwnerClientId);
+
+            if (IsLocalPlayer)
+            {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+            }
         }
 
         void OnLook(InputValue value)
@@ -296,39 +301,42 @@ namespace Vi.Player
         }
 
         private Attributes followTarget;
-        private OnScreenStick[] joysticks = new OnScreenStick[0];
+        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private void Update()
         {
             if (!IsLocalPlayer) { return; }
 
+            #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
-                lookInput = Vector2.zero;
+                Vector2 lookInputToAdd = Vector2.zero;
                 PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
                     foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (touch.isTap)
-                        {
-                            // Interact action?
-                        }
-                        else
-                        {
-                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<OnScreenStick>(); }
+                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
-                            foreach (OnScreenStick joystick in joysticks)
+                        bool isTouchingJoystick = false;
+                        foreach (UIDeadZoneElement joystick in joysticks)
+                        {
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                             {
-                                if (!RectTransformUtility.RectangleContainsScreenPoint(joystick.transform.parent.GetComponent<RectTransform>(), touch.startScreenPosition) & touch.screenPosition.x > Screen.width / 2f)
-                                {
-                                    lookInput += touch.delta;
-                                }
+                                isTouchingJoystick = true;
+                                break;
                             }
+                        }
+
+                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                        {
+                            lookInputToAdd += touch.delta;
                         }
                     }
                 }
+                lookInput += lookInputToAdd;
             }
+            #endif
 
             if (moveInput != Vector2.zero)
             {
@@ -364,7 +372,8 @@ namespace Vi.Player
                 targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
 
-                float xAngle = transform.eulerAngles.x - GetLookInput().y;
+                Vector2 lookInput = GetLookInput();
+                float xAngle = transform.eulerAngles.x - lookInput.y;
                 if (xAngle > 85 & xAngle < 275)
                 {
                     if (Mathf.Abs(xAngle - 85) > Mathf.Abs(xAngle - 275))
@@ -376,8 +385,9 @@ namespace Vi.Player
                         xAngle = 85;
                     }
                 }
-                transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + GetLookInput().x, 0);
+                transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
+            ResetLookInput();
         }
     }
 }

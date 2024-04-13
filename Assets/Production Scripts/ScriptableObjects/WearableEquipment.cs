@@ -39,7 +39,7 @@ namespace Vi.ScriptableObjects
                 }
                 srenderer.bones = newBones;
                 srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
-                srenderer.updateWhenOffscreen = true;
+                srenderer.updateWhenOffscreen = false;
             }
         }
 

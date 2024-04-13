@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -138,6 +139,7 @@ namespace Vi.Core
         private void Awake()
         {
             animator = GetComponent<Animator>();
+            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             weaponHandler = GetComponentInParent<WeaponHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();

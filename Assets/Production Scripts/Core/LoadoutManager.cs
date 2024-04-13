@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -103,18 +104,13 @@ namespace Vi.Core
         public IEnumerator ApplyDefaultEquipment(CharacterReference.RaceAndGender raceAndGender)
         {
             yield return null;
-
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
-            //animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.wearableEquipmentPrefab.name.Contains("Pants_Peasant"))); // Peasant pants
 
             WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout();
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.helmGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.shouldersGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.chestArmorGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.glovesGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.beltGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.robeGearItemId), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == loadout.bootsGearItemId), raceAndGender);
+            foreach (FixedString32Bytes itemId in loadout.GetLoadoutArmorPiecesAsList())
+            {
+                animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId), raceAndGender);
+            }
         }
 
         public void ChangeWeaponBeforeSpawn(WeaponSlotType weaponSlotType, CharacterReference.WeaponOption weaponOption)
@@ -246,17 +242,20 @@ namespace Vi.Core
         private IEnumerator ApplyEquipmentFromLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout)
         {
             yield return null;
-
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
-
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.helmGearItemId).itemId : loadout.helmGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.shouldersGearItemId).itemId : loadout.shouldersGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.chestArmorGearItemId).itemId : loadout.chestArmorGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.glovesGearItemId).itemId : loadout.glovesGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.beltGearItemId).itemId : loadout.beltGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.robeGearItemId).itemId : loadout.robeGearItemId.ToString())), raceAndGender);
-            animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.bootsGearItemId).itemId : loadout.bootsGearItemId.ToString())), raceAndGender);
+
+            foreach (FixedString32Bytes itemId in loadout.GetLoadoutArmorPiecesAsList())
+            {
+                if (NetworkObject.IsPlayerObject)
+                {
+                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == itemId.ToString()).itemId), raceAndGender);
+                }
+                else
+                {
+                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId.ToString()), raceAndGender);
+                }
+            }
         }
 
         public override void OnNetworkDespawn()
