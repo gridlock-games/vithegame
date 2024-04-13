@@ -303,21 +303,85 @@ namespace Vi.ScriptableObjects
                 if (raceAndGenderFolder.Contains("HumanMale"))
                 {
                     RaceAndGender raceAndGender = RaceAndGender.HumanMale;
+
                     foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
                     {
                         string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\')+1)..].Replace("_", " ")[1..].Trim();
-                        foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
+
+                        foreach (string textureFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Texture"), "*.png", SearchOption.TopDirectoryOnly))
                         {
-                            string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
-                            Directory.CreateDirectory(dest);
+                            string materialName = "";
+                            string filename = Path.GetFileNameWithoutExtension(textureFilePath);
+                            if (filename.Contains("Cloth"))
+                            {
+                                materialName = "M_Cloth";
+                            }
+                            else if (filename.Contains("Armor"))
+                            {
+                                materialName = "M_Armor";
+                            }
+                            else
+                            {
+                                Debug.LogError("Not sure how to handle texture path - " + filename);
+                                continue;
+                            }
 
-                            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
-                            GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
-                            PrefabUtility.SaveAsPrefabAsset(modelSource, Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab"));
+                            if (filename.Contains("Normal"))
+                            {
+                                TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(textureFilePath);
+                                importer.textureType = TextureImporterType.NormalMap;
+                                importer.SaveAndReimport();
+                            }
+
+                            string materialFilePath = Path.Join(Path.Join(armorSetFolder, "Texture"), materialName + ".mat");
+
+                            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFilePath);
+
+                            Material material = AssetDatabase.LoadAssetAtPath<Material>(materialFilePath);
+                            bool materialAlreadyExists = material != null;
+                            if (!materialAlreadyExists) { material = new Material(Shader.Find("Universal Render Pipeline/Lit")); }
+
+                            if (filename.Contains("Albedo"))
+                            {
+                                material.mainTexture = texture;
+                            }
+                            else if (filename.Contains("Emission"))
+                            {
+                                material.SetTexture("_EmissionMap", texture);
+                            }
+                            else if (filename.Contains("Metallic"))
+                            {
+                                material.SetTexture("_MetallicGlossMap", texture);
+                            }
+                            else if (filename.Contains("Normal"))
+                            {
+                                material.SetTexture("_BumpMap", texture);
+                            }
+                            else
+                            {
+                                Debug.LogError("Not sure where to assign texture - " + filename);
+                            }
+
+                            if (!materialAlreadyExists) { AssetDatabase.CreateAsset(material, materialFilePath); }
                         }
-                    }
 
-                    //Debug.Log(Path.Join(raceAndGenderFilePath, "Texture"));
+                        //foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
+                        //{
+                        //    string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                        //    Directory.CreateDirectory(dest);
+
+                        //    GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
+                        //    GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
+
+                        //    foreach (SkinnedMeshRenderer skinnedMeshRenderer in modelSource.GetComponentsInChildren<SkinnedMeshRenderer>())
+                        //    {
+                        //        //skinnedMeshRenderer.materials = ;
+                        //    }
+
+                        //    PrefabUtility.SaveAsPrefabAsset(modelSource, Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab"));
+                        //    DestroyImmediate(modelSource);
+                        //}
+                    }
                 }
                 else if (raceAndGenderFolder.Contains("HumanFemale"))
                 {
@@ -328,6 +392,8 @@ namespace Vi.ScriptableObjects
                     Debug.LogError("Unsure how to handle path - " + raceAndGenderFolder);
                 }
             }
+
+            AssetDatabase.SaveAssets();
 
             //string[] filepaths = Directory.GetDirectories(@"Assets\PackagedPrefabs\Vi_Character", "*", SearchOption.AllDirectories);
             //foreach (string filepath in filepaths)
@@ -609,6 +675,6 @@ namespace Vi.ScriptableObjects
 
             return new Color32((byte)(r / total), (byte)(g / total), (byte)(b / total), (byte)(a / total));
         }
-        #endif
+#endif
     }
 }
