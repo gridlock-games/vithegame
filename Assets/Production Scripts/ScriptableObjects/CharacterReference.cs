@@ -283,7 +283,7 @@ namespace Vi.ScriptableObjects
 
                 foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
                 {
-                    string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\') + 1)..].Replace("_", " ")[1..].Trim();
+                    string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\') + 1)..].Replace("_", " ").Replace("Armor", "")[1..].Trim();
                     Dictionary<string, string> materialDictionary = new Dictionary<string, string>();
 
                     foreach (string textureFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Texture"), "*.png", SearchOption.TopDirectoryOnly))
