@@ -25,6 +25,7 @@ namespace Vi.Player
                 GetComponent<Camera>().enabled = true;
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
@@ -39,6 +40,11 @@ namespace Vi.Player
         public override void OnNetworkDespawn()
         {
             PlayerDataManager.Singleton.RemoveSpectatorInstance(OwnerClientId);
+
+            if (IsLocalPlayer)
+            {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+            }
         }
 
         void OnLook(InputValue value)
