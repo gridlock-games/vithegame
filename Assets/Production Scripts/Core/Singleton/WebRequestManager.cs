@@ -876,15 +876,16 @@ namespace Vi.Core
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
             Loadout defaultLoadout = GetDefaultLoadout();
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.helmGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.helmGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.shouldersGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.shouldersGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.chestArmorGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.chestArmorGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.glovesGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.glovesGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.beltGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.beltGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.robeGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.robeGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.bootsGearItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.bootsGearItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon1ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon1ItemId.ToString()); }
-            if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == defaultLoadout.weapon2ItemId)) { Debug.LogWarning("Item not in inventory but you're putting it in a loadout"); yield return AddItemToInventory(postRequest.downloadHandler.text, defaultLoadout.weapon2ItemId.ToString()); }
+
+            // Add items from default loadout to character inventory
+            foreach (FixedString32Bytes itemId in defaultLoadout.GetLoadoutAsList())
+            {
+                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
+                {
+                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
+                }
+            }
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
@@ -945,17 +946,6 @@ namespace Vi.Core
             //            armorOptions.Find(item => item.name == "Empty Belt").itemWebId,
             //            armorOptions.Find(item => item.name == "Empty Pants").itemWebId,
             //            armorOptions.Find(item => item.name == "Empty Boots").itemWebId,
-            //            System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
-            //            System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
-            //            true);
-
-            //return new Loadout("1", armorOptions.Find(item => item.name == "Helm SMage 03").itemWebId,
-            //            armorOptions.Find(item => item.name == "Shoulders SMage").itemWebId,
-            //            armorOptions.Find(item => item.name == "Chest SMage").itemWebId,
-            //            armorOptions.Find(item => item.name == "Gloves SMage").itemWebId,
-            //            armorOptions.Find(item => item.name == "Belt SMage").itemWebId,
-            //            armorOptions.Find(item => item.name == "Robe SMage").itemWebId,
-            //            armorOptions.Find(item => item.name == "Boots SMage").itemWebId,
             //            System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
             //            System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
             //            true);
@@ -1207,6 +1197,24 @@ namespace Vi.Core
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
+            }
+
+            public List<FixedString32Bytes> GetLoadoutAsList()
+            {
+                return new List<FixedString32Bytes>()
+                {
+                    helmGearItemId,
+                    chestArmorGearItemId,
+                    shouldersGearItemId,
+                    bootsGearItemId,
+                    pantsGearItemId,
+                    beltGearItemId,
+                    glovesGearItemId,
+                    capeGearItemId,
+                    robeGearItemId,
+                    weapon1ItemId,
+                    weapon2ItemId
+                };
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
