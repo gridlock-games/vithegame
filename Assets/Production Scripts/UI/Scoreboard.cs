@@ -18,11 +18,7 @@ namespace Vi.UI
 
         public void CloseSelf()
         {
-            KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-            if (kvp.Value)
-            {
-                kvp.Value.GetComponent<ActionMapHandler>().CloseScoreboard();
-            }
+            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<ActionMapHandler>().CloseScoreboard();
         }
 
         private void Start()

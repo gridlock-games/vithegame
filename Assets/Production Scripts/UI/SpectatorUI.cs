@@ -33,11 +33,6 @@ namespace Vi.UI
             spectator.GetComponent<ActionMapHandler>().OnPause();
         }
 
-        public void OpenInventoryMenu()
-        {
-            spectator.GetComponent<ActionMapHandler>().OnInventory();
-        }
-
         public void OpenScoreboard()
         {
             spectator.GetComponent<ActionMapHandler>().OpenScoreboard();
