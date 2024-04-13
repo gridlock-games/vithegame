@@ -300,97 +300,122 @@ namespace Vi.ScriptableObjects
             {
                 if (raceAndGenderFolder.Contains("CharacterModels")) { continue; }
 
+                RaceAndGender raceAndGender = RaceAndGender.HumanMale;
                 if (raceAndGenderFolder.Contains("HumanMale"))
                 {
-                    RaceAndGender raceAndGender = RaceAndGender.HumanMale;
-
-                    foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
-                    {
-                        string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\')+1)..].Replace("_", " ")[1..].Trim();
-
-                        foreach (string textureFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Texture"), "*.png", SearchOption.TopDirectoryOnly))
-                        {
-                            string materialName = "";
-                            string filename = Path.GetFileNameWithoutExtension(textureFilePath);
-                            if (filename.Contains("Cloth"))
-                            {
-                                materialName = "M_Cloth";
-                            }
-                            else if (filename.Contains("Armor"))
-                            {
-                                materialName = "M_Armor";
-                            }
-                            else
-                            {
-                                Debug.LogError("Not sure how to handle texture path - " + filename);
-                                continue;
-                            }
-
-                            if (filename.Contains("Normal"))
-                            {
-                                TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(textureFilePath);
-                                importer.textureType = TextureImporterType.NormalMap;
-                                importer.SaveAndReimport();
-                            }
-
-                            string materialFilePath = Path.Join(Path.Join(armorSetFolder, "Texture"), materialName + ".mat");
-
-                            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFilePath);
-
-                            Material material = AssetDatabase.LoadAssetAtPath<Material>(materialFilePath);
-                            bool materialAlreadyExists = material != null;
-                            if (!materialAlreadyExists) { material = new Material(Shader.Find("Universal Render Pipeline/Lit")); }
-
-                            if (filename.Contains("Albedo"))
-                            {
-                                material.mainTexture = texture;
-                            }
-                            else if (filename.Contains("Emission"))
-                            {
-                                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-                                material.SetTexture("_EmissionMap", texture);
-                            }
-                            else if (filename.Contains("Metallic"))
-                            {
-                                material.SetTexture("_MetallicGlossMap", texture);
-                            }
-                            else if (filename.Contains("Normal"))
-                            {
-                                material.SetTexture("_BumpMap", texture);
-                            }
-                            else
-                            {
-                                Debug.LogError("Not sure where to assign texture - " + filename);
-                            }
-                            
-                            if (!materialAlreadyExists) { AssetDatabase.CreateAsset(material, materialFilePath); }
-                        }
-
-                        //foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
-                        //{
-                        //    string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
-                        //    Directory.CreateDirectory(dest);
-
-                        //    GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
-                        //    GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
-
-                        //    foreach (SkinnedMeshRenderer skinnedMeshRenderer in modelSource.GetComponentsInChildren<SkinnedMeshRenderer>())
-                        //    {
-                        //        //skinnedMeshRenderer.materials = ;
-                        //    }
-
-                        //    PrefabUtility.SaveAsPrefabAsset(modelSource, Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab"));
-                        //    DestroyImmediate(modelSource);
-                        //}
-                    }
+                    raceAndGender = RaceAndGender.HumanMale;
                 }
                 else if (raceAndGenderFolder.Contains("HumanFemale"))
                 {
-
+                    raceAndGender = RaceAndGender.HumanFemale;
                 }
                 else
                 {
                     Debug.LogError("Unsure how to handle path - " + raceAndGenderFolder);
+                    continue;
+                }
+
+                foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
+                {
+                    string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\') + 1)..].Replace("_", " ")[1..].Trim();
+                    Dictionary<string, string> materialDictionary = new Dictionary<string, string>();
+
+                    foreach (string textureFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Texture"), "*.png", SearchOption.TopDirectoryOnly))
+                    {
+                        string materialName = "";
+                        string filename = Path.GetFileNameWithoutExtension(textureFilePath);
+                        if (filename.Contains("Cloth"))
+                        {
+                            materialName = "M_Cloth";
+                        }
+                        else if (filename.Contains("Armor"))
+                        {
+                            materialName = "M_Armor";
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure how to handle texture path - " + filename);
+                            continue;
+                        }
+
+                        if (filename.Contains("Normal"))
+                        {
+                            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(textureFilePath);
+                            importer.textureType = TextureImporterType.NormalMap;
+                            importer.SaveAndReimport();
+                        }
+
+                        string materialFilePath = Path.Join(Path.Join(armorSetFolder, "Texture"), materialName + ".mat");
+
+                        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFilePath);
+
+                        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialFilePath);
+                        bool materialAlreadyExists = material != null;
+                        if (!materialAlreadyExists) { material = new Material(Shader.Find("Universal Render Pipeline/Lit")); }
+
+                        if (filename.Contains("Albedo"))
+                        {
+                            material.mainTexture = texture;
+                        }
+                        else if (filename.Contains("Emission"))
+                        {
+                            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                            material.SetTexture("_EmissionMap", texture);
+                        }
+                        else if (filename.Contains("Metallic"))
+                        {
+                            material.SetTexture("_MetallicGlossMap", texture);
+                        }
+                        else if (filename.Contains("Normal"))
+                        {
+                            material.SetTexture("_BumpMap", texture);
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure where to assign texture - " + filename);
+                        }
+
+                        if (!materialAlreadyExists) { AssetDatabase.CreateAsset(material, materialFilePath); }
+
+                        if (!materialDictionary.ContainsKey(materialName)) { materialDictionary.Add(materialName, materialFilePath); }
+                    }
+
+                    foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
+                    {
+                        string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                        Directory.CreateDirectory(dest);
+
+                        GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
+                        GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
+
+                        foreach (SkinnedMeshRenderer skinnedMeshRenderer in modelSource.GetComponentsInChildren<SkinnedMeshRenderer>())
+                        {
+                            Material[] newMaterials = new Material[skinnedMeshRenderer.materials.Length];
+                            for (int i = 0; i < skinnedMeshRenderer.materials.Length; i++)
+                            {
+                                if (skinnedMeshRenderer.materials[i].name.Contains("Cloth"))
+                                {
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Cloth"]);
+                                }
+                                else if (skinnedMeshRenderer.materials[i].name.Contains("Cloth"))
+                                {
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Armor"]);
+                                }
+                                else
+                                {
+                                    Debug.LogError("Not sure how to handle material - " + skinnedMeshRenderer.materials[i]);
+                                    newMaterials[i] = null;
+                                }
+                            }
+                            skinnedMeshRenderer.materials = newMaterials;
+                        }
+
+                        WearableEquipment wearableEquipment = modelSource.AddComponent<WearableEquipment>();
+                        wearableEquipment.equipmentType = System.Enum.Parse<EquipmentType>(modelSource.name);
+
+                        PrefabUtility.SaveAsPrefabAsset(modelSource, Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab"));
+                        DestroyImmediate(modelSource);
+                    }
                 }
             }
 
