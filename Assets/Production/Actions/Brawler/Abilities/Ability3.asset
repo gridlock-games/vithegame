@@ -4650,8 +4650,8 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 
   mustBeAiming: 0
-  attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.3
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.4
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -4666,8 +4666,9 @@ MonoBehaviour:
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
+  isFollowUpAttack: 0
   ailment: 2
-  ailmentDuration: 5
+  grabDuration: 2
   grabDistance: 3
   dodgeLock: 2
   canCancelLightAttacks: 1
