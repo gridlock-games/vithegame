@@ -319,6 +319,9 @@ namespace Vi.ScriptableObjects
                         bool materialAlreadyExists = material != null;
                         if (!materialAlreadyExists) { material = new Material(Shader.Find("Universal Render Pipeline/Lit")); }
 
+                        // Render both faces if this is a cloth material
+                        if (materialName == "M_Cloth") { material.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Off); }
+
                         if (filename.Contains("Albedo"))
                         {
                             material.mainTexture = texture;
