@@ -788,10 +788,7 @@ namespace Vi.Core
             newLoadout.weapon1ItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "");
             newLoadout.weapon2ItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "");
 
-            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout.loadoutSlot.ToString(),
-                newLoadout.helmGearItemId.ToString(), newLoadout.shouldersGearItemId.ToString(), newLoadout.chestArmorGearItemId.ToString(),
-                newLoadout.glovesGearItemId.ToString(), newLoadout.beltGearItemId.ToString(), newLoadout.robeGearItemId.ToString(),
-                newLoadout.bootsGearItemId.ToString(), newLoadout.weapon1ItemId.ToString(), newLoadout.weapon2ItemId.ToString());
+            CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -1448,21 +1445,23 @@ namespace Vi.Core
             public string charId;
             public NestedCharacterLoadoutPutPayload loadout;
 
-            public CharacterLoadoutPutPayload(string charId, string loadoutSlot, string helmGearItemId, string shouldersGearItemId, string chestArmorGearItemId, string glovesGearItemId, string beltGearItemId, string robeGearItemId, string bootsGearItemId, string weapon1ItemId, string weapon2ItemId)
+            public CharacterLoadoutPutPayload(string charId, Loadout loadout)
             {
                 this.charId = charId;
-                loadout = new NestedCharacterLoadoutPutPayload()
+                this.loadout = new NestedCharacterLoadoutPutPayload()
                 {
-                    loadoutSlot = loadoutSlot,
-                    helmGearItemId = helmGearItemId,
-                    shouldersGearItemId = shouldersGearItemId,
-                    chestArmorGearItemId = chestArmorGearItemId,
-                    glovesGearItemId = glovesGearItemId,
-                    beltGearItemId = beltGearItemId,
-                    robeGearItemId = robeGearItemId,
-                    bootsGearItemId = bootsGearItemId,
-                    weapon1ItemId = weapon1ItemId,
-                    weapon2ItemId = weapon2ItemId
+                    loadoutSlot = loadout.loadoutSlot.ToString(),
+                    helmGearItemId = loadout.helmGearItemId.ToString(),
+                    chestArmorGearItemId = loadout.chestArmorGearItemId.ToString(),
+                    shouldersGearItemId = loadout.shouldersGearItemId.ToString(),
+                    bootsGearItemId = loadout.bootsGearItemId.ToString(),
+                    pantsGearItemId = loadout.pantsGearItemId.ToString(),
+                    beltGearItemId = loadout.beltGearItemId.ToString(),
+                    glovesGearItemId = loadout.glovesGearItemId.ToString(),
+                    capeGearItemId = loadout.capeGearItemId.ToString(),
+                    robeGearItemId = loadout.robeGearItemId.ToString(),
+                    weapon1ItemId = loadout.weapon1ItemId.ToString(),
+                    weapon2ItemId = loadout.weapon2ItemId.ToString()
                 };
             }
 
@@ -1470,12 +1469,14 @@ namespace Vi.Core
             {
                 public string loadoutSlot;
                 public string helmGearItemId;
-                public string shouldersGearItemId;
                 public string chestArmorGearItemId;
-                public string glovesGearItemId;
-                public string beltGearItemId;
-                public string robeGearItemId;
+                public string shouldersGearItemId;
                 public string bootsGearItemId;
+                public string pantsGearItemId;
+                public string beltGearItemId;
+                public string glovesGearItemId;
+                public string capeGearItemId;
+                public string robeGearItemId;
                 public string weapon1ItemId;
                 public string weapon2ItemId;
             }
