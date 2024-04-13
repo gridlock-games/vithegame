@@ -934,7 +934,15 @@ namespace Vi.Core
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            return new Loadout("1", "", "", "", "", "", "", "", "", "",
+            return new Loadout("1", armorOptions.Find(item => item.name == "Arab Helm").itemWebId,
+                armorOptions.Find(item => item.name == "Arab Chest").itemWebId,
+                armorOptions.Find(item => item.name == "European Shoulders").itemWebId,
+                armorOptions.Find(item => item.name == "Arab Boots").itemWebId,
+                armorOptions.Find(item => item.name == "Arab Pants").itemWebId,
+                armorOptions.Find(item => item.name == "Arab Belt").itemWebId,
+                armorOptions.Find(item => item.name == "Arab Gloves").itemWebId,
+                armorOptions.Find(item => item.name == "European Cape").itemWebId,
+                "",
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
@@ -1214,6 +1222,22 @@ namespace Vi.Core
                     robeGearItemId,
                     weapon1ItemId,
                     weapon2ItemId
+                };
+            }
+
+            public List<FixedString32Bytes> GetLoadoutArmorPiecesAsList()
+            {
+                return new List<FixedString32Bytes>()
+                {
+                    helmGearItemId,
+                    chestArmorGearItemId,
+                    shouldersGearItemId,
+                    bootsGearItemId,
+                    pantsGearItemId,
+                    beltGearItemId,
+                    glovesGearItemId,
+                    capeGearItemId,
+                    robeGearItemId
                 };
             }
 
