@@ -292,208 +292,57 @@ namespace Vi.ScriptableObjects
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
-            // Non-character customization equipment options (armor)
             equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
-            string[] filepaths = Directory.GetFiles(@"Assets\PackagedPrefabs\Vi_Character", "*.fbx", SearchOption.AllDirectories);
-            foreach (string filepath in filepaths)
+
+            // Clone Folder Structure first
+            string destinationTopFolder = @"Assets\Production\Prefabs\WearableEquipment";
+            foreach (string raceAndGenderFolder in Directory.GetDirectories(@"Assets\PackagedPrefabs\Vi_Character"))
             {
-                string filename = Path.GetFileNameWithoutExtension(filepath);
-                Debug.Log(filepath);
-                continue;
-                string humanMaleString = "Hu_M_";
+                if (raceAndGenderFolder.Contains("CharacterModels")) { continue; }
 
-                // Check that this filename is a human male
-                if (filename.Substring(0, humanMaleString.Length) != humanMaleString) { continue; }
-
-                // Check if this file is of an eligible equipment type
-                bool isEquipment = false;
-                foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
+                if (raceAndGenderFolder.Contains("HumanMale"))
                 {
-                    if (filename.Contains(equipmentType.ToString()))
+                    RaceAndGender raceAndGender = RaceAndGender.HumanMale;
+                    foreach (string armorSetFolder in Directory.GetDirectories(raceAndGenderFolder))
                     {
-                        isEquipment = true;
-                        break;
-                    }
-                }
-                if (!isEquipment) { continue; }
-
-                if (equipmentTypesThatAreForCharacterCustomization.Contains(GetEquipmentTypeFromFilename(filename))) { continue; }
-
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
-                if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { Debug.LogWarning("No skinned mesh renderer " + filepath); continue; }
-
-                // Find paths for each race/gender prefab
-                string humanMalePath = filepath;
-
-                string humanFemalePath = "";
-                string orcMalePath = "";
-                string orcFemalePath = "";
-
-                foreach (KeyValuePair<RaceAndGender, string> kvp in raceAndGenderPrefixes)
-                {
-                    if (kvp.Key == RaceAndGender.HumanMale) { continue; }
-
-                    string modifiedFilename = Path.GetFileNameWithoutExtension(humanMalePath).Replace(humanMaleString, kvp.Value);
-                    string[] stringOptions = System.Array.FindAll(filepaths, item => LevenshteinDistance.Calculate(modifiedFilename, Path.GetFileNameWithoutExtension(item)) <= 0 & filename != Path.GetFileNameWithoutExtension(item));
-                    System.Array.Sort(stringOptions, (x, y) => LevenshteinDistance.Calculate(Path.GetFileNameWithoutExtension(x), modifiedFilename).CompareTo(LevenshteinDistance.Calculate(Path.GetFileNameWithoutExtension(y), modifiedFilename)));
-
-                    if (stringOptions.Length > 0)
-                    {
-                        switch (kvp.Key)
+                        string armorSetName = armorSetFolder[(armorSetFolder.LastIndexOf('\\')+1)..].Replace("_", " ")[1..].Trim();
+                        foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
                         {
-                            case RaceAndGender.HumanFemale:
-                                humanFemalePath = stringOptions[0];
-                                break;
-                            case RaceAndGender.OrcMale:
-                                orcMalePath = stringOptions[0];
-                                break;
-                            case RaceAndGender.OrcFemale:
-                                orcFemalePath = stringOptions[0];
-                                break;
-                            default:
-                                Debug.LogError("Race and gender not supported! " + kvp.Key);
-                                break;
+                            string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                            Directory.CreateDirectory(dest);
                         }
                     }
+
+                    //Debug.Log(Path.Join(raceAndGenderFilePath, "Texture"));
                 }
-
-                Dictionary<RaceAndGender, string> modelFilepaths = new Dictionary<RaceAndGender, string>()
+                else if (raceAndGenderFolder.Contains("HumanFemale"))
                 {
-                    { RaceAndGender.HumanMale, humanMalePath },
-                    { RaceAndGender.HumanFemale, humanFemalePath },
-                    { RaceAndGender.OrcMale, orcMalePath },
-                    { RaceAndGender.OrcFemale, orcFemalePath }
-                };
 
-                Dictionary<RaceAndGender, WearableEquipment> models = new Dictionary<RaceAndGender, WearableEquipment>();
-                Texture2D humanMaleTexture = null;
-
-                foreach (KeyValuePair<RaceAndGender, string> kvp in modelFilepaths)
-                {
-                    prefab = AssetDatabase.LoadAssetAtPath<GameObject>(kvp.Value);
-                    // Add wearable equipment component to prefab here if necessary
-                    if (prefab)
-                    {
-                        if (!prefab.GetComponent<WearableEquipment>())
-                        {
-                            foreach (Component comp in prefab.GetComponents<Component>())
-                            {
-                                if (comp.GetType() == typeof(Transform)) { continue; }
-
-                                DestroyImmediate(comp, true);
-                            }
-                            prefab.AddComponent<WearableEquipment>();
-                        }
-
-                        // Create the wearable equipment option object
-                        if (prefab.TryGetComponent(out WearableEquipment wearableEquipment))
-                        {
-                            Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
-                            TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
-                            if (!importer.isReadable)
-                            {
-                                importer.isReadable = true;
-                                importer.SaveAndReimport();
-                            }
-
-                            if (kvp.Key == RaceAndGender.HumanMale) { humanMaleTexture = texture2D; }
-
-                            Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
-                            foreach (Transform child in children)
-                            {
-                                child.gameObject.layer = LayerMask.NameToLayer("Character");
-                            }
-
-                            models.Add(kvp.Key, wearableEquipment);
-                        }
-                    }
-                    else
-                    {
-                        models.Add(kvp.Key, null);
-                    }
                 }
-
-                WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(models, AverageColorFromTexture(humanMaleTexture));
-
-                bool allModelsFound = true;
-                foreach (KeyValuePair<RaceAndGender, WearableEquipment> kvp in models)
+                else
                 {
-                    if (!equipmentTypesThatAreForCharacterCustomization.Contains(wearableEquipmentOption.equipmentType) & kvp.Value == null)
-                    {
-                        Debug.LogWarning(filename + " No prefab for " + kvp.Key);
-                        allModelsFound = false;
-                    }
-                }
-
-                if (allModelsFound & !equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption)))
-                {
-                    equipmentOptions.Add(wearableEquipmentOption);
-                }
-
-                foreach (KeyValuePair<RaceAndGender, WearableEquipment> kvp in models)
-                {
-                    if (kvp.Value) { kvp.Value.equipmentType = wearableEquipmentOption.equipmentType; }
+                    Debug.LogError("Unsure how to handle path - " + raceAndGenderFolder);
                 }
             }
 
-            // Character customization equipment
-            foreach (string filepath in filepaths)
-            {
-                string filename = Path.GetFileNameWithoutExtension(filepath);
+            //string[] filepaths = Directory.GetDirectories(@"Assets\PackagedPrefabs\Vi_Character", "*", SearchOption.AllDirectories);
+            //foreach (string filepath in filepaths)
+            //{
+            //    if (filepath.Contains("CharacterModels")) { continue; }
 
-                // Check if this file is of an eligible equipment type
-                bool isEquipment = false;
-                foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
-                {
-                    if (Path.GetFileNameWithoutExtension(filepath).Contains(equipmentType.ToString()))
-                    {
-                        isEquipment = true;
-                        break;
-                    }
-                }
+            //    if (filepath.Contains("Texture"))
+            //    {
 
-                if (!isEquipment) { continue; }
+            //    }
+            //    else if (filepath.Contains("Model"))
+            //    {
 
-                if (!equipmentTypesThatAreForCharacterCustomization.Contains(GetEquipmentTypeFromFilename(filename))) { continue; }
+            //    }
 
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filepath);
-                if (!prefab.GetComponentInChildren<SkinnedMeshRenderer>()) { continue; }
-
-                // Add wearable equipment component to prefab here if necessary
-                if (!prefab.GetComponent<WearableEquipment>())
-                {
-                    foreach (Component comp in prefab.GetComponents<Component>())
-                    {
-                        if (comp.GetType() == typeof(Transform)) { continue; }
-
-                        DestroyImmediate(comp, true);
-                    }
-                    prefab.AddComponent<WearableEquipment>();
-                }
-
-                // Create the wearable equipment option object
-                if (prefab.TryGetComponent(out WearableEquipment wearableEquipment))
-                {
-                    Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
-                    TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
-                    if (!importer.isReadable)
-                    {
-                        importer.isReadable = true;
-                        importer.SaveAndReimport();
-                    }
-
-                    Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
-                    foreach (Transform child in children)
-                    {
-                        child.gameObject.layer = LayerMask.NameToLayer("Character");
-                    }
-
-                    WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(wearableEquipment, AverageColorFromTexture(texture2D));
-                    if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
-                    wearableEquipment.equipmentType = wearableEquipmentOption.equipmentType;
-                }
-            }
+            //    Debug.Log(filepath);
+            //}
         }
+
         /*
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
