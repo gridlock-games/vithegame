@@ -310,6 +310,10 @@ namespace Vi.ScriptableObjects
                         {
                             string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
                             Directory.CreateDirectory(dest);
+
+                            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
+                            GameObject modelSource = (GameObject)PrefabUtility.InstantiatePrefab(model);
+                            PrefabUtility.SaveAsPrefabAsset(modelSource, Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab"));
                         }
                     }
 
