@@ -347,6 +347,7 @@ namespace Vi.ScriptableObjects
                             }
                             else if (filename.Contains("Emission"))
                             {
+                                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
                                 material.SetTexture("_EmissionMap", texture);
                             }
                             else if (filename.Contains("Metallic"))
@@ -361,7 +362,7 @@ namespace Vi.ScriptableObjects
                             {
                                 Debug.LogError("Not sure where to assign texture - " + filename);
                             }
-
+                            
                             if (!materialAlreadyExists) { AssetDatabase.CreateAsset(material, materialFilePath); }
                         }
 
