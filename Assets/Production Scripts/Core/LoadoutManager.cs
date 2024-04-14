@@ -106,7 +106,7 @@ namespace Vi.Core
             yield return null;
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
 
-            WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout();
+            WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout1();
             foreach (FixedString32Bytes itemId in loadout.GetLoadoutArmorPiecesAsList())
             {
                 animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId), raceAndGender);
