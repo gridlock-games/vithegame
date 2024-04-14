@@ -460,7 +460,7 @@ namespace Vi.UI
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
-            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption.equipmentType, wearableEquipmentOption, raceAndGender);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 

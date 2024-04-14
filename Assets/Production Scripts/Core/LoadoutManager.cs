@@ -106,10 +106,11 @@ namespace Vi.Core
             yield return null;
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
 
-            WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout();
-            foreach (FixedString32Bytes itemId in loadout.GetLoadoutArmorPiecesAsList())
+            WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout1();
+            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString32Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
-                animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId), raceAndGender);
+                CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value);
+                animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
             }
         }
 
@@ -239,21 +240,22 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator ApplyEquipmentFromLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout)
+        public IEnumerator ApplyEquipmentFromLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout)
         {
             yield return null;
+
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
 
-            foreach (FixedString32Bytes itemId in loadout.GetLoadoutArmorPiecesAsList())
+            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString32Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == itemId.ToString()).itemId), raceAndGender);
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == kvp.Value.ToString()).itemId), raceAndGender);
                 }
                 else
                 {
-                    animationHandler.ApplyWearableEquipment(wearableEquipmentOptions.Find(item => item.itemWebId == itemId.ToString()), raceAndGender);
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()), raceAndGender);
                 }
             }
         }
