@@ -75,6 +75,7 @@ namespace Vi.UI
 
             loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Primary, loadout.weapon1ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
             loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Secondary, loadout.weapon2ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
+            loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, loadout));
 
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
