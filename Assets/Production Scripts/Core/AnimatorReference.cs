@@ -97,6 +97,15 @@ namespace Vi.Core
             }
         }
 
+        public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
+        {
+            if (wearableEquipmentInstances.ContainsKey(equipmentType))
+            {
+                Destroy(wearableEquipmentInstances[equipmentType]);
+                wearableEquipmentInstances.Remove(equipmentType);
+            }
+        }
+
         [System.Serializable]
         private class MaterialReplacementDefintion
         {

@@ -1244,19 +1244,19 @@ namespace Vi.Core
                 };
             }
 
-            public List<FixedString32Bytes> GetLoadoutArmorPiecesAsList()
+            public Dictionary<CharacterReference.EquipmentType, FixedString32Bytes> GetLoadoutArmorPiecesAsDictionary()
             {
-                return new List<FixedString32Bytes>()
+                return new Dictionary<CharacterReference.EquipmentType, FixedString32Bytes>()
                 {
-                    helmGearItemId,
-                    chestArmorGearItemId,
-                    shouldersGearItemId,
-                    bootsGearItemId,
-                    pantsGearItemId,
-                    beltGearItemId,
-                    glovesGearItemId,
-                    capeGearItemId,
-                    robeGearItemId
+                    { CharacterReference.EquipmentType.Helm, helmGearItemId },
+                    { CharacterReference.EquipmentType.Chest, chestArmorGearItemId },
+                    { CharacterReference.EquipmentType.Shoulders, shouldersGearItemId },
+                    { CharacterReference.EquipmentType.Boots, bootsGearItemId },
+                    { CharacterReference.EquipmentType.Pants, pantsGearItemId },
+                    { CharacterReference.EquipmentType.Belt, beltGearItemId },
+                    { CharacterReference.EquipmentType.Gloves, glovesGearItemId },
+                    { CharacterReference.EquipmentType.Cape, capeGearItemId },
+                    { CharacterReference.EquipmentType.Robe, robeGearItemId }
                 };
             }
 
