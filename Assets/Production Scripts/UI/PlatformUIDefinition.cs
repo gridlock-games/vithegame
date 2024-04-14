@@ -28,6 +28,10 @@ namespace Vi.UI
         {
             public GameObject gameObjectToMove;
             public Vector2 newAnchoredPosition;
+            public bool shouldOverrideAnchors;
+            public Vector2 anchorMinOverride;
+            public Vector2 anchorMaxOverride;
+            public Vector2 pivotOverride;
         }
 
         [System.Serializable]
@@ -53,7 +57,14 @@ namespace Vi.UI
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform))
                     {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                        if (moveUIDefinition.shouldOverrideAnchors)
+                        {
+                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                            rt.pivot = moveUIDefinition.pivotOverride;
+                        }
+                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
                 }
 
@@ -72,7 +83,14 @@ namespace Vi.UI
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform))
                     {
-                        moveUIDefinition.gameObjectToMove.GetComponent<RectTransform>().anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                        if (moveUIDefinition.shouldOverrideAnchors)
+                        {
+                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                            rt.pivot = moveUIDefinition.pivotOverride;
+                        }
+                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
                     }
                 }
             }
