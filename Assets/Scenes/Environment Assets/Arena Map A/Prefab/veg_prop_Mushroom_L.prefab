@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &1870607586215207604
 Transform:
@@ -152,6 +152,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: veg_Mushroom_M
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 600fb5e5112533046814e19b6397993f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 600fb5e5112533046814e19b6397993f, type: 3}
 --- !u!4 &1232166046235387300 stripped
@@ -226,6 +231,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: veg_Mushroom_S
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ed4a93cb00953264a9f66b007cacfdd4,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed4a93cb00953264a9f66b007cacfdd4, type: 3}
