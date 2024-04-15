@@ -51,6 +51,11 @@ namespace Vi.UI
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
         }
 
+        private void OnDestroy()
+        {
+            Destroy(camInstance);
+        }
+
         private void OnEnable()
         {
             camInstance.SetActive(true);
