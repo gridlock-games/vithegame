@@ -144,7 +144,7 @@ namespace Vi.UI
             //if (wearableEquipmentOption.armorPreviewPrefab) { armorPreviewObject = Instantiate(wearableEquipmentOption.armorPreviewPrefab); }
 
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
-            loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, newLoadout));
+            loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, newLoadout, playerData.character._id.ToString()));
 
             playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
             PlayerDataManager.Singleton.SetPlayerData(playerData);

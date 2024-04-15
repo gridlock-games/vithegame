@@ -561,7 +561,7 @@ namespace Vi.UI
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyDefaultEquipment(character.raceAndGender));
+            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
         }
 
         private new void OnDestroy()
