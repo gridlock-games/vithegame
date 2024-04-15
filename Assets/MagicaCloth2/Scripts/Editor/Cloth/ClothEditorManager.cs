@@ -34,7 +34,7 @@ namespace MagicaCloth2
             public GizmoType gizmoType;
             public ClothBehaviour component;
             public int componentHash;
-            public VirtualMesh editMesh;
+            public VirtualMeshContainer editMeshContainer;
             public int nextBuildHash;
             public int importCount;
         }
@@ -210,7 +210,7 @@ namespace MagicaCloth2
                     info.building = false;
                     info.result = ResultCode.Empty;
                     info.component = component;
-                    info.editMesh = null;
+                    info.editMeshContainer = null;
                     info.gizmoType = gizmoType;
                     info.componentHash = 0;
                     info.nextBuildHash = 0;
@@ -228,6 +228,7 @@ namespace MagicaCloth2
             if (cloth && EditorApplication.isPlaying == false)
             {
                 int hash = component.GetMagicaHashCode();
+                //Debug.Log($"Hash:{hash}");
 
                 lock (editClothDict)
                 {
@@ -265,19 +266,19 @@ namespace MagicaCloth2
             }
         }
 
-        public static VirtualMesh GetEditMesh(ClothBehaviour comp)
+        public static VirtualMeshContainer GetEditMeshContainer(ClothBehaviour comp)
         {
             if (isValid == false)
                 return null;
             if (comp == null)
                 return null;
             int id = comp.GetInstanceID();
-            VirtualMesh vmesh = null;
+            VirtualMeshContainer cmesh = null;
             lock (editClothDict)
             {
-                vmesh = editClothDict.ContainsKey(id) ? editClothDict[id].editMesh : null;
+                cmesh = editClothDict.ContainsKey(id) ? editClothDict[id].editMeshContainer : null;
             }
-            return vmesh;
+            return cmesh;
         }
 
         /// <summary>
@@ -311,7 +312,7 @@ namespace MagicaCloth2
             {
                 foreach (var info in editClothDict.Values)
                 {
-                    info?.editMesh?.Dispose();
+                    info?.editMeshContainer?.Dispose();
                 }
                 editClothDict.Clear();
             }
@@ -335,7 +336,7 @@ namespace MagicaCloth2
                 foreach (var id in destroyList)
                 {
                     //Debug.Log($"削除");
-                    editClothDict[id].editMesh?.Dispose();
+                    editClothDict[id].editMeshContainer?.Dispose();
                     editClothDict.Remove(id);
                 }
                 destroyList.Clear();
@@ -440,7 +441,7 @@ namespace MagicaCloth2
             var sdata = cloth.SerializeData;
             var sdata2 = cloth.GetSerializeData2();
             var setupList = new List<RenderSetupData>();
-            VirtualMesh editMesh = null;
+            VirtualMeshContainer editMeshContainer = null;
             ResultCode result = new ResultCode();
 
             try
@@ -455,7 +456,7 @@ namespace MagicaCloth2
                 // メッシュを構築するための最低限のデータが揃っているか確認
                 if (sdata.IsValid() == false)
                 {
-                    result.SetResult(Define.Result.Empty);
+                    result.SetResult(sdata.VerificationResult);
                     throw new MagicaClothProcessingException();
                 }
 
@@ -467,10 +468,10 @@ namespace MagicaCloth2
                         if (ren)
                         {
                             var setup = new RenderSetupData(ren);
+                            result.Merge(setup.result);
                             if (setup.IsFaild())
                             {
                                 setup.Dispose();
-                                result.Set(setup.result);
                                 throw new MagicaClothProcessingException();
                             }
                             setupList.Add(setup);
@@ -484,9 +485,16 @@ namespace MagicaCloth2
                 }
                 else if (sdata.clothType == ClothProcess.ClothType.BoneCloth)
                 {
-                    var setup = new RenderSetupData(cloth.ClothTransform, sdata.rootBones, sdata.connectionMode, cloth.name);
+                    var setup = new RenderSetupData(RenderSetupData.SetupType.BoneCloth, cloth.ClothTransform, sdata.rootBones, null, sdata.connectionMode, cloth.name);
                     setupList.Add(setup);
                 }
+                else if (sdata.clothType == ClothProcess.ClothType.BoneSpring)
+                {
+                    // BoneSpringではLine接続のみ
+                    var setup = new RenderSetupData(RenderSetupData.SetupType.BoneSpring, cloth.ClothTransform, sdata.rootBones, sdata.colliderCollisionConstraint.collisionBones, RenderSetupData.BoneConnectionMode.Line, cloth.name);
+                    setupList.Add(setup);
+                }
+
                 if (setupList.Count == 0)
                 {
                     result.SetError(Define.Result.CreateCloth_InvalidSetupList);
@@ -511,7 +519,7 @@ namespace MagicaCloth2
                     var ret = cloth.Process.GeneratePaintMapDataList(paintMapDataList);
                     if (ret.IsError())
                     {
-                        result = ret;
+                        result.Merge(ret);
                         throw new MagicaClothProcessingException();
                     }
                     if (paintMapDataList.Count != setupList.Count)
@@ -525,7 +533,8 @@ namespace MagicaCloth2
                 // エディットメッシュ作成
                 // メッシュはセンター空間で作成される
                 ct.ThrowIfCancellationRequested();
-                editMesh = new VirtualMesh("EditMesh");
+                var editMesh = new VirtualMesh("EditMesh");
+                editMeshContainer = new VirtualMeshContainer(editMesh);
                 if (sdata.clothType == ClothProcess.ClothType.MeshCloth)
                 {
                     // MeshClothではクロストランスフォームを追加しておく
@@ -535,7 +544,6 @@ namespace MagicaCloth2
 
                 // セレクションデータ
                 // ペイントマップ指定の場合は空で初期化
-                //SelectionData selectionData = usePaintMap ? new SelectionData() : sdata2.selectionData;
                 SelectionData selectionData = usePaintMap ? new SelectionData() : sdata2.selectionData.Clone();
 
                 // ■スレッド
@@ -547,7 +555,6 @@ namespace MagicaCloth2
                         ct.ThrowIfCancellationRequested();
                         if (sdata.clothType == ClothProcess.ClothType.MeshCloth)
                         {
-                            //foreach (var setup in setupList)
                             for (int i = 0; i < setupList.Count; i++)
                             {
                                 var setup = setupList[i];
@@ -569,7 +576,7 @@ namespace MagicaCloth2
                                     var ret = cloth.Process.GenerateSelectionDataFromPaintMap(clothTransformRecord, renderMesh, paintMapDataList[i], out SelectionData renderSelectionData);
                                     if (ret.IsError())
                                     {
-                                        result = ret;
+                                        result.Merge(ret);
                                         throw new MagicaClothProcessingException();
                                     }
 
@@ -588,20 +595,20 @@ namespace MagicaCloth2
                                 editMesh.Reduction(sdata.reductionSetting, ct);
                                 if (editMesh.IsError)
                                 {
-                                    result = editMesh.result;
+                                    result.Merge(editMesh.result);
                                     throw new MagicaClothProcessingException();
                                 }
 
                                 //Debug.Log($"(REDUCTION) {editMesh}");
                             }
                         }
-                        else if (sdata.clothType == ClothProcess.ClothType.BoneCloth)
+                        else if (sdata.clothType == ClothProcess.ClothType.BoneCloth || sdata.clothType == ClothProcess.ClothType.BoneSpring)
                         {
                             // import
                             editMesh.ImportFrom(setupList[0]);
                             if (editMesh.IsError)
                             {
-                                result = editMesh.result;
+                                result.Merge(editMesh.result);
                                 throw new MagicaClothProcessingException();
                             }
                             //Debug.Log($"(IMPORT) {editMesh}");
@@ -619,7 +626,7 @@ namespace MagicaCloth2
                         editMesh.Optimization();
                         if (editMesh.IsError)
                         {
-                            result = editMesh.result;
+                            result.Merge(editMesh.result);
                             throw new MagicaClothProcessingException();
                         }
                         //Debug.Log($"(OPTIMIZE) {editMesh}");
@@ -678,7 +685,7 @@ namespace MagicaCloth2
                         editMesh.ConvertProxyMesh(cloth.SerializeData, null, null, normalAdjustmentTransformRecored);
                         if (editMesh.IsError)
                         {
-                            result = editMesh.result;
+                            result.Merge(editMesh.result);
                             throw new MagicaClothProcessingException();
                         }
                         //Debug.Log($"(PROXY) {editMesh}");
@@ -716,8 +723,6 @@ namespace MagicaCloth2
                 ct.ThrowIfCancellationRequested();
                 if (cloth == null || isValid == false)
                 {
-                    //result.SetError(Define.Result.CreateCloth_InvalidCloth);
-                    //throw new MagicaClothProcessingException();
                     // キャンセル扱いにする
                     throw new OperationCanceledException();
                 }
@@ -753,16 +758,16 @@ namespace MagicaCloth2
                             var info = editClothDict[id];
                             info.building = false;
                             info.result = result;
-                            info.editMesh?.Dispose();
+                            info.editMeshContainer?.Dispose();
                             if (result.IsSuccess())
                             {
-                                info.editMesh = editMesh;
-                                editMesh = null;
+                                info.editMeshContainer = editMeshContainer;
+                                editMeshContainer = null;
                                 Develop.DebugLog($"Registration Complete : {cloth.name}");
                             }
                             else
                             {
-                                info.editMesh = null;
+                                info.editMeshContainer = null;
                             }
                         }
                     }
@@ -773,7 +778,7 @@ namespace MagicaCloth2
                 {
                     setup?.Dispose();
                 }
-                editMesh?.Dispose();
+                editMeshContainer?.Dispose();
 
                 //span.DebugLog();
 
@@ -852,12 +857,15 @@ namespace MagicaCloth2
                 return selectionData;
 
             // BoneClothはRootをFixedに定義する、それ以外はMove
-            if (sdata.clothType == ClothProcess.ClothType.BoneCloth)
+            if (sdata.clothType == ClothProcess.ClothType.BoneCloth || sdata.clothType == ClothProcess.ClothType.BoneSpring)
             {
                 selectionData.Fill(VertexAttribute.Move);
 
                 // BoneClothではセットアップデータのrootのみ固定に設定する
-                using var setup = new RenderSetupData(cloth.ClothTransform, sdata.rootBones, sdata.connectionMode, cloth.name);
+                // BoneSpringではLine接続のみとなる
+                var connectionMode = sdata.clothType == ClothProcess.ClothType.BoneSpring ? RenderSetupData.BoneConnectionMode.Line : sdata.connectionMode;
+                var setupType = sdata.clothType == ClothProcess.ClothType.BoneSpring ? RenderSetupData.SetupType.BoneSpring : RenderSetupData.SetupType.BoneCloth;
+                using var setup = new RenderSetupData(setupType, cloth.ClothTransform, sdata.rootBones, null, connectionMode, cloth.name);
                 foreach (int id in setup.rootTransformIdList)
                 {
                     int rootIndex = setup.GetTransformIndexFromId(id);
@@ -945,7 +953,7 @@ namespace MagicaCloth2
                                 if (isPlaying)
                                     ClothEditorUtility.DrawClothRuntime(cloth.Process, cloth.GizmoSerializeData.clothDebugSettings, active);
                                 else
-                                    ClothEditorUtility.DrawClothEditor(info.editMesh, cloth.GizmoSerializeData.clothDebugSettings, cloth.SerializeData, active, false, false);
+                                    ClothEditorUtility.DrawClothEditor(info.editMeshContainer, cloth.GizmoSerializeData.clothDebugSettings, cloth.SerializeData, active, false, false);
                             }
 
 #if MC2_DEBUG
@@ -953,9 +961,9 @@ namespace MagicaCloth2
                             if (cloth.GizmoSerializeData.proxyDebugSettings.enable)
                             {
                                 if (isPlaying)
-                                    VirtualMeshEditorUtility.DrawRuntimeGizmos(cloth.Process, false, cloth.Process.ProxyMesh, cloth.GizmoSerializeData.proxyDebugSettings, active, true);
+                                    VirtualMeshEditorUtility.DrawRuntimeGizmos(cloth.Process, false, cloth.Process.ProxyMeshContainer, cloth.GizmoSerializeData.proxyDebugSettings, active, true);
                                 else
-                                    VirtualMeshEditorUtility.DrawGizmos(info.editMesh, cloth.GizmoSerializeData.proxyDebugSettings, active, true);
+                                    VirtualMeshEditorUtility.DrawGizmos(info.editMeshContainer, cloth.GizmoSerializeData.proxyDebugSettings, active, true);
                             }
 
                             // Mapping Mesh
@@ -964,8 +972,8 @@ namespace MagicaCloth2
                                 if (isPlaying)
                                 {
                                     var renderMeshInfo = cloth.Process.GetRenderMeshInfo(cloth.GizmoSerializeData.debugMappingIndex);
-                                    if (renderMeshInfo != null && renderMeshInfo.renderMesh != null)
-                                        VirtualMeshEditorUtility.DrawRuntimeGizmos(cloth.Process, true, renderMeshInfo.renderMesh, cloth.GizmoSerializeData.mappingDebugSettings, active, true);
+                                    if (renderMeshInfo != null && renderMeshInfo.renderMeshContainer != null)
+                                        VirtualMeshEditorUtility.DrawRuntimeGizmos(cloth.Process, true, renderMeshInfo.renderMeshContainer, cloth.GizmoSerializeData.mappingDebugSettings, active, true);
                                 }
                             }
 #endif // MC2_DEBUG

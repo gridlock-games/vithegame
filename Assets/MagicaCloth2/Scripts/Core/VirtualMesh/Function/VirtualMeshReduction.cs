@@ -48,7 +48,7 @@ namespace MagicaCloth2
                 float sameDistance = maxSideLength * math.saturate(Define.System.ReductionSameDistance);
                 float simpleDistance = maxSideLength * math.saturate(settings.simpleDistance);
                 float shapeDistance = maxSideLength * math.saturate(settings.shapeDistance);
-                //Develop.DebugLog($"ReductionDista. maxSideLength:{maxSideLength}, same:{sameDistance}, simple:{simpleDistance}, shape:{shapeDistance}");
+                Develop.DebugLog($"ReductionDista. maxSideLength:{maxSideLength}, same:{sameDistance}, simple:{simpleDistance}, shape:{shapeDistance}");
 
                 // 同一距離リダクション
                 ct.ThrowIfCancellationRequested();
@@ -349,6 +349,8 @@ namespace MagicaCloth2
 
             // スキニングボーンのリマップデータ作成
             // 使用しているボーンインデックスを収集する
+            //Debug.Log($"workData.useSkinBoneMap count:{workData.useSkinBoneMap.Count()}");
+            using var useSkinBoneMapKeyList = new NativeList<int>(Allocator.Persistent); // Unity2023.1.5対応
             var collectUseSkinJob = new Organize_CollectUseSkinBoneJob()
             {
                 oldVertexCount = workData.oldVertexCount,
@@ -359,6 +361,7 @@ namespace MagicaCloth2
                 newSkinBoneTransformIndices = workData.newSkinBoneTransformIndices,
                 newSkinBoneBindPoses = workData.newSkinBoneBindPoseList,
                 newSkinBoneCount = workData.newSkinBoneCount,
+                useSkinBoneMapKeyList = useSkinBoneMapKeyList, // Unity2023.1.5対応
             };
             collectUseSkinJob.Run();
         }
@@ -419,9 +422,12 @@ namespace MagicaCloth2
             public NativeArray<float4x4> oldBindPoses;
 
             public NativeParallelHashMap<int, int> useSkinBoneMap;
+
             public NativeList<int> newSkinBoneTransformIndices;
             public NativeList<float4x4> newSkinBoneBindPoses;
             public NativeReference<int> newSkinBoneCount;
+
+            public NativeList<int> useSkinBoneMapKeyList; // Unity2023.1.5対応
 
             public void Execute()
             {
@@ -441,18 +447,27 @@ namespace MagicaCloth2
                             //Debug.Log(bw.boneIndices[i]);
 
                             // まずは旧ボーンインデックスを収集
+                            int index = bw.boneIndices[i];
                             useSkinBoneMap.TryAdd(bw.boneIndices[i], 0);
                         }
                     }
                 }
 
                 // 利用されるボーンに連番をふる
-                var oldBoneIndexArray = useSkinBoneMap.GetKeyArray(Allocator.Temp);
+                // Unity2023.1.5対応
+                //var oldBoneIndexArray = useSkinBoneMap.GetKeyArray(Allocator.Temp);
+                useSkinBoneMapKeyList.Clear();
+                foreach (var kv in useSkinBoneMap)
+                {
+                    useSkinBoneMapKeyList.Add(kv.Key);
+                }
 
                 // 不要なトランスフォームを削除した新しいスキニングボーンとバインドポーズのリストを作成する
-                for (int i = 0; i < oldBoneIndexArray.Length; i++)
+                //for (int i = 0; i < oldBoneIndexArray.Length; i++) // Unity2023.1.5対応
+                for (int i = 0; i < useSkinBoneMapKeyList.Length; i++) // Unity2023.1.5対応
                 {
-                    int oldBoneIndex = oldBoneIndexArray[i];
+                    //int oldBoneIndex = oldBoneIndexArray[i]; // Unity2023.1.5対応
+                    int oldBoneIndex = useSkinBoneMapKeyList[i]; // Unity2023.1.5対応
                     useSkinBoneMap[oldBoneIndex] = i;
 
                     // 新しいトランスフォームインデックス
@@ -463,7 +478,8 @@ namespace MagicaCloth2
                 }
 
                 // 最適化後のスキンボーン数
-                newSkinBoneCount.Value = oldBoneIndexArray.Length;
+                //newSkinBoneCount.Value = oldBoneIndexArray.Length; // Unity2023.1.5対応
+                newSkinBoneCount.Value = useSkinBoneMapKeyList.Length; // Unity2023.1.5対応
             }
         }
 
@@ -643,7 +659,7 @@ namespace MagicaCloth2
                 {
                     int newIndex2 = vertexRemapIndices[oldVertexIndex];
                     //Debug.Assert(newIndex != newIndex2);
-                    newVertexToVertexMap.UniqueAdd((ushort)newIndex, (ushort)newIndex2);
+                    newVertexToVertexMap.MC2UniqueAdd((ushort)newIndex, (ushort)newIndex2);
                 }
 
                 //Debug.Log($"[{newIndex}] cnt:{newVertexToVertexMap.CountValuesForKey((ushort)newIndex)}");
@@ -748,7 +764,7 @@ namespace MagicaCloth2
                         if (vindex == edge.x || vindex == edge.y)
                             continue;
 
-                        if (newVertexToVertexMap.Contains((ushort)edge.y, vindex))
+                        if (newVertexToVertexMap.MC2Contains((ushort)edge.y, vindex))
                         {
                             // トライアングル生成
                             int3 tri = DataUtility.PackInt3(edge.x, edge.y, vindex);
