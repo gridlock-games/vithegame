@@ -71,8 +71,15 @@ namespace Vi.Core
         {
             currentEquippedWeapon.OnValueChanged += OnCurrentEquippedWeaponChange;
 
+            StartCoroutine(InstantiateWeaponsOnSpawn());
+        }
+
+        private IEnumerator InstantiateWeaponsOnSpawn()
+        {
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+
+            yield return WebRequestManager.Singleton.GetCharacterInventory(playerData.character._id.ToString());
 
             PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon1ItemId).itemId : playerData.character.GetActiveLoadout().weapon1ItemId));
             SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == (NetworkObject.IsPlayerObject ? WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetActiveLoadout().weapon2ItemId).itemId : playerData.character.GetActiveLoadout().weapon2ItemId));
@@ -87,7 +94,7 @@ namespace Vi.Core
                 primaryAmmo.Value = primaryWeapon.ShouldUseAmmo() ? primaryWeapon.GetMaxAmmoCount() : 0;
                 secondaryAmmo.Value = secondaryWeapon.ShouldUseAmmo() ? secondaryWeapon.GetMaxAmmoCount() : 0;
             }
-            
+
             OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
 
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout()));
@@ -357,6 +364,7 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
             if (!IsLocalPlayer) { return; }
+            if (!weaponHandler.WeaponInitialized) { return; }
 
             if (currentEquippedWeapon.Value == 1)
             {
