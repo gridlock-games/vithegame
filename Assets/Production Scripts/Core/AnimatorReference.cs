@@ -32,11 +32,11 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
-            {
-                CharacterReference.CharacterMaterial headMaterial = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(characterMaterial.raceAndGender).Find(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head & characterMaterial.material.name.Contains(string.Concat(item.material.name.Where(char.IsDigit))));
-                ApplyCharacterMaterial(headMaterial);
-            }
+            //if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
+            //{
+            //    CharacterReference.CharacterMaterial headMaterial = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(characterMaterial.raceAndGender).Find(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head & characterMaterial.material.name.Contains(string.Concat(item.material.name.Where(char.IsDigit))));
+            //    ApplyCharacterMaterial(headMaterial);
+            //}
 
             MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
