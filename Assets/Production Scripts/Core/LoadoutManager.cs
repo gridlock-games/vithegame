@@ -101,19 +101,6 @@ namespace Vi.Core
             StartCoroutine(ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString()));
         }
 
-        public IEnumerator ApplyDefaultEquipment(CharacterReference.RaceAndGender raceAndGender)
-        {
-            yield return null;
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
-
-            WebRequestManager.Loadout loadout = WebRequestManager.Singleton.GetDefaultLoadout1();
-            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString32Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
-            {
-                CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value);
-                animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
-            }
-        }
-
         public void ChangeWeaponBeforeSpawn(WeaponSlotType weaponSlotType, CharacterReference.WeaponOption weaponOption)
         {
             if (IsSpawned) { Debug.LogError("ChangeWeaponBeforeSpawn() should only be called when an object isn't spawned! Use it for displaying previews"); return; }
@@ -248,7 +235,14 @@ namespace Vi.Core
 
             foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString32Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
-                if (NetworkObject.IsPlayerObject | !NetworkObject.IsSpawned)
+                if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
+                {
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
+                    if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId); }
+                    if (wearableEquipmentOption == null) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()); }
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
+                }
+                else if (NetworkObject.IsPlayerObject)
                 {
                     animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId), raceAndGender);
                 }

@@ -612,8 +612,10 @@ namespace Vi.UI
 
             if (previewObject)
             {
-                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
-                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+                LoadoutManager loadoutManager = previewObject.GetComponent<LoadoutManager>();
+                loadoutManager.ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                loadoutManager.ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+                StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString()));
             }
         }
 
