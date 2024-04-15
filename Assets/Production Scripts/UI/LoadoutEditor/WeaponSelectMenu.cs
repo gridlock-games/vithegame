@@ -29,6 +29,7 @@ namespace Vi.UI
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
 
+                // Always keep other weapon's button non-interactable
                 if (weaponOption.itemWebId != otherWeapon.itemWebId) { buttonList.Add(button); }
                 else { button.interactable = false; }
 
