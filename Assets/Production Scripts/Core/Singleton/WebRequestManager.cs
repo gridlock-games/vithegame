@@ -1264,12 +1264,14 @@ namespace Vi.Core
             {
                 serializer.SerializeValue(ref loadoutSlot);
                 serializer.SerializeValue(ref helmGearItemId);
-                serializer.SerializeValue(ref shouldersGearItemId);
                 serializer.SerializeValue(ref chestArmorGearItemId);
-                serializer.SerializeValue(ref glovesGearItemId);
-                serializer.SerializeValue(ref beltGearItemId);
-                serializer.SerializeValue(ref robeGearItemId);
+                serializer.SerializeValue(ref shouldersGearItemId);
                 serializer.SerializeValue(ref bootsGearItemId);
+                serializer.SerializeValue(ref pantsGearItemId);
+                serializer.SerializeValue(ref beltGearItemId);
+                serializer.SerializeValue(ref glovesGearItemId);
+                serializer.SerializeValue(ref capeGearItemId);
+                serializer.SerializeValue(ref robeGearItemId);
                 serializer.SerializeValue(ref weapon1ItemId);
                 serializer.SerializeValue(ref weapon2ItemId);
                 serializer.SerializeValue(ref active);
