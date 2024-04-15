@@ -9,14 +9,26 @@ namespace Vi.UI
 {
     public class LoadoutEditorMenu : Menu
     {
-        [SerializeField] private WeaponSelectMenu weaponSelectMenu;
+        [Header("Loadout Editor Menu")]
         [SerializeField] private Button[] loadoutButtons;
+        [SerializeField] private Camera characterPreviewCameraPrefab;
+        [SerializeField] private Vector3 characterPreviewCameraOffset;
 
+        [Header("Weapon Select Menu")]
+        [SerializeField] private WeaponSelectMenu weaponSelectMenu;
         [SerializeField] private Button primaryWeaponButton;
         [SerializeField] private Button secondaryWeaponButton;
 
-        [SerializeField] private Camera characterPreviewCameraPrefab;
-        [SerializeField] private Vector3 characterPreviewCameraOffset;
+        [Header("Armor Select Menu")]
+        [SerializeField] private ArmorSelectMenu armorSelectMenu;
+        [SerializeField] private Button helmButton;
+        [SerializeField] private Button chestButton;
+        [SerializeField] private Button shouldersButton;
+        [SerializeField] private Button glovesButton;
+        [SerializeField] private Button pantsButton;
+        [SerializeField] private Button bootsButton;
+        [SerializeField] private Button beltButton;
+        [SerializeField] private Button capeButton;
 
         private LoadoutManager loadoutManager;
         private Attributes attributes;
@@ -30,6 +42,15 @@ namespace Vi.UI
             camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
             camInstance.transform.LookAt(transform.root);
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
+
+            helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm); });
+            chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest); });
+            shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders); });
+            glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves); });
+            pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants); });
+            bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots); });
+            beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt); });
+            capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape); });
         }
 
         private void Update()
@@ -98,6 +119,12 @@ namespace Vi.UI
             menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
             gameObject.SetActive(false);
+        }
+
+        private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType)
+        {
+            //PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            //CharacterReference.WearableEquipmentOption wearableEquipmentOption 
         }
     }
 }

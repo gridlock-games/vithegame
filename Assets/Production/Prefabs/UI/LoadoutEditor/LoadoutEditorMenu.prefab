@@ -369,9 +369,9 @@ RectTransform:
   - {fileID: 5353864345578512121}
   - {fileID: 4693838786143597042}
   - {fileID: 8600882823767918851}
-  - {fileID: 5074687528722949346}
-  - {fileID: 3904232150947122907}
   - {fileID: 7093348561545890983}
+  - {fileID: 3904232150947122907}
+  - {fileID: 5074687528722949346}
   - {fileID: 4071946652868894244}
   - {fileID: 3044857481208529188}
   m_Father: {fileID: 8683997091564097973}
@@ -497,18 +497,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6477ae20320f0541aa09e58477907d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponSelectMenu: {fileID: 3563389112968934345, guid: b3acf6bb3bae756459ef47d0ad251a96,
-    type: 3}
   loadoutButtons:
   - {fileID: 6314030588728949710}
   - {fileID: 6925164705196636068}
   - {fileID: 7336604370294373636}
   - {fileID: 8533054386661039843}
-  primaryWeaponButton: {fileID: 700795957282161525}
-  secondaryWeaponButton: {fileID: 7981583418132947954}
   characterPreviewCameraPrefab: {fileID: 4757042726182180341, guid: 8b165954d7298fa409f7aa527e5841d7,
     type: 3}
   characterPreviewCameraOffset: {x: 0, y: 1, z: 3}
+  weaponSelectMenu: {fileID: 3563389112968934345, guid: b3acf6bb3bae756459ef47d0ad251a96,
+    type: 3}
+  primaryWeaponButton: {fileID: 700795957282161525}
+  secondaryWeaponButton: {fileID: 7981583418132947954}
+  armorSelectMenu: {fileID: 2162864202067643293, guid: 9f83927185909244e8bf851ed0c22939,
+    type: 3}
+  helmButton: {fileID: 6546556053875799246}
+  chestButton: {fileID: 8161998427434068602}
+  shouldersButton: {fileID: 6197509111361331961}
+  glovesButton: {fileID: 450282441725083120}
+  pantsButton: {fileID: 2742114589475584802}
+  bootsButton: {fileID: 3035282467152482449}
+  beltButton: {fileID: 8236943264314816385}
+  capeButton: {fileID: 254547551669311962}
 --- !u!1 &617611897012372536
 GameObject:
   m_ObjectHideFlags: 0
@@ -1126,10 +1136,10 @@ RectTransform:
   m_Father: {fileID: 7582937143203700841}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 8}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1026, y: 0}
+  m_SizeDelta: {x: 898, y: 8}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &9070009105454484527
 CanvasRenderer:
@@ -1399,10 +1409,10 @@ RectTransform:
   m_Father: {fileID: 7582937143203700841}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 898, y: 0}
+  m_SizeDelta: {x: 128, y: 28}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2708128376364496057
 CanvasRenderer:
@@ -2922,7 +2932,7 @@ RectTransform:
   m_Children:
   - {fileID: 4144745729602251088}
   m_Father: {fileID: 7536638108309441832}
-  m_RootOrder: 10
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -4098,10 +4108,10 @@ RectTransform:
   m_Father: {fileID: 7582937143203700841}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 8}
+  m_SizeDelta: {x: 898, y: 8}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3639017961959817642
 CanvasRenderer:
@@ -4388,7 +4398,7 @@ RectTransform:
   m_Children:
   - {fileID: 7448881352603963160}
   m_Father: {fileID: 7536638108309441832}
-  m_RootOrder: 12
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
