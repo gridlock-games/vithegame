@@ -20,17 +20,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: e8bd19cd569048c4d89dbcafcf9abd33,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8bd19cd569048c4d89dbcafcf9abd33,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8bd19cd569048c4d89dbcafcf9abd33,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8bd19cd569048c4d89dbcafcf9abd33,
         type: 3}
@@ -634,6 +634,10 @@ MonoBehaviour:
     normalAlignmentSetting:
       alignmentMode: 0
       adjustmentTransform: {fileID: 0}
+    cullingSettings:
+      cameraCullingMode: 30
+      cameraCullingMethod: 0
+      cameraCullingRenderers: []
     normalAxis: 1
     gravity: 5
     gravityDirection:
@@ -697,19 +701,31 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     inertiaConstraint:
-      movementInertia: 1
-      rotationInertia: 1
-      depthInertia: 0
-      centrifualAcceleration: 0
+      anchor: {fileID: 0}
+      anchorInertia: 0
+      worldInertia: 1
+      movementInertiaSmoothing: 0.5
       movementSpeedLimit:
         value: 5
         use: 1
       rotationSpeedLimit:
         value: 720
         use: 1
+      localInertia: 1
+      localMovementSpeedLimit:
+        value: 5
+        use: 0
+      localRotationSpeedLimit:
+        value: 720
+        use: 0
+      depthInertia: 0
+      centrifualAcceleration: 0
       particleSpeedLimit:
         value: 4
         use: 1
+      teleportMode: 0
+      teleportDistance: 0.5
+      teleportRotation: 90
     tetherConstraint:
       distanceCompression: 0.9
     distanceConstraint:
@@ -861,11 +877,39 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-      stiffness: 1
+      stiffness: 0.5
     colliderCollisionConstraint:
       mode: 1
       friction: 0.05
       colliderList: []
+      collisionBones: []
+      limitDistance:
+        value: 0.05
+        useCurve: 0
+        curve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
     selfCollisionConstraint:
       selfMode: 0
       surfaceThickness:
@@ -906,6 +950,12 @@ MonoBehaviour:
       synchronization: 0.7
       depthWeight: 0
       movingWind: 0
+    springConstraint:
+      useSpring: 1
+      springPower: 0.04
+      limitDistance: 0.1
+      normalLimitRatio: 1
+      springNoise: 0
   serializeData2:
     selectionData:
       positions:
@@ -1116,6 +1166,20 @@ MonoBehaviour:
       - Value: 1
       maxConnectionDistance: 0.0026621942
       userEdit: 1
+    preBuildData:
+      enabled: 0
+      buildId: 
+      preBuildScriptableObject: {fileID: 0}
+      uniquePreBuildData:
+        version: 0
+        buildResult:
+          result: 0
+          warning: 0
+        renderSetupDataList: []
+        proxyMesh:
+          transformData:
+            transformArray: []
+        renderMeshList: []
   gizmoSerializeData:
     always: 0
     clothDebugSettings:
@@ -1130,6 +1194,13 @@ MonoBehaviour:
       animatedPosition: 0
       animatedAxis: 0
       animatedShape: 0
+      inertiaCenter: 1
+  animationPoseRatioProperty: 0
+  gravityProperty: 0
+  dampingProperty: 0
+  worldInertiaProperty: 0
+  localInertiaProperty: 0
+  windInfluenceProperty: 0
 --- !u!114 &8175923562505448277
 MonoBehaviour:
   m_ObjectHideFlags: 0
