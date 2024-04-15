@@ -38,7 +38,7 @@ namespace Vi.UI
             loadoutManager = GetComponentInParent<LoadoutManager>();
             attributes = GetComponentInParent<Attributes>();
 
-            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform);
+            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform.parent);
             camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
             camInstance.transform.LookAt(transform.root);
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
@@ -53,12 +53,14 @@ namespace Vi.UI
 
         private void OnEnable()
         {
+            camInstance.SetActive(true);
             int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
                 Button button = loadoutButtons[i];
                 int var = i;
                 if (PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+                button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(delegate { OpenLoadout(button, var); });
             }
 
@@ -127,6 +129,7 @@ namespace Vi.UI
             menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
             gameObject.SetActive(false);
+            camInstance.SetActive(false);
         }
 
         private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType, int loadoutSlot)
@@ -137,6 +140,7 @@ namespace Vi.UI
             menu.Initialize(equipmentType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _armorSelect;
             gameObject.SetActive(false);
+            camInstance.SetActive(true);
         }
     }
 }
