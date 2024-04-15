@@ -42,15 +42,6 @@ namespace Vi.UI
             camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
             camInstance.transform.LookAt(transform.root);
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
-
-            helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm); });
-            chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest); });
-            shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders); });
-            glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves); });
-            pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants); });
-            bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots); });
-            beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt); });
-            capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape); });
         }
 
         private void Update()
@@ -109,6 +100,23 @@ namespace Vi.UI
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
             secondaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+
+            helmButton.onClick.RemoveAllListeners();
+            helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
+            chestButton.onClick.RemoveAllListeners();
+            chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
+            shouldersButton.onClick.RemoveAllListeners();
+            shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
+            glovesButton.onClick.RemoveAllListeners();
+            glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
+            pantsButton.onClick.RemoveAllListeners();
+            pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants, loadoutSlot); });
+            bootsButton.onClick.RemoveAllListeners();
+            bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots, loadoutSlot); });
+            beltButton.onClick.RemoveAllListeners();
+            beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt, loadoutSlot); });
+            capeButton.onClick.RemoveAllListeners();
+            capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });
         }
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
@@ -121,15 +129,12 @@ namespace Vi.UI
             gameObject.SetActive(false);
         }
 
-        private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType)
+        private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType, int loadoutSlot)
         {
-            //PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            //CharacterReference.WearableEquipmentOption wearableEquipmentOption 
-
             GameObject _armorSelect = Instantiate(armorSelectMenu.gameObject);
             ArmorSelectMenu menu = _armorSelect.GetComponent<ArmorSelectMenu>();
             menu.SetLastMenu(gameObject);
-            menu.Initialize(attributes.GetPlayerDataId());
+            menu.Initialize(equipmentType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _armorSelect;
             gameObject.SetActive(false);
         }
