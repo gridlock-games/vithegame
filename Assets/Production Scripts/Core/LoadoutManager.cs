@@ -237,7 +237,8 @@ namespace Vi.Core
             {
                 if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
                 {
-                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId);
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
+                    if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId); }
                     if (wearableEquipmentOption == null) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()); }
                     animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
