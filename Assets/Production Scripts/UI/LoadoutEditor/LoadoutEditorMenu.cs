@@ -133,8 +133,8 @@ namespace Vi.UI
             menu.SetLastMenu(gameObject);
             menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
-            gameObject.SetActive(false);
             camInstance.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType, int loadoutSlot)
@@ -144,8 +144,8 @@ namespace Vi.UI
             menu.SetLastMenu(gameObject);
             menu.Initialize(equipmentType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _armorSelect;
-            gameObject.SetActive(false);
             camInstance.SetActive(true);
+            gameObject.SetActive(false);
         }
     }
 }
