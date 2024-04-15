@@ -125,6 +125,13 @@ namespace Vi.UI
         {
             //PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
             //CharacterReference.WearableEquipmentOption wearableEquipmentOption 
+
+            GameObject _armorSelect = Instantiate(armorSelectMenu.gameObject);
+            ArmorSelectMenu menu = _armorSelect.GetComponent<ArmorSelectMenu>();
+            menu.SetLastMenu(gameObject);
+            menu.Initialize(attributes.GetPlayerDataId());
+            childMenu = _armorSelect;
+            gameObject.SetActive(false);
         }
     }
 }
