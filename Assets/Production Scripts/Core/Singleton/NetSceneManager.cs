@@ -294,13 +294,19 @@ namespace Vi.Core
                     }
                 }
             }
+
+            foreach (ScenePayload scenePayload in System.Array.FindAll(scenePayloads, item => item.sceneType == SceneType.Environment & System.Array.Exists(item.sceneReferences, x => x.SceneName == scene.name)))
+            {
+                SceneManager.SetActiveScene(scene);
+                break;
+            }
         }
 
         private void OnSceneUnload(Scene scene)
         {
             //Debug.Log("Unloaded " + scene.name);
         }
-
+        
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
