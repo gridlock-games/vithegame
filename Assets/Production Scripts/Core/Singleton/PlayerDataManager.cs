@@ -306,8 +306,8 @@ namespace Vi.Core
                     playerDataList.Add(playerData);
                     disconnectedPlayerDataList.RemoveAt(index);
                 }
-
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.AddPlayerScore(playerData.id, playerData.character._id); }
+                
+                if (GameModeManager.Singleton & playerData.team != Team.Spectator) { GameModeManager.Singleton.AddPlayerScore(playerData.id, playerData.character._id); }
             }
         }
 
