@@ -422,6 +422,8 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
+
+                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(), character._id.ToString())); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }

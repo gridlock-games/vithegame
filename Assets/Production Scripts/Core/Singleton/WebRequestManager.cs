@@ -952,7 +952,7 @@ namespace Vi.Core
                 armorOptions.Find(item => item.name == "European Belt").itemWebId,
                 armorOptions.Find(item => item.name == "European Gloves").itemWebId,
                 armorOptions.Find(item => item.name == "European Cape").itemWebId,
-                armorOptions.Find(item => item.name == "European Pants").itemWebId,
+                "",
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
@@ -972,7 +972,7 @@ namespace Vi.Core
                 armorOptions.Find(item => item.name == "Arab Belt").itemWebId,
                 armorOptions.Find(item => item.name == "Arab Gloves").itemWebId,
                 "",
-                armorOptions.Find(item => item.name == "Arab Pants").itemWebId,
+                "",
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
