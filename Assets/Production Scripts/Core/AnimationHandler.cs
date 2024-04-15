@@ -298,7 +298,7 @@ namespace Vi.Core
         {
             if (wearableEquipmentOption == null)
             {
-                Debug.LogWarning("Equipment option is null");
+                Debug.LogWarning(equipmentType + " Equipment option is null");
                 animatorReference.ClearWearableEquipment(equipmentType);
                 return;
             }

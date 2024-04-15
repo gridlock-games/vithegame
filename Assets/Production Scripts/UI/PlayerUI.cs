@@ -111,16 +111,6 @@ namespace Vi.UI
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private void Start()
         {
-            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
-            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
-
-            ToggleAttackType(false);
-            fadeToWhiteImage.color = Color.black;
-
-            playerCard.Initialize(GetComponentInParent<Attributes>());
-
-            UpdateWeapon(false);
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
@@ -131,6 +121,16 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
+
+            ToggleAttackType(false);
+            fadeToWhiteImage.color = Color.black;
+
+            playerCard.Initialize(GetComponentInParent<Attributes>());
+
+            UpdateWeapon(false);
         }
 
         public void OnRebinding()

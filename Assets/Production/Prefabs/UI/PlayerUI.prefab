@@ -687,6 +687,7 @@ MonoBehaviour:
   movementRange: 125
   shouldReposition: 0
   joystickValueMultiplier: 4
+  limits: {fileID: 4824479231797674246}
 --- !u!114 &4758944105944543620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1093,12 +1094,28 @@ MonoBehaviour:
     objectsToMove:
     - gameObjectToMove: {fileID: 3302969314903897264}
       newAnchoredPosition: {x: -560, y: 430}
+      shouldOverrideAnchors: 1
+      anchorMinOverride: {x: 1, y: 0}
+      anchorMaxOverride: {x: 1, y: 0}
+      pivotOverride: {x: 1, y: 0}
     - gameObjectToMove: {fileID: 7850063440274356507}
       newAnchoredPosition: {x: -400, y: 550}
+      shouldOverrideAnchors: 1
+      anchorMinOverride: {x: 1, y: 0}
+      anchorMaxOverride: {x: 1, y: 0}
+      pivotOverride: {x: 1, y: 0}
     - gameObjectToMove: {fileID: 2607331335753300304}
       newAnchoredPosition: {x: -200, y: 550}
+      shouldOverrideAnchors: 1
+      anchorMinOverride: {x: 1, y: 0}
+      anchorMaxOverride: {x: 1, y: 0}
+      pivotOverride: {x: 1, y: 0}
     - gameObjectToMove: {fileID: 8507629784855563432}
       newAnchoredPosition: {x: -40, y: 430}
+      shouldOverrideAnchors: 1
+      anchorMinOverride: {x: 1, y: 0}
+      anchorMaxOverride: {x: 1, y: 0}
+      pivotOverride: {x: 1, y: 0}
   controlSchemeTextDefinitions: []
 --- !u!1 &2539763201719894588
 GameObject:
@@ -1214,11 +1231,11 @@ RectTransform:
   m_Father: {fileID: 3714436478388541962}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -806.25, y: 17.182373}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 93.75, y: 17.182373}
   m_SizeDelta: {x: 120, y: 120}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5780120364017054967
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1615,11 +1632,11 @@ RectTransform:
   m_Father: {fileID: 3714436478388541962}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -1181.25, y: 17.182373}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -281.25, y: 17.182373}
   m_SizeDelta: {x: 120, y: 120}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1177527380756215143
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2762,6 +2779,7 @@ MonoBehaviour:
   movementRange: 125
   shouldReposition: 1
   joystickValueMultiplier: 1
+  limits: {fileID: 210338626573094431}
 --- !u!1 &5766265470416114759
 GameObject:
   m_ObjectHideFlags: 0
@@ -3508,7 +3526,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.000061035156, y: 0}
-  m_SizeDelta: {x: 483.92404, y: 75.31645}
+  m_SizeDelta: {x: 487.32272, y: 75.78487}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &1397874844356754323
 CanvasRenderer:
@@ -3829,11 +3847,11 @@ RectTransform:
   m_Father: {fileID: 3714436478388541962}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -993.75, y: 17.182373}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -93.75, y: 17.182373}
   m_SizeDelta: {x: 120, y: 120}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1490853123030461736
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3938,11 +3956,11 @@ RectTransform:
   m_Father: {fileID: 3714436478388541962}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -618.75, y: 17.182373}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 281.25, y: 17.182373}
   m_SizeDelta: {x: 120, y: 120}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5051602509591367120
 CanvasRenderer:
   m_ObjectHideFlags: 0
