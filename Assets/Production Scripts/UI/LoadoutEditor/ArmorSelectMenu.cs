@@ -74,6 +74,8 @@ namespace Vi.UI
                 button.onClick.AddListener(delegate { ChangeArmor(button, wearableEquipmentOption, loadoutSlot); });
 
                 if (wearableEquipmentOption.itemWebId == initialWearableEquipmentOption.itemWebId) { invokeThis = button; }
+
+                buttonList.Add(button);
             }
 
             invokeThis.onClick.Invoke();
