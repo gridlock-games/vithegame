@@ -9,7 +9,12 @@ namespace MagicaCloth2
         public enum Result
         {
             None = 0,
+
+            /// <summary>
+            /// It is not an error, but the data is empty.
+            /// </summary>
             Empty = 1,
+
             Success = 2,
             Cancel = 3,
             Process = 4,
@@ -26,10 +31,17 @@ namespace MagicaCloth2
             ///////////////////////////////////////////////////////////////////
             Warning = 10000,
 
+            RenderMesh_UnknownWarning = 10100,
+            RenderMesh_VertexWeightIs5BonesOrMore,
+
             ///////////////////////////////////////////////////////////////////
             // Error(20000 - )
             ///////////////////////////////////////////////////////////////////
             Error = 20000,
+
+            // Validating serialized data
+            SerializeData_InvalidData = 20050,
+            SerializeData_Over31Renderers,
 
             // init
             Init_InvalidData = 20100,
@@ -64,6 +76,7 @@ namespace MagicaCloth2
             CreateCloth_InvalidPaintMap,
             CreateCloth_PaintMapNotReadable,
             CreateCloth_PaintMapCountMismatch,
+            CreateCloth_CanNotStart,
 
             // Reduction
             Reduction_Exception = 20500,
@@ -119,6 +132,27 @@ namespace MagicaCloth2
             MagicaMesh_Invalid,
             MagicaMesh_InvalidRenderer,
             MagicaMesh_InvalidMeshFilter,
+
+            // PreBuildData
+            PreBuildData_UnknownError = 22600,
+            PreBuildData_MagicaClothException,
+            PreBuildData_VirtualMeshDeserializationException,
+            PreBuildData_VerificationResult,
+            PreBuildData_VersionMismatch,
+            PreBuildData_InvalidClothData,
+            PreBuildData_Empty,
+            PreBuildData_InvalidScale,
+
+            // PreBuild
+            PreBuild_UnknownError = 22700,
+            PreBuild_Exception,
+            PreBuild_InvalidPreBuildData,
+            PreBuild_InvalidRenderSetupData,
+            PreBuild_SetupDeserializationError,
+
+            // PreBuild Deserialization
+            Deserialization_UnknownError = 22800,
+            Deserialization_Exception,
         }
     }
 }

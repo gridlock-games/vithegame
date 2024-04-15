@@ -203,21 +203,21 @@ namespace MagicaCloth2
 
         public void Dispose()
         {
-            lengthBuffer.DisposeSafe();
-            localPosBuffer.DisposeSafe();
-            localRotBuffer.DisposeSafe();
-            rotationBuffer.DisposeSafe();
-            restorationVectorBuffer.DisposeSafe();
+            lengthBuffer.MC2DisposeSafe();
+            localPosBuffer.MC2DisposeSafe();
+            localRotBuffer.MC2DisposeSafe();
+            rotationBuffer.MC2DisposeSafe();
+            restorationVectorBuffer.MC2DisposeSafe();
         }
 
         internal void WorkBufferUpdate()
         {
             int pcnt = MagicaManager.Simulation.ParticleCount;
-            lengthBuffer.Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
-            localPosBuffer.Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
-            localRotBuffer.Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
-            rotationBuffer.Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
-            restorationVectorBuffer.Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
+            lengthBuffer.MC2Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
+            localPosBuffer.MC2Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
+            localRotBuffer.MC2Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
+            rotationBuffer.MC2Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
+            restorationVectorBuffer.MC2Resize(pcnt, options: NativeArrayOptions.UninitializedMemory);
         }
 
         public override string ToString()
@@ -252,6 +252,8 @@ namespace MagicaCloth2
             // 微調整および堅牢性を上げるために反復回数を増やしている。
             var job = new AngleConstraintJob()
             {
+                simulationPower = MagicaManager.Time.SimulationPower,
+
                 stepBaseLineIndexArray = sm.processingStepBaseLine.Buffer,
 
                 teamDataArray = tm.teamDataArray.GetNativeArray(),
@@ -285,6 +287,8 @@ namespace MagicaCloth2
         [BurstCompile]
         struct AngleConstraintJob : IJobParallelForDefer
         {
+            public float4 simulationPower;
+
             [Unity.Collections.ReadOnly]
             public NativeArray<int> stepBaseLineIndexArray;
 
@@ -397,7 +401,9 @@ namespace MagicaCloth2
                             float vlen = math.distance(npos, pnpos);
 
                             // 親からの基本姿勢
-                            var v = math.normalize(bpos - pbpos);
+                            var bv = bpos - pbpos;
+                            Develop.Assert(math.length(bv) > 0.0f);
+                            var v = math.normalize(bv);
                             var ipq = math.inverse(pbrot);
                             float3 localPos = math.mul(ipq, v);
                             quaternion localRot = math.mul(ipq, brot);
@@ -480,10 +486,11 @@ namespace MagicaCloth2
                             float vlen = math.length(v);
                             float blen = lengthBufferArray[pindex];
                             vlen = math.lerp(vlen, blen, 0.5f); // 計算前の距離に徐々に近づける
+                            Develop.Assert(vlen > 0.0f);
                             v = math.normalize(v) * vlen;
 
                             // ベクトル角度クランプ
-                            float maxAngleDeg = angleParam.limitCurveData.EvaluateCurve(cdepth);
+                            float maxAngleDeg = angleParam.limitCurveData.MC2EvaluateCurve(cdepth);
                             float maxAngleRad = math.radians(maxAngleDeg);
                             float angle = MathUtility.Angle(v, tv);
                             float3 rv = v;
@@ -550,7 +557,8 @@ namespace MagicaCloth2
                             float3 tv = restorationVectorBufferArray[pindex];
 
                             // 復元力
-                            float restorationStiffness = angleParam.restorationStiffness.EvaluateCurveClamp01(cdepth);
+                            float restorationStiffness = angleParam.restorationStiffness.MC2EvaluateCurveClamp01(cdepth);
+                            restorationStiffness = math.saturate(restorationStiffness * simulationPower.w);
 
                             //int _pindex = indexBuffer[i] + p_start;
                             //Debug.Log($"i:{i} [{_pindex}] stiffness:{restorationStiffness} cdepth:{cdepth}");

@@ -104,10 +104,14 @@ namespace MagicaCloth2
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
             ClothParameterInspector();
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             GizmoInspector();
+            EditorGUILayout.Space();
+            ClothPreBuildInspector();
             serializedObject.ApplyModifiedProperties();
 
             //DrawDefaultInspector();
@@ -164,55 +168,92 @@ namespace MagicaCloth2
         {
             var cloth = target as MagicaCloth;
 
-            ResultCode result;
             if (EditorApplication.isPlaying)
             {
-                result = cloth.Process.Result;
+                StaticStringBuilder.Clear();
+                StaticStringBuilder.AppendLine("[State]");
+                StaticStringBuilder.Append(cloth.Process.IsState(ClothProcess.State_UsePreBuild) ? "Pre-Build Construction" : "Runtime Construction");
+                DispClothStatus(StaticStringBuilder.ToString(), cloth.Process.Result, true);
             }
             else
             {
-                result = ClothEditorManager.GetResultCode(cloth);
+                var preBuildData = cloth.GetSerializeData2().preBuildData;
+                if (preBuildData.enabled)
+                {
+                    // pre-build
+                    DispClothStatus("[Pre-Build Construction]", preBuildData.DataValidate(), false);
+                }
+                else
+                {
+                    // runtime
+                    DispClothStatus("[Runtime Construction]", ClothEditorManager.GetResultCode(cloth), true);
+                }
             }
+        }
 
+        void DispClothStatus(string title, ResultCode result, bool dispWarning)
+        {
+            StaticStringBuilder.Clear();
+            StaticStringBuilder.AppendLine(title);
+
+            // normal / error
             MessageType mtype = MessageType.Info;
             if (result.IsError())
                 mtype = MessageType.Error;
-            else if (result.IsWarning())
-                mtype = MessageType.Warning;
-
             var infoMessage = result.GetResultInformation();
             if (infoMessage != null)
-                EditorGUILayout.HelpBox($"{result.GetResultString()}\n{infoMessage}", mtype);
+            {
+                StaticStringBuilder.AppendLine(result.GetResultString());
+                StaticStringBuilder.AppendLine(infoMessage);
+            }
             else
-                EditorGUILayout.HelpBox(result.GetResultString(), mtype);
+            {
+                StaticStringBuilder.AppendLine(result.GetResultString());
+            }
+            EditorGUILayout.HelpBox(StaticStringBuilder.ToString(), mtype);
+
+            // warning
+            if (dispWarning && result.IsWarning())
+            {
+                mtype = MessageType.Warning;
+                infoMessage = result.GetWarningInformation();
+                if (infoMessage != null)
+                    EditorGUILayout.HelpBox($"{result.GetWarningString()}\n{infoMessage}", mtype);
+                else
+                    EditorGUILayout.HelpBox(result.GetWarningString(), mtype);
+            }
         }
 
         void DispProxyMesh()
         {
             var cloth = target as MagicaCloth;
 
-            VirtualMesh vmesh = null;
+            VirtualMeshContainer cmesh;
             if (EditorApplication.isPlaying)
             {
-                vmesh = cloth.Process?.ProxyMesh;
+                cmesh = cloth.Process?.ProxyMeshContainer;
             }
             else
             {
-                vmesh = ClothEditorManager.GetEditMesh(cloth);
+                cmesh = ClothEditorManager.GetEditMeshContainer(cloth);
             }
-            if (vmesh == null)
+            if (cmesh == null || cmesh.shareVirtualMesh == null)
                 return;
+
+            var vmesh = cmesh.shareVirtualMesh;
 
             StaticStringBuilder.Clear();
             if (EditorApplication.isPlaying)
                 StaticStringBuilder.AppendLine("[Proxy Mesh]");
             else
                 StaticStringBuilder.AppendLine("[Edit Mesh]");
+            if (EditorApplication.isPlaying)
+                StaticStringBuilder.AppendLine($"Visible: {!cloth.Process.IsCullingInvisible()}");
             StaticStringBuilder.AppendLine($"Vertex: {vmesh.VertexCount}");
             StaticStringBuilder.AppendLine($"Edge: {vmesh.EdgeCount}");
             StaticStringBuilder.AppendLine($"Triangle: {vmesh.TriangleCount}");
             StaticStringBuilder.AppendLine($"SkinBoneCount: {vmesh.SkinBoneCount}");
-            StaticStringBuilder.Append($"TransformCount: {vmesh.TransformCount}");
+            StaticStringBuilder.Append($"TransformCount: {cmesh.GetTransformCount()}");
 
             EditorGUILayout.HelpBox(StaticStringBuilder.ToString(), MessageType.Info);
         }
@@ -221,34 +262,69 @@ namespace MagicaCloth2
         void ClothMainInspector()
         {
             var cloth = target as MagicaCloth;
+            var clothType = cloth.SerializeData.clothType;
+            bool isBoneSpring = clothType == ClothProcess.ClothType.BoneSpring;
+
+            bool runtime = EditorApplication.isPlaying;
+
+            // 同期状態
+            bool sync = EditorApplication.isPlaying && cloth.SyncCloth != null;
 
             EditorGUILayout.LabelField("Main", EditorStyles.boldLabel);
 
             // Cloth
             {
-                var clothType = serializedObject.FindProperty("serializeData.clothType");
+                var clothTypeProperty = serializedObject.FindProperty("serializeData.clothType");
 
-                EditorGUILayout.PropertyField(clothType, new GUIContent("Cloth Type"));
+                using (new EditorGUI.DisabledScope(runtime))
+                {
+                    EditorGUILayout.PropertyField(clothTypeProperty, new GUIContent("Cloth Type"));
+                }
 
                 var paintMode = serializedObject.FindProperty("serializeData.paintMode");
 
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    if (cloth.SerializeData.clothType == ClothProcess.ClothType.BoneCloth)
+                    if (clothType == ClothProcess.ClothType.BoneCloth)
                     {
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rootBones"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.connectionMode"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rootRotation"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rotationalInterpolation"));
                     }
-                    else if (cloth.SerializeData.clothType == ClothProcess.ClothType.MeshCloth)
+                    else if (clothType == ClothProcess.ClothType.BoneSpring)
+                    {
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rootBones"));
+                        // BoneSpringでは接続モードは指定させない。内部ではLineで固定される。
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("ConnectionMode");
+                            EditorGUILayout.LabelField("[Line]");
+                        }
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rootRotation"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.rotationalInterpolation"));
+                    }
+                    else if (clothType == ClothProcess.ClothType.MeshCloth)
                     {
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.sourceRenderers"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.reductionSetting"));
                     }
 
                     EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.updateMode"));
+                    if (sync == false)
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.updateMode"));
+                    else
+                    {
+                        // 同期中は操作不可
+                        using (new EditorGUI.DisabledScope(true))
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUILayout.LabelField("Update Mode");
+                                EditorGUILayout.LabelField("(Synchronizing)");
+                            }
+                        }
+                    }
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.animationPoseRatio"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.normalAxis"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.normalAlignmentSetting.alignmentMode"), new GUIContent("Normal Alignment"));
@@ -257,7 +333,7 @@ namespace MagicaCloth2
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.normalAlignmentSetting.adjustmentTransform"));
                     }
 
-                    if (cloth.SerializeData.clothType == ClothProcess.ClothType.MeshCloth)
+                    if (clothType == ClothProcess.ClothType.MeshCloth)
                     {
                         EditorGUILayout.Space();
                         EditorGUILayout.PropertyField(paintMode);
@@ -279,34 +355,133 @@ namespace MagicaCloth2
             }
 
             // Custom Skinning
-            Foldout("Custom Skinning", serializedObject.FindProperty("serializeData.customSkinningSetting.enable"), null, () =>
+            if (isBoneSpring == false)
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.customSkinningSetting.skinningBones"));
+                Foldout("Custom Skinning", serializedObject.FindProperty("serializeData.customSkinningSetting.enable"), null, () =>
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.customSkinningSetting.skinningBones"));
+                });
+            }
+
+            // Culling
+            Foldout("Culling", null, () =>
+            {
+                if (sync == false)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.cullingSettings.cameraCullingMode"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.cullingSettings.cameraCullingMethod"));
+                    if (cloth.SerializeData.cullingSettings.cameraCullingMethod == CullingSettings.CameraCullingMethod.ManualRenderer)
+                    {
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.cullingSettings.cameraCullingRenderers"));
+                    }
+                }
+                else
+                {
+                    // 同期中は操作不可
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Camera Culling Mode");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Camera Culling Method");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                    }
+                }
             });
+        }
+
+        void ClothPreBuildInspector()
+        {
+            var cloth = target as MagicaCloth;
+
+            bool generation = false;
+
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+            {
+                Foldout("Pre-Build", serializedObject.FindProperty("serializeData2.preBuildData.enabled"), null, () =>
+                {
+                    // information
+                    var preBuildData = cloth.GetSerializeData2().preBuildData;
+                    if (preBuildData.UsePreBuild())
+                    {
+                        DispClothStatus("[Pre-Build Construction]", preBuildData.DataValidate(), false);
+                    }
+
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData2.preBuildData.buildId"), new GUIContent("Build ID"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData2.preBuildData.preBuildScriptableObject"), new GUIContent("Write Object"));
+                    using (var horizontalScope = new GUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.Space();
+                        GUI.backgroundColor = Color.red;
+                        if (GUILayout.Button("Create PreBuild Data"))
+                        {
+                            generation = true;
+                        }
+                        GUI.backgroundColor = Color.white;
+                        EditorGUILayout.Space();
+                    }
+                });
+            }
+
+            if (generation)
+            {
+                // PreBuildデータ構築実行
+                Develop.Log($"Start PreBuild data creation.");
+                var preBuildResult = PreBuildDataCreation.CreatePreBuildData(cloth);
+                Develop.Log($"PreBuild data creation completed. [{cloth.GetSerializeData2().preBuildData.buildId}] : {preBuildResult.GetResultString()}");
+            }
         }
 
         void ClothParameterInspector()
         {
             var cloth = target as MagicaCloth;
+            var clothType = cloth.SerializeData.clothType;
+            bool isBoneSpring = clothType == ClothProcess.ClothType.BoneSpring;
+
+            // 同期状態
+            bool sync = EditorApplication.isPlaying && cloth.SyncCloth != null;
 
             ClothPresetUtility.DrawPresetButton(cloth, cloth.SerializeData);
 
             // Force
             Foldout("Force", null, () =>
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravity"), new GUIContent("Gravity"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravityDirection"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravityFalloff"));
+                if (isBoneSpring == false)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravity"), new GUIContent("Gravity"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravityDirection"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.gravityFalloff"));
+                }
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.damping"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.stablizationTimeAfterReset"), new GUIContent("Stablization Time"));
             });
+
+            // Spring
+            if (isBoneSpring)
+            {
+                Foldout("Spring", serializedObject.FindProperty("serializeData.springConstraint.useSpring"), null, () =>
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.springConstraint.springPower"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.springConstraint.limitDistance"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.springConstraint.normalLimitRatio"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.springConstraint.springNoise"));
+                });
+            }
 
             // Angle Restoration
             Foldout("Angle Restoration", serializedObject.FindProperty("serializeData.angleRestorationConstraint.useAngleRestoration"), null, () =>
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.angleRestorationConstraint.stiffness"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.angleRestorationConstraint.velocityAttenuation"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.angleRestorationConstraint.gravityFalloff"));
+                if (isBoneSpring == false)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.angleRestorationConstraint.gravityFalloff"));
+                }
             }
             );
 
@@ -319,73 +494,170 @@ namespace MagicaCloth2
             );
 
             // Shape
-            Foldout("Shape Restoration", null, () =>
+            // BoneSpringではすべて定数なので隠蔽する
+            if (isBoneSpring == false)
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.distanceConstraint.stiffness"), new GUIContent("Distance Stiffness"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.tetherConstraint.distanceCompression"), new GUIContent("Tether Compression"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.triangleBendingConstraint.stiffness"), new GUIContent("Triangle Bending Stiffness"));
-            });
+                Foldout("Shape Restoration", null, () =>
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.distanceConstraint.stiffness"), new GUIContent("Distance Stiffness"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.tetherConstraint.distanceCompression"), new GUIContent("Tether Compression"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.triangleBendingConstraint.stiffness"), new GUIContent("Triangle Bending Stiffness"));
+                });
+            }
 
             // Inertia
             Foldout("Inertia", null, () =>
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.movementInertia"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.rotationInertia"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.depthInertia"));
+                if (sync == false)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.anchor"));
+                    if (cloth.SerializeData.inertiaConstraint.anchor != null)
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.anchorInertia"));
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.worldInertia"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.movementInertiaSmoothing"), new GUIContent("World Inertia Smoothing"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.movementSpeedLimit"), new GUIContent("World Movement Speed Limit"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.rotationSpeedLimit"), new GUIContent("World Rotation Speed Limit"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.teleportMode"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.teleportDistance"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.teleportRotation"));
+                }
+                else
+                {
+                    // 同期中は操作不可
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Anchor");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Anchor Inertia");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        EditorGUILayout.Space();
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("World Inertia");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("World Inertia Smoothing");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("World Movement Speed Limit");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("World Rotation Speed Limit");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Teleport Mode");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Teleport Distance");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField("Teleport Rotation");
+                            EditorGUILayout.LabelField("(Synchronizing)");
+                        }
+                    }
+                }
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.localInertia"), new GUIContent("Local Inertia"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.localMovementSpeedLimit"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.localRotationSpeedLimit"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.depthInertia"), new GUIContent("Local Depth Inertia"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.centrifualAcceleration"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.movementSpeedLimit"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.rotationSpeedLimit"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.inertiaConstraint.particleSpeedLimit"));
             });
 
             // Motion
-            Foldout("Movement Limit", null, () =>
+            if (isBoneSpring == false)
             {
-                var useMaxDistance = serializedObject.FindProperty("serializeData.motionConstraint.useMaxDistance");
-                var useBackstop = serializedObject.FindProperty("serializeData.motionConstraint.useBackstop");
-                EditorGUILayout.PropertyField(useMaxDistance);
-                using (new EditorGUI.DisabledScope(!useMaxDistance.boolValue))
+                Foldout("Movement Limit", null, () =>
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.maxDistance"));
-                }
-                EditorGUILayout.PropertyField(useBackstop);
-                using (new EditorGUI.DisabledScope(!useBackstop.boolValue))
-                {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.backstopRadius"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.backstopDistance"));
-                }
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.stiffness"));
+                    var useMaxDistance = serializedObject.FindProperty("serializeData.motionConstraint.useMaxDistance");
+                    var useBackstop = serializedObject.FindProperty("serializeData.motionConstraint.useBackstop");
+                    EditorGUILayout.PropertyField(useMaxDistance);
+                    using (new EditorGUI.DisabledScope(!useMaxDistance.boolValue))
+                    {
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.maxDistance"));
+                    }
+                    EditorGUILayout.PropertyField(useBackstop);
+                    using (new EditorGUI.DisabledScope(!useBackstop.boolValue))
+                    {
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.backstopRadius"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.backstopDistance"));
+                    }
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.motionConstraint.stiffness"));
 
-                var paintMode = serializedObject.FindProperty("serializeData.paintMode");
-                if (paintMode.enumValueIndex == 0)
-                    PaintButton(ClothPainter.PaintMode.Motion);
+                    var paintMode = serializedObject.FindProperty("serializeData.paintMode");
+                    if (paintMode.enumValueIndex == 0)
+                        PaintButton(ClothPainter.PaintMode.Motion);
+                }
+                );
             }
-            );
 
             // Collider Collision
             Foldout("Collider Collision", null, () =>
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.mode"));
+                if (isBoneSpring)
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("Mode");
+                        EditorGUILayout.LabelField("[Point]");
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.mode"));
+                }
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.radius"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.friction"));
+                if (clothType == ClothProcess.ClothType.BoneSpring)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.limitDistance"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.collisionBones"));
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.friction"));
+                }
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.colliderCollisionConstraint.colliderList"));
             }
             );
 
             // Self Collision
-            Foldout("Self Collision", "Self Collision (Beta)", () =>
+            if (isBoneSpring == false)
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.selfMode"));
-                var syncMode = serializedObject.FindProperty("serializeData.selfCollisionConstraint.syncMode");
-                EditorGUILayout.PropertyField(syncMode);
-                if (syncMode.enumValueIndex != 0)
+                Foldout("Self Collision", "Self Collision (Beta)", () =>
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.syncPartner"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.selfMode"));
+                    var syncMode = serializedObject.FindProperty("serializeData.selfCollisionConstraint.syncMode");
+                    EditorGUILayout.PropertyField(syncMode);
+                    if (syncMode.enumValueIndex != 0)
+                    {
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.syncPartner"));
+                    }
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.surfaceThickness"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.clothMass"));
                 }
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.surfaceThickness"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serializeData.selfCollisionConstraint.clothMass"));
+                );
             }
-            );
 
             // Wind
             Foldout("Wind", null, () =>
@@ -424,9 +696,11 @@ namespace MagicaCloth2
                     minmax.Set(Define.System.SelfCollisionThicknessMin, Define.System.SelfCollisionThicknessMax);
                     break;
                 case "movementSpeedLimit":
+                case "localMovementSpeedLimit":
                     minmax.Set(0.0f, Define.System.MaxMovementSpeedLimit);
                     break;
                 case "rotationSpeedLimit":
+                case "localRotationSpeedLimit":
                     minmax.Set(0.0f, Define.System.MaxRotationSpeedLimit);
                     break;
                 case "particleSpeedLimit":
@@ -456,6 +730,7 @@ namespace MagicaCloth2
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.animatedPosition"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.animatedAxis"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.animatedShape"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.inertiaCenter"));
                 //EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.basicPosition"));
                 //EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.basicAxis"));
                 //EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmoSerializeData.clothDebugSettings.basicShape"));
@@ -600,17 +875,17 @@ namespace MagicaCloth2
                     if (edit == false)
                     {
                         // 最新の編集メッシュからセレクションデータを生成する
-                        var editMesh = ClothEditorManager.GetEditMesh(cloth);
-                        if (editMesh != null)
+                        var editMeshContainer = ClothEditorManager.GetEditMeshContainer(cloth);
+                        if (editMeshContainer != null && editMeshContainer.shareVirtualMesh != null)
                         {
                             // すでにセレクションデータが存在し、かつユーザー編集データならばコンバートする
-                            var selectionData = GetSelectionData(cloth, editMesh);
+                            var selectionData = GetSelectionData(cloth, editMeshContainer.shareVirtualMesh);
 
                             // セレクションデータにメッシュの最大接続距離を記録する
-                            selectionData.maxConnectionDistance = editMesh.maxVertexDistance.Value;
+                            selectionData.maxConnectionDistance = editMeshContainer.shareVirtualMesh.maxVertexDistance.Value;
 
                             // ペイント開始
-                            ClothPainter.EnterPaint(paintMode, this, cloth, editMesh, selectionData);
+                            ClothPainter.EnterPaint(paintMode, this, cloth, editMeshContainer, selectionData);
                             SceneView.RepaintAll();
                         }
                     }

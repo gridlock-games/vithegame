@@ -1,6 +1,9 @@
 ﻿// Magica Cloth 2.
 // Copyright (c) 2023 MagicaSoft.
 // https://magicasoft.jp
+using System;
+using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,6 +58,14 @@ namespace MagicaCloth2
             Selection.activeGameObject = obj;
         }
 
+        [MenuItem("GameObject/Create Other/Magica Cloth2/Magica Settings", priority = 200)]
+        static void AddSettings()
+        {
+            var obj = AddObject("Magica Settings", false, true);
+            var comp = obj.AddComponent<MagicaSettings>();
+            Selection.activeGameObject = obj;
+        }
+
         /// <summary>
         /// ヒエラルキーにオブジェクトを１つ追加する
         /// </summary>
@@ -93,6 +104,18 @@ namespace MagicaCloth2
                 return;
             }
 
+            StringBuilder allsb = new StringBuilder();
+
+            var timeManager = MagicaManager.Time;
+            if (timeManager == null)
+            {
+                Debug.LogWarning("Time Manager is null!");
+            }
+            else
+            {
+                timeManager.InformationLog(allsb);
+            }
+
             var teamManager = MagicaManager.Team;
             if (teamManager == null)
             {
@@ -100,8 +123,7 @@ namespace MagicaCloth2
             }
             else
             {
-                //Debug.Log(teamManager);
-                teamManager.DebugLog();
+                teamManager.InformationLog(allsb);
             }
 
             var vmeshManager = MagicaManager.VMesh;
@@ -111,7 +133,7 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(vmeshManager);
+                vmeshManager.InformationLog(allsb);
             }
 
             var transformManager = MagicaManager.Bone;
@@ -121,7 +143,7 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(transformManager);
+                transformManager.InformationLog(allsb);
             }
 
             var simulationManager = MagicaManager.Simulation;
@@ -131,7 +153,7 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(simulationManager);
+                simulationManager.InformationLog(allsb);
             }
 
             var colliderManager = MagicaManager.Collider;
@@ -141,7 +163,7 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(colliderManager);
+                colliderManager.InformationLog(allsb);
             }
 
             var windManager = MagicaManager.Wind;
@@ -151,7 +173,7 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(windManager);
+                windManager.InformationLog(allsb);
             }
 
             var renderManager = MagicaManager.Render;
@@ -161,8 +183,29 @@ namespace MagicaCloth2
             }
             else
             {
-                Debug.Log(renderManager);
+                renderManager.InformationLog(allsb);
             }
+
+            var preBuildManager = MagicaManager.PreBuild;
+            if (preBuildManager == null)
+            {
+                Debug.LogWarning("PreBuild Manager is null!");
+            }
+            else
+            {
+                preBuildManager.InformationLog(allsb);
+            }
+
+            // clipboard
+            //GUIUtility.systemCopyBuffer = allsb.ToString();
+
+            // file
+            DateTime dt = DateTime.Now;
+            var filename = dt.ToString("yyyy-MM-dd-HHmm-ss");
+            StreamWriter sw = new StreamWriter($"./MagicaCloth2_SysInfo_{filename}.txt", false);
+            sw.WriteLine(allsb.ToString());
+            sw.Flush();
+            sw.Close();
         }
     }
 }

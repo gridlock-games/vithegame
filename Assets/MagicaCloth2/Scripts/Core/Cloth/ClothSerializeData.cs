@@ -92,7 +92,7 @@ namespace MagicaCloth2
         /// [OK] Runtime changes.
         /// [NG] Export/Import with Presets
         /// </summary>
-        public ClothUpdateMode updateMode = ClothUpdateMode.Normal;
+        public ClothUpdateMode updateMode = ClothUpdateMode.AnimatorLinkage;
 
         /// <summary>
         /// Blend ratio between initial pose and animation pose.
@@ -116,6 +116,11 @@ namespace MagicaCloth2
         /// Normal definition.
         /// </summary>
         public NormalAlignmentSettings normalAlignmentSetting = new NormalAlignmentSettings();
+
+        /// <summary>
+        /// culling settings.
+        /// </summary>
+        public CullingSettings cullingSettings = new CullingSettings();
 
         /// <summary>
         /// axis to use as normal.
@@ -241,5 +246,10 @@ namespace MagicaCloth2
         /// Wind
         /// </summary>
         public WindSettings wind = new WindSettings();
+
+        /// <summary>
+        /// Spring
+        /// </summary>
+        public SpringConstraint.SerializeData springConstraint = new SpringConstraint.SerializeData();
     }
 }

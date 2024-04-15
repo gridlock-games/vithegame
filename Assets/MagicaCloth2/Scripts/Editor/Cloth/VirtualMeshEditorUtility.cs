@@ -29,14 +29,15 @@ namespace MagicaCloth2
         /// </summary>
         /// <param name="vmesh"></param>
         /// <param name="debugSettings"></param>
-        public static void DrawGizmos(VirtualMesh vmesh, VirtualMeshDebugSettings debugSettings, bool selected, bool useHandles)
+        public static void DrawGizmos(VirtualMeshContainer cmesh, VirtualMeshDebugSettings debugSettings, bool selected, bool useHandles)
         {
             if (debugSettings.enable == false)
                 return;
-            if (vmesh == null || vmesh.IsSuccess == false || vmesh.VertexCount == 0)
+            if (cmesh == null || cmesh.shareVirtualMesh == null || cmesh.shareVirtualMesh.IsSuccess == false || cmesh.shareVirtualMesh.VertexCount == 0)
                 return;
 
-            var t = vmesh.GetCenterTransform();
+            var vmesh = cmesh.shareVirtualMesh;
+            var t = cmesh.GetCenterTransform();
             if (t == null)
                 return;
 
@@ -45,7 +46,7 @@ namespace MagicaCloth2
                 useHandles,
                 true,
                 selected,
-                vmesh,
+                cmesh,
                 debugSettings,
                 t,
                 0,
@@ -54,7 +55,8 @@ namespace MagicaCloth2
                 dummyRotations,
                 vmesh.localNormals.GetNativeArray(),
                 vmesh.localTangents.GetNativeArray(),
-                vmesh.boneWeights.GetNativeArray()
+                vmesh.boneWeights.GetNativeArray(),
+                vmesh.uv.GetNativeArray()
                );
         }
 
@@ -65,7 +67,7 @@ namespace MagicaCloth2
         /// <param name="cprocess"></param>
         /// <param name="vmesh"></param>
         /// <param name="debugSettings"></param>
-        public static void DrawRuntimeGizmos(ClothProcess cprocess, bool isMapping, VirtualMesh vmesh, VirtualMeshDebugSettings debugSettings, bool selected, bool useHandles)
+        public static void DrawRuntimeGizmos(ClothProcess cprocess, bool isMapping, VirtualMeshContainer cmesh, VirtualMeshDebugSettings debugSettings, bool selected, bool useHandles)
         {
             if (cprocess == null || cprocess.IsValid() == false)
                 return;
@@ -76,33 +78,36 @@ namespace MagicaCloth2
             if (MagicaManager.Team.ContainsTeamData(cprocess.TeamId) == false)
                 return;
 
-            if (vmesh == null || vmesh.IsSuccess == false)
+            if (cmesh == null || cmesh.shareVirtualMesh == null || cmesh.shareVirtualMesh.IsSuccess == false)
                 return;
 
-            var t = vmesh.GetCenterTransform();
+            var t = cmesh.GetCenterTransform();
             if (t == null)
                 return;
 
             // チームデータ
-            var tdata = MagicaManager.Team.GetTeamData(cprocess.TeamId);
+            ref var tdata = ref MagicaManager.Team.GetTeamDataRef(cprocess.TeamId);
 
             var tm = MagicaManager.Team;
             var vm = MagicaManager.VMesh;
 
             // メッシュタイプにより参照するデータを切り替える
+            var vmesh = cmesh.shareVirtualMesh;
             var attributes = vmesh.IsMapping ? vm.mappingAttributes : vm.attributes;
             var positions = vmesh.IsMapping ? vm.mappingPositions : vm.positions;
             var rotations = vmesh.IsMapping ? null : vm.rotations;
             var boneWeights = vmesh.IsMapping ? vm.mappingBoneWeights : vm.boneWeights;
+            var uvs = vmesh.IsMapping ? null : vmesh.uv;
             int vstart = vmesh.IsMapping ? tm.mappingDataArray[vmesh.mappingId].mappingCommonChunk.startIndex : tdata.proxyCommonChunk.startIndex;
 
             using NativeArray<quaternion> dummyRotations = new NativeArray<quaternion>(0, Allocator.TempJob);
+            using NativeArray<float2> dummyUvs = new NativeArray<float2>(0, Allocator.TempJob);
 
             DrawGizmosInternal(
                 useHandles,
                 isMapping ? true : false,
                 selected,
-                vmesh,
+                cmesh,
                 debugSettings,
                 t,
                 vstart,
@@ -111,7 +116,8 @@ namespace MagicaCloth2
                 rotations != null ? rotations.GetNativeArray() : dummyRotations,
                 vmesh.localNormals.GetNativeArray(),
                 vmesh.localTangents.GetNativeArray(),
-                boneWeights.GetNativeArray()
+                boneWeights.GetNativeArray(),
+                uvs != null ? uvs.GetNativeArray() : dummyUvs
                 );
         }
 
@@ -119,7 +125,7 @@ namespace MagicaCloth2
             bool useHandles,
             bool isLocal,
             bool selected,
-            VirtualMesh vmesh,
+            VirtualMeshContainer cmesh,
             VirtualMeshDebugSettings debugSettings,
             Transform center,
             int vstart,
@@ -128,7 +134,8 @@ namespace MagicaCloth2
             NativeArray<quaternion> rotations,
             NativeArray<float3> normals,
             NativeArray<float3> tangents,
-            NativeArray<VirtualMeshBoneWeight> boneWeights
+            NativeArray<VirtualMeshBoneWeight> boneWeights,
+            NativeArray<float2> uvs
             )
         {
             // 座標空間に合わせる
@@ -149,7 +156,8 @@ namespace MagicaCloth2
             if (scam == null)
                 return;
             quaternion camRot = scam.transform.rotation;
-            quaternion invCamRot = math.inverse(camRot);
+            //quaternion invCamRot = math.inverse(camRot);
+            var vmesh = cmesh.shareVirtualMesh;
             int vcnt = vmesh.VertexCount;
 
             // 表示スケール調整
@@ -158,6 +166,7 @@ namespace MagicaCloth2
             float drawAxisSize = debugSettings.lineSize * scl;
 
             bool hasRotation = rotations.IsCreated && rotations.Length > 0;
+            bool hasUv = uvs.IsCreated && uvs.Length > 0;
             float colorScale = selected ? 1 : 0.5f;
 
             // position
@@ -405,13 +414,15 @@ namespace MagicaCloth2
             }
 
             // triangle normal
-            if (debugSettings.triangleNormal || debugSettings.triangleNumber)
+            if (debugSettings.triangleNormal || debugSettings.triangleNumber || debugSettings.triangleTangent)
             {
                 positionBuffer0.Clear();
                 segmentBuffer0.Clear();
+                positionBuffer1.Clear();
+                segmentBuffer1.Clear();
 
                 Color colF = Color.yellow;
-                //Color colB = new Color(1.0f, 0.3f, 0.3f, 1.0f);
+                Color colB = new Color(1.0f, 0.3f, 0.3f, 1.0f);
                 for (int i = 0; i < vmesh.TriangleCount; i++)
                 {
                     if (i < debugSettings.triangleMinIndex || i > debugSettings.triangleMaxIndex)
@@ -424,13 +435,24 @@ namespace MagicaCloth2
                     var c = MathUtility.TriangleCenter(pos1, pos2, pos3);
                     if (debugSettings.triangleNormal)
                     {
-                        var dir = math.mul(invCamRot, n);
+                        //var dir = math.mul(invCamRot, n);
                         //GizmoUtility.SetColor((dir.z < 0.0f ? colF : colB) * colorScale, useHandles);
                         //GizmoUtility.DrawLine(c, c + n * drawAxisSize, useHandles);
                         positionBuffer0.Add(c);
                         positionBuffer0.Add(c + n * drawAxisSize);
                         segmentBuffer0.Add(i * 2);
                         segmentBuffer0.Add(i * 2 + 1);
+                    }
+                    if (debugSettings.triangleTangent && hasUv)
+                    {
+                        var uv1 = uvs[vstart + tri.x];
+                        var uv2 = uvs[vstart + tri.y];
+                        var uv3 = uvs[vstart + tri.z];
+                        var tn = MathUtility.TriangleTangent(pos1, pos2, pos3, uv1, uv2, uv3);
+                        positionBuffer1.Add(c);
+                        positionBuffer1.Add(c + tn * drawAxisSize);
+                        segmentBuffer1.Add(i * 2);
+                        segmentBuffer1.Add(i * 2 + 1);
                     }
                     if (debugSettings.triangleNumber)
                         Handles.Label(c, i.ToString());
@@ -440,6 +462,11 @@ namespace MagicaCloth2
                 {
                     GizmoUtility.SetColor(colF * colorScale, useHandles);
                     Handles.DrawLines(positionBuffer0.ToArray(), segmentBuffer0.ToArray());
+                }
+                if (debugSettings.triangleTangent && hasUv)
+                {
+                    GizmoUtility.SetColor(colB * colorScale, useHandles);
+                    Handles.DrawLines(positionBuffer1.ToArray(), segmentBuffer1.ToArray());
                 }
             }
 
@@ -479,10 +506,12 @@ namespace MagicaCloth2
             // bone name
             if (debugSettings.boneName)
             {
-                int cnt = vmesh.transformData.Count;
+                //int cnt = vmesh.transformData.Count;
+                int cnt = cmesh.GetTransformCount();
                 for (int i = 0; i < cnt; i++)
                 {
-                    var t = vmesh.transformData.GetTransformFromIndex(i);
+                    //var t = vmesh.transformData.GetTransformFromIndex(i);
+                    var t = cmesh.GetTransformFromIndex(i);
                     if (t)
                     {
                         var pos = t.position;

@@ -67,38 +67,74 @@ namespace MagicaCloth2
         /// <returns>true=start build. false=build failed.</returns>
         public bool BuildAndRun()
         {
-            if (Application.isPlaying == false)
-                return false;
+            bool ret = false;
+            bool buildComplate = true;
 
-            DisableAutoBuild();
-
-            if (Process.IsState(ClothProcess.State_Build))
+            try
             {
-                Develop.LogError($"Already built.:{this.name}");
-                return false;
-            }
+                if (Application.isPlaying == false)
+                    throw new MagicaClothProcessingException();
 
-            // initialize generated data.
-            if (Process.GenerateInitialization() == false)
-                return false;
+                DisableAutoBuild();
 
-            // setting by type.
-            if (serializeData.clothType == ClothProcess.ClothType.BoneCloth)
-            {
-                // BoneCloth用のセレクションデータの作成
-                // ただしセレクションデータが存在し、かつユーザー定義されている場合は作成しない
-                var nowSelection = serializeData2.selectionData;
-                if (nowSelection == null || nowSelection.IsValid() == false || nowSelection.IsUserEdit() == false)
+                if (Process.IsState(ClothProcess.State_Build))
                 {
-                    if (Process.GenerateBoneClothSelection() == false)
-                        return false;
+                    Develop.LogError($"Already built.:{this.name}");
+                    throw new MagicaClothProcessingException();
+                }
+
+                // initialize generated data.
+                if (Process.GenerateInitialization() == false)
+                    throw new MagicaClothProcessingException();
+
+                // check Pre-Build
+                bool usePreBuildData = serializeData2.preBuildData.UsePreBuild();
+
+                if (usePreBuildData == false)
+                {
+                    // Runtime Build.
+                    // setting by type.
+                    switch (serializeData.clothType)
+                    {
+                        case ClothProcess.ClothType.BoneCloth:
+                        case ClothProcess.ClothType.BoneSpring:
+                            // BoneCloth用のセレクションデータの作成
+                            // ただしセレクションデータが存在し、かつユーザー定義されている場合は作成しない
+                            var nowSelection = serializeData2.selectionData;
+                            if (nowSelection == null || nowSelection.IsValid() == false || nowSelection.IsUserEdit() == false)
+                            {
+                                if (Process.GenerateBoneClothSelection() == false)
+                                    throw new MagicaClothProcessingException();
+                            }
+                            break;
+                    }
+
+                    // build and run.
+                    ret = Process.StartRuntimeBuild();
+                    if (ret)
+                        buildComplate = false; // OnBuildCompleteはランタイム構築後に呼ばれる
+                }
+                else
+                {
+                    // pre-build
+                    ret = Process.PreBuildDataConstruction();
                 }
             }
+            catch (MagicaClothProcessingException)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+            finally
+            {
+                // ビルド完了イベント
+                if (buildComplate)
+                    OnBuildComplete?.Invoke(ret);
+            }
 
-            // build and run.
-            Process.StartBuild();
-
-            return true;
+            return ret;
         }
 
         /// <summary>
@@ -153,9 +189,8 @@ namespace MagicaCloth2
         {
             if (IsValid())
             {
-                var tdata = MagicaManager.Team.GetTeamData(Process.TeamId);
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(Process.TeamId);
                 tdata.timeScale = Mathf.Clamp01(timeScale);
-                MagicaManager.Team.SetTeamData(Process.TeamId, tdata);
             }
         }
 
@@ -168,7 +203,7 @@ namespace MagicaCloth2
         {
             if (IsValid())
             {
-                var tdata = MagicaManager.Team.GetTeamData(Process.TeamId);
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(Process.TeamId);
                 return tdata.timeScale;
             }
             else
@@ -179,14 +214,26 @@ namespace MagicaCloth2
         /// シミュレーションを初期状態にリセットします
         /// Reset the simulation to its initial state.
         /// </summary>
-        public void ResetCloth()
+        /// <param name="keepPose">If true, resume while maintaining posture.</param>
+        public void ResetCloth(bool keepPose = false)
         {
             if (IsValid())
             {
-                var tdata = MagicaManager.Team.GetTeamData(Process.TeamId);
-                tdata.flag.SetBits(TeamManager.Flag_Reset, true);
-                tdata.flag.SetBits(TeamManager.Flag_TimeReset, true);
-                MagicaManager.Team.SetTeamData(Process.TeamId, tdata);
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(Process.TeamId);
+                if (keepPose)
+                {
+                    // Keep
+                    tdata.flag.SetBits(TeamManager.Flag_KeepTeleport, true);
+                }
+                else
+                {
+                    // Reset
+                    tdata.flag.SetBits(TeamManager.Flag_Reset, true);
+                    tdata.flag.SetBits(TeamManager.Flag_TimeReset, true);
+                    tdata.flag.SetBits(TeamManager.Flag_CullingKeep, false);
+                    Process.SetState(ClothProcess.State_CullingKeep, false);
+                    Process.UpdateRendererUse();
+                }
             }
         }
 
@@ -199,11 +246,43 @@ namespace MagicaCloth2
         {
             if (IsValid())
             {
-                var cdata = MagicaManager.Team.GetCenterData(Process.TeamId);
+                ref var cdata = ref MagicaManager.Team.GetCenterDataRef(Process.TeamId);
                 return ClothTransform.TransformPoint(cdata.frameLocalPosition);
             }
             else
                 return Vector3.zero;
+        }
+
+        /// <summary>
+        /// 外力を加えます
+        /// Add external force.
+        /// </summary>
+        /// <param name="forceDirection"></param>
+        /// <param name="forceVelocity">(m/s)</param>
+        /// <param name="fmode"></param>
+        public void AddForce(Vector3 forceDirection, float forceVelocity, ClothForceMode fmode = ClothForceMode.VelocityAdd)
+        {
+            if (IsValid() && forceDirection.magnitude > 0.0f && forceVelocity > 0.0f && fmode != ClothForceMode.None)
+            {
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(Process.TeamId);
+                tdata.forceMode = fmode;
+                tdata.impactForce = forceDirection.normalized * forceVelocity;
+            }
+        }
+
+        /// <summary>
+        /// TransformおよびMeshへの書き込みを禁止または許可します
+        /// この機能を使うことでストップモーションを実装することが可能です
+        /// Prevent or allow writing to Transform and Mesh.
+        /// By using this function, it is possible to implement stop motion.
+        /// </summary>
+        /// <param name="sw">true=write disabled, false=write enabled</param>
+        public void SetSkipWriting(bool sw)
+        {
+            if (IsValid())
+            {
+                Process.SetSkipWriting(sw);
+            }
         }
     }
 }
