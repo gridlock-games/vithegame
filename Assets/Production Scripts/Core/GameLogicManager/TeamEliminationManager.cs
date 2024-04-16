@@ -135,8 +135,17 @@ namespace Vi.Core.GameModeManagers
             if (viEssenceInstance & IsServer) { if (viEssenceInstance.IsSpawned) { viEssenceInstance.NetworkObject.Despawn(true); } }
             if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             if (gameOver) { return; }
-            string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
-            roundResultMessage.Value = message;
+
+            if (winningPlayersDataIds.Length == 0)
+            {
+                string message = "Round draw! ";
+                roundResultMessage.Value = message;
+            }
+            else
+            {
+                string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
+                roundResultMessage.Value = message;
+            }
         }
 
         protected override void OnRoundTimerEnd()
@@ -166,10 +175,14 @@ namespace Vi.Core.GameModeManagers
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else
+            else if (!overtime.Value)
             {
                 roundTimer.Value = 30;
                 overtime.Value = true;
+            }
+            else
+            {
+                OnRoundEnd(new int[0]);
             }
         }
 
