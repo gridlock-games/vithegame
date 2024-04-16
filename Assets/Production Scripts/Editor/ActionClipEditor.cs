@@ -54,6 +54,7 @@ namespace Vi.Editor
         private SerializedProperty spCanFlashAttack;
         private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
+        private SerializedProperty spAilmentHitDefinition;
         private SerializedProperty spGrabDuration;
         private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
@@ -128,6 +129,7 @@ namespace Vi.Editor
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
+            spAilmentHitDefinition = serializedObject.FindProperty("ailmentHitDefinition");
             spGrabDuration = serializedObject.FindProperty("grabDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
@@ -289,6 +291,7 @@ namespace Vi.Editor
                 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -356,6 +359,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -430,6 +434,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -504,6 +509,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);

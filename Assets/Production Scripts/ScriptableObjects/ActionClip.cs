@@ -133,6 +133,7 @@ namespace Vi.ScriptableObjects
         public bool canFlashAttack;
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
+        public bool[] ailmentHitDefinition;
         public float grabDuration = 2;
         public float grabDistance = 3;
 
