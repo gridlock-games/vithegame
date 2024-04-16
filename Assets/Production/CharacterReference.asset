@@ -35,7 +35,7 @@ MonoBehaviour:
       type: 2}
     weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
     weaponPreviewPrefab: {fileID: 0}
-    itemWebId: 661cd4427e854fc4cd6ef64b
+    itemWebId: 661ecf1c55a26cdaadf23e04
   - name: Great Sword
     weaponIcon: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
@@ -44,7 +44,7 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: ae398536bf363f849b1251753e5231fe,
       type: 3}
-    itemWebId: 661cd4437e854fc4cd6ef64d
+    itemWebId: 661ecf1c55a26cdaadf23e12
   - name: Crossbow
     weaponIcon: {fileID: 21300000, guid: 68743a50c8f944f3ebb7d295c75ae863, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 68743a50c8f944f3ebb7d295c75ae863, type: 3}
@@ -53,7 +53,7 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: af22b4a2825753b48b9a67d4cb444187,
       type: 3}
-    itemWebId: 661cd4437e854fc4cd6ef64f
+    itemWebId: 661ecf1d55a26cdaadf23e1e
   - name: Axe
     weaponIcon: {fileID: 21300000, guid: 33fbf3f6a3c524da2a67d8c7060e6e75, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 33fbf3f6a3c524da2a67d8c7060e6e75, type: 3}
@@ -62,7 +62,7 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: f56c8fe4c780d8c4dac0ae5c53a2e46d,
       type: 3}
-    itemWebId: 661cd4437e854fc4cd6ef651
+    itemWebId: 661ecf1d55a26cdaadf23e29
   - name: Lance
     weaponIcon: {fileID: 21300000, guid: 37befea6e6186e24cb908953cb043936, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 37befea6e6186e24cb908953cb043936, type: 3}
@@ -71,16 +71,111 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 160fe5d2b5a3d9c4bb29d5efb734085c,
       type: 3}
-    itemWebId: 661cd4447e854fc4cd6ef653
+    itemWebId: 661ecf1d55a26cdaadf23e36
   emptyWearableEquipment: {fileID: 4940541453049098453, guid: 0d63d1c715aa4c14d9842fd63a41c092,
     type: 3}
   equipmentOptions:
-  - name: Hair01
-    equipmentType: 11
-    averageTextureColor: {r: 0.18039216, g: 0.12941177, b: 0.09019608, a: 1}
-    itemWebId: 
-    raceAndGenders: 0000000001000000
+  - name: Arab Belt
+    equipmentType: 0
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf1e55a26cdaadf23e43
+    raceAndGenders: 0100000000000000
     wearableEquipmentOptions:
-    - {fileID: 7301104956023788035, guid: 6ed737a65d7ad344b9201fc4882b3c28, type: 3}
-    - {fileID: 483328069900146755, guid: 6efdaf7503476d04e92f4f6ce0ff150c, type: 3}
+    - {fileID: 5555030054718781773, guid: d361612143077e34580b4808b00d8686, type: 3}
+    - {fileID: 5018431000275761832, guid: e49535ab9d5ebb7408083392cc8531c2, type: 3}
+  - name: Arab Boots
+    equipmentType: 1
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf1f55a26cdaadf23e6a
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7008609637495664191, guid: 2ef14f72906766a4792bcc8597a32dfa, type: 3}
+    - {fileID: 7689353322763404186, guid: 695fae91d2276e74dab8237771494a4c, type: 3}
+  - name: Arab Chest
+    equipmentType: 3
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf1f55a26cdaadf23e76
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 869461822910146766, guid: 2423fd3a47837534f960dd735a7c071c, type: 3}
+    - {fileID: 8011782809947272121, guid: 7b6f2a65da14e6247b3a7245ced5259e, type: 3}
+  - name: Arab Gloves
+    equipmentType: 4
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf1f55a26cdaadf23e82
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 4609398101410787690, guid: a6fa32f418e3b13469895b1b63f0ead1, type: 3}
+    - {fileID: 8392520174590038646, guid: 98ba609fa62e6864ba710f26f44b5464, type: 3}
+  - name: Arab Helm
+    equipmentType: 5
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf1f55a26cdaadf23e8e
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7713379071267682007, guid: 585cdce70c424fb4e8c9d1115a69d750, type: 3}
+    - {fileID: 34421861813703689, guid: b7b7452bd60ba7f489c2b016eed7cfe3, type: 3}
+  - name: Arab Pants
+    equipmentType: 6
+    averageTextureColor: {r: 0.18431373, g: 0.23137255, b: 0.25490198, a: 1}
+    itemWebId: 661ecf2055a26cdaadf23e9a
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 4317603835957216769, guid: 3a38b418318c6064b9578f236a26a84e, type: 3}
+    - {fileID: 8584576227869146840, guid: ba421554f5ecf204db604f0000f47449, type: 3}
+  - name: Runic Boots
+    equipmentType: 1
+    averageTextureColor: {r: 0.3372549, g: 0.44313726, b: 0.42352942, a: 1}
+    itemWebId: 661ecf2055a26cdaadf23ea6
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 2960521421875701326, guid: 876b801ef5f4d8544bd38811626c10b7, type: 3}
+    - {fileID: 4877412807948652129, guid: 76730ddddf96daf44ba70269803743c5, type: 3}
+  - name: Runic Cape
+    equipmentType: 2
+    averageTextureColor: {r: 0.19607843, g: 0.29803923, b: 0.26666668, a: 1}
+    itemWebId: 661ecf2155a26cdaadf23ebf
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 5284925193828874892, guid: cb0a865112b07c74da55257a67e44fff, type: 3}
+    - {fileID: 5288549232329494327, guid: 228e9f2085014714c84aaa8506dadec7, type: 3}
+  - name: Runic Chest
+    equipmentType: 3
+    averageTextureColor: {r: 0.3372549, g: 0.44313726, b: 0.42352942, a: 1}
+    itemWebId: 661ecf2155a26cdaadf23ecc
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 8900552189078437240, guid: 2fbc45abeedf5b141b2acb91a3366c39, type: 3}
+    - {fileID: 2845856886260701892, guid: 2d65ca064f80d3e4798621700807c56d, type: 3}
+  - name: Runic Gloves
+    equipmentType: 4
+    averageTextureColor: {r: 0.3372549, g: 0.44313726, b: 0.42352942, a: 1}
+    itemWebId: 661ecf2155a26cdaadf23ed8
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 3141958370974047423, guid: edd7a8694467276449958cf21d631878, type: 3}
+    - {fileID: 44817825463069584, guid: 024f4f83007b9854cab6d0a0b960affc, type: 3}
+  - name: Runic Pants
+    equipmentType: 6
+    averageTextureColor: {r: 0.3372549, g: 0.44313726, b: 0.42352942, a: 1}
+    itemWebId: 661ecf2155a26cdaadf23ee4
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 86348611692484151, guid: 170fe12a1f0887b4d856c1ef1dc4bb66, type: 3}
+    - {fileID: 2862443126372418796, guid: 07504d313b4039a4f929eb59f54d0a38, type: 3}
+  - name: Runic Shoulders
+    equipmentType: 8
+    averageTextureColor: {r: 0.3372549, g: 0.44313726, b: 0.42352942, a: 1}
+    itemWebId: 661ecf2355a26cdaadf23f14
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7834197904394956578, guid: 988cc165c0034e34282baaf7f2d96b64, type: 3}
+    - {fileID: 966803504340038541, guid: 9f69142bbe3f68348b006c56457353cc, type: 3}
+  - name: Runic Belt
+    equipmentType: 0
+    averageTextureColor: {r: 0.23921569, g: 0.3254902, b: 0.20392157, a: 1}
+    itemWebId: 661ecf2455a26cdaadf23f38
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 4663531067712379620, guid: d455157f8dac69849819375066269db8, type: 3}
   characterMaterialOptions: []
