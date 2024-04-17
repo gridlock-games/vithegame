@@ -78,7 +78,7 @@ namespace Vi.UI
                 var networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
                 
                 List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
-                WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip != networkTransport.ConnectionData.Address);
+                WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address);
                 foreach (WebRequestManager.Server server in lobbyServers)
                 {
                     if (server.ip != networkTransport.ConnectionData.Address) { continue; }
