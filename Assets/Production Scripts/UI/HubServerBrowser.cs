@@ -26,6 +26,8 @@ namespace Vi.UI
             {
                 foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
                 {
+                    if (server.ip != networkTransport.ConnectionData.Address) { continue; }
+
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
                         ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
