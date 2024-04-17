@@ -189,7 +189,7 @@ namespace Vi.Core
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
-
+            Debug.Log(actionClip.name);
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
@@ -197,12 +197,72 @@ namespace Vi.Core
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+
+                if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+                if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip)); }
             }
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionStateName, weaponHandler.GetWeapon().name);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
+        }
+
+        private bool heavyAttackReleased;
+        public void HeavyAttackReleased()
+        {
+            heavyAttackReleased = true;
+        }
+
+        public void HeavyAttackPressed()
+        {
+            heavyAttackReleased = false;
+        }
+
+        private Coroutine playAdditionalStatesCoroutine;
+        private IEnumerator PlayAdditionalStates(ActionClip actionClip)
+        {
+            Animator.SetBool("CanExitAction", false);
+            int nextStateNameIndex = 0;
+            while (nextStateNameIndex < actionClip.additionalAnimationStates.Length)
+            {
+                string currentStateName = nextStateNameIndex == 0 ? actionClip.name : actionClip.additionalAnimationStates[nextStateNameIndex-1];
+
+                // Play the 2nd animation (looping animation) right after the 1st completes
+                if (nextStateNameIndex == 0)
+                {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(currentStateName))
+                    {
+                        // If we are at the end of the animation, play the next animation
+                        if (1 - Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime <= actionClip.transitionTime)
+                        {
+                            Animator.CrossFade(actionClip.additionalAnimationStates[nextStateNameIndex], actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                            nextStateNameIndex++;
+                        }
+                    }
+                }
+                else if (nextStateNameIndex == 1) // Play the end animation (attack animation) after the player releases the attack button
+                {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(currentStateName))
+                    {
+                        if (heavyAttackReleased)
+                        {
+                            Debug.Log("heavy attack released");
+                            Animator.SetBool("CanExitAction", true);
+                            heavyAttackReleased = false;
+                            Animator.CrossFade(actionClip.additionalAnimationStates[nextStateNameIndex], actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                            nextStateNameIndex++;
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Unsure how to handle state name index of " + nextStateNameIndex);
+                    break;
+                }
+
+                yield return null;
+            }
         }
 
         private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)

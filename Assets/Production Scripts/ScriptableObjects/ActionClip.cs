@@ -104,6 +104,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private AnimationCurve debugVerticalMotion;
 
         public float YAngleRotationOffset = 0;
+        public string[] additionalAnimationStates = new string[0];
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
@@ -133,7 +134,7 @@ namespace Vi.ScriptableObjects
         public bool canFlashAttack;
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
-        public bool[] ailmentHitDefinition;
+        public bool[] ailmentHitDefinition = new bool[0];
         public float grabDuration = 2;
         public float grabDistance = 3;
 
