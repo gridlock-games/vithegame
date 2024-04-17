@@ -64,7 +64,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
             else
             {

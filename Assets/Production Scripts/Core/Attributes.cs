@@ -216,7 +216,7 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon);
+            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
         }
 
         private IEnumerator ResetStaggerBool()
@@ -225,11 +225,11 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon);
+            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon);
         }
 
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
@@ -291,7 +291,7 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
-        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
+        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
             {
@@ -329,7 +329,6 @@ namespace Vi.Core
 
             if (runtimeWeapon & attack.ailment != ActionClip.Ailment.Grab)
             {
-                Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = runtimeWeapon.GetHitCounter();
                 // These hit numbers are BEFORE the hit has been added to the weapon
                 if (hitCounter.ContainsKey(this))
                 {
