@@ -3778,10 +3778,13 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 0
+  additionalAnimationStates:
+  - HeavyAttack1_Loop
+  - HeavyAttack1_End
   avatarLayer: 0
   transitionTime: 0.15
   animationSpeed: 1
-  agentStaminaCost: 20
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
@@ -3802,8 +3805,10 @@ MonoBehaviour:
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
+  isFollowUpAttack: 0
   ailment: 0
-  ailmentDuration: 2
+  ailmentHitDefinition: 
+  grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
@@ -3820,6 +3825,12 @@ MonoBehaviour:
   actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
+  useRotationalTargetingSystem: 1
+  limitAttackMotionBasedOnTarget: 1
+  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
+  boxCastHalfExtents: {x: 2, y: 1, z: 1}
+  boxCastDistance: 5
+  maximumTargetingRotationAngle: 60
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

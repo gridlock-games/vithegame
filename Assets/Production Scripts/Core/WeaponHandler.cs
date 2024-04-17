@@ -526,7 +526,7 @@ namespace Vi.Core
                 Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
 
-            if (shouldRepeatLightAttack) { OnLightAttack(); }
+            if (shouldRepeatLightAttack) { LightAttack(true); }
             if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
         }
 
@@ -537,11 +537,19 @@ namespace Vi.Core
             return IsInRecovery & CurrentActionClip.canFlashAttack;
         }
 
-        void OnLightAttack()
+        void OnLightAttack(InputValue value)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
+            LightAttack(value.isPressed);
+        }
+
+        private void LightAttack(bool isPressed)
+        {
+            if (isPressed)
+            {
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
+            }
         }
 
         private bool shouldRepeatLightAttack;
@@ -568,6 +576,12 @@ namespace Vi.Core
                     Destroy(actionVFXPreviewInstance.gameObject);
                     return;
                 }
+
+                animationHandler.HeavyAttackPressed();
+            }
+            else
+            {
+                animationHandler.HeavyAttackReleased();
             }
 
             if (CanAim)
