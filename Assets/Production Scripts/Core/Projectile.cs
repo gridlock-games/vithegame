@@ -12,16 +12,18 @@ namespace Vi.Core
         [SerializeField] private int killDistance = 500;
 
         private Attributes attacker;
+        private ShooterWeapon shooterWeapon;
         private ActionClip attack;
         private Vector3 projectileForce;
         private bool initialized;
 
-        public void Initialize(Attributes attacker, ActionClip attack, Vector3 projectileForce)
+        public void Initialize(Attributes attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce)
         {
             if (!IsServer) { Debug.LogError("Projectile.Initialize() should only be called on the server!"); return; }
             if (initialized) { Debug.LogError("Projectile.Initialize() already called, why are you calling it again idiot?"); return; }
 
             this.attacker = attacker;
+            this.shooterWeapon = shooterWeapon;
             this.attack = attack;
             this.projectileForce = projectileForce;
             initialized = true;
@@ -62,7 +64,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                networkCollider.Attributes.ProcessProjectileHit(attacker, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
             else
             {
