@@ -186,22 +186,22 @@ namespace Vi.Player
 
         [SerializeField] private GameObject minimapPrefab;
         GameObject minimapInstance;
-        void OnMinimap(InputValue value)
-        {
-            if (ExternalUI) { return; }
-            if (scoreboardInstance) { return; }
-            if (pauseInstance) { return; }
-            if (inventoryInstance) { return; }
+        //void OnMinimap(InputValue value)
+        //{
+        //    if (ExternalUI) { return; }
+        //    if (scoreboardInstance) { return; }
+        //    if (pauseInstance) { return; }
+        //    if (inventoryInstance) { return; }
 
-            if (value.isPressed)
-            {
-                minimapInstance = Instantiate(minimapPrefab);
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Destroy(minimapInstance);
-            }
-        }
+        //    if (value.isPressed)
+        //    {
+        //        minimapInstance = Instantiate(minimapPrefab);
+        //    }
+        //    else
+        //    {
+        //        Cursor.lockState = CursorLockMode.Locked;
+        //        Destroy(minimapInstance);
+        //    }
+        //}
     }
 }
