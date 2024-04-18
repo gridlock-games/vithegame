@@ -542,7 +542,7 @@ namespace Vi.Core
             LightAttack(value.isPressed);
         }
 
-        private void LightAttack(bool isPressed)
+        public void LightAttack(bool isPressed)
         {
             if (isPressed)
             {
