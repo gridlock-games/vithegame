@@ -193,13 +193,16 @@ namespace Vi.Core
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
+                if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-                else
+                else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
-
-                if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
-                if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip)); }
+                else // If this is a heavy attack
+                {
+                    playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
+                }
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -222,46 +225,42 @@ namespace Vi.Core
         private Coroutine playAdditionalStatesCoroutine;
         private IEnumerator PlayAdditionalStates(ActionClip actionClip)
         {
-            Animator.SetBool("CanExitAction", false);
-            int nextStateNameIndex = 0;
-            while (nextStateNameIndex < actionClip.additionalAnimationStates.Length)
+            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayAdditionalStates() should only be called for heavy attack action clips!"); yield break; }
+
+            Animator.ResetTrigger("ProgressHeavyAttackState");
+            Animator.SetBool("EnhanceHeavyAttack", false);
+            Animator.SetBool("CancelHeavyAttack", false);
+
+            Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+
+            float loopTime = 0;
+            while (true)
             {
-                string currentStateName = nextStateNameIndex == 0 ? actionClip.name : actionClip.additionalAnimationStates[nextStateNameIndex-1];
-
-                // Play the 2nd animation (looping animation) right after the 1st completes
-                if (nextStateNameIndex == 0)
-                {
-                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(currentStateName))
-                    {
-                        // If we are at the end of the animation, play the next animation
-                        if (1 - Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime <= actionClip.transitionTime)
-                        {
-                            Animator.CrossFade(actionClip.additionalAnimationStates[nextStateNameIndex], actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
-                            nextStateNameIndex++;
-                        }
-                    }
-                }
-                else if (nextStateNameIndex == 1) // Play the end animation (attack animation) after the player releases the attack button
-                {
-                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(currentStateName))
-                    {
-                        if (heavyAttackReleased)
-                        {
-                            Debug.Log("heavy attack released");
-                            Animator.SetBool("CanExitAction", true);
-                            heavyAttackReleased = false;
-                            Animator.CrossFade(actionClip.additionalAnimationStates[nextStateNameIndex], actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
-                            nextStateNameIndex++;
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Unsure how to handle state name index of " + nextStateNameIndex);
-                    break;
-                }
-
                 yield return null;
+
+                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop"))
+                {
+                    loopTime += Time.deltaTime;
+                }
+
+                if (loopTime > 1.5f) // Enhance
+                {
+                    Animator.SetBool("EnhanceHeavyAttack", true);
+                }
+
+                if (heavyAttackReleased)
+                {
+                    if (loopTime > 0.75f) // Attack
+                    {
+                        Animator.SetTrigger("ProgressHeavyAttackState");
+                        Animator.SetBool("CancelHeavyAttack", false);
+                    }
+                    else // Cancel
+                    {
+                        Animator.SetTrigger("ProgressHeavyAttackState");
+                        Animator.SetBool("CancelHeavyAttack", true);
+                    }
+                }
             }
         }
 
