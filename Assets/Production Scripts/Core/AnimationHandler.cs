@@ -24,6 +24,29 @@ namespace Vi.Core
             }
         }
 
+        public bool IsActionClipPlaying(ActionClip actionClip)
+        {
+            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName);
+        }
+
+        public float GetActionClipNormalizedTime(ActionClip actionClip)
+        {
+            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            {
+                return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+            }
+            else if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            {
+                return Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public bool IsAtRest()
         {
             return animatorReference.IsAtRest();
