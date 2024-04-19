@@ -295,15 +295,6 @@ namespace Vi.Core
                     else // Return straight to idle
                     {
                         Animator.SetTrigger("CancelHeavyAttackState");
-
-                        //if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Start"))
-                        //{
-                        //    Animator.SetTrigger("CancelHeavyAttackState");
-                        //}
-                        //else
-                        //{
-                        //    Animator.CrossFade("Empty", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
-                        //}
                     }
                     HeavyAttackChargeTime = chargeTime;
                     yield break;
