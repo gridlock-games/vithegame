@@ -115,6 +115,14 @@ namespace Vi.ScriptableObjects
 
         public Weapon.WeaponBone[] effectedWeaponBones;
         public bool mustBeAiming;
+
+        public bool canEnhance = true;
+        public float chargeTimeDamageMultiplier = 5;
+        public float enhancedChargeDamageMultiplier = 1;
+
+        public const float enhanceChargeTime = 1.5f;
+        public const float chargeAttackTime = 0.75f;
+
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;

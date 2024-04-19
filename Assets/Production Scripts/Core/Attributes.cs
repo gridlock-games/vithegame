@@ -384,7 +384,19 @@ namespace Vi.Core
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
 
-            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f * attacker.damageMultiplier : -attack.damage * attacker.damageMultiplier;
+            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
+            damage *= attacker.damageMultiplier;
+
+            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                damage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                Debug.Log(damage);
+                if (attack.canEnhance & attacker.animationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
+                {
+                    damage *= attack.enhancedChargeDamageMultiplier;
+                    Debug.Log("ENHANCE " + damage);
+                }
+            }
 
             if (HP.Value + damage <= 0)
             {

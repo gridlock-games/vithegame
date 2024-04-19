@@ -36,6 +36,11 @@ namespace Vi.Editor
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
+        
+        private SerializedProperty spCanEnhance;
+        private SerializedProperty spChargeTimeDamageMultiplier;
+        private SerializedProperty spEnhancedChargeDamageMultiplier;
+
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spDamage;
@@ -96,7 +101,9 @@ namespace Vi.Editor
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
+
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
+
             spShouldApplyRootMotion = serializedObject.FindProperty("shouldApplyRootMotion");
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
@@ -112,6 +119,11 @@ namespace Vi.Editor
 
             spEffectedWeaponBones = serializedObject.FindProperty("effectedWeaponBones");
             spMustBeAiming = serializedObject.FindProperty("mustBeAiming");
+
+            spCanEnhance = serializedObject.FindProperty("canEnhance");
+            spChargeTimeDamageMultiplier = serializedObject.FindProperty("chargeTimeDamageMultiplier");
+            spEnhancedChargeDamageMultiplier = serializedObject.FindProperty("enhancedChargeDamageMultiplier");
+
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spDamage = serializedObject.FindProperty("damage");
@@ -325,6 +337,11 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spMustBeAiming);
 
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Charge Attack Settings", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spCanEnhance);
+                EditorGUILayout.PropertyField(spChargeTimeDamageMultiplier);
+                EditorGUILayout.PropertyField(spEnhancedChargeDamageMultiplier);
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);

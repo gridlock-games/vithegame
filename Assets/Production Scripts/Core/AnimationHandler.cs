@@ -212,20 +212,18 @@ namespace Vi.Core
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
-            Debug.Log(actionClip.name);
+
+            if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
-                if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
-
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
-                {
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
-                }
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -245,6 +243,7 @@ namespace Vi.Core
             heavyAttackReleased = false;
         }
 
+        public float HeavyAttackChargeTime { get; private set; }
         private Coroutine playAdditionalStatesCoroutine;
         private IEnumerator PlayAdditionalStates(ActionClip actionClip)
         {
@@ -266,14 +265,17 @@ namespace Vi.Core
                     loopTime += Time.deltaTime;
                 }
 
-                if (loopTime > 1.5f) // Enhance
+                if (actionClip.canEnhance)
                 {
-                    Animator.SetBool("EnhanceHeavyAttack", true);
+                    if (loopTime > ActionClip.enhanceChargeTime) // Enhance
+                    {
+                        Animator.SetBool("EnhanceHeavyAttack", true);
+                    }
                 }
-
+                
                 if (heavyAttackReleased)
                 {
-                    if (loopTime > 0.75f) // Attack
+                    if (loopTime > ActionClip.chargeAttackTime) // Attack
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", false);
@@ -283,6 +285,8 @@ namespace Vi.Core
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", true);
                     }
+                    HeavyAttackChargeTime = loopTime;
+                    yield break;
                 }
             }
         }
