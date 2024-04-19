@@ -255,17 +255,17 @@ namespace Vi.Core
 
             Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
 
-            float loopTime = 0;
+            float chargeTime = 0;
             while (true)
             {
                 yield return null;
 
                 if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
-                    loopTime += Time.deltaTime;
+                    chargeTime += Time.deltaTime;
                 }
 
-                if (loopTime > ActionClip.chargePenaltyTime)
+                if (chargeTime > ActionClip.chargePenaltyTime)
                 {
                     attributes.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
                     HeavyAttackChargeTime = 0;
@@ -274,7 +274,7 @@ namespace Vi.Core
 
                 if (actionClip.canEnhance)
                 {
-                    if (loopTime > ActionClip.enhanceChargeTime) // Enhance
+                    if (chargeTime > ActionClip.enhanceChargeTime) // Enhance
                     {
                         Animator.SetBool("EnhanceHeavyAttack", true);
                     }
@@ -282,21 +282,21 @@ namespace Vi.Core
                 
                 if (heavyAttackReleased)
                 {
-                    if (loopTime > ActionClip.chargeAttackTime) // Attack
+                    if (chargeTime > ActionClip.chargeAttackTime) // Attack
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", false);
                     }
-                    else if (loopTime > ActionClip.cancelChargeTime) // Play Cancel Anim
+                    else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", true);
                     }
                     else // Return straight to idle
                     {
-                        Animator.CrossFade("Empty", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                        Animator.SetTrigger("CancelHeavyAttackState");
                     }
-                    HeavyAttackChargeTime = loopTime;
+                    HeavyAttackChargeTime = chargeTime;
                     yield break;
                 }
             }
