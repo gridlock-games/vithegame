@@ -260,9 +260,16 @@ namespace Vi.Core
             {
                 yield return null;
 
-                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop"))
+                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
                     loopTime += Time.deltaTime;
+                }
+
+                if (loopTime > ActionClip.chargePenaltyTime)
+                {
+                    attributes.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
+                    HeavyAttackChargeTime = 0;
+                    yield break;
                 }
 
                 if (actionClip.canEnhance)

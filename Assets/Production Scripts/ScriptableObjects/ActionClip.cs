@@ -119,7 +119,9 @@ namespace Vi.ScriptableObjects
         public bool canEnhance = true;
         public float chargeTimeDamageMultiplier = 5;
         public float enhancedChargeDamageMultiplier = 1;
+        public float chargePenaltyDamage = 10;
 
+        public const float chargePenaltyTime = 3;
         public const float enhanceChargeTime = 1.5f;
         public const float chargeAttackTime = 0.75f;
 

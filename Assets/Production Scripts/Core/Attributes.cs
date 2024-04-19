@@ -250,6 +250,30 @@ namespace Vi.Core
             return true;
         }
 
+        public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
+            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            {
+                ailment.Value = ActionClip.Ailment.Death;
+                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+            }
+            else
+            {
+                ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
+                animationHandler.PlayAction(hitReaction);
+            }
+
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, false);
+            AddHP(damage);
+            return true;
+        }
+
         private NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
 
         private void SetKiller(Attributes killer) { killerNetObjId.Value = killer.NetworkObjectId; }
@@ -390,11 +414,9 @@ namespace Vi.Core
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
                 damage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                Debug.Log(damage);
                 if (attack.canEnhance & attacker.animationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
                 {
                     damage *= attack.enhancedChargeDamageMultiplier;
-                    Debug.Log("ENHANCE " + damage);
                 }
             }
 

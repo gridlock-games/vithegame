@@ -3789,6 +3789,7 @@ MonoBehaviour:
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.5
   damage: 5
@@ -3810,7 +3811,7 @@ MonoBehaviour:
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 0
+  dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0

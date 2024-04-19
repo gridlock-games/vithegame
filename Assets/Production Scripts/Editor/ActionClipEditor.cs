@@ -40,6 +40,7 @@ namespace Vi.Editor
         private SerializedProperty spCanEnhance;
         private SerializedProperty spChargeTimeDamageMultiplier;
         private SerializedProperty spEnhancedChargeDamageMultiplier;
+        private SerializedProperty spChargePenaltyDamage;
 
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
@@ -123,6 +124,7 @@ namespace Vi.Editor
             spCanEnhance = serializedObject.FindProperty("canEnhance");
             spChargeTimeDamageMultiplier = serializedObject.FindProperty("chargeTimeDamageMultiplier");
             spEnhancedChargeDamageMultiplier = serializedObject.FindProperty("enhancedChargeDamageMultiplier");
+            spChargePenaltyDamage = serializedObject.FindProperty("chargePenaltyDamage");
 
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
@@ -342,6 +344,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanEnhance);
                 EditorGUILayout.PropertyField(spChargeTimeDamageMultiplier);
                 EditorGUILayout.PropertyField(spEnhancedChargeDamageMultiplier);
+                EditorGUILayout.PropertyField(spChargePenaltyDamage);
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
