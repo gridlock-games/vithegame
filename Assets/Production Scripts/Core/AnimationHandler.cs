@@ -272,7 +272,6 @@ namespace Vi.Core
                     if (chargeTime > ActionClip.chargePenaltyTime)
                     {
                         attributes.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
-                        Debug.Log("CHARGE CANCELLED " + chargeTime);
                         HeavyAttackChargeTime = 0;
                         yield break;
                     }
@@ -293,7 +292,6 @@ namespace Vi.Core
                         {
                             Animator.SetTrigger("CancelHeavyAttackState");
                         }
-                        Debug.Log("CHARGE RELEASED " + chargeTime);
                         HeavyAttackChargeTime = chargeTime;
                         EvaluateChargeAttackClientRpc(chargeTime);
                         yield break;
@@ -321,7 +319,6 @@ namespace Vi.Core
             {
                 Animator.SetTrigger("CancelHeavyAttackState");
             }
-            Debug.Log("CHARGE RELEASED " + chargeTime);
         }
 
         private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)
