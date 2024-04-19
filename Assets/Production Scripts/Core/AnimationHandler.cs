@@ -287,10 +287,14 @@ namespace Vi.Core
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", false);
                     }
-                    else // Cancel
+                    else if (loopTime > ActionClip.cancelChargeTime) // Play Cancel Anim
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         Animator.SetBool("CancelHeavyAttack", true);
+                    }
+                    else // Return straight to idle
+                    {
+                        Animator.CrossFade("Empty", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
                     }
                     HeavyAttackChargeTime = loopTime;
                     yield break;
