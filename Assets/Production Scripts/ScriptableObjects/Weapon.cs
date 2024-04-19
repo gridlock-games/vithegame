@@ -151,6 +151,8 @@ namespace Vi.ScriptableObjects
 
         public ActionClip GetDeathReaction() { return hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip; }
 
+        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip; }
+
         public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
             HitLocation hitLocation;

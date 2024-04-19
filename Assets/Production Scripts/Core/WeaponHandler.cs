@@ -420,25 +420,9 @@ namespace Vi.Core
             else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
-                if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+                if (animationHandler.IsActionClipPlaying(CurrentActionClip))
                 {
-                    float normalizedTime = animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
-                    IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
-                    IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
-                    IsInAnticipation = !IsAttacking & !IsInRecovery;
-
-                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                    {
-                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
-                        {
-                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
-                        }
-                    }
-                }
-                else if (animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
-                {
-                    float normalizedTime = animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
+                    float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
@@ -542,7 +526,7 @@ namespace Vi.Core
             LightAttack(value.isPressed);
         }
 
-        private void LightAttack(bool isPressed)
+        public void LightAttack(bool isPressed)
         {
             if (isPressed)
             {

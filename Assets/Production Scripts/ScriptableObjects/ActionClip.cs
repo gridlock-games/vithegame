@@ -104,7 +104,6 @@ namespace Vi.ScriptableObjects
         [SerializeField] private AnimationCurve debugVerticalMotion;
 
         public float YAngleRotationOffset = 0;
-        public string[] additionalAnimationStates = new string[0];
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
@@ -116,6 +115,16 @@ namespace Vi.ScriptableObjects
 
         public Weapon.WeaponBone[] effectedWeaponBones;
         public bool mustBeAiming;
+
+        public bool canEnhance = true;
+        public float chargeTimeDamageMultiplier = 5;
+        public float enhancedChargeDamageMultiplier = 1;
+        public float chargePenaltyDamage = 10;
+
+        public const float chargePenaltyTime = 3;
+        public const float enhanceChargeTime = 1.5f;
+        public const float chargeAttackTime = 0.75f;
+
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;
