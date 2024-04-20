@@ -45,8 +45,6 @@ namespace Vi.UI
         [SerializeField] private Sprite lightAttackIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private Sprite aimIcon;
-        [SerializeField] private Image primaryWeaponButton;
-        [SerializeField] private Image secondaryWeaponButton;
         [SerializeField] private Button switchAttackTypeButton;
         [SerializeField] private Image aimButton;
         [SerializeField] private Button scoreboardButton;
@@ -66,6 +64,11 @@ namespace Vi.UI
         public void OpenScoreboard()
         {
             attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
+        }
+
+        public void SwitchWeapon()
+        {
+            attributes.GetComponent<LoadoutManager>().SwitchWeapon();
         }
 
         private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
@@ -228,9 +231,6 @@ namespace Vi.UI
             ToggleAttackType(true);
             aimButton.gameObject.SetActive(weaponHandler.CanAim);
             switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
-
-            primaryWeaponButton.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
-            secondaryWeaponButton.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
         }
 
         private void UpdateActiveUIElements()
