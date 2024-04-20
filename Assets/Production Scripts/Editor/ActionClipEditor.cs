@@ -31,6 +31,7 @@ namespace Vi.Editor
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
         private SerializedProperty spAnimationSpeed;
+        private SerializedProperty spRecoveryAnimationSpeed;
 
         private SerializedProperty spYAngleRotationOffset;
 
@@ -112,6 +113,7 @@ namespace Vi.Editor
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
+            spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
@@ -187,6 +189,14 @@ namespace Vi.Editor
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
         }
 
+        private readonly List<ActionClip.ClipType> configurableRecoverySpeedTypes = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.LightAttack,
+            ActionClip.ClipType.HeavyAttack,
+            ActionClip.ClipType.FlashAttack,
+            ActionClip.ClipType.Ability
+        };
+
         private Weapon weapon;
         private AnimatorOverrideController animatorOverrideController;
         private AnimationClip animationClip;
@@ -195,6 +205,9 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.PropertyField(spAnimationSpeed);
+
+            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
+            
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
 
