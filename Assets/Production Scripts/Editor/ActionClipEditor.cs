@@ -189,6 +189,14 @@ namespace Vi.Editor
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
         }
 
+        private readonly List<ActionClip.ClipType> configurableRecoverySpeedTypes = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.LightAttack,
+            ActionClip.ClipType.HeavyAttack,
+            ActionClip.ClipType.FlashAttack,
+            ActionClip.ClipType.Ability
+        };
+
         private Weapon weapon;
         private AnimatorOverrideController animatorOverrideController;
         private AnimationClip animationClip;
@@ -198,7 +206,7 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.PropertyField(spAnimationSpeed);
 
-            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
+            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
             
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
