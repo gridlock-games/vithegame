@@ -354,6 +354,22 @@ namespace Vi.Core
             }
         }
 
+        public void SwitchWeapon()
+        {
+            if (currentEquippedWeapon.Value == 1)
+            {
+                OnWeapon2();
+            }
+            else if (currentEquippedWeapon.Value == 2)
+            {
+                OnWeapon1();
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle current equipped weapon value of - " + currentEquippedWeapon.Value);
+            }
+        }
+
         private void Update()
         {
             if (!IsSpawned) { return; }
