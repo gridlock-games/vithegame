@@ -6504,8 +6504,12 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.6
+  recoveryNormalizedTime: 0.3
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -6522,6 +6526,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 1
   ailment: 0
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
@@ -6536,11 +6541,9 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 9059005774130335826, guid: 89ff078aac7e48d499356f32170eb49a, type: 3}
-  - {fileID: 6773071653687936824, guid: 82831a52d839c47488f5ecbae6c77eff, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
-  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
