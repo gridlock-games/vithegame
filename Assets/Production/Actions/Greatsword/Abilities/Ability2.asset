@@ -11152,6 +11152,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.1
   animationSpeed: 1
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
@@ -11161,7 +11162,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.1
+  attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.4
   damage: 1
   healAmount: 0
