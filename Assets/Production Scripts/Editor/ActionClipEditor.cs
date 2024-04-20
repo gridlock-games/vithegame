@@ -31,6 +31,7 @@ namespace Vi.Editor
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
         private SerializedProperty spAnimationSpeed;
+        private SerializedProperty spRecoveryAnimationSpeed;
 
         private SerializedProperty spYAngleRotationOffset;
 
@@ -112,6 +113,7 @@ namespace Vi.Editor
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
+            spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
@@ -195,6 +197,9 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.PropertyField(spAnimationSpeed);
+
+            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
+            
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
 
