@@ -11157,8 +11157,12 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.4
-  recoveryNormalizedTime: 0.8
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.1
+  recoveryNormalizedTime: 0.4
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -11175,6 +11179,7 @@ MonoBehaviour:
   canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 4
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
@@ -11191,7 +11196,7 @@ MonoBehaviour:
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
-  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
