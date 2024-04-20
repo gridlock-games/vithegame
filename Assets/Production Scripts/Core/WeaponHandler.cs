@@ -561,11 +561,11 @@ namespace Vi.Core
                     return;
                 }
 
-                animationHandler.HeavyAttackPressed();
+                animationHandler.HeavyAttackPressedServerRpc();
             }
             else
             {
-                animationHandler.HeavyAttackReleased();
+                animationHandler.HeavyAttackReleasedServerRpc();
             }
 
             if (CanAim)
