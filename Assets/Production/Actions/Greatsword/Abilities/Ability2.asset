@@ -11152,7 +11152,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.1
   animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  recoveryAnimationSpeed: 1.5
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
@@ -11184,10 +11184,10 @@ MonoBehaviour:
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
-  canCancelLightAttacks: 0
+  canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 0
+  canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
