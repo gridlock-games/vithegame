@@ -3997,11 +3997,16 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   animationSpeed: 1
+  recoveryAnimationSpeed: 1.5
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 12000000
   mustBeAiming: 0
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
   recoveryNormalizedTime: 0.3
   damage: 1
@@ -4020,6 +4025,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 0
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
