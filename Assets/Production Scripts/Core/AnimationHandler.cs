@@ -247,7 +247,6 @@ namespace Vi.Core
             Animator.SetBool("EnhanceHeavyAttack", false);
             Animator.SetBool("CancelHeavyAttack", false);
             Animator.SetBool("PlayHeavyAttackEnd", actionClip.chargeAttackHasEndAnimation);
-            Animator.SetBool("HeavyAttackStateIsLoop", actionClip.chargeAttackStateIsLoop);
 
             Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
 
@@ -275,7 +274,7 @@ namespace Vi.Core
                     {
                         attributes.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
                         HeavyAttackChargeTime = 0;
-                        yield break;
+                        break;
                     }
 
                     if (heavyAttackReleased)
@@ -284,6 +283,22 @@ namespace Vi.Core
                         {
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
+
+                            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"));
+
+                            while (true)
+                            {
+                                yield return null;
+
+                                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"))
+                                {
+                                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                                    {
+                                        Animator.SetTrigger("ProgressHeavyAttackState");
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
                         {
@@ -296,7 +311,7 @@ namespace Vi.Core
                         }
                         HeavyAttackChargeTime = chargeTime;
                         EvaluateChargeAttackClientRpc(chargeTime);
-                        yield break;
+                        break;
                     }
                 }
             }

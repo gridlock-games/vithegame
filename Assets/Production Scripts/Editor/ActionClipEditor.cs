@@ -39,7 +39,7 @@ namespace Vi.Editor
         private SerializedProperty spMustBeAiming;
 
         private SerializedProperty spChargeAttackHasEndAnimation;
-        private SerializedProperty spChargeAttackStateIsLoop;
+        private SerializedProperty spChargeAttackStateLoopCount;
         private SerializedProperty spCanEnhance;
         private SerializedProperty spChargeTimeDamageMultiplier;
         private SerializedProperty spEnhancedChargeDamageMultiplier;
@@ -126,7 +126,7 @@ namespace Vi.Editor
             spMustBeAiming = serializedObject.FindProperty("mustBeAiming");
 
             spChargeAttackHasEndAnimation = serializedObject.FindProperty("chargeAttackHasEndAnimation");
-            spChargeAttackStateIsLoop = serializedObject.FindProperty("chargeAttackStateIsLoop");
+            spChargeAttackStateLoopCount = serializedObject.FindProperty("chargeAttackStateLoopCount");
             spCanEnhance = serializedObject.FindProperty("canEnhance");
             spChargeTimeDamageMultiplier = serializedObject.FindProperty("chargeTimeDamageMultiplier");
             spEnhancedChargeDamageMultiplier = serializedObject.FindProperty("enhancedChargeDamageMultiplier");
@@ -359,7 +359,7 @@ namespace Vi.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Charge Attack Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.PropertyField(spChargeAttackHasEndAnimation);
-                EditorGUILayout.PropertyField(spChargeAttackStateIsLoop);
+                EditorGUILayout.PropertyField(spChargeAttackStateLoopCount);
                 EditorGUILayout.PropertyField(spCanEnhance);
                 EditorGUILayout.PropertyField(spChargeTimeDamageMultiplier);
                 if (spCanEnhance.boolValue) { EditorGUILayout.PropertyField(spEnhancedChargeDamageMultiplier); }
