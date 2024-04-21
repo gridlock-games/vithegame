@@ -982,6 +982,15 @@ namespace Vi.Core
                     break;
                 }
             }
+
+            if (inputAttackType == Weapon.InputAttackType.HeavyAttack)
+            {
+                if (selectedAttack == null)
+                {
+                    selectedAttack = weaponInstance.GetAttackList().Find(item => item.inputs.SequenceEqual(new List<Weapon.InputAttackType>() { Weapon.InputAttackType.HeavyAttack }) & item.comboCondition == Weapon.ComboCondition.None & !item.attackClip.mustBeAiming);
+                }
+            }
+
             if (selectedAttack == null) { return null; }
             return selectedAttack.attackClip;
         }
