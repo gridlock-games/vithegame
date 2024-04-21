@@ -33,18 +33,20 @@ namespace Vi.Core
         public float GetActionClipNormalizedTime(ActionClip actionClip)
         {
             string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            float normalizedTime = 0;
             if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
             {
-                return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+                normalizedTime = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
             }
             else if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
             {
-                return Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+                normalizedTime = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
             }
-            else
-            {
-                return 0;
-            }
+
+            float floor = Mathf.FloorToInt(normalizedTime);
+            if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
+
+            return normalizedTime;
         }
 
         public bool IsAtRest()
