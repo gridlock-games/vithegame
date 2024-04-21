@@ -404,6 +404,12 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spGrabDistance);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
+                EditorGUILayout.PropertyField(spCanCancelLightAttacks);
+                EditorGUILayout.PropertyField(spCanCancelHeavyAttacks);
+                EditorGUILayout.PropertyField(spCanCancelAbilities);
+                EditorGUILayout.PropertyField(spCanBeCancelledByLightAttacks);
+                EditorGUILayout.PropertyField(spCanBeCancelledByHeavyAttacks);
+                EditorGUILayout.PropertyField(spCanBeCancelledByAbilities);
                 EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
