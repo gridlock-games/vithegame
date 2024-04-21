@@ -246,6 +246,8 @@ namespace Vi.Core
             Animator.ResetTrigger("ProgressHeavyAttackState");
             Animator.SetBool("EnhanceHeavyAttack", false);
             Animator.SetBool("CancelHeavyAttack", false);
+            Animator.SetBool("PlayHeavyAttackEnd", actionClip.chargeAttackHasEndAnimation);
+            Animator.SetBool("HeavyAttackStateIsLoop", actionClip.chargeAttackStateIsLoop);
 
             Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
 

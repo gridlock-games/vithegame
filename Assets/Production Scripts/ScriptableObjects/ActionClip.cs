@@ -117,6 +117,8 @@ namespace Vi.ScriptableObjects
         public Weapon.WeaponBone[] effectedWeaponBones;
         public bool mustBeAiming;
 
+        public bool chargeAttackHasEndAnimation;
+        public bool chargeAttackStateIsLoop;
         public bool canEnhance = true;
         public float chargeTimeDamageMultiplier = 5;
         public float enhancedChargeDamageMultiplier = 1;
