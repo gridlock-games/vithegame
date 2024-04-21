@@ -391,8 +391,11 @@ namespace Vi.UI
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
-                    canCountDown = false;
-                    if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for essence war"; }
+                    team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    canCountDown = (team1List.Count == 3 & team2List.Count == 3) | (team1List.Count == 5 & team2List.Count == 5);
+
+                    if (!canCountDown) { cannotCountDownMessage = "Essence War is 3v3 or 5v5 only"; }
                     break;
                 case PlayerDataManager.GameMode.OutpostRush:
                     canCountDown = false;

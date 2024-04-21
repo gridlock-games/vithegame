@@ -310,7 +310,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) * weaponHandler.CurrentActionClip.animationSpeed;
+                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) * (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed);
                 }
             }
 

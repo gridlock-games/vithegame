@@ -657,7 +657,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
-            NetSceneManager.Singleton.LoadScene("Arena Map A");
+            NetSceneManager.Singleton.LoadScene("Eclipse Grove");
         }
 
         public void OpenServerBrowser()
