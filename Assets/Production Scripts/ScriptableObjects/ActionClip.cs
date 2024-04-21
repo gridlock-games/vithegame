@@ -108,6 +108,7 @@ namespace Vi.ScriptableObjects
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
         public float animationSpeed = 1;
+        public float recoveryAnimationSpeed = 1;
 
         public float agentStaminaCost = 20;
         public float agentDefenseCost = 0;
@@ -115,6 +116,20 @@ namespace Vi.ScriptableObjects
 
         public Weapon.WeaponBone[] effectedWeaponBones;
         public bool mustBeAiming;
+
+        public bool chargeAttackHasEndAnimation;
+        public float chargeAttackStateLoopCount = 1;
+        public bool canEnhance = true;
+        public float chargeTimeDamageMultiplier = 5;
+        public float enhancedChargeDamageMultiplier = 1;
+        public float chargePenaltyDamage = 10;
+
+        public const float chargePenaltyTime = 3;
+        public const float enhanceChargeTime = 1.5f;
+        public const float chargeAttackTime = 0.75f;
+        public const float cancelChargeTime = 0.25f;
+        public const float chargeAttackStateAnimatorTransitionDuration = 0.25f;
+
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
         public float damage = 20;
@@ -133,6 +148,7 @@ namespace Vi.ScriptableObjects
         public bool canFlashAttack;
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
+        public bool[] ailmentHitDefinition = new bool[0];
         public float grabDuration = 2;
         public float grabDistance = 3;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -31,11 +32,11 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
-            {
-                CharacterReference.CharacterMaterial headMaterial = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(characterMaterial.raceAndGender).Find(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head & characterMaterial.material.name.Contains(string.Concat(item.material.name.Where(char.IsDigit))));
-                ApplyCharacterMaterial(headMaterial);
-            }
+            //if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
+            //{
+            //    CharacterReference.CharacterMaterial headMaterial = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(characterMaterial.raceAndGender).Find(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head & characterMaterial.material.name.Contains(string.Concat(item.material.name.Where(char.IsDigit))));
+            //    ApplyCharacterMaterial(headMaterial);
+            //}
 
             MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
@@ -96,6 +97,15 @@ namespace Vi.Core
             }
         }
 
+        public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
+        {
+            if (wearableEquipmentInstances.ContainsKey(equipmentType))
+            {
+                Destroy(wearableEquipmentInstances[equipmentType]);
+                wearableEquipmentInstances.Remove(equipmentType);
+            }
+        }
+
         [System.Serializable]
         private class MaterialReplacementDefintion
         {
@@ -138,6 +148,7 @@ namespace Vi.Core
         private void Awake()
         {
             animator = GetComponent<Animator>();
+            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             weaponHandler = GetComponentInParent<WeaponHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();

@@ -3120,7 +3120,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YAngleRotationOffset: 3
+  YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
   animationSpeed: 1
@@ -3129,7 +3129,11 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 11000000
   mustBeAiming: 0
-  attackingNormalizedTime: 1
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.45
   recoveryNormalizedTime: 1
   damage: 8
   healAmount: 0
@@ -3147,6 +3151,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 2
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
@@ -3161,9 +3166,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 7655699095433700820, guid: 28f208f76608bff44989664db84562c3, type: 3}
-  - {fileID: 1690537743943305692, guid: 3444ae63b408f5f41af8b6fe73845edf, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
     type: 3}
   previewActionVFXScale: {x: 0.7, y: 0.7, z: 0.7}

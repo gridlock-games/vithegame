@@ -83,7 +83,7 @@ namespace Vi.Core
                 {
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position, projectileSpawnPoint.transform.rotation);
                     projectileInstance.GetComponent<NetworkObject>().Spawn();
-                    projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, parentWeaponHandler.CurrentActionClip, projectileForce);
+                    projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo) { parentWeaponHandler.UseAmmo(); }

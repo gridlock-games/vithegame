@@ -216,7 +216,7 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon);
+            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
         }
 
         private IEnumerator ResetStaggerBool()
@@ -225,11 +225,11 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        public bool ProcessProjectileHit(Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition);
+            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon);
         }
 
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
@@ -246,6 +246,30 @@ namespace Vi.Core
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             RenderHitGlowOnly();
+            AddHP(damage);
+            return true;
+        }
+
+        public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
+            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            {
+                ailment.Value = ActionClip.Ailment.Death;
+                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+            }
+            else
+            {
+                ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
+                animationHandler.PlayAction(hitReaction);
+            }
+
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, false);
             AddHP(damage);
             return true;
         }
@@ -291,15 +315,11 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
-        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, RuntimeWeapon runtimeWeapon = null)
+        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null)
         {
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
-            }
-            else // is projectile hit
-            {
-                if (runtimeWeapon) { Debug.LogError("When processing a projectile hit, you shouldn't be passing in a runtime weapon!"); return false; }
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
@@ -330,14 +350,56 @@ namespace Vi.Core
             // Combination ailment logic here
             bool applyAilmentRegardless = false;
             ActionClip.Ailment attackAilment = attack.ailment == ActionClip.Ailment.Grab ? ActionClip.Ailment.None : attack.ailment;
-            if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
-            if (ailment.Value == ActionClip.Ailment.Stun & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
+
+            if (runtimeWeapon & attack.ailment != ActionClip.Ailment.Grab)
+            {
+                // These hit numbers are BEFORE the hit has been added to the weapon
+                if (hitCounter.ContainsKey(this))
+                {
+                    if (attack.ailmentHitDefinition.Length > hitCounter[this].hitNumber)
+                    {
+                        if (attack.ailmentHitDefinition[hitCounter[this].hitNumber]) // If we are in the ailment hit definition and it is true
+                        {
+                            attackAilment = attack.ailment;
+                        }
+                        else // If we are in the ailment hit definition, but it is false
+                        {
+                            attackAilment = ActionClip.Ailment.None;
+                        }
+                    }
+                    else // If we are out of the range of the ailment hit array
+                    {
+                        attackAilment = attack.ailment;
+                    }
+                }
+                else // First hit
+                {
+                    if (attack.ailmentHitDefinition.Length > 0)
+                    {
+                        if (attack.ailmentHitDefinition[0]) // If we are in the ailment hit definition and it is true
+                        {
+                            attackAilment = attack.ailment;
+                        }
+                        else // If we are in the ailment hit definition, but it is false
+                        {
+                            attackAilment = ActionClip.Ailment.None;
+                        }
+                    }
+                    else // If the ailment hit definition array is empty
+                    {
+                        attackAilment = attack.ailment;
+                    }
+                }
+            }
+
+            if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
             if (ailment.Value == ActionClip.Ailment.Stun & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Stagger; }
 
-            if (ailment.Value == ActionClip.Ailment.Stagger & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Stagger & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
-            if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
-            if (ailment.Value == ActionClip.Ailment.Knockup & attack.ailment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attackAilment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
@@ -346,7 +408,17 @@ namespace Vi.Core
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
 
-            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f * attacker.damageMultiplier : -attack.damage * attacker.damageMultiplier;
+            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
+            damage *= attacker.damageMultiplier;
+
+            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                damage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                if (attack.canEnhance & attacker.animationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
+                {
+                    damage *= attack.enhancedChargeDamageMultiplier;
+                }
+            }
 
             if (HP.Value + damage <= 0)
             {
@@ -556,12 +628,12 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
 
-            if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
-
             GlowRenderer.RenderInvincible(IsInvincible);
             GlowRenderer.RenderUninterruptable(IsUninterruptable);
 
             if (!IsServer) { return; }
+
+            if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
 
             isInvincible.Value = Time.time <= invincibilityEndTime;
             isUninterruptable.Value = Time.time <= uninterruptableEndTime;

@@ -6498,14 +6498,19 @@ MonoBehaviour:
   YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
-  animationSpeed: 1
-  agentStaminaCost: 1
+  animationSpeed: 0.75
+  recoveryAnimationSpeed: 1
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.5
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.4
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -6522,25 +6527,24 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 1
   ailment: 0
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
-  canCancelLightAttacks: 1
+  canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
   canBeCancelledByLightAttacks: 1
-  canBeCancelledByHeavyAttacks: 1
-  canBeCancelledByAbilities: 1
+  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 311f42101bcd67e4d81d0cf3a36bcc47, type: 3}
   abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 9059005774130335826, guid: 89ff078aac7e48d499356f32170eb49a, type: 3}
-  - {fileID: 6773071653687936824, guid: 82831a52d839c47488f5ecbae6c77eff, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
-  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}

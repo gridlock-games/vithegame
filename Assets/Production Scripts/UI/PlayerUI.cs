@@ -45,10 +45,9 @@ namespace Vi.UI
         [SerializeField] private Sprite lightAttackIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private Sprite aimIcon;
-        [SerializeField] private Image primaryWeaponButton;
-        [SerializeField] private Image secondaryWeaponButton;
         [SerializeField] private Button switchAttackTypeButton;
         [SerializeField] private Image aimButton;
+        [SerializeField] private Button scoreboardButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -60,6 +59,16 @@ namespace Vi.UI
         public void OpenInventoryMenu()
         {
             attributes.GetComponent<ActionMapHandler>().OnInventory();
+        }
+
+        public void OpenScoreboard()
+        {
+            attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
+        }
+
+        public void SwitchWeapon()
+        {
+            attributes.GetComponent<LoadoutManager>().SwitchWeapon();
         }
 
         private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
@@ -105,16 +114,6 @@ namespace Vi.UI
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private void Start()
         {
-            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
-            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
-
-            ToggleAttackType(false);
-            fadeToWhiteImage.color = Color.black;
-
-            playerCard.Initialize(GetComponentInParent<Attributes>());
-
-            UpdateWeapon(false);
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
@@ -125,6 +124,16 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            RectTransform rt = (RectTransform)moveJoystick.transform.parent;
+            moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
+
+            ToggleAttackType(false);
+            fadeToWhiteImage.color = Color.black;
+
+            playerCard.Initialize(GetComponentInParent<Attributes>());
+
+            UpdateWeapon(false);
         }
 
         public void OnRebinding()
@@ -222,9 +231,6 @@ namespace Vi.UI
             ToggleAttackType(true);
             aimButton.gameObject.SetActive(weaponHandler.CanAim);
             switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
-
-            primaryWeaponButton.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
-            secondaryWeaponButton.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
         }
 
         private void UpdateActiveUIElements()
@@ -239,6 +245,8 @@ namespace Vi.UI
         {
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
+
+            scoreboardButton.gameObject.SetActive(Core.GameModeManagers.GameModeManager.Singleton);
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {

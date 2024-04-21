@@ -75,21 +75,26 @@ namespace Vi.UI
 
             if (IsServer)
             {
+                var networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+                
                 List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address);
+                foreach (WebRequestManager.Server server in lobbyServers)
                 {
+                    if (server.ip != networkTransport.ConnectionData.Address) { continue; }
+
                     if (server.population == 0)
                         emptyServerList.Add(server);
                 }
 
-                if (emptyServerList.Count < emptyLobbyServersRequired | WebRequestManager.Singleton.LobbyServers.Length < minimumLobbyServersRequired)
+                if (emptyServerList.Count < emptyLobbyServersRequired | lobbyServers.Length < minimumLobbyServersRequired)
                 {
                     if (!creatingNewLobby)
                     {
                         StartCoroutine(CreateNewLobby());
                     }
                 }
-                else if (emptyServerList.Count > emptyLobbyServersRequired & WebRequestManager.Singleton.LobbyServers.Length > minimumLobbyServersRequired)
+                else if (emptyServerList.Count > emptyLobbyServersRequired & lobbyServers.Length > minimumLobbyServersRequired)
                 {
                     if (emptyServerList.Count > 0 & !WebRequestManager.Singleton.IsDeletingServer)
                     {

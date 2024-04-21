@@ -34,11 +34,10 @@ MonoBehaviour:
   hitAudioClip: {fileID: 8300000, guid: 99ace9ddb8b8b48b7baf9df95c8d771b, type: 3}
   knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
     type: 3}
-  hitVFXPrefab: {fileID: 4329036519906242892, guid: 8fa4d75523fd22445abc60e9da3a5790,
+  hitVFXPrefab: {fileID: 1008842686038376, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
   blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
-  blockVFXPrefab: {fileID: 4329036519906242892, guid: 583f37b3acf6baf43bfe1b375082eba6,
-    type: 3}
+  blockVFXPrefab: {fileID: 0}
   weaponModelData:
   - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
       type: 3}
@@ -67,6 +66,13 @@ MonoBehaviour:
       weaponRotationOffset: {x: 356.96768, y: 6.90903, z: 257.56854}
       stowedWeaponPositionOffset: {x: 0.15, y: 0.117, z: -0.026}
       stowedWeaponRotationOffset: {x: 16.55491, y: 102.8175, z: 271.44424}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: e16ed5c86b47a4b7190a7b9545d382d6,
+        type: 3}
+      weaponBone: 15
+      weaponPositionOffset: {x: 0.205, y: 0.062, z: -0.08}
+      weaponRotationOffset: {x: 28.777721, y: 30.740602, z: 334.7686}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
       type: 3}
     data:
@@ -154,14 +160,8 @@ MonoBehaviour:
   - inputs: 0000000000000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 680a19656b558a04498346cf7b29ed76, type: 2}
-  - inputs: 0000000001000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: fde308ba0a28d4848bede9a081dc11e0, type: 2}
   - inputs: 01000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: fde308ba0a28d4848bede9a081dc11e0, type: 2}
-  - inputs: 0300000001000000
-    comboCondition: 1
     attackClip: {fileID: 11400000, guid: fde308ba0a28d4848bede9a081dc11e0, type: 2}
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}

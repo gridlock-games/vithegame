@@ -45,6 +45,10 @@ namespace Vi.Core.GameModeManagers
             {
                 message = winningPlayersDataIds.Length.ToString() + " players are tied for first place! ";
             }
+            else if (winningPlayersDataIds.Length == 0)
+            {
+                message = "Round draw! ";
+            }
             else
             {
                 message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " has won the round! ";
@@ -64,10 +68,14 @@ namespace Vi.Core.GameModeManagers
             {
                 OnRoundEnd(highestKillIdList.ToArray());
             }
-            else
+            else if (!overtime.Value)
             {
                 roundTimer.Value = 30;
                 overtime.Value = true;
+            }
+            else
+            {
+                OnRoundEnd(new int[0]);
             }
         }
 

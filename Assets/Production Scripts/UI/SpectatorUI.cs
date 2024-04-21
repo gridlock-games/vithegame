@@ -30,7 +30,12 @@ namespace Vi.UI
 
         public void OpenPauseMenu()
         {
-            Instantiate(pauseMenu.gameObject);
+            spectator.GetComponent<ActionMapHandler>().OnPause();
+        }
+
+        public void OpenScoreboard()
+        {
+            spectator.GetComponent<ActionMapHandler>().OpenScoreboard();
         }
 
         private void Update()

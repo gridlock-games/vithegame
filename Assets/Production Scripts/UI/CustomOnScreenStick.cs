@@ -14,6 +14,7 @@ namespace Vi.UI
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
         [SerializeField] private float joystickValueMultiplier = 1;
+        [SerializeField] private RectTransform limits;
 
         public enum JoystickActionType
         {
@@ -41,8 +42,18 @@ namespace Vi.UI
             movementHandler = transform.root.GetComponent<MovementHandler>();
         }
 
+        private void OnEnable()
+        {
+            InputSystem.onBeforeUpdate += UpdateJoystick;
+        }
+
+        private void OnDisable()
+        {
+            InputSystem.onBeforeUpdate -= UpdateJoystick;
+        }
+
         private int interactingTouchId = -1;
-        private void Update()
+        private void UpdateJoystick()
         {
             if (EnhancedTouchSupport.enabled)
             {
@@ -122,15 +133,15 @@ namespace Vi.UI
         private void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
-            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint, movementRange);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, null, out Vector2 localPoint);
+            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 
         private void OnTouchDrag(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.screenPosition, null, out Vector2 localPoint);
-            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint, movementRange);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, null, out Vector2 localPoint);
+            rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 
         private void OnTouchUp()

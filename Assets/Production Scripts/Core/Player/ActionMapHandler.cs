@@ -75,13 +75,28 @@ namespace Vi.Player
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
+            ToggleScoreboard(value.isPressed);
+        }
+
+        public void OpenScoreboard()
+        {
+            ToggleScoreboard(true);
+        }
+
+        public void CloseScoreboard()
+        {
+            ToggleScoreboard(false);
+        }
+
+        private void ToggleScoreboard(bool isOn)
+        {
             if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (minimapInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
 
-            if (value.isPressed)
+            if (isOn)
             {
                 scoreboardInstance = Instantiate(scoreboardPrefab);
             }
@@ -92,9 +107,9 @@ namespace Vi.Player
             }
 
             if (playerUIInstance)
-                playerUIInstance.SetActive(!value.isPressed);
+                playerUIInstance.SetActive(!isOn);
             if (spectatorUIInstance)
-                spectatorUIInstance.SetActive(!value.isPressed);
+                spectatorUIInstance.SetActive(!isOn);
         }
 
         void OnHeavyAttack()
@@ -171,22 +186,22 @@ namespace Vi.Player
 
         [SerializeField] private GameObject minimapPrefab;
         GameObject minimapInstance;
-        void OnMinimap(InputValue value)
-        {
-            if (ExternalUI) { return; }
-            if (scoreboardInstance) { return; }
-            if (pauseInstance) { return; }
-            if (inventoryInstance) { return; }
+        //void OnMinimap(InputValue value)
+        //{
+        //    if (ExternalUI) { return; }
+        //    if (scoreboardInstance) { return; }
+        //    if (pauseInstance) { return; }
+        //    if (inventoryInstance) { return; }
 
-            if (value.isPressed)
-            {
-                minimapInstance = Instantiate(minimapPrefab);
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Destroy(minimapInstance);
-            }
-        }
+        //    if (value.isPressed)
+        //    {
+        //        minimapInstance = Instantiate(minimapPrefab);
+        //    }
+        //    else
+        //    {
+        //        Cursor.lockState = CursorLockMode.Locked;
+        //        Destroy(minimapInstance);
+        //    }
+        //}
     }
 }

@@ -16,5 +16,21 @@ namespace Vi.UI
             weaponIconImage.sprite = weaponOption.weaponIcon;
             weaponNameText.text = weaponOption.name;
         }
+
+        public void InitializeEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        {
+            if (wearableEquipmentOption == null)
+            {
+                weaponIconImage.sprite = null;
+                weaponIconImage.color = Color.red;
+                weaponNameText.text = "None";
+            }
+            else
+            {
+                weaponIconImage.sprite = null;
+                weaponIconImage.color = Color.red;
+                weaponNameText.text = wearableEquipmentOption.name;
+            }
+        }
     }
 }

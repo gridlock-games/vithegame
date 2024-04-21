@@ -9,14 +9,26 @@ namespace Vi.UI
 {
     public class LoadoutEditorMenu : Menu
     {
-        [SerializeField] private WeaponSelectMenu weaponSelectMenu;
+        [Header("Loadout Editor Menu")]
         [SerializeField] private Button[] loadoutButtons;
+        [SerializeField] private Camera characterPreviewCameraPrefab;
+        [SerializeField] private Vector3 characterPreviewCameraOffset;
 
+        [Header("Weapon Select Menu")]
+        [SerializeField] private WeaponSelectMenu weaponSelectMenu;
         [SerializeField] private Button primaryWeaponButton;
         [SerializeField] private Button secondaryWeaponButton;
 
-        [SerializeField] private Camera characterPreviewCameraPrefab;
-        [SerializeField] private Vector3 characterPreviewCameraOffset;
+        [Header("Armor Select Menu")]
+        [SerializeField] private ArmorSelectMenu armorSelectMenu;
+        [SerializeField] private Button helmButton;
+        [SerializeField] private Button chestButton;
+        [SerializeField] private Button shouldersButton;
+        [SerializeField] private Button glovesButton;
+        [SerializeField] private Button pantsButton;
+        [SerializeField] private Button bootsButton;
+        [SerializeField] private Button beltButton;
+        [SerializeField] private Button capeButton;
 
         private LoadoutManager loadoutManager;
         private Attributes attributes;
@@ -26,7 +38,7 @@ namespace Vi.UI
             loadoutManager = GetComponentInParent<LoadoutManager>();
             attributes = GetComponentInParent<Attributes>();
 
-            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform);
+            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform.parent);
             camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
             camInstance.transform.LookAt(transform.root);
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
@@ -39,14 +51,21 @@ namespace Vi.UI
             camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
         }
 
+        private void OnDestroy()
+        {
+            Destroy(camInstance);
+        }
+
         private void OnEnable()
         {
+            camInstance.SetActive(true);
             int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
                 Button button = loadoutButtons[i];
                 int var = i;
                 if (PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+                button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(delegate { OpenLoadout(button, var); });
             }
 
@@ -75,6 +94,7 @@ namespace Vi.UI
 
             loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Primary, loadout.weapon1ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
             loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Secondary, loadout.weapon2ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
+            loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, loadout, playerData.character._id.ToString()));
 
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
@@ -87,6 +107,23 @@ namespace Vi.UI
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
             secondaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+
+            helmButton.onClick.RemoveAllListeners();
+            helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
+            chestButton.onClick.RemoveAllListeners();
+            chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
+            shouldersButton.onClick.RemoveAllListeners();
+            shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
+            glovesButton.onClick.RemoveAllListeners();
+            glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
+            pantsButton.onClick.RemoveAllListeners();
+            pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants, loadoutSlot); });
+            bootsButton.onClick.RemoveAllListeners();
+            bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots, loadoutSlot); });
+            beltButton.onClick.RemoveAllListeners();
+            beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt, loadoutSlot); });
+            capeButton.onClick.RemoveAllListeners();
+            capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });
         }
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
@@ -96,6 +133,18 @@ namespace Vi.UI
             menu.SetLastMenu(gameObject);
             menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
+            camInstance.SetActive(false);
+            gameObject.SetActive(false);
+        }
+
+        private void OpenArmorSelect(CharacterReference.EquipmentType equipmentType, int loadoutSlot)
+        {
+            GameObject _armorSelect = Instantiate(armorSelectMenu.gameObject);
+            ArmorSelectMenu menu = _armorSelect.GetComponent<ArmorSelectMenu>();
+            menu.SetLastMenu(gameObject);
+            menu.Initialize(equipmentType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
+            childMenu = _armorSelect;
+            camInstance.SetActive(true);
             gameObject.SetActive(false);
         }
     }

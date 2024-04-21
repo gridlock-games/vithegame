@@ -11152,13 +11152,18 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.1
   animationSpeed: 1
-  agentStaminaCost: 1
+  recoveryAnimationSpeed: 1.5
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.35
-  recoveryNormalizedTime: 0.518
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.4
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -11175,13 +11180,14 @@ MonoBehaviour:
   canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 4
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
-  canCancelLightAttacks: 0
+  canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 0
+  canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
@@ -11191,7 +11197,7 @@ MonoBehaviour:
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
-  previewActionVFXScale: {x: 1, y: 1, z: 1}
+  previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}

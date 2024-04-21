@@ -12367,13 +12367,18 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.1
   animationSpeed: 1
+  recoveryAnimationSpeed: 2
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.3
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.35
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -12390,6 +12395,7 @@ MonoBehaviour:
   canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 0
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
@@ -12408,7 +12414,7 @@ MonoBehaviour:
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5

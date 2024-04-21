@@ -24,6 +24,31 @@ namespace Vi.Core
             }
         }
 
+        public bool IsActionClipPlaying(ActionClip actionClip)
+        {
+            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName);
+        }
+
+        public float GetActionClipNormalizedTime(ActionClip actionClip)
+        {
+            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            float normalizedTime = 0;
+            if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            {
+                normalizedTime = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+            }
+            else if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            {
+                normalizedTime = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+            }
+
+            float floor = Mathf.FloorToInt(normalizedTime);
+            if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
+
+            return normalizedTime;
+        }
+
         public bool IsAtRest()
         {
             return animatorReference.IsAtRest();
@@ -190,19 +215,129 @@ namespace Vi.Core
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
+            if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-                else
+                else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                else // If this is a heavy attack
+                    playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionStateName, weaponHandler.GetWeapon().name);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
+        }
+
+        private bool heavyAttackReleased;
+        [ServerRpc] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
+        [ServerRpc] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
+
+        public float HeavyAttackChargeTime { get; private set; }
+        private Coroutine playAdditionalStatesCoroutine;
+        private IEnumerator PlayAdditionalStates(ActionClip actionClip)
+        {
+            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayAdditionalStates() should only be called for heavy attack action clips!"); yield break; }
+
+            Animator.ResetTrigger("CancelHeavyAttackState");
+            Animator.ResetTrigger("ProgressHeavyAttackState");
+            Animator.SetBool("EnhanceHeavyAttack", false);
+            Animator.SetBool("CancelHeavyAttack", false);
+            Animator.SetBool("PlayHeavyAttackEnd", actionClip.chargeAttackHasEndAnimation);
+
+            Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+
+            float chargeTime = 0;
+            while (true)
+            {
+                yield return null;
+
+                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
+                {
+                    chargeTime += Time.deltaTime;
+                }
+
+                if (actionClip.canEnhance)
+                {
+                    if (chargeTime > ActionClip.enhanceChargeTime) // Enhance
+                    {
+                        Animator.SetBool("EnhanceHeavyAttack", true);
+                    }
+                }
+
+                if (IsServer)
+                {
+                    if (chargeTime > ActionClip.chargePenaltyTime)
+                    {
+                        attributes.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
+                        HeavyAttackChargeTime = 0;
+                        break;
+                    }
+
+                    if (heavyAttackReleased)
+                    {
+                        if (chargeTime > ActionClip.chargeAttackTime) // Attack
+                        {
+                            Animator.SetTrigger("ProgressHeavyAttackState");
+                            Animator.SetBool("CancelHeavyAttack", false);
+
+                            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"));
+
+                            while (true)
+                            {
+                                yield return null;
+
+                                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"))
+                                {
+                                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                                    {
+                                        Animator.SetTrigger("ProgressHeavyAttackState");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
+                        {
+                            Animator.SetTrigger("ProgressHeavyAttackState");
+                            Animator.SetBool("CancelHeavyAttack", true);
+                        }
+                        else // Return straight to idle
+                        {
+                            Animator.SetTrigger("CancelHeavyAttackState");
+                        }
+                        HeavyAttackChargeTime = chargeTime;
+                        EvaluateChargeAttackClientRpc(chargeTime);
+                        break;
+                    }
+                }
+            }
+        }
+
+        [ClientRpc]
+        private void EvaluateChargeAttackClientRpc(float chargeTime)
+        {
+            if (IsServer) { return; }
+
+            if (chargeTime > ActionClip.chargeAttackTime) // Attack
+            {
+                Animator.SetTrigger("ProgressHeavyAttackState");
+                Animator.SetBool("CancelHeavyAttack", false);
+            }
+            else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
+            {
+                Animator.SetTrigger("ProgressHeavyAttackState");
+                Animator.SetBool("CancelHeavyAttack", true);
+            }
+            else // Return straight to idle
+            {
+                Animator.SetTrigger("CancelHeavyAttackState");
+            }
         }
 
         private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)
@@ -246,13 +381,17 @@ namespace Vi.Core
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
 
+            if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+
             // Play the action clip on the client side based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
-                else
+                else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                else // If this is a heavy attack
+                    playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
 
             // Set the current action clip for the weapon handler
@@ -294,9 +433,14 @@ namespace Vi.Core
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
-        public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
+        public void ApplyWearableEquipment(CharacterReference.EquipmentType equipmentType, CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
-            if (wearableEquipmentOption == null) { Debug.LogWarning("Equipment option is null"); return; }
+            if (wearableEquipmentOption == null)
+            {
+                Debug.LogWarning(equipmentType + " Equipment option is null");
+                animatorReference.ClearWearableEquipment(equipmentType);
+                return;
+            }
             animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
         }
 
@@ -336,11 +480,11 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
             CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
-            ApplyWearableEquipment(beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Beard, beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
             CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
-            ApplyWearableEquipment(browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Brows, browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
             CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
-            ApplyWearableEquipment(hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)

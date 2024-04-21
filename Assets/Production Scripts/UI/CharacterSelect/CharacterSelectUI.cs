@@ -395,6 +395,11 @@ namespace Vi.UI
             
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
 
+            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            selectedRace = raceAndGenderStrings[0];
+            selectedGender = raceAndGenderStrings[1];
+            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
             {
                 primaryWeaponIcon.gameObject.SetActive(true);
@@ -402,6 +407,8 @@ namespace Vi.UI
 
                 CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
                 CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
+
+                StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
 
                 primaryWeaponIcon.sprite = primaryOption.weaponIcon;
                 primaryWeaponText.text = primaryOption.name;
@@ -415,17 +422,14 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
+
+                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(), character._id.ToString())); }
             }
 
-            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
-            selectedRace = raceAndGenderStrings[0];
-            selectedGender = raceAndGenderStrings[1];
-            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
             selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
             selectedCharacter.raceAndGender = raceAndGender;
-            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyDefaultEquipment(raceAndGender));
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
@@ -460,7 +464,7 @@ namespace Vi.UI
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
-            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption.equipmentType, wearableEquipmentOption, raceAndGender);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
@@ -653,7 +657,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
-            NetSceneManager.Singleton.LoadScene("Arena Map A");
+            NetSceneManager.Singleton.LoadScene("Eclipse Grove");
         }
 
         public void OpenServerBrowser()

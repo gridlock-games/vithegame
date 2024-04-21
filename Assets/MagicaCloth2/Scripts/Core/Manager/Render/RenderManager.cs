@@ -63,7 +63,7 @@ namespace MagicaCloth2
         /// </summary>
         /// <param name="ren"></param>
         /// <returns></returns>
-        public int AddRenderer(Renderer ren)
+        public int AddRenderer(Renderer ren, RenderSetupData referenceSetupData, RenderSetupData.UniqueSerializationData referenceUniqueSetupData)
         {
             if (isValid == false)
                 return 0;
@@ -78,7 +78,7 @@ namespace MagicaCloth2
                 {
                     // 新規
                     var rdata = new RenderData();
-                    rdata.Initialize(ren);
+                    rdata.Initialize(ren, referenceSetupData, referenceUniqueSetupData);
                     renderDataDict.Add(handle, rdata);
                 }
 
@@ -168,21 +168,26 @@ namespace MagicaCloth2
         }
 
         //=========================================================================================
-        public override string ToString()
+        public void InformationLog(StringBuilder allsb)
         {
-            if (IsValid() == false)
-                return $"Render Manager. Invalid.";
-
             StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine($"Render Manager. Count({renderDataDict.Count})");
-
-            foreach (var kv in renderDataDict)
+            sb.AppendLine($"========== Render Manager ==========");
+            if (IsValid() == false)
             {
-                sb.Append(kv.Value.ToString());
+                sb.AppendLine($"Render Manager. Invalid.");
             }
+            else
+            {
+                sb.AppendLine($"Render Manager. Count({renderDataDict.Count})");
 
-            return sb.ToString();
+                foreach (var kv in renderDataDict)
+                {
+                    sb.Append(kv.Value.ToString());
+                }
+            }
+            sb.AppendLine();
+            Debug.Log(sb.ToString());
+            allsb.Append(sb);
         }
     }
 }

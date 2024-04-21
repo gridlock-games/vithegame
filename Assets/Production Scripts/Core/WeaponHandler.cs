@@ -420,25 +420,9 @@ namespace Vi.Core
             else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
             {
                 bool lastIsAttacking = IsAttacking;
-                if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+                if (animationHandler.IsActionClipPlaying(CurrentActionClip))
                 {
-                    float normalizedTime = animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
-                    IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
-                    IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
-                    IsInAnticipation = !IsAttacking & !IsInRecovery;
-
-                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                    {
-                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
-                        {
-                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
-                        }
-                    }
-                }
-                else if (animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
-                {
-                    float normalizedTime = animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).normalizedTime;
+                    float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
@@ -526,7 +510,7 @@ namespace Vi.Core
                 Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
 
-            if (shouldRepeatLightAttack) { OnLightAttack(); }
+            if (shouldRepeatLightAttack) { LightAttack(true); }
             if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
         }
 
@@ -537,11 +521,19 @@ namespace Vi.Core
             return IsInRecovery & CurrentActionClip.canFlashAttack;
         }
 
-        void OnLightAttack()
+        void OnLightAttack(InputValue value)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-            if (actionClip != null)
-                animationHandler.PlayAction(actionClip);
+            LightAttack(value.isPressed);
+        }
+
+        public void LightAttack(bool isPressed)
+        {
+            if (isPressed)
+            {
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
+            }
         }
 
         private bool shouldRepeatLightAttack;
@@ -568,6 +560,12 @@ namespace Vi.Core
                     Destroy(actionVFXPreviewInstance.gameObject);
                     return;
                 }
+
+                animationHandler.HeavyAttackPressedServerRpc();
+            }
+            else
+            {
+                animationHandler.HeavyAttackReleasedServerRpc();
             }
 
             if (CanAim)

@@ -628,6 +628,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 5
+  additionalAnimationStates: []
   avatarLayer: 1
   transitionTime: 0.05
   animationSpeed: 1
@@ -638,7 +639,7 @@ MonoBehaviour:
   mustBeAiming: 1
   attackingNormalizedTime: 0
   recoveryNormalizedTime: 1
-  damage: 8
+  damage: 1
   healAmount: 0
   staminaDamage: 5
   defenseDamage: 5
@@ -654,6 +655,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 0
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0

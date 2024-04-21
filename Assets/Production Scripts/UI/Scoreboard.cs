@@ -4,6 +4,8 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
+using Unity.Netcode;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -13,6 +15,11 @@ namespace Vi.UI
         [SerializeField] private ScoreboardElement scoreboardElementPrefab;
         [SerializeField] private Transform scoreboardElementParent;
         [SerializeField] private Text scoreboardHeaderText;
+
+        public void CloseSelf()
+        {
+            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<ActionMapHandler>().CloseScoreboard();
+        }
 
         private void Start()
         {
@@ -37,6 +44,8 @@ namespace Vi.UI
             }
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetDisconnectedPlayerDataList())
             {
+                if (playerData.team == PlayerDataManager.Team.Spectator) { continue; }
+
                 GameObject instance = Instantiate(scoreboardElementPrefab.gameObject, scoreboardElementParent);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {

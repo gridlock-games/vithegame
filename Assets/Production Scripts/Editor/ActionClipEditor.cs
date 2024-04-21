@@ -31,11 +31,20 @@ namespace Vi.Editor
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
         private SerializedProperty spAnimationSpeed;
+        private SerializedProperty spRecoveryAnimationSpeed;
 
         private SerializedProperty spYAngleRotationOffset;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
+
+        private SerializedProperty spChargeAttackHasEndAnimation;
+        private SerializedProperty spChargeAttackStateLoopCount;
+        private SerializedProperty spCanEnhance;
+        private SerializedProperty spChargeTimeDamageMultiplier;
+        private SerializedProperty spEnhancedChargeDamageMultiplier;
+        private SerializedProperty spChargePenaltyDamage;
+
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spDamage;
@@ -54,6 +63,7 @@ namespace Vi.Editor
         private SerializedProperty spCanFlashAttack;
         private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
+        private SerializedProperty spAilmentHitDefinition;
         private SerializedProperty spGrabDuration;
         private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
@@ -95,7 +105,9 @@ namespace Vi.Editor
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
+
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
+
             spShouldApplyRootMotion = serializedObject.FindProperty("shouldApplyRootMotion");
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
@@ -103,6 +115,8 @@ namespace Vi.Editor
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
+            spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
+            spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
@@ -110,6 +124,14 @@ namespace Vi.Editor
 
             spEffectedWeaponBones = serializedObject.FindProperty("effectedWeaponBones");
             spMustBeAiming = serializedObject.FindProperty("mustBeAiming");
+
+            spChargeAttackHasEndAnimation = serializedObject.FindProperty("chargeAttackHasEndAnimation");
+            spChargeAttackStateLoopCount = serializedObject.FindProperty("chargeAttackStateLoopCount");
+            spCanEnhance = serializedObject.FindProperty("canEnhance");
+            spChargeTimeDamageMultiplier = serializedObject.FindProperty("chargeTimeDamageMultiplier");
+            spEnhancedChargeDamageMultiplier = serializedObject.FindProperty("enhancedChargeDamageMultiplier");
+            spChargePenaltyDamage = serializedObject.FindProperty("chargePenaltyDamage");
+
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spDamage = serializedObject.FindProperty("damage");
@@ -128,6 +150,7 @@ namespace Vi.Editor
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
+            spAilmentHitDefinition = serializedObject.FindProperty("ailmentHitDefinition");
             spGrabDuration = serializedObject.FindProperty("grabDuration");
             spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
@@ -168,9 +191,15 @@ namespace Vi.Editor
             spDebugForwardMotion = serializedObject.FindProperty("debugForwardMotion");
             spDebugSidesMotion = serializedObject.FindProperty("debugSidesMotion");
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
-
-            spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
         }
+
+        private readonly List<ActionClip.ClipType> configurableRecoverySpeedTypes = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.LightAttack,
+            ActionClip.ClipType.HeavyAttack,
+            ActionClip.ClipType.FlashAttack,
+            ActionClip.ClipType.Ability
+        };
 
         private Weapon weapon;
         private AnimatorOverrideController animatorOverrideController;
@@ -180,6 +209,9 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
             EditorGUILayout.PropertyField(spAnimationSpeed);
+
+            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
+            
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
 
@@ -274,18 +306,22 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
-
+                
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -321,6 +357,14 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spMustBeAiming);
 
                 EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Charge Attack Settings", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spChargeAttackHasEndAnimation);
+                EditorGUILayout.PropertyField(spChargeAttackStateLoopCount);
+                EditorGUILayout.PropertyField(spCanEnhance);
+                EditorGUILayout.PropertyField(spChargeTimeDamageMultiplier);
+                if (spCanEnhance.boolValue) { EditorGUILayout.PropertyField(spEnhancedChargeDamageMultiplier); }
+                EditorGUILayout.PropertyField(spChargePenaltyDamage);
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
@@ -337,18 +381,23 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -407,18 +456,23 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);
@@ -477,18 +531,23 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spIsFollowUpAttack);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
-                EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
-                if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+
+                if (!spMustBeAiming.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                    EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                    EditorGUILayout.PropertyField(spBoxCastDistance);
-                    EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    EditorGUILayout.PropertyField(spUseRotationalTargetingSystem);
+                    EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
+                    if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
                 }
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabDuration);

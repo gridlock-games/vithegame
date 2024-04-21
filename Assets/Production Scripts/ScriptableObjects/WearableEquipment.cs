@@ -34,12 +34,12 @@ namespace Vi.ScriptableObjects
 
                     if (!boneMap.TryGetValue(bone.name, out newBones[i]))
                     {
-                        Debug.LogWarning("Unable to map bone \"" + bone.name + "\" to target skeleton.");
+                        Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton.");
                     }
                 }
                 srenderer.bones = newBones;
                 srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
-                srenderer.updateWhenOffscreen = true;
+                srenderer.updateWhenOffscreen = false;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Vi.ScriptableObjects
         {
             if (!boneMap.TryGetValue(_name, out Transform _rootBone))
             {
-                Debug.LogWarning("Unable to map bone \"" + _name + "\" to target skeleton.");
+                Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton.");
             }
             return _rootBone;
         }
