@@ -284,6 +284,8 @@ namespace Vi.Core
 
                     if (heavyAttackReleased)
                     {
+                        HeavyAttackChargeTime = chargeTime;
+                        EvaluateChargeAttackClientRpc(chargeTime, actionClip.name, actionClip.chargeAttackStateLoopCount);
                         if (chargeTime > ActionClip.chargeAttackTime) // Attack
                         {
                             Animator.SetTrigger("ProgressHeavyAttackState");
@@ -314,8 +316,6 @@ namespace Vi.Core
                         {
                             Animator.SetTrigger("CancelHeavyAttackState");
                         }
-                        HeavyAttackChargeTime = chargeTime;
-                        EvaluateChargeAttackClientRpc(chargeTime);
                         break;
                     }
                 }
@@ -323,7 +323,7 @@ namespace Vi.Core
         }
 
         [ClientRpc]
-        private void EvaluateChargeAttackClientRpc(float chargeTime)
+        private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
         {
             if (IsServer) { return; }
 
@@ -331,6 +331,8 @@ namespace Vi.Core
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", false);
+
+                StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount));
             }
             else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
             {
@@ -340,6 +342,25 @@ namespace Vi.Core
             else // Return straight to idle
             {
                 Animator.SetTrigger("CancelHeavyAttackState");
+            }
+        }
+
+        private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount)
+        {
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"));
+
+            while (true)
+            {
+                yield return null;
+
+                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"))
+                {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                    {
+                        Animator.SetTrigger("ProgressHeavyAttackState");
+                        break;
+                    }
+                }
             }
         }
 
