@@ -118,7 +118,7 @@ namespace Vi.Core
                         if (weaponHandler.IsInRecovery) { return; }
                     }
                 }
-                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
@@ -134,17 +134,17 @@ namespace Vi.Core
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                     }
                 }
-                else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                 }
 
-                if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability | lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                // If the last clip was a clip that can't be cancelled, don't play this clip
+                if (actionClip.IsAttack() & !weaponHandler.IsInRecovery)
                 {
-                    // If the last clip was an ability that can't be cancelled, don't play this clip
                     if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
                     {
                         return;
                     }
