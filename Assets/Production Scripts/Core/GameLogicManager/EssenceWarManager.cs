@@ -20,11 +20,17 @@ namespace Vi.Core.GameModeManagers
         private const int neutralAncientSlaveCount = 3;
         private const float neutralAncientRoamRadius = 5;
 
+        private GameObject instance;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             roundResultMessage.Value = "Essence war starting! ";
 
+            if (IsServer)
+            {
+
+            }
         }
 
         public string GetLeftScoreString()
