@@ -26,7 +26,7 @@ namespace Vi.UI
 
     }
 
-    void SaveAsData()
+    public void SaveAsData()
     {
       MoveUIDefinition[] convertedObject = new MoveUIDefinition[editableUIObjects.Length];
       for (int i = 0; i < editableUIObjects.Length; i++)
