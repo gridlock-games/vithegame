@@ -90,6 +90,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
+        public bool IsAttack() { return new List<ClipType>() { ClipType.LightAttack, ClipType.HeavyAttack, ClipType.Ability }.Contains(clipType); }
 
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
@@ -124,10 +125,10 @@ namespace Vi.ScriptableObjects
         public float enhancedChargeDamageMultiplier = 1;
         public float chargePenaltyDamage = 10;
 
-        public const float chargePenaltyTime = 3;
-        public const float enhanceChargeTime = 1.5f;
-        public const float chargeAttackTime = 0.75f;
-        public const float cancelChargeTime = 0.25f;
+        public const float chargePenaltyTime = 1.0f;
+        public const float enhanceChargeTime = 0.50f;
+        public const float chargeAttackTime = 0.08f;
+        public const float cancelChargeTime = 0.03f;
         public const float chargeAttackStateAnimatorTransitionDuration = 0.25f;
 
         public float attackingNormalizedTime = 0.25f;

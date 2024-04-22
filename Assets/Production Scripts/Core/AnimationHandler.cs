@@ -118,7 +118,7 @@ namespace Vi.Core
                         if (weaponHandler.IsInRecovery) { return; }
                     }
                 }
-                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
@@ -134,16 +134,19 @@ namespace Vi.Core
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
                     }
                 }
-                else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
                     if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
+                }
 
-                    // If the last clip was an ability that can't be cancelled, don't play this clip
+                // If the last clip was a clip that can't be cancelled, don't play this clip
+                if (actionClip.IsAttack() & !weaponHandler.IsInRecovery)
+                {
                     if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                        return;
                     }
                 }
             }
@@ -281,6 +284,8 @@ namespace Vi.Core
 
                     if (heavyAttackReleased)
                     {
+                        HeavyAttackChargeTime = chargeTime;
+                        EvaluateChargeAttackClientRpc(chargeTime, actionClip.name, actionClip.chargeAttackStateLoopCount);
                         if (chargeTime > ActionClip.chargeAttackTime) // Attack
                         {
                             Animator.SetTrigger("ProgressHeavyAttackState");
@@ -311,8 +316,6 @@ namespace Vi.Core
                         {
                             Animator.SetTrigger("CancelHeavyAttackState");
                         }
-                        HeavyAttackChargeTime = chargeTime;
-                        EvaluateChargeAttackClientRpc(chargeTime);
                         break;
                     }
                 }
@@ -320,7 +323,7 @@ namespace Vi.Core
         }
 
         [ClientRpc]
-        private void EvaluateChargeAttackClientRpc(float chargeTime)
+        private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
         {
             if (IsServer) { return; }
 
@@ -328,6 +331,8 @@ namespace Vi.Core
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", false);
+
+                StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount));
             }
             else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
             {
@@ -337,6 +342,25 @@ namespace Vi.Core
             else // Return straight to idle
             {
                 Animator.SetTrigger("CancelHeavyAttackState");
+            }
+        }
+
+        private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount)
+        {
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"));
+
+            while (true)
+            {
+                yield return null;
+
+                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"))
+                {
+                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                    {
+                        Animator.SetTrigger("ProgressHeavyAttackState");
+                        break;
+                    }
+                }
             }
         }
 

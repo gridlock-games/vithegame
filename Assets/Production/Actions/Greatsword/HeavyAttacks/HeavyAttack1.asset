@@ -3185,7 +3185,7 @@ MonoBehaviour:
   effectedWeaponBones: 12000000
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
-  chargeAttackStateIsLoop: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 1
   enhancedChargeDamageMultiplier: 1
@@ -3212,8 +3212,8 @@ MonoBehaviour:
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
-  canCancelLightAttacks: 0
-  canCancelHeavyAttacks: 0
+  canCancelLightAttacks: 1
+  canCancelHeavyAttacks: 1
   canCancelAbilities: 0
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0

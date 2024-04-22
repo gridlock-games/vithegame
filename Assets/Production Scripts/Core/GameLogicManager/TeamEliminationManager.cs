@@ -50,7 +50,6 @@ namespace Vi.Core.GameModeManagers
             }
             else if (CanSpawnViEssence()) // If we are in a 1vX situation
             {
-                Debug.Log("Spawning vi essence");
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(this, damageCircleInstance);
             }
