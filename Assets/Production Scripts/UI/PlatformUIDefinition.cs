@@ -23,16 +23,6 @@ namespace Vi.UI
             public MoveUIDefinition[] objectsToMove;
         }
 
-        [System.Serializable]
-        private struct MoveUIDefinition
-        {
-            public GameObject gameObjectToMove;
-            public Vector2 newAnchoredPosition;
-            public bool shouldOverrideAnchors;
-            public Vector2 anchorMinOverride;
-            public Vector2 anchorMaxOverride;
-            public Vector2 pivotOverride;
-        }
 
         [System.Serializable]
         private struct ControlSchemeTextDefinition
@@ -129,4 +119,15 @@ namespace Vi.UI
             }
         }
     }
+
+  [System.Serializable]
+  public struct MoveUIDefinition
+  {
+    public GameObject gameObjectToMove;
+    public Vector2 newAnchoredPosition;
+    public bool shouldOverrideAnchors;
+    public Vector2 anchorMinOverride;
+    public Vector2 anchorMaxOverride;
+    public Vector2 pivotOverride;
+  }
 }
