@@ -11158,6 +11158,8 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
@@ -11189,7 +11191,7 @@ MonoBehaviour:
   canCancelAbilities: 1
   canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 0
-  canBeCancelledByAbilities: 0
+  canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
   abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []

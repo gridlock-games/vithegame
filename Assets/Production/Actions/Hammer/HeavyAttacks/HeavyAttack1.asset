@@ -118,7 +118,7 @@ MonoBehaviour:
   chargeAttackHasEndAnimation: 1
   chargeAttackStateLoopCount: 3
   canEnhance: 1
-  chargeTimeDamageMultiplier: 5
+  chargeTimeDamageMultiplier: 1
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
@@ -132,14 +132,14 @@ MonoBehaviour:
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 3
-  timeBetweenHits: 0.05
+  timeBetweenHits: 0.15
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 1
   isFollowUpAttack: 0
-  ailment: 0
-  ailmentHitDefinition: 
+  ailment: 2
+  ailmentHitDefinition: 010000
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
