@@ -2699,6 +2699,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  environmentViewPoints: []
+  gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 03000000
     teams: 03000000
@@ -2748,6 +2750,21 @@ MonoBehaviour:
     - {x: 0, y: 5, z: 0}
     - {x: 0, y: 10, z: 0}
     - {x: 0, y: 110, z: 0}
+  damageCircleMaxScale: {x: 250, y: 200, z: 250}
+  damageCircleMinScale: {x: 5, y: 200, z: 5}
+  shrinkSize: 20
+  ancientBossLightSpawnPoint:
+    position: {x: -55, y: -1, z: -65}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  ancientBossCorruptSpawnPoint:
+    position: {x: 55, y: -1, z: 65}
+    rotation: {x: 0, y: 1, z: 0, w: -0.00000004371139}
+  ancientBossNeutralSpawnPoint:
+    position: {x: 0, y: -3, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  displayDefaultGizmos: 1
+  displayDamageCircleGizmos: 0
+  displayEssenceWarGizmos: 1
 --- !u!4 &735316442
 Transform:
   m_ObjectHideFlags: 0

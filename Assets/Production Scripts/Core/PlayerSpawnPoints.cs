@@ -10,9 +10,16 @@ namespace Vi.Core
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
+
+        [Header("Damage Circle")]
         [SerializeField] private Vector3 damageCircleMaxScale = new Vector3(100, 200, 100);
         [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);
         [SerializeField] private float shrinkSize = 20;
+
+        [Header("Essence War")]
+        public TransformData ancientBossLightSpawnPoint;
+        public TransformData ancientBossCorruptSpawnPoint;
+        public TransformData ancientBossNeutralSpawnPoint;
 
         public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
 
@@ -80,41 +87,69 @@ namespace Vi.Core
             return returnedSpawnPoints;
         }
 
+
+        [Header("Gizmos")]
+        [SerializeField] private bool displayDefaultGizmos;
+        [SerializeField] private bool displayDamageCircleGizmos;
+        [SerializeField] private bool displayEssenceWarGizmos;
+
         private void OnDrawGizmos()
         {
-            foreach (TransformData transformData in environmentViewPoints)
+            if (displayDefaultGizmos)
             {
-                Gizmos.color = Color.white;
-                Gizmos.DrawSphere(transformData.position, 2);
-                Gizmos.color = Color.black;
-                Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward * 5);
-            }
-
-            foreach (TransformData transformData in gameItemSpawnPoints)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(transformData.position, 0.5f);
-                Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward);
-            }
-
-            foreach (SpawnPointDefinition spawnPoint in spawnPoints)
-            {
-                Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
-                for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
+                foreach (TransformData transformData in environmentViewPoints)
                 {
-                    Vector3 spawnPosition = spawnPoint.spawnPositions[i];
-                    Quaternion spawnRotation = Quaternion.Euler(spawnPoint.spawnRotations[i]);
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawSphere(transformData.position, 2);
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward * 5);
+                }
 
-                    Gizmos.DrawWireSphere(spawnPosition, 2);
-                    Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
+                foreach (TransformData transformData in gameItemSpawnPoints)
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawSphere(transformData.position, 0.5f);
+                    Gizmos.DrawRay(transformData.position, transformData.rotation * Vector3.forward);
+                }
+
+                foreach (SpawnPointDefinition spawnPoint in spawnPoints)
+                {
+                    Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
+                    for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
+                    {
+                        Vector3 spawnPosition = spawnPoint.spawnPositions[i];
+                        Quaternion spawnRotation = Quaternion.Euler(spawnPoint.spawnRotations[i]);
+
+                        Gizmos.DrawWireSphere(spawnPosition, 2);
+                        Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
+                    }
                 }
             }
+            
+            if (displayDamageCircleGizmos)
+            {
+                // Damage Circle
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(Vector3.zero, damageCircleMaxScale.x / 2);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
+            }
+            
+            if (displayEssenceWarGizmos)
+            {
+                // Essence War
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(ancientBossLightSpawnPoint.position, 0.5f);
+                Gizmos.DrawRay(ancientBossLightSpawnPoint.position, ancientBossLightSpawnPoint.rotation * Vector3.forward);
 
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(Vector3.zero, damageCircleMaxScale.x / 2);
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawSphere(ancientBossCorruptSpawnPoint.position, 0.5f);
+                Gizmos.DrawRay(ancientBossCorruptSpawnPoint.position, ancientBossCorruptSpawnPoint.rotation * Vector3.forward);
 
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
+                Gizmos.color = Color.black;
+                Gizmos.DrawSphere(ancientBossNeutralSpawnPoint.position, 0.5f);
+                Gizmos.DrawRay(ancientBossNeutralSpawnPoint.position, ancientBossNeutralSpawnPoint.rotation * Vector3.forward);
+            }
         }
 
         [System.Serializable]

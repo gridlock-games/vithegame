@@ -90,6 +90,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
+        public bool IsAttack() { return new List<ClipType>() { ClipType.LightAttack, ClipType.HeavyAttack, ClipType.FlashAttack, ClipType.Ability }.Contains(clipType); }
 
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
