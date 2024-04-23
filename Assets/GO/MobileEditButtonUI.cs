@@ -1,3 +1,4 @@
+using GameCreator.Pool;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -13,11 +14,13 @@ namespace Vi.UI
 
     public RectTransform[] editableUIObjects;
     public int uisettingID;
-
+    [SerializeField] MoveUIDefinition[] convertedObject;
+    [SerializeField] private UIDefinition[] platformUIDefinitions;
+    [SerializeField] PlatformUIDefinition platformUIDefinition;
     // Start is called before the first frame update
     void Start()
     {
-
+      LoadPreviousData();
     }
 
     // Update is called once per frame
@@ -26,12 +29,22 @@ namespace Vi.UI
 
     }
 
-    public void SaveAsData()
+    public void LoadPreviousData()
     {
-      MoveUIDefinition[] convertedObject = new MoveUIDefinition[editableUIObjects.Length];
+      String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
+      convertedObject = JsonConvert.DeserializeObject<MoveUIDefinition[]>(previousModifcationdataString);
+      //Get the Platform UI Definition and update the text
+      
+    }
+
+
+      public void SaveAsData()
+    {
+      convertedObject = new MoveUIDefinition[editableUIObjects.Length];
       for (int i = 0; i < editableUIObjects.Length; i++)
       {
-        convertedObject[i].gameObjectToMove = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.actualGameObject;
+        convertedObject[i].objectID = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.objectID;
+        convertedObject[i].gameObjectToMove = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.actualGameObject; //Remove if broke/useless
         convertedObject[i].newAnchoredPosition = editableUIObjects[i].anchoredPosition;
         convertedObject[i].anchorMinOverride = editableUIObjects[i].anchorMin;
         convertedObject[i].shouldOverrideAnchors = false;
@@ -59,11 +72,5 @@ namespace Vi.UI
     //  public Vector2 pivotOverride;
     //}
 
-  }
-  [System.Serializable]
-  public struct MoveUIDefIdentifier
-  {
-    public string objectID;
-    public GameObject actualGameObject;
   }
 }
