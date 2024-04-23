@@ -8,7 +8,7 @@ using Vi.Core.GameModeManagers;
 namespace Vi.Core
 {
     [RequireComponent(typeof(WeaponHandler))]
-    public class Attributes : NetworkBehaviour
+    public class Attributes : CombatAgent
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 

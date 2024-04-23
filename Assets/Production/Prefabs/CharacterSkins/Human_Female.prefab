@@ -1777,6 +1777,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5051897936928101952, guid: 22bd3c00c9bb8314fbb8d8939059d52c,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5051897936928101952, guid: 22bd3c00c9bb8314fbb8d8939059d52c,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: d1936d2c66c75e04494a0e5f9cf29df9, type: 2}
@@ -2063,7 +2068,10 @@ MonoBehaviour:
   - characterMaterialType: 2
     skinnedMeshRenderers:
     - {fileID: 1307675129190855996}
-  wearableEquipmentRendererDefinitions: []
+  wearableEquipmentRendererDefinitions:
+  - equipmentType: 1
+    skinnedMeshRenderers:
+    - {fileID: 3165888317671842374}
 --- !u!4 &7673629860551332845 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 22bd3c00c9bb8314fbb8d8939059d52c,

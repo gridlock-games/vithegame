@@ -468,6 +468,11 @@ namespace Vi.Core
             return playerSpawnPoints;
         }
 
+        public PlayerSpawnPoints GetPlayerSpawnPoints()
+        {
+            return playerSpawnPoints;
+        }
+
         public Vector3 GetDamageCircleMaxScale()
         {
             if (playerSpawnPoints)

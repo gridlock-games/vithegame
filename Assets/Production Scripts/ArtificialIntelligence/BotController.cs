@@ -95,7 +95,6 @@ namespace Vi.ArtificialIntelligence
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
         private NetworkVariable<bool> isGrounded = new NetworkVariable<bool>();
-        public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
         private void ProcessMovementTick()
         {
             // This method is only called on the server

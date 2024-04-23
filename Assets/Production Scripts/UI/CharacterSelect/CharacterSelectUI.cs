@@ -410,20 +410,23 @@ namespace Vi.UI
 
                 StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
 
-                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-                primaryWeaponText.text = primaryOption.name;
-                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-                secondaryWeaponText.text = secondaryOption.name;
+                if (primaryOption != null & secondaryOption != null)
+                {
+                    primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                    primaryWeaponText.text = primaryOption.name;
+                    secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                    secondaryWeaponText.text = secondaryOption.name;
 
-                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
-                previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+                    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+                }
             }
             else
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
 
-                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(), character._id.ToString())); }
+                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString())); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
