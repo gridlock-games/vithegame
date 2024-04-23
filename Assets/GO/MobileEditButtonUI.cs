@@ -1,67 +1,68 @@
-using GameCreator.Pool;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
 namespace Vi.UI
 {
   public class MobileEditButtonUI : MonoBehaviour
   {
-
     public RectTransform[] editableUIObjects;
-    public int uisettingID;
-    [SerializeField] MoveUIDefinition[] convertedObject;
-    [SerializeField] private UIDefinition[] platformUIDefinitions;
-    [SerializeField] PlatformUIDefinition platformUIDefinition;
+
+    //[SerializeField] public MoveUIDefinition[] convertedObject;
+    [SerializeField] public List<MoveUIDefinition_Class> convertedObject;
+    [SerializeField] public UIDefinition[] platformUIDefinitions;
+
+    [SerializeField] public PlatformUIDefinition platformUIDefinition;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-      LoadPreviousData();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-
     }
 
-    public void LoadPreviousData()
+    public void SaveAsData()
     {
-      String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
-      convertedObject = JsonConvert.DeserializeObject<MoveUIDefinition[]>(previousModifcationdataString);
-      //Get the Platform UI Definition and update the text
-      
-    }
-
-
-      public void SaveAsData()
-    {
-      convertedObject = new MoveUIDefinition[editableUIObjects.Length];
+      convertedObject = new List<MoveUIDefinition_Class>();
       for (int i = 0; i < editableUIObjects.Length; i++)
       {
-        convertedObject[i].objectID = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.objectID;
-        convertedObject[i].gameObjectToMove = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.actualGameObject; //Remove if broke/useless
-        convertedObject[i].newAnchoredPosition = editableUIObjects[i].anchoredPosition;
-        convertedObject[i].anchorMinOverride = editableUIObjects[i].anchorMin;
-        convertedObject[i].shouldOverrideAnchors = false;
-        convertedObject[i].anchorMaxOverride = editableUIObjects[i].anchorMax;
-        convertedObject[i].pivotOverride = editableUIObjects[i].pivot;
+        MoveUIDefinition_Class toConvertRaw = new MoveUIDefinition_Class();
+
+        toConvertRaw.objectID = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.objectID;
+        if (toConvertRaw.objectID == null || toConvertRaw.objectID == "")
+        {
+          toConvertRaw.objectID = "unassign" + i;
+        }
+        //convertedObject[i].gameObjectToMove = editableUIObjects[i].gameObject.GetComponent<DragableUIObject>().moveUIDefIdentifier.actualGameObject; //Remove if broke/useless
+        toConvertRaw.newAnchoredPosition = new float[] { editableUIObjects[i].anchoredPosition.x, editableUIObjects[i].anchoredPosition.y };
+        toConvertRaw.anchorMinOverride = new float[] { editableUIObjects[i].anchorMin.x, editableUIObjects[i].anchorMin.y }; 
+        toConvertRaw.shouldOverrideAnchors = false;
+        toConvertRaw.anchorMaxOverride = new float[] { editableUIObjects[i].anchorMax.x, editableUIObjects[i].anchorMax.y };
+        toConvertRaw.pivotOverride = new float[] { editableUIObjects[i].pivot.x, editableUIObjects[i].pivot.y };
+        convertedObject.Add(toConvertRaw);
       }
 
-
+      Debug.Log("Saving");
       //Save the data to the user input
       if (convertedObject != null)
       {
-        String convertedData = JsonConvert.SerializeObject(convertedObject);
+        //var convertedData = JsonUtility.ToJson(convertedObject);
+        
+        var convertedData = JsonConvert.SerializeObject(convertedObject);
+        Debug.Log(convertedData);
         PlayerPrefs.SetString("ButtonUiLayout", convertedData);
+        Debug.Log("Completed");
       }
 
       //Show error if there a problem saving/or is null
+
+      //Then close the Ui and return to the menu - Also Reload Platform UI Definition if needed.
     }
+
     //private struct MoveUIDefinition
     //{
     //  public GameObject gameObjectToMove;
@@ -73,4 +74,5 @@ namespace Vi.UI
     //}
 
   }
+
 }

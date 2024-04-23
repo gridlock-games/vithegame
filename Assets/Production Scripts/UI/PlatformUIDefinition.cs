@@ -1,4 +1,6 @@
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,19 +14,66 @@ namespace Vi.UI
     [SerializeField] private InputActionAsset controlsAsset;
     [SerializeField] private UIDefinition[] platformUIDefinitions;
     [SerializeField] private UIDefinition LiveplatformUIDefinition;
+    [SerializeField] private List<MoveUIDefinition> deSeralizedObject;
     [SerializeField] private MoveUIDefIdentifier[] moveUIDefinitions;
-    [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions; 
-
+    [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
     private void setCorrectPlatformUiDefinition()
     {
-      foreach (var platformItem in platformUIDefinitions)
+      LiveplatformUIDefinition = platformUIDefinitions[0];
+      //foreach (var platformItem in platformUIDefinitions)
+      //{
+      //  //Check the platform identifier and then disregards the rest we don't need to check anymore
+      //  if (platformItem.platforms.Contains(Application.platform))
+      //  {
+      //    LiveplatformUIDefinition = platformItem;
+      //    break;
+      //  }
+      //}
+    }
+
+    private void LoadAndSetCorrectIDtoGameObject()
+    {
+      //Load data from Playerdef
+      String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
+      Debug.Log(previousModifcationdataString);
+      //MoveUIDefinition_Class[] deconvert = JsonUtility.FromJson<MoveUIDefinition_Class[]>(previousModifcationdataString);
+      MoveUIDefinition_Class[] deconvert = JsonConvert.DeserializeObject<MoveUIDefinition_Class[]>(previousModifcationdataString);
+      Debug.Log(deconvert);
+
+      //Convert from MoveUIDefinition_Class to MoveUIDefinition
+      foreach (var item in deconvert)
       {
-        //Check the platform identifier and then disregards the rest we don't need to check anymore
-        if (platformItem.platforms.Contains(Application.platform))
+        MoveUIDefinition uiDef = new MoveUIDefinition();
+        uiDef.objectID = item.objectID;
+        uiDef.newAnchoredPosition = new Vector2(item.newAnchoredPosition[0], item.newAnchoredPosition[1]);
+        uiDef.anchorMinOverride = new Vector2(item.anchorMinOverride[0], item.anchorMinOverride[1]);
+        uiDef.shouldOverrideAnchors = item.shouldOverrideAnchors;
+        uiDef.anchorMaxOverride = new Vector2(item.anchorMaxOverride[0], item.anchorMaxOverride[1]);
+        uiDef.pivotOverride = new Vector2(item.pivotOverride[0], item.pivotOverride[1]);
+
+        deSeralizedObject.Add(uiDef);
+      }
+
+      for (int i = 0; i < platformUIDefinitions[0].objectsToMove.Length; i++)
+      {
+        foreach (var item in deSeralizedObject)
+          //Reassign new item
+          if (item.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
+          {
+            platformUIDefinitions[0].objectsToMove[i] = item;
+          }
+      }
+      //Assign ID to each object
+      foreach (var movedef in moveUIDefinitions)
+      {
+        for (int i = 0; i < LiveplatformUIDefinition.objectsToMove.Length; i++)
         {
-          LiveplatformUIDefinition = platformItem;
-          break;
+          if (movedef.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
+          {
+            platformUIDefinitions[0].objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
+            break;
+          }
         }
       }
     }
@@ -32,6 +81,7 @@ namespace Vi.UI
     private void Start()
     {
       setCorrectPlatformUiDefinition();
+      LoadAndSetCorrectIDtoGameObject();
       ChangeUILayout();
     }
 
@@ -68,19 +118,22 @@ namespace Vi.UI
 
     private void Update()
     {
-      foreach (MoveUIDefinition moveUIDefinition in LiveplatformUIDefinition.objectsToMove)
+      if (LiveplatformUIDefinition.objectsToMove != null)
       {
-        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
-        if (moveUIDefinition.shouldOverrideAnchors)
+        foreach (MoveUIDefinition moveUIDefinition in LiveplatformUIDefinition.objectsToMove)
         {
-          rt.anchorMin = moveUIDefinition.anchorMinOverride;
-          rt.anchorMax = moveUIDefinition.anchorMaxOverride;
-          rt.pivot = moveUIDefinition.pivotOverride;
+          RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+          if (moveUIDefinition.shouldOverrideAnchors)
+          {
+            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+            rt.pivot = moveUIDefinition.pivotOverride;
+          }
+          rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
         }
-        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
-      }
 
-      ControlSchemeDef();
+        ControlSchemeDef();
+      }
     }
 
     private void ControlSchemeDef()
@@ -125,7 +178,7 @@ namespace Vi.UI
     }
   }
 
-  [System.Serializable]
+  [Serializable]
   public struct ControlSchemeTextDefinition
   {
     public RuntimePlatform[] platforms;
@@ -135,17 +188,16 @@ namespace Vi.UI
     public string stringAfterBinding;
   }
 
-  [System.Serializable]
+  [Serializable]
   public struct UIDefinition
   {
-    public int uidefID;
     public RuntimePlatform[] platforms;
     public GameObject[] gameObjectsToEnable;
     public GameObject[] gameObjectsToDestroy;
     public MoveUIDefinition[] objectsToMove;
   }
 
-  [System.Serializable]
+  [Serializable]
   public struct MoveUIDefinition
   {
     public string objectID;
@@ -157,10 +209,22 @@ namespace Vi.UI
     public Vector2 pivotOverride;
   }
 
-  [System.Serializable]
+  [Serializable]
   public struct MoveUIDefIdentifier
   {
     public string objectID;
     public GameObject actualGameObject;
+  }
+
+  [Serializable]
+  public class MoveUIDefinition_Class
+  {
+    public string objectID;
+    public GameObject gameObjectToMove;
+    public float[] newAnchoredPosition;
+    public bool shouldOverrideAnchors;
+    public float[] anchorMinOverride;
+    public float[] anchorMaxOverride;
+    public float[] pivotOverride;
   }
 }
