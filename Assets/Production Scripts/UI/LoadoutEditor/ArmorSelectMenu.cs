@@ -29,7 +29,7 @@ namespace Vi.UI
             this.playerDataId = playerDataId;
             this.loadoutManager = loadoutManager;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
             CharacterReference.WearableEquipmentOption initialWearableEquipmentOption = null;
 
             switch (equipmentType)

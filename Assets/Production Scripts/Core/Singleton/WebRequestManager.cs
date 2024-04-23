@@ -874,8 +874,8 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            Loadout defaultLoadout1 = GetDefaultLoadout1();
-            Loadout defaultLoadout2 = GetDefaultLoadout2();
+            Loadout defaultLoadout1 = GetDefaultLoadout1(character.raceAndGender);
+            Loadout defaultLoadout2 = GetDefaultLoadout2(character.raceAndGender);
 
             // Add items from default loadout to character inventory
             foreach (FixedString32Bytes itemId in defaultLoadout1.GetLoadoutAsList())
@@ -936,20 +936,26 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1, GetDefaultLoadout1(), GetDefaultLoadout1(), GetDefaultLoadout1(), GetDefaultLoadout1(), CharacterReference.RaceAndGender.HumanMale); }
+        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1,
+            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
+            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
+            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
+            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
+            CharacterReference.RaceAndGender.HumanMale); }
 
-        public Loadout GetDefaultLoadout1()
+        public Loadout GetDefaultLoadout1(CharacterReference.RaceAndGender raceAndGender)
         {
-            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
+            var beltOption = armorOptions.Find(item => item.name == "Runic Belt");
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.name == "Runic Chest").itemWebId,
                 armorOptions.Find(item => item.name == "Runic Shoulders").itemWebId,
                 armorOptions.Find(item => item.name == "Runic Boots").itemWebId,
                 armorOptions.Find(item => item.name == "Runic Pants").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Belt").itemWebId,
+                beltOption == null ? "" : beltOption.itemWebId,
                 armorOptions.Find(item => item.name == "Runic Gloves").itemWebId,
                 armorOptions.Find(item => item.name == "Runic Cape").itemWebId,
                 "",
@@ -958,9 +964,9 @@ namespace Vi.Core
                 true);
         }
 
-        public Loadout GetDefaultLoadout2()
+        public Loadout GetDefaultLoadout2(CharacterReference.RaceAndGender raceAndGender)
         {
-            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             return new Loadout("1",
@@ -1106,7 +1112,7 @@ namespace Vi.Core
                         return loadoutPreset4;
                     default:
                         Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
-                        return Singleton.GetDefaultLoadout1();
+                        return Singleton.GetDefaultLoadout1(raceAndGender);
                 }
             }
 
@@ -1315,10 +1321,10 @@ namespace Vi.Core
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    loadout1Index == -1 ? Singleton.GetDefaultLoadout1() : loadOuts[loadout1Index].ToLoadout(),
-                    loadout2Index == -1 ? Singleton.GetDefaultLoadout1() : loadOuts[loadout2Index].ToLoadout(),
-                    loadout3Index == -1 ? Singleton.GetDefaultLoadout1() : loadOuts[loadout3Index].ToLoadout(),
-                    loadout4Index == -1 ? Singleton.GetDefaultLoadout1() : loadOuts[loadout4Index].ToLoadout(),
+                    loadout1Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
             }
         }
@@ -1606,7 +1612,7 @@ namespace Vi.Core
                 postRequest.Dispose();
             }
 
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetAllArmorEquipmentOptions();
 
             for (int i = 0; i < wearableEquipmentOptions.Count; i++)
             {
