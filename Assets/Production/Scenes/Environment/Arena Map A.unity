@@ -3722,7 +3722,7 @@ Transform:
   - {fileID: 1921778827}
   - {fileID: 1998561729}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &346043804
 GameObject:
@@ -37056,6 +37056,18 @@ MonoBehaviour:
   damageCircleMaxScale: {x: 70, y: 200, z: 70}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
+  ancientBossLightSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  ancientBossCorruptSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  ancientBossNeutralSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  displayDefaultGizmos: 0
+  displayDamageCircleGizmos: 0
+  displayEssenceWarGizmos: 0
 --- !u!1001 &1631713600
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42785,7 +42797,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 33185c3e598958e43bac1743ad592959,
         type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 33185c3e598958e43bac1743ad592959,
         type: 3}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -29,8 +30,17 @@ namespace Vi.Core.GameModeManagers
 
             if (IsServer)
             {
-
+                StartCoroutine(SpawnAncients());
             }
+        }
+
+        private IEnumerator SpawnAncients()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
+            PlayerSpawnPoints playerSpawnPoints = PlayerDataManager.Singleton.GetPlayerSpawnPoints();
+            Instantiate(ancientBossCorruptPrefab, playerSpawnPoints.ancientBossCorruptSpawnPoint.position, playerSpawnPoints.ancientBossCorruptSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
+            Instantiate(ancientBossLightPrefab, playerSpawnPoints.ancientBossLightSpawnPoint.position, playerSpawnPoints.ancientBossLightSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
+            Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
         }
 
         public string GetLeftScoreString()
