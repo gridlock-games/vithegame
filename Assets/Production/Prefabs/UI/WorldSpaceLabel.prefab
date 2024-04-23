@@ -416,6 +416,7 @@ GameObject:
   - component: {fileID: 7095846274849915265}
   - component: {fileID: 7095846274849915326}
   - component: {fileID: 7095846274849915266}
+  - component: {fileID: 8622354700707930082}
   m_Layer: 5
   m_Name: WorldSpaceLabel
   m_TagString: Untagged
@@ -529,6 +530,18 @@ MonoBehaviour:
   statusImageParent: {fileID: 3952354506870513417}
   statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}
+--- !u!225 &8622354700707930082
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7095846274849915327}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7095846275019019570
 GameObject:
   m_ObjectHideFlags: 0

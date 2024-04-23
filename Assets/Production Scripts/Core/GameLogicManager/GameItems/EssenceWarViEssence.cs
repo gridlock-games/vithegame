@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EssenceWarViEssence : MonoBehaviour
+namespace Vi.Core.GameModeManagers
 {
-    // Start is called before the first frame update
-    void Start()
+    public class EssenceWarViEssence : MonoBehaviour
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

@@ -28,9 +28,16 @@ namespace Vi.UI
         private Attributes attributes;
         private Renderer rendererToFollow;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
+        private CanvasGroup[] canvasGroups;
 
         private void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             attributes = GetComponentInParent<Attributes>();
 
             transform.SetParent(null, true);
@@ -68,6 +75,11 @@ namespace Vi.UI
 
         private void LateUpdate()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }

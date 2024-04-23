@@ -29,18 +29,21 @@ public class DebugOverlay : MonoBehaviour
         fpsText.text = "";
         dividerText.text = "";
         pingText.text = "";
+
+        InvokeRepeating(nameof(RefreshFps), 0, 0.1f);
     }
 
     void OnEnable()
     {
         Application.logMessageReceived += Log;
-        fpsCounterCoroutine = StartCoroutine(FPSCounter());
     }
 
     void OnDisable()
     {
         Application.logMessageReceived -= Log;
     }
+
+    private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
 
     public void Log(string logString, string stackTrace, LogType type)
     {
@@ -57,6 +60,8 @@ public class DebugOverlay : MonoBehaviour
         consoleLogText.text = myLog;
     }
 
+    private int fpsValue;
+
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
@@ -65,25 +70,19 @@ public class DebugOverlay : MonoBehaviour
         bool fpsEnabled = bool.Parse(PlayerPrefs.GetString("FPSEnabled"));
         bool pingEnabled = bool.Parse(PlayerPrefs.GetString("PingEnabled"));
 
-        //if (Input.GetKeyDown(KeyCode.BackQuote))
-        //{
-        //    PlayerPrefs.SetString("DebugOverlayEnabled", (!enableDisplay).ToString());
-        //    myLog = "";
-        //}
-
         debugCanvas.SetActive(consoleEnabled | fpsEnabled | pingEnabled);
 
         consoleParent.SetActive(consoleEnabled);
 
         if (fpsEnabled)
         {
-            fpsText.text = Mathf.RoundToInt(frameCount).ToString() + "FPS";
+            fpsText.text = fpsValue.ToString() + "FPS";
             Color fpsTextColor;
-            if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate)
+            if (fpsValue >= Screen.currentResolution.refreshRate)
             {
                 fpsTextColor = Color.green;
             }
-            else if (Mathf.RoundToInt(frameCount) >= Screen.currentResolution.refreshRate / 2)
+            else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
             {
                 fpsTextColor = Color.yellow;
             }
@@ -138,19 +137,6 @@ public class DebugOverlay : MonoBehaviour
         {
             pingText.text = "";
             dividerText.text = "";
-        }
-    }
-
-    private Coroutine fpsCounterCoroutine;
-    private float frameCount;
-    private IEnumerator FPSCounter()
-    {
-        if (fpsCounterCoroutine != null)
-            StopCoroutine(fpsCounterCoroutine);
-        while (true)
-        {
-            frameCount = 1f / Time.unscaledDeltaTime;
-            yield return new WaitForSeconds(0.1f);
         }
     }
 }

@@ -18,8 +18,16 @@ namespace Vi.UI
 
         protected TeamDeathmatchManager teamDeathmatchManager;
 
+        private CanvasGroup[] canvasGroups;
+
         protected void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             teamDeathmatchManager = GetComponentInParent<TeamDeathmatchManager>();
 
             roundResultText.enabled = false;
@@ -33,6 +41,11 @@ namespace Vi.UI
 
         protected void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!teamDeathmatchManager.IsSpawned) { return; }
 
             roundTimerText.text = teamDeathmatchManager.GetRoundTimerDisplayString();

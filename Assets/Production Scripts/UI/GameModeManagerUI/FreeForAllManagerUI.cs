@@ -18,8 +18,16 @@ namespace Vi.UI
 
         protected FreeForAllManager freeForAllManager;
 
+        private CanvasGroup[] canvasGroups;
+
         protected void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             freeForAllManager = GetComponentInParent<FreeForAllManager>();
 
             roundResultText.enabled = false;
@@ -33,6 +41,11 @@ namespace Vi.UI
 
         protected void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!freeForAllManager.IsSpawned) { return; }
 
             roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();

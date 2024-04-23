@@ -27,6 +27,7 @@ namespace Vi.Core
 
         private void Start()
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
@@ -58,6 +59,8 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
 
             if (!PlayerPrefs.HasKey("Rebinds")) { PlayerPrefs.SetString("Rebinds", ""); }
+
+            if (!PlayerPrefs.HasKey("UIOpacity")) { PlayerPrefs.SetFloat("UIOpacity", 1); }
 
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {
