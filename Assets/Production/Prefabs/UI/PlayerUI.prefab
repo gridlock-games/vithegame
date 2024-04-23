@@ -505,6 +505,7 @@ MonoBehaviour:
   joystickActionType: 1
   movementRange: 125
   shouldReposition: 0
+  joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
   limits: {fileID: 4824479231797674246}
 --- !u!114 &4758944105944543620
@@ -2544,6 +2545,7 @@ MonoBehaviour:
   joystickActionType: 0
   movementRange: 125
   shouldReposition: 1
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   limits: {fileID: 210338626573094431}
 --- !u!1 &5825969018045366987
@@ -3202,7 +3204,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.000061035156, y: 0}
-  m_SizeDelta: {x: 482, y: 74}
+  m_SizeDelta: {x: 486.82117, y: 75.695366}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &1397874844356754323
 CanvasRenderer:
