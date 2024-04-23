@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private JoystickActionType joystickActionType;
         [SerializeField] private float movementRange = 125;
         [SerializeField] private bool shouldReposition;
+        [SerializeField] private string joystickValueMultiplierPlayerPref;
         [SerializeField] private float joystickValueMultiplier = 1;
         [SerializeField] private RectTransform limits;
 
@@ -33,6 +34,8 @@ namespace Vi.UI
         private MovementHandler movementHandler;
         private void Start()
         {
+            if (PlayerPrefs.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = PlayerPrefs.GetFloat(joystickValueMultiplierPlayerPref); }
+
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
 

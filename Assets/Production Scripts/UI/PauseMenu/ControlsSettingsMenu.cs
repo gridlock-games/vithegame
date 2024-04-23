@@ -16,6 +16,9 @@ namespace Vi.UI
         [SerializeField] private InputField mouseYSensitivityInput;
         [SerializeField] private InputField zoomMultiplierInput;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
+        [SerializeField] private RectTransform lookSettingsGroupParent;
+        [SerializeField] private RectTransform mobileLookJoystickInputParent;
+        [SerializeField] private InputField mobileLookJoystickSensitivityInput;
         [Header("Key Rebinding")]
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private GridLayoutGroup scrollViewContentGrid;
@@ -51,6 +54,15 @@ namespace Vi.UI
             mouseXSensitivityInput.text = PlayerPrefs.GetFloat("MouseXSensitivity").ToString();
             mouseYSensitivityInput.text = PlayerPrefs.GetFloat("MouseYSensitivity").ToString();
             zoomMultiplierInput.text = PlayerPrefs.GetFloat("ZoomSensitivityMultiplier").ToString();
+            mobileLookJoystickSensitivityInput.text = PlayerPrefs.GetFloat("MobileLookJoystickSensitivity").ToString();
+
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                mobileLookJoystickInputParent.gameObject.SetActive(true);
+                lookSettingsGroupParent.sizeDelta = new Vector2(lookSettingsGroupParent.sizeDelta.x, lookSettingsGroupParent.sizeDelta.y + 125);
+                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
+                rebindingElementParent.anchoredPosition = new Vector2(rebindingElementParent.anchoredPosition.x, rebindingElementParent.anchoredPosition.y - 125);
+            }
 
             zoomModeDropdown.AddOptions(holdToggleOptions);
             zoomModeDropdown.value = holdToggleOptions.IndexOf(PlayerPrefs.GetString("ZoomMode"));
@@ -202,6 +214,15 @@ namespace Vi.UI
         public void ChangeZoomMode()
         {
             PlayerPrefs.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
+        }
+
+        public void ChangeMobileLookJoystickSensitivity()
+        {
+            mobileLookJoystickSensitivityInput.text = Regex.Replace(mobileLookJoystickSensitivityInput.text, @"[^0-9|.]", "");
+            if (float.TryParse(mobileLookJoystickSensitivityInput.text, out float sensitivity))
+            {
+                PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", sensitivity);
+            }
         }
     }
 }

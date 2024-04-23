@@ -425,7 +425,6 @@ GameObject:
   - component: {fileID: 7667653797634952869}
   - component: {fileID: 8157511657368136266}
   - component: {fileID: 4758944105944543620}
-  - component: {fileID: 6005787498088446413}
   m_Layer: 0
   m_Name: LookJoystick
   m_TagString: Untagged
@@ -481,7 +480,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7c554f13a30254ed69540ffb9e90255b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -506,6 +505,7 @@ MonoBehaviour:
   joystickActionType: 1
   movementRange: 125
   shouldReposition: 0
+  joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
   limits: {fileID: 4824479231797674246}
 --- !u!114 &4758944105944543620
@@ -521,19 +521,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/rightTrigger
---- !u!114 &6005787498088446413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610452173114550401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ControlPath: <Gamepad>/leftTrigger
 --- !u!1 &2004907598540655215
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,16 +880,10 @@ MonoBehaviour:
   deathUIParent: {fileID: 1261820042609325003}
   aliveUIParent: {fileID: 8571122044361422770}
   moveJoystick: {fileID: 589014628962476026}
-  lightAttackButton: {fileID: 4758944105944543620}
-  heavyAttackButton: {fileID: 6005787498088446413}
-  lookJoystickImage: {fileID: 7667653797634952869}
-  attackTypeToggleImage: {fileID: 4563282601554071472}
-  lightAttackIcon: {fileID: 21300000, guid: 7c554f13a30254ed69540ffb9e90255b, type: 3}
-  heavyAttackIcon: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
-  aimIcon: {fileID: 21300000, guid: a1d1e466cd42447d1b87e31f150c4a4b, type: 3}
-  switchAttackTypeButton: {fileID: 4305966019654369716}
-  aimButton: {fileID: 5353979728603681489}
   scoreboardButton: {fileID: 3227792922799834725}
+  heavyAttackButton: {fileID: 4563282601554071472}
+  aimIcon: {fileID: 21300000, guid: a1d1e466cd42447d1b87e31f150c4a4b, type: 3}
+  heavyAttackIcon: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
 --- !u!114 &5666987421114583128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1256,9 +1237,9 @@ GameObject:
   - component: {fileID: 8808352656708624571}
   - component: {fileID: 5203641016263860084}
   - component: {fileID: 4563282601554071472}
-  - component: {fileID: 4305966019654369716}
+  - component: {fileID: 510869252408901711}
   m_Layer: 0
-  m_Name: Attack Type Toggle Button
+  m_Name: HeavyAttackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1312,7 +1293,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7c554f13a30254ed69540ffb9e90255b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1322,7 +1303,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4305966019654369716
+--- !u!114 &510869252408901711
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1331,53 +1312,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3278160205124062361}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 4563282601554071472}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: ToggleAttackType
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  m_ControlPath: <Gamepad>/leftTrigger
 --- !u!1 &3289547961240334779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1414,7 +1352,6 @@ RectTransform:
   - {fileID: 5724712073000026927}
   - {fileID: 2739320560445226099}
   - {fileID: 8808352656708624571}
-  - {fileID: 6644889613107664476}
   - {fileID: 407986274450116968}
   m_Father: {fileID: 3714436478388541962}
   m_RootOrder: 14
@@ -2608,98 +2545,9 @@ MonoBehaviour:
   joystickActionType: 0
   movementRange: 125
   shouldReposition: 1
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   limits: {fileID: 210338626573094431}
---- !u!1 &5766265470416114759
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6644889613107664476}
-  - component: {fileID: 6850779212933127724}
-  - component: {fileID: 5353979728603681489}
-  - component: {fileID: 4215639990962576778}
-  m_Layer: 0
-  m_Name: Aim Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &6644889613107664476
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766265470416114759}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8369445866491870090}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -550, y: 200}
-  m_SizeDelta: {x: 150, y: 150}
-  m_Pivot: {x: 1, y: 0}
---- !u!222 &6850779212933127724
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766265470416114759}
-  m_CullTransparentMesh: 1
---- !u!114 &5353979728603681489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766265470416114759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a1d1e466cd42447d1b87e31f150c4a4b, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!114 &4215639990962576778
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766265470416114759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ControlPath: <Gamepad>/leftTrigger
 --- !u!1 &5825969018045366987
 GameObject:
   m_ObjectHideFlags: 0
@@ -3356,7 +3204,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.000061035156, y: 0}
-  m_SizeDelta: {x: 482, y: 74}
+  m_SizeDelta: {x: 486.82117, y: 75.695366}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &1397874844356754323
 CanvasRenderer:
@@ -4030,7 +3878,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8369445866491870090}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
