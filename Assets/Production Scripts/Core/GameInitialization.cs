@@ -27,6 +27,7 @@ namespace Vi.Core
 
         private void Start()
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();

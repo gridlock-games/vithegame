@@ -17,8 +17,16 @@ namespace Vi.UI
 
         protected TeamEliminationManager teamEliminationManager;
 
+        private CanvasGroup[] canvasGroups;
+
         protected void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             teamEliminationManager = GetComponentInParent<TeamEliminationManager>();
 
             roundResultText.enabled = false;
@@ -31,6 +39,11 @@ namespace Vi.UI
 
         protected void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!teamEliminationManager.IsSpawned) { return; }
 
             roundTimerText.text = teamEliminationManager.GetRoundTimerDisplayString();

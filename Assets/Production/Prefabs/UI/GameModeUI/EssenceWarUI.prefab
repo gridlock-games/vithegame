@@ -1430,6 +1430,7 @@ GameObject:
   - component: {fileID: 7757707048149690147}
   - component: {fileID: 7757707048149690146}
   - component: {fileID: 4386178333087574387}
+  - component: {fileID: 4674860448606815101}
   m_Layer: 5
   m_Name: EssenceWarUI
   m_TagString: Untagged
@@ -1538,6 +1539,18 @@ MonoBehaviour:
   gameEndText: {fileID: 6287037704251600050}
   roundResultText: {fileID: 5669168531654275004}
   roundWinThresholdText: {fileID: 3389305359995068172}
+--- !u!225 &4674860448606815101
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7757707048149690173}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7837106804767106401
 GameObject:
   m_ObjectHideFlags: 0
