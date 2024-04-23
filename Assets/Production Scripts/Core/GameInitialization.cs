@@ -59,6 +59,8 @@ namespace Vi.Core
 
             if (!PlayerPrefs.HasKey("Rebinds")) { PlayerPrefs.SetString("Rebinds", ""); }
 
+            if (!PlayerPrefs.HasKey("UIOpacity")) { PlayerPrefs.SetFloat("UIOpacity", 1); }
+
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {
                 PlayerPrefs.SetFloat("MasterVolume", 0.75f);

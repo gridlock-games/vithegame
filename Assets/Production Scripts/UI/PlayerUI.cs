@@ -112,8 +112,15 @@ namespace Vi.UI
         }
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
+        private CanvasGroup[] canvasGroups;
         private void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
@@ -243,6 +250,11 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
 
