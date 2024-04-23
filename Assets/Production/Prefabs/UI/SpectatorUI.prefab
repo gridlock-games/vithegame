@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 6114019404356350463}
   - component: {fileID: 318619431775699751}
   - component: {fileID: 8147565166783601869}
+  - component: {fileID: 1987947467530254698}
   m_Layer: 0
   m_Name: SpectatorUI
   m_TagString: Untagged
@@ -340,9 +341,29 @@ MonoBehaviour:
     objectsToMove:
     - gameObjectToMove: {fileID: 6114019403561036632}
       newAnchoredPosition: {x: 0, y: 85}
+      shouldOverrideAnchors: 0
+      anchorMinOverride: {x: 0, y: 0}
+      anchorMaxOverride: {x: 0, y: 0}
+      pivotOverride: {x: 0, y: 0}
     - gameObjectToMove: {fileID: 6114019404567166531}
       newAnchoredPosition: {x: 0, y: 85}
+      shouldOverrideAnchors: 0
+      anchorMinOverride: {x: 0, y: 0}
+      anchorMaxOverride: {x: 0, y: 0}
+      pivotOverride: {x: 0, y: 0}
   controlSchemeTextDefinitions: []
+--- !u!225 &1987947467530254698
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6114019404356350461}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6114019404567166531
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,6 +525,7 @@ MonoBehaviour:
   movementRange: 125
   shouldReposition: 1
   joystickValueMultiplier: 1
+  limits: {fileID: 0}
 --- !u!1 &7452032538359885697
 GameObject:
   m_ObjectHideFlags: 0
@@ -597,6 +619,7 @@ MonoBehaviour:
   movementRange: 125
   shouldReposition: 0
   joystickValueMultiplier: 4
+  limits: {fileID: 0}
 --- !u!1 &8400070427144414092
 GameObject:
   m_ObjectHideFlags: 0
