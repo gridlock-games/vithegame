@@ -56,7 +56,7 @@ namespace Vi.UI
             zoomMultiplierInput.text = PlayerPrefs.GetFloat("ZoomSensitivityMultiplier").ToString();
             mobileLookJoystickSensitivityInput.text = PlayerPrefs.GetFloat("MobileLookJoystickSensitivity").ToString();
 
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer | Application.platform == RuntimePlatform.WindowsEditor)
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 mobileLookJoystickInputParent.gameObject.SetActive(true);
                 lookSettingsGroupParent.sizeDelta = new Vector2(lookSettingsGroupParent.sizeDelta.x, lookSettingsGroupParent.sizeDelta.y + 125);
