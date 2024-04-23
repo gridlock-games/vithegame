@@ -81,6 +81,7 @@ namespace Vi.UI
             foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in wearableEquipmentOptions)
             {
                 if (wearableEquipmentOption.equipmentType != equipmentType) { continue; }
+                if (wearableEquipmentOption.GetModel(playerData.character.raceAndGender, null) == null) { continue; }
 
                 WeaponOptionElement ele = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
                 ele.InitializeEquipment(wearableEquipmentOption);

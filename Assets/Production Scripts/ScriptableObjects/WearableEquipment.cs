@@ -9,6 +9,7 @@ namespace Vi.ScriptableObjects
     public class WearableEquipment : MonoBehaviour
     {
         public CharacterReference.EquipmentType equipmentType;
+        public bool shouldDisableCharSkinRenderer;
 
         private void Start()
         {
