@@ -18,7 +18,7 @@ namespace Vi.UI
     [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
     public bool usePlayerpref;
-    
+
     [Serializable]
     public struct ControlSchemeTextDefinition
     {
@@ -57,40 +57,44 @@ namespace Vi.UI
     {
       //Load data from Playerdef
       String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
-      Debug.Log(previousModifcationdataString);
-      //MoveUIDefinition_Class[] deconvert = JsonUtility.FromJson<MoveUIDefinition_Class[]>(previousModifcationdataString);
-      MoveUIDefinition_Class[] deconvert = JsonConvert.DeserializeObject<MoveUIDefinition_Class[]>(previousModifcationdataString);
-      Debug.Log(deconvert);
+      if (previousModifcationdataString != null || previousModifcationdataString == "")
+            {
+        Debug.Log(previousModifcationdataString);
+        //MoveUIDefinition_Class[] deconvert = JsonUtility.FromJson<MoveUIDefinition_Class[]>(previousModifcationdataString);
+        MoveUIDefinition_Class[] deconvert = JsonConvert.DeserializeObject<MoveUIDefinition_Class[]>(previousModifcationdataString);
+        Debug.Log(deconvert);
 
-      //Convert from MoveUIDefinition_Class to MoveUIDefinition
-      foreach (var item in deconvert)
-      {
-        MoveUIDefinition uiDef = new MoveUIDefinition();
-        uiDef.objectID = item.objectID;
-        uiDef.newAnchoredPosition = new Vector2(item.newAnchoredPosition[0], item.newAnchoredPosition[1]);
-        uiDef.anchorMinOverride = new Vector2(item.anchorMinOverride[0], item.anchorMinOverride[1]);
-        uiDef.shouldOverrideAnchors = item.shouldOverrideAnchors;
-        uiDef.anchorMaxOverride = new Vector2(item.anchorMaxOverride[0], item.anchorMaxOverride[1]);
-        uiDef.pivotOverride = new Vector2(item.pivotOverride[0], item.pivotOverride[1]);
-
-        deSeralizedObject.Add(uiDef);
-      }
-
-      //set the prelive data to deseralized data
-
-      liveplatformUIDefinition.objectsToMove = deSeralizedObject.ToArray();
-
-      foreach (var movedef in moveUIIdentities)
-      {
-        for (int i = 0; i < liveplatformUIDefinition.objectsToMove.Length; i++)
+        //Convert from MoveUIDefinition_Class to MoveUIDefinition
+        foreach (var item in deconvert)
         {
-          if (movedef.objectID == liveplatformUIDefinition.objectsToMove[i].objectID && movedef.actualGameObject != null)
+          MoveUIDefinition uiDef = new MoveUIDefinition();
+          uiDef.objectID = item.objectID;
+          uiDef.newAnchoredPosition = new Vector2(item.newAnchoredPosition[0], item.newAnchoredPosition[1]);
+          uiDef.anchorMinOverride = new Vector2(item.anchorMinOverride[0], item.anchorMinOverride[1]);
+          uiDef.shouldOverrideAnchors = item.shouldOverrideAnchors;
+          uiDef.anchorMaxOverride = new Vector2(item.anchorMaxOverride[0], item.anchorMaxOverride[1]);
+          uiDef.pivotOverride = new Vector2(item.pivotOverride[0], item.pivotOverride[1]);
+
+          deSeralizedObject.Add(uiDef);
+        }
+
+        //set the prelive data to deseralized data
+
+        liveplatformUIDefinition.objectsToMove = deSeralizedObject.ToArray();
+
+        foreach (var movedef in moveUIIdentities)
+        {
+          for (int i = 0; i < liveplatformUIDefinition.objectsToMove.Length; i++)
           {
-            liveplatformUIDefinition.objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
-            break;
+            if (movedef.objectID == liveplatformUIDefinition.objectsToMove[i].objectID && movedef.actualGameObject != null)
+            {
+              liveplatformUIDefinition.objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
+              break;
+            }
           }
         }
       }
+
     }
 
     private void Start()
