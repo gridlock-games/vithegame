@@ -59,16 +59,7 @@ namespace Vi.UI
       //set the prelive data to deseralized data
 
       liveplatformUIDefinition.objectsToMove = deSeralizedObject.ToArray();
-      //for (int i = 0; i < platformUIDefinitions[0].objectsToMove.Length; i++)
-      //{
-      //  foreach (var item in deSeralizedObject)
-      //    //Reassign new item
-      //    if (item.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
-      //    {
-      //      platformUIDefinitions[0].objectsToMove[i] = item;
-      //    }
-      //}
-      //Assign ID to each object
+
       foreach (var movedef in moveUIDefinitions)
       {
         for (int i = 0; i < liveplatformUIDefinition.objectsToMove.Length; i++)
