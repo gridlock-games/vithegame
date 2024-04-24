@@ -18,6 +18,7 @@ namespace Vi.UI
     [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
     public bool usePlayerpref;
+    
     [Serializable]
     public struct ControlSchemeTextDefinition
     {
@@ -26,6 +27,15 @@ namespace Vi.UI
       public string action;
       public string stringBeforeBinding;
       public string stringAfterBinding;
+    }
+
+    [Serializable]
+    public struct UIDefinition
+    {
+      public RuntimePlatform[] platforms;
+      public GameObject[] gameObjectsToEnable;
+      public GameObject[] gameObjectsToDestroy;
+      public MoveUIDefinition[] objectsToMove;
     }
 
     private void setCorrectPlatformUiDefinition()
@@ -188,14 +198,6 @@ namespace Vi.UI
     }
   }
 
-  [Serializable]
-  public struct UIDefinition
-  {
-    public RuntimePlatform[] platforms;
-    public GameObject[] gameObjectsToEnable;
-    public GameObject[] gameObjectsToDestroy;
-    public MoveUIDefinition[] objectsToMove;
-  }
 
   [Serializable]
   public struct MoveUIDefinition

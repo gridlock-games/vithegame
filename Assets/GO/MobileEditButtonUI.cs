@@ -11,7 +11,6 @@ namespace Vi.UI
         //[SerializeField] public MoveUIDefinition[] convertedObject;
         private List<MoveUIDefinition_Class> convertedObject;
 
-        [SerializeField] public UIDefinition[] platformUIDefinitions;
         [SerializeField] private PlatformUIDefinition pud;
         [SerializeField] private MoveUIDefinition[] defaultSet;
         [SerializeField] private GameObject pudUI;
