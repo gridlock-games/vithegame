@@ -1229,7 +1229,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   draggableObject: {fileID: 0}
   moveUIDefIdentifier:
-    objectID: 
+    objectID: abil4
     actualGameObject: {fileID: 0}
 --- !u!1 &3081177110703389668
 GameObject:
@@ -1295,6 +1295,7 @@ GameObject:
   - component: {fileID: 1543283148845235104}
   - component: {fileID: 8727175781036985151}
   - component: {fileID: 3086781234168438017}
+  - component: {fileID: 5445133026608651895}
   m_Layer: 0
   m_Name: SwapWeaponButton
   m_TagString: Untagged
@@ -1416,6 +1417,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5445133026608651895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3124334596239454657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: WeaponSwap
+    actualGameObject: {fileID: 0}
 --- !u!1 &3470107754209780718
 GameObject:
   m_ObjectHideFlags: 0
@@ -1654,7 +1671,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   draggableObject: {fileID: 0}
   moveUIDefIdentifier:
-    objectID: 
+    objectID: abil2
     actualGameObject: {fileID: 0}
 --- !u!1 &4395332813952066461
 GameObject:
@@ -2340,6 +2357,7 @@ GameObject:
   - component: {fileID: 8940093601008215128}
   - component: {fileID: 8860700638647961669}
   - component: {fileID: 5388365946683487515}
+  - component: {fileID: 2095859561151778422}
   m_Layer: 0
   m_Name: Defend Button
   m_TagString: Untagged
@@ -2418,6 +2436,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/rightShoulder
+--- !u!114 &2095859561151778422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6665932132228137871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: def
+    actualGameObject: {fileID: 0}
 --- !u!1 &6912002907042234485
 GameObject:
   m_ObjectHideFlags: 0
@@ -2430,6 +2464,7 @@ GameObject:
   - component: {fileID: 9159394635881263479}
   - component: {fileID: 6802946983335661921}
   - component: {fileID: 5580824286140666531}
+  - component: {fileID: 2783099875230431011}
   m_Layer: 0
   m_Name: Dodge Button
   m_TagString: Untagged
@@ -2508,6 +2543,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/leftStickPress
+--- !u!114 &2783099875230431011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6912002907042234485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: dodge
+    actualGameObject: {fileID: 0}
 --- !u!1 &7061224269077998824
 GameObject:
   m_ObjectHideFlags: 0
@@ -3163,6 +3214,7 @@ GameObject:
   - component: {fileID: 1443192267789292322}
   - component: {fileID: 7161916441027757030}
   - component: {fileID: 7490023911854329314}
+  - component: {fileID: 1072447317091983819}
   m_Layer: 0
   m_Name: Attack Type Toggle Button
   m_TagString: Untagged
@@ -3284,6 +3336,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1072447317091983819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164578627587489999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: AtkTogl
+    actualGameObject: {fileID: 0}
 --- !u!1 &8184982426568867309
 GameObject:
   m_ObjectHideFlags: 0
@@ -3454,7 +3522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   draggableObject: {fileID: 0}
   moveUIDefIdentifier:
-    objectID: 
+    objectID: abil1
     actualGameObject: {fileID: 0}
 --- !u!1 &8238090590137363611
 GameObject:
@@ -3806,7 +3874,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   draggableObject: {fileID: 0}
   moveUIDefIdentifier:
-    objectID: 
+    objectID: abil3
     actualGameObject: {fileID: 0}
 --- !u!1 &9040065098236618301
 GameObject:
@@ -4067,8 +4135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controlsAsset: {fileID: 0}
   platformUIDefinitions:
-  - uidefID: 0
-    platforms: 080000000b000000
+  - platforms: 080000000b0000000700000002000000
     gameObjectsToEnable:
     - {fileID: 8184982426568867309}
     - {fileID: 948573995461454101}
@@ -4102,14 +4169,40 @@ MonoBehaviour:
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-  LiveplatformUIDefinition:
-    uidefID: 0
+  preLiveplatformUIDefinition:
+    platforms: 
+    gameObjectsToEnable: []
+    gameObjectsToDestroy: []
+    objectsToMove: []
+  liveplatformUIDefinition:
     platforms: 
     gameObjectsToEnable: []
     gameObjectsToDestroy: []
     objectsToMove: []
   deSeralizedObject: []
-  moveUIDefinitions: []
+  moveUIDefinitions:
+  - objectID: abil1
+    actualGameObject: {fileID: 8207446657545550054}
+  - objectID: abil2
+    actualGameObject: {fileID: 3513145586053412173}
+  - objectID: abil3
+    actualGameObject: {fileID: 8655687992615466246}
+  - objectID: abil4
+    actualGameObject: {fileID: 3035734430057349374}
+  - objectID: pausebtn
+    actualGameObject: {fileID: 1236608184957896513}
+  - objectID: loadoutbtn
+    actualGameObject: {fileID: 291364653447703359}
+  - objectID: scorebtn
+    actualGameObject: {fileID: 8172029473609301449}
+  - objectID: def
+    actualGameObject: {fileID: 6665932132228137871}
+  - objectID: dodge
+    actualGameObject: {fileID: 6912002907042234485}
+  - objectID: AtkTogl
+    actualGameObject: {fileID: 8164578627587489999}
+  - objectID: WeaponSwap
+    actualGameObject: {fileID: 3124334596239454657}
   controlSchemeTextDefinitions: []
 --- !u!1 &9155599769878072938
 GameObject:
@@ -4751,6 +4844,28 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114039092108050114, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
+--- !u!1 &291364653447703359 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 292604778460072803}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3537591524392137219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291364653447703359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: loadoutbtn
+    actualGameObject: {fileID: 0}
 --- !u!224 &509189459695868425 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
@@ -5245,6 +5360,28 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114039092108050114, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
+--- !u!1 &1236608184957896513 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1237918643483485981}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8116769229943177013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1236608184957896513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: pausebtn
+    actualGameObject: {fileID: 0}
 --- !u!224 &1311518436812191351 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
@@ -6547,11 +6684,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
         type: 3}
-      propertyPath: editableUIObjects.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
-        type: 3}
       propertyPath: editableUIObjects.Array.data[0]
       value: 
       objectReference: {fileID: 3489092141994578537}
@@ -6570,6 +6702,41 @@ PrefabInstance:
       propertyPath: editableUIObjects.Array.data[3]
       value: 
       objectReference: {fileID: 3945181418509045923}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[4]
+      value: 
+      objectReference: {fileID: 8246867190722088191}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[5]
+      value: 
+      objectReference: {fileID: 509189459695868425}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[6]
+      value: 
+      objectReference: {fileID: 1311518436812191351}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[7]
+      value: 
+      objectReference: {fileID: 1387802593998802809}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[8]
+      value: 
+      objectReference: {fileID: 8805718004364374053}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[9]
+      value: 
+      objectReference: {fileID: 2742052554163154157}
+    - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
+        type: 3}
+      propertyPath: editableUIObjects.Array.data[10]
+      value: 
+      objectReference: {fileID: 6456263066663329086}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 31246d24c4573114c8d5e07bd3397b0c, type: 3}
 --- !u!224 &7437569396074644914 stripped
@@ -6779,12 +6946,34 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 8172988132244462997}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 8172029473609301449}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8172029473609301449 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8172988132244462997}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1387224746857831451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8172029473609301449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3ec936af75d3b4d88697ce96aa657b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draggableObject: {fileID: 0}
+  moveUIDefIdentifier:
+    objectID: scorebtn
+    actualGameObject: {fileID: 0}
 --- !u!224 &8246867190722088191 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,

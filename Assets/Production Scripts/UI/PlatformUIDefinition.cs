@@ -13,23 +13,24 @@ namespace Vi.UI
   {
     [SerializeField] private InputActionAsset controlsAsset;
     [SerializeField] private UIDefinition[] platformUIDefinitions;
-    [SerializeField] private UIDefinition LiveplatformUIDefinition;
+    [SerializeField] private UIDefinition liveplatformUIDefinition;
     [SerializeField] private List<MoveUIDefinition> deSeralizedObject;
     [SerializeField] private MoveUIDefIdentifier[] moveUIDefinitions;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
     private void setCorrectPlatformUiDefinition()
     {
-      LiveplatformUIDefinition = platformUIDefinitions[0];
-      //foreach (var platformItem in platformUIDefinitions)
-      //{
-      //  //Check the platform identifier and then disregards the rest we don't need to check anymore
-      //  if (platformItem.platforms.Contains(Application.platform))
-      //  {
-      //    LiveplatformUIDefinition = platformItem;
-      //    break;
-      //  }
-      //}
+      //LiveplatformUIDefinition = platformUIDefinitions[0];
+
+      foreach (var platformItem in platformUIDefinitions)
+      {
+        //Check the platform identifier and then disregards the rest we don't need to check anymore
+        if (platformItem.platforms.Contains(Application.platform))
+        {
+          liveplatformUIDefinition = platformItem;
+          break;
+        }
+      }
     }
 
     private void LoadAndSetCorrectIDtoGameObject()
@@ -55,23 +56,26 @@ namespace Vi.UI
         deSeralizedObject.Add(uiDef);
       }
 
-      for (int i = 0; i < platformUIDefinitions[0].objectsToMove.Length; i++)
-      {
-        foreach (var item in deSeralizedObject)
-          //Reassign new item
-          if (item.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
-          {
-            platformUIDefinitions[0].objectsToMove[i] = item;
-          }
-      }
+      //set the prelive data to deseralized data
+
+      liveplatformUIDefinition.objectsToMove = deSeralizedObject.ToArray();
+      //for (int i = 0; i < platformUIDefinitions[0].objectsToMove.Length; i++)
+      //{
+      //  foreach (var item in deSeralizedObject)
+      //    //Reassign new item
+      //    if (item.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
+      //    {
+      //      platformUIDefinitions[0].objectsToMove[i] = item;
+      //    }
+      //}
       //Assign ID to each object
       foreach (var movedef in moveUIDefinitions)
       {
-        for (int i = 0; i < LiveplatformUIDefinition.objectsToMove.Length; i++)
+        for (int i = 0; i < liveplatformUIDefinition.objectsToMove.Length; i++)
         {
-          if (movedef.objectID == platformUIDefinitions[0].objectsToMove[i].objectID)
+          if (movedef.objectID == liveplatformUIDefinition.objectsToMove[i].objectID)
           {
-            platformUIDefinitions[0].objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
+            liveplatformUIDefinition.objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
             break;
           }
         }
@@ -87,16 +91,16 @@ namespace Vi.UI
 
     private void ChangeUILayout()
     {
-      foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
-      {
-        foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+      //foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
+      //{
+        foreach (GameObject g in liveplatformUIDefinition.gameObjectsToEnable)
         {
-          g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+          g.SetActive(liveplatformUIDefinition.platforms.Contains(Application.platform));
         }
 
-        foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+        foreach (MoveUIDefinition moveUIDefinition in liveplatformUIDefinition.objectsToMove)
         {
-          if (platformUIDefinition.platforms.Contains(Application.platform))
+          if (liveplatformUIDefinition.platforms.Contains(Application.platform))
           {
             RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
             if (moveUIDefinition.shouldOverrideAnchors)
@@ -109,18 +113,18 @@ namespace Vi.UI
           }
         }
 
-        foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+        foreach (GameObject g in liveplatformUIDefinition.gameObjectsToDestroy)
         {
-          if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+          if (liveplatformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
         }
-      }
+      //}
     }
 
     private void Update()
     {
-      if (LiveplatformUIDefinition.objectsToMove != null)
+      if (liveplatformUIDefinition.objectsToMove != null)
       {
-        foreach (MoveUIDefinition moveUIDefinition in LiveplatformUIDefinition.objectsToMove)
+        foreach (MoveUIDefinition moveUIDefinition in liveplatformUIDefinition.objectsToMove)
         {
           RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
           if (moveUIDefinition.shouldOverrideAnchors)
@@ -131,9 +135,8 @@ namespace Vi.UI
           }
           rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
         }
-
-        ControlSchemeDef();
       }
+      ControlSchemeDef();
     }
 
     private void ControlSchemeDef()

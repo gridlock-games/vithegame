@@ -904,30 +904,68 @@ MonoBehaviour:
     - {fileID: 5844044293463057731}
     gameObjectsToDestroy: []
     objectsToMove:
-    - gameObjectToMove: {fileID: 3302969314903897264}
+    - objectID: 
+      gameObjectToMove: {fileID: 3302969314903897264}
       newAnchoredPosition: {x: -560, y: 430}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 7850063440274356507}
+    - objectID: 
+      gameObjectToMove: {fileID: 7850063440274356507}
       newAnchoredPosition: {x: -400, y: 550}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 2607331335753300304}
+    - objectID: 
+      gameObjectToMove: {fileID: 2607331335753300304}
       newAnchoredPosition: {x: -200, y: 550}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 8507629784855563432}
+    - objectID: 
+      gameObjectToMove: {fileID: 8507629784855563432}
       newAnchoredPosition: {x: -40, y: 430}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
+  preLiveplatformUIDefinition:
+    platforms: 
+    gameObjectsToEnable: []
+    gameObjectsToDestroy: []
+    objectsToMove: []
+  liveplatformUIDefinition:
+    platforms: 
+    gameObjectsToEnable: []
+    gameObjectsToDestroy: []
+    objectsToMove: []
+  deSeralizedObject: []
+  moveUIDefinitions:
+  - objectID: abil1
+    actualGameObject: {fileID: 3302969314903897264}
+  - objectID: abil2
+    actualGameObject: {fileID: 7850063440274356507}
+  - objectID: abil3
+    actualGameObject: {fileID: 2607331335753300304}
+  - objectID: abil4
+    actualGameObject: {fileID: 8507629784855563432}
+  - objectID: pausebtn
+    actualGameObject: {fileID: 5555582391938255639}
+  - objectID: loadoutbtn
+    actualGameObject: {fileID: 6357700365567027049}
+  - objectID: scorebtn
+    actualGameObject: {fileID: 3267596643778015647}
+  - objectID: def
+    actualGameObject: {fileID: 50121939501879257}
+  - objectID: dodge
+    actualGameObject: {fileID: 278214178510785571}
+  - objectID: AtkTogl
+    actualGameObject: {fileID: 3278160205124062361}
+  - objectID: WeaponSwap
+    actualGameObject: {fileID: 8605228337057791383}
   controlSchemeTextDefinitions: []
 --- !u!1 &2539763201719894588
 GameObject:
@@ -3204,7 +3242,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.000061035156, y: 0}
-  m_SizeDelta: {x: 486.82117, y: 75.695366}
+  m_SizeDelta: {x: 494, y: 76}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &1397874844356754323
 CanvasRenderer:
@@ -5324,12 +5362,18 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 3268625078682554819}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 3267596643778015647}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &3267596643778015647 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 3268625078682554819}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &3333497513468805289 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
@@ -6076,6 +6120,12 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114039092108050114, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
+--- !u!1 &5555582391938255639 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 5556821974607342411}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &5621415127064803873 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
@@ -6262,6 +6312,12 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 114039092108050114, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
+--- !u!1 &6357700365567027049 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e,
+    type: 3}
+  m_PrefabInstance: {fileID: 6359010284028643125}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &6566588324393195103 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224770289861022058, guid: b4689c3e500723546b3091a30eb3366e,
