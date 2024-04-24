@@ -14,6 +14,11 @@ namespace Vi.UI
         //private List<GameModeManager.KillHistoryElement> cachedKillHistory = new List<GameModeManager.KillHistoryElement>();
         private List<int> displayedKillHistoryIndices = new List<int>();
 
+        public void SetPreviewOn()
+        {
+
+        }
+
         private void Update()
         {
             if (!GameModeManager.Singleton) { return; }
