@@ -99,7 +99,7 @@ namespace Vi.UI
     private void Start()
     {
       setCorrectPlatformUiDefinition();
-      if (usePlayerpref) LoadAndSetCorrectIDtoGameObject();
+      if (usePlayerpref && (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))LoadAndSetCorrectIDtoGameObject();
       ChangeUILayout();
     }
 

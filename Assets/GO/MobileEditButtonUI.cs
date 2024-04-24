@@ -18,7 +18,7 @@ namespace Vi.UI
         // Start is called before the first frame update
         private void Start()
         {
-            //Disable Platform UIDef after its run its course
+            //Disable Platform UIDef after it run its course
             pud.enabled = false;
         }
 
