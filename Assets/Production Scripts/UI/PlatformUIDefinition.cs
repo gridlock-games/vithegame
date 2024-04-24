@@ -64,7 +64,7 @@ namespace Vi.UI
       {
         for (int i = 0; i < liveplatformUIDefinition.objectsToMove.Length; i++)
         {
-          if (movedef.objectID == liveplatformUIDefinition.objectsToMove[i].objectID)
+          if (movedef.objectID == liveplatformUIDefinition.objectsToMove[i].objectID && movedef.actualGameObject != null)
           {
             liveplatformUIDefinition.objectsToMove[i].gameObjectToMove = movedef.actualGameObject;
             break;
@@ -84,12 +84,14 @@ namespace Vi.UI
     {
       //foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
       //{
-        foreach (GameObject g in liveplatformUIDefinition.gameObjectsToEnable)
-        {
-          g.SetActive(liveplatformUIDefinition.platforms.Contains(Application.platform));
-        }
+      foreach (GameObject g in liveplatformUIDefinition.gameObjectsToEnable)
+      {
+        g.SetActive(liveplatformUIDefinition.platforms.Contains(Application.platform));
+      }
 
-        foreach (MoveUIDefinition moveUIDefinition in liveplatformUIDefinition.objectsToMove)
+      foreach (MoveUIDefinition moveUIDefinition in liveplatformUIDefinition.objectsToMove)
+      {
+        if (moveUIDefinition.gameObjectToMove != null)
         {
           if (liveplatformUIDefinition.platforms.Contains(Application.platform))
           {
@@ -103,11 +105,12 @@ namespace Vi.UI
             rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
           }
         }
+      }
 
-        foreach (GameObject g in liveplatformUIDefinition.gameObjectsToDestroy)
-        {
-          if (liveplatformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
-        }
+      foreach (GameObject g in liveplatformUIDefinition.gameObjectsToDestroy)
+      {
+        if (liveplatformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+      }
       //}
     }
 
@@ -117,14 +120,17 @@ namespace Vi.UI
       {
         foreach (MoveUIDefinition moveUIDefinition in liveplatformUIDefinition.objectsToMove)
         {
-          RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
-          if (moveUIDefinition.shouldOverrideAnchors)
+          if (moveUIDefinition.gameObjectToMove != null)
           {
-            rt.anchorMin = moveUIDefinition.anchorMinOverride;
-            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
-            rt.pivot = moveUIDefinition.pivotOverride;
+            RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+            if (moveUIDefinition.shouldOverrideAnchors)
+            {
+              rt.anchorMin = moveUIDefinition.anchorMinOverride;
+              rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+              rt.pivot = moveUIDefinition.pivotOverride;
+            }
+            rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
           }
-          rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
         }
       }
       ControlSchemeDef();
