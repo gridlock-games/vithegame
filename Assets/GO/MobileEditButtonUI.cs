@@ -60,8 +60,13 @@ namespace Vi.UI
       //Show error if there a problem saving/or is null
 
       //Then close the Ui and return to the menu - Also Reload Platform UI Definition if needed.
+      ClosePrefab();
     }
 
+    public void ClosePrefab()
+    {
+      Destroy(this.gameObject);
+    }
     //private struct MoveUIDefinition
     //{
     //  public GameObject gameObjectToMove;
