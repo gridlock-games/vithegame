@@ -46,8 +46,10 @@ namespace Vi.UI
             public string stringAfterBinding;
         }
 
+        #if UNITY_EDITOR
         private void OnValidate()
         {
+            bool shouldSetDirty = false;
             foreach (UIDefinition UIDefinition in platformUIDefinitions)
             {
                 for (int i = 0; i < UIDefinition.objectsToMove.Length; i++)
@@ -57,12 +59,14 @@ namespace Vi.UI
                     {
                         moveUIDefinition.gameObjectPath = GetGameObjectPath(moveUIDefinition.gameObjectToMove);
                         UIDefinition.objectsToMove[i] = moveUIDefinition;
+                        shouldSetDirty = true;
                     }
                 }
             }
 
-            EditorUtility.SetDirty(this);
+            if (shouldSetDirty) { EditorUtility.SetDirty(this); }
         }
+        #endif
 
         public static string GetGameObjectPath(GameObject obj)
         {
