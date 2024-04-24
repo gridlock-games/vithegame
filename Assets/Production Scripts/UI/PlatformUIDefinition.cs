@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Vi.Core;
+using UnityEditor;
 
 namespace Vi.UI
 {
@@ -26,6 +27,7 @@ namespace Vi.UI
         [System.Serializable]
         private struct MoveUIDefinition
         {
+            public string gameObjectPath;
             public GameObject gameObjectToMove;
             public Vector2 newAnchoredPosition;
             public bool shouldOverrideAnchors;
@@ -42,6 +44,35 @@ namespace Vi.UI
             public string action;
             public string stringBeforeBinding;
             public string stringAfterBinding;
+        }
+
+        private void OnValidate()
+        {
+            foreach (UIDefinition UIDefinition in platformUIDefinitions)
+            {
+                for (int i = 0; i < UIDefinition.objectsToMove.Length; i++)
+                {
+                    MoveUIDefinition moveUIDefinition = UIDefinition.objectsToMove[i];
+                    if (moveUIDefinition.gameObjectToMove)
+                    {
+                        moveUIDefinition.gameObjectPath = GetGameObjectPath(moveUIDefinition.gameObjectToMove);
+                        UIDefinition.objectsToMove[i] = moveUIDefinition;
+                    }
+                }
+            }
+
+            EditorUtility.SetDirty(this);
+        }
+
+        public static string GetGameObjectPath(GameObject obj)
+        {
+            string path = "/" + obj.name;
+            while (obj.transform.parent != null)
+            {
+                obj = obj.transform.parent.gameObject;
+                path = "/" + obj.name + path;
+            }
+            return path;
         }
 
         private void Start()
