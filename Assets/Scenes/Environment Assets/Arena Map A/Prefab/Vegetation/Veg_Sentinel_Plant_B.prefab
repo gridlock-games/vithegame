@@ -1,0 +1,358 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4658938133268006401
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5470764281039838395}
+  - component: {fileID: 8954234360467903262}
+  - component: {fileID: 6604286945836771284}
+  m_Layer: 0
+  m_Name: Veg_Sentinel_Plant_B
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5470764281039838395
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4658938133268006401}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1005134568435137632}
+  - {fileID: 5750268036724862316}
+  - {fileID: 665055613314737628}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8954234360467903262
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4658938133268006401}
+  m_Mesh: {fileID: -337081317217317629, guid: 2850503c499a32d48b19871fa105181e, type: 3}
+--- !u!23 &6604286945836771284
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4658938133268006401}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 875c4e8a2ce2a8b41bb0efd03c328863, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &754438622076722059
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5470764281039838395}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.79671
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.79671
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.79671
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.38243422
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.92398274
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 135.031
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_Name
+      value: Veg_Sentinel_Plant_B
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2850503c499a32d48b19871fa105181e, type: 3}
+--- !u!4 &1005134568435137632 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+    type: 3}
+  m_PrefabInstance: {fileID: 754438622076722059}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1058480001264665143
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5470764281039838395}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.61993
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.61993
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.61993
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.003
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.74078876
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.6717381
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -84.403
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_Name
+      value: Veg_Sentinel_Plant_B (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2850503c499a32d48b19871fa105181e, type: 3}
+--- !u!4 &665055613314737628 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1058480001264665143}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5208332899370781319
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5470764281039838395}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.77903
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.77903
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.77903
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.87822807
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.47824207
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 57.141
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2850503c499a32d48b19871fa105181e,
+        type: 3}
+      propertyPath: m_Name
+      value: Veg_Sentinel_Plant_B (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2850503c499a32d48b19871fa105181e, type: 3}
+--- !u!4 &5750268036724862316 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2850503c499a32d48b19871fa105181e,
+    type: 3}
+  m_PrefabInstance: {fileID: 5208332899370781319}
+  m_PrefabAsset: {fileID: 0}
