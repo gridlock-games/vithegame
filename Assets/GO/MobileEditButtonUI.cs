@@ -9,7 +9,7 @@ namespace Vi.UI
         public RectTransform[] editableUIObjects;
 
         //[SerializeField] public MoveUIDefinition[] convertedObject;
-        [SerializeField] public List<MoveUIDefinition_Class> convertedObject;
+        private List<MoveUIDefinition_Class> convertedObject;
 
         [SerializeField] public UIDefinition[] platformUIDefinitions;
         [SerializeField] private PlatformUIDefinition pud;
