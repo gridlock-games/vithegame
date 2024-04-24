@@ -17,7 +17,7 @@ namespace Vi.UI
     private List<MoveUIDefinition> deSeralizedObject;
     [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
-    public bool usePlayerpref;
+    public bool usePlayerpref = false;
 
     [Serializable]
     public struct ControlSchemeTextDefinition
@@ -99,7 +99,7 @@ namespace Vi.UI
     private void Start()
     {
       setCorrectPlatformUiDefinition();
-      if (usePlayerpref && (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))LoadAndSetCorrectIDtoGameObject();
+      if (usePlayerpref && (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)) LoadAndSetCorrectIDtoGameObject();
       ChangeUILayout();
     }
 
