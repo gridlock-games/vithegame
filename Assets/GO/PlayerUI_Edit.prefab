@@ -801,6 +801,7 @@ MonoBehaviour:
   joystickActionType: 0
   movementRange: 125
   shouldReposition: 1
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   limits: {fileID: 6835181698163556937}
 --- !u!1 &1709032387965770217
@@ -1368,7 +1369,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3124334596239454657}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -2085,6 +2086,7 @@ MonoBehaviour:
   joystickActionType: 1
   movementRange: 125
   shouldReposition: 0
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 4
   limits: {fileID: 2216837660463877456}
 --- !u!114 &2178367988051738066
@@ -2430,7 +2432,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6665932132228137871}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
   m_Name: 
@@ -2537,7 +2539,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6912002907042234485}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
   m_Name: 
@@ -3287,7 +3289,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8164578627587489999}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -4111,16 +4113,10 @@ MonoBehaviour:
   deathUIParent: {fileID: 5598773626931707805}
   aliveUIParent: {fileID: 3081177110703389668}
   moveJoystick: {fileID: 6060910482015228844}
-  lightAttackButton: {fileID: 2178367988051738066}
-  heavyAttackButton: {fileID: 1110387719188493723}
-  lookJoystickImage: {fileID: 3916107296892011251}
-  attackTypeToggleImage: {fileID: 7161916441027757030}
-  lightAttackIcon: {fileID: 21300000, guid: 7c554f13a30254ed69540ffb9e90255b, type: 3}
-  heavyAttackIcon: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
-  aimIcon: {fileID: 21300000, guid: a1d1e466cd42447d1b87e31f150c4a4b, type: 3}
-  switchAttackTypeButton: {fileID: 7490023911854329314}
-  aimButton: {fileID: 1620482664718147207}
   scoreboardButton: {fileID: 8141198437298571827}
+  heavyAttackButton: {fileID: 0}
+  aimIcon: {fileID: 21300000, guid: a1d1e466cd42447d1b87e31f150c4a4b, type: 3}
+  heavyAttackIcon: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
 --- !u!114 &1339006560642319374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4169,11 +4165,6 @@ MonoBehaviour:
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-  preLiveplatformUIDefinition:
-    platforms: 
-    gameObjectsToEnable: []
-    gameObjectsToDestroy: []
-    objectsToMove: []
   liveplatformUIDefinition:
     platforms: 
     gameObjectsToEnable: []
@@ -4681,6 +4672,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 5a1c805a3cf8435489b9fe2517abf3a2,
         type: 3}
+    - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -5196,6 +5192,11 @@ PrefabInstance:
     - target: {fileID: 1311602136260700, guid: b4689c3e500723546b3091a30eb3366e, type: 3}
       propertyPath: m_Name
       value: Pause Menu Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
         type: 3}
@@ -6706,7 +6707,7 @@ PrefabInstance:
         type: 3}
       propertyPath: editableUIObjects.Array.data[4]
       value: 
-      objectReference: {fileID: 8246867190722088191}
+      objectReference: {fileID: 1311518436812191351}
     - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
         type: 3}
       propertyPath: editableUIObjects.Array.data[5]
@@ -6716,7 +6717,7 @@ PrefabInstance:
         type: 3}
       propertyPath: editableUIObjects.Array.data[6]
       value: 
-      objectReference: {fileID: 1311518436812191351}
+      objectReference: {fileID: 8246867190722088191}
     - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
         type: 3}
       propertyPath: editableUIObjects.Array.data[7]
@@ -6726,12 +6727,12 @@ PrefabInstance:
         type: 3}
       propertyPath: editableUIObjects.Array.data[8]
       value: 
-      objectReference: {fileID: 8805718004364374053}
+      objectReference: {fileID: 2742052554163154157}
     - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
         type: 3}
       propertyPath: editableUIObjects.Array.data[9]
       value: 
-      objectReference: {fileID: 2742052554163154157}
+      objectReference: {fileID: 8805718004364374053}
     - target: {fileID: 583138920088022011, guid: 31246d24c4573114c8d5e07bd3397b0c,
         type: 3}
       propertyPath: editableUIObjects.Array.data[10]
@@ -6776,6 +6777,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114579828141692838, guid: b4689c3e500723546b3091a30eb3366e,
         type: 3}
@@ -6947,7 +6953,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 8172988132244462997}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8172029473609301449}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 

@@ -13,7 +13,6 @@ namespace Vi.UI
     [SerializeField] public List<MoveUIDefinition_Class> convertedObject;
     [SerializeField] public UIDefinition[] platformUIDefinitions;
 
-    [SerializeField] public PlatformUIDefinition platformUIDefinition;
 
     // Start is called before the first frame update
     private void Start()
