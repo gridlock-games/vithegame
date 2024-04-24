@@ -58,7 +58,7 @@ namespace Vi.UI
       //Load data from Playerdef
       String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
       if (previousModifcationdataString != null || previousModifcationdataString == "")
-            {
+      {
         Debug.Log(previousModifcationdataString);
         //MoveUIDefinition_Class[] deconvert = JsonUtility.FromJson<MoveUIDefinition_Class[]>(previousModifcationdataString);
         MoveUIDefinition_Class[] deconvert = JsonConvert.DeserializeObject<MoveUIDefinition_Class[]>(previousModifcationdataString);
@@ -94,7 +94,6 @@ namespace Vi.UI
           }
         }
       }
-
     }
 
     private void Start()
@@ -201,7 +200,6 @@ namespace Vi.UI
       return platformUIDefinitions;
     }
   }
-
 
   [Serializable]
   public struct MoveUIDefinition
