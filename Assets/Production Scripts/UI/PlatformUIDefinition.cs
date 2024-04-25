@@ -16,10 +16,10 @@ namespace Vi.UI
 
     [SerializeField] private InputActionAsset controlsAsset;
     [SerializeField] private UIDefinition[] platformUIDefinitions;
-    [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
     [Header("User Generated PlayerPrefID")]
+    [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     public bool usePlayerpref = false;
     public string playerPrefID = "ButtonUiLayout";
 

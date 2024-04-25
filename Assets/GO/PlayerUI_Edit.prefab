@@ -2944,8 +2944,6 @@ MonoBehaviour:
   - {fileID: 2742052554163154157}
   - {fileID: 8805718004364374053}
   - {fileID: 6456263066663329086}
-  convertedObject: []
-  platformUIDefinitions: []
   pud: {fileID: 1339006560642319374}
   defaultSet:
   - objectID: abil4
@@ -4885,13 +4883,8 @@ MonoBehaviour:
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-  liveplatformUIDefinition:
-    platforms: 
-    gameObjectsToEnable: []
-    gameObjectsToDestroy: []
-    objectsToMove: []
-  deSeralizedObject: []
-  moveUIDefinitions:
+  controlSchemeTextDefinitions: []
+  moveUIIdentities:
   - objectID: abil1
     actualGameObject: {fileID: 8207446657545550054}
   - objectID: abil2
@@ -4914,7 +4907,8 @@ MonoBehaviour:
     actualGameObject: {fileID: 8164578627587489999}
   - objectID: WeaponSwap
     actualGameObject: {fileID: 3124334596239454657}
-  controlSchemeTextDefinitions: []
+  usePlayerpref: 0
+  playerPrefID: ButtonUiLayout
 --- !u!1 &9155599769878072938
 GameObject:
   m_ObjectHideFlags: 0
