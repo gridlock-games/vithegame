@@ -110,6 +110,15 @@ namespace Vi.UI
             }
         }
 
+        private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
+        private void Awake()
+        {
+            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            {
+                originalPositionMap.Add(child, child.localPosition);
+            }
+        }
+
         private void OnEnable()
         {
             if (PlayerPrefs.HasKey(customizablePlayerPrefName))
@@ -120,6 +129,13 @@ namespace Vi.UI
                 {
                     GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
                     ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<Transform, Vector3> kvp in originalPositionMap)
+                {
+                    kvp.Key.localPosition = kvp.Value;
                 }
             }
         }

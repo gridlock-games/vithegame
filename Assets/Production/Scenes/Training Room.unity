@@ -228,6 +228,18 @@ MonoBehaviour:
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
+  ancientBossLightSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  ancientBossCorruptSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  ancientBossNeutralSpawnPoint:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  displayDefaultGizmos: 0
+  displayDamageCircleGizmos: 0
+  displayEssenceWarGizmos: 0
 --- !u!4 &1467391050
 Transform:
   m_ObjectHideFlags: 0
