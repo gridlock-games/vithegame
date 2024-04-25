@@ -18,6 +18,7 @@ namespace Vi.UI
     [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
     public bool usePlayerpref = false;
+    public string playerPrefID = "ButtonUiLayout";
 
     [Serializable]
     public struct ControlSchemeTextDefinition
@@ -56,7 +57,7 @@ namespace Vi.UI
     private void LoadAndSetCorrectIDtoGameObject()
     {
       //Load data from Playerdef
-      String previousModifcationdataString = PlayerPrefs.GetString("ButtonUiLayout");
+      String previousModifcationdataString = PlayerPrefs.GetString(playerPrefID);
       if (previousModifcationdataString != null || previousModifcationdataString == "")
       {
         Debug.Log(previousModifcationdataString);
