@@ -520,9 +520,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 15
+  viewDistance: 20
+  shouldUseFixedScale: 1
+  fixedScaleValue: 0.007
   scalingSpeed: 8
   scalingDistanceDivisor: 500
-  viewDistance: 20
   nameDisplay: {fileID: 7095846274158110464}
   nameBackground: {fileID: 7095846275019019572}
   healthFillImage: {fileID: 5812772587367031554}

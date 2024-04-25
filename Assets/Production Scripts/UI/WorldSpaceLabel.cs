@@ -11,9 +11,13 @@ namespace Vi.UI
     {
         [Header("Visual Settings")]
         [SerializeField] private float rotationSpeed = 15;
+        [SerializeField] private float viewDistance = 20;
+        [Header("Fixed Scale Settings")]
+        [SerializeField] private bool shouldUseFixedScale;
+        [SerializeField] private float fixedScaleValue = 0.007f;
+        [Header("Relative Scaling Settings")]
         [SerializeField] private float scalingSpeed = 8;
         [SerializeField] private float scalingDistanceDivisor = 500;
-        [SerializeField] private float viewDistance = 20;
 
         [Header("Object Assignments")]
         [SerializeField] private Text nameDisplay;
@@ -103,11 +107,18 @@ namespace Vi.UI
                     Quaternion mouseOverRotation = Quaternion.LookRotation(Camera.main.transform.position - rendererToFollow.bounds.center);
                     float upAngle = Vector3.SignedAngle(Camera.main.transform.up, mouseOverRotation * Vector3.up, Camera.main.transform.right);
                     float horizontalAngle = Quaternion.Angle(Camera.main.transform.rotation, mouseOverRotation);
-                    localScaleTarget = horizontalAngle > 178 & (upAngle > -4 & upAngle <= 0) ? Vector3.one * (camDistance / scalingDistanceDivisor) : Vector3.zero;
+
+                    if (shouldUseFixedScale)
+                        localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue) : Vector3.zero;
+                    else
+                        localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? Vector3.one * (camDistance / scalingDistanceDivisor) : Vector3.zero;
                 }
                 else
                 {
-                    localScaleTarget = Vector3.one * (camDistance / scalingDistanceDivisor);
+                    if (shouldUseFixedScale)
+                        localScaleTarget = new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue);
+                    else
+                        localScaleTarget = Vector3.one * (camDistance / scalingDistanceDivisor);
                 }
 
                 Vector3 pos = rendererToFollow.bounds.center;
