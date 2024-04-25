@@ -44,6 +44,7 @@ namespace Vi.UI
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
                     {
                         if (c is Graphic) { continue; }
+                        if (c.GetType().ToString() == "DuloGames.UI.UIHighlightTransition") { continue; }
                         c.enabled = false;
                     }
 
