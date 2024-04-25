@@ -15,7 +15,7 @@ namespace Vi.UI
         [SerializeField] private MoveUIDefinition[] defaultSet;
         [SerializeField] private GameObject pudUI;
 
-    [SerializeField] private string playerPrefID = "ButtonUiLayout";;
+    [SerializeField] private string playerPrefID = "ButtonUiLayout";
 
     // Start is called before the first frame update
     private void Start()
