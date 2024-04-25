@@ -15,8 +15,10 @@ namespace Vi.UI
         [SerializeField] private UIDefinition[] platformUIDefinitions;
         [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
+        public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
+
         [System.Serializable]
-        private struct UIDefinition
+        public struct UIDefinition
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
@@ -25,7 +27,7 @@ namespace Vi.UI
         }
 
         [System.Serializable]
-        private struct MoveUIDefinition
+        public struct MoveUIDefinition
         {
             public string gameObjectPath;
             public GameObject gameObjectToMove;

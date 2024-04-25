@@ -107,12 +107,31 @@ namespace Vi.Core.GameModeManagers
                 killType = KillType.Environment;
             }
 
+            public KillHistoryElement(bool isEnvironmentKill)
+            {
+                if (isEnvironmentKill)
+                {
+                    killerName = "";
+                    victimName = "Victim";
+                    weaponName = "Environment";
+                    killType = KillType.Environment;
+                }
+                else
+                {
+                    var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+                    killerName = "Killer";
+                    victimName = "Victim";
+                    weaponName = weaponOptions[Random.Range(0, weaponOptions.Length-1)].weapon.name;
+                    killType = KillType.Player;
+                }
+            }
+
             public Sprite GetKillFeedIcon(KillHistoryElement killHistoryElement)
             {
                 if (killType == KillType.Player)
                     return System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString()).killFeedIcon;
                 else if (killType == KillType.Environment)
-                    return Singleton.environmentKillFeedIcon;
+                    return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
                 else
                     Debug.LogError("Not sure what icon to provide for kill type: " + killHistoryElement.killType);
                 return null;

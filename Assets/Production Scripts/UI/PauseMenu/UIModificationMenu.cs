@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Vi.Core;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -14,23 +15,70 @@ namespace Vi.UI
 
         private void Start()
         {
+            PlatformUIDefinition.UIDefinition[] platformUIDefinitions = playerUIPrefab.GetComponent<PlatformUIDefinition>().GetPlatformUIDefinitions();
+
             foreach (Transform child in playerUIPrefab.transform)
             {
-                GameObject g = Instantiate(child.gameObject, UIMimicParent);
+                GameObject copy = Instantiate(child.gameObject, UIMimicParent);
 
-                foreach (Transform nestedChild in g.GetComponentsInChildren<Transform>())
+                Transform[] copyChildren = copy.GetComponentsInChildren<Transform>(true);
+                Transform[] originalChildren = child.GetComponentsInChildren<Transform>(true);
+
+                copyChildren = System.Array.FindAll(copyChildren, item => System.Array.Exists(originalChildren, originalItem => item.name.Replace("(Clone)", "") == originalItem.name));
+
+                for (int childIndex = 0; childIndex < copyChildren.Length; childIndex++)
                 {
-                    if (nestedChild.TryGetComponent(out KillFeed killFeed))
+                    if (copyChildren[childIndex].TryGetComponent(out KillFeed killFeed))
                     {
                         killFeed.SetPreviewOn();
                         continue;
                     }
-                    if (nestedChild.GetComponent<KillFeedElement>()) { continue; }
+                    if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 
-                    foreach (Behaviour c in nestedChild.GetComponents<Behaviour>())
+                    foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
                     {
                         if (c is Graphic) { continue; }
                         c.enabled = false;
+                    }
+
+                    if (childIndex < originalChildren.Length)
+                    {
+                        foreach (PlatformUIDefinition.UIDefinition platformUIDefinition in platformUIDefinitions)
+                        {
+                            foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                            {
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    copyChildren[childIndex].gameObject.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                                }
+                            }
+
+                            foreach (PlatformUIDefinition.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                            {
+                                if (moveUIDefinition.gameObjectToMove == originalChildren[childIndex].gameObject)
+                                {
+                                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                                    {
+                                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                                        if (moveUIDefinition.shouldOverrideAnchors)
+                                        {
+                                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                                            rt.pivot = moveUIDefinition.pivotOverride;
+                                        }
+                                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                                    }
+                                }
+                            }
+
+                            foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                            {
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                                }
+                            }
+                        }
                     }
                 }
             }
