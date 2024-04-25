@@ -339,13 +339,15 @@ MonoBehaviour:
     - {fileID: 3622361814003049589}
     - {fileID: 8997484398386368091}
     objectsToMove:
-    - gameObjectToMove: {fileID: 6114019403561036632}
+    - gameObjectPath: /SpectatorUI/RotationParent/LeftLayoutGroup
+      gameObjectToMove: {fileID: 6114019403561036632}
       newAnchoredPosition: {x: 0, y: 85}
       shouldOverrideAnchors: 0
       anchorMinOverride: {x: 0, y: 0}
       anchorMaxOverride: {x: 0, y: 0}
       pivotOverride: {x: 0, y: 0}
-    - gameObjectToMove: {fileID: 6114019404567166531}
+    - gameObjectPath: /SpectatorUI/RotationParent/RightLayoutGroup
+      gameObjectToMove: {fileID: 6114019404567166531}
       newAnchoredPosition: {x: 0, y: 85}
       shouldOverrideAnchors: 0
       anchorMinOverride: {x: 0, y: 0}
@@ -524,6 +526,7 @@ MonoBehaviour:
   joystickActionType: 0
   movementRange: 125
   shouldReposition: 1
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   limits: {fileID: 0}
 --- !u!1 &7452032538359885697
@@ -618,6 +621,7 @@ MonoBehaviour:
   joystickActionType: 1
   movementRange: 125
   shouldReposition: 0
+  joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 4
   limits: {fileID: 0}
 --- !u!1 &8400070427144414092

@@ -896,7 +896,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlsAsset: {fileID: 0}
+  customizablePlayerPrefName: UIOverrides
+  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
+    type: 3}
   platformUIDefinitions:
   - platforms: 080000000b000000
     gameObjectsToEnable:
@@ -904,25 +906,29 @@ MonoBehaviour:
     - {fileID: 5844044293463057731}
     gameObjectsToDestroy: []
     objectsToMove:
-    - gameObjectToMove: {fileID: 3302969314903897264}
+    - gameObjectPath: /PlayerUI/AliveUIParent/Ability 1
+      gameObjectToMove: {fileID: 3302969314903897264}
       newAnchoredPosition: {x: -560, y: 430}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 7850063440274356507}
+    - gameObjectPath: /PlayerUI/AliveUIParent/Ability 2
+      gameObjectToMove: {fileID: 7850063440274356507}
       newAnchoredPosition: {x: -400, y: 550}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 2607331335753300304}
+    - gameObjectPath: /PlayerUI/AliveUIParent/Ability 3
+      gameObjectToMove: {fileID: 2607331335753300304}
       newAnchoredPosition: {x: -200, y: 550}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
       anchorMaxOverride: {x: 1, y: 0}
       pivotOverride: {x: 1, y: 0}
-    - gameObjectToMove: {fileID: 8507629784855563432}
+    - gameObjectPath: /PlayerUI/AliveUIParent/Ability 4
+      gameObjectToMove: {fileID: 8507629784855563432}
       newAnchoredPosition: {x: -40, y: 430}
       shouldOverrideAnchors: 1
       anchorMinOverride: {x: 1, y: 0}
@@ -3204,7 +3210,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.000061035156, y: 0}
-  m_SizeDelta: {x: 486.82117, y: 75.695366}
+  m_SizeDelta: {x: 489.48773, y: 75.57097}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &1397874844356754323
 CanvasRenderer:

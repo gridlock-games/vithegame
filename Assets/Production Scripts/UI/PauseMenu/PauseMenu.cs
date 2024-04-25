@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private AudioSettingsMenu audioSettingsMenu;
         [SerializeField] private GameSettingsMenu gameSettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
+        [SerializeField] private UIModificationMenu UIModificationMenu;
         [SerializeField] private Button goBackScenesButton;
 
         public void OpenVideoMenu()
@@ -42,6 +43,14 @@ namespace Vi.UI
         public void OpenControlMenu()
         {
             GameObject _settings = Instantiate(controlSettingsMenu.gameObject);
+            _settings.GetComponent<Menu>().SetLastMenu(gameObject);
+            childMenu = _settings;
+            gameObject.SetActive(false);
+        }
+
+        public void OpenUIModificiationMenu()
+        {
+            GameObject _settings = Instantiate(UIModificationMenu.gameObject);
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
             gameObject.SetActive(false);

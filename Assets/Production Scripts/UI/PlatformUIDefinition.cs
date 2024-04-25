@@ -5,17 +5,22 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Vi.Core;
+using UnityEditor;
+using Newtonsoft.Json;
 
 namespace Vi.UI
 {
     public class PlatformUIDefinition : MonoBehaviour
     {
+        [SerializeField] private string customizablePlayerPrefName;
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private UIDefinition[] platformUIDefinitions;
         [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
+        public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
+
         [System.Serializable]
-        private struct UIDefinition
+        public struct UIDefinition
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
@@ -24,7 +29,7 @@ namespace Vi.UI
         }
 
         [System.Serializable]
-        private struct MoveUIDefinition
+        public struct MoveUIDefinition
         {
             public GameObject gameObjectToMove;
             public Vector2 newAnchoredPosition;
@@ -42,6 +47,36 @@ namespace Vi.UI
             public string action;
             public string stringBeforeBinding;
             public string stringAfterBinding;
+        }
+
+        public struct PositionOverrideDefinition
+        {
+            public string gameObjectPath;
+            public float newAnchoredX;
+            public float newAnchoredY;
+        }
+
+        public static string GetGameObjectPath(GameObject obj)
+        {
+            string path = "/" + obj.name;
+            while (obj.transform.parent != null)
+            {
+                obj = obj.transform.parent.gameObject;
+                path = "/" + obj.name + path;
+            }
+            return path;
+        }
+
+        public GameObject GetGameObjectFromPath(string path)
+        {
+            Transform g = transform;
+            foreach (string step in path.Split("/"))
+            {
+                if (string.IsNullOrWhiteSpace(step)) { continue; }
+                if (step == name.Replace("(Clone)", "")) { continue; }
+                g = g.Find(step);
+            }
+            return g.gameObject;
         }
 
         private void Start()
@@ -71,6 +106,20 @@ namespace Vi.UI
                 foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (PlayerPrefs.HasKey(customizablePlayerPrefName))
+            {
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PlayerPrefs.GetString(customizablePlayerPrefName));
+
+                foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
+                {
+                    GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                    ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
                 }
             }
         }

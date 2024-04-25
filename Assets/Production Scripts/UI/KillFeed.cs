@@ -14,30 +14,77 @@ namespace Vi.UI
         //private List<GameModeManager.KillHistoryElement> cachedKillHistory = new List<GameModeManager.KillHistoryElement>();
         private List<int> displayedKillHistoryIndices = new List<int>();
 
+        private bool isPreview;
+        private List<GameModeManager.KillHistoryElement> previewKillHistoryList;
+
+        public void SetPreviewOn()
+        {
+            isPreview = true;
+        }
+
+        private void Start()
+        {
+            previewKillHistoryList = new List<GameModeManager.KillHistoryElement>()
+            {
+                new GameModeManager.KillHistoryElement(false),
+                new GameModeManager.KillHistoryElement(false),
+                new GameModeManager.KillHistoryElement(true),
+                new GameModeManager.KillHistoryElement(false),
+                new GameModeManager.KillHistoryElement(false),
+                new GameModeManager.KillHistoryElement(true)
+            };
+        }
+
         private void Update()
         {
-            if (!GameModeManager.Singleton) { return; }
-
-            List<GameModeManager.KillHistoryElement> cachedKillHistory = GameModeManager.Singleton.GetKillHistory();
-
-            if (cachedKillHistory.Count == 0) { displayedKillHistoryIndices.Clear(); }
-
-            Queue<(int, GameModeManager.KillHistoryElement)> killElementsToDisplay = new Queue<(int, GameModeManager.KillHistoryElement)>();
-            for (int i = 0; i < cachedKillHistory.Count; i++)
+            if (isPreview)
             {
-                if (displayedKillHistoryIndices.Contains(i)) { continue; }
-                killElementsToDisplay.Enqueue((i, cachedKillHistory[i]));
-                if (killElementsToDisplay.Count >= killFeedElementInstances.Length) { break; }
+                List<GameModeManager.KillHistoryElement> cachedKillHistory = previewKillHistoryList;
+
+                if (cachedKillHistory.Count == 0) { displayedKillHistoryIndices.Clear(); }
+
+                Queue<(int, GameModeManager.KillHistoryElement)> killElementsToDisplay = new Queue<(int, GameModeManager.KillHistoryElement)>();
+                for (int i = 0; i < cachedKillHistory.Count; i++)
+                {
+                    if (displayedKillHistoryIndices.Contains(i)) { continue; }
+                    killElementsToDisplay.Enqueue((i, cachedKillHistory[i]));
+                    if (killElementsToDisplay.Count >= killFeedElementInstances.Length) { break; }
+                }
+
+                for (int i = 0; i < killFeedElementInstances.Length; i++)
+                {
+                    if (killElementsToDisplay.Count == 0) { break; }
+                    if (!killFeedElementInstances[i].IsNotRunning()) { continue; }
+
+                    (int index, GameModeManager.KillHistoryElement killHistoryElement) = killElementsToDisplay.Dequeue();
+                    killFeedElementInstances[i].Initialize(killHistoryElement);
+                }
             }
-
-            for (int i = 0; i < killFeedElementInstances.Length; i++)
+            else
             {
-                if (killElementsToDisplay.Count == 0) { break; }
-                if (!killFeedElementInstances[i].IsNotRunning()) { continue; }
+                if (!GameModeManager.Singleton) { return; }
 
-                (int index, GameModeManager.KillHistoryElement killHistoryElement) = killElementsToDisplay.Dequeue();
-                killFeedElementInstances[i].Initialize(killHistoryElement);
-                displayedKillHistoryIndices.Add(index);
+                List<GameModeManager.KillHistoryElement> cachedKillHistory = GameModeManager.Singleton.GetKillHistory();
+
+                if (cachedKillHistory.Count == 0) { displayedKillHistoryIndices.Clear(); }
+
+                Queue<(int, GameModeManager.KillHistoryElement)> killElementsToDisplay = new Queue<(int, GameModeManager.KillHistoryElement)>();
+                for (int i = 0; i < cachedKillHistory.Count; i++)
+                {
+                    if (displayedKillHistoryIndices.Contains(i)) { continue; }
+                    killElementsToDisplay.Enqueue((i, cachedKillHistory[i]));
+                    if (killElementsToDisplay.Count >= killFeedElementInstances.Length) { break; }
+                }
+
+                for (int i = 0; i < killFeedElementInstances.Length; i++)
+                {
+                    if (killElementsToDisplay.Count == 0) { break; }
+                    if (!killFeedElementInstances[i].IsNotRunning()) { continue; }
+
+                    (int index, GameModeManager.KillHistoryElement killHistoryElement) = killElementsToDisplay.Dequeue();
+                    killFeedElementInstances[i].Initialize(killHistoryElement);
+                    displayedKillHistoryIndices.Add(index);
+                }
             }
         }
     }
