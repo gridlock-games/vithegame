@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Vi.Core;
 using System.Linq;
+using UnityEngine.InputSystem.OnScreen;
 
 namespace Vi.UI
 {
@@ -13,6 +14,7 @@ namespace Vi.UI
         [SerializeField] private PlayerUI playerUIPrefab;
         [SerializeField] private RectTransform UIMimicParent;
 
+        private Dictionary<GameObject, GameObject> prefabCrosswalk = new Dictionary<GameObject, GameObject>();
         private void Start()
         {
             PlatformUIDefinition.UIDefinition[] platformUIDefinitions = playerUIPrefab.GetComponent<PlatformUIDefinition>().GetPlatformUIDefinitions();
@@ -28,6 +30,8 @@ namespace Vi.UI
 
                 for (int childIndex = 0; childIndex < copyChildren.Length; childIndex++)
                 {
+                    prefabCrosswalk.Add(copyChildren[childIndex].gameObject, originalChildren[childIndex].gameObject);
+
                     if (copyChildren[childIndex].TryGetComponent(out KillFeed killFeed))
                     {
                         killFeed.SetPreviewOn();
@@ -39,6 +43,11 @@ namespace Vi.UI
                     {
                         if (c is Graphic) { continue; }
                         c.enabled = false;
+                    }
+
+                    if (copyChildren[childIndex].GetComponent<OnScreenButton>())
+                    {
+                        copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
                     }
 
                     if (childIndex < originalChildren.Length)
@@ -59,7 +68,8 @@ namespace Vi.UI
                                 {
                                     if (platformUIDefinition.platforms.Contains(Application.platform))
                                     {
-                                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                                        RectTransform rt = (RectTransform)copyChildren[childIndex];
+                                        Debug.Log(copyChildren[childIndex].gameObject);
                                         if (moveUIDefinition.shouldOverrideAnchors)
                                         {
                                             rt.anchorMin = moveUIDefinition.anchorMinOverride;
@@ -75,7 +85,7 @@ namespace Vi.UI
                             {
                                 if (g == originalChildren[childIndex].gameObject)
                                 {
-                                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(copyChildren[childIndex]); }
                                 }
                             }
                         }
