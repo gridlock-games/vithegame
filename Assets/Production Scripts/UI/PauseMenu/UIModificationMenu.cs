@@ -45,9 +45,10 @@ namespace Vi.UI
                         c.enabled = false;
                     }
 
-                    if (copyChildren[childIndex].GetComponent<OnScreenButton>())
+                    if (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>())
                     {
-                        copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
+                        DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
+                        draggableUIObject.Initialize((RectTransform)copy.transform);
                     }
 
                     if (childIndex < originalChildren.Length)
