@@ -69,7 +69,6 @@ namespace Vi.UI
                                     if (platformUIDefinition.platforms.Contains(Application.platform))
                                     {
                                         RectTransform rt = (RectTransform)copyChildren[childIndex];
-                                        Debug.Log(copyChildren[childIndex].gameObject);
                                         if (moveUIDefinition.shouldOverrideAnchors)
                                         {
                                             rt.anchorMin = moveUIDefinition.anchorMinOverride;
