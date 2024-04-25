@@ -809,7 +809,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.1
+  transitionTime: 0.05
   animationSpeed: 1
   recoveryAnimationSpeed: 2
   agentStaminaCost: 20
@@ -817,6 +817,8 @@ MonoBehaviour:
   agentRageCost: 50
   effectedWeaponBones: 12000000
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
