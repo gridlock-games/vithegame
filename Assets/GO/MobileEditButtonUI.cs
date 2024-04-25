@@ -15,8 +15,10 @@ namespace Vi.UI
         [SerializeField] private MoveUIDefinition[] defaultSet;
         [SerializeField] private GameObject pudUI;
 
-        // Start is called before the first frame update
-        private void Start()
+    [SerializeField] private string playerPrefID = "ButtonUiLayout";;
+
+    // Start is called before the first frame update
+    private void Start()
         {
             //Disable Platform UIDef after it run its course
             pud.enabled = false;
@@ -56,7 +58,7 @@ namespace Vi.UI
 
                 var convertedData = JsonConvert.SerializeObject(convertedObject);
                 Debug.Log(convertedData);
-                PlayerPrefs.SetString("ButtonUiLayout", convertedData);
+                PlayerPrefs.SetString(playerPrefID, convertedData);
                 Debug.Log("Completed");
             }
 
