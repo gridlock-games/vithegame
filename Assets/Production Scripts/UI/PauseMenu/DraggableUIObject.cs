@@ -8,10 +8,10 @@ namespace Vi.UI
 {
     public class DraggableUIObject : MonoBehaviour, IDragHandler
     {
-        private RectTransform limits;
-        public void Initialize(RectTransform limits)
+        private UIModificationMenu UIModificationMenu;
+        public void Initialize(UIModificationMenu UIModificationMenu)
         {
-            this.limits = limits;
+            this.UIModificationMenu = UIModificationMenu;
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -20,6 +20,8 @@ namespace Vi.UI
             newPosition.x = Mathf.Clamp(newPosition.x, 0, Screen.width - 50);
             newPosition.y = Mathf.Clamp(newPosition.y, 0, Screen.height - 50);
             transform.position = newPosition;
+
+            UIModificationMenu.OnDraggableUIObject(this);
         }
     }
 }

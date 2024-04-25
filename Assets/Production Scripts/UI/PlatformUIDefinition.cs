@@ -11,6 +11,7 @@ namespace Vi.UI
 {
     public class PlatformUIDefinition : MonoBehaviour
     {
+        [SerializeField] private string customizablePlayerPrefName;
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private UIDefinition[] platformUIDefinitions;
         [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
@@ -46,6 +47,13 @@ namespace Vi.UI
             public string action;
             public string stringBeforeBinding;
             public string stringAfterBinding;
+        }
+
+        public struct PositionOverrideDefinition
+        {
+            public string gameObjectPath;
+            public float newAnchoredX;
+            public float newAnchoredY;
         }
 
         #if UNITY_EDITOR

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using Vi.Core;
 using System.Linq;
 using UnityEngine.InputSystem.OnScreen;
+using Newtonsoft.Json;
 
 namespace Vi.UI
 {
@@ -48,7 +49,7 @@ namespace Vi.UI
                     if (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>())
                     {
                         DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
-                        draggableUIObject.Initialize((RectTransform)copy.transform);
+                        draggableUIObject.Initialize(this);
                     }
 
                     if (childIndex < originalChildren.Length)
@@ -92,6 +93,31 @@ namespace Vi.UI
                     }
                 }
             }
+        }
+
+        public void OnDraggableUIObject(DraggableUIObject draggableUIObject)
+        {
+            RectTransform modifiedRect = (RectTransform)draggableUIObject.transform;
+            GameObject prefabRef = prefabCrosswalk[draggableUIObject.gameObject];
+
+            List<PlatformUIDefinition.PositionOverrideDefinition> overridesList;
+            if (PlayerPrefs.HasKey("UIOverrides"))
+            {
+                overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
+            }
+            else
+            {
+                overridesList = new List<PlatformUIDefinition.PositionOverrideDefinition>();
+            }
+
+            overridesList.Add(new PlatformUIDefinition.PositionOverrideDefinition
+            {
+                gameObjectPath = PlatformUIDefinition.GetGameObjectPath(prefabRef),
+                newAnchoredX = modifiedRect.anchoredPosition.x,
+                newAnchoredY = modifiedRect.anchoredPosition.y
+            });
+            
+            PlayerPrefs.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
         }
     }
 }
