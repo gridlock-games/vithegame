@@ -12,15 +12,17 @@ namespace Vi.UI
         [Header("Visual Settings")]
         [SerializeField] private float rotationSpeed = 15;
         [SerializeField] private float viewDistance = 20;
+        [SerializeField] private float healthBarViewDistance = 5;
         [Header("Fixed Scale Settings")]
         [SerializeField] private bool shouldUseFixedScale;
-        [SerializeField] private float fixedScaleValue = 0.007f;
+        [SerializeField] private float fixedScaleValue = 0.01f;
         [Header("Relative Scaling Settings")]
         [SerializeField] private float scalingSpeed = 8;
         [SerializeField] private float scalingDistanceDivisor = 500;
 
         [Header("Object Assignments")]
         [SerializeField] private Text nameDisplay;
+        [SerializeField] private RectTransform healthBarParent;
         [SerializeField] private Image nameBackground;
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
@@ -58,6 +60,7 @@ namespace Vi.UI
             }
 
             transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
         }
 
         private void RefreshRendererToFollow()
@@ -95,6 +98,7 @@ namespace Vi.UI
             healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
 
             Vector3 localScaleTarget = Vector3.zero;
+            Vector3 healthBarLocalScaleTarget = Vector3.zero;
             if (Camera.main)
             {
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), Time.deltaTime * rotationSpeed);
@@ -111,12 +115,14 @@ namespace Vi.UI
                     else
                         localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? Vector3.one * (camDistance / scalingDistanceDivisor) : Vector3.zero;
                 }
-                else
+                else // Cam distance is less than view distance
                 {
                     if (shouldUseFixedScale)
                         localScaleTarget = new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue);
                     else
                         localScaleTarget = Vector3.one * (camDistance / scalingDistanceDivisor);
+
+                    if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
 
                 Vector3 pos = rendererToFollow.bounds.center;
@@ -129,6 +135,16 @@ namespace Vi.UI
                 //Debug.LogWarning("Can't find a main camera for world space labels!");
             }
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
+
+            if (healthBarLocalScaleTarget == Vector3.zero)
+            {
+                KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                if (localPlayerKvp.Value)
+                {
+                    if (localPlayerKvp.Value.GetComponent<WeaponHandler>().CanAim) { healthBarLocalScaleTarget = Vector3.one; }
+                }
+            }
+            healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
