@@ -11,10 +11,11 @@ namespace Vi.UI
 {
   public class PlatformUIDefinition : MonoBehaviour
   {
+
+    private UIDefinition liveplatformUIDefinition;
+
     [SerializeField] private InputActionAsset controlsAsset;
     [SerializeField] private UIDefinition[] platformUIDefinitions;
-    private UIDefinition liveplatformUIDefinition;
-    private List<MoveUIDefinition> deSeralizedObject;
     [SerializeField] private MoveUIDefIdentifier[] moveUIIdentities;
     [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
 
@@ -62,6 +63,7 @@ namespace Vi.UI
       String previousModifcationdataString = PlayerPrefs.GetString(playerPrefID);
       if (previousModifcationdataString != null || previousModifcationdataString == "")
       {
+        List<MoveUIDefinition> deSeralizedObject = new List<MoveUIDefinition>();
         Debug.Log(previousModifcationdataString);
         //MoveUIDefinition_Class[] deconvert = JsonUtility.FromJson<MoveUIDefinition_Class[]>(previousModifcationdataString);
         MoveUIDefinition_Class[] deconvert = JsonConvert.DeserializeObject<MoveUIDefinition_Class[]>(previousModifcationdataString);
