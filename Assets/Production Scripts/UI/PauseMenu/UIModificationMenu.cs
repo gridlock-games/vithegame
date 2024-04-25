@@ -47,7 +47,7 @@ namespace Vi.UI
                         c.enabled = false;
                     }
 
-                    if (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>())
+                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
                     {
                         if (PlayerPrefs.HasKey("UIOverrides"))
                         {
