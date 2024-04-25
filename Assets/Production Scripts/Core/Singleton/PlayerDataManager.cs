@@ -611,24 +611,38 @@ namespace Vi.Core
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
-            if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Add)
+            switch (networkListEvent.Type)
             {
-                //Debug.Log("Id: " + networkListEvent.Value.id + " - Name: " + networkListEvent.Value.character.name + "'s data has been added.");
-                if (IsServer)
-                {
-                    if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                case NetworkListEvent<PlayerData>.EventType.Add:
+                    if (IsServer)
                     {
-                        playersToSpawnQueue.Enqueue(networkListEvent.Value);
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                        {
+                            playersToSpawnQueue.Enqueue(networkListEvent.Value);
+                        }
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
                     }
-                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                }
-            }
-            else if (networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.Remove | networkListEvent.Type == NetworkListEvent<PlayerData>.EventType.RemoveAt)
-            {
-                if (IsServer)
-                {
-                    StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                }
+                    break;
+                case NetworkListEvent<PlayerData>.EventType.Insert:
+                    break;
+                case NetworkListEvent<PlayerData>.EventType.Remove:
+                case NetworkListEvent<PlayerData>.EventType.RemoveAt:
+                    if (IsServer)
+                    {
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                    }
+                    break;
+                case NetworkListEvent<PlayerData>.EventType.Value:
+                    if (localPlayers.ContainsKey(networkListEvent.Value.id))
+                    {
+                        LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].GetComponent<LoadoutManager>();
+                        loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString()));
+                    }
+                    break;
+                case NetworkListEvent<PlayerData>.EventType.Clear:
+                    break;
+                case NetworkListEvent<PlayerData>.EventType.Full:
+                    break;
             }
         }
 
