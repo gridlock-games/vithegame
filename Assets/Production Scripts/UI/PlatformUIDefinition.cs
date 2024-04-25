@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Vi.Core;
 using UnityEditor;
+using Newtonsoft.Json;
 
 namespace Vi.UI
 {
@@ -30,7 +31,6 @@ namespace Vi.UI
         [System.Serializable]
         public struct MoveUIDefinition
         {
-            public string gameObjectPath;
             public GameObject gameObjectToMove;
             public Vector2 newAnchoredPosition;
             public bool shouldOverrideAnchors;
@@ -56,28 +56,6 @@ namespace Vi.UI
             public float newAnchoredY;
         }
 
-        #if UNITY_EDITOR
-        private void OnValidate()
-        {
-            bool shouldSetDirty = false;
-            foreach (UIDefinition UIDefinition in platformUIDefinitions)
-            {
-                for (int i = 0; i < UIDefinition.objectsToMove.Length; i++)
-                {
-                    MoveUIDefinition moveUIDefinition = UIDefinition.objectsToMove[i];
-                    if (moveUIDefinition.gameObjectToMove)
-                    {
-                        moveUIDefinition.gameObjectPath = GetGameObjectPath(moveUIDefinition.gameObjectToMove);
-                        UIDefinition.objectsToMove[i] = moveUIDefinition;
-                        shouldSetDirty = true;
-                    }
-                }
-            }
-
-            if (shouldSetDirty) { EditorUtility.SetDirty(this); }
-        }
-        #endif
-
         public static string GetGameObjectPath(GameObject obj)
         {
             string path = "/" + obj.name;
@@ -87,6 +65,18 @@ namespace Vi.UI
                 path = "/" + obj.name + path;
             }
             return path;
+        }
+
+        public GameObject GetGameObjectFromPath(string path)
+        {
+            Transform g = transform;
+            foreach (string step in path.Split("/"))
+            {
+                if (string.IsNullOrWhiteSpace(step)) { continue; }
+                if (step == name.Replace("(Clone)", "")) { continue; }
+                g = g.Find(step);
+            }
+            return g.gameObject;
         }
 
         private void Start()
@@ -116,6 +106,20 @@ namespace Vi.UI
                 foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
                 {
                     if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (PlayerPrefs.HasKey(customizablePlayerPrefName))
+            {
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PlayerPrefs.GetString(customizablePlayerPrefName));
+
+                foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
+                {
+                    GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                    ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
                 }
             }
         }

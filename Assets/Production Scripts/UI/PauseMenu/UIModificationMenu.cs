@@ -18,7 +18,8 @@ namespace Vi.UI
         private Dictionary<GameObject, GameObject> prefabCrosswalk = new Dictionary<GameObject, GameObject>();
         private void Start()
         {
-            PlatformUIDefinition.UIDefinition[] platformUIDefinitions = playerUIPrefab.GetComponent<PlatformUIDefinition>().GetPlatformUIDefinitions();
+            PlatformUIDefinition platformUIDefinitionComponent = playerUIPrefab.GetComponent<PlatformUIDefinition>();
+            PlatformUIDefinition.UIDefinition[] platformUIDefinitions = platformUIDefinitionComponent.GetPlatformUIDefinitions();
 
             foreach (Transform child in playerUIPrefab.transform)
             {
@@ -48,6 +49,20 @@ namespace Vi.UI
 
                     if (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>())
                     {
+                        if (PlayerPrefs.HasKey("UIOverrides"))
+                        {
+                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
+
+                            foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
+                            {
+                                GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    ((RectTransform)copyChildren[childIndex]).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
+                                }
+                            }
+                        }
+
                         DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
                         draggableUIObject.Initialize(this);
                     }
