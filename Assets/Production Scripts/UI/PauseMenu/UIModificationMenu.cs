@@ -18,6 +18,12 @@ namespace Vi.UI
         private Dictionary<GameObject, GameObject> prefabCrosswalk = new Dictionary<GameObject, GameObject>();
         private void Start()
         {
+            foreach (KeyValuePair<GameObject, GameObject> kvp in prefabCrosswalk)
+            {
+                Destroy(kvp.Key);
+            }
+            prefabCrosswalk.Clear();
+
             PlatformUIDefinition platformUIDefinitionComponent = playerUIPrefab.GetComponent<PlatformUIDefinition>();
             PlatformUIDefinition.UIDefinition[] platformUIDefinitions = platformUIDefinitionComponent.GetPlatformUIDefinitions();
 
@@ -134,6 +140,12 @@ namespace Vi.UI
             });
             
             PlayerPrefs.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
+        }
+
+        public void ResetUI()
+        {
+            PlayerPrefs.DeleteKey("UIOverrides");
+            Start();
         }
     }
 }
