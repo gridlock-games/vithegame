@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.051282052
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.07692308
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.102564104
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.12820512
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -65,7 +65,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.15384616
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.17948718
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -83,7 +83,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.23076923
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.30769232
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.33333334
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.35897437
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -119,7 +119,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.38461536
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.41025642
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.5128205
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -146,7 +146,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.5897436
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.64102566
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.6923077
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.7948718
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -182,7 +182,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.9230769
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -191,7 +191,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1.25
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1166,16 +1166,16 @@ MonoBehaviour:
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
-  effectedWeaponBones: 06000000
+  effectedWeaponBones: 1200000011000000
   mustBeAiming: 0
-  chargeAttackHasEndAnimation: 0
-  chargeAttackStateLoopCount: 1
+  chargeAttackHasEndAnimation: 1
+  chargeAttackStateLoopCount: 2
   canEnhance: 1
   chargeTimeDamageMultiplier: 1
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.5
+  attackingNormalizedTime: 0.15
+  recoveryNormalizedTime: 1
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -1184,9 +1184,9 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 1
-  timeBetweenHits: 1
-  isBlockable: 1
+  maxHitLimit: 8
+  timeBetweenHits: 0.15
+  isBlockable: 0
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
@@ -1196,7 +1196,7 @@ MonoBehaviour:
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
-  canCancelLightAttacks: 0
+  canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
   canBeCancelledByLightAttacks: 0

@@ -2033,15 +2033,22 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.2
+  transitionTime: 0.05
   animationSpeed: 1.2
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
   mustBeAiming: 0
-  attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.3
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
+  attackingNormalizedTime: 0.15
+  recoveryNormalizedTime: 0.26
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -2058,6 +2065,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 1
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
