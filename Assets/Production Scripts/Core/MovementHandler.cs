@@ -40,7 +40,10 @@ namespace Vi.Core
 
 		public void ResetLookInput()
         {
-			lookInput = Vector2.zero;
+			if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+				lookInput = Vector2.zero;
+			}
         }
 
 		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput; }

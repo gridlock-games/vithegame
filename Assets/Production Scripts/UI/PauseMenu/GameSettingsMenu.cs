@@ -12,10 +12,16 @@ namespace Vi.UI
         [SerializeField] private Toggle consoleToggle;
         [SerializeField] private Toggle showFPSToggle;
         [SerializeField] private Toggle showPingToggle;
+        [SerializeField] private Slider UIOpacitySlider;
 
         private void SetPlayerPrefFromToggle(Toggle toggle, string playerPrefName)
         {
             PlayerPrefs.SetString(playerPrefName, toggle.isOn.ToString());
+        }
+
+        private void SetPlayerPrefFromSlider(Slider slider, string playerPrefName)
+        {
+            PlayerPrefs.SetFloat(playerPrefName, slider.value);
         }
 
         private void Start()
@@ -29,6 +35,11 @@ namespace Vi.UI
             consoleToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(consoleToggle, "ConsoleEnabled"); });
             showFPSToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showFPSToggle, "FPSEnabled"); });
             showPingToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showPingToggle, "PingEnabled"); });
+
+            UIOpacitySlider.value = PlayerPrefs.GetFloat("UIOpacity");
+            UIOpacitySlider.minValue = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.1f : 0;
+
+            UIOpacitySlider.onValueChanged.AddListener(delegate { SetPlayerPrefFromSlider(UIOpacitySlider, "UIOpacity"); });
         }
     }
 }

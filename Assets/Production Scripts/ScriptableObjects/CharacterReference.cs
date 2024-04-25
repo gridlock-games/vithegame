@@ -242,9 +242,11 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
-        public List<WearableEquipmentOption> GetArmorEquipmentOptions() { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType)); }
+        public List<WearableEquipmentOption> GetArmorEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender, null) != null); }
 
-        public List<WearableEquipmentOption> GetCharacterEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender, GetEmptyWearableEquipment()) != null); }
+        public List<WearableEquipmentOption> GetAllArmorEquipmentOptions() { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType)); }
+
+        public List<WearableEquipmentOption> GetCharacterEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender, null) != null); }
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
@@ -382,35 +384,42 @@ namespace Vi.ScriptableObjects
                         WearableEquipment wearableEquipment = modelSource.AddComponent<WearableEquipment>();
                         wearableEquipment.equipmentType = System.Enum.Parse<EquipmentType>(modelSource.name);
 
-                        Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
-                        TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
-                        if (!importer.isReadable)
+                        try
                         {
-                            importer.isReadable = true;
-                            importer.SaveAndReimport();
+                            Texture2D texture2D = (Texture2D)wearableEquipment.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.GetTexture("_BaseMap");
+                            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture2D));
+                            if (!importer.isReadable)
+                            {
+                                importer.isReadable = true;
+                                importer.SaveAndReimport();
+                            }
+
+                            Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
+                            foreach (Transform child in children)
+                            {
+                                child.gameObject.layer = LayerMask.NameToLayer("Character");
+                            }
+
+                            WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType, AverageColorFromTexture(texture2D));
+                            if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
+
+                            string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
+                            PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
+                            DestroyImmediate(modelSource);
+
+                            int index = equipmentOptions.FindIndex(item => item.Equals(wearableEquipmentOption));
+                            if (index == -1)
+                            {
+                                Debug.LogError("Couldn't find wearable equipment option " + wearableEquipmentOption.name);
+                            }
+                            else
+                            {
+                                equipmentOptions[index].AddModel(raceAndGender, AssetDatabase.LoadAssetAtPath<GameObject>(prefabVariantPath).GetComponent<WearableEquipment>());
+                            }
                         }
-
-                        Transform[] children = wearableEquipment.GetComponentsInChildren<Transform>(true);
-                        foreach (Transform child in children)
+                        catch
                         {
-                            child.gameObject.layer = LayerMask.NameToLayer("Character");
-                        }
-
-                        WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType, AverageColorFromTexture(texture2D));
-                        if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
-
-                        string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
-                        PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
-                        DestroyImmediate(modelSource);
-
-                        int index = equipmentOptions.FindIndex(item => item.Equals(wearableEquipmentOption));
-                        if (index == -1)
-                        {
-                            Debug.LogError("Couldn't find wearable equipment option " + wearableEquipmentOption.name);
-                        }
-                        else
-                        {
-                            equipmentOptions[index].AddModel(raceAndGender, AssetDatabase.LoadAssetAtPath<GameObject>(prefabVariantPath).GetComponent<WearableEquipment>());
+                            Debug.LogError("Error while importing " + modelFilePath);
                         }
                     }
                 }

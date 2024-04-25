@@ -29,7 +29,7 @@ namespace Vi.UI
             this.playerDataId = playerDataId;
             this.loadoutManager = loadoutManager;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions();
+            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
             CharacterReference.WearableEquipmentOption initialWearableEquipmentOption = null;
 
             switch (equipmentType)
@@ -81,6 +81,7 @@ namespace Vi.UI
             foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in wearableEquipmentOptions)
             {
                 if (wearableEquipmentOption.equipmentType != equipmentType) { continue; }
+                if (wearableEquipmentOption.GetModel(playerData.character.raceAndGender, null) == null) { continue; }
 
                 WeaponOptionElement ele = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
                 ele.InitializeEquipment(wearableEquipmentOption);

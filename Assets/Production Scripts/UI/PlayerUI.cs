@@ -8,8 +8,6 @@ using UnityEngine.UI;
 using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
-using UnityEngine.InputSystem.OnScreen;
-using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
@@ -38,16 +36,10 @@ namespace Vi.UI
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
         [SerializeField] private CustomOnScreenStick moveJoystick;
-        [SerializeField] private OnScreenButton lightAttackButton;
-        [SerializeField] private OnScreenButton heavyAttackButton;
-        [SerializeField] private Image lookJoystickImage;
-        [SerializeField] private Image attackTypeToggleImage;
-        [SerializeField] private Sprite lightAttackIcon;
-        [SerializeField] private Sprite heavyAttackIcon;
-        [SerializeField] private Sprite aimIcon;
-        [SerializeField] private Button switchAttackTypeButton;
-        [SerializeField] private Image aimButton;
         [SerializeField] private Button scoreboardButton;
+        [SerializeField] private Image heavyAttackButton;
+        [SerializeField] private Sprite aimIcon;
+        [SerializeField] private Sprite heavyAttackIcon;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -71,33 +63,6 @@ namespace Vi.UI
             attributes.GetComponent<LoadoutManager>().SwitchWeapon();
         }
 
-        private Weapon.InputAttackType attackType = Weapon.InputAttackType.HeavyAttack;
-        public void ToggleAttackType(bool isRefreshing)
-        {
-            if (isRefreshing) { attackType = Weapon.InputAttackType.HeavyAttack; }
-
-            if (attackType == Weapon.InputAttackType.LightAttack)
-            {
-                attackType = Weapon.InputAttackType.HeavyAttack;
-                attackTypeToggleImage.sprite = lightAttackIcon;
-                lookJoystickImage.sprite = heavyAttackIcon;
-                lightAttackButton.enabled = false;
-                heavyAttackButton.enabled = true;
-            }
-            else if (attackType == Weapon.InputAttackType.HeavyAttack)
-            {
-                attackType = Weapon.InputAttackType.LightAttack;
-                attackTypeToggleImage.sprite = heavyAttackIcon;
-                lookJoystickImage.sprite = lightAttackIcon;
-                lightAttackButton.enabled = true;
-                heavyAttackButton.enabled = false;
-            }
-            else
-            {
-                Debug.LogError("Something's fucked up");
-            }
-        }
-
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private LoadoutManager loadoutManager;
@@ -112,8 +77,15 @@ namespace Vi.UI
         }
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
+        private CanvasGroup[] canvasGroups;
         private void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
@@ -128,7 +100,6 @@ namespace Vi.UI
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
 
-            ToggleAttackType(false);
             fadeToWhiteImage.color = Color.black;
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
@@ -227,10 +198,6 @@ namespace Vi.UI
             }
 
             lastWeapon = weaponHandler.GetWeapon();
-
-            ToggleAttackType(true);
-            aimButton.gameObject.SetActive(weaponHandler.CanAim);
-            switchAttackTypeButton.gameObject.SetActive(!weaponHandler.CanAim);
         }
 
         private void UpdateActiveUIElements()
@@ -243,6 +210,11 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
 
@@ -322,6 +294,8 @@ namespace Vi.UI
             UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
 
             lastControlScheme = playerInput.currentControlScheme;
+
+            heavyAttackButton.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
         }
     }
 }

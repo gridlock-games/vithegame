@@ -27,6 +27,7 @@ namespace Vi.Core
 
         private void Start()
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
@@ -48,6 +49,7 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
+            if (!PlayerPrefs.HasKey("MobileLookJoystickSensitivity")) { PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", 4); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
 
@@ -58,6 +60,8 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
 
             if (!PlayerPrefs.HasKey("Rebinds")) { PlayerPrefs.SetString("Rebinds", ""); }
+
+            if (!PlayerPrefs.HasKey("UIOpacity")) { PlayerPrefs.SetFloat("UIOpacity", 1); }
 
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {

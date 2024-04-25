@@ -114,7 +114,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 474.7212, y: 99.33086}
+  m_SizeDelta: {x: 477, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4097134337240977548
 CanvasRenderer:
@@ -432,7 +432,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 145}
-  m_SizeDelta: {x: 803.94055, y: 99.33086}
+  m_SizeDelta: {x: 809, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5694737114806260832
 CanvasRenderer:
@@ -1430,6 +1430,7 @@ GameObject:
   - component: {fileID: 7757707048149690147}
   - component: {fileID: 7757707048149690146}
   - component: {fileID: 3350775299806327625}
+  - component: {fileID: 7744647505305684082}
   m_Layer: 5
   m_Name: TeamEliminationUI
   m_TagString: Untagged
@@ -1538,6 +1539,18 @@ MonoBehaviour:
   gameEndText: {fileID: 6287037704251600050}
   roundResultText: {fileID: 5669168531654275004}
   roundWinThresholdText: {fileID: 3389305359995068172}
+--- !u!225 &7744647505305684082
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7757707048149690173}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7837106804767106401
 GameObject:
   m_ObjectHideFlags: 0

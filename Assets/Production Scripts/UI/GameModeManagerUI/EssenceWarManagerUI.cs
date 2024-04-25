@@ -17,8 +17,16 @@ namespace Vi.UI
 
         protected EssenceWarManager essenceWarManager;
 
+        private CanvasGroup[] canvasGroups;
+
         protected void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             essenceWarManager = GetComponentInParent<EssenceWarManager>();
 
             roundResultText.enabled = false;
@@ -31,6 +39,11 @@ namespace Vi.UI
 
         protected void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             if (!essenceWarManager.IsSpawned) { return; }
 
             roundTimerText.text = essenceWarManager.GetRoundTimerDisplayString();

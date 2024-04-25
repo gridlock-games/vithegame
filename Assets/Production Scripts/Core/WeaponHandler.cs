@@ -509,9 +509,6 @@ namespace Vi.Core
             {
                 Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
             }
-
-            if (shouldRepeatLightAttack) { LightAttack(true); }
-            if (shouldRepeatHeavyAttack) { HeavyAttack(true); }
         }
 
         [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
@@ -536,10 +533,21 @@ namespace Vi.Core
             }
         }
 
-        private bool shouldRepeatLightAttack;
+        private Coroutine lightAttackHoldCoroutine;
         void OnLightAttackHold(InputValue value)
         {
-            shouldRepeatLightAttack = value.isPressed;
+            if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
+            if (value.isPressed) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
+            else { LightAttack(false); }
+        }
+
+        private IEnumerator LightAttackHold()
+        {
+            while (true)
+            {
+                yield return null;
+                LightAttack(true);
+            }
         }
 
         public bool CanAim { get; private set; }
@@ -591,16 +599,28 @@ namespace Vi.Core
             }
         }
 
-        private bool shouldRepeatHeavyAttack;
+        private Coroutine heavyAttackHoldCoroutine;
         void OnHeavyAttackHold(InputValue value)
         {
+            if (heavyAttackHoldCoroutine != null) { StopCoroutine(heavyAttackHoldCoroutine); }
+
             if (CanAim)
             {
                 HeavyAttack(value.isPressed);
             }
             else
             {
-                shouldRepeatHeavyAttack = value.isPressed;
+                if (value.isPressed) { heavyAttackHoldCoroutine = StartCoroutine(HeavyAttackHold()); }
+                else { HeavyAttack(false); }
+            }
+        }
+
+        private IEnumerator HeavyAttackHold()
+        {
+            while (true)
+            {
+                yield return null;
+                HeavyAttack(true);
             }
         }
 

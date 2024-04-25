@@ -14,8 +14,15 @@ namespace Vi.UI
         [SerializeField] private PlayerCard[] rightPlayerCards;
 
         private Spectator spectator;
+        private CanvasGroup[] canvasGroups;
         private void Start()
         {
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             spectator = GetComponentInParent<Spectator>();
 
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
@@ -40,6 +47,11 @@ namespace Vi.UI
 
         private void Update()
         {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+            }
+
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
             List<Attributes> initializedAttributesList = new List<Attributes>();
 
