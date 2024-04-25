@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.5
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -29,7 +29,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1.5
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -3178,7 +3178,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   animationSpeed: 1.25
-  recoveryAnimationSpeed: 1
+  recoveryAnimationSpeed: 0.85
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
@@ -3191,7 +3191,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.7
+  recoveryNormalizedTime: 0.3
   damage: 5
   healAmount: 0
   staminaDamage: 0
@@ -3200,8 +3200,8 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 3
-  timeBetweenHits: 0.5
+  maxHitLimit: 1
+  timeBetweenHits: 0.15
   isBlockable: 0
   isUninterruptable: 0
   isInvincible: 0
@@ -3214,10 +3214,10 @@ MonoBehaviour:
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
-  canCancelAbilities: 0
+  canCancelAbilities: 1
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
-  canBeCancelledByAbilities: 0
+  canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
@@ -3227,7 +3227,7 @@ MonoBehaviour:
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
