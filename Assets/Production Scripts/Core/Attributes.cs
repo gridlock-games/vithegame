@@ -403,6 +403,8 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
+            if (ailment.Value != ActionClip.Ailment.None & attackAilment == ActionClip.Ailment.Pull) { attackAilment = ActionClip.Ailment.None; }
+
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
@@ -717,7 +719,7 @@ namespace Vi.Core
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
+        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
