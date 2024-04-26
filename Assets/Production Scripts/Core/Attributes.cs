@@ -485,7 +485,7 @@ namespace Vi.Core
             if (attackAilment != ailment.Value | applyAilmentRegardless)
             {
                 bool shouldApplyAilment = false;
-                if (attackAilment != ActionClip.Ailment.None)
+                if (attackAilment != ActionClip.Ailment.None & attackAilment != ActionClip.Ailment.Pull)
                 {
                     Vector3 startPos = transform.position;
                     Vector3 endPos = hitSourcePosition;
