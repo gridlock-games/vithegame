@@ -717,7 +717,7 @@ namespace Vi.Core
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None; }
+        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;

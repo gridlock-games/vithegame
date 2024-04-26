@@ -18,6 +18,12 @@ namespace Vi.UI
         private Dictionary<GameObject, GameObject> prefabCrosswalk = new Dictionary<GameObject, GameObject>();
         private void Start()
         {
+            foreach (KeyValuePair<GameObject, GameObject> kvp in prefabCrosswalk)
+            {
+                Destroy(kvp.Key);
+            }
+            prefabCrosswalk.Clear();
+
             PlatformUIDefinition platformUIDefinitionComponent = playerUIPrefab.GetComponent<PlatformUIDefinition>();
             PlatformUIDefinition.UIDefinition[] platformUIDefinitions = platformUIDefinitionComponent.GetPlatformUIDefinitions();
 
@@ -44,10 +50,11 @@ namespace Vi.UI
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
                     {
                         if (c is Graphic) { continue; }
+                        if (c.GetType().ToString() == "DuloGames.UI.UIHighlightTransition") { continue; }
                         c.enabled = false;
                     }
 
-                    if (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>())
+                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
                     {
                         if (PlayerPrefs.HasKey("UIOverrides"))
                         {
@@ -133,6 +140,12 @@ namespace Vi.UI
             });
             
             PlayerPrefs.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
+        }
+
+        public void ResetUI()
+        {
+            PlayerPrefs.DeleteKey("UIOverrides");
+            Start();
         }
     }
 }
