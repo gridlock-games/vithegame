@@ -916,7 +916,7 @@ namespace Vi.Core
                 }
                 return actionClip;
             }
-            else if (animationHandler.IsAtRest()) // If we are at rest
+            else if (animationHandler.IsAtRest() | animationHandler.IsDodging())
             {
                 ResetComboSystem();
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);

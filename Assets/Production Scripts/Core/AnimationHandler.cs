@@ -69,6 +69,13 @@ namespace Vi.Core
             return Animator.IsInTransition(Animator.GetLayerIndex("Reload")) & !Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
         }
 
+        public bool IsDodging()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Dodge) { return false; }
+            return !IsAtRest();
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
@@ -80,6 +87,7 @@ namespace Vi.Core
 
         // Stores the type of the last action clip played
         private ActionClip lastClipPlayed;
+        private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
 
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
@@ -93,17 +101,28 @@ namespace Vi.Core
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
+            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
+            AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+                if (nextStateInfo.IsName(actionStateName)) { return; }
             }
 
+            bool shouldUseDodgeCancelTransitionTime = false;
             // If we are not at rest and the last clip was a dodge, don't play this clip
-            if (!Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
+            if (!currentStateInfo.IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
             {
-                if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsTag("CanDodge")))
+                if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & currentStateInfo.IsTag("CanDodge")))
                 {
-                    if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                    if (actionClip.IsAttack() & IsDodging() & currentStateInfo.IsName(lastClipPlayed.name))
+                    {
+                        if (currentStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
+                        shouldUseDodgeCancelTransitionTime = true;
+                    }
+                    else
+                    {
+                        if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
+                    }
                 }
 
                 // Dodge lock checks
@@ -120,7 +139,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
-                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
+                    if (currentStateInfo.IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
@@ -136,11 +155,11 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
-                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name)) { return; }
+                    if (currentStateInfo.IsName(actionClip.name)) { return; }
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
-                if (actionClip.IsAttack() & !weaponHandler.IsInRecovery)
+                if (actionClip.IsAttack() & !weaponHandler.IsInRecovery & lastClipPlayed.IsAttack())
                 {
                     if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
                     & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
@@ -179,7 +198,7 @@ namespace Vi.Core
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName)) { return; }
+                if (nextStateInfo.IsName(actionStateName)) { return; }
             }
 
             // Check stamina and rage requirements and apply statuses for specific actions
@@ -224,9 +243,9 @@ namespace Vi.Core
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.transitionTime : actionClip.dodgeCancelTransitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
-                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.transitionTime : actionClip.dodgeCancelTransitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
