@@ -30,6 +30,7 @@ namespace Vi.Editor
 
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
+        private SerializedProperty spDodgeCancelTransitionTime;
         private SerializedProperty spAnimationSpeed;
         private SerializedProperty spRecoveryAnimationSpeed;
 
@@ -114,6 +115,7 @@ namespace Vi.Editor
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
+            spDodgeCancelTransitionTime = serializedObject.FindProperty("dodgeCancelTransitionTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
             spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
@@ -208,6 +210,7 @@ namespace Vi.Editor
         {
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
+            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }
             EditorGUILayout.PropertyField(spAnimationSpeed);
 
             if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
