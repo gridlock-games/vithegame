@@ -125,9 +125,9 @@ namespace Vi.ScriptableObjects
         public float enhancedChargeDamageMultiplier = 1;
         public float chargePenaltyDamage = 10;
 
-        public const float chargePenaltyTime = 1.5f;
-        public const float enhanceChargeTime = 1.00f;
-        public const float chargeAttackTime = 0.50f;
+        public const float chargePenaltyTime = 1.0f;
+        public const float enhanceChargeTime = 0.50f;
+        public const float chargeAttackTime = 0.1f;
         public const float cancelChargeTime = 0.000f;
         public const float chargeAttackStateAnimatorTransitionDuration = 0.25f;
 
