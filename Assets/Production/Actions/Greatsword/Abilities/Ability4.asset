@@ -109,18 +109,21 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   animationSpeed: 1
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.4
-  damage: 10
+  recoveryNormalizedTime: 0.2
+  damage: 7
   healAmount: 0
   staminaDamage: 0
   defenseDamage: 1

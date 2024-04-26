@@ -6505,6 +6505,8 @@ MonoBehaviour:
   agentRageCost: 0
   effectedWeaponBones: 0f000000
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
@@ -6521,11 +6523,11 @@ MonoBehaviour:
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 1
-  isBlockable: 0
-  isUninterruptable: 1
+  isBlockable: 1
+  isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 0
-  isFollowUpAttack: 1
+  canFlashAttack: 1
+  isFollowUpAttack: 0
   ailment: 0
   ailmentHitDefinition: 
   grabDuration: 2
