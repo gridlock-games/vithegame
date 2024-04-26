@@ -243,9 +243,9 @@ namespace Vi.Core
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.transitionTime : actionClip.dodgeCancelTransitionTime, Animator.GetLayerIndex("Actions"), 0);
+                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
-                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.transitionTime : actionClip.dodgeCancelTransitionTime, Animator.GetLayerIndex("Actions"));
+                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
