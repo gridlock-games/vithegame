@@ -109,7 +109,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  recoveryAnimationSpeed: 0.75
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
@@ -121,8 +121,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.23
+  attackingNormalizedTime: 0.6
+  recoveryNormalizedTime: 0.7
   damage: 6
   healAmount: 0
   staminaDamage: 0
@@ -133,10 +133,10 @@ MonoBehaviour:
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 0.25
-  isBlockable: 0
+  isBlockable: 1
   isUninterruptable: 0
-  isInvincible: 1
-  canFlashAttack: 1
+  isInvincible: 0
+  canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 5
   ailmentHitDefinition: 
