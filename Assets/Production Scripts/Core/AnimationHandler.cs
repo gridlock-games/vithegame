@@ -413,7 +413,6 @@ namespace Vi.Core
         [ClientRpc]
         private void PlayActionClientRpc(string actionStateName, string weaponName)
         {
-            if (IsServer) { return; }
             StartCoroutine(PlayActionOnClient(actionStateName, weaponName));
         }
 
@@ -423,6 +422,11 @@ namespace Vi.Core
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge | actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            {
+                weaponHandler.StopAiming();
+            }
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 

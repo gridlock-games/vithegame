@@ -736,6 +736,12 @@ namespace Vi.Core
 
         public bool IsAiming() { return aiming.Value; }
 
+        public void StopAiming()
+        {
+            if (!IsOwner) { Debug.LogError("WeaponHandler.StopAiming() should only be called by the server!"); return; }
+            aiming.Value = false;
+        }
+
         private void Aim(bool isAiming, bool instantAim)
         {
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)

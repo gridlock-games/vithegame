@@ -83,29 +83,6 @@ namespace Vi.Player
 
             targetRotationX = Mathf.Clamp(targetRotationX, -maxPitch / 2.0f, maxPitch / 2.0f);
 
-            Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
-
-            if (weaponHandler.IsAiming())
-            {
-                cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
-                cameraInterp.transform.rotation = targetRotation;
-            }
-            else
-            {
-                cameraInterp.transform.position = Vector3.SmoothDamp(
-                   cameraInterp.transform.position,
-                   cameraPivot.TransformPoint(Vector3.zero),
-                   ref _velocityPosition,
-                   smoothTime
-                );
-
-                Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
-                eulers.z = 0;
-                cameraInterp.transform.eulerAngles = eulers;
-            }
-
-            currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
-
             bool shouldLookAtCameraInterp = true;
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -116,12 +93,38 @@ namespace Vi.Player
                     if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
                     transform.rotation = killerRotation;
                     shouldLookAtCameraInterp = false;
+
+                    currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
+                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
                 }
             }
-            
+
             if (shouldLookAtCameraInterp)
             {
+                Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
+
+                if (weaponHandler.IsAiming())
+                {
+                    cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+                    cameraInterp.transform.rotation = targetRotation;
+                }
+                else
+                {
+                    cameraInterp.transform.position = Vector3.SmoothDamp(
+                       cameraInterp.transform.position,
+                       cameraPivot.TransformPoint(Vector3.zero),
+                       ref _velocityPosition,
+                       smoothTime
+                    );
+
+                    Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
+                    eulers.z = 0;
+                    cameraInterp.transform.eulerAngles = eulers;
+                }
+
+                currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
                 transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+
                 transform.LookAt(cameraInterp.transform);
 
                 // Do the same thing for the clone transform
