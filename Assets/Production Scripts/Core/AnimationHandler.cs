@@ -454,6 +454,8 @@ namespace Vi.Core
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
+
+            lastClipPlayed = actionClip;
         }
 
         [ClientRpc] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }

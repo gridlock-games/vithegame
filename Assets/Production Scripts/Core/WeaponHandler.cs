@@ -408,15 +408,16 @@ namespace Vi.Core
                 if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
             }
 
-            if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
-                | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
-            {
-                IsBlocking = isBlocking.Value;
-            }
-            else
-            {
-                IsBlocking = false;
-            }
+            IsBlocking = isBlocking.Value;
+            //if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+            //    | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            //{
+            //    IsBlocking = isBlocking.Value;
+            //}
+            //else
+            //{
+            //    IsBlocking = false;
+            //}
 
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
             if (currentActionClipWeapon != weaponInstance.name)
@@ -538,9 +539,12 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-                if (actionClip != null)
-                    animationHandler.PlayAction(actionClip);
+                if (!IsBlocking)
+                {
+                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                    if (actionClip != null)
+                        animationHandler.PlayAction(actionClip);
+                }
             }
         }
 
@@ -604,9 +608,12 @@ namespace Vi.Core
             }
             else if (isPressed)
             {
-                ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-                if (actionClip != null)
-                    animationHandler.PlayAction(actionClip);
+                if (!IsBlocking)
+                {
+                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                    if (actionClip != null)
+                        animationHandler.PlayAction(actionClip);
+                }
             }
         }
 
@@ -827,11 +834,6 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("Reloading", false);
             loadoutManager.Reload(weaponInstance);
             reloadRunning = false;
-        }
-
-        public void SetIsBlocking(bool isBlocking)
-        {
-            this.isBlocking.Value = isBlocking;
         }
 
         public bool IsBlocking { get; private set; }
