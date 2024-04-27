@@ -56,6 +56,9 @@ namespace Vi.ScriptableObjects
             }
             return runSpeed;
         }
+
+        public float GetRunSpeed() { return runSpeed; }
+
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
         public float GetMaxDefense() { return maxDefense; }
