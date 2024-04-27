@@ -54,6 +54,18 @@ namespace Vi.Core
             return animatorReference.IsAtRest();
         }
 
+        public bool CanAim()
+        {
+            if (IsAtRest())
+            {
+                return true;
+            }
+            else
+            {
+                return !(lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction);
+            }
+        }
+
         public bool IsAiming()
         {
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
@@ -422,11 +434,6 @@ namespace Vi.Core
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
-
-            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge | actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
-            {
-                weaponHandler.StopAiming();
-            }
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 

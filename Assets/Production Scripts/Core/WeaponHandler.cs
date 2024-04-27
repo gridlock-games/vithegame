@@ -501,13 +501,9 @@ namespace Vi.Core
             {
                 Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
             }
-            else if (animationHandler.IsAtRest())
-            {
-                Aim(aiming.Value, IsServer);
-            }
             else
             {
-                Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
+                Aim(aiming.Value & animationHandler.CanAim(), IsServer);
             }
         }
 
@@ -732,18 +728,13 @@ namespace Vi.Core
             }
         }
 
-        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
+        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
 
-        public bool IsAiming() { return aiming.Value; }
-
-        public void StopAiming()
-        {
-            if (!IsOwner) { Debug.LogError("WeaponHandler.StopAiming() should only be called by the server!"); return; }
-            aiming.Value = false;
-        }
+        public bool IsAiming() { return aiming.Value & animationHandler.CanAim(); }
 
         private void Aim(bool isAiming, bool instantAim)
         {
+            Debug.Log(isAiming);
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
