@@ -83,7 +83,6 @@ namespace Vi.Player
 
             targetRotationX = Mathf.Clamp(targetRotationX, -maxPitch / 2.0f, maxPitch / 2.0f);
 
-            bool shouldLookAtCameraInterp = true;
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 Debug.Log(movementHandler.CameraFollowTarget);
@@ -95,7 +94,6 @@ namespace Vi.Player
 
                     transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
                     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8);
-                    shouldLookAtCameraInterp = false;
                 }
                 else
                 {
@@ -105,15 +103,13 @@ namespace Vi.Player
                         Quaternion killerRotation = Quaternion.LookRotation(killer.transform.position - transform.position, Vector3.up);
                         if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
                         transform.rotation = killerRotation;
-                        shouldLookAtCameraInterp = false;
 
                         currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
                         transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
                     }
                 }
             }
-
-            if (shouldLookAtCameraInterp)
+            else
             {
                 Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
