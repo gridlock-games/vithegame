@@ -11,7 +11,7 @@ namespace Vi.Player
 {
     public class PlayerMovementHandler : MovementHandler
     {
-        [SerializeField] private Camera cameraInstance;
+        [SerializeField] private CameraController cameraController;
         [SerializeField] private Camera minimapCameraInstance;
 
         [Header("Locomotion Settings")]
@@ -31,7 +31,7 @@ namespace Vi.Player
 
         public void SetCameraRotation(float rotationX, float rotationY)
         {
-            cameraInstance.GetComponent<CameraController>().SetRotation(rotationX, rotationY);
+            cameraController.SetRotation(rotationX, rotationY);
         }
 
         [Header("Collision Settings")]
@@ -84,7 +84,7 @@ namespace Vi.Player
             Quaternion newRotation = movementPrediction.CurrentRotation;
             if (IsOwner)
             {
-                Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
+                Vector3 camDirection = cameraController.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
@@ -223,8 +223,8 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
-                cameraInstance.GetComponent<AudioListener>().enabled = true;
-                cameraInstance.enabled = true;
+                cameraController.GetComponent<AudioListener>().enabled = true;
+                cameraController.GetComponent<Camera>().enabled = true;
                 minimapCameraInstance.enabled = true;
 
                 PlayerInput playerInput = GetComponent<PlayerInput>();
@@ -237,7 +237,7 @@ namespace Vi.Player
             }
             else
             {
-                Destroy(cameraInstance.gameObject);
+                Destroy(cameraController.gameObject);
                 Destroy(minimapCameraInstance.gameObject);
                 GetComponent<PlayerInput>().enabled = false;
             }
@@ -254,7 +254,7 @@ namespace Vi.Player
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (cameraInstance) { Destroy(cameraInstance.gameObject); }
+            if (cameraController) { Destroy(cameraController.gameObject); }
             if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
         }
 
@@ -325,6 +325,8 @@ namespace Vi.Player
                 bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
                 minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
             }
+
+            if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
         private float positionStrength = 1;
@@ -388,11 +390,10 @@ namespace Vi.Player
 
             if (bool.Parse(PlayerPrefs.GetString("AutoAim")))
             {
-                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraInstance & !weaponHandler.CurrentActionClip.mustBeAiming)
+                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
                     if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                     {
-                        CameraController cameraController = cameraInstance.GetComponent<CameraController>();
                         ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
                         RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                         List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
@@ -448,6 +449,57 @@ namespace Vi.Player
                 {
                     networkInteractable.Interact(gameObject);
                     break;
+                }
+            }
+        }
+
+        public Attributes CameraFollowTarget { get; private set; }
+        void OnIncrementFollowPlayer()
+        {
+            if (attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                List<Attributes> spectatableAttributesList = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
+                if (CameraFollowTarget == null)
+                {
+                    if (spectatableAttributesList.Count > 0) { CameraFollowTarget = spectatableAttributesList[0]; }
+                }
+                else
+                {
+                    int index = spectatableAttributesList.IndexOf(CameraFollowTarget);
+                    index += 1;
+                    if (index >= 0 & index < spectatableAttributesList.Count)
+                    {
+                        CameraFollowTarget = spectatableAttributesList[index];
+                    }
+                    else if (spectatableAttributesList.Count > 0)
+                    {
+                        CameraFollowTarget = spectatableAttributesList[0];
+                    }
+                }
+            }
+        }
+
+        void OnDecrementFollowPlayer()
+        {
+            if (attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                List<Attributes> spectatableAttributesList = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
+                if (CameraFollowTarget == null)
+                {
+                    if (spectatableAttributesList.Count > 0) { CameraFollowTarget = spectatableAttributesList[^1]; }
+                }
+                else
+                {
+                    int index = spectatableAttributesList.IndexOf(CameraFollowTarget);
+                    index -= 1;
+                    if (index >= 0 & index < spectatableAttributesList.Count)
+                    {
+                        CameraFollowTarget = spectatableAttributesList[index];
+                    }
+                    else if (spectatableAttributesList.Count > 0)
+                    {
+                        CameraFollowTarget = spectatableAttributesList[^1];
+                    }
                 }
             }
         }

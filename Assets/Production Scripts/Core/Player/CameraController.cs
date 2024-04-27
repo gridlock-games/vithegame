@@ -86,16 +86,30 @@ namespace Vi.Player
             bool shouldLookAtCameraInterp = true;
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                NetworkObject killer = attributes.GetKiller();
-                if (killer)
-                {
-                    Quaternion killerRotation = Quaternion.LookRotation(killer.transform.position - transform.position, Vector3.up);
-                    if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
-                    transform.rotation = killerRotation;
-                    shouldLookAtCameraInterp = false;
+                Debug.Log(movementHandler.CameraFollowTarget);
 
-                    currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
-                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                if (movementHandler.CameraFollowTarget)
+                {
+                    Vector3 targetPosition = movementHandler.CameraFollowTarget.transform.position + movementHandler.CameraFollowTarget.transform.rotation * new Vector3(0, 3, -3);
+                    Quaternion targetRotation = Quaternion.LookRotation(movementHandler.CameraFollowTarget.transform.position - transform.position);
+
+                    transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8);
+                    shouldLookAtCameraInterp = false;
+                }
+                else
+                {
+                    NetworkObject killer = attributes.GetKiller();
+                    if (killer)
+                    {
+                        Quaternion killerRotation = Quaternion.LookRotation(killer.transform.position - transform.position, Vector3.up);
+                        if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
+                        transform.rotation = killerRotation;
+                        shouldLookAtCameraInterp = false;
+
+                        currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
+                        transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                    }
                 }
             }
 
