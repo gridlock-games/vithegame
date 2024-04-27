@@ -842,15 +842,19 @@ namespace Vi.Core
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            isBlocking.Value = value.isPressed;
-            //if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            //{
-            //    if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
-            //}
-            //else
-            //{
-            //    isBlocking.Value = value.isPressed;
-            //}
+            bool isPressed = value.isPressed;
+            if (PlayerPrefs.GetString("BlockingMode") == "TOGGLE")
+            {
+                if (isPressed) { isBlocking.Value = !isBlocking.Value; }
+            }
+            else if (PlayerPrefs.GetString("BlockingMode") == "HOLD")
+            {
+                isBlocking.Value = isPressed;
+            }
+            else
+            {
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PlayerPrefs.GetString("BlockingMode"));
+            }
         }
 
         void OnTimeScaleChange()
