@@ -293,6 +293,7 @@ namespace Vi.Core
 
         public bool CanSwapWeapons()
         {
+            if (attributes.GetAilment() != ActionClip.Ailment.None) { return false; }
             if (weaponHandler.IsAiming()) { return false; }
             if (animationHandler.IsAiming()) { return false; }
             if (!animationHandler.IsAtRest()) { return false; }
