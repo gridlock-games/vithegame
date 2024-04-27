@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
@@ -26,6 +28,7 @@ namespace Vi.Player
         private Vector3 _velocityPosition;
         private PlayerMovementHandler movementHandler;
         private WeaponHandler weaponHandler;
+        private Attributes attributes;
         private GameObject cameraInterp;
         private Vector3 currentPositionOffset;
 
@@ -51,6 +54,7 @@ namespace Vi.Player
 
             movementHandler = GetComponentInParent<PlayerMovementHandler>();
             weaponHandler = movementHandler.GetComponent<WeaponHandler>();
+            attributes = movementHandler.GetComponent<Attributes>();
             transform.SetParent(null, true);
             cameraInterp = new GameObject("Camera Interp");
             CameraPositionClone = new GameObject("Empty Camera Position Clone");
@@ -62,6 +66,9 @@ namespace Vi.Player
             Destroy(cameraInterp);
             Destroy(CameraPositionClone);
         }
+
+        private const float killerRotationSpeed = 4;
+        private const float killerRotationSlerpThreshold = 1;
 
         private void Update()
         {
@@ -99,19 +106,34 @@ namespace Vi.Player
 
             currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
 
-            // Update camera transform itself
-            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-            transform.LookAt(cameraInterp.transform);
-
-            // Do the same thing for the clone transform
-            CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-            CameraPositionClone.transform.LookAt(cameraInterp.transform);
-
-            // Move camera if there is a wall in the way
-            Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
-            if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            bool shouldLookAtCameraInterp = true;
+            if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                NetworkObject killer = attributes.GetKiller();
+                if (killer)
+                {
+                    Quaternion killerRotation = Quaternion.LookRotation(killer.transform.position - transform.position, Vector3.up);
+                    if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
+                    transform.rotation = killerRotation;
+                    shouldLookAtCameraInterp = false;
+                }
+            }
+            
+            if (shouldLookAtCameraInterp)
+            {
+                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                transform.LookAt(cameraInterp.transform);
+
+                // Do the same thing for the clone transform
+                CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                CameraPositionClone.transform.LookAt(cameraInterp.transform);
+
+                // Move camera if there is a wall in the way
+                Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
+                if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                {
+                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                }
             }
         }
     }
