@@ -52,12 +52,18 @@ namespace Vi.Core
         public bool WeaponInitialized { get; private set; }
         public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
         {
-            if (IsOwner & aiming.Value) { aiming.Value = false; return; }
+            if (IsOwner) { aiming.Value = false; }
 
             weaponInstance = weapon;
-            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
+            StartCoroutine(SwapAnimatorController(runtimeAnimatorController));
             EquipWeapon();
             WeaponInitialized = true;
+        }
+
+        private IEnumerator SwapAnimatorController(RuntimeAnimatorController runtimeAnimatorController)
+        {
+            yield return new WaitUntil(() => !animationHandler.IsAiming());
+            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
@@ -167,6 +173,8 @@ namespace Vi.Core
             {
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
+
+            if (!CanAim & animationHandler.IsAiming()) { animationHandler.LimbReferences.OnCannotAim(); }
 
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
@@ -489,21 +497,28 @@ namespace Vi.Core
                 IsInRecovery = false;
             }
 
-            if (IsInAnticipation)
+            if (CanAim)
             {
-                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
-            }
-            else if (IsAttacking)
-            {
-                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
-            }
-            else if (IsInRecovery)
-            {
-                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                if (IsInAnticipation)
+                {
+                    Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else if (IsAttacking)
+                {
+                    Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else if (IsInRecovery)
+                {
+                    Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else
+                {
+                    Aim(aiming.Value & animationHandler.CanAim(), IsServer);
+                }
             }
             else
             {
-                Aim(aiming.Value & animationHandler.CanAim(), IsServer);
+                Aim(false, true);
             }
         }
 
@@ -734,7 +749,7 @@ namespace Vi.Core
 
         private void Aim(bool isAiming, bool instantAim)
         {
-            Debug.Log(isAiming);
+            animationHandler.Animator.SetBool("Aiming", isAiming & !animationHandler.IsReloading());
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
