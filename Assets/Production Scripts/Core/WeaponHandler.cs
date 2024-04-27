@@ -457,7 +457,11 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone])
                         {
-                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), weaponInstances[weaponBone].transform.position);
+                            AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
+                            if (attackSoundEffect)
+                                AudioManager.Singleton.PlayClipAtPoint(attackSoundEffect, weaponInstances[weaponBone].transform.position);
+                            else
+                                Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
                         }
                         else
                         {

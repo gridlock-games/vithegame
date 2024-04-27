@@ -82,7 +82,12 @@ namespace Vi.ScriptableObjects
 
         [Header("Rest Of Settings")]
         [SerializeField] private List<AttackSoundEffect> attackSoundEffects = new List<AttackSoundEffect>();
-        public AudioClip GetAttackSoundEffect(WeaponBone weaponBone) { return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect; }
+        public AudioClip GetAttackSoundEffect(WeaponBone weaponBone)
+        {
+            AttackSoundEffect attackSoundEffect = attackSoundEffects.Find(item => item.weaponBone == weaponBone);
+            if (attackSoundEffect == null) { return null; }
+            return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect;
+        }
 
         public AudioClip drawSoundEffect;
         public AudioClip sheatheSoundEffect;
