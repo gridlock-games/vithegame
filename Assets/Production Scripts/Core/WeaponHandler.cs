@@ -408,17 +408,15 @@ namespace Vi.Core
                 if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
             }
 
-            IsBlocking = isBlocking.Value;
-            //if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
-            //    | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
-            //{
-            //    IsBlocking = isBlocking.Value;
-            //}
-            //else
-            //{
-            //    IsBlocking = false;
-            //}
-
+            if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            {
+                IsBlocking = isBlocking.Value;
+            }
+            else
+            {
+                IsBlocking = false;
+            }
+            
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
             if (currentActionClipWeapon != weaponInstance.name)
             {
