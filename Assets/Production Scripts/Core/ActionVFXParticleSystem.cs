@@ -9,6 +9,8 @@ namespace Vi.Core
     [RequireComponent(typeof(Rigidbody))]
     public class ActionVFXParticleSystem : ActionVFX
     {
+        [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
+
         private Attributes attacker;
         private ActionClip attack;
 
@@ -88,7 +90,7 @@ namespace Vi.Core
 
                             if (canHit)
                             {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), transform.position))
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                 {
                                     if (!hitCounter.ContainsKey(networkCollider.Attributes))
                                     {
@@ -126,7 +128,7 @@ namespace Vi.Core
 
                             if (canHit)
                             {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), transform.position))
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                 {
                                     if (!hitCounter.ContainsKey(networkCollider.Attributes))
                                     {
