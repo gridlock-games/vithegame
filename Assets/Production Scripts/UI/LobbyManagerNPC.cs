@@ -55,11 +55,13 @@ namespace Vi.UI
         }
 
         private Vector3 originalScale;
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
         {
             originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UI.gameObject.SetActive(false);
+            networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
         }
 
         private const float scalingSpeed = 8;
@@ -75,7 +77,6 @@ namespace Vi.UI
 
             if (IsServer)
             {
-                var networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
                 
                 List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
                 WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address);
@@ -109,7 +110,7 @@ namespace Vi.UI
         {
             creatingNewLobby = true;
 
-            int originalServerCount = WebRequestManager.Singleton.LobbyServers.Length;
+            int originalServerCount = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length;
 
             string path = "";
             if (Application.isEditor)
@@ -125,7 +126,7 @@ namespace Vi.UI
 
             System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
             Debug.Log("Waiting for server count change: " + originalServerCount);
-            yield return new WaitUntil(() => WebRequestManager.Singleton.LobbyServers.Length != originalServerCount);
+            yield return new WaitUntil(() => System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length != originalServerCount);
             Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
 
             creatingNewLobby = false;

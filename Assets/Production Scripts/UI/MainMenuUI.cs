@@ -76,9 +76,9 @@ namespace Vi.UI
             {
                 networkTransport.ConnectionData.Address = "127.0.0.1";
             }
-
+            
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
             {
                 portList.Add(int.Parse(server.port));
             }

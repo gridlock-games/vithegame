@@ -406,7 +406,7 @@ namespace Vi.UI
                 secondaryWeaponIcon.gameObject.SetActive(true);
 
                 LoadoutManager loadoutManager = previewObject.GetComponent<LoadoutManager>();
-                StartCoroutine(loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
+                loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
                 primaryWeaponIcon.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
                 primaryWeaponText.text = loadoutManager.PrimaryWeaponOption.name;
@@ -418,7 +418,7 @@ namespace Vi.UI
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
 
-                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString())); }
+                if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString()); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }

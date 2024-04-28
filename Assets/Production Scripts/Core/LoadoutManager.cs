@@ -63,16 +63,31 @@ namespace Vi.Core
             currentEquippedWeapon.OnValueChanged += OnCurrentEquippedWeaponChange;
 
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            StartCoroutine(ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString()));
+            ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
         }
 
-        public IEnumerator ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId)
+        private Coroutine applyLoadoutCoroutine;
+        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath = false)
         {
+            if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
+            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForDeath));
+        }
+
+        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath)
+        {
+            if (waitForDeath)
+            {
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
+                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
+            }
+
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
+            if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId); }
             if (PrimaryWeaponOption == null) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId.ToString()); }
 
+            if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon2ItemId.ToString()).itemId); }
             if (SecondaryWeaponOption == null) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId.ToString()); }
 
