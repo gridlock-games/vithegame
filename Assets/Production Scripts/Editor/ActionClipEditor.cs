@@ -24,6 +24,10 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
 
+        private SerializedProperty spAttackRootMotionForwardMultiplier;
+        private SerializedProperty spAttackRootMotionSidesMultiplier;
+        private SerializedProperty spAttackRootMotionVerticalMultiplier;
+
         private SerializedProperty spDebugForwardMotion;
         private SerializedProperty spDebugSidesMotion;
         private SerializedProperty spDebugVerticalMotion;
@@ -113,6 +117,11 @@ namespace Vi.Editor
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
+
+            spAttackRootMotionForwardMultiplier = serializedObject.FindProperty("attackRootMotionForwardMultiplier");
+            spAttackRootMotionSidesMultiplier = serializedObject.FindProperty("attackRootMotionSidesMultiplier");
+            spAttackRootMotionVerticalMultiplier = serializedObject.FindProperty("attackRootMotionVerticalMultiplier");
+
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spDodgeCancelTransitionTime = serializedObject.FindProperty("dodgeCancelTransitionTime");
@@ -195,7 +204,7 @@ namespace Vi.Editor
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
         }
 
-        private readonly List<ActionClip.ClipType> configurableRecoverySpeedTypes = new List<ActionClip.ClipType>()
+        private readonly List<ActionClip.ClipType> actionClipAttackTypes = new List<ActionClip.ClipType>()
         {
             ActionClip.ClipType.LightAttack,
             ActionClip.ClipType.HeavyAttack,
@@ -210,10 +219,10 @@ namespace Vi.Editor
         {
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
-            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }
+            if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }
             EditorGUILayout.PropertyField(spAnimationSpeed);
 
-            if (configurableRecoverySpeedTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
+            if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
             
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
@@ -281,6 +290,14 @@ namespace Vi.Editor
                 }
             }
             EditorGUILayout.Space();
+
+            if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex))
+            {
+                EditorGUILayout.LabelField("These curves multiply the root motion of the hit reaction on the victim", EditorStyles.whiteLabel);
+                EditorGUILayout.PropertyField(spAttackRootMotionForwardMultiplier);
+                EditorGUILayout.PropertyField(spAttackRootMotionSidesMultiplier);
+                EditorGUILayout.PropertyField(spAttackRootMotionVerticalMultiplier);
+            }
 
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
