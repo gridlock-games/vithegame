@@ -100,6 +100,14 @@ namespace Vi.ScriptableObjects
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        public AnimationCurve attackRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+
+        public AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+
         [SerializeField] private AnimationCurve debugForwardMotion;
         [SerializeField] private AnimationCurve debugSidesMotion;
         [SerializeField] private AnimationCurve debugVerticalMotion;
