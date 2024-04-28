@@ -17,13 +17,12 @@ namespace Vi.UI
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
-
+        [SerializeField] private Text loginMethodText;
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
 
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
-
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -35,12 +34,10 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
-
         [SerializeField] private Text welcomeUserText;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
-
         [SerializeField] private Button startLobbyServerButton;
 
         private bool startServerCalled;
@@ -342,6 +339,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
+
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
 
