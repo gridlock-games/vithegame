@@ -10,7 +10,20 @@ namespace Vi.Editor
     [CanEditMultipleObjects]
     public class ActionVFXParticleSystemEditor : ActionVFXEditor
     {
-        
+        private SerializedProperty spShouldUseAttackerPositionForHitAngles;
+
+        private new void OnEnable()
+        {
+            base.OnEnable();
+            spShouldUseAttackerPositionForHitAngles = serializedObject.FindProperty("shouldUseAttackerPositionForHitAngles");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            EditorGUILayout.PropertyField(spShouldUseAttackerPositionForHitAngles);
+            serializedObject.ApplyModifiedProperties();
+        }
     }
 }
 
