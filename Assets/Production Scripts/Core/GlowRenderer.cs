@@ -91,7 +91,7 @@ namespace Vi.Core
             }
         }
 
-        private Color defaultColor = new Color(0, 0, 0, 0);
+        private readonly Color defaultColor = new Color(0, 0, 0, 0);
         private const float defaultFresnelPower = 5;
         private void Update()
         {
