@@ -292,9 +292,9 @@ namespace Vi.Core.GameModeManagers
                 {
                     AddPlayerScore(playerData.id, playerData.character._id);
                 }
+                //roundTimer.Value = roundDuration;
+                nextGameActionTimer.Value = nextGameActionDuration;
             }
-            //roundTimer.Value = roundDuration;
-            nextGameActionTimer.Value = nextGameActionDuration;
 
             #if UNITY_EDITOR
             if (!IsClient)

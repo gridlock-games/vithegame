@@ -16,6 +16,7 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private UIDefinition[] platformUIDefinitions;
         [SerializeField] private ControlSchemeTextDefinition[] controlSchemeTextDefinitions;
+        [SerializeField] private ControlSchemeDefinition[] controlSchemeDefinitions;
 
         public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
 
@@ -49,6 +50,15 @@ namespace Vi.UI
             public string stringAfterBinding;
         }
 
+        [System.Serializable]
+        private struct ControlSchemeDefinition
+        {
+            public string controlSchemeName;
+            public GameObject[] gameObjectsToEnable;
+            public GameObject[] gameObjectsToDestroy;
+            public MoveUIDefinition[] objectsToMove;
+        }
+
         public struct PositionOverrideDefinition
         {
             public string gameObjectPath;
@@ -77,6 +87,45 @@ namespace Vi.UI
                 g = g.Find(step);
             }
             return g.gameObject;
+        }
+
+        private void EvaluateControlSchemeDefinitions()
+        {
+            if (!PlayerDataManager.Singleton) { return; }
+            Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+            if (localPlayer)
+            {
+                if (localPlayer.TryGetComponent(out PlayerInput playerInput))
+                {
+                    foreach (ControlSchemeDefinition controlSchemeDefinition in controlSchemeDefinitions)
+                    {
+                        foreach (GameObject g in controlSchemeDefinition.gameObjectsToEnable)
+                        {
+                            g.SetActive(playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName);
+                        }
+
+                        foreach (MoveUIDefinition moveUIDefinition in controlSchemeDefinition.objectsToMove)
+                        {
+                            if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName)
+                            {
+                                RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                                if (moveUIDefinition.shouldOverrideAnchors)
+                                {
+                                    rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                                    rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                                    rt.pivot = moveUIDefinition.pivotOverride;
+                                }
+                                rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                            }
+                        }
+
+                        foreach (GameObject g in controlSchemeDefinition.gameObjectsToDestroy)
+                        {
+                            if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName) { Destroy(g); }
+                        }
+                    }
+                }
+            }
         }
 
         private void Start()
@@ -108,6 +157,7 @@ namespace Vi.UI
                     if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
                 }
             }
+            EvaluateControlSchemeDefinitions();
         }
 
         private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
@@ -142,6 +192,7 @@ namespace Vi.UI
 
         private void Update()
         {
+            EvaluateControlSchemeDefinitions();
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)

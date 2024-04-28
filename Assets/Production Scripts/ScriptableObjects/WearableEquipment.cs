@@ -35,7 +35,7 @@ namespace Vi.ScriptableObjects
 
                     if (!boneMap.TryGetValue(bone.name, out newBones[i]))
                     {
-                        Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton.");
+                        if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
                     }
                 }
                 srenderer.bones = newBones;
@@ -74,7 +74,7 @@ namespace Vi.ScriptableObjects
         {
             if (!boneMap.TryGetValue(_name, out Transform _rootBone))
             {
-                Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton.");
+                if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
             }
             return _rootBone;
         }

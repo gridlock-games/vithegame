@@ -32,6 +32,7 @@ namespace Vi.UI
         private Vector2 joystickParentOriginalAnchoredPosition;
         private Vector2 joystickOriginalAnchoredPosition;
         private MovementHandler movementHandler;
+        private PlayerInput playerInput;
         private void Start()
         {
             if (PlayerPrefs.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = PlayerPrefs.GetFloat(joystickValueMultiplierPlayerPref); }
@@ -43,6 +44,7 @@ namespace Vi.UI
             joystickOriginalAnchoredPosition = rt.anchoredPosition;
 
             movementHandler = transform.root.GetComponent<MovementHandler>();
+            playerInput = movementHandler.GetComponent<PlayerInput>();
         }
 
         private void OnEnable()
@@ -118,17 +120,20 @@ namespace Vi.UI
                     OnTouchUp();
                 }
 
-                switch (joystickActionType)
+                if (playerInput.currentControlScheme == "Touchscreen")
                 {
-                    case JoystickActionType.Move:
-                        movementHandler.SetMoveInput(GetJoystickValue());
-                        break;
-                    case JoystickActionType.Look:
-                        movementHandler.SetLookInput(GetJoystickValue());
-                        break;
-                    default:
-                        Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);
-                        break;
+                    switch (joystickActionType)
+                    {
+                        case JoystickActionType.Move:
+                            movementHandler.SetMoveInput(GetJoystickValue());
+                            break;
+                        case JoystickActionType.Look:
+                            movementHandler.SetLookInput(GetJoystickValue());
+                            break;
+                        default:
+                            Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);
+                            break;
+                    }
                 }
             }
         }

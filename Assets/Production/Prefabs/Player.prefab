@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2126180b17357164ca655fa448f0236a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraInstance: {fileID: 3945128956232022068}
+  cameraController: {fileID: 3945128956232022059}
   minimapCameraInstance: {fileID: 3092678811823459878}
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
@@ -346,6 +346,7 @@ MonoBehaviour:
   aimingTransitionSpeed: 8
   aimingPositionOffset: {x: 0, y: 0, z: 1}
   collisionPositionOffset: -0.3
+  Camera: {fileID: 0}
 --- !u!1 &3945128957587517371
 GameObject:
   m_ObjectHideFlags: 0
