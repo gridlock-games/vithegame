@@ -24,7 +24,7 @@ namespace Vi.Editor
 
         private SerializedProperty spWeaponBone;
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
             spVFXRotationOffset = serializedObject.FindProperty("vfxRotationOffset");
