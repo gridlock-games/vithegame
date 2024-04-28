@@ -409,6 +409,9 @@ namespace Vi.Core
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+            hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
+            hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
+            hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
 
             float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
             damage *= attacker.damageMultiplier;
