@@ -248,7 +248,10 @@ namespace Vi.ArtificialIntelligence
 
                     if (targetAttributes)
                     {
-                        if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = targetAttributes.transform.position; }
+                        if (navMeshAgent.isOnNavMesh)
+                        {
+                            if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
+                        }
 
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                         {
@@ -258,7 +261,10 @@ namespace Vi.ArtificialIntelligence
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
-                    if (navMeshAgent.isOnNavMesh) { navMeshAgent.destination = currentPosition.Value; }
+                    if (navMeshAgent.isOnNavMesh)
+                    {
+                        if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { navMeshAgent.destination = currentPosition.Value; }
+                    }
                 }
             }
         }
