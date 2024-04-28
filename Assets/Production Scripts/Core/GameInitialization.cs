@@ -27,7 +27,6 @@ namespace Vi.Core
 
         private void Start()
         {
-            PlayerPrefs.DeleteAll();
             InitializePlayerPrefs();
 
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -59,7 +58,7 @@ namespace Vi.Core
 
             if (!PlayerPrefs.HasKey("AutoAim")) { PlayerPrefs.SetString("AutoAim", true.ToString()); }
 
-            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", true.ToString()); }
+            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
 
