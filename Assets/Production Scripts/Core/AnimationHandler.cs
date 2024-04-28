@@ -485,7 +485,7 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            if (characterMaterial == null) { Debug.LogWarning("Character Material is null"); return; }
+            if (characterMaterial == null) { return; }
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
@@ -493,11 +493,12 @@ namespace Vi.Core
         {
             if (wearableEquipmentOption == null)
             {
-                Debug.LogWarning(equipmentType + " Equipment option is null");
                 animatorReference.ClearWearableEquipment(equipmentType);
-                return;
             }
-            animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            else
+            {
+                animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            }
         }
 
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
