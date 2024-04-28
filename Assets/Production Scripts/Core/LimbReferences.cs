@@ -78,7 +78,6 @@ namespace Vi.Core
 
                 if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
-            animator.SetBool("Aiming", isAiming);
             animator.SetLayerWeight(animator.GetLayerIndex("Aiming"), weight);
             StartCoroutine(SetHandAimingBool(hand, isAiming));
         }
@@ -106,6 +105,15 @@ namespace Vi.Core
                 LeftHandFollowTarget.target = reachTarget;
                 if (instantReach) { leftHandReachRig.GetRig().weight = weight; }
             }
+        }
+
+        public void OnCannotAim()
+        {
+            animator.SetLayerWeight(animator.GetLayerIndex("Aiming"), 0);
+            leftHandAimRig.weight = 0;
+            rightHandAimRig.weight = 0;
+            leftHandReachRig.weight = 0;
+            rightHandReachRig.weight = 0;
         }
 
         private Animator animator;

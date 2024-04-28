@@ -92,37 +92,43 @@ namespace Vi.UI
             CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId);
             CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId);
 
-            loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Primary, loadout.weapon1ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
-            loadoutManager.ChangeWeapon(LoadoutManager.WeaponSlotType.Secondary, loadout.weapon2ItemId.ToString(), PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
-
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
             primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name;
-            primaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+            bool canEditLoadout = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+            primaryWeaponButton.interactable = canEditLoadout;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
             secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
-            secondaryWeaponButton.interactable = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+            secondaryWeaponButton.interactable = canEditLoadout;
 
             helmButton.onClick.RemoveAllListeners();
             helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
+            helmButton.interactable = canEditLoadout;
             chestButton.onClick.RemoveAllListeners();
             chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
+            chestButton.interactable = canEditLoadout;
             shouldersButton.onClick.RemoveAllListeners();
             shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
+            shouldersButton.interactable = canEditLoadout;
             glovesButton.onClick.RemoveAllListeners();
             glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
+            glovesButton.interactable = canEditLoadout;
             pantsButton.onClick.RemoveAllListeners();
             pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants, loadoutSlot); });
+            pantsButton.interactable = canEditLoadout;
             bootsButton.onClick.RemoveAllListeners();
             bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots, loadoutSlot); });
+            bootsButton.interactable = canEditLoadout;
             beltButton.onClick.RemoveAllListeners();
             beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt, loadoutSlot); });
+            beltButton.interactable = canEditLoadout;
             capeButton.onClick.RemoveAllListeners();
             capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });
+            capeButton.interactable = canEditLoadout;
         }
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)
