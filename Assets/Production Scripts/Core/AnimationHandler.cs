@@ -425,6 +425,7 @@ namespace Vi.Core
         [ClientRpc]
         private void PlayActionClientRpc(string actionStateName, string weaponName)
         {
+            if (IsServer) { return; }
             StartCoroutine(PlayActionOnClient(actionStateName, weaponName));
         }
 
