@@ -85,8 +85,6 @@ namespace Vi.Player
 
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                Debug.Log(movementHandler.CameraFollowTarget);
-
                 if (movementHandler.CameraFollowTarget)
                 {
                     Vector3 targetPosition = movementHandler.CameraFollowTarget.transform.position + movementHandler.CameraFollowTarget.transform.rotation * new Vector3(0, 3, -3);

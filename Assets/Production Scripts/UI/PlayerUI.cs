@@ -65,13 +65,11 @@ namespace Vi.UI
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
-        private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
 
         private void Awake()
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
-            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
         }
@@ -116,6 +114,7 @@ namespace Vi.UI
         private void UpdateWeapon(bool forceRefresh)
         {
             if (playerInput.currentControlScheme == null) { return; }
+            if (!weaponHandler.WeaponInitialized) { return; }
 
             if (!forceRefresh)
             {
