@@ -405,28 +405,28 @@ namespace Vi.UI
                 primaryWeaponIcon.gameObject.SetActive(true);
                 secondaryWeaponIcon.gameObject.SetActive(true);
 
-                CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
-                CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
+                //CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon1ItemId).itemId);
+                //CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[character._id.ToString()].Find(item => item.id == character.GetActiveLoadout().weapon2ItemId).itemId);
 
-                StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
+                StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
 
-                if (primaryOption != null & secondaryOption != null)
-                {
-                    primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-                    primaryWeaponText.text = primaryOption.name;
-                    secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-                    secondaryWeaponText.text = secondaryOption.name;
+                //if (primaryOption != null & secondaryOption != null)
+                //{
+                //    primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                //    primaryWeaponText.text = primaryOption.name;
+                //    secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                //    secondaryWeaponText.text = secondaryOption.name;
 
-                    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
-                    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
-                }
+                //    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
+                //    previewObject.GetComponent<LoadoutManager>().ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
+                //}
             }
             else
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
 
-                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString())); }
+                if (previewObject) { StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString())); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
