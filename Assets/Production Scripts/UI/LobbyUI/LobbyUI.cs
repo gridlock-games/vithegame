@@ -564,7 +564,7 @@ namespace Vi.UI
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
+            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
         }
 
         private new void OnDestroy()
@@ -615,7 +615,7 @@ namespace Vi.UI
 
             if (previewObject)
             {
-                StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString()));
+                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString());
             }
         }
 

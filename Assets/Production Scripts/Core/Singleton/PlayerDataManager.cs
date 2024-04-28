@@ -636,7 +636,7 @@ namespace Vi.Core
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].GetComponent<LoadoutManager>();
-                        loadoutManager.StartCoroutine(loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString()));
+                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
