@@ -230,13 +230,7 @@ namespace Vi.Core
 
         public List<Attributes> GetActivePlayerObjects(Attributes attributesToExclude = null)
         {
-            List<Attributes> attributesList = new List<Attributes>();
-            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator))
-            {
-                if (kvp.Value == attributesToExclude) { continue; }
-                attributesList.Add(kvp.Value);
-            }
-            return attributesList;
+            return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
         public KeyValuePair<int, Attributes> GetLocalPlayerObject()
