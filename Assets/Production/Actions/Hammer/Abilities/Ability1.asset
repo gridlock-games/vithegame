@@ -114,7 +114,7 @@ MonoBehaviour:
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: 12000000
+  effectedWeaponBones: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -156,11 +156,12 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
-  - {fileID: 0}
-  previewActionVFX: {fileID: 0}
+  - {fileID: 2423139617000239351, guid: ddc681a477b8f7d41bfe91332301fceb, type: 3}
+  previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
+    type: 3}
   previewActionVFXScale: {x: 0, y: 0, z: 0}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
