@@ -27,10 +27,12 @@ namespace Vi.Core
 
         private void Start()
         {
+            PlayerPrefs.DeleteAll();
+            InitializePlayerPrefs();
+
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
-            InitializePlayerPrefs();
 
             if (!WebRequestManager.IsServerBuild())
             {
@@ -57,7 +59,7 @@ namespace Vi.Core
 
             if (!PlayerPrefs.HasKey("AutoAim")) { PlayerPrefs.SetString("AutoAim", true.ToString()); }
 
-            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", false.ToString()); }
+            if (!PlayerPrefs.HasKey("ConsoleEnabled")) { PlayerPrefs.SetString("ConsoleEnabled", true.ToString()); }
             if (!PlayerPrefs.HasKey("FPSEnabled")) { PlayerPrefs.SetString("FPSEnabled", false.ToString()); }
             if (!PlayerPrefs.HasKey("PingEnabled")) { PlayerPrefs.SetString("PingEnabled", false.ToString()); }
 
@@ -163,7 +165,15 @@ namespace Vi.Core
             {
                 headerText.text = "Loading Main Menu";
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                try
+                {
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                }
+                catch
+                {
+                    headerText.text = "Could Not Load Main Menu";
+                    yield break;
+                }
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
             else
