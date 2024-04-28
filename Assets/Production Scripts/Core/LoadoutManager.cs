@@ -38,11 +38,11 @@ namespace Vi.Core
             Debug.LogError("Unknown weapon to fire " + weapon);
         }
 
-        private CharacterReference.WeaponOption primaryWeaponOption;
+        public CharacterReference.WeaponOption PrimaryWeaponOption { get; private set; }
         private Weapon primaryWeaponInstance;
         private NetworkVariable<int> primaryAmmo = new NetworkVariable<int>();
 
-        private CharacterReference.WeaponOption secondaryWeaponOption;
+        public CharacterReference.WeaponOption SecondaryWeaponOption { get; private set; }
         private Weapon secondaryWeaponInstance;
         private NetworkVariable<int> secondaryAmmo = new NetworkVariable<int>();
 
@@ -68,6 +68,25 @@ namespace Vi.Core
 
         public IEnumerator ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId)
         {
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId); }
+            if (PrimaryWeaponOption == null) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId.ToString()); }
+
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon2ItemId.ToString()).itemId); }
+            if (SecondaryWeaponOption == null) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId.ToString()); }
+
+            primaryWeaponInstance = Instantiate(PrimaryWeaponOption.weapon);
+            secondaryWeaponInstance = Instantiate(SecondaryWeaponOption.weapon);
+
+            if (IsServer)
+            {
+                primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;
+                secondaryAmmo.Value = secondaryWeaponInstance.ShouldUseAmmo() ? secondaryWeaponInstance.GetMaxAmmoCount() : 0;
+            }
+
+            OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
+
             yield return null;
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
@@ -90,25 +109,6 @@ namespace Vi.Core
                     animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()), raceAndGender);
                 }
             }
-
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { primaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId); }
-            if (primaryWeaponOption == null) { primaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId.ToString()); }
-
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { secondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon2ItemId.ToString()).itemId); }
-            if (secondaryWeaponOption == null) { secondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId.ToString()); }
-
-            primaryWeaponInstance = Instantiate(primaryWeaponOption.weapon);
-            secondaryWeaponInstance = Instantiate(secondaryWeaponOption.weapon);
-
-            if (IsServer)
-            {
-                primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;
-                secondaryAmmo.Value = secondaryWeaponInstance.ShouldUseAmmo() ? secondaryWeaponInstance.GetMaxAmmoCount() : 0;
-            }
-
-            OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
         }
 
         public override void OnNetworkDespawn()
@@ -121,11 +121,11 @@ namespace Vi.Core
             switch (current)
             {
                 case 1:
-                    weaponHandler.SetNewWeapon(primaryWeaponInstance, primaryWeaponOption.animationController);
+                    weaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(secondaryWeaponInstance);
                     break;
                 case 2:
-                    weaponHandler.SetNewWeapon(secondaryWeaponInstance, secondaryWeaponOption.animationController);
+                    weaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(primaryWeaponInstance);
                     break;
                 default:
