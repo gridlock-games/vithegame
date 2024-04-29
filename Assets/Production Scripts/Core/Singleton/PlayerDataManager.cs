@@ -752,7 +752,8 @@ namespace Vi.Core
             }
             if (IsClient)
             {
-                StartCoroutine(ReturnToCharacterSelect());
+                // This object gets despawned, so make sure to not start this on a networkobject
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
             }
         }
 
