@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -378,7 +379,7 @@ namespace Vi.Core
         {
             if (clientId >= 0)
             {
-                NetworkManager.DisconnectClient((ulong)clientId);
+                NetworkManager.DisconnectClient((ulong)clientId, "You have been kicked from the session.");
             }
             else
             {
@@ -740,6 +741,7 @@ namespace Vi.Core
             spawnPlayerRunning = false;
         }
 
+        [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
             //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
@@ -750,8 +752,8 @@ namespace Vi.Core
             }
             if (IsClient)
             {
-                StartCoroutine(ReturnToCharacterSelect());
-                Debug.Log(NetworkManager.DisconnectReason);
+                // This object gets despawned, so make sure to not start this on a networkobject
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
             }
         }
 
@@ -761,6 +763,11 @@ namespace Vi.Core
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
                 NetSceneManager.Singleton.LoadScene("Character Select");
+            }
+
+            if (!string.IsNullOrWhiteSpace(NetworkManager.DisconnectReason))
+            {
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = NetworkManager.DisconnectReason;
             }
         }
 

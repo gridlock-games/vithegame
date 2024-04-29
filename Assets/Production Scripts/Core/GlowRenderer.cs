@@ -133,7 +133,7 @@ namespace Vi.Core
             {
                 glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), fresnelPowerTarget, colorChangeSpeed * Time.deltaTime));
                 //glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, colorTarget, colorChangeSpeed * Time.deltaTime);
-                glowMaterialInstance.color = colorTarget;
+                if (glowMaterialInstance.color != colorTarget) { glowMaterialInstance.color = colorTarget; }
             }
         }
     }
