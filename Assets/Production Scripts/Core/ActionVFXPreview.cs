@@ -7,6 +7,12 @@ namespace Vi.Core
 {
     public class ActionVFXPreview : ActionVFX
     {
+        Renderer[] renderers;
+        private void Start()
+        {
+            renderers = GetComponentsInChildren<Renderer>();
+        }
+
         private void LateUpdate()
         {
             if (transformType == TransformType.Projectile)
@@ -29,6 +35,11 @@ namespace Vi.Core
                     floorHit = hit;
 
                     break;
+                }
+
+                foreach (Renderer renderer in renderers)
+                {
+                    renderer.forceRenderingOff = !bHit;
                 }
 
                 if (bHit)

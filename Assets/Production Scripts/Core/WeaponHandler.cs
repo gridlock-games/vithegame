@@ -336,6 +336,14 @@ namespace Vi.Core
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
+                    else if (isPreviewVFX)
+                    {
+                        vfxInstance = Instantiate(actionVFXPrefab.gameObject,
+                            attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                            attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            isPreviewVFX ? attackerTransform : null
+                        );
+                    }
                     break;
                 //case ActionVFX.TransformType.OriginatorAndTarget:
                 //    break;
@@ -362,7 +370,7 @@ namespace Vi.Core
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
-            else
+            else if (!isPreviewVFX & actionVFXPrefab.transformType == ActionVFX.TransformType.ConformToGround)
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
