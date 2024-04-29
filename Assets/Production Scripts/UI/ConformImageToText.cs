@@ -17,14 +17,28 @@ namespace Vi.UI
         private void Start()
         {
             image = GetComponent<Image>();
+            EvaluateText();
         }
 
         private void Update()
         {
+            EvaluateText();
+        }
+
+        private string lastEvaluatedTextValue = null;
+        private void EvaluateText()
+        {
             image.enabled = textToConformTo.enabled & textToConformTo.text != "";
-            // Scale size of name background by size of text
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textToConformTo.preferredWidth * textToConformTo.transform.localScale.x + horizontalPadding);
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, textToConformTo.preferredHeight * textToConformTo.transform.localScale.y + verticalPadding);
+            if (image.enabled)
+            {
+                if (textToConformTo.text == lastEvaluatedTextValue) { return; }
+
+                lastEvaluatedTextValue = textToConformTo.text;
+
+                // Scale size of background by size of text
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textToConformTo.preferredWidth * textToConformTo.transform.localScale.x + horizontalPadding);
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, textToConformTo.preferredHeight * textToConformTo.transform.localScale.y + verticalPadding);
+            }
         }
     }
 }

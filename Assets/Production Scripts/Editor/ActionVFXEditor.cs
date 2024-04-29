@@ -17,6 +17,7 @@ namespace Vi.Editor
         private SerializedProperty spTransformType;
 
         private SerializedProperty spRaycastOffset;
+        private SerializedProperty spRaycastMaxDistance;
         private SerializedProperty spCrossProductDirection;
         private SerializedProperty spLookRotationUpDirection;
 
@@ -33,6 +34,7 @@ namespace Vi.Editor
             spTransformType = serializedObject.FindProperty("transformType");
 
             spRaycastOffset = serializedObject.FindProperty("raycastOffset");
+            spRaycastMaxDistance = serializedObject.FindProperty("raycastMaxDistance");
             spCrossProductDirection = serializedObject.FindProperty("crossProductDirection");
             spLookRotationUpDirection = serializedObject.FindProperty("lookRotationUpDirection");
 
@@ -56,6 +58,7 @@ namespace Vi.Editor
             if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.ConformToGround)
             {
                 EditorGUILayout.PropertyField(spRaycastOffset);
+                EditorGUILayout.PropertyField(spRaycastMaxDistance);
                 EditorGUILayout.PropertyField(spCrossProductDirection);
                 EditorGUILayout.PropertyField(spLookRotationUpDirection);
             }

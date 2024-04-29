@@ -271,6 +271,7 @@ namespace Vi.Core
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
             actionPreviewVFXPrefab.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+            actionPreviewVFXPrefab.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
             actionPreviewVFXPrefab.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
             actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
             actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
@@ -324,9 +325,8 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
-                    //startPos.y += actionVFXPrefab.raycastOffset.y;
-                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                    Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(startPos, Vector3.down * actionVFXPrefab.raycastMaxDistance, Color.red, 3);
 
                     if (bHit)
                     {
@@ -336,7 +336,7 @@ namespace Vi.Core
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
-                    else
+                    else if (isPreviewVFX)
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
@@ -370,7 +370,7 @@ namespace Vi.Core
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
-            else
+            else if (!isPreviewVFX & actionVFXPrefab.transformType == ActionVFX.TransformType.ConformToGround)
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }

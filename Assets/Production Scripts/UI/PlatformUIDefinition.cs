@@ -89,46 +89,75 @@ namespace Vi.UI
             return g.gameObject;
         }
 
-        private void EvaluateControlSchemeDefinitions()
+        PlayerInput playerInput;
+        private void FindPlayerInput()
         {
+            if (playerInput) { return; }
             if (!PlayerDataManager.Singleton) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
-            if (localPlayer)
-            {
-                if (localPlayer.TryGetComponent(out PlayerInput playerInput))
-                {
-                    foreach (ControlSchemeDefinition controlSchemeDefinition in controlSchemeDefinitions)
-                    {
-                        foreach (GameObject g in controlSchemeDefinition.gameObjectsToEnable)
-                        {
-                            g.SetActive(playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName);
-                        }
+            if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
+        }
 
-                        foreach (MoveUIDefinition moveUIDefinition in controlSchemeDefinition.objectsToMove)
+        private string lastEvaluatedControlScheme;
+        private void EvaluateControlSchemeDefinitions()
+        {
+            if (!playerInput) { return; }
+            if (playerInput.currentControlScheme == lastEvaluatedControlScheme) { return; }
+            foreach (ControlSchemeDefinition controlSchemeDefinition in controlSchemeDefinitions)
+            {
+                foreach (GameObject g in controlSchemeDefinition.gameObjectsToEnable)
+                {
+                    g.SetActive(playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName);
+                }
+
+                foreach (MoveUIDefinition moveUIDefinition in controlSchemeDefinition.objectsToMove)
+                {
+                    if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName)
+                    {
+                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                        if (moveUIDefinition.shouldOverrideAnchors)
                         {
-                            if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName)
+                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                            rt.pivot = moveUIDefinition.pivotOverride;
+                        }
+                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+
+                foreach (GameObject g in controlSchemeDefinition.gameObjectsToDestroy)
+                {
+                    if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName) { Destroy(g); }
+                }
+            }
+
+            foreach (ControlSchemeTextDefinition controlSchemeTextDefinition in controlSchemeTextDefinitions)
+            {
+                if (controlSchemeTextDefinition.platforms.Contains(Application.platform))
+                {
+                    InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
+
+                    foreach (InputBinding binding in playerInput.actions[controlSchemeTextDefinition.action].bindings)
+                    {
+                        bool shouldBreak = false;
+                        foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                        {
+                            if (binding.path.ToLower().Contains(device.name.ToLower()))
                             {
-                                RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
-                                if (moveUIDefinition.shouldOverrideAnchors)
-                                {
-                                    rt.anchorMin = moveUIDefinition.anchorMinOverride;
-                                    rt.anchorMax = moveUIDefinition.anchorMaxOverride;
-                                    rt.pivot = moveUIDefinition.pivotOverride;
-                                }
-                                rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                                controlSchemeTextDefinition.textElement.text = controlSchemeTextDefinition.stringBeforeBinding.Replace("\\n", "\n") + binding.ToDisplayString() + controlSchemeTextDefinition.stringAfterBinding.Replace("\\n", "\n");
+                                shouldBreak = true;
+                                break;
                             }
                         }
-
-                        foreach (GameObject g in controlSchemeDefinition.gameObjectsToDestroy)
-                        {
-                            if (playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName) { Destroy(g); }
-                        }
+                        if (shouldBreak) { break; }
                     }
                 }
             }
+
+            lastEvaluatedControlScheme = playerInput.currentControlScheme;
         }
 
-        private void Start()
+        private void EvaluateUIDefinitionsOnFirstFrame()
         {
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
@@ -157,7 +186,31 @@ namespace Vi.UI
                     if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
                 }
             }
-            EvaluateControlSchemeDefinitions();
+            lastEvaluatedResolution = Screen.currentResolution;
+        }
+
+        private Resolution lastEvaluatedResolution;
+        private void EvaluateUIDefinitionsInUpdate()
+        {
+            if (Screen.currentResolution.width == lastEvaluatedResolution.width & Screen.currentResolution.height == lastEvaluatedResolution.height) { return; }
+            foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
+            {
+                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                {
+                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                    {
+                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
+                        if (moveUIDefinition.shouldOverrideAnchors)
+                        {
+                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                            rt.pivot = moveUIDefinition.pivotOverride;
+                        }
+                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                    }
+                }
+            }
+            lastEvaluatedResolution = Screen.currentResolution;
         }
 
         private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
@@ -190,59 +243,18 @@ namespace Vi.UI
             }
         }
 
+        private void Start()
+        {
+            FindPlayerInput();
+            EvaluateUIDefinitionsOnFirstFrame();
+            EvaluateControlSchemeDefinitions();
+        }
+
         private void Update()
         {
+            FindPlayerInput();
+            EvaluateUIDefinitionsInUpdate();
             EvaluateControlSchemeDefinitions();
-            foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
-            {
-                foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
-                {
-                    if (platformUIDefinition.platforms.Contains(Application.platform))
-                    {
-                        RectTransform rt = (RectTransform)moveUIDefinition.gameObjectToMove.transform;
-                        if (moveUIDefinition.shouldOverrideAnchors)
-                        {
-                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
-                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
-                            rt.pivot = moveUIDefinition.pivotOverride;
-                        }
-                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
-                    }
-                }
-            }
-
-            if (PlayerDataManager.Singleton)
-            {
-                Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
-                if (localPlayer)
-                {
-                    if (localPlayer.TryGetComponent(out PlayerInput playerInput))
-                    {
-                        foreach (ControlSchemeTextDefinition controlSchemeTextDefinition in controlSchemeTextDefinitions)
-                        {
-                            if (controlSchemeTextDefinition.platforms.Contains(Application.platform))
-                            {
-                                InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
-
-                                foreach (InputBinding binding in playerInput.actions[controlSchemeTextDefinition.action].bindings)
-                                {
-                                    bool shouldBreak = false;
-                                    foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
-                                    {
-                                        if (binding.path.ToLower().Contains(device.name.ToLower()))
-                                        {
-                                            controlSchemeTextDefinition.textElement.text = controlSchemeTextDefinition.stringBeforeBinding.Replace("\\n", "\n") + binding.ToDisplayString() + controlSchemeTextDefinition.stringAfterBinding.Replace("\\n", "\n");
-                                            shouldBreak = true;
-                                            break;
-                                        }
-                                    }
-                                    if (shouldBreak) { break; }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
