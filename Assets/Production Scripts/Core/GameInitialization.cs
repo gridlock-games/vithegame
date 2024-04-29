@@ -27,10 +27,11 @@ namespace Vi.Core
 
         private void Start()
         {
+            InitializePlayerPrefs();
+
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
             StartCoroutine(LoadScenes());
-            InitializePlayerPrefs();
 
             if (!WebRequestManager.IsServerBuild())
             {
@@ -163,7 +164,15 @@ namespace Vi.Core
             {
                 headerText.text = "Loading Main Menu";
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                try
+                {
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                }
+                catch
+                {
+                    headerText.text = "Could Not Load Main Menu";
+                    yield break;
+                }
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
             else
