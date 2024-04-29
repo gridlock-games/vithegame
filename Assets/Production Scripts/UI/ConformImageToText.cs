@@ -17,14 +17,33 @@ namespace Vi.UI
         private void Start()
         {
             image = GetComponent<Image>();
+            EvaluateText();
         }
 
         private void Update()
         {
+            EvaluateText();
+        }
+
+        private float lastPreferredWidth;
+        private float lastPreferredHeight;
+        private void EvaluateText()
+        {
             image.enabled = textToConformTo.enabled & textToConformTo.text != "";
-            // Scale size of name background by size of text
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textToConformTo.preferredWidth * textToConformTo.transform.localScale.x + horizontalPadding);
-            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, textToConformTo.preferredHeight * textToConformTo.transform.localScale.y + verticalPadding);
+            if (image.enabled)
+            {
+                float preferredWidth = textToConformTo.preferredWidth * textToConformTo.transform.localScale.x;
+                float preferredHeight = textToConformTo.preferredHeight * textToConformTo.transform.localScale.y;
+
+                if (Mathf.Approximately(preferredWidth, lastPreferredWidth) & Mathf.Approximately(preferredHeight, lastPreferredHeight)) { return; }
+
+                // Scale size of background by size of text
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredWidth + horizontalPadding);
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight + verticalPadding);
+
+                lastPreferredWidth = textToConformTo.preferredWidth;
+                lastPreferredHeight = textToConformTo.preferredHeight;
+            }
         }
     }
 }
