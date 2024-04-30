@@ -30,7 +30,7 @@ namespace Vi.Core
             InitializePlayerPrefs();
 
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
+            Application.targetFrameRate = PlayerPrefs.GetInt("TargetFrameRate");
             StartCoroutine(LoadScenes());
 
             if (!WebRequestManager.IsServerBuild())
@@ -47,13 +47,15 @@ namespace Vi.Core
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
+            if (!PlayerPrefs.HasKey("TargetFrameRate")) { PlayerPrefs.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
+
             if (!PlayerPrefs.HasKey("InvertMouse")) { PlayerPrefs.SetString("InvertMouse", false.ToString()); }
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("MobileLookJoystickSensitivity")) { PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", 4); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
-            if (!PlayerPrefs.HasKey("BlockingMode")) { PlayerPrefs.GetString("BlockingMode", "HOLD"); }
+            if (!PlayerPrefs.HasKey("BlockingMode")) { PlayerPrefs.SetString("BlockingMode", "HOLD"); }
             
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
 
