@@ -45,7 +45,7 @@ namespace Vi.UI
             UI
         }
 
-        private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
+        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
 
         private PlayerInput playerInput;
 

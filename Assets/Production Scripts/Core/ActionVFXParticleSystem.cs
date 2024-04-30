@@ -84,8 +84,8 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)
@@ -122,8 +122,8 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)
