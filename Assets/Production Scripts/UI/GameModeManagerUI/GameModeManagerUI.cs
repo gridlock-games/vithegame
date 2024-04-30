@@ -25,7 +25,7 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
             }
-            gameModeManager = GetComponent<GameModeManager>();
+            gameModeManager = GetComponentInParent<GameModeManager>();
 
             roundResultText.enabled = false;
 
