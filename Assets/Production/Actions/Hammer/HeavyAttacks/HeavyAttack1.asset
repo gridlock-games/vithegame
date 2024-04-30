@@ -253,7 +253,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
+  animationSpeed: 1.15
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
@@ -261,7 +261,7 @@ MonoBehaviour:
   effectedWeaponBones: 12000000
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 1
-  chargeAttackStateLoopCount: 2
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 1
   enhancedChargeDamageMultiplier: 1
@@ -276,15 +276,15 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 3
+  maxHitLimit: 1
   timeBetweenHits: 0.15
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 1
   isFollowUpAttack: 0
-  ailment: 5
-  ailmentHitDefinition: 010101
+  ailment: 2
+  ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0

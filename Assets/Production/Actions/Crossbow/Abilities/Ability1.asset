@@ -780,6 +780,150 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  attackRootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  attackRootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  attackRootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hitReactionRootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hitReactionRootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hitReactionRootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   debugForwardMotion:
     serializedVersion: 2
     m_Curve:
@@ -1548,12 +1692,16 @@ MonoBehaviour:
   YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
+  dodgeCancelTransitionTime: 0.15
   animationSpeed: 1.35
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 1
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 11000000
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
   canEnhance: 1
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
@@ -1587,11 +1735,12 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: ddaf850384c166f46a44d1388d87be8f, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: -5220340233243105456, guid: a179a32d8977f7a468af39122f7f4f04, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
@@ -1599,7 +1748,7 @@ MonoBehaviour:
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
-  maximumTargetingRotationAngle: 60
+  maximumTargetingRotationAngle: 10
   aimDuringAnticipation: 1
   aimDuringAttack: 1
   aimDuringRecovery: 1
