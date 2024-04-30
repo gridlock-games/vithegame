@@ -53,7 +53,7 @@ namespace Vi.Core
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("MobileLookJoystickSensitivity")) { PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", 4); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
-            if (!PlayerPrefs.HasKey("BlockingMode")) { PlayerPrefs.GetString("BlockingMode", "HOLD"); }
+            if (!PlayerPrefs.HasKey("BlockingMode")) { PlayerPrefs.SetString("BlockingMode", "HOLD"); }
             
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
 
