@@ -647,7 +647,7 @@ namespace Vi.Core
             UpdateDefense();
             UpdateRage();
 
-            if (bool.Parse(PlayerPrefs.GetString("PingEnabled"))) { roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId); }
+            roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
         }
 
         private float staminaDelayCooldown;
