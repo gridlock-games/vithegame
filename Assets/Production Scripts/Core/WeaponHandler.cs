@@ -370,7 +370,7 @@ namespace Vi.Core
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
-            else if (!isPreviewVFX & actionVFXPrefab.transformType == ActionVFX.TransformType.ConformToGround)
+            else if (!isPreviewVFX & actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
