@@ -43,7 +43,7 @@ namespace Vi.Core.GameModeManagers
             Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
         }
 
-        public string GetLeftScoreString()
+        public override string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
@@ -70,7 +70,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public string GetRightScoreString()
+        public override string GetRightScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 

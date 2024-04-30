@@ -185,7 +185,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public string GetLeftScoreString()
+        public override string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
@@ -212,7 +212,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public string GetRightScoreString()
+        public override string GetRightScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 

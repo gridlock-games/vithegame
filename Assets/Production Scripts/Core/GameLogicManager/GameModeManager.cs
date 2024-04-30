@@ -434,6 +434,10 @@ namespace Vi.Core.GameModeManagers
             return highestKillPlayerScores;
         }
 
+        public virtual string GetLeftScoreString() { return string.Empty; }
+
+        public virtual string GetRightScoreString() { return string.Empty; }
+
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
