@@ -132,16 +132,22 @@ namespace Vi.UI
 
         private void Update()
         {
+            //bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
+            //    | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
+            //    | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
+            //    | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
+            //    | originalGraphicsPreset != graphicsPresetDropdown.value
+            //    | originalRenderScaleValue != renderScaleSlider.value
+            //    | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
+            //    | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
+            //    | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
+            //    | originalHDR != hdrToggle.isOn;
+
             bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
                 | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
                 | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
-                | originalGraphicsPreset != graphicsPresetDropdown.value
-                | originalRenderScaleValue != renderScaleSlider.value
-                | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
-                | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
-                | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
-                | originalHDR != hdrToggle.isOn;
+                | originalGraphicsPreset != graphicsPresetDropdown.value;
 
             applyChangesButton.interactable = changesPresent;
             discardChangesButton.interactable = changesPresent;
@@ -269,6 +275,7 @@ namespace Vi.UI
             }
 
             Application.targetFrameRate = targetFrameRate;
+            PlayerPrefs.SetInt("TargetFrameRate", targetFrameRate);
         }
     }
 }
