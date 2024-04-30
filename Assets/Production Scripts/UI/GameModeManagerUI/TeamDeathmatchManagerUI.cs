@@ -6,57 +6,14 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    public class TeamDeathmatchManagerUI : MonoBehaviour
+    public class TeamDeathmatchManagerUI : GameModeManagerUI
     {
-        [SerializeField] protected Text leftScoreText;
-        [SerializeField] protected Text rightScoreText;
-        [SerializeField] protected Text roundTimerText;
-        [SerializeField] protected Text gameEndText;
-        [SerializeField] protected Text roundResultText;
-        [SerializeField] protected Text roundWinThresholdText;
         [SerializeField] protected Text killsToWinRoundThresholdText;
 
-        protected TeamDeathmatchManager teamDeathmatchManager;
-
-        private CanvasGroup[] canvasGroups;
-
-        protected void Start()
+        private new void Start()
         {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            teamDeathmatchManager = GetComponentInParent<TeamDeathmatchManager>();
-
-            roundResultText.enabled = false;
-
-            leftScoreText.text = "Your Team: ";
-            rightScoreText.text = "Enemy Team: ";
-
-            roundWinThresholdText.text = "Rounds To Win Game: " + teamDeathmatchManager.GetNumberOfRoundsWinsToWinGame().ToString();
-            killsToWinRoundThresholdText.text = "Kills To Win Round: " + teamDeathmatchManager.GetKillsToWinRound();
-        }
-
-        protected void Update()
-        {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            if (!teamDeathmatchManager.IsSpawned) { return; }
-
-            roundTimerText.text = teamDeathmatchManager.GetRoundTimerDisplayString();
-            roundTimerText.color = teamDeathmatchManager.IsInOvertime() ? Color.red : Color.white;
-            leftScoreText.text = teamDeathmatchManager.GetLeftScoreString();
-            rightScoreText.text = teamDeathmatchManager.GetRightScoreString();
-
-            roundResultText.enabled = teamDeathmatchManager.ShouldDisplayNextGameAction();
-            roundResultText.text = teamDeathmatchManager.AreAllPlayersConnected() ? teamDeathmatchManager.GetRoundResultMessage() + teamDeathmatchManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
-
-            gameEndText.text = teamDeathmatchManager.GetGameEndMessage();
+            base.Start();
+            killsToWinRoundThresholdText.text = "Kills To Win Round: " + gameModeManager.GetComponent<TeamDeathmatchManager>().GetKillsToWinRound();
         }
     }
 }

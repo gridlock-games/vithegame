@@ -434,6 +434,10 @@ namespace Vi.Core.GameModeManagers
             return highestKillPlayerScores;
         }
 
+        public virtual string GetLeftScoreString() { return string.Empty; }
+
+        public virtual string GetRightScoreString() { return string.Empty; }
+
         protected void Awake()
         {
             scoreList = new NetworkList<PlayerScore>();
@@ -474,18 +478,36 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public void RegisterCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        {
+            scoreList.OnListChanged += onListChangedDelegate;
+        }
+
+        public void UnsubscribeCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        {
+            scoreList.OnListChanged -= onListChangedDelegate;
+        }
+
         private GameObject UIInstance;
         protected void Start()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
-        public bool AreAllPlayersConnected() { return PlayerDataManager.Singleton.GetActivePlayerObjects().TrueForAll(item => item.IsSpawnedOnOwnerInstance()); }
+        public bool IsWaitingForPlayers { get; private set; } = true;
+        private bool AreAllPlayersConnected()
+        {
+            List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            if (players.Count == 0) { return false; }
+            return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
+        }
 
         protected void Update()
         {
+            if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
+            IsWaitingForPlayers = false;
+
             if (!IsServer) { return; }
-            if (!AreAllPlayersConnected()) { return; }
 
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
             {
