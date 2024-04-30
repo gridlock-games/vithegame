@@ -59,6 +59,7 @@ namespace Vi.UI
             networkTransport.ConnectionData.Port = hubPort;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
+            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
         public void StartLobbyServer()

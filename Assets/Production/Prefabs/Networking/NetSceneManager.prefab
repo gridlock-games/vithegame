@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1445296912
+  GlobalObjectIdHash: 457855972
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -102,6 +102,15 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
       sceneName: Player Hub
+  - name: Player Hub Environment
+    sceneType: 3
+    scenePreviewIcon: {fileID: 0}
+    sceneReferences:
+    - m_AssetGUID: 3b7216b42cafd664184580fede3f3d75
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Arena Map A
   - name: Lobby
     sceneType: 1
     scenePreviewIcon: {fileID: 0}
