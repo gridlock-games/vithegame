@@ -114,8 +114,8 @@ namespace Vi.UI
 
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
 
-            msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
-            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+            //msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
+            //msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
 
             hdrToggle.isOn = pipeline.supportsHDR;
 
