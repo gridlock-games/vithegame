@@ -255,7 +255,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 30
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 0f000000
@@ -266,8 +266,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.4
-  recoveryNormalizedTime: 0.75
+  attackingNormalizedTime: 0.35
+  recoveryNormalizedTime: 0.8
   damage: 2
   healAmount: 0
   staminaDamage: 0
@@ -277,7 +277,7 @@ MonoBehaviour:
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 3
-  timeBetweenHits: 0.4
+  timeBetweenHits: 0.34
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
@@ -295,13 +295,13 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 3daf3a15cfd146543942e4b6524260ad, type: 3}
-  abilityCooldownTime: 20
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 4063615639490360170, guid: c1bded535e92346aa9c7a7936e89300e, type: 3}
-  - {fileID: 3798140967264129616, guid: c08438c55570549b3896381678e27df1, type: 3}
+  - {fileID: 1307477173093867283, guid: 150c2ee685cd44eada9e9e2f97e60186, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1
