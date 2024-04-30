@@ -77,8 +77,6 @@ namespace Vi.Core
                 if (parentWeaponHandler.GetAmmoCount() <= 0 | !parentWeaponHandler.CurrentActionClip.requireAmmo) { return; }
             }
 
-            Debug.Log(parentWeaponHandler.CurrentActionClip.requireAmmo);
-
             if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)
             {
                 if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits())
