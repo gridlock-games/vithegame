@@ -478,6 +478,16 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public void RegisterCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        {
+            scoreList.OnListChanged += onListChangedDelegate;
+        }
+
+        public void UnsubscribeCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        {
+            scoreList.OnListChanged -= onListChangedDelegate;
+        }
+
         private GameObject UIInstance;
         protected void Start()
         {
@@ -494,10 +504,10 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
-            if (!IsServer) { return; }
             if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
-
             IsWaitingForPlayers = false;
+
+            if (!IsServer) { return; }
 
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
             {

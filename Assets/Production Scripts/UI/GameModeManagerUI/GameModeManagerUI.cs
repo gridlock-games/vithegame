@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -26,10 +27,22 @@ namespace Vi.UI
                 canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
             }
             gameModeManager = GetComponentInParent<GameModeManager>();
-
+            gameModeManager.RegisterCallback(delegate { OnScoreListChanged(); });
+            
             roundResultText.enabled = false;
 
             roundWinThresholdText.text = "Rounds To Win Game: " + gameModeManager.GetNumberOfRoundsWinsToWinGame().ToString();
+        }
+
+        private void OnDestroy()
+        {
+            gameModeManager.UnsubscribeCallback(delegate { OnScoreListChanged(); });
+        }
+
+        protected void OnScoreListChanged()
+        {
+            leftScoreText.text = gameModeManager.GetLeftScoreString();
+            rightScoreText.text = gameModeManager.GetRightScoreString();
         }
 
         protected void Update()
@@ -43,8 +56,6 @@ namespace Vi.UI
 
             roundTimerText.text = gameModeManager.GetRoundTimerDisplayString();
             roundTimerText.color = gameModeManager.IsInOvertime() ? Color.red : Color.white;
-            leftScoreText.text = gameModeManager.GetLeftScoreString();
-            rightScoreText.text = gameModeManager.GetRightScoreString();
 
             roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
             roundResultText.text = gameModeManager.IsWaitingForPlayers ? gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
