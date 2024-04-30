@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6606538700639939835
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_Name
+      value: axe_charge_dust
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5de378093d01f1748a644c9832d30c89, type: 3}
+--- !u!1 &2116280371860152180 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+    type: 3}
+  m_PrefabInstance: {fileID: 6606538700639939835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-7803361781611202622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116280371860152180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 0
+  onActivateVFXSpawnNormalizedTime: 0
+  raycastOffset: {x: 0, y: 2, z: 3}
+  raycastMaxDistance: 5
+  crossProductDirection: {x: 1, y: 0, z: 0}
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18

@@ -100211,8 +100211,11 @@ MonoBehaviour:
   transformType: 4
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
+  raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+  shouldUseAttackerPositionForHitAngles: 0
 --- !u!54 &5166609527337984315
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -100240,5 +100243,5 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 4, z: 10}
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Size: {x: 6.598658, y: 4, z: 7.9722795}
+  m_Center: {x: 0.1962328, y: 0.99999994, z: 0.22893667}
