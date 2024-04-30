@@ -44,6 +44,7 @@ namespace Vi.Core
             headerText.text = "Preparing Your Vi Experience";
         }
 
+        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
             if (!PlayerPrefs.HasKey("InvertMouse")) { PlayerPrefs.SetString("InvertMouse", false.ToString()); }
@@ -74,6 +75,20 @@ namespace Vi.Core
             else
             {
                 AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume");
+            }
+
+            VerifyHoldPlayerPref("ZoomMode", 1);
+            VerifyHoldPlayerPref("BlockingMode", 0);
+        }
+
+        private void VerifyHoldPlayerPref(string key, int defaultIndex)
+        {
+            if (!PlayerPrefs.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
+
+            if (!holdToggleOptions.Contains(PlayerPrefs.GetString(key)))
+            {
+                if (defaultIndex < 0 | defaultIndex >= holdToggleOptions.Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
+                PlayerPrefs.SetString(key, holdToggleOptions[defaultIndex]);
             }
         }
 
