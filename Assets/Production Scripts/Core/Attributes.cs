@@ -351,7 +351,7 @@ namespace Vi.Core
             bool applyAilmentRegardless = false;
             ActionClip.Ailment attackAilment = attack.ailment == ActionClip.Ailment.Grab ? ActionClip.Ailment.None : attack.ailment;
 
-            if (runtimeWeapon & attack.ailment != ActionClip.Ailment.Grab)
+            if (attack.ailment != ActionClip.Ailment.Grab)
             {
                 // These hit numbers are BEFORE the hit has been added to the weapon
                 if (hitCounter.ContainsKey(this))
