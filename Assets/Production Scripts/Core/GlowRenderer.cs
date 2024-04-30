@@ -93,6 +93,8 @@ namespace Vi.Core
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
         private const float defaultFresnelPower = 5;
+
+        private float currentFresnelPower;
         private void Update()
         {
             Color colorTarget = defaultColor;
@@ -129,10 +131,10 @@ namespace Vi.Core
                 fresnelPowerTarget = fresnelPower;
             }
 
+            currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
             foreach (Material glowMaterialInstance in glowMaterialInstances)
             {
-                glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), fresnelPowerTarget, colorChangeSpeed * Time.deltaTime));
-                //glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, colorTarget, colorChangeSpeed * Time.deltaTime);
+                glowMaterialInstance.SetFloat("_FresnelPower", currentFresnelPower);
                 if (glowMaterialInstance.color != colorTarget) { glowMaterialInstance.color = colorTarget; }
             }
         }
