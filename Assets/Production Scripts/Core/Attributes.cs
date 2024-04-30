@@ -557,7 +557,7 @@ namespace Vi.Core
         private int knockupHitCounter;
         private const int knockupHitLimit = 5;
 
-        private const float stunDuration = 2;
+        private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
         private const float rageToBeAddedOnHit = 2;
