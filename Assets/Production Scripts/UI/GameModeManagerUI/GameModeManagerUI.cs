@@ -27,6 +27,8 @@ namespace Vi.UI
             }
             gameModeManager = GetComponent<GameModeManager>();
 
+            roundResultText.enabled = false;
+
             roundWinThresholdText.text = "Rounds To Win Game: " + gameModeManager.GetNumberOfRoundsWinsToWinGame().ToString();
         }
 
