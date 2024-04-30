@@ -484,12 +484,20 @@ namespace Vi.Core.GameModeManagers
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
-        public bool AreAllPlayersConnected() { return PlayerDataManager.Singleton.GetActivePlayerObjects().TrueForAll(item => item.IsSpawnedOnOwnerInstance()); }
+        public bool IsWaitingForPlayers { get; private set; } = true;
+        private bool AreAllPlayersConnected()
+        {
+            List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            if (players.Count == 0) { return false; }
+            return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
+        }
 
         protected void Update()
         {
             if (!IsServer) { return; }
-            if (!AreAllPlayersConnected()) { return; }
+            if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
+
+            IsWaitingForPlayers = false;
 
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
             {

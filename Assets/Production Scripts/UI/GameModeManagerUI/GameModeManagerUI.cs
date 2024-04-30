@@ -47,7 +47,7 @@ namespace Vi.UI
             rightScoreText.text = gameModeManager.GetRightScoreString();
 
             roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
-            roundResultText.text = gameModeManager.AreAllPlayersConnected() ? gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
+            roundResultText.text = gameModeManager.IsWaitingForPlayers ? gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
 
             gameEndText.text = gameModeManager.GetGameEndMessage();
         }
