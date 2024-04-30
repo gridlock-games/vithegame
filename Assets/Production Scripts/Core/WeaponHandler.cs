@@ -902,7 +902,7 @@ namespace Vi.Core
                     {
                         if (actionClip.requireAmmo)
                         {
-                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            if (GetAmmoCount() < actionClip.requiredAmmoAmount)
                             {
                                 OnReload();
                                 return null;
@@ -946,7 +946,7 @@ namespace Vi.Core
                     {
                         if (actionClip.requireAmmo)
                         {
-                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            if (GetAmmoCount() < actionClip.requiredAmmoAmount)
                             {
                                 OnReload();
                                 return null;
