@@ -96,7 +96,6 @@ namespace Vi.UI
 
                     if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
                     {
-                        if (copyChildren[childIndex].gameObject.name == "Ability 1") { Debug.Log(copyChildren[childIndex]); }
                         if (PlayerPrefs.HasKey("UIOverrides"))
                         {
                             List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
