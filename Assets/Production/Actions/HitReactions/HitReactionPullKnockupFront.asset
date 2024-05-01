@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: Ability4
+  m_Name: HitReactionPullKnockupFront
   m_EditorClassIdentifier: 
-  clipType: 4
+  clipType: 3
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -53,7 +53,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -68,7 +68,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: -1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -255,9 +255,9 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 20
   agentDefenseCost: 0
-  agentRageCost: 0
+  agentRageCost: 50
   effectedWeaponBones: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -266,12 +266,12 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.165
-  recoveryNormalizedTime: 0.25
-  damage: 6
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.75
+  damage: 20
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 7
+  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
@@ -279,31 +279,29 @@ MonoBehaviour:
   maxHitLimit: 1
   timeBetweenHits: 1
   isBlockable: 1
-  isUninterruptable: 1
+  isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 2
+  ailment: 5
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
-  canCancelLightAttacks: 1
+  canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
-  canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 1
+  canCancelAbilities: 0
+  canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
-  abilityImageIcon: {fileID: 21300000, guid: 9bf97dcba80142747b174163e2666a20, type: 3}
-  abilityCooldownTime: 0
+  abilityImageIcon: {fileID: 0}
+  abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 82199973914113988, guid: 0d5da7402b014cd4a843ba22e274c93b, type: 3}
-  previewActionVFX: {fileID: 2951280832426361480, guid: 5018b3ee257acd84fb55f47bf0955508,
-    type: 3}
-  previewActionVFXScale: {x: 0.3, y: 0.3, z: 0.3}
+  actionVFXList: []
+  previewActionVFX: {fileID: 0}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}

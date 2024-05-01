@@ -153,6 +153,7 @@ namespace Vi.ScriptableObjects
             public HitLocation hitLocation = HitLocation.Front;
             public ActionClip reactionClip;
             public bool shouldAlreadyHaveAilment;
+            public ActionClip.Ailment ailmentToAlreadyHave;
         }
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
@@ -188,12 +189,18 @@ namespace Vi.ScriptableObjects
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
             
-            if (hitReaction == null) // If attack isn't blockable
+            if (hitReaction == null) // If attack wasn't blocked
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
-                    // Find the start reaction for the attack's ailment
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                    // Find a hit reaction for an in progress ailment with an ailment matching the attack ailment
+                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & item.shouldAlreadyHaveAilment & currentAilment == item.ailmentToAlreadyHave);
+
+                    if (hitReaction == null)
+                    {
+                        // Find the start reaction for the attack's ailment
+                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                    }
                 }
                 else if (currentAilment != ActionClip.Ailment.None)
                 {
@@ -215,7 +222,7 @@ namespace Vi.ScriptableObjects
 
             if (hitReaction == null)
             {
-                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + attackAilment + " blocking: " + isBlocking);
+                Debug.LogError("Could not find hit reaction for location: " + hitLocation + " for weapon: " + this + " ailment: " + attackAilment + " blocking: " + isBlocking + " current ailment: " + currentAilment);
                 return null;
             }
 
