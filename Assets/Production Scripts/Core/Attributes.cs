@@ -470,17 +470,17 @@ namespace Vi.Core
                 weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform);
             }
 
-            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
-            {
-                TryAddStatus(status.status, status.value, status.duration, status.delay);
-            }
-
             return true;
         }
 
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
+
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                TryAddStatus(status.status, status.value, status.duration, status.delay);
+            }
 
             // Ailments
             if (attackAilment != ailment.Value | applyAilmentRegardless)
