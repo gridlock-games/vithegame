@@ -57,9 +57,9 @@ namespace Vi.Core
             public AsyncOperationHandle<SceneInstance> asyncOperation;
             public LoadingType loadingType;
 
-            public AsyncOperationUI(string sceneName, AsyncOperationHandle<SceneInstance> asyncOperation, LoadingType loadingType)
+            public AsyncOperationUI(ScenePayload scenePayload, AsyncOperationHandle<SceneInstance> asyncOperation, LoadingType loadingType)
             {
-                this.sceneName = sceneName;
+                sceneName = scenePayload.name;
                 this.asyncOperation = asyncOperation;
                 this.loadingType = loadingType;
             }
@@ -86,7 +86,7 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
+                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle, AsyncOperationUI.LoadingType.Loading));
                         PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
                     break;
@@ -100,13 +100,13 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
-                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, handle, AsyncOperationUI.LoadingType.Loading));
+                        PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle, AsyncOperationUI.LoadingType.Loading));
                         PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
                     break;
                 case SceneType.Environment:
                     AsyncOperationHandle<SceneInstance> handle2 = Addressables.LoadSceneAsync(scenePayload.sceneReferences[0], LoadSceneMode.Additive);
-                    PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload.sceneReferences[0].SceneName, handle2, AsyncOperationUI.LoadingType.Loading));
+                    PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle2, AsyncOperationUI.LoadingType.Loading));
                     PersistentLocalObjects.Singleton.SceneHandles.Add(handle2);
                     break;
                 default:
@@ -190,7 +190,7 @@ namespace Vi.Core
             {
                 AsyncOperationHandle<SceneInstance> handle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!handle.IsValid()) { continue; }
-                PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scene.SceneName, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
+                PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
                 PersistentLocalObjects.Singleton.SceneHandles.Remove(handle);
             }
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Remove(scenePayload);
