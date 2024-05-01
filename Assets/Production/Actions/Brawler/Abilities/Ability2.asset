@@ -283,7 +283,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 1
   isFollowUpAttack: 0
-  ailment: 4
+  ailment: 1
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
@@ -297,7 +297,11 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 21300000, guid: 7601e10f958babe478c3d5a5dadf41af, type: 3}
   abilityCooldownTime: 10
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 5
+    value: 3
+    duration: 5
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 8713873220667196919, guid: d3a28360368ec4cb59ef25931cb55beb, type: 3}

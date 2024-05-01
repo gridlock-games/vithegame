@@ -425,7 +425,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.5
+      value: 0.75
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -434,7 +434,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 0.5
+      value: 0.75
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1316,8 +1316,8 @@ MonoBehaviour:
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
   canEnhance: 1
-  chargeTimeDamageMultiplier: 1
-  enhancedChargeDamageMultiplier: 1
+  chargeTimeDamageMultiplier: 1.1
+  enhancedChargeDamageMultiplier: 1.2
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.65
@@ -1335,12 +1335,12 @@ MonoBehaviour:
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
-  isFollowUpAttack: 1
+  isFollowUpAttack: 0
   ailment: 2
   ailmentHitDefinition: 0100
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 0
+  dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
@@ -1350,7 +1350,11 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 6
+    value: 0.01
+    duration: 3
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 4367426690217078746, guid: 4d02e067e94c045e48c63f1c0e0f09f4, type: 3}
@@ -1358,7 +1362,7 @@ MonoBehaviour:
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
