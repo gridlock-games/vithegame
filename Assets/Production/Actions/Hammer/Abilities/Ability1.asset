@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.08888888
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.11944444
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.14444445
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.16388889
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -65,7 +65,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.18888889
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.21944444
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -83,7 +83,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.26944444
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.40555555
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.5416667
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.67777777
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -119,7 +119,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.8166666
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.9527778
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0.15
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1551,7 +1551,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 12
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
@@ -1586,18 +1586,18 @@ MonoBehaviour:
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
-  canCancelAbilities: 0
+  canCancelAbilities: 1
   canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: dec3e6f08deb98d46b3b6d158139b9d0, type: 3}
-  abilityCooldownTime: 12
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 11
     value: 1
-    duration: 5
-    delay: 1
+    duration: 3
+    delay: 0.65
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 7756308889154499822, guid: ddc681a477b8f7d41bfe91332301fceb, type: 3}
