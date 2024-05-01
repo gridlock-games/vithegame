@@ -403,8 +403,6 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
-            if (ailment.Value == ActionClip.Ailment.Knockup & attackAilment == ActionClip.Ailment.Pull) { attackAilment = ActionClip.Ailment.None; }
-
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);

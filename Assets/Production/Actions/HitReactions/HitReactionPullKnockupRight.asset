@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: HitReactionLeftPull
+  m_Name: HitReactionPullKnockupRight
   m_EditorClassIdentifier: 
   clipType: 3
   hitReactionType: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -188,7 +188,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -197,7 +197,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -251,9 +251,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.4
+  transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1.1
+  animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
