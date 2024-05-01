@@ -246,6 +246,7 @@ namespace Vi.Core
                 }
 
                 Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
+                // Only apply curves if we are at the present
                 bool shouldApplyCurves = true;
                 if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"))
                 {
