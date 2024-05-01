@@ -251,7 +251,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.15
+  transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1.15
   recoveryAnimationSpeed: 1
@@ -289,9 +289,9 @@ MonoBehaviour:
   grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 1
-  canCancelHeavyAttacks: 1
+  canCancelHeavyAttacks: 0
   canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 0
+  canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 0}
