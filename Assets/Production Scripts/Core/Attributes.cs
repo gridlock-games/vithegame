@@ -403,8 +403,6 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
-            if (ailment.Value != ActionClip.Ailment.None & attackAilment == ActionClip.Ailment.Pull) { attackAilment = ActionClip.Ailment.None; }
-
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
@@ -557,7 +555,7 @@ namespace Vi.Core
         private int knockupHitCounter;
         private const int knockupHitLimit = 5;
 
-        private const float stunDuration = 2;
+        private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
         private const float rageToBeAddedOnHit = 2;
@@ -743,8 +741,10 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
+        public List<ActionClip.Status> GetActiveStatuses() { return activeStatuses; }
         private NetworkList<ActionClip.StatusPayload> statuses;
+
+        private List<ActionClip.Status> activeStatuses = new List<ActionClip.Status>();
 
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
@@ -757,8 +757,9 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
-            if (!statuses.Contains(statusPayload))
+            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains(statusPayload.status))
             {
+                Debug.LogError("Trying to remove status but it isn't in both status lists! " + statusPayload.status);
                 return false;
             }
             else
@@ -776,9 +777,11 @@ namespace Vi.Core
                 if (indexToRemoveAt > -1)
                 {
                     statuses.RemoveAt(indexToRemoveAt);
+                    activeStatuses.Remove(statusPayload.status);
                 }
                 else
                 {
+                    Debug.LogError("Trying to remove status but couldn't find an index to remove at! " + statusPayload.status);
                     return false;
                 }
             }
@@ -798,9 +801,9 @@ namespace Vi.Core
         public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
         private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
 
-        public bool IsRooted() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.rooted, 0, 0, 0)); }
-        public bool IsSilenced() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.silenced, 0, 0, 0)); }
-        public bool IsFeared() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.fear, 0, 0, 0)); }
+        public bool IsRooted() { return activeStatuses.Contains(ActionClip.Status.rooted); }
+        public bool IsSilenced() { return activeStatuses.Contains(ActionClip.Status.silenced); }
+        public bool IsFeared() { return activeStatuses.Contains(ActionClip.Status.fear); }
 
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
@@ -811,6 +814,7 @@ namespace Vi.Core
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);
+            activeStatuses.Add(statusPayload.status);
             switch (statusPayload.status)
             {
                 case ActionClip.Status.damageMultiplier:

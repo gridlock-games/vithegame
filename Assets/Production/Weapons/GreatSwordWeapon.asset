@@ -52,11 +52,11 @@ MonoBehaviour:
       weaponRotationOffset: {x: 4.6802106, y: 16.330914, z: 76.437965}
       stowedWeaponPositionOffset: {x: -0.00176, y: 0.0018, z: 0.00071}
       stowedWeaponRotationOffset: {x: 0, y: 106.1, z: 95.8}
-    - weaponPrefab: {fileID: 6393463382022712343, guid: fa40f58342ff4a39b1af7f2843d7209a,
+    - weaponPrefab: {fileID: 5275617305407401058, guid: b101ba3286ac6467cbe07cb62edb1ba5,
         type: 3}
       weaponBone: 15
-      weaponPositionOffset: {x: -0.00263, y: 0.00022, z: 0.00028}
-      weaponRotationOffset: {x: 275.93893, y: 60.637478, z: 191.01381}
+      weaponPositionOffset: {x: -0.00154, y: -0.00039, z: 0.00037}
+      weaponRotationOffset: {x: 276.43954, y: 34.327003, z: 218.84573}
       stowedWeaponPositionOffset: {x: 0.00019, y: 0.0018, z: 0.00005}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 90}
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
@@ -69,11 +69,11 @@ MonoBehaviour:
       weaponRotationOffset: {x: 3.075497, y: 22.15016, z: 62.85931}
       stowedWeaponPositionOffset: {x: -0.278, y: 0.273, z: 0.193}
       stowedWeaponRotationOffset: {x: 24.163656, y: 117.32909, z: 96.8193}
-    - weaponPrefab: {fileID: 6393463382022712343, guid: fa40f58342ff4a39b1af7f2843d7209a,
+    - weaponPrefab: {fileID: 5275617305407401058, guid: b101ba3286ac6467cbe07cb62edb1ba5,
         type: 3}
       weaponBone: 15
-      weaponPositionOffset: {x: -0.42168164, y: -0.014186548, z: 0.003868551}
-      weaponRotationOffset: {x: 312.68723, y: 71.33122, z: 170.67136}
+      weaponPositionOffset: {x: -0.169, y: -0.005, z: 0.022}
+      weaponRotationOffset: {x: 276.91245, y: 248.75131, z: 9.138016}
       stowedWeaponPositionOffset: {x: 0.13269722, y: 0.12788163, z: 0.012116122}
       stowedWeaponRotationOffset: {x: 359.66025, y: 40.232082, z: 64.3235}
   - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
@@ -114,57 +114,91 @@ MonoBehaviour:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 2
     reactionClip: {fileID: 11400000, guid: 05b1171e4538c0e43b5db798c2e1911d, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 3
     reactionClip: {fileID: 11400000, guid: 9dc8643244347494dadf539f987fd495, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 49ece318b9e7d4747adcf8bd4b4595f4, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 5ea22a3e631747f40b1d6a2cbe07247e, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: a114819f2c0ea204fbef7303261d6fba, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: 19b2b3ef7f2225645a1c7d2cb4fb8da3, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: 5e4f61032e6e9d54380f051fd2315a83, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: 107e27049db271f4fb9e47f250223348, type: 2}
     shouldAlreadyHaveAilment: 0
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: eda370bfd1557fa43a556f1efcbad27c, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 2
-    reactionClip: {fileID: 11400000, guid: cb61798929dd974468c2eae5d29522bf, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 3
-    reactionClip: {fileID: 11400000, guid: c0ec34330d54bfe428a47a06f0641b36, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 4
-    reactionClip: {fileID: 11400000, guid: 788768a60d1b40e48945404237a0978e, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: 0e8007f65893acd489b5c5efc73a34b8, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 2
-    reactionClip: {fileID: 11400000, guid: 2e5e9730f3c6241459447289a5992e58, type: 2}
-    shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 3
     reactionClip: {fileID: 11400000, guid: 280ed873bb7183841a8fe528a6a6a5b5, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: 2e5e9730f3c6241459447289a5992e58, type: 2}
+    shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 0e8007f65893acd489b5c5efc73a34b8, type: 2}
+    shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 282899389b0c395409acf1b0bc1e48ff, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: fcfe87df3c8ad6740a208a5315069289, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: 6308cbd95e85f984990aeb9fdf61bcb1, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: 843e829315f82134a803dcdc5bf732e0, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 77a81210b39218249b96989f4a41aabb, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: 788768a60d1b40e48945404237a0978e, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: eda370bfd1557fa43a556f1efcbad27c, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: cb61798929dd974468c2eae5d29522bf, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: c0ec34330d54bfe428a47a06f0641b36, type: 2}
+    shouldAlreadyHaveAilment: 1
+    ailmentToAlreadyHave: 2
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: b896f757d35339a408512cb7b113cc8c, type: 2}
     shouldAlreadyHaveAilment: 0
+    ailmentToAlreadyHave: 0
   ability1: {fileID: 11400000, guid: b938073a9c1f9c94ca7f9b08debd4377, type: 2}
   ability2: {fileID: 11400000, guid: 2f1daac69cd01ec42b82680231bab1ce, type: 2}
   ability3: {fileID: 11400000, guid: 7f86ebf73305e4049a24e974c33deae5, type: 2}

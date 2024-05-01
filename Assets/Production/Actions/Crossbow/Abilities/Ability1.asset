@@ -1695,7 +1695,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1.35
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 1
+  agentStaminaCost: 10
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 11000000
@@ -1708,10 +1708,10 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.45
   recoveryNormalizedTime: 1
-  damage: 2
+  damage: 3
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 3
+  defenseDamage: 2
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0

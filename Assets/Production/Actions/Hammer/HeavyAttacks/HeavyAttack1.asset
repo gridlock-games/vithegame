@@ -251,7 +251,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.15
+  transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1.15
   recoveryAnimationSpeed: 1
@@ -278,26 +278,30 @@ MonoBehaviour:
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 0.15
-  isBlockable: 1
+  isBlockable: 0
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 1
+  canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 2
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 0
+  dodgeLock: 1
   canCancelLightAttacks: 1
-  canCancelHeavyAttacks: 1
+  canCancelHeavyAttacks: 0
   canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 0
+  canBeCancelledByLightAttacks: 1
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 6
+    value: 0.01
+    duration: 3
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 6888380652104232706, guid: 19a727a86aea544888e5d43468a67804, type: 3}
