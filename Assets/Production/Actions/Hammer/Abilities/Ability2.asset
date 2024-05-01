@@ -6645,7 +6645,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
@@ -6656,8 +6656,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.65
+  attackingNormalizedTime: 0.165
+  recoveryNormalizedTime: 0.25
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -6668,13 +6668,13 @@ MonoBehaviour:
   ragePenaltyOnMiss: 0
   maxHitLimit: 3
   timeBetweenHits: 0.03
-  isBlockable: 0
+  isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 1
   ailment: 4
-  ailmentHitDefinition: 0100
+  ailmentHitDefinition: 000001
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
@@ -6685,7 +6685,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 311f42101bcd67e4d81d0cf3a36bcc47, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 20
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []

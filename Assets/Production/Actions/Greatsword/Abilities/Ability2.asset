@@ -11298,7 +11298,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1.5
-  agentStaminaCost: 0
+  agentStaminaCost: 15
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 0f000000
@@ -11324,7 +11324,7 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 1
+  canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 4
   ailmentHitDefinition: 
@@ -11338,9 +11338,13 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 9
+    value: 0.05
+    duration: 4
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 6737512766313445128, guid: 588f6402083c64cb2a6d65c23d40846d, type: 3}

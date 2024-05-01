@@ -257,7 +257,7 @@ MonoBehaviour:
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
-  agentRageCost: 0
+  agentRageCost: 50
   effectedWeaponBones: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -268,7 +268,7 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 0.3
-  damage: 7
+  damage: 15
   healAmount: 0
   staminaDamage: 0
   defenseDamage: 1
@@ -278,7 +278,7 @@ MonoBehaviour:
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 1
-  isBlockable: 0
+  isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
@@ -295,9 +295,13 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 0d170b51b97b7d946ae35eb532c04d2e, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 40
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 11
+    value: 1
+    duration: 5
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 8673425928235801585, guid: c7e120502a2410640b4e008812322bc2, type: 3}
