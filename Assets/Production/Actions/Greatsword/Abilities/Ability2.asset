@@ -11324,7 +11324,7 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 1
+  canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 4
   ailmentHitDefinition: 
@@ -11340,7 +11340,11 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
   abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 9
+    value: 0.05
+    duration: 4
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 6737512766313445128, guid: 588f6402083c64cb2a6d65c23d40846d, type: 3}
