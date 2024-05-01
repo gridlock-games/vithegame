@@ -5023,7 +5023,7 @@ GameObject:
   - component: {fileID: 3730964296283589503}
   - component: {fileID: 4398858583647616671}
   m_Layer: 0
-  m_Name: FX_EarthSkill_Hit_floor_02_2
+  m_Name: brawler_ground_smash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10013,9 +10013,11 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0.4
   raycastOffset: {x: 0, y: 2, z: 0}
+  raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  shouldUseAttackerPositionForHitAngles: 0
 --- !u!54 &3730964296283589503
 Rigidbody:
   m_ObjectHideFlags: 0
