@@ -3366,7 +3366,11 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 6
+    value: 0.01
+    duration: 3
+    delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 3721360468853069914, guid: 82f717fbf9bbd57439863c36b801fff0, type: 3}
