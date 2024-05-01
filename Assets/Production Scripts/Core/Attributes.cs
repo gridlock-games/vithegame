@@ -403,8 +403,6 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
-            if (ailment.Value != ActionClip.Ailment.None & attackAilment == ActionClip.Ailment.Pull) { attackAilment = ActionClip.Ailment.None; }
-
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
@@ -743,7 +741,7 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
+        public List<ActionClip.Status> GetActiveStatuses() { return activeStatuses; }
         private NetworkList<ActionClip.StatusPayload> statuses;
 
         private List<ActionClip.Status> activeStatuses = new List<ActionClip.Status>();
