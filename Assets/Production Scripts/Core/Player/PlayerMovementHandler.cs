@@ -141,7 +141,7 @@ namespace Vi.Player
             }
             else if (animationHandler.ShouldApplyRootMotion())
             {
-                if (attributes.IsRooted())
+                if (attributes.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
                 {
                     movement = Vector3.zero;
                 }
