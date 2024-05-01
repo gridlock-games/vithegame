@@ -100,6 +100,14 @@ namespace Vi.ScriptableObjects
         public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        public AnimationCurve attackRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+
+        public AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+
         [SerializeField] private AnimationCurve debugForwardMotion;
         [SerializeField] private AnimationCurve debugSidesMotion;
         [SerializeField] private AnimationCurve debugVerticalMotion;
@@ -127,8 +135,8 @@ namespace Vi.ScriptableObjects
         public float chargePenaltyDamage = 10;
 
         public const float chargePenaltyTime = 1.0f;
-        public const float enhanceChargeTime = 0.50f;
-        public const float chargeAttackTime = 0.1f;
+        public const float enhanceChargeTime = 0.20f;
+        public const float chargeAttackTime = 0.001f;
         public const float cancelChargeTime = 0.000f;
         public const float chargeAttackStateAnimatorTransitionDuration = 0.25f;
 

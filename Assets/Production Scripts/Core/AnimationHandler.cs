@@ -54,6 +54,18 @@ namespace Vi.Core
             return animatorReference.IsAtRest();
         }
 
+        public bool CanAim()
+        {
+            if (IsAtRest())
+            {
+                return true;
+            }
+            else
+            {
+                return !(lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge | lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction);
+            }
+        }
+
         public bool IsAiming()
         {
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
@@ -282,6 +294,7 @@ namespace Vi.Core
                 if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
+                    Debug.Log(chargeTime);
                 }
 
                 if (actionClip.canEnhance)
@@ -443,6 +456,8 @@ namespace Vi.Core
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
+
+            lastClipPlayed = actionClip;
         }
 
         [ClientRpc] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
@@ -472,7 +487,7 @@ namespace Vi.Core
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
-            if (characterMaterial == null) { Debug.LogWarning("Character Material is null"); return; }
+            if (characterMaterial == null) { return; }
             animatorReference.ApplyCharacterMaterial(characterMaterial);
         }
 
@@ -480,11 +495,12 @@ namespace Vi.Core
         {
             if (wearableEquipmentOption == null)
             {
-                Debug.LogWarning(equipmentType + " Equipment option is null");
                 animatorReference.ClearWearableEquipment(equipmentType);
-                return;
             }
-            animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            else
+            {
+                animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
+            }
         }
 
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)

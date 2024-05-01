@@ -74,7 +74,7 @@ namespace Vi.Core
             bool shouldUseAmmo = parentWeaponHandler.ShouldUseAmmo();
             if (shouldUseAmmo)
             {
-                if (parentWeaponHandler.GetAmmoCount() <= 0) { return; }
+                if (parentWeaponHandler.GetAmmoCount() <= 0 | !parentWeaponHandler.CurrentActionClip.requireAmmo) { return; }
             }
 
             if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)

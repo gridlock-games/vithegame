@@ -17,13 +17,12 @@ namespace Vi.UI
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
-
+        [SerializeField] private Text loginMethodText;
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
 
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
-
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -35,12 +34,10 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
-
         [SerializeField] private Text welcomeUserText;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
-
         [SerializeField] private Button startLobbyServerButton;
 
         private bool startServerCalled;
@@ -62,6 +59,7 @@ namespace Vi.UI
             networkTransport.ConnectionData.Port = hubPort;
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
+            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
         public void StartLobbyServer()
@@ -76,9 +74,9 @@ namespace Vi.UI
             {
                 networkTransport.ConnectionData.Address = "127.0.0.1";
             }
-
+            
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
             {
                 portList.Add(int.Parse(server.port));
             }
@@ -342,6 +340,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
+
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
 

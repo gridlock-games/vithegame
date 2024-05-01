@@ -200,18 +200,18 @@ namespace Vi.Core
 
             public Data()
             {
-                this.pointA = Vector3.zero;
-                this.pointB = Vector3.zero;
-                this.time = Time.time;
-                this.visible = false;
+                pointA = Vector3.zero;
+                pointB = Vector3.zero;
+                time = Time.time;
+                visible = false;
             }
 
             public Data(Vector3 pointA, Vector3 pointB, bool invisible)
             {
                 this.pointA = pointA;
                 this.pointB = pointB;
-                this.time = Time.time;
-                this.visible = invisible;
+                time = Time.time;
+                visible = invisible;
             }
         }
 
@@ -428,12 +428,12 @@ namespace Vi.Core
                     continue;
                 }
 
-                this.GenerateSpline(index, magnitude, ref vertices);
+                GenerateSpline(index, magnitude, ref vertices);
                 index += 1;
             }
 
-            this.mesh.vertices = vertices.ToArray();
-            this.RegenerateMesh();
+            mesh.vertices = vertices.ToArray();
+            RegenerateMesh();
         }
 
         private void GenerateSpline(int position, float magnitude, ref List<Vector3> vertices)
@@ -489,7 +489,9 @@ namespace Vi.Core
 
         private void RegenerateMesh()
         {
-            Vector2[] uv = new Vector2[mesh.vertices.Length];
+            List<Vector3> vertices = new List<Vector3>();
+            mesh.GetVertices(vertices);
+            Vector2[] uv = new Vector2[vertices.Count];
             for (int i = 0; i < uv.Length; i += 2)
             {
                 float offset = (float)i / uv.Length;
@@ -498,8 +500,8 @@ namespace Vi.Core
                 uv[i + 1] = new Vector2(offset, 0f);
             }
 
-            int[] triangles = new int[mesh.vertices.Length * 3];
-            for (int i = 0; i < mesh.vertices.Length - 2; i += 2)
+            int[] triangles = new int[vertices.Count * 3];
+            for (int i = 0; i < vertices.Count - 2; i += 2)
             {
                 triangles[i * 3 + 0] = i + 0;
                 triangles[i * 3 + 1] = i + 1;

@@ -19570,14 +19570,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 1, z: 0.15}
+  vfxPositionOffset: {x: 0.25, y: 1, z: 0.15}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
+  transformType: 1
+  onActivateVFXSpawnNormalizedTime: 0.05
   raycastOffset: {x: 0, y: 2, z: 0}
+  raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
 --- !u!1 &1204394302079532
 GameObject:
   m_ObjectHideFlags: 0
@@ -24477,7 +24479,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4475523087162332
 Transform:
   m_ObjectHideFlags: 0

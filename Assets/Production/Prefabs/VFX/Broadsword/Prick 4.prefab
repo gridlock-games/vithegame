@@ -9799,6 +9799,7 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0.1
   raycastOffset: {x: 0, y: 2, z: 0}
+  raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
@@ -19583,7 +19584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4928264300982108632
 Transform:
   m_ObjectHideFlags: 0

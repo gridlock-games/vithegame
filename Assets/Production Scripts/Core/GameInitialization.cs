@@ -27,10 +27,11 @@ namespace Vi.Core
 
         private void Start()
         {
-            Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Application.targetFrameRate = Screen.currentResolution.refreshRate + 60;
-            StartCoroutine(LoadScenes());
             InitializePlayerPrefs();
+
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            Application.targetFrameRate = PlayerPrefs.GetInt("TargetFrameRate");
+            StartCoroutine(LoadScenes());
 
             if (!WebRequestManager.IsServerBuild())
             {
@@ -43,14 +44,19 @@ namespace Vi.Core
             headerText.text = "Preparing Your Vi Experience";
         }
 
+        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
+            if (!PlayerPrefs.HasKey("TargetFrameRate")) { PlayerPrefs.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
+
             if (!PlayerPrefs.HasKey("InvertMouse")) { PlayerPrefs.SetString("InvertMouse", false.ToString()); }
             if (!PlayerPrefs.HasKey("MouseXSensitivity")) { PlayerPrefs.SetFloat("MouseXSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("MouseYSensitivity")) { PlayerPrefs.SetFloat("MouseYSensitivity", 0.2f); }
             if (!PlayerPrefs.HasKey("ZoomSensitivityMultiplier")) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", 1); }
             if (!PlayerPrefs.HasKey("MobileLookJoystickSensitivity")) { PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", 4); }
             if (!PlayerPrefs.HasKey("ZoomMode")) { PlayerPrefs.SetString("ZoomMode", "TOGGLE"); }
+            if (!PlayerPrefs.HasKey("BlockingMode")) { PlayerPrefs.SetString("BlockingMode", "HOLD"); }
+            
             if (!PlayerPrefs.HasKey("DisableBots")) { PlayerPrefs.SetString("DisableBots", false.ToString()); }
 
             if (!PlayerPrefs.HasKey("AutoAim")) { PlayerPrefs.SetString("AutoAim", true.ToString()); }
@@ -71,6 +77,20 @@ namespace Vi.Core
             else
             {
                 AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume");
+            }
+
+            VerifyHoldPlayerPref("ZoomMode", 1);
+            VerifyHoldPlayerPref("BlockingMode", 0);
+        }
+
+        private void VerifyHoldPlayerPref(string key, int defaultIndex)
+        {
+            if (!PlayerPrefs.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
+
+            if (!holdToggleOptions.Contains(PlayerPrefs.GetString(key)))
+            {
+                if (defaultIndex < 0 | defaultIndex >= holdToggleOptions.Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
+                PlayerPrefs.SetString(key, holdToggleOptions[defaultIndex]);
             }
         }
 
@@ -161,7 +181,15 @@ namespace Vi.Core
             {
                 headerText.text = "Loading Main Menu";
                 yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                try
+                {
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                }
+                catch
+                {
+                    headerText.text = "Could Not Load Main Menu";
+                    yield break;
+                }
                 SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
             else

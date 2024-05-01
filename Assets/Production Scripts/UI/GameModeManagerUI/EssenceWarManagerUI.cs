@@ -6,55 +6,8 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    public class EssenceWarManagerUI : MonoBehaviour
+    public class EssenceWarManagerUI : GameModeManagerUI
     {
-        [SerializeField] protected Text leftScoreText;
-        [SerializeField] protected Text rightScoreText;
-        [SerializeField] protected Text roundTimerText;
-        [SerializeField] protected Text gameEndText;
-        [SerializeField] protected Text roundResultText;
-        [SerializeField] protected Text roundWinThresholdText;
-
-        protected EssenceWarManager essenceWarManager;
-
-        private CanvasGroup[] canvasGroups;
-
-        protected void Start()
-        {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            essenceWarManager = GetComponentInParent<EssenceWarManager>();
-
-            roundResultText.enabled = false;
-
-            leftScoreText.text = "Your Team: ";
-            rightScoreText.text = "Enemy Team: ";
-
-            roundWinThresholdText.text = "Rounds To Win Game: " + essenceWarManager.GetNumberOfRoundsWinsToWinGame().ToString();
-        }
-
-        protected void Update()
-        {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            if (!essenceWarManager.IsSpawned) { return; }
-
-            roundTimerText.text = essenceWarManager.GetRoundTimerDisplayString();
-            roundTimerText.color = essenceWarManager.IsInOvertime() ? Color.red : Color.white;
-            leftScoreText.text = essenceWarManager.GetLeftScoreString();
-            rightScoreText.text = essenceWarManager.GetRightScoreString();
-
-            roundResultText.enabled = essenceWarManager.ShouldDisplayNextGameAction();
-            roundResultText.text = essenceWarManager.AreAllPlayersConnected() ? essenceWarManager.GetRoundResultMessage() + essenceWarManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
-
-            gameEndText.text = essenceWarManager.GetGameEndMessage();
-        }
+        
     }
 }

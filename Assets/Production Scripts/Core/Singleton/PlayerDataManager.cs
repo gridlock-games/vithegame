@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -212,31 +213,17 @@ namespace Vi.Core
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
-            List<Attributes> attributesList = new List<Attributes>();
-
             // If the attributes to exclude is on competitor or peaceful teams, we don't want to return any teammates for this attributes
             if (attributesToExclude)
             {
-                if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return attributesList; }
+                if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return new List<Attributes>(); }
             }
-
-            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team))
-            {
-                if (kvp.Value == attributesToExclude) { continue; }
-                attributesList.Add(kvp.Value);
-            }
-            return attributesList;
+            return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
         public List<Attributes> GetActivePlayerObjects(Attributes attributesToExclude = null)
         {
-            List<Attributes> attributesList = new List<Attributes>();
-            foreach (var kvp in localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator))
-            {
-                if (kvp.Value == attributesToExclude) { continue; }
-                attributesList.Add(kvp.Value);
-            }
-            return attributesList;
+            return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
         public KeyValuePair<int, Attributes> GetLocalPlayerObject()
@@ -392,7 +379,7 @@ namespace Vi.Core
         {
             if (clientId >= 0)
             {
-                NetworkManager.DisconnectClient((ulong)clientId);
+                NetworkManager.DisconnectClient((ulong)clientId, "You have been kicked from the session.");
             }
             else
             {
@@ -636,7 +623,7 @@ namespace Vi.Core
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].GetComponent<LoadoutManager>();
-                        loadoutManager.StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString()));
+                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
@@ -754,6 +741,7 @@ namespace Vi.Core
             spawnPlayerRunning = false;
         }
 
+        [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
             //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
@@ -764,8 +752,8 @@ namespace Vi.Core
             }
             if (IsClient)
             {
-                StartCoroutine(ReturnToCharacterSelect());
-                Debug.Log(NetworkManager.DisconnectReason);
+                // This object gets despawned, so make sure to not start this on a networkobject
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
             }
         }
 
@@ -775,6 +763,11 @@ namespace Vi.Core
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
                 NetSceneManager.Singleton.LoadScene("Character Select");
+            }
+
+            if (!string.IsNullOrWhiteSpace(NetworkManager.DisconnectReason))
+            {
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = NetworkManager.DisconnectReason;
             }
         }
 

@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2126180b17357164ca655fa448f0236a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraInstance: {fileID: 3945128956232022068}
+  cameraController: {fileID: 3945128956232022059}
   minimapCameraInstance: {fileID: 3092678811823459878}
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
@@ -426,7 +426,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
 --- !u!136 &6750394594016454577
 CapsuleCollider:
   m_ObjectHideFlags: 0

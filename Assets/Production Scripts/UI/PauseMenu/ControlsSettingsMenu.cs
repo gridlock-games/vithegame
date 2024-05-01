@@ -16,6 +16,7 @@ namespace Vi.UI
         [SerializeField] private InputField mouseYSensitivityInput;
         [SerializeField] private InputField zoomMultiplierInput;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
+        [SerializeField] private TMP_Dropdown blockingModeDropdown;
         [SerializeField] private RectTransform lookSettingsGroupParent;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
@@ -44,7 +45,7 @@ namespace Vi.UI
             UI
         }
 
-        private List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
+        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
 
         private PlayerInput playerInput;
 
@@ -66,6 +67,9 @@ namespace Vi.UI
 
             zoomModeDropdown.AddOptions(holdToggleOptions);
             zoomModeDropdown.value = holdToggleOptions.IndexOf(PlayerPrefs.GetString("ZoomMode"));
+
+            blockingModeDropdown.AddOptions(holdToggleOptions);
+            blockingModeDropdown.value = holdToggleOptions.IndexOf(PlayerPrefs.GetString("BlockingMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
@@ -214,6 +218,11 @@ namespace Vi.UI
         public void ChangeZoomMode()
         {
             PlayerPrefs.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
+        }
+
+        public void ChangeBlockingMode()
+        {
+            PlayerPrefs.SetString("BlockingMode", holdToggleOptions[blockingModeDropdown.value]);
         }
 
         public void ChangeMobileLookJoystickSensitivity()

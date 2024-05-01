@@ -7,6 +7,12 @@ namespace Vi.Core
 {
     public class ActionVFXPreview : ActionVFX
     {
+        Renderer[] renderers;
+        private void Start()
+        {
+            renderers = GetComponentsInChildren<Renderer>();
+        }
+
         private void LateUpdate()
         {
             if (transformType == TransformType.Projectile)
@@ -16,9 +22,8 @@ namespace Vi.Core
             else if (transformType == TransformType.ConformToGround)
             {
                 Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
-                startPos.y += raycastOffset.y;
-                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                Debug.DrawRay(startPos, Vector3.down * raycastMaxDistance, Color.red, 3);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                 bool bHit = false;
@@ -30,6 +35,11 @@ namespace Vi.Core
                     floorHit = hit;
 
                     break;
+                }
+
+                foreach (Renderer renderer in renderers)
+                {
+                    renderer.forceRenderingOff = !bHit;
                 }
 
                 if (bHit)

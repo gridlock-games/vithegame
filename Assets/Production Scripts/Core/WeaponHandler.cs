@@ -52,12 +52,18 @@ namespace Vi.Core
         public bool WeaponInitialized { get; private set; }
         public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
         {
-            if (IsOwner & aiming.Value) { aiming.Value = false; return; }
+            if (IsOwner) { aiming.Value = false; }
 
             weaponInstance = weapon;
-            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
+            StartCoroutine(SwapAnimatorController(runtimeAnimatorController));
             EquipWeapon();
             WeaponInitialized = true;
+        }
+
+        private IEnumerator SwapAnimatorController(RuntimeAnimatorController runtimeAnimatorController)
+        {
+            yield return new WaitUntil(() => !animationHandler.IsAiming());
+            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
@@ -168,6 +174,8 @@ namespace Vi.Core
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
+            if (!CanAim & animationHandler.IsAiming()) { animationHandler.LimbReferences.OnCannotAim(); }
+
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
             weaponInstances = instances;
@@ -263,6 +271,7 @@ namespace Vi.Core
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
             actionPreviewVFXPrefab.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+            actionPreviewVFXPrefab.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
             actionPreviewVFXPrefab.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
             actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
             actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
@@ -316,9 +325,8 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
-                    //startPos.y += actionVFXPrefab.raycastOffset.y;
-                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, 50, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                    Debug.DrawRay(startPos, Vector3.down * 50, Color.red, 3);
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(startPos, Vector3.down * actionVFXPrefab.raycastMaxDistance, Color.red, 3);
 
                     if (bHit)
                     {
@@ -328,7 +336,7 @@ namespace Vi.Core
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
-                    else
+                    else if (isPreviewVFX)
                     {
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
@@ -362,7 +370,7 @@ namespace Vi.Core
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
             }
-            else
+            else if (!isPreviewVFX & actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
             {
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
@@ -400,8 +408,7 @@ namespace Vi.Core
                 if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
             }
 
-            if ((animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty") & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
-                | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 IsBlocking = isBlocking.Value;
             }
@@ -409,7 +416,7 @@ namespace Vi.Core
             {
                 IsBlocking = false;
             }
-
+            
             ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
             if (currentActionClipWeapon != weaponInstance.name)
             {
@@ -450,7 +457,11 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone])
                         {
-                            AudioManager.Singleton.PlayClipAtPoint(weaponInstance.GetAttackSoundEffect(weaponBone), weaponInstances[weaponBone].transform.position);
+                            AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
+                            if (attackSoundEffect)
+                                AudioManager.Singleton.PlayClipAtPoint(attackSoundEffect, weaponInstances[weaponBone].transform.position);
+                            else if (Application.isEditor)
+                                Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
                         }
                         else
                         {
@@ -489,25 +500,28 @@ namespace Vi.Core
                 IsInRecovery = false;
             }
 
-            if (IsInAnticipation)
+            if (CanAim)
             {
-                Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
-            }
-            else if (IsAttacking)
-            {
-                Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
-            }
-            else if (IsInRecovery)
-            {
-                Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
-            }
-            else if (animationHandler.IsAtRest())
-            {
-                Aim(aiming.Value, IsServer);
+                if (IsInAnticipation)
+                {
+                    Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else if (IsAttacking)
+                {
+                    Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else if (IsInRecovery)
+                {
+                    Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, true);
+                }
+                else
+                {
+                    Aim(aiming.Value & animationHandler.CanAim(), IsServer);
+                }
             }
             else
             {
-                Aim(aiming.Value & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction, IsServer);
+                Aim(false, true);
             }
         }
 
@@ -527,9 +541,12 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-                if (actionClip != null)
-                    animationHandler.PlayAction(actionClip);
+                if (!IsBlocking)
+                {
+                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                    if (actionClip != null)
+                        animationHandler.PlayAction(actionClip);
+                }
             }
         }
 
@@ -593,9 +610,12 @@ namespace Vi.Core
             }
             else if (isPressed)
             {
-                ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-                if (actionClip != null)
-                    animationHandler.PlayAction(actionClip);
+                if (!IsBlocking)
+                {
+                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                    if (actionClip != null)
+                        animationHandler.PlayAction(actionClip);
+                }
             }
         }
 
@@ -732,12 +752,13 @@ namespace Vi.Core
             }
         }
 
-        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand); }
+        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
 
-        public bool IsAiming() { return aiming.Value; }
+        public bool IsAiming() { return aiming.Value & animationHandler.CanAim(); }
 
         private void Aim(bool isAiming, bool instantAim)
         {
+            animationHandler.Animator.SetBool("Aiming", isAiming & !animationHandler.IsReloading());
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
@@ -817,24 +838,23 @@ namespace Vi.Core
             reloadRunning = false;
         }
 
-        public void SetIsBlocking(bool isBlocking)
-        {
-            this.isBlocking.Value = isBlocking;
-        }
-
         public bool IsBlocking { get; private set; }
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            isBlocking.Value = value.isPressed;
-            //if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            //{
-            //    if (value.isPressed) { isBlocking.Value = !isBlocking.Value; }
-            //}
-            //else
-            //{
-            //    isBlocking.Value = value.isPressed;
-            //}
+            bool isPressed = value.isPressed;
+            if (PlayerPrefs.GetString("BlockingMode") == "TOGGLE")
+            {
+                if (isPressed) { isBlocking.Value = !isBlocking.Value; }
+            }
+            else if (PlayerPrefs.GetString("BlockingMode") == "HOLD")
+            {
+                isBlocking.Value = isPressed;
+            }
+            else
+            {
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PlayerPrefs.GetString("BlockingMode"));
+            }
         }
 
         void OnTimeScaleChange()
@@ -882,7 +902,7 @@ namespace Vi.Core
                     {
                         if (actionClip.requireAmmo)
                         {
-                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            if (GetAmmoCount() < actionClip.requiredAmmoAmount)
                             {
                                 OnReload();
                                 return null;
@@ -926,7 +946,7 @@ namespace Vi.Core
                     {
                         if (actionClip.requireAmmo)
                         {
-                            if (GetAmmoCount() < actionClip.maxHitLimit)
+                            if (GetAmmoCount() < actionClip.requiredAmmoAmount)
                             {
                                 OnReload();
                                 return null;

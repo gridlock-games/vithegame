@@ -6,57 +6,14 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    public class FreeForAllManagerUI : MonoBehaviour
+    public class FreeForAllManagerUI : GameModeManagerUI
     {
-        [SerializeField] protected Text leftScoreText;
-        [SerializeField] protected Text rightScoreText;
-        [SerializeField] protected Text roundTimerText;
-        [SerializeField] protected Text gameEndText;
-        [SerializeField] protected Text roundResultText;
-        [SerializeField] protected Text roundWinThresholdText;
-        [SerializeField] protected Text killsToWinRoundThresholdText;
+        [SerializeField] private Text killsToWinRoundThresholdText;
 
-        protected FreeForAllManager freeForAllManager;
-
-        private CanvasGroup[] canvasGroups;
-
-        protected void Start()
+        private new void Start()
         {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            freeForAllManager = GetComponentInParent<FreeForAllManager>();
-
-            roundResultText.enabled = false;
-
-            leftScoreText.text = "Your Team: ";
-            rightScoreText.text = "Enemy Team: ";
-
-            roundWinThresholdText.text = "Rounds To Win Game: " + freeForAllManager.GetNumberOfRoundsWinsToWinGame().ToString();
-            killsToWinRoundThresholdText.text = "Kills To Win Round: " + freeForAllManager.GetKillsToWinRound();
-        }
-
-        protected void Update()
-        {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
-            }
-
-            if (!freeForAllManager.IsSpawned) { return; }
-
-            roundTimerText.text = freeForAllManager.GetRoundTimerDisplayString();
-            roundTimerText.color = freeForAllManager.IsInOvertime() ? Color.red : Color.white;
-            leftScoreText.text = freeForAllManager.GetLeftScoreString();
-            rightScoreText.text = freeForAllManager.GetRightScoreString();
-
-            roundResultText.enabled = freeForAllManager.ShouldDisplayNextGameAction();
-            roundResultText.text = freeForAllManager.AreAllPlayersConnected() ? freeForAllManager.GetRoundResultMessage() + freeForAllManager.GetNextGameActionTimerDisplayString() : "WAITING FOR PLAYERS";
-
-            gameEndText.text = freeForAllManager.GetGameEndMessage();
+            base.Start();
+            killsToWinRoundThresholdText.text = "Kills To Win Round: " + gameModeManager.GetComponent<FreeForAllManager>().GetKillsToWinRound();
         }
     }
 }

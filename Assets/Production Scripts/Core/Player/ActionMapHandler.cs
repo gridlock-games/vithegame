@@ -156,7 +156,6 @@ namespace Vi.Player
         GameObject inventoryInstance;
         public void OnInventory()
         {
-            if (!loadoutManager.CanSwapWeapons() & !inventoryInstance) { return; }
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }

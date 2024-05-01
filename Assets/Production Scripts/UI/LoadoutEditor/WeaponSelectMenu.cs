@@ -67,7 +67,6 @@ namespace Vi.UI
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
             
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
-            loadoutManager.ChangeWeapon(weaponType, inventoryItemId, PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None);
 
             playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
             PlayerDataManager.Singleton.SetPlayerData(playerData);

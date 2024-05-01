@@ -564,7 +564,7 @@ namespace Vi.UI
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-            StartCoroutine(previewObject.GetComponent<LoadoutManager>().ApplyEquipmentFromLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString()));
+            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
         }
 
         private new void OnDestroy()
@@ -615,10 +615,7 @@ namespace Vi.UI
 
             if (previewObject)
             {
-                LoadoutManager loadoutManager = previewObject.GetComponent<LoadoutManager>();
-                loadoutManager.ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Primary, primaryOption);
-                loadoutManager.ChangeWeaponBeforeSpawn(LoadoutManager.WeaponSlotType.Secondary, secondaryOption);
-                StartCoroutine(loadoutManager.ApplyEquipmentFromLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString()));
+                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString());
             }
         }
 

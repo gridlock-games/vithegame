@@ -9,6 +9,8 @@ namespace Vi.Core
     [RequireComponent(typeof(Rigidbody))]
     public class ActionVFXParticleSystem : ActionVFX
     {
+        [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
+
         private Attributes attacker;
         private ActionClip attack;
 
@@ -82,13 +84,13 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)
                             {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), transform.position))
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                 {
                                     if (!hitCounter.ContainsKey(networkCollider.Attributes))
                                     {
@@ -120,13 +122,13 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attacker.GetComponent<WeaponHandler>().CurrentActionClip.maxHitLimit) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attacker.GetComponent<WeaponHandler>().CurrentActionClip.GetTimeBetweenHits()) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
                             if (canHit)
                             {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), transform.position))
+                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                 {
                                     if (!hitCounter.ContainsKey(networkCollider.Attributes))
                                     {

@@ -91,122 +91,51 @@ namespace Vi.Core
             }
         }
 
-        private Color defaultColor = new Color(0, 0, 0, 0);
-        private float defaultFresnelPower = 5;
+        private readonly Color defaultColor = new Color(0, 0, 0, 0);
+        private const float defaultFresnelPower = 5;
+
+        private float currentFresnelPower;
         private void Update()
         {
-            // Invincible
+            Color colorTarget = defaultColor;
+            float fresnelPowerTarget = defaultFresnelPower;
+
             if (isInvincible)
             {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(1, 1, 0);
-                }
-                return;
+                colorTarget = new Color(1, 1, 0);
+                fresnelPowerTarget = fresnelPower;
             }
-            else
+            else if (isUninterruptable)
             {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
+                colorTarget = new Color(1, 1, 1);
+                fresnelPowerTarget = fresnelPower;
             }
-
-            // UnInterruptable
-            if (isUninterruptable)
+            else if (Time.time - lastHitTime < 0.25f)
             {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(1, 1, 1);
-                }
-                return;
+                colorTarget = new Color(1, 0, 0);
+                fresnelPowerTarget = fresnelPower;
             }
-            else
+            else if (Time.time - lastHealTime < 0.25f)
             {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
+                colorTarget = new Color(0, 1, 0);
+                fresnelPowerTarget = fresnelPower;
+            }
+            else if (Time.time - lastBlockTime < 0.25f)
+            {
+                colorTarget = new Color(0, 0, 1);
+                fresnelPowerTarget = fresnelPower;
+            }
+            else if (canFlashAttack)
+            {
+                colorTarget = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+                fresnelPowerTarget = fresnelPower;
             }
 
-            // Hit
-            if (Time.time - lastHitTime < 0.25f)
+            currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
+            foreach (Material glowMaterialInstance in glowMaterialInstances)
             {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(1, 0, 0);
-                }
-                return;
-            }
-            else
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
-            }
-
-            // Heal
-            if (Time.time - lastHealTime < 0.25f)
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(0, 1, 0);
-                }
-                return;
-            }
-            else
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
-            }
-
-            // Block
-            if (Time.time - lastBlockTime < 0.25f)
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(0, 0, 1);
-                }
-                return;
-            }
-            else
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
-            }
-
-            // Flash Attack
-            if (canFlashAttack)
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", fresnelPower);
-                    glowMaterialInstance.color = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
-                }
-                return;
-            }
-            else
-            {
-                foreach (Material glowMaterialInstance in glowMaterialInstances)
-                {
-                    glowMaterialInstance.SetFloat("_FresnelPower", Mathf.Lerp(glowMaterialInstance.GetFloat("_FresnelPower"), defaultFresnelPower, colorChangeSpeed * Time.deltaTime));
-                    glowMaterialInstance.color = Color.Lerp(glowMaterialInstance.color, defaultColor, colorChangeSpeed * Time.deltaTime);
-                }
+                glowMaterialInstance.SetFloat("_FresnelPower", currentFresnelPower);
+                if (glowMaterialInstance.color != colorTarget) { glowMaterialInstance.color = colorTarget; }
             }
         }
     }
