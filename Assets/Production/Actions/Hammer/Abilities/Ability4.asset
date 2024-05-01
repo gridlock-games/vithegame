@@ -257,7 +257,7 @@ MonoBehaviour:
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
-  agentRageCost: 0
+  agentRageCost: 50
   effectedWeaponBones: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -283,7 +283,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 2
+  ailment: 3
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
@@ -295,7 +295,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 9bf97dcba80142747b174163e2666a20, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 60
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
