@@ -746,6 +746,8 @@ namespace Vi.Core
         public NetworkList<ActionClip.StatusPayload> GetActiveStatuses() { return statuses; }
         private NetworkList<ActionClip.StatusPayload> statuses;
 
+        private List<ActionClip.Status> activeStatuses = new List<ActionClip.Status>();
+
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
@@ -757,8 +759,9 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
-            if (!statuses.Contains(statusPayload))
+            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains(statusPayload.status))
             {
+                Debug.LogError("Trying to remove status but it isn't in both status lists! " + statusPayload.status);
                 return false;
             }
             else
@@ -776,9 +779,11 @@ namespace Vi.Core
                 if (indexToRemoveAt > -1)
                 {
                     statuses.RemoveAt(indexToRemoveAt);
+                    activeStatuses.Remove(statusPayload.status);
                 }
                 else
                 {
+                    Debug.LogError("Trying to remove status but couldn't find an index to remove at! " + statusPayload.status);
                     return false;
                 }
             }
@@ -798,9 +803,9 @@ namespace Vi.Core
         public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
         private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
 
-        public bool IsRooted() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.rooted, 0, 0, 0)); }
-        public bool IsSilenced() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.silenced, 0, 0, 0)); }
-        public bool IsFeared() { return statuses.Contains(new ActionClip.StatusPayload(ActionClip.Status.fear, 0, 0, 0)); }
+        public bool IsRooted() { return activeStatuses.Contains(ActionClip.Status.rooted); }
+        public bool IsSilenced() { return activeStatuses.Contains(ActionClip.Status.silenced); }
+        public bool IsFeared() { return activeStatuses.Contains(ActionClip.Status.fear); }
 
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
@@ -811,6 +816,7 @@ namespace Vi.Core
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);
+            activeStatuses.Add(statusPayload.status);
             switch (statusPayload.status)
             {
                 case ActionClip.Status.damageMultiplier:
