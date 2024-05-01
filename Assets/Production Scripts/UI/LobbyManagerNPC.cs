@@ -127,7 +127,7 @@ namespace Vi.UI
             System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
             Debug.Log("Waiting for server count change: " + originalServerCount);
             yield return new WaitUntil(() => System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length != originalServerCount);
-            Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + WebRequestManager.Singleton.LobbyServers.Length);
+            Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length);
 
             creatingNewLobby = false;
         }
