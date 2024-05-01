@@ -168,7 +168,7 @@ namespace Vi.ArtificialIntelligence
             }
             else if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() ? Vector3.zero : rootMotion;
+                movement = attributes.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown ? Vector3.zero : rootMotion;
             }
             else
             {
