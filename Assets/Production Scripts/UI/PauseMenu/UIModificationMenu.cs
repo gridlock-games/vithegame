@@ -54,26 +54,6 @@ namespace Vi.UI
                         c.enabled = false;
                     }
 
-                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
-                    {
-                        if (PlayerPrefs.HasKey("UIOverrides"))
-                        {
-                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
-
-                            foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
-                            {
-                                GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
-                                if (g == originalChildren[childIndex].gameObject)
-                                {
-                                    ((RectTransform)copyChildren[childIndex]).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
-                                }
-                            }
-                        }
-
-                        DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
-                        draggableUIObject.Initialize(this);
-                    }
-
                     if (childIndex < originalChildren.Length)
                     {
                         foreach (PlatformUIDefinition.UIDefinition platformUIDefinition in platformUIDefinitions)
@@ -112,6 +92,27 @@ namespace Vi.UI
                                 }
                             }
                         }
+                    }
+
+                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
+                    {
+                        if (copyChildren[childIndex].gameObject.name == "Ability 1") { Debug.Log(copyChildren[childIndex]); }
+                        if (PlayerPrefs.HasKey("UIOverrides"))
+                        {
+                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
+
+                            foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
+                            {
+                                GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    ((RectTransform)copyChildren[childIndex]).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
+                                }
+                            }
+                        }
+
+                        DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
+                        draggableUIObject.Initialize(this);
                     }
                 }
             }
