@@ -489,7 +489,7 @@ namespace Vi.Core.GameModeManagers
 
         private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
-            if (!gameOver)
+            if (!gameOver & !IsWaitingForPlayers)
             {
                 if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
             }
