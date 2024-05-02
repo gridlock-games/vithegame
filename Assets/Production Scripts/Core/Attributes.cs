@@ -479,6 +479,10 @@ namespace Vi.Core
             return true;
         }
 
+        private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
+
+        public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
+
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
@@ -536,6 +540,7 @@ namespace Vi.Core
                             break;
                         case ActionClip.Ailment.Pull:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
+                            pullAssailantDataId.Value = attacker.GetPlayerDataId();
                             break;
                         case ActionClip.Ailment.Death:
                             break;

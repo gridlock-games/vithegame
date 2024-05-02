@@ -149,6 +149,7 @@ namespace Vi.Core
 
         Animator animator;
         WeaponHandler weaponHandler;
+        Attributes attributes;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
 
@@ -157,6 +158,7 @@ namespace Vi.Core
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = weaponHandler.GetComponent<Attributes>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
         }
@@ -259,7 +261,16 @@ namespace Vi.Core
                     worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionVerticalMultiplier.Evaluate(normalizedTime);
                     worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionForwardMultiplier.Evaluate(normalizedTime);
                 }
-                Vector3 curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+
+                Vector3 curveAdjustedLocalRootMotion;
+                if (attributes.GetAilment() == ActionClip.Ailment.Pull)
+                {
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
+                else
+                {
+                    curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+                }
 
                 networkRootMotion += curveAdjustedLocalRootMotion;
                 localRootMotion += curveAdjustedLocalRootMotion;
