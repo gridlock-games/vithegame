@@ -213,12 +213,16 @@ namespace Vi.UI
             lastEvaluatedResolution = Screen.currentResolution;
         }
 
-        private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
+        private Dictionary<RectTransform, Vector2> originalPositionMap = new Dictionary<RectTransform, Vector2>();
         private void Awake()
         {
-            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            FindPlayerInput();
+            EvaluateUIDefinitionsOnFirstFrame();
+            EvaluateControlSchemeDefinitions();
+
+            foreach (RectTransform child in GetComponentsInChildren<RectTransform>(true))
             {
-                originalPositionMap.Add(child, child.localPosition);
+                originalPositionMap.Add(child, child.anchoredPosition);
             }
         }
 
@@ -236,18 +240,11 @@ namespace Vi.UI
             }
             else
             {
-                foreach (KeyValuePair<Transform, Vector3> kvp in originalPositionMap)
+                foreach (KeyValuePair<RectTransform, Vector2> kvp in originalPositionMap)
                 {
-                    kvp.Key.localPosition = kvp.Value;
+                    kvp.Key.anchoredPosition = kvp.Value;
                 }
             }
-        }
-
-        private void Start()
-        {
-            FindPlayerInput();
-            EvaluateUIDefinitionsOnFirstFrame();
-            EvaluateControlSchemeDefinitions();
         }
 
         private void Update()

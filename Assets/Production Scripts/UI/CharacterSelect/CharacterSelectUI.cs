@@ -21,6 +21,7 @@ namespace Vi.UI
         [SerializeField] private CharacterCard characterCardPrefab;
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
+        [SerializeField] private Button selectCharacterButton_autoConnectToHub;
         [SerializeField] private Button goToTrainingRoomButton;
         [SerializeField] private Button addCharacterButton;
         [SerializeField] private Image primaryWeaponIcon;
@@ -56,6 +57,7 @@ namespace Vi.UI
         }
 
         [Header("Server Browser")]
+        [SerializeField] private GameObject alertBoxPrefab;
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
         [SerializeField] private GameObject serverListParent;
@@ -74,6 +76,8 @@ namespace Vi.UI
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton_autoConnectToHub.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
 
@@ -308,6 +312,7 @@ namespace Vi.UI
         private void RefreshButtonInteractability(bool disableAll = false)
         {
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
@@ -463,8 +468,11 @@ namespace Vi.UI
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
         }
 
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
         {
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+
             WebRequestManager.Singleton.RefreshServers();
 
             primaryWeaponIcon.gameObject.SetActive(false);
@@ -475,7 +483,6 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private void Update()
         {
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
 
             if (webRequestStatusText.gameObject.activeSelf)
@@ -653,6 +660,28 @@ namespace Vi.UI
             NetworkManager.Singleton.StartHost();
             NetSceneManager.Singleton.LoadScene("Training Room");
             NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+        }
+
+        public IEnumerator AutoConnectToHubServer()
+        {
+            selectCharacterButton_autoConnectToHub.interactable = false;
+
+            WebRequestManager.Singleton.RefreshServers();
+
+            yield return new WaitUntil(() => WebRequestManager.Singleton.IsRefreshingServers);
+
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
+                networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+                StartClient();
+            }
+            else
+            {
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "No Hub Server Online.";
+            }
+            
+            selectCharacterButton_autoConnectToHub.interactable = true;
         }
 
         public void OpenServerBrowser()

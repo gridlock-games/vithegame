@@ -74,6 +74,12 @@ namespace Vi.UI
             }
         }
 
+        private readonly static List<PlayerDataManager.GameMode> whitelistedGameModes = new List<PlayerDataManager.GameMode>()
+        {
+            PlayerDataManager.GameMode.FreeForAll,
+            PlayerDataManager.GameMode.TeamElimination
+        };
+
         private void Awake()
         {
             lockedClients = new NetworkList<ulong>();
@@ -84,7 +90,8 @@ namespace Vi.UI
             bool first = true;
             foreach (PlayerDataManager.GameMode gameMode in System.Enum.GetValues(typeof(PlayerDataManager.GameMode)))
             {
-                if (gameMode == PlayerDataManager.GameMode.None) { continue; }
+                if (!whitelistedGameModes.Contains(gameMode)) { continue; }
+                //if (gameMode == PlayerDataManager.GameMode.None) { continue; }
 
                 GameModeOption option = Instantiate(gameModeOptionPrefab.gameObject, gameModeOptionParent).GetComponent<GameModeOption>();
                 StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));

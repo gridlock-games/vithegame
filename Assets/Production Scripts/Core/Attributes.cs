@@ -179,6 +179,7 @@ namespace Vi.Core
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
+            activeStatuses = new NetworkList<int>();
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
         }
@@ -470,17 +471,17 @@ namespace Vi.Core
                 weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform);
             }
 
-            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
-            {
-                TryAddStatus(status.status, status.value, status.duration, status.delay);
-            }
-
             return true;
         }
 
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
+
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                TryAddStatus(status.status, status.value, status.duration, status.delay);
+            }
 
             // Ailments
             if (attackAilment != ailment.Value | applyAilmentRegardless)
@@ -741,10 +742,19 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        public List<ActionClip.Status> GetActiveStatuses() { return activeStatuses; }
+        public List<ActionClip.Status> GetActiveStatuses()
+        {
+            List<ActionClip.Status> statusList = new List<ActionClip.Status>();
+            foreach (ActionClip.Status status in activeStatuses)
+            {
+                statusList.Add(status);
+            }
+            return statusList;
+        }
+
         private NetworkList<ActionClip.StatusPayload> statuses;
 
-        private List<ActionClip.Status> activeStatuses = new List<ActionClip.Status>();
+        private NetworkList<int> activeStatuses;
 
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
@@ -757,7 +767,7 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
 
-            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains(statusPayload.status))
+            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains((int)statusPayload.status))
             {
                 Debug.LogError("Trying to remove status but it isn't in both status lists! " + statusPayload.status);
                 return false;
@@ -777,7 +787,7 @@ namespace Vi.Core
                 if (indexToRemoveAt > -1)
                 {
                     statuses.RemoveAt(indexToRemoveAt);
-                    activeStatuses.Remove(statusPayload.status);
+                    activeStatuses.Remove((int)statusPayload.status);
                 }
                 else
                 {
@@ -801,9 +811,9 @@ namespace Vi.Core
         public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
         private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
 
-        public bool IsRooted() { return activeStatuses.Contains(ActionClip.Status.rooted); }
-        public bool IsSilenced() { return activeStatuses.Contains(ActionClip.Status.silenced); }
-        public bool IsFeared() { return activeStatuses.Contains(ActionClip.Status.fear); }
+        public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
+        public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
+        public bool IsFeared() { return activeStatuses.Contains((int)ActionClip.Status.fear); }
 
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
@@ -814,7 +824,7 @@ namespace Vi.Core
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);
-            activeStatuses.Add(statusPayload.status);
+            activeStatuses.Add((int)statusPayload.status);
             switch (statusPayload.status)
             {
                 case ActionClip.Status.damageMultiplier:
