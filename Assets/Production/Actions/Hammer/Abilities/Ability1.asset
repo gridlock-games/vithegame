@@ -713,7 +713,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 2
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -722,7 +722,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 2
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -737,7 +737,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 2
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -746,7 +746,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 2
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1564,7 +1564,7 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.165
   recoveryNormalizedTime: 0.25
-  damage: 6
+  damage: 1
   healAmount: 0
   staminaDamage: 0
   defenseDamage: 4
@@ -1595,8 +1595,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 11
-    value: 1
-    duration: 3
+    value: 0
+    duration: 0
     delay: 0.65
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
