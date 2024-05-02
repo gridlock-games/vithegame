@@ -211,6 +211,7 @@ namespace Vi.Core.GameModeManagers
         {
             gameOver = true;
             this.gameEndMessage.Value = gameEndMessage;
+            roundResultMessage.Value = "Game over! ";
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
