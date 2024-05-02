@@ -434,6 +434,10 @@ namespace Vi.Core
             {
                 if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
             }
+            else if (Application.isEditor)
+            {
+                Debug.LogWarning("ActionClip " + attack.name + " is inflicting 0 damage!");
+            }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
