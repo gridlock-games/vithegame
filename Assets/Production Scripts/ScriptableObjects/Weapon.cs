@@ -195,6 +195,12 @@ namespace Vi.ScriptableObjects
                     // Find the start reaction for the attack's ailment
                     hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
 
+                    // Find a hit reaction for an in progress ailment
+                    if (hitReaction == null)
+                    {
+                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
+                    }
+
                     // Find a normal hit reaction if there isn't a special hit reaction for this ailment
                     if (hitReaction == null)
                     {

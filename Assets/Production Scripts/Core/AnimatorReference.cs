@@ -263,7 +263,7 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (attributes.GetAilment() == ActionClip.Ailment.Pull)
+                if (attributes.IsPulled())
                 {
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }

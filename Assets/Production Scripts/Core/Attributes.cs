@@ -481,6 +481,10 @@ namespace Vi.Core
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
 
+        private NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
+
+        public bool IsPulled() { return isPulled.Value; }
+
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
@@ -504,8 +508,19 @@ namespace Vi.Core
                     endPos.y = 0;
                     ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
+                    if (attackAilment == ActionClip.Ailment.Pull) { pullAssailantDataId.Value = attacker.GetPlayerDataId(); }
+
                     shouldApplyAilment = true;
-                    ailment.Value = attackAilment;
+
+                    if (attackAilment == ActionClip.Ailment.Pull)
+                    {
+                        isPulled.Value = true;
+                    }
+                    else
+                    {
+                        ailment.Value = attackAilment;
+                    }
+
                     if (ailment.Value == ActionClip.Ailment.Death)
                     {
                         if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
@@ -540,14 +555,15 @@ namespace Vi.Core
                             break;
                         case ActionClip.Ailment.Pull:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
-                            pullAssailantDataId.Value = attacker.GetPlayerDataId();
                             break;
                         case ActionClip.Ailment.Death:
                             break;
                         default:
-                            Debug.LogWarning(attackAilment + " has not been implemented yet!");
+                            if (attackAilment != ActionClip.Ailment.Pull) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
                             break;
                     }
+
+                    if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
                 }
             }
 
@@ -750,6 +766,15 @@ namespace Vi.Core
             yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
             yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
             ailment.Value = ActionClip.Ailment.None;
+        }
+
+        private Coroutine pullResetCoroutine;
+        private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
+        {
+            if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            isPulled.Value = false;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()
