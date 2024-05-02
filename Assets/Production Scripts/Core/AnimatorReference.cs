@@ -238,23 +238,24 @@ namespace Vi.Core
             if (ShouldApplyRootMotion())
             {
                 float normalizedTime = 0;
+                bool shouldApplyCurves = false;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
                     normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    shouldApplyCurves = true;
                 }
                 else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
                     normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    shouldApplyCurves = true;
                 }
 
-                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
-                // Only apply curves if we are at the present
-                bool shouldApplyCurves = true;
                 if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"))
                 {
                     shouldApplyCurves = false;
                 }
 
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
                 {
                     worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionSidesMultiplier.Evaluate(normalizedTime);
