@@ -893,7 +893,7 @@ namespace Vi.Core
             if (animationHandler.IsReloading()) { return null; }
 
             // If we are in recovery, and not transitioning to a different action
-            if (IsInRecovery & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+            if (IsInRecovery) // & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))
             {
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
