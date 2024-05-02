@@ -153,7 +153,6 @@ namespace Vi.ScriptableObjects
             public HitLocation hitLocation = HitLocation.Front;
             public ActionClip reactionClip;
             public bool shouldAlreadyHaveAilment;
-            public ActionClip.Ailment ailmentToAlreadyHave;
         }
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
@@ -193,14 +192,8 @@ namespace Vi.ScriptableObjects
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
-                    // Find a hit reaction for an in progress ailment with an ailment matching the attack ailment
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & item.shouldAlreadyHaveAilment & currentAilment == item.ailmentToAlreadyHave);
-
-                    if (hitReaction == null)
-                    {
-                        // Find the start reaction for the attack's ailment
-                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
-                    }
+                    // Find the start reaction for the attack's ailment
+                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
                 }
                 else if (currentAilment != ActionClip.Ailment.None)
                 {

@@ -434,9 +434,10 @@ namespace Vi.Core
             {
                 if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
             }
-            else if (Application.isEditor)
+            else
             {
-                Debug.LogWarning("ActionClip " + attack.name + " is inflicting 0 damage!");
+                if (Application.isEditor) { Debug.LogWarning("ActionClip " + attack.name + " is inflicting 0 damage!"); }
+                return false;
             }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
@@ -454,7 +455,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack));
+                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
 
                 if (damage != 0)
                 {
@@ -478,7 +479,7 @@ namespace Vi.Core
             return true;
         }
 
-        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack)
+        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
 
@@ -491,7 +492,7 @@ namespace Vi.Core
             if (attackAilment != ailment.Value | applyAilmentRegardless)
             {
                 bool shouldApplyAilment = false;
-                if (attackAilment != ActionClip.Ailment.None & attackAilment != ActionClip.Ailment.Pull)
+                if (attackAilment != ActionClip.Ailment.None)
                 {
                     Vector3 startPos = transform.position;
                     Vector3 endPos = hitSourcePosition;
@@ -531,10 +532,10 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Pull:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays());
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Death:
                             break;
@@ -739,10 +740,10 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
-        private IEnumerator ResetAilmentAfterAnimationPlays()
+        private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Empty"));
+            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
             ailment.Value = ActionClip.Ailment.None;
         }
 
