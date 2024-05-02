@@ -207,6 +207,14 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Returning to lobby!";
         }
 
+        private void EndGamePrematurely(string gameEndMessage)
+        {
+            gameOver = true;
+            this.gameEndMessage.Value = gameEndMessage;
+            roundResultMessage.Value = "Game over! ";
+            nextGameActionTimer.Value = nextGameActionDuration;
+        }
+
         private bool isFirstRound = true;
         protected virtual void OnRoundStart()
         {
@@ -286,6 +294,7 @@ namespace Vi.Core.GameModeManagers
             _singleton = this;
             if (IsServer)
             {
+                scoreList.OnListChanged += OnScoreListChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
@@ -309,6 +318,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (IsServer)
             {
+                scoreList.OnListChanged -= OnScoreListChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
@@ -474,6 +484,17 @@ namespace Vi.Core.GameModeManagers
                 catch
                 {
                     Debug.LogError("Error whiel setting value for field: " + propertyName);
+                }
+            }
+        }
+
+        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
+        {
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+            {
+                if (!gameOver & !IsWaitingForPlayers)
+                {
+                    if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
                 }
             }
         }

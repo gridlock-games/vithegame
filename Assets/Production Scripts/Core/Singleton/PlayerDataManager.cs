@@ -226,6 +226,12 @@ namespace Vi.Core
             return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
+        public Attributes GetPlayerObjectById(int id)
+        {
+            if (!localPlayers.ContainsKey(id)) { Debug.LogError("No player object for Id: " + id); return null; }
+            return localPlayers[id];
+        }
+
         public KeyValuePair<int, Attributes> GetLocalPlayerObject()
         {
             try

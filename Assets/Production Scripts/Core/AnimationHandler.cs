@@ -294,7 +294,7 @@ namespace Vi.Core
                 if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
-                    Debug.Log(chargeTime);
+                    if (Application.isEditor) { Debug.Log(chargeTime); }
                 }
 
                 if (actionClip.canEnhance)
