@@ -91,8 +91,7 @@ namespace Vi.UI
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
-            //nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
-            nameDisplay.text = attributes.GetAilment().ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameBackground.color = relativeTeamColor;
             nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
