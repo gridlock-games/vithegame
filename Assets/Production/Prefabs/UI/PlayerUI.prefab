@@ -1305,8 +1305,9 @@ MonoBehaviour:
   - platforms: 080000000b000000
     gameObjectsToEnable:
     - {fileID: 3289547961240334779}
-    gameObjectsToDestroy:
+    gameObjectsToDisable:
     - {fileID: 7706548239243370245}
+    gameObjectsToDestroy: []
     objectsToMove:
     - gameObjectToMove: {fileID: 3302969314903897264}
       newAnchoredPosition: {x: -560, y: 430}
@@ -4237,7 +4238,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7393267018165496682}
   m_Layer: 0
-  m_Name: DestroyOnMobile
+  m_Name: OnlyDisplayOnPC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
