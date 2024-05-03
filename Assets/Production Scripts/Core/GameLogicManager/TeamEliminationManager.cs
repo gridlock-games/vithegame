@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -52,13 +53,22 @@ namespace Vi.Core.GameModeManagers
             {
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(this, damageCircleInstance);
+                isViEssenceSpawned.Value = true;
             }
             else // If we cannot spawn vi essence, destroy it if it exists
             {
-                if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+                if (viEssenceInstance & IsServer)
+                {
+                    isViEssenceSpawned.Value = false;
+                    viEssenceInstance.NetworkObject.Despawn(true);
+                }
                 if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             }
         }
+
+        private NetworkVariable<bool> isViEssenceSpawned = new NetworkVariable<bool>();
+
+        public bool IsViEssenceSpawned() { return isViEssenceSpawned.Value; }
 
         private TeamEliminationViEssence viEssenceInstance;
         public override void OnPlayerKill(Attributes killer, Attributes victim)
@@ -83,10 +93,15 @@ namespace Vi.Core.GameModeManagers
             {
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(this, damageCircleInstance);
+                isViEssenceSpawned.Value = true;
             }
             else // If we cannot spawn vi essence, destroy it if it exists
             {
-                if (viEssenceInstance & IsServer) { viEssenceInstance.NetworkObject.Despawn(true); }
+                if (viEssenceInstance & IsServer)
+                {
+                    isViEssenceSpawned.Value = false;
+                    viEssenceInstance.NetworkObject.Despawn(true);
+                }
                 if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             }
         }
@@ -105,6 +120,7 @@ namespace Vi.Core.GameModeManagers
             {
                 viEssenceInstance = SpawnGameItem(viEssencePrefab).GetComponent<TeamEliminationViEssence>();
                 viEssenceInstance.Initialize(this, damageCircleInstance);
+                isViEssenceSpawned.Value = true;
             }
         }
 
@@ -131,7 +147,14 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnRoundEnd(winningPlayersDataIds);
             damageCircleInstance.ResetDamageCircle();
-            if (viEssenceInstance & IsServer) { if (viEssenceInstance.IsSpawned) { viEssenceInstance.NetworkObject.Despawn(true); } }
+            if (viEssenceInstance & IsServer)
+            {
+                if (viEssenceInstance.IsSpawned)
+                {
+                    isViEssenceSpawned.Value = false;
+                    viEssenceInstance.NetworkObject.Despawn(true);
+                }
+            }
             if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
             if (gameOver) { return; }
 

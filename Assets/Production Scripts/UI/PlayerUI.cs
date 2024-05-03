@@ -63,6 +63,26 @@ namespace Vi.UI
             attributes.GetComponent<LoadoutManager>().SwitchWeapon();
         }
 
+        public void StartLightAttack()
+        {
+            weaponHandler.LightAttackHold(true);
+        }
+
+        public void StopLightAttack()
+        {
+            weaponHandler.LightAttackHold(false);
+        }
+
+        public void StartHeavyAttack()
+        {
+            weaponHandler.HeavyAttackHold(true);
+        }
+
+        public void StopHeavyAttack()
+        {
+            weaponHandler.HeavyAttackHold(false);
+        }
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private PlayerInput playerInput;
