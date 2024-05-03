@@ -153,7 +153,6 @@ namespace Vi.ScriptableObjects
             public HitLocation hitLocation = HitLocation.Front;
             public ActionClip reactionClip;
             public bool shouldAlreadyHaveAilment;
-            public ActionClip.Ailment ailmentToAlreadyHave;
         }
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
@@ -193,13 +192,19 @@ namespace Vi.ScriptableObjects
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
-                    // Find a hit reaction for an in progress ailment with an ailment matching the attack ailment
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & item.shouldAlreadyHaveAilment & currentAilment == item.ailmentToAlreadyHave);
+                    // Find the start reaction for the attack's ailment
+                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
 
+                    // Find a hit reaction for an in progress ailment
                     if (hitReaction == null)
                     {
-                        // Find the start reaction for the attack's ailment
-                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
+                    }
+
+                    // Find a normal hit reaction if there isn't a special hit reaction for this ailment
+                    if (hitReaction == null)
+                    {
+                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
                     }
                 }
                 else if (currentAilment != ActionClip.Ailment.None)

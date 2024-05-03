@@ -149,6 +149,7 @@ namespace Vi.Core
 
         Animator animator;
         WeaponHandler weaponHandler;
+        Attributes attributes;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
 
@@ -157,6 +158,7 @@ namespace Vi.Core
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            attributes = weaponHandler.GetComponent<Attributes>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
         }
@@ -236,30 +238,40 @@ namespace Vi.Core
             if (ShouldApplyRootMotion())
             {
                 float normalizedTime = 0;
+                bool shouldApplyCurves = false;
                 if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
                     normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    shouldApplyCurves = true;
                 }
                 else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
                 {
                     normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
+                    shouldApplyCurves = true;
                 }
 
-                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
-                // Only apply curves if we are at the present
-                bool shouldApplyCurves = true;
                 if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"))
                 {
                     shouldApplyCurves = false;
                 }
 
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
                 {
                     worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionSidesMultiplier.Evaluate(normalizedTime);
                     worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionVerticalMultiplier.Evaluate(normalizedTime);
                     worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionForwardMultiplier.Evaluate(normalizedTime);
                 }
-                Vector3 curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+
+                Vector3 curveAdjustedLocalRootMotion;
+                if (attributes.IsPulled())
+                {
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
+                else
+                {
+                    curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+                }
 
                 networkRootMotion += curveAdjustedLocalRootMotion;
                 localRootMotion += curveAdjustedLocalRootMotion;
