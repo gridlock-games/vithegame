@@ -88,6 +88,13 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
+        public bool IsPlayingBlockingHitReaction()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetHitReactionType() != ActionClip.HitReactionType.Blocking) { return false; }
+            return !IsAtRest();
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
@@ -100,7 +107,7 @@ namespace Vi.Core
         // Stores the type of the last action clip played
         private ActionClip lastClipPlayed;
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
-        private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.55f;
+        private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.15f;
 
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
@@ -116,6 +123,7 @@ namespace Vi.Core
 
             AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
             AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
+            // If we are transitioning to the same state as this actionclip
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
                 if (nextStateInfo.IsName(actionStateName)) { return; }
@@ -138,6 +146,7 @@ namespace Vi.Core
                     case ActionClip.ClipType.FlashAttack:
                         if (currentStateInfo.IsName(lastClipPlayed.name))
                         {
+                            if (IsLocalPlayer) { Debug.Log(lastClipPlayed.name + " " + lastClipPlayed.GetHitReactionType()); }
                             if (IsDodging())
                             {
                                 // Check the dodge time threshold, this allows dodges to be interrupted faster by attacks
@@ -145,8 +154,7 @@ namespace Vi.Core
                                 shouldUseDodgeCancelTransitionTime = true;
                                 shouldEvaluatePreviousState = false;
                             }
-                            else if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction
-                                & lastClipPlayed.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+                            else if (IsPlayingBlockingHitReaction())
                             {
                                 // Check the blocking hit reaction time threshold, this allows us to counter from blocking
                                 if (currentStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return; }
