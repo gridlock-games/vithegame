@@ -100,6 +100,7 @@ namespace Vi.Core
         // Stores the type of the last action clip played
         private ActionClip lastClipPlayed;
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
+        private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.55f;
 
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
@@ -121,22 +122,53 @@ namespace Vi.Core
             }
 
             bool shouldUseDodgeCancelTransitionTime = false;
-            // If we are not at rest and the last clip was a dodge, don't play this clip
+            // If we are not at rest
             if (!currentStateInfo.IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
             {
-                if (!(actionClip.GetClipType() == ActionClip.ClipType.Dodge & currentStateInfo.IsTag("CanDodge")))
+                bool shouldEvaluatePreviousState = true;
+                switch (actionClip.GetClipType())
                 {
-                    if (actionClip.IsAttack() & IsDodging() & currentStateInfo.IsName(lastClipPlayed.name))
-                    {
-                        if (currentStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
-                        shouldUseDodgeCancelTransitionTime = true;
-                    }
-                    else
-                    {
-                        if ((actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) | (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)) { return; }
-                    }
+                    case ActionClip.ClipType.Dodge:
+                        // If the clip we are trying to play is a dodge, and we cannot dodge out of the current state, don't play this
+                        if (!currentStateInfo.IsTag("CanDodge")) { return; }
+                        break;
+                    case ActionClip.ClipType.LightAttack:
+                    case ActionClip.ClipType.HeavyAttack:
+                    case ActionClip.ClipType.Ability:
+                    case ActionClip.ClipType.FlashAttack:
+                        if (currentStateInfo.IsName(lastClipPlayed.name))
+                        {
+                            if (IsDodging())
+                            {
+                                // Check the dodge time threshold, this allows dodges to be interrupted faster by attacks
+                                if (currentStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
+                                shouldUseDodgeCancelTransitionTime = true;
+                                shouldEvaluatePreviousState = false;
+                            }
+                            else if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction
+                                & lastClipPlayed.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+                            {
+                                // Check the blocking hit reaction time threshold, this allows us to counter from blocking
+                                if (currentStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return; }
+                                shouldEvaluatePreviousState = false;
+                            }
+                        }
+                        break;
+                    case ActionClip.ClipType.HitReaction:
+                        break;
+                    default:
+                        break;
                 }
 
+                if (shouldEvaluatePreviousState)
+                {
+                    if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
+                    }
+                }
+                
                 // Dodge lock checks
                 if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
                 {
