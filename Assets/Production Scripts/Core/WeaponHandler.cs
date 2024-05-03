@@ -551,11 +551,16 @@ namespace Vi.Core
         }
 
         private Coroutine lightAttackHoldCoroutine;
-        void OnLightAttackHold(InputValue value)
+        public void LightAttackHold(bool isPressed)
         {
             if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
-            if (value.isPressed) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
+            if (isPressed) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
             else { LightAttack(false); }
+        }
+
+        void OnLightAttackHold(InputValue value)
+        {
+            LightAttackHold(value.isPressed);
         }
 
         private IEnumerator LightAttackHold()
@@ -619,20 +624,25 @@ namespace Vi.Core
             }
         }
 
-        private Coroutine heavyAttackHoldCoroutine;
-        void OnHeavyAttackHold(InputValue value)
+        public void HeavyAttackHold(bool isPressed)
         {
             if (heavyAttackHoldCoroutine != null) { StopCoroutine(heavyAttackHoldCoroutine); }
 
             if (CanAim)
             {
-                HeavyAttack(value.isPressed);
+                HeavyAttack(isPressed);
             }
             else
             {
-                if (value.isPressed) { heavyAttackHoldCoroutine = StartCoroutine(HeavyAttackHold()); }
+                if (isPressed) { heavyAttackHoldCoroutine = StartCoroutine(HeavyAttackHold()); }
                 else { HeavyAttack(false); }
             }
+        }
+
+        private Coroutine heavyAttackHoldCoroutine;
+        void OnHeavyAttackHold(InputValue value)
+        {
+            HeavyAttackHold(value.isPressed);
         }
 
         private IEnumerator HeavyAttackHold()
