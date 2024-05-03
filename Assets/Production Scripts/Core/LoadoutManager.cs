@@ -48,6 +48,23 @@ namespace Vi.Core
 
         private NetworkVariable<int> currentEquippedWeapon = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        public WeaponSlotType GetEquippedSlotType()
+        {
+            if (currentEquippedWeapon.Value == 1)
+            {
+                return WeaponSlotType.Primary;
+            }
+            else if (currentEquippedWeapon.Value == 2)
+            {
+                return WeaponSlotType.Secondary;
+            }
+            else
+            {
+                Debug.LogError("Not sure what slot type corresponds to equipped weapon value of " + currentEquippedWeapon.Value);
+                return WeaponSlotType.Primary;
+            }
+        }
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private AnimationHandler animationHandler;

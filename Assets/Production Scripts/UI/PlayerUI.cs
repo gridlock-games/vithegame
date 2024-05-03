@@ -99,6 +99,9 @@ namespace Vi.UI
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
         }
 
+        private Vector2 equippedWeaponCardAnchoredPosition;
+        private Vector2 stowedWeaponCardAnchoredPosition;
+
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
         private void Start()
@@ -119,6 +122,9 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            equippedWeaponCardAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
+            stowedWeaponCardAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
 
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
@@ -233,6 +239,18 @@ namespace Vi.UI
             deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
         }
 
+        private const float weaponCardAnimationSpeed = 8;
+        private void UpdateWeaponCardPositions()
+        {
+            bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
+
+            RectTransform primaryRT = (RectTransform)primaryWeaponCard.transform;
+            RectTransform secondaryRT = (RectTransform)secondaryWeaponCard.transform;
+
+            primaryRT.anchoredPosition = Vector2.Lerp(primaryRT.anchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            secondaryRT.anchoredPosition = Vector2.Lerp(secondaryRT.anchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+        }
+
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
@@ -318,6 +336,7 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
+            UpdateWeaponCardPositions();
             UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
 
             lastControlScheme = playerInput.currentControlScheme;
