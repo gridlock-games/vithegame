@@ -186,6 +186,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "SwitchWeapon",
+                    "type": "Button",
+                    "id": "4f0eea53-c759-4370-b316-0751f15be24e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "DisableBots",
                     "type": "Button",
                     "id": "788e612b-1b33-4ef0-ba01-1b9fe58a4d25",
@@ -643,33 +652,11 @@
                 },
                 {
                     "name": "",
-                    "id": "ab668cde-08df-4dde-80e3-e52c3480baf6",
-                    "path": "<Gamepad>/dpad/up",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad;Touchscreen",
-                    "action": "Weapon1",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "a04f7a3c-a5c4-4e14-9839-ae5e2379298a",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
-                    "action": "Weapon2",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "834fc4ae-7efa-43a9-be14-030a5e77b1d6",
-                    "path": "<Gamepad>/dpad/down",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad;Touchscreen",
                     "action": "Weapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -748,6 +735,17 @@
                     "processors": "",
                     "groups": "Touchscreen",
                     "action": "DecrementFollowPlayer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "40be275f-c13f-4dd4-a5dc-7ec6341e32d7",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SwitchWeapon",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -211,6 +211,11 @@ namespace Vi.Core
             }
         }
 
+        void OnSwitchWeapon()
+        {
+            SwitchWeapon();
+        }
+
         public void SwitchWeapon()
         {
             if (currentEquippedWeapon.Value == 1)
