@@ -668,7 +668,7 @@ namespace Vi.UI
 
             WebRequestManager.Singleton.RefreshServers();
 
-            yield return new WaitUntil(() => WebRequestManager.Singleton.IsRefreshingServers);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {

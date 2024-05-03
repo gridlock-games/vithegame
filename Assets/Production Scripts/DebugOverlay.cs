@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using Unity.Netcode;
 using Vi.Core;
 
 public class DebugOverlay : MonoBehaviour

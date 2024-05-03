@@ -410,7 +410,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (gameOver)
                 {
-                    NetSceneManager.Singleton.LoadScene("Lobby");
+                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { NetSceneManager.Singleton.LoadScene("Lobby"); }
                 }
                 else
                 {
