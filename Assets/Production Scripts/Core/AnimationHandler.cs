@@ -146,7 +146,6 @@ namespace Vi.Core
                     case ActionClip.ClipType.FlashAttack:
                         if (currentStateInfo.IsName(lastClipPlayed.name))
                         {
-                            if (IsLocalPlayer) { Debug.Log(lastClipPlayed.name + " " + lastClipPlayed.GetHitReactionType()); }
                             if (IsDodging())
                             {
                                 // Check the dodge time threshold, this allows dodges to be interrupted faster by attacks
