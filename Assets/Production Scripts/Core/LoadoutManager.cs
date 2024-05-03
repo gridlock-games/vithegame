@@ -249,6 +249,8 @@ namespace Vi.Core
             }
         }
 
+        public string WeaponNameThatCanFlashAttack { get; private set; }
+
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -274,6 +276,7 @@ namespace Vi.Core
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                WeaponNameThatCanFlashAttack = canFlashAttack ? SecondaryWeaponOption.weapon.name : string.Empty;
             }
             else if (currentEquippedWeapon.Value == 2)
             {
@@ -294,6 +297,11 @@ namespace Vi.Core
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                WeaponNameThatCanFlashAttack = canFlashAttack ? PrimaryWeaponOption.weapon.name : string.Empty;
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle current equipped weapon value of " + currentEquippedWeapon.Value);
             }
         }
 

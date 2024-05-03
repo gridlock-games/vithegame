@@ -39,6 +39,7 @@ namespace Vi.UI
         private Image backgroundImage;
         private Color originalBackgroundColor;
         private Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        private const float backgroundColorTransitionSpeed = 16;
 
         private void Start()
         {
@@ -52,6 +53,8 @@ namespace Vi.UI
             if (!loadoutManager) { return; }
 
             if (weapon.ShouldUseAmmo()) { ammoText.text = loadoutManager.GetAmmoCount(weapon).ToString(); }
+
+            backgroundImage.color = Color.Lerp(backgroundImage.color, loadoutManager.WeaponNameThatCanFlashAttack == weapon.name ? flashAttackColor : originalBackgroundColor, Time.deltaTime * backgroundColorTransitionSpeed);
         }
     }
 }
