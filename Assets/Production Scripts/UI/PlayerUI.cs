@@ -16,10 +16,10 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
-        [SerializeField] private Text ammoText;
         [Header("Weapon Cards")]
         [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
         [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
+        [SerializeField] private RuntimeWeaponCard mobileWeaponCard;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -229,8 +229,9 @@ namespace Vi.UI
 
             lastWeapon = weaponHandler.GetWeapon();
 
-            primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary);
-            secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary);
+            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary); }
+            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary); }
+            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager, loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon, loadoutManager.GetEquippedSlotType()); }
         }
 
         private void UpdateActiveUIElements()
@@ -242,6 +243,8 @@ namespace Vi.UI
         private const float weaponCardAnimationSpeed = 8;
         private void UpdateWeaponCardPositions()
         {
+            if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
+
             bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
 
             RectTransform primaryRT = (RectTransform)primaryWeaponCard.transform;
@@ -290,9 +293,6 @@ namespace Vi.UI
                         }
                     }
                 }
-
-                ammoText.transform.parent.gameObject.SetActive(weaponHandler.ShouldUseAmmo());
-                ammoText.text = "Ammo: " + weaponHandler.GetAmmoCount().ToString() + " / " + weaponHandler.GetMaxAmmoCount().ToString();
 
                 fadeToBlackImage.color = Color.clear;
                 fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
