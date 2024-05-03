@@ -18,8 +18,8 @@ namespace Vi.Core
 
         public int GetAmmoCount(Weapon weapon)
         {
-            if (weapon == primaryWeaponInstance) { return primaryAmmo.Value; }
-            if (weapon == secondaryWeaponInstance) { return secondaryAmmo.Value; }
+            if (weapon == primaryWeaponInstance | weapon.name == primaryWeaponInstance.name.Replace("(Clone)", "")) { return primaryAmmo.Value; }
+            if (weapon == secondaryWeaponInstance | weapon.name == secondaryWeaponInstance.name.Replace("(Clone)", "")) { return secondaryAmmo.Value; }
             Debug.LogError("Unknown weapon to get ammo count " + weapon);
             return 0;
         }

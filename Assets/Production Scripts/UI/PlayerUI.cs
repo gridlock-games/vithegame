@@ -17,6 +17,9 @@ namespace Vi.UI
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
         [SerializeField] private Text ammoText;
+        [Header("Weapon Cards")]
+        [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
+        [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -60,7 +63,7 @@ namespace Vi.UI
 
         public void SwitchWeapon()
         {
-            attributes.GetComponent<LoadoutManager>().SwitchWeapon();
+            loadoutManager.SwitchWeapon();
         }
 
         public void StartLightAttack()
@@ -85,6 +88,7 @@ namespace Vi.UI
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
 
         private void Awake()
@@ -92,6 +96,7 @@ namespace Vi.UI
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
+            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
         }
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
@@ -217,6 +222,9 @@ namespace Vi.UI
             }
 
             lastWeapon = weaponHandler.GetWeapon();
+
+            primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary);
+            secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary);
         }
 
         private void UpdateActiveUIElements()
