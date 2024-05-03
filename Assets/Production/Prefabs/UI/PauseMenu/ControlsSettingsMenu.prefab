@@ -1355,17 +1355,26 @@ MonoBehaviour:
     - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
-  - overrideActionName: Primary Weapon
+  - overrideActionName: Use Primary Weapon
     actionGroup: 1
     inputActionReferences:
     - {fileID: 6323030998958668391, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
+    - Gamepad
     - Touchscreen
-  - overrideActionName: Secondary Weapon
+  - overrideActionName: Use Secondary Weapon
     actionGroup: 1
     inputActionReferences:
     - {fileID: -2829945742728114018, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
+    - Gamepad
+    - Touchscreen
+  - overrideActionName: Switch Weapon
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -8441861740736939578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Keyboard & Mouse
     - Touchscreen
   - overrideActionName: 
     actionGroup: 2
