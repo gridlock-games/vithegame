@@ -109,6 +109,14 @@ namespace Vi.Core
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
         private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.15f;
 
+
+        private readonly static List<ActionClip.ClipType> clipTypesToCheckForCancellation = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.LightAttack,
+            ActionClip.ClipType.HeavyAttack,
+            ActionClip.ClipType.Ability
+        };
+
         // This method plays the action on the server
         private void PlayActionOnServer(string actionStateName)
         {
@@ -210,7 +218,7 @@ namespace Vi.Core
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
-                if (actionClip.IsAttack() & !weaponHandler.IsInRecovery & lastClipPlayed.IsAttack())
+                if (clipTypesToCheckForCancellation.Contains(actionClip.GetClipType()) & !weaponHandler.IsInRecovery & clipTypesToCheckForCancellation.Contains(lastClipPlayed.GetClipType()))
                 {
                     if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
                     & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
