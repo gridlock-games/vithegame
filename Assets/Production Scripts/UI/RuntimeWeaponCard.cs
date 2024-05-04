@@ -11,11 +11,19 @@ namespace Vi.UI
     public class RuntimeWeaponCard : MonoBehaviour
     {
         [SerializeField] private Image weaponIcon;
-        [SerializeField] private Image weaponSlotTypeColor;
-        [SerializeField] private RectTransform ammoParent;
-        [SerializeField] private Text ammoText;
-        [SerializeField] private Text magSizeText;
+        [Header("With Binding String")]
+        [SerializeField] private RectTransform withBindingParent;
         [SerializeField] private Text weaponBindingText;
+        [SerializeField] private Image withBindingWeaponSlotTypeColor;
+        [SerializeField] private RectTransform withBindingAmmoParent;
+        [SerializeField] private Text withBindingAmmoText;
+        [SerializeField] private Text withBindingMagSizeText;
+        [Header("No Binding String")]
+        [SerializeField] private RectTransform noBindingParent;
+        [SerializeField] private Image noBindingWeaponSlotTypeColor;
+        [SerializeField] private RectTransform noBindingAmmoParent;
+        [SerializeField] private Text noBindingAmmoText;
+        [SerializeField] private Text noBindingMagSizeText;
 
         private Dictionary<LoadoutManager.WeaponSlotType, Color> slotTypeColors = new Dictionary<LoadoutManager.WeaponSlotType, Color>()
         {
@@ -37,11 +45,19 @@ namespace Vi.UI
             this.playerInput = playerInput;
             this.inputActions = inputActions;
 
-            weaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
+            withBindingWeaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
+            noBindingWeaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
+            
             weaponIcon.sprite = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == weapon.name.Replace("(Clone)", "")).weaponIcon;
-            ammoParent.gameObject.SetActive(weapon.ShouldUseAmmo());
+            
+            withBindingAmmoParent.gameObject.SetActive(weapon.ShouldUseAmmo());
+            noBindingAmmoParent.gameObject.SetActive(weapon.ShouldUseAmmo());
 
-            if (weapon.ShouldUseAmmo()) { magSizeText.text = weapon.GetMaxAmmoCount().ToString(); }
+            if (weapon.ShouldUseAmmo())
+            {
+                withBindingMagSizeText.text = weapon.GetMaxAmmoCount().ToString();
+                noBindingMagSizeText.text = weapon.GetMaxAmmoCount().ToString();
+            }
         }
 
         private Image backgroundImage;
@@ -63,7 +79,11 @@ namespace Vi.UI
         {
             if (!loadoutManager) { return; }
 
-            if (weapon.ShouldUseAmmo()) { ammoText.text = loadoutManager.GetAmmoCount(weapon).ToString(); }
+            if (weapon.ShouldUseAmmo())
+            {
+                withBindingAmmoText.text = loadoutManager.GetAmmoCount(weapon).ToString();
+                noBindingAmmoText.text = loadoutManager.GetAmmoCount(weapon).ToString();
+            }
 
             backgroundImage.color = Color.Lerp(backgroundImage.color, loadoutManager.WeaponNameThatCanFlashAttack == weapon.name ? flashAttackColor : originalBackgroundColor, Time.deltaTime * backgroundColorTransitionSpeed);
 
@@ -91,9 +111,16 @@ namespace Vi.UI
                         break;
                     }
                 }
-                if (shouldBreak) { break; }
+                if (shouldBreak)
+                {
+                    withBindingParent.gameObject.SetActive(true);
+                    noBindingParent.gameObject.SetActive(false);
+                    break;
+                }
                 else // If we couldn't find an input binding string
                 {
+                    withBindingParent.gameObject.SetActive(false);
+                    noBindingParent.gameObject.SetActive(true);
                     weaponBindingText.text = string.Empty;
                 }
             }
