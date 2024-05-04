@@ -88,17 +88,35 @@ public class DebugOverlay : MonoBehaviour
         {
             fpsText.text = fpsValue.ToString() + "FPS";
             Color fpsTextColor;
-            if (fpsValue >= Screen.currentResolution.refreshRate)
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                fpsTextColor = Color.green;
-            }
-            else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
-            {
-                fpsTextColor = Color.yellow;
+                if (fpsValue < 30)
+                {
+                    fpsTextColor = Color.red;
+                }
+                else if (fpsValue < 45)
+                {
+                    fpsTextColor = Color.yellow;
+                }
+                else
+                {
+                    fpsTextColor = Color.green;
+                }
             }
             else
             {
-                fpsTextColor = Color.red;
+                if (fpsValue >= Screen.currentResolution.refreshRate)
+                {
+                    fpsTextColor = Color.green;
+                }
+                else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
+                {
+                    fpsTextColor = Color.yellow;
+                }
+                else
+                {
+                    fpsTextColor = Color.red;
+                }
             }
             fpsText.color = fpsTextColor;
         }
