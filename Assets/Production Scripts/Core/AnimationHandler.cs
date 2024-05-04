@@ -146,7 +146,29 @@ namespace Vi.Core
                 {
                     case ActionClip.ClipType.Dodge:
                         // If the clip we are trying to play is a dodge, and we cannot dodge out of the current state, don't play this
-                        if (!currentStateInfo.IsTag("CanDodge")) { return; }
+                        if (currentStateInfo.IsName(lastClipPlayed.name))
+                        {
+                            // Dodge lock checks
+                            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                            {
+                                if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
+                                {
+                                    return;
+                                }
+                                else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
+                                {
+                                    if (weaponHandler.IsInRecovery) { return; }
+                                }
+                            }
+                        }
+                        else if (currentStateInfo.IsTag("CanDodge"))
+                        {
+                            shouldEvaluatePreviousState = false;
+                        }
+                        else
+                        {
+                            return;
+                        }
                         break;
                     case ActionClip.ClipType.LightAttack:
                     case ActionClip.ClipType.HeavyAttack:
@@ -177,6 +199,7 @@ namespace Vi.Core
 
                 if (shouldEvaluatePreviousState)
                 {
+                    // If we are in the middle of dodging, or playing a hit reaction, don't play this clip unless it's a hit reaction
                     if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return; }
@@ -184,19 +207,7 @@ namespace Vi.Core
                     }
                 }
                 
-                // Dodge lock checks
-                if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
-                {
-                    if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
-                    {
-                        return;
-                    }
-                    else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
-                    {
-                        if (weaponHandler.IsInRecovery) { return; }
-                    }
-                }
-                else if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (currentStateInfo.IsName(actionClip.name)) { return; }
                     if (!actionClip.canCancelLightAttacks)
