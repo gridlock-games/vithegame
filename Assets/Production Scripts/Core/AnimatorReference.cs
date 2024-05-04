@@ -250,10 +250,7 @@ namespace Vi.Core
                     shouldApplyCurves = true;
                 }
 
-                if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & !animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"))
-                {
-                    shouldApplyCurves = false;
-                }
+                if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"); }
 
                 Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 if (shouldApplyCurves)

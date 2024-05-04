@@ -328,32 +328,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  customizablePlayerPrefName: 
   controlsAsset: {fileID: 0}
   platformUIDefinitions:
   - platforms: 080000000b000000
     gameObjectsToEnable:
     - {fileID: 3144451764282779984}
+    gameObjectsToDisable: []
     gameObjectsToDestroy:
     - {fileID: 1982527543365779000}
     - {fileID: 2097671688540077757}
     - {fileID: 3622361814003049589}
     - {fileID: 8997484398386368091}
     objectsToMove:
-    - gameObjectPath: /SpectatorUI/RotationParent/LeftLayoutGroup
-      gameObjectToMove: {fileID: 6114019403561036632}
+    - gameObjectToMove: {fileID: 6114019403561036632}
       newAnchoredPosition: {x: 0, y: 85}
       shouldOverrideAnchors: 0
       anchorMinOverride: {x: 0, y: 0}
       anchorMaxOverride: {x: 0, y: 0}
       pivotOverride: {x: 0, y: 0}
-    - gameObjectPath: /SpectatorUI/RotationParent/RightLayoutGroup
-      gameObjectToMove: {fileID: 6114019404567166531}
+    - gameObjectToMove: {fileID: 6114019404567166531}
       newAnchoredPosition: {x: 0, y: 85}
       shouldOverrideAnchors: 0
       anchorMinOverride: {x: 0, y: 0}
       anchorMaxOverride: {x: 0, y: 0}
       pivotOverride: {x: 0, y: 0}
   controlSchemeTextDefinitions: []
+  controlSchemeDefinitions: []
 --- !u!225 &1987947467530254698
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -528,7 +529,7 @@ MonoBehaviour:
   shouldReposition: 1
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
-  limits: {fileID: 0}
+  limits: {fileID: 3582757192039560226}
 --- !u!1 &7452032538359885697
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,7 +624,7 @@ MonoBehaviour:
   shouldReposition: 0
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 4
-  limits: {fileID: 0}
+  limits: {fileID: 4077336050427970810}
 --- !u!1 &8400070427144414092
 GameObject:
   m_ObjectHideFlags: 0

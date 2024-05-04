@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731704, g: 0.1341472, b: 0.121078566, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -789,12 +789,14 @@ MonoBehaviour:
   - platforms: 080000000b000000
     gameObjectsToEnable:
     - {fileID: 1863482480}
+    gameObjectsToDisable: []
     gameObjectsToDestroy:
     - {fileID: 2096573338}
     objectsToMove: []
   - platforms: 000000000100000002000000070000000d00000010000000
     gameObjectsToEnable:
     - {fileID: 2096573338}
+    gameObjectsToDisable: []
     gameObjectsToDestroy: []
     objectsToMove: []
   controlSchemeTextDefinitions: []
