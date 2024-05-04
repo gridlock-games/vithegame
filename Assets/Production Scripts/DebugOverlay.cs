@@ -66,6 +66,9 @@ public class DebugOverlay : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         bool consoleEnabled = bool.Parse(PlayerPrefs.GetString("ConsoleEnabled"));
+
+        Debug.unityLogger.logEnabled = Application.isEditor | SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null | consoleEnabled;
+
         bool fpsEnabled = bool.Parse(PlayerPrefs.GetString("FPSEnabled"));
         bool pingEnabled = bool.Parse(PlayerPrefs.GetString("PingEnabled"));
 
