@@ -37,6 +37,11 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private InputActionAsset inputActions;
 
+        public void SetPreviewOn()
+        {
+
+        }
+
         public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, PlayerInput playerInput, InputActionAsset inputActions)
         {
             this.loadoutManager = loadoutManager;

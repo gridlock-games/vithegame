@@ -45,6 +45,12 @@ namespace Vi.UI
                         killFeed.SetPreviewOn();
                         continue;
                     }
+                    if (copyChildren[childIndex].TryGetComponent(out RuntimeWeaponCard weaponCard))
+                    {
+                        weaponCard.SetPreviewOn();
+                        continue;
+                    }
+                    if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
                     if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
