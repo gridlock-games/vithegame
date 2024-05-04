@@ -126,6 +126,9 @@ namespace Vi.UI
             equippedWeaponCardAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
             stowedWeaponCardAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
 
+            currentPrimaryWeaponCardAnchoredPosition = equippedWeaponCardAnchoredPosition;
+            currentSecondaryWeaponCardAnchoredPosition = stowedWeaponCardAnchoredPosition;
+
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
 
@@ -246,6 +249,9 @@ namespace Vi.UI
         }
 
         private const float weaponCardAnimationSpeed = 8;
+        // These 2 are for performance, since getting an anchored position every frame is expensive
+        private Vector2 currentPrimaryWeaponCardAnchoredPosition;
+        private Vector2 currentSecondaryWeaponCardAnchoredPosition;
         private void UpdateWeaponCardPositions()
         {
             if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
@@ -255,8 +261,11 @@ namespace Vi.UI
             RectTransform primaryRT = (RectTransform)primaryWeaponCard.transform;
             RectTransform secondaryRT = (RectTransform)secondaryWeaponCard.transform;
 
-            primaryRT.anchoredPosition = Vector2.Lerp(primaryRT.anchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
-            secondaryRT.anchoredPosition = Vector2.Lerp(secondaryRT.anchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            currentPrimaryWeaponCardAnchoredPosition = Vector2.Lerp(currentPrimaryWeaponCardAnchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            currentSecondaryWeaponCardAnchoredPosition = Vector2.Lerp(currentSecondaryWeaponCardAnchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            
+            primaryRT.anchoredPosition = currentPrimaryWeaponCardAnchoredPosition;
+            secondaryRT.anchoredPosition = currentSecondaryWeaponCardAnchoredPosition;
         }
 
         private string lastControlScheme;
