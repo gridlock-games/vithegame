@@ -47,7 +47,7 @@ namespace Vi.UI
                     }
                     if (copyChildren[childIndex].TryGetComponent(out RuntimeWeaponCard weaponCard))
                     {
-                        weaponCard.SetPreviewOn();
+                        weaponCard.SetPreviewOn(weaponCard.name.Contains("Primary") ? LoadoutManager.WeaponSlotType.Primary : LoadoutManager.WeaponSlotType.Secondary);
                         continue;
                     }
                     if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
