@@ -15,6 +15,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform ammoParent;
         [SerializeField] private Text ammoText;
         [SerializeField] private Text magSizeText;
+        [SerializeField] private Text weaponBindingText;
 
         private Dictionary<LoadoutManager.WeaponSlotType, Color> slotTypeColors = new Dictionary<LoadoutManager.WeaponSlotType, Color>()
         {
@@ -24,11 +25,17 @@ namespace Vi.UI
 
         private LoadoutManager loadoutManager;
         private Weapon weapon;
+        private LoadoutManager.WeaponSlotType weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
+        private PlayerInput playerInput;
+        private InputActionAsset inputActions;
 
-        public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, InputActionAsset inputActions)
+        public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, PlayerInput playerInput, InputActionAsset inputActions)
         {
             this.loadoutManager = loadoutManager;
             this.weapon = weapon;
+            this.weaponSlotType = weaponSlotType;
+            this.playerInput = playerInput;
+            this.inputActions = inputActions;
 
             weaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
             weaponIcon.sprite = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == weapon.name.Replace("(Clone)", "")).weaponIcon;
@@ -49,6 +56,9 @@ namespace Vi.UI
             flashAttackColor.a = originalBackgroundColor.a;
         }
 
+        private string lastControlScheme;
+        private bool forceRefreshThisFrame;
+
         private void Update()
         {
             if (!loadoutManager) { return; }
@@ -56,6 +66,40 @@ namespace Vi.UI
             if (weapon.ShouldUseAmmo()) { ammoText.text = loadoutManager.GetAmmoCount(weapon).ToString(); }
 
             backgroundImage.color = Color.Lerp(backgroundImage.color, loadoutManager.WeaponNameThatCanFlashAttack == weapon.name ? flashAttackColor : originalBackgroundColor, Time.deltaTime * backgroundColorTransitionSpeed);
+
+            if (playerInput.currentControlScheme != lastControlScheme | forceRefreshThisFrame)
+            {
+                UpdateControlSchemeText();
+            }
+
+            lastControlScheme = playerInput.currentControlScheme;
+        }
+
+        private void UpdateControlSchemeText()
+        {
+            InputControlScheme controlScheme = inputActions.FindControlScheme(playerInput.currentControlScheme).Value;
+
+            foreach (InputBinding binding in playerInput.actions[weaponSlotType == LoadoutManager.WeaponSlotType.Primary ? "Weapon1" : "Weapon2"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    if (binding.path.ToLower().Contains(device.name.ToLower()))
+                    {
+                        weaponBindingText.text = binding.ToDisplayString();
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            forceRefreshThisFrame = false;
+        }
+
+        public void OnRebinding()
+        {
+            forceRefreshThisFrame = true;
         }
     }
 }

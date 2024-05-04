@@ -139,6 +139,9 @@ namespace Vi.UI
         public void OnRebinding()
         {
             UpdateWeapon(true);
+            primaryWeaponCard.OnRebinding();
+            secondaryWeaponCard.OnRebinding();
+            mobileWeaponCard.OnRebinding();
         }
 
         private Weapon lastWeapon;
@@ -229,9 +232,11 @@ namespace Vi.UI
 
             lastWeapon = weaponHandler.GetWeapon();
 
-            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary, controlsAsset); }
-            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary, controlsAsset); }
-            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager, loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon, loadoutManager.GetEquippedSlotType(), controlsAsset); }
+            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary, playerInput, controlsAsset); }
+            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary, playerInput, controlsAsset); }
+            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager,
+                loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon,
+                loadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
         }
 
         private void UpdateActiveUIElements()
