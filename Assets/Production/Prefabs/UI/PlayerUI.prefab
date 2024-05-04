@@ -1522,6 +1522,7 @@ MonoBehaviour:
   abilityIcon: {fileID: 6126061482839369894}
   cooldownIcon: {fileID: 4829082238170671926}
   keybindText: {fileID: 1333201298012355498}
+  previewAbility: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
 --- !u!114 &995221158223248338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1845,6 +1846,7 @@ MonoBehaviour:
   abilityIcon: {fileID: 8259719719499757355}
   cooldownIcon: {fileID: 5297922108880207605}
   keybindText: {fileID: 5587602348448662597}
+  previewAbility: {fileID: 11400000, guid: 37533bdf5386df04b90799a58da70ded, type: 2}
 --- !u!114 &6420865732813888387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4234,6 +4236,7 @@ MonoBehaviour:
   abilityIcon: {fileID: 2832703789315893707}
   cooldownIcon: {fileID: 8559538377721121361}
   keybindText: {fileID: 107790375096434020}
+  previewAbility: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
 --- !u!114 &4957832957114585902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4457,6 +4460,7 @@ MonoBehaviour:
   abilityIcon: {fileID: 5375345695109089952}
   cooldownIcon: {fileID: 5870683369447575431}
   keybindText: {fileID: 4335839954100517866}
+  previewAbility: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
 --- !u!114 &1169189957620281401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5000,6 +5004,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8369445866491870090}
     m_Modifications:
+    - target: {fileID: 6932058376124054148, guid: b6ba154c51138ee40b1debc0c893f0f5,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7667533425376972107, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_Name

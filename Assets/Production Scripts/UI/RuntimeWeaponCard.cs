@@ -37,6 +37,15 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private InputActionAsset inputActions;
 
+        public void SetPreviewOn(LoadoutManager.WeaponSlotType weaponSlotType)
+        {
+            withBindingParent.gameObject.SetActive(false);
+            noBindingParent.gameObject.SetActive(true);
+
+            withBindingWeaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
+            noBindingWeaponSlotTypeColor.color = slotTypeColors[weaponSlotType];
+        }
+
         public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, PlayerInput playerInput, InputActionAsset inputActions)
         {
             this.loadoutManager = loadoutManager;
