@@ -31,6 +31,7 @@ namespace Vi.UI
         [SerializeField] private Text secondaryWeaponText;
         [SerializeField] private Button[] loadoutPresetButtons;
         [SerializeField] private Button spectateButton;
+        [SerializeField] private Text spectatorCountText;
         [Header("Room Settings Assignments")]
         [SerializeField] private GameModeOption gameModeOptionPrefab;
         [SerializeField] private Transform gameModeOptionParent;
@@ -360,8 +361,11 @@ namespace Vi.UI
 
             gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
+            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            spectatorCountText.text = "Spectator Count: " + playerDataList.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
+            playerDataList = playerDataList.FindAll(item => item.team != PlayerDataManager.Team.Spectator);
+
             // Timer logic
-            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             bool startingGame = playerDataList.Count != 0;
             foreach (PlayerDataManager.PlayerData playerData in playerDataList)
             {
