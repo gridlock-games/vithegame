@@ -2221,7 +2221,7 @@ MonoBehaviour:
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
-  timeBetweenHits: 1
+  timeBetweenHits: 0.1
   isBlockable: 1
   isUninterruptable: 1
   isInvincible: 0
@@ -2239,7 +2239,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 674b0afeb4b9de743930aa2b08cde859, type: 3}
-  abilityCooldownTime: 6
+  abilityCooldownTime: 8
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []

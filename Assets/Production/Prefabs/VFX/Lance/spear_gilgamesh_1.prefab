@@ -20,7 +20,7 @@ PrefabInstance:
     - target: {fileID: 3538861917734417955, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
         type: 3}
       propertyPath: m_Name
-      value: spear_gilgamesh
+      value: spear_gilgamesh_1
       objectReference: {fileID: 0}
     - target: {fileID: 3538861917734417957, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
         type: 3}
@@ -45,7 +45,12 @@ PrefabInstance:
     - target: {fileID: 3538861917734417957, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
         type: 3}
       propertyPath: TriggerModule.outside
-      value: 0
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3538861917734417957, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
+        type: 3}
+      propertyPath: TriggerModule.radiusScale
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3538861917734417957, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
         type: 3}
@@ -333,10 +338,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0, y: 0, z: -3}
-  vfxRotationOffset: {x: 120, y: 0, z: 0}
+  vfxRotationOffset: {x: 110, y: -5, z: 0}
   vfxSpawnType: 0
   transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
+  onActivateVFXSpawnNormalizedTime: 0.15
   raycastOffset: {x: 0, y: 2, z: 3}
   raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}

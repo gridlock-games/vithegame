@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &8630566667584951573
+--- !u!1001 &7505088495585148167
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,7 +10,12 @@ PrefabInstance:
     - target: {fileID: 3861996540212581410, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
         type: 3}
       propertyPath: m_Name
-      value: spear_gilgamesh Variant
+      value: spear_gilgamesh_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3861996540212581412, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: TriggerModule.radiusScale
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3861996540212581415, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
         type: 3}
@@ -69,8 +74,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
         type: 3}
+      propertyPath: vfxPositionOffset.x
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: vfxPositionOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: vfxPositionOffset.z
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: vfxRotationOffset.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: vfxRotationOffset.z
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
       propertyPath: onActivateVFXSpawnNormalizedTime
-      value: 0.4
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9eb2c7039c9ad4f0f93389abbe340c3a, type: 3}

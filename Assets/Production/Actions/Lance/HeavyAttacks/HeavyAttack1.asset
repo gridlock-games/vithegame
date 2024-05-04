@@ -20,22 +20,40 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 10
+      value: 1.35
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 136
       weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.102924705
+      value: 1.35
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.119406044
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 10
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 136
       weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -254,7 +272,7 @@ MonoBehaviour:
   transitionTime: 0.1
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1.5
-  recoveryAnimationSpeed: 1.3
+  recoveryAnimationSpeed: 1.5
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
@@ -284,7 +302,7 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 2
-  ailmentHitDefinition: 000001
+  ailmentHitDefinition: 010000
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 1
@@ -299,7 +317,10 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 7759964872974293715, guid: 2b653f079be9e46208648fc4966dcce8, type: 3}
+  - {fileID: 7057281741328151756, guid: 16f2573dcfbd8405f8fb53570f1cc05f, type: 3}
+  - {fileID: -2307277777639303676, guid: 8d3f722683f794ac18e8fafdb835723e, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
