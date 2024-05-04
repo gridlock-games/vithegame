@@ -482,7 +482,6 @@ namespace Vi.Core
         }
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
-
         private NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
 
         public bool IsPulled() { return isPulled.Value; }
@@ -578,6 +577,38 @@ namespace Vi.Core
                     SetInviniciblity(recoveryTimeInvincibilityBuffer);
                     ailment.Value = ActionClip.Ailment.None;
                 }
+            }
+
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            {
+                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                {
+                    weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
+                }
+            }
+        }
+
+        [System.Serializable]
+        private struct OnHitActionVFX
+        {
+            public ActionClip.Ailment ailment;
+            public ActionVFX actionVFX;
+        }
+
+        [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
+
+        private void OnValidate()
+        {
+            List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
+            {
+                if (!onHitActionVFX.actionVFX) { continue; }
+                if (onHitActionVFX.actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { actionVFXToRemove.Add(onHitActionVFX.actionVFX); }
+            }
+
+            foreach (ActionVFX actionVFX in actionVFXToRemove)
+            {
+                ailmentOnHitActionVFXList.RemoveAll(item => item.actionVFX == actionVFX);
             }
         }
 
@@ -729,7 +760,7 @@ namespace Vi.Core
         public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
 
         public bool IsRespawning { get; private set; }
-        public bool isWaitingForSpawnPoint;
+        [HideInInspector] public bool isWaitingForSpawnPoint;
         private Coroutine respawnCoroutine;
         private float respawnSelfCalledTime;
         private IEnumerator RespawnSelf()
