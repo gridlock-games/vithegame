@@ -144,16 +144,35 @@ namespace Vi.Core
 
         public bool CanHit(Attributes attacker, Attributes victim) { return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team) & attacker != victim; }
 
+        private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
+        {
+            { Team.Red, Color.red },
+            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255) },
+            { Team.Yellow, Color.yellow },
+            { Team.Green, Color.green },
+            { Team.Blue, Color.blue },
+            { Team.Purple, Color.magenta }
+        };
+
         public static Color GetTeamColor(Team team)
         {
-            if (ColorUtility.TryParseHtmlString(team.ToString(), out Color color))
+            if (teamColors.ContainsKey(team))
             {
-                return color;
+                return teamColors[team];
             }
             else
             {
                 return Color.black;
             }
+
+            //if (ColorUtility.TryParseHtmlString(team.ToString(), out Color color))
+            //{
+            //    return color;
+            //}
+            //else
+            //{
+            //    return Color.black;
+            //}
         }
 
         public static string GetTeamText(Team team)
