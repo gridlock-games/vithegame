@@ -16,7 +16,10 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
-        [SerializeField] private Text ammoText;
+        [Header("Weapon Cards")]
+        [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
+        [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
+        [SerializeField] private RuntimeWeaponCard mobileWeaponCard;
         [Header("Ability Cards")]
         [SerializeField] private AbilityCard ability1;
         [SerializeField] private AbilityCard ability2;
@@ -60,7 +63,7 @@ namespace Vi.UI
 
         public void SwitchWeapon()
         {
-            attributes.GetComponent<LoadoutManager>().SwitchWeapon();
+            loadoutManager.SwitchWeapon();
         }
 
         public void StartLightAttack()
@@ -85,6 +88,7 @@ namespace Vi.UI
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+        private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
 
         private void Awake()
@@ -92,7 +96,11 @@ namespace Vi.UI
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
+            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
         }
+
+        private Vector2 equippedWeaponCardAnchoredPosition;
+        private Vector2 stowedWeaponCardAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
@@ -114,6 +122,9 @@ namespace Vi.UI
                     statusIcons.Add(statusIcon);
                 }
             }
+
+            equippedWeaponCardAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
+            stowedWeaponCardAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
 
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
@@ -217,12 +228,30 @@ namespace Vi.UI
             }
 
             lastWeapon = weaponHandler.GetWeapon();
+
+            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary); }
+            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary); }
+            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager, loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon, loadoutManager.GetEquippedSlotType()); }
         }
 
         private void UpdateActiveUIElements()
         {
             aliveUIParent.SetActive(attributes.GetAilment() != ActionClip.Ailment.Death);
             deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
+        }
+
+        private const float weaponCardAnimationSpeed = 8;
+        private void UpdateWeaponCardPositions()
+        {
+            if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
+
+            bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
+
+            RectTransform primaryRT = (RectTransform)primaryWeaponCard.transform;
+            RectTransform secondaryRT = (RectTransform)secondaryWeaponCard.transform;
+
+            primaryRT.anchoredPosition = Vector2.Lerp(primaryRT.anchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            secondaryRT.anchoredPosition = Vector2.Lerp(secondaryRT.anchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
         private string lastControlScheme;
@@ -264,9 +293,6 @@ namespace Vi.UI
                         }
                     }
                 }
-
-                ammoText.transform.parent.gameObject.SetActive(weaponHandler.ShouldUseAmmo());
-                ammoText.text = "Ammo: " + weaponHandler.GetAmmoCount().ToString() + " / " + weaponHandler.GetMaxAmmoCount().ToString();
 
                 fadeToBlackImage.color = Color.clear;
                 fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
@@ -310,6 +336,7 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
+            UpdateWeaponCardPositions();
             UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
 
             lastControlScheme = playerInput.currentControlScheme;

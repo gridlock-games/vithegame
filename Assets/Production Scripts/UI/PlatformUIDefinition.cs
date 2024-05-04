@@ -25,6 +25,7 @@ namespace Vi.UI
         {
             public RuntimePlatform[] platforms;
             public GameObject[] gameObjectsToEnable;
+            public GameObject[] gameObjectsToDisable;
             public GameObject[] gameObjectsToDestroy;
             public MoveUIDefinition[] objectsToMove;
         }
@@ -164,6 +165,11 @@ namespace Vi.UI
                 foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
                 {
                     g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                }
+
+                foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
+                {
+                    g.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
                 }
 
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)

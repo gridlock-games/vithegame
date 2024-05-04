@@ -15,6 +15,7 @@ namespace Vi.UI
         [SerializeField] private ScoreboardElement scoreboardElementPrefab;
         [SerializeField] private Transform scoreboardElementParent;
         [SerializeField] private Text scoreboardHeaderText;
+        [SerializeField] private Text spectatorCountText;
 
         public void CloseSelf()
         {
@@ -24,7 +25,7 @@ namespace Vi.UI
         private void Start()
         {
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
-                scoreboardHeaderText.text = "Training Room | " + PlayerDataManager.Singleton.GetMapName();
+                scoreboardHeaderText.text = "No Game Mode | " + PlayerDataManager.Singleton.GetMapName();
             else
                 scoreboardHeaderText.text = LobbyUI.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " | " + PlayerDataManager.Singleton.GetMapName();
 
@@ -83,6 +84,11 @@ namespace Vi.UI
                 }
                 elementList[i].transform.SetSiblingIndex(i + dividerCounter);
             }
+        }
+
+        private void Update()
+        {
+            spectatorCountText.text = "Spectator Count: " + PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
         }
     }
 }

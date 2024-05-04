@@ -18,8 +18,8 @@ namespace Vi.Core
 
         public int GetAmmoCount(Weapon weapon)
         {
-            if (weapon == primaryWeaponInstance) { return primaryAmmo.Value; }
-            if (weapon == secondaryWeaponInstance) { return secondaryAmmo.Value; }
+            if (weapon == primaryWeaponInstance | weapon.name == primaryWeaponInstance.name.Replace("(Clone)", "")) { return primaryAmmo.Value; }
+            if (weapon == secondaryWeaponInstance | weapon.name == secondaryWeaponInstance.name.Replace("(Clone)", "")) { return secondaryAmmo.Value; }
             Debug.LogError("Unknown weapon to get ammo count " + weapon);
             return 0;
         }
@@ -47,6 +47,23 @@ namespace Vi.Core
         private NetworkVariable<int> secondaryAmmo = new NetworkVariable<int>();
 
         private NetworkVariable<int> currentEquippedWeapon = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public WeaponSlotType GetEquippedSlotType()
+        {
+            if (currentEquippedWeapon.Value == 1)
+            {
+                return WeaponSlotType.Primary;
+            }
+            else if (currentEquippedWeapon.Value == 2)
+            {
+                return WeaponSlotType.Secondary;
+            }
+            else
+            {
+                Debug.LogError("Not sure what slot type corresponds to equipped weapon value of " + currentEquippedWeapon.Value);
+                return WeaponSlotType.Primary;
+            }
+        }
 
         private WeaponHandler weaponHandler;
         private Attributes attributes;
@@ -157,8 +174,9 @@ namespace Vi.Core
             return true;
         }
 
-        private float lastFlashAttackTime = Mathf.NegativeInfinity;
-        private const float flashAttackCooldown = 3;
+        private float lastPrimaryFlashAttackTime = Mathf.NegativeInfinity;
+        private float lastSecondaryFlashAttackTime = Mathf.NegativeInfinity;
+        private const float flashAttackCooldown = 5;
         void OnWeapon1()
         {
             if (currentEquippedWeapon.Value == 1) { return; }
@@ -172,14 +190,14 @@ namespace Vi.Core
                 ActionClip flashAttack = primaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastFlashAttackTime > flashAttackCooldown)
+                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
                         if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
                         if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
                         FlashAttackServerRpc(1);
                         currentEquippedWeapon.Value = 1;
-                        lastFlashAttackTime = Time.time;
+                        lastPrimaryFlashAttackTime = Time.time;
                     }
                 }
             }
@@ -198,14 +216,14 @@ namespace Vi.Core
                 ActionClip flashAttack = secondaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastFlashAttackTime > flashAttackCooldown)
+                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
                         if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
                         if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
                         FlashAttackServerRpc(2);
                         currentEquippedWeapon.Value = 2;
-                        lastFlashAttackTime = Time.time;
+                        lastSecondaryFlashAttackTime = Time.time;
                     }
                 }
             }
@@ -232,6 +250,8 @@ namespace Vi.Core
             }
         }
 
+        public string WeaponNameThatCanFlashAttack { get; private set; }
+
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -244,7 +264,7 @@ namespace Vi.Core
                 ActionClip flashAttack = secondaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastFlashAttackTime > flashAttackCooldown)
+                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (flashAttack.agentStaminaCost > attributes.GetStamina())
                             canFlashAttack = false;
@@ -257,6 +277,7 @@ namespace Vi.Core
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                WeaponNameThatCanFlashAttack = canFlashAttack ? SecondaryWeaponOption.weapon.name : string.Empty;
             }
             else if (currentEquippedWeapon.Value == 2)
             {
@@ -264,7 +285,7 @@ namespace Vi.Core
                 ActionClip flashAttack = primaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastFlashAttackTime > flashAttackCooldown)
+                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (flashAttack.agentStaminaCost > attributes.GetStamina())
                             canFlashAttack = false;
@@ -277,6 +298,11 @@ namespace Vi.Core
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                WeaponNameThatCanFlashAttack = canFlashAttack ? PrimaryWeaponOption.weapon.name : string.Empty;
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle current equipped weapon value of " + currentEquippedWeapon.Value);
             }
         }
 
