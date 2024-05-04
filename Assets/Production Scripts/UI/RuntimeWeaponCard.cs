@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.ScriptableObjects;
 using Vi.Core;
+using UnityEngine.InputSystem;
 
 namespace Vi.UI
 {
@@ -24,7 +25,7 @@ namespace Vi.UI
         private LoadoutManager loadoutManager;
         private Weapon weapon;
 
-        public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType)
+        public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, InputActionAsset inputActions)
         {
             this.loadoutManager = loadoutManager;
             this.weapon = weapon;
