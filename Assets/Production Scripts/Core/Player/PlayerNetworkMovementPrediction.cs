@@ -105,6 +105,9 @@ namespace Vi.Player
         {
             latestServerState = new StatePayload(0, CurrentPosition, CurrentRotation);
 
+            CurrentPosition = transform.position;
+            CurrentRotation = transform.rotation;
+
             if (IsServer)
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             if (IsClient)
