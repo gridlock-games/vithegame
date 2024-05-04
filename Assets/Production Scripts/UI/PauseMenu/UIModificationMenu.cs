@@ -94,12 +94,11 @@ namespace Vi.UI
                         }
                     }
 
-                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
+                    if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
                     {
                         if (PlayerPrefs.HasKey("UIOverrides"))
                         {
                             List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
-
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                             {
                                 GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
@@ -109,7 +108,6 @@ namespace Vi.UI
                                 }
                             }
                         }
-
                         DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
                         draggableUIObject.Initialize(this);
                     }
