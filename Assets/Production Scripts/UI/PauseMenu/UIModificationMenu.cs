@@ -66,6 +66,14 @@ namespace Vi.UI
                                 }
                             }
 
+                            foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
+                            {
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    copyChildren[childIndex].gameObject.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
+                                }
+                            }
+
                             foreach (PlatformUIDefinition.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
                             {
                                 if (moveUIDefinition.gameObjectToMove == originalChildren[childIndex].gameObject)
