@@ -86,12 +86,16 @@ namespace Vi.UI
                 {
                     if (binding.path.ToLower().Contains(device.name.ToLower()))
                     {
-                        weaponBindingText.text = binding.ToDisplayString();
+                        weaponBindingText.text = binding.ToDisplayString().Replace("Right ", "R").Replace("Left ", "L").Replace("Control", "Ctrl");
                         shouldBreak = true;
                         break;
                     }
                 }
                 if (shouldBreak) { break; }
+                else // If we couldn't find an input binding string
+                {
+                    weaponBindingText.text = string.Empty;
+                }
             }
 
             forceRefreshThisFrame = false;
