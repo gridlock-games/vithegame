@@ -131,11 +131,9 @@ namespace Vi.Player
                 }
 
                 currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
-                currentPositionOffset.y = movementHandler.CameraYOffset;
                 transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
 
-                Vector3 lookAtTargetPosition = new Vector3(cameraInterp.transform.position.x, cameraInterp.transform.position.y + movementHandler.CameraYOffset, cameraInterp.transform.position.z);
-                transform.LookAt(lookAtTargetPosition);
+                transform.LookAt(cameraInterp.transform);
 
                 // Do the same thing for the clone transform
                 CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;

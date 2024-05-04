@@ -345,8 +345,16 @@ namespace Vi.Core
                         );
                     }
                     break;
-                //case ActionVFX.TransformType.OriginatorAndTarget:
-                //    break;
+                case ActionVFX.TransformType.ParentToVictim:
+                    if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
+                case ActionVFX.TransformType.StationaryOnVictim:
+                    if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
                 default:
                     Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;

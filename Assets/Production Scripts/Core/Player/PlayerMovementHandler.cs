@@ -357,19 +357,8 @@ namespace Vi.Player
 
         private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
-        public float CameraYOffset { get; private set; }
-
         private void UpdateLocomotion()
         {
-            if (animationHandler.IsAtRest())
-            {
-                CameraYOffset = 0;
-            }
-            else
-            {
-                CameraYOffset = weaponHandler.CurrentActionClip.cameraYOffsetAnimationCurve.Evaluate(animationHandler.GetActionClipNormalizedTime(weaponHandler.CurrentActionClip));
-            }
-
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
             {
                 //Debug.Log("Teleporting player: " + OwnerClientId);
