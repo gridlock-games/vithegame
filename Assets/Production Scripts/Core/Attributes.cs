@@ -472,8 +472,10 @@ namespace Vi.Core
 
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
-                if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { continue; }
-                weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform);
+                if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                {
+                    weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                }
             }
 
             return true;

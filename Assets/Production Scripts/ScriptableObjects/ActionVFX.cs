@@ -19,7 +19,8 @@ namespace Vi.ScriptableObjects
             SpawnAtWeaponPoint,
             Projectile,
             ConformToGround,
-            OriginatorAndTarget
+            ParentToVictim,
+            StationaryOnVictim
         }
 
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
