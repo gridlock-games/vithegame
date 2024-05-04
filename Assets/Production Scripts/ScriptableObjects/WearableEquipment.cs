@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Unity.Netcode;
 
 namespace Vi.ScriptableObjects
 {
@@ -13,6 +14,8 @@ namespace Vi.ScriptableObjects
 
         private void Start()
         {
+            NetworkObject networkObject = GetComponentInParent<NetworkObject>();
+
             Transform target = GetComponentInParent<Animator>().transform;
             FindRootBone(ref target, target);
 
@@ -40,7 +43,7 @@ namespace Vi.ScriptableObjects
                 }
                 srenderer.bones = newBones;
                 srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
-                srenderer.updateWhenOffscreen = false;
+                srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
             }
         }
 

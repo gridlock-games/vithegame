@@ -112,6 +112,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private AnimationCurve debugVerticalMotion;
 
         public float YAngleRotationOffset = 0;
+        public AnimationCurve cameraYOffsetAnimationCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 0));
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;

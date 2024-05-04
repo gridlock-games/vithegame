@@ -33,7 +33,7 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
-            gameObject.SetActive(attributes != null);
+            transform.GetChild(0).gameObject.SetActive(attributes != null);
         }
 
         private PlayerUI playerUI;
@@ -66,7 +66,7 @@ namespace Vi.UI
         public const float fillSpeed = 4;
         private void Update()
         {
-            if (!attributes) { gameObject.SetActive(false); return; }
+            if (!attributes) { transform.GetChild(0).gameObject.SetActive(false); return; }
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
