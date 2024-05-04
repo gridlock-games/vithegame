@@ -252,11 +252,11 @@ namespace Vi.UI
         }
 
         private const float weaponCardAnimationSpeed = 8;
-        // These 2 are for performance, since getting an anchored position every frame is expensive
-        private Vector2 currentPrimaryWeaponCardAnchoredPosition;
-        private Vector2 currentSecondaryWeaponCardAnchoredPosition;
         private RectTransform primaryWeaponCardRectTransform;
         private RectTransform secondaryWeaponCardRectTransform;
+        // These are for performance, since getting an anchored position every frame is expensive
+        private Vector2 currentPrimaryWeaponCardAnchoredPosition;
+        private Vector2 currentSecondaryWeaponCardAnchoredPosition;
         private void UpdateWeaponCardPositions()
         {
             if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
