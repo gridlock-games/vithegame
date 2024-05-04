@@ -286,28 +286,35 @@ namespace Vi.Player
                 {
                     foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (touch.isTap)
+                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                         {
-                            OnInteract();
-                        }
-                        else
-                        {
-                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
-
-                            bool isTouchingJoystick = false;
-                            foreach (UIDeadZoneElement joystick in joysticks)
+                            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                            foreach (RaycastHit hit in allHits)
                             {
-                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
                                 {
-                                    isTouchingJoystick = true;
+                                    networkInteractable.Interact(gameObject);
                                     break;
                                 }
                             }
+                        }
 
-                            if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
+
+                        bool isTouchingJoystick = false;
+                        foreach (UIDeadZoneElement joystick in joysticks)
+                        {
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
                             {
-                                lookInputToAdd += touch.delta;
+                                isTouchingJoystick = true;
+                                break;
                             }
+                        }
+
+                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                        {
+                            lookInputToAdd += touch.delta;
                         }
                     }
                 }
@@ -441,7 +448,7 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {
