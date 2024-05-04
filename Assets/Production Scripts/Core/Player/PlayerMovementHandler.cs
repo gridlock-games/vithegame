@@ -216,7 +216,18 @@ namespace Vi.Player
                 }
             }
             lastMovement = movement;
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition + movement + gravity, newRotation);
+
+            Vector3 newPosition;
+            if (Mathf.Approximately(movement.y, 0))
+            {
+                newPosition = movementPrediction.CurrentPosition + movement + gravity;
+            }
+            else
+            {
+                newPosition = movementPrediction.CurrentPosition + movement;
+            }
+
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
         public override void OnNetworkSpawn()
