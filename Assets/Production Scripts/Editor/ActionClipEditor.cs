@@ -39,6 +39,7 @@ namespace Vi.Editor
         private SerializedProperty spRecoveryAnimationSpeed;
 
         private SerializedProperty spYAngleRotationOffset;
+        private SerializedProperty spCameraYOffsetAnimationCurve;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spMustBeAiming;
@@ -128,6 +129,7 @@ namespace Vi.Editor
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
             spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
+            spCameraYOffsetAnimationCurve = serializedObject.FindProperty("cameraYOffsetAnimationCurve");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
@@ -226,6 +228,7 @@ namespace Vi.Editor
             
             EditorGUILayout.PropertyField(spAvatarLayer);
             spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
+            EditorGUILayout.PropertyField(spCameraYOffsetAnimationCurve);
 
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);
