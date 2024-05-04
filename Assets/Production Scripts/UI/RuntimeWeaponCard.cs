@@ -39,7 +39,8 @@ namespace Vi.UI
 
         public void SetPreviewOn()
         {
-
+            withBindingParent.gameObject.SetActive(false);
+            noBindingParent.gameObject.SetActive(true);
         }
 
         public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, PlayerInput playerInput, InputActionAsset inputActions)
