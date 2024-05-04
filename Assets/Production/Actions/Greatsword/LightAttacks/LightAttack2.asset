@@ -3904,6 +3904,30 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 0
+  cameraYOffsetAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
@@ -3921,7 +3945,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.35
+  recoveryNormalizedTime: 0.25
   damage: 3
   healAmount: 0
   staminaDamage: 0
@@ -3941,7 +3965,7 @@ MonoBehaviour:
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 2
+  dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
