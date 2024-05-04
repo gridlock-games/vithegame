@@ -28,9 +28,14 @@ namespace Vi.UI
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
             List<PlayerCard> rightPlayerCardsTemp = rightPlayerCards.ToList();
 
-            leftPlayerCardsTemp.RemoveAll(item => item == null);
-            rightPlayerCardsTemp.RemoveAll(item => item == null);
-
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                leftPlayerCardsTemp.RemoveAt(leftPlayerCardsTemp.Count - 1);
+                leftPlayerCardsTemp.RemoveAt(leftPlayerCardsTemp.Count - 1);
+                rightPlayerCardsTemp.RemoveAt(rightPlayerCardsTemp.Count - 1);
+                rightPlayerCardsTemp.RemoveAt(rightPlayerCardsTemp.Count - 1);
+            }
+            
             leftPlayerCards = leftPlayerCardsTemp.ToArray();
             rightPlayerCards = rightPlayerCardsTemp.ToArray();
         }
