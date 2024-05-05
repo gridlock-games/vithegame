@@ -25,6 +25,7 @@ namespace Vi.Editor
             base.OnInspectorGUI();
             EditorGUILayout.PropertyField(spProjectileForce);
             EditorGUILayout.PropertyField(spTimeToActivateGravity);
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
