@@ -99,8 +99,8 @@ namespace Vi.UI
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
         }
 
-        private Vector2 equippedWeaponCardAnchoredPosition;
-        private Vector2 stowedWeaponCardAnchoredPosition;
+        private Vector3 equippedWeaponCardAnchoredPosition;
+        private Vector3 stowedWeaponCardAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
@@ -123,8 +123,8 @@ namespace Vi.UI
                 }
             }
 
-            equippedWeaponCardAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
-            stowedWeaponCardAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
+            equippedWeaponCardAnchoredPosition = primaryWeaponCard.transform.localPosition;
+            stowedWeaponCardAnchoredPosition = secondaryWeaponCard.transform.localPosition;
 
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
@@ -252,11 +252,8 @@ namespace Vi.UI
 
             bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
 
-            RectTransform primaryRT = (RectTransform)primaryWeaponCard.transform;
-            RectTransform secondaryRT = (RectTransform)secondaryWeaponCard.transform;
-
-            primaryRT.anchoredPosition = Vector2.Lerp(primaryRT.anchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
-            secondaryRT.anchoredPosition = Vector2.Lerp(secondaryRT.anchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
         private string lastControlScheme;

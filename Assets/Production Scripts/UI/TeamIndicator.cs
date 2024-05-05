@@ -19,6 +19,9 @@ namespace Vi.UI
             Update();
         }
 
+        private readonly int _Glow = Shader.PropertyToID("_Glow");
+        private readonly int _Transparency = Shader.PropertyToID("_Transparency");
+
         private void Update()
         {
             foreach (Renderer r in renderers)
@@ -36,8 +39,8 @@ namespace Vi.UI
                         else
                             mat.color = Color.black;
 
-                        mat.SetFloat("_Glow", glowAmount);
-                        mat.SetFloat("_Transparency", mat.color == Color.black ? 0 : 1);
+                        mat.SetFloat(_Glow, glowAmount);
+                        mat.SetFloat(_Transparency, mat.color == Color.black ? 0 : 1);
                     }
                 }
                 r.enabled = attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;

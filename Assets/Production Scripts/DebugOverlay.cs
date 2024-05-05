@@ -61,11 +61,22 @@ public class DebugOverlay : MonoBehaviour
 
     private int fpsValue;
 
+    private Attributes localPlayer;
+    private void FindLocalPlayer()
+    {
+        if (localPlayer) { return; }
+        if (!PlayerDataManager.Singleton) { return; }
+        localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+    }
+
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         bool consoleEnabled = bool.Parse(PlayerPrefs.GetString("ConsoleEnabled"));
+
+        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
+
         bool fpsEnabled = bool.Parse(PlayerPrefs.GetString("FPSEnabled"));
         bool pingEnabled = bool.Parse(PlayerPrefs.GetString("PingEnabled"));
 
@@ -77,17 +88,35 @@ public class DebugOverlay : MonoBehaviour
         {
             fpsText.text = fpsValue.ToString() + "FPS";
             Color fpsTextColor;
-            if (fpsValue >= Screen.currentResolution.refreshRate)
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                fpsTextColor = Color.green;
-            }
-            else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
-            {
-                fpsTextColor = Color.yellow;
+                if (fpsValue < 30)
+                {
+                    fpsTextColor = Color.red;
+                }
+                else if (fpsValue < 45)
+                {
+                    fpsTextColor = Color.yellow;
+                }
+                else
+                {
+                    fpsTextColor = Color.green;
+                }
             }
             else
             {
-                fpsTextColor = Color.red;
+                if (fpsValue >= Screen.currentResolution.refreshRate)
+                {
+                    fpsTextColor = Color.green;
+                }
+                else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
+                {
+                    fpsTextColor = Color.yellow;
+                }
+                else
+                {
+                    fpsTextColor = Color.red;
+                }
             }
             fpsText.color = fpsTextColor;
         }
@@ -98,31 +127,28 @@ public class DebugOverlay : MonoBehaviour
 
         if (pingEnabled)
         {
+            FindLocalPlayer();
             bool pingTextEvaluated = false;
-            if (PlayerDataManager.Singleton)
+            if (localPlayer)
             {
-                KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                if (kvp.Value)
+                ulong ping = localPlayer.GetRoundTripTime();
+                pingText.text = ping.ToString() + "ms";
+                dividerText.text = fpsEnabled ? "|" : "";
+                Color pingTextColor;
+                if (ping >= 80)
                 {
-                    ulong ping = kvp.Value.GetRoundTripTime();
-                    pingText.text = ping.ToString() + "ms";
-                    dividerText.text = fpsEnabled ? "|" : "";
-                    Color pingTextColor;
-                    if (ping >= 80)
-                    {
-                        pingTextColor = Color.red;
-                    }
-                    else if (ping >= 50)
-                    {
-                        pingTextColor = Color.yellow;
-                    }
-                    else
-                    {
-                        pingTextColor = Color.green;
-                    }
-                    pingText.color = pingTextColor;
-                    pingTextEvaluated = true;
+                    pingTextColor = Color.red;
                 }
+                else if (ping >= 50)
+                {
+                    pingTextColor = Color.yellow;
+                }
+                else
+                {
+                    pingTextColor = Color.green;
+                }
+                pingText.color = pingTextColor;
+                pingTextEvaluated = true;
             }
 
             if (!pingTextEvaluated)

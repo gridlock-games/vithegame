@@ -130,13 +130,16 @@ namespace Vi.Core
                 colorTarget = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
                 fresnelPowerTarget = fresnelPower;
             }
-
+            
             currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
             foreach (Material glowMaterialInstance in glowMaterialInstances)
             {
-                glowMaterialInstance.SetFloat("_FresnelPower", currentFresnelPower);
-                if (glowMaterialInstance.color != colorTarget) { glowMaterialInstance.color = colorTarget; }
+                glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
+                glowMaterialInstance.SetColor(_Color, colorTarget);
             }
         }
+
+        private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");
+        private readonly int _Color = Shader.PropertyToID("_Color");
     }
 }

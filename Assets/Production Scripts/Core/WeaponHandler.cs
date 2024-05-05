@@ -367,6 +367,10 @@ namespace Vi.Core
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
                     StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
                 }
+                else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
+                {
+                    actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
+                }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPreview actionVFXPreview))
                 {
                     actionVFXPreviewInstance = actionVFXPreview;
