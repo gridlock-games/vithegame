@@ -45,6 +45,12 @@ namespace Vi.UI
                         killFeed.SetPreviewOn();
                         continue;
                     }
+                    if (copyChildren[childIndex].TryGetComponent(out RuntimeWeaponCard weaponCard))
+                    {
+                        weaponCard.SetPreviewOn(weaponCard.name.Contains("Primary") ? LoadoutManager.WeaponSlotType.Primary : LoadoutManager.WeaponSlotType.Secondary);
+                        continue;
+                    }
+                    if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
                     if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
@@ -63,6 +69,14 @@ namespace Vi.UI
                                 if (g == originalChildren[childIndex].gameObject)
                                 {
                                     copyChildren[childIndex].gameObject.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
+                                }
+                            }
+
+                            foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
+                            {
+                                if (g == originalChildren[childIndex].gameObject)
+                                {
+                                    copyChildren[childIndex].gameObject.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
                                 }
                             }
 
@@ -94,12 +108,11 @@ namespace Vi.UI
                         }
                     }
 
-                    if (copyChildren[childIndex].GetComponent<Button>() | (copyChildren[childIndex].GetComponent<OnScreenButton>() & !copyChildren[childIndex].GetComponent<CustomOnScreenStick>()))
+                    if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
                     {
                         if (PlayerPrefs.HasKey("UIOverrides"))
                         {
                             List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
-
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                             {
                                 GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
@@ -109,7 +122,6 @@ namespace Vi.UI
                                 }
                             }
                         }
-
                         DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
                         draggableUIObject.Initialize(this);
                     }

@@ -345,8 +345,24 @@ namespace Vi.Core
                         );
                     }
                     break;
-                //case ActionVFX.TransformType.OriginatorAndTarget:
-                //    break;
+                case ActionVFX.TransformType.ParentToVictim:
+                    if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
+                case ActionVFX.TransformType.StationaryOnVictim:
+                    if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                    break;
+                case ActionVFX.TransformType.AimAtTarget:
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+
+                    // Look at point then apply rotation offset
+                    vfxInstance.transform.LookAt(animationHandler.GetAimPoint());
+                    vfxInstance.transform.rotation *= Quaternion.Euler(actionVFXPrefab.vfxRotationOffset);
+                    break;
                 default:
                     Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;
@@ -358,6 +374,10 @@ namespace Vi.Core
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
                     StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                }
+                else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
+                {
+                    actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPreview actionVFXPreview))
                 {

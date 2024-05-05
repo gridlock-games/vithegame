@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Vi.ScriptableObjects
 {
+    [DisallowMultipleComponent]
     public class ActionVFX : MonoBehaviour
     {
         public enum VFXSpawnType
@@ -19,7 +20,9 @@ namespace Vi.ScriptableObjects
             SpawnAtWeaponPoint,
             Projectile,
             ConformToGround,
-            OriginatorAndTarget
+            ParentToVictim,
+            StationaryOnVictim,
+            AimAtTarget
         }
 
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);

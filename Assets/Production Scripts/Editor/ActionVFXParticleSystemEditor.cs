@@ -12,16 +12,25 @@ namespace Vi.Editor
     {
         private SerializedProperty spShouldUseAttackerPositionForHitAngles;
 
+        private SerializedProperty spShouldOverrideMaxHits;
+        private SerializedProperty spMaxHitOverride;
+
         private new void OnEnable()
         {
             base.OnEnable();
             spShouldUseAttackerPositionForHitAngles = serializedObject.FindProperty("shouldUseAttackerPositionForHitAngles");
+
+            spShouldOverrideMaxHits = serializedObject.FindProperty("shouldOverrideMaxHits");
+            spMaxHitOverride = serializedObject.FindProperty("maxHitOverride");
         }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             EditorGUILayout.PropertyField(spShouldUseAttackerPositionForHitAngles);
+
+            EditorGUILayout.PropertyField(spShouldOverrideMaxHits);
+            if (spShouldOverrideMaxHits.boolValue) { EditorGUILayout.IntSlider(spMaxHitOverride, 1, 100); }
             serializedObject.ApplyModifiedProperties();
         }
     }

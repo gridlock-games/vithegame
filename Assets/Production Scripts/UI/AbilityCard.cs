@@ -12,8 +12,18 @@ namespace Vi.UI
         [SerializeField] private Image abilityIcon;
         [SerializeField] private Image cooldownIcon;
         [SerializeField] private Text keybindText;
+        [SerializeField] private ActionClip previewAbility;
 
         private ActionClip ability;
+
+        public void SetPreviewOn()
+        {
+            if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
+            ability = previewAbility;
+            abilityIcon.sprite = ability.abilityImageIcon;
+            keybindText.text = previewAbility.name.Replace("Ability", "");
+            cooldownIcon.fillAmount = 0;
+        }
 
         public void UpdateCard(ActionClip ability, string keybindText)
         {

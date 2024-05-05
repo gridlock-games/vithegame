@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Vi.Core;
-using UnityEditor;
+using UnityEngine.InputSystem.OnScreen;
 using Newtonsoft.Json;
 
 namespace Vi.UI
@@ -19,6 +19,8 @@ namespace Vi.UI
         [SerializeField] private ControlSchemeDefinition[] controlSchemeDefinitions;
 
         public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
+
+        public static bool UIElementIsAbleToBeModified(GameObject g) { return g.GetComponent<Button>() | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>()); }
 
         [System.Serializable]
         public struct UIDefinition
@@ -228,7 +230,7 @@ namespace Vi.UI
 
             foreach (RectTransform child in GetComponentsInChildren<RectTransform>(true))
             {
-                originalPositionMap.Add(child, child.anchoredPosition);
+                if (UIElementIsAbleToBeModified(child.gameObject)) { originalPositionMap.Add(child, child.anchoredPosition); }
             }
         }
 

@@ -337,10 +337,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: -3}
-  vfxRotationOffset: {x: 110, y: -5, z: 0}
+  vfxPositionOffset: {x: -0.09, y: 2.82, z: 1.02}
+  vfxRotationOffset: {x: 90, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 0
+  transformType: 7
   onActivateVFXSpawnNormalizedTime: 0.15
   raycastOffset: {x: 0, y: 2, z: 3}
   raycastMaxDistance: 5
@@ -348,6 +348,8 @@ MonoBehaviour:
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   shouldUseAttackerPositionForHitAngles: 0
+  shouldOverrideMaxHits: 1
+  maxHitOverride: 1
 --- !u!198 &3861996540620367916 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 3538861919214094893, guid: 4b91bb8b8ef8e0d4db5721cd1eb1ad76,
