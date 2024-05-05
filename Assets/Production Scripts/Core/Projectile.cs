@@ -6,6 +6,7 @@ using Unity.Netcode;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class Projectile : NetworkBehaviour
     {
         [Header("Projectile Settings")]
@@ -35,6 +36,13 @@ namespace Vi.Core
         private void Start()
         {
             startPosition = transform.position;
+
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
+            foreach (Collider col in colliders)
+            {
+                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
+            }
         }
 
         private void Update()
