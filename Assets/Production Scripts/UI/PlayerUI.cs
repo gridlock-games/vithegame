@@ -99,8 +99,8 @@ namespace Vi.UI
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
         }
 
-        private Vector2 equippedWeaponCardAnchoredPosition;
-        private Vector2 stowedWeaponCardAnchoredPosition;
+        private Vector3 equippedWeaponCardAnchoredPosition;
+        private Vector3 stowedWeaponCardAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
@@ -123,14 +123,8 @@ namespace Vi.UI
                 }
             }
 
-            primaryWeaponCardRectTransform = (RectTransform)primaryWeaponCard.transform;
-            secondaryWeaponCardRectTransform = (RectTransform)secondaryWeaponCard.transform;
-
-            equippedWeaponCardAnchoredPosition = primaryWeaponCardRectTransform.anchoredPosition;
-            stowedWeaponCardAnchoredPosition = secondaryWeaponCardRectTransform.anchoredPosition;
-
-            currentPrimaryWeaponCardAnchoredPosition = equippedWeaponCardAnchoredPosition;
-            currentSecondaryWeaponCardAnchoredPosition = stowedWeaponCardAnchoredPosition;
+            equippedWeaponCardAnchoredPosition = primaryWeaponCard.transform.localPosition;
+            stowedWeaponCardAnchoredPosition = secondaryWeaponCard.transform.localPosition;
 
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
@@ -252,22 +246,14 @@ namespace Vi.UI
         }
 
         private const float weaponCardAnimationSpeed = 8;
-        private RectTransform primaryWeaponCardRectTransform;
-        private RectTransform secondaryWeaponCardRectTransform;
-        // These are for performance, since getting an anchored position every frame is expensive
-        private Vector2 currentPrimaryWeaponCardAnchoredPosition;
-        private Vector2 currentSecondaryWeaponCardAnchoredPosition;
         private void UpdateWeaponCardPositions()
         {
             if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
 
             bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
 
-            currentPrimaryWeaponCardAnchoredPosition = Vector2.Lerp(currentPrimaryWeaponCardAnchoredPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
-            currentSecondaryWeaponCardAnchoredPosition = Vector2.Lerp(currentSecondaryWeaponCardAnchoredPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
-
-            primaryWeaponCardRectTransform.anchoredPosition = currentPrimaryWeaponCardAnchoredPosition;
-            secondaryWeaponCardRectTransform.anchoredPosition = currentSecondaryWeaponCardAnchoredPosition;
+            primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
         private string lastControlScheme;
