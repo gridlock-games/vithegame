@@ -255,10 +255,10 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 1000000
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: 
+  effectedWeaponBones: 12000000
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -303,7 +303,8 @@ MonoBehaviour:
     duration: 8
     delay: 0
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 6515331773666235339, guid: 973656b742417994d89339df56df859c, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 0, y: 0, z: 0}
   useRotationalTargetingSystem: 1

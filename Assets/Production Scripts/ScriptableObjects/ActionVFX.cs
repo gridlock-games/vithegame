@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Vi.ScriptableObjects
 {
+    [DisallowMultipleComponent]
     public class ActionVFX : MonoBehaviour
     {
         public enum VFXSpawnType

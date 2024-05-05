@@ -43,6 +43,8 @@ namespace Vi.Core
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
             }
+
+            if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
         }
 
         private void Update()
