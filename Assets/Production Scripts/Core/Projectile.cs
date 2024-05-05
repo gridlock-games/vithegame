@@ -16,9 +16,10 @@ namespace Vi.Core
         private ShooterWeapon shooterWeapon;
         private ActionClip attack;
         private Vector3 projectileForce;
+        private float damageMultiplier;
         private bool initialized;
 
-        public void Initialize(Attributes attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce)
+        public void Initialize(Attributes attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce, float damageMultiplier)
         {
             if (!IsServer) { Debug.LogError("Projectile.Initialize() should only be called on the server!"); return; }
             if (initialized) { Debug.LogError("Projectile.Initialize() already called, why are you calling it again idiot?"); return; }
@@ -27,6 +28,7 @@ namespace Vi.Core
             this.shooterWeapon = shooterWeapon;
             this.attack = attack;
             this.projectileForce = projectileForce;
+            this.damageMultiplier = damageMultiplier;
             initialized = true;
 
             GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
@@ -74,7 +76,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
             }
             else
             {
