@@ -200,8 +200,18 @@ namespace Vi.Core
         public ActionClip CurrentActionClip { get; private set; }
         private string currentActionClipWeapon;
 
+        private const float abilityCancelledDuringAnticipationCooldownReductionPercent = 0.1f;
+
         public void SetActionClip(ActionClip actionClip, string weaponName)
         {
+            if (IsInAnticipation)
+            {
+                if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+                {
+                    weaponInstance.ReduceAbilityCooldownTime(CurrentActionClip, abilityCancelledDuringAnticipationCooldownReductionPercent);
+                }
+            }
+
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)

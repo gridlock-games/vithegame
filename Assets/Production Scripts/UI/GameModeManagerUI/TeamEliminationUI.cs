@@ -32,6 +32,7 @@ namespace Vi.UI
         {
             base.Update();
 
+            Debug.Log(teamEliminationManager.IsViEssenceSpawned() + " " + viLogoImage.color);
             if (teamEliminationManager.IsViEssenceSpawned())
             {
                 viLogoImage.color = Color.Lerp(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
