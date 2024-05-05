@@ -782,6 +782,18 @@ namespace Vi.Core
             }
         }
 
+        public bool IsNextProjectileDamageMultiplied()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.GetNextDamageMultiplier() > 1;
+                }
+            }
+            return false;
+        }
+
         public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
 
         public bool IsAiming() { return aiming.Value & animationHandler.CanAim(); }

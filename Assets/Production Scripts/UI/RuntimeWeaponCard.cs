@@ -32,6 +32,7 @@ namespace Vi.UI
         };
 
         private LoadoutManager loadoutManager;
+        private WeaponHandler weaponHandler;
         private Weapon weapon;
         private LoadoutManager.WeaponSlotType weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
         private PlayerInput playerInput;
@@ -49,6 +50,7 @@ namespace Vi.UI
         public void Initialize(LoadoutManager loadoutManager, Weapon weapon, LoadoutManager.WeaponSlotType weaponSlotType, PlayerInput playerInput, InputActionAsset inputActions)
         {
             this.loadoutManager = loadoutManager;
+            weaponHandler = loadoutManager.GetComponent<WeaponHandler>();
             this.weapon = weapon;
             this.weaponSlotType = weaponSlotType;
             this.playerInput = playerInput;
@@ -72,6 +74,8 @@ namespace Vi.UI
         private Image backgroundImage;
         private Color originalBackgroundColor;
         private Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        private Color originalAmmoTextColor;
+        private Color projectileMultiplierColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
         private const float backgroundColorTransitionSpeed = 16;
 
         private void Start()
@@ -79,6 +83,9 @@ namespace Vi.UI
             backgroundImage = GetComponent<Image>();
             originalBackgroundColor = backgroundImage.color;
             flashAttackColor.a = originalBackgroundColor.a;
+
+            originalAmmoTextColor = noBindingAmmoText.color;
+            projectileMultiplierColor.a = originalAmmoTextColor.a;
         }
 
         private string lastControlScheme;
@@ -93,6 +100,9 @@ namespace Vi.UI
                 withBindingAmmoText.text = loadoutManager.GetAmmoCount(weapon).ToString();
                 noBindingAmmoText.text = loadoutManager.GetAmmoCount(weapon).ToString();
             }
+
+            withBindingAmmoText.color = Color.Lerp(withBindingAmmoText.color, weaponHandler.IsNextProjectileDamageMultiplied() ? projectileMultiplierColor : originalAmmoTextColor, Time.deltaTime * backgroundColorTransitionSpeed);
+            noBindingAmmoText.color = Color.Lerp(noBindingAmmoText.color, weaponHandler.IsNextProjectileDamageMultiplied() ? projectileMultiplierColor : originalAmmoTextColor, Time.deltaTime * backgroundColorTransitionSpeed);
 
             backgroundImage.color = Color.Lerp(backgroundImage.color, loadoutManager.WeaponNameThatCanFlashAttack == weapon.name ? flashAttackColor : originalBackgroundColor, Time.deltaTime * backgroundColorTransitionSpeed);
 
