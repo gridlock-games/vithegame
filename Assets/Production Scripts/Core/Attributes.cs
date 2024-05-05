@@ -226,11 +226,11 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
 
-            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon);
+            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
         }
 
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
@@ -316,7 +316,7 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
-        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null)
+        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
             {
@@ -414,6 +414,8 @@ namespace Vi.Core
 
             float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
             damage *= attacker.damageMultiplier;
+            damage *= damageMultiplier;
+            Debug.Log(damage);
 
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
