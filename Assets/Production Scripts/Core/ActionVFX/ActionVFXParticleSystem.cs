@@ -116,33 +116,40 @@ namespace Vi.Core
             {
                 for (int colliderIndex = 0; colliderIndex < insideColliderData.GetColliderCount(particleIndex); colliderIndex++)
                 {
-                    Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
-                    if (col.TryGetComponent(out NetworkCollider networkCollider))
+                    try
                     {
-                        if (networkCollider.Attributes)
+                        Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
+                        if (col.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            bool canHit = true;
-                            if (hitCounter.ContainsKey(networkCollider.Attributes))
+                            if (networkCollider.Attributes)
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
-                            }
-
-                            if (canHit)
-                            {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                                bool canHit = true;
+                                if (hitCounter.ContainsKey(networkCollider.Attributes))
                                 {
-                                    if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                    if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                                    if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
+                                }
+
+                                if (canHit)
+                                {
+                                    if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                     {
-                                        hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
-                                    }
-                                    else
-                                    {
-                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                        if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                        {
+                                            hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                        }
+                                        else
+                                        {
+                                            hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    catch
+                    {
+                        // Do nothing because this error is dumb
                     }
                 }
             }

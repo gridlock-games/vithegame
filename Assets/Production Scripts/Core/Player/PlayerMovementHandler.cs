@@ -92,7 +92,7 @@ namespace Vi.Player
                 if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
                 else if (!attributes.ShouldPlayHitStop())
-                    newRotation = Quaternion.RotateTowards(inputPayload.rotation, Quaternion.LookRotation(camDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed);
+                    newRotation = Quaternion.LookRotation(camDirection);
             }
             else
             {
