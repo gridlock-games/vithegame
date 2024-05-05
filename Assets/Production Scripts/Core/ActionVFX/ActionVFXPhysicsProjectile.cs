@@ -56,7 +56,7 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                if (NetworkManager.Singleton.IsServer) networkCollider.Attributes.ProcessProjectileHit(attacker, null, default, attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                if (NetworkManager.Singleton.IsServer) networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
 
             Destroy(gameObject);
