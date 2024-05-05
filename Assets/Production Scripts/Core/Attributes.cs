@@ -629,7 +629,7 @@ namespace Vi.Core
                 GlowRenderer.RenderHit();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-                AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+                AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
 
             RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
@@ -641,7 +641,7 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
 
         private void RenderHitGlowOnly()
@@ -670,7 +670,7 @@ namespace Vi.Core
             {
                 GlowRenderer.RenderBlock();
                 StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-                AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+                AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
             RenderBlockClientRpc(impactPosition);
@@ -680,7 +680,7 @@ namespace Vi.Core
         {
             GlowRenderer.RenderBlock();
             StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
