@@ -355,6 +355,14 @@ namespace Vi.Core
                     vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
+                case ActionVFX.TransformType.AimAtTarget:
+                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
+                    vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+
+                    // Look at point then apply rotation offset
+                    vfxInstance.transform.LookAt(animationHandler.GetAimPoint());
+                    vfxInstance.transform.rotation *= Quaternion.Euler(actionVFXPrefab.vfxRotationOffset);
+                    break;
                 default:
                     Debug.LogError(actionVFXPrefab.transformType + " has not been implemented yet!");
                     break;

@@ -21,7 +21,8 @@ namespace Vi.ScriptableObjects
             Projectile,
             ConformToGround,
             ParentToVictim,
-            StationaryOnVictim
+            StationaryOnVictim,
+            AimAtTarget
         }
 
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
