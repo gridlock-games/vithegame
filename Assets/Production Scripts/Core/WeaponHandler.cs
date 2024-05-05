@@ -832,6 +832,18 @@ namespace Vi.Core
             {
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                {
+                    runtimeWeapon.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
+                }
+                else
+                {
+                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
+                }
+            }
         }
 
         void OnReload()

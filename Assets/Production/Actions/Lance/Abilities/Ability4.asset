@@ -257,8 +257,9 @@ MonoBehaviour:
   recoveryAnimationSpeed: 0.8
   agentStaminaCost: 0
   agentDefenseCost: 0
-  agentRageCost: 50
+  agentRageCost: 0
   effectedWeaponBones: 
+  weaponBonesToHide: 12000000
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -295,7 +296,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: ad4518998d2dd5b4d82b50098538ba60, type: 3}
-  abilityCooldownTime: 60
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
