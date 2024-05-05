@@ -10,6 +10,8 @@ namespace Vi.Core
     public class ActionVFXParticleSystem : ActionVFX
     {
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
+        [SerializeField] private bool shouldOverrideMaxHits;
+        [SerializeField] private int maxHitOverride = 1;
 
         private Attributes attacker;
         private ActionClip attack;
@@ -84,7 +86,7 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                 if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
@@ -122,7 +124,7 @@ namespace Vi.Core
                             bool canHit = true;
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= attack.maxHitLimit) { canHit = false; }
+                                if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                 if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
                             }
 
