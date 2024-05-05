@@ -415,7 +415,6 @@ namespace Vi.Core
             float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
             damage *= attacker.damageMultiplier;
             damage *= damageMultiplier;
-            Debug.Log(damage);
 
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
