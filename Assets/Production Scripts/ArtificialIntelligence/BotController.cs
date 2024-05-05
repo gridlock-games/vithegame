@@ -124,7 +124,7 @@ namespace Vi.ArtificialIntelligence
             if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                 newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.RotateTowards(currentRotation.Value, Quaternion.LookRotation(lookDirection), 1f / NetworkManager.NetworkTickSystem.TickRate * angularSpeed) : currentRotation.Value;
+                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
