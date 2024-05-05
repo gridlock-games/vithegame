@@ -7,10 +7,27 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 119070087, guid: 5750154a22692224e92f088407844f8a, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 469809414, guid: 5750154a22692224e92f088407844f8a, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1041132980, guid: 5750154a22692224e92f088407844f8a, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
         type: 3}
       propertyPath: m_Name
       value: FX_Shoot_Axe_projectile
+      objectReference: {fileID: 0}
+    - target: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5881470062439506428, guid: 5750154a22692224e92f088407844f8a,
         type: 3}
@@ -116,11 +133,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2740d5ab5aa0d49b40abf56cf7ddb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxPositionOffset: {x: 0, y: 2, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 3
-  onActivateVFXSpawnNormalizedTime: 0
+  onActivateVFXSpawnNormalizedTime: 0.3
   raycastOffset: {x: 0, y: 2, z: 3}
   raycastMaxDistance: 5
   crossProductDirection: {x: 1, y: 0, z: 0}
