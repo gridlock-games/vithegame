@@ -10,9 +10,9 @@ namespace Vi.Core
     public class ActionVFXPhysicsProjectile : ActionVFX
     {
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
+        [SerializeField] private float timeToActivateGravity = 0;
 
         private Attributes attacker;
-        private ShooterWeapon shooterWeapon;
         private ActionClip attack;
         private bool initialized;
 
@@ -37,6 +37,15 @@ namespace Vi.Core
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
+
+            StartCoroutine(ActivateGravityCoroutine());
+        }
+
+        private IEnumerator ActivateGravityCoroutine()
+        {
+            GetComponent<Rigidbody>().useGravity = false;
+            yield return new WaitForSeconds(timeToActivateGravity);
+            GetComponent<Rigidbody>().useGravity = true;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -47,9 +56,9 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                if (NetworkManager.Singleton.IsServer) networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                if (NetworkManager.Singleton.IsServer) networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
-            Debug.Log(other);
+
             Destroy(gameObject);
         }
     }
