@@ -16,7 +16,6 @@ namespace Vi.Editor
         private SerializedProperty spMaxHitOverride;
 
         private SerializedProperty spScaleVFXBasedOnEdges;
-        private SerializedProperty spMinVFXScale;
         private SerializedProperty spBoundsPoint;
         private SerializedProperty spBoundsLocalAxis;
 
@@ -29,7 +28,6 @@ namespace Vi.Editor
             spMaxHitOverride = serializedObject.FindProperty("maxHitOverride");
 
             spScaleVFXBasedOnEdges = serializedObject.FindProperty("scaleVFXBasedOnEdges");
-            spMinVFXScale = serializedObject.FindProperty("minVFXScale");
             spBoundsPoint = serializedObject.FindProperty("boundsPoint");
             spBoundsLocalAxis = serializedObject.FindProperty("boundsLocalAxis");
         }
@@ -43,10 +41,11 @@ namespace Vi.Editor
             if (spShouldOverrideMaxHits.boolValue) { EditorGUILayout.IntSlider(spMaxHitOverride, 1, 100); }
 
             EditorGUILayout.PropertyField(spScaleVFXBasedOnEdges);
-            if (spScaleVFXBasedOnEdges.boolValue) { EditorGUILayout.PropertyField(spMinVFXScale); }
-
-            EditorGUILayout.PropertyField(spBoundsPoint);
-            EditorGUILayout.PropertyField(spBoundsLocalAxis);
+            if (spScaleVFXBasedOnEdges.boolValue)
+            {
+                EditorGUILayout.PropertyField(spBoundsPoint);
+                EditorGUILayout.PropertyField(spBoundsLocalAxis);
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

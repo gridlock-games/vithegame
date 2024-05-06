@@ -13,7 +13,6 @@ namespace Vi.Core
         [SerializeField] private bool shouldOverrideMaxHits;
         [SerializeField] private int maxHitOverride = 1;
         [SerializeField] private bool scaleVFXBasedOnEdges;
-        [SerializeField] private Vector3 minVFXScale;
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
@@ -54,28 +53,30 @@ namespace Vi.Core
 
         private void Start()
         {
-            Vector3 endBoundsPoint = boundsPoint;
-            while (endBoundsPoint != Vector3.zero)
+            if (scaleVFXBasedOnEdges)
             {
-                RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
-                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-                bool bHit = false;
-                foreach (RaycastHit hit in allHits)
+                Vector3 endBoundsPoint = boundsPoint;
+                while (endBoundsPoint != Vector3.zero)
                 {
-                    bHit = true;
-                    Debug.Log(hit.collider + " " + hit.transform.root);
-                    break;
+                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+                    bool bHit = false;
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        bHit = true;
+                        Debug.Log(hit.collider + " " + hit.transform.root);
+                        break;
+                    }
+
+                    if (bHit) { break; }
+
+                    endBoundsPoint = Vector3.MoveTowards(endBoundsPoint, Vector3.zero, 0.1f);
                 }
-
-                if (bHit) { break; }
-
-                endBoundsPoint = Vector3.MoveTowards(endBoundsPoint, Vector3.zero, 0.1f);
+                Vector3 newScale = new Vector3(DivideBounds(boundsPoint.x, endBoundsPoint.x), DivideBounds(boundsPoint.y, endBoundsPoint.y), DivideBounds(boundsPoint.z, endBoundsPoint.z));
+                transform.localScale = Vector3.Scale(transform.localScale, newScale);
             }
-            Vector3 newScale = new Vector3(DivideBounds(boundsPoint.x, endBoundsPoint.x), DivideBounds(boundsPoint.y, endBoundsPoint.y), DivideBounds(boundsPoint.z, endBoundsPoint.z));
-            transform.localScale = Vector3.Scale(transform.localScale, newScale);
-            Debug.Log(endBoundsPoint + " " + boundsPoint + " " + newScale + " " + transform.localScale);
         }
 
         private void OnTriggerEnter(Collider other)
