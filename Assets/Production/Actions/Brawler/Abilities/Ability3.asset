@@ -2517,7 +2517,7 @@ MonoBehaviour:
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: 
+  effectedWeaponBones: 06000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -2526,8 +2526,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.4
+  attackingNormalizedTime: 0
+  recoveryNormalizedTime: 1
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -2543,10 +2543,10 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 1
-  ailment: 2
+  ailment: 7
+  grabAttackClip: {fileID: 7400000, guid: 6b868ae9684898d4fb4fca9e0285ed1d, type: 3}
+  grabVictimClip: {fileID: 7400000, guid: 77a6a122458e2e1499714b46a41f333e, type: 3}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 2
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
@@ -2559,8 +2559,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 82199973914113988, guid: c0f12ed2fca9d2045bac625817ae0b46, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
