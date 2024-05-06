@@ -338,6 +338,20 @@ namespace Vi.Core
             return null;
         }
 
+        public void CancelGrab()
+        {
+            if (IsGrabbed())
+            {
+                if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
+                isGrabbed.Value = false;
+            }
+
+            if (animationHandler.IsGrabAttacking())
+            {
+                animationHandler.CancelAllActions();
+            }
+        }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -458,12 +472,19 @@ namespace Vi.Core
             {
                 if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
                 {
+                    if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
+                    {
+                        GetGrabAssailant().CancelGrab();
+                        CancelGrab();
+                    }
+
                     if (hitReaction.ailment == ActionClip.Ailment.Grab)
                     {
                         grabAttackClipName.Value = attack.name;
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
-                    if (!IsGrabbed()) { animationHandler.PlayAction(hitReaction); }
+
+                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
                 }
             }
             else

@@ -125,6 +125,7 @@ namespace Vi.Core
             CanAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
+            List<RuntimeWeapon> runtimeWeapons = new List<RuntimeWeapon>();
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
@@ -133,6 +134,7 @@ namespace Vi.Core
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
                         GameObject instance = Instantiate(modelData.weaponPrefab);
+                        runtimeWeapons.Add(instance.GetComponent<RuntimeWeapon>());
                         instances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
@@ -179,6 +181,18 @@ namespace Vi.Core
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
             weaponInstances = instances;
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                {
+                    runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeapons);
+                }
+                else
+                {
+                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
+                }
+            }
         }
 
         public void PlayFlashAttack()

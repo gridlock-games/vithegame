@@ -30,6 +30,11 @@ namespace Vi.Core
             return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName);
         }
 
+        public bool IsActionClipPlayingInCurrentState(ActionClip actionClip)
+        {
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(GetActionClipAnimationStateName(actionClip));
+        }
+
         private string GetActionClipAnimationStateName(ActionClip actionClip)
         {
             string animationStateName = actionClip.name;
@@ -315,6 +320,7 @@ namespace Vi.Core
             }
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
+            if (attributes.IsGrabbed()) { transitionTime = 0; }
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
