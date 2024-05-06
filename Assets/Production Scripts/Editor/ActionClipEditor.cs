@@ -618,6 +618,31 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spRequiredAmmoAmount);
                 }
             }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.GrabAttack)
+            {
+                EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
+                EditorGUILayout.PropertyField(spStaminaDamage);
+                EditorGUILayout.PropertyField(spDefenseDamage);
+                EditorGUILayout.PropertyField(spMaxHitLimit);
+                if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spActionVFXList);
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
+                spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
+                spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

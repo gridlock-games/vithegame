@@ -453,7 +453,11 @@ namespace Vi.Core
             {
                 if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
                 {
-                    if (hitReaction.ailment == ActionClip.Ailment.Grab) { grabAttackClipName.Value = attack.name; }
+                    if (hitReaction.ailment == ActionClip.Ailment.Grab)
+                    {
+                        grabAttackClipName.Value = attack.name;
+                        attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                    }
                     animationHandler.PlayAction(hitReaction);
                 }
             }

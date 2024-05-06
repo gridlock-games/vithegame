@@ -13,6 +13,7 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip)
         {
+            Debug.Log(actionClip);
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name);
@@ -284,7 +285,7 @@ namespace Vi.Core
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
-            string animationStateName = actionClipName;
+            string animationStateName = actionClipName.Contains("GrabAttack") ? "GrabAttack" : actionClipName;
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
@@ -311,7 +312,6 @@ namespace Vi.Core
                 else // If this is a heavy attack
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
-            Debug.Log(animationStateName);
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
@@ -490,7 +490,7 @@ namespace Vi.Core
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
-            string animationStateName = actionClipName;
+            string animationStateName = actionClipName.Contains("GrabAttack") ? "GrabAttack" : actionClipName;
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
