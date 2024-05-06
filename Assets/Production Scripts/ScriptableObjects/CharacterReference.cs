@@ -35,7 +35,7 @@ namespace Vi.ScriptableObjects
             public string name;
             public Sprite weaponIcon;
             public Sprite killFeedIcon;
-            public RuntimeAnimatorController animationController;
+            public AnimatorOverrideController animationController;
             public Weapon weapon;
             public GameObject weaponPreviewPrefab;
             public string itemWebId;

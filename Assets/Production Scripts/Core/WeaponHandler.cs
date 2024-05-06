@@ -431,8 +431,7 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
 
-            if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
-                    | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
             {
                 if (CurrentActionClip.isUninterruptable) { attributes.SetUninterruptable(Time.deltaTime * 2); }
                 if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
@@ -447,14 +446,13 @@ namespace Vi.Core
                 IsBlocking = false;
             }
             
-            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
             if (currentActionClipWeapon != weaponInstance.name)
             {
                 IsInAnticipation = false;
                 IsAttacking = false;
                 IsInRecovery = false;
             }
-            else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
+            else if (CurrentActionClip.IsAttack())
             {
                 bool lastIsAttacking = IsAttacking;
                 if (animationHandler.IsActionClipPlaying(CurrentActionClip))

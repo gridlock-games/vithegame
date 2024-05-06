@@ -26,13 +26,21 @@ namespace Vi.Core
 
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
-            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
-            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName);
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName);
+        }
+
+        private string GetActionClipAnimationStateName(ActionClip actionClip)
+        {
+            string animationStateName = actionClip.name;
+            if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            return animationStateName;
         }
 
         public float GetActionClipNormalizedTime(ActionClip actionClip)
         {
-            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            string stateName = GetActionClipAnimationStateName(actionClip);
             float normalizedTime = 0;
             if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
             {
@@ -95,6 +103,13 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
+        public bool IsGrabAttacking()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+            return !IsAtRest();
+        }
+
         public void CancelAllActions()
         {
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
@@ -118,11 +133,11 @@ namespace Vi.Core
         };
 
         // This method plays the action on the server
-        private void PlayActionOnServer(string actionStateName)
+        private void PlayActionOnServer(string actionClipName)
         {
             WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (!movementHandler.CanMove()) { return; }
             if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
@@ -134,7 +149,7 @@ namespace Vi.Core
             // If we are transitioning to the same state as this actionclip
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (nextStateInfo.IsName(actionStateName)) { return; }
+                if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
             bool shouldUseDodgeCancelTransitionTime = false;
@@ -240,35 +255,10 @@ namespace Vi.Core
                 }
             }
 
-            if (actionClip.ailment == ActionClip.Ailment.Grab)
-            {
-                float raycastDistance = actionClip.grabDistance;
-                bool bHit = false;
-                RaycastHit[] allHits = Physics.RaycastAll(transform.position + Vector3.up, transform.forward, raycastDistance, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
-                Debug.DrawRay(transform.position + Vector3.up, transform.forward * raycastDistance, Color.blue, 2);
-                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-
-                foreach (RaycastHit hit in allHits)
-                {
-                    if (hit.transform == transform) { continue; }
-                    if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
-                    {
-                        if (networkCollider.Attributes == attributes) { return; }
-
-                        networkCollider.Attributes.TryAddStatus(ActionClip.Status.rooted, 0, actionClip.grabDuration, 0);
-                    }
-                    bHit = true;
-                    break;
-                }
-
-                // Make sure that there is a detected target
-                if (!bHit) { return; }
-            }
-
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
             {
-                if (nextStateInfo.IsName(actionStateName)) { return; }
+                if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
             // Check stamina and rage requirements and apply statuses for specific actions
@@ -276,7 +266,7 @@ namespace Vi.Core
             {
                 if (weaponHandler.GetWeapon().dodgeStaminaCost > attributes.GetStamina()) { return; }
                 attributes.AddStamina(-weaponHandler.GetWeapon().dodgeStaminaCost);
-                StartCoroutine(SetInvincibleStatusOnDodge(actionStateName));
+                StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
@@ -309,19 +299,35 @@ namespace Vi.Core
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+
+            if (actionClip.ailment == ActionClip.Ailment.Grab)
+            {
+                AnimatorOverrideController animatorOverrideController = loadoutManager.PrimaryWeaponOption.animationController;
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    animatorOverrideController["GrabReaction"] = attributes.GetGrabReactionClip();
+                }
+                else
+                {
+                    animatorOverrideController["GrabAttack"] = actionClip.grabAttackClip;
+                }
+            }
+
+            float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                    Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
-                    Animator.CrossFade(actionStateName, shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                    Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionStateName, weaponHandler.GetWeapon().name);
+            PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
         }
@@ -482,28 +488,43 @@ namespace Vi.Core
 
         // Remote Procedure Call method for playing the action on the client
         [ClientRpc]
-        private void PlayActionClientRpc(string actionStateName, string weaponName)
+        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
             if (IsServer) { return; }
-            StartCoroutine(PlayActionOnClient(actionStateName, weaponName));
+            StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
         }
 
-        private IEnumerator PlayActionOnClient(string actionStateName, string weaponName)
+        private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
 
             // Retrieve the ActionClip based on the actionStateName
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionStateName);
+            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
-            // Play the action clip on the client side based on its type
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+
+            if (actionClip.ailment == ActionClip.Ailment.Grab)
+            {
+                AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(Animator.runtimeAnimatorController);
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();
+                }
+                else
+                {
+                    animatorOverrideController["Grab_Attack"] = actionClip.grabAttackClip;
+                }
+            }
+
+            // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction | actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                    Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"), 0);
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
-                    Animator.CrossFade(actionStateName, actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+                    Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
                     playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
             }
@@ -513,7 +534,7 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
-            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionStateName)); }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionClipName)); }
 
             lastClipPlayed = actionClip;
         }
@@ -538,10 +559,6 @@ namespace Vi.Core
 
         public Animator Animator { get; private set; }
         public LimbReferences LimbReferences { get; private set; }
-        Attributes attributes;
-        WeaponHandler weaponHandler;
-        AnimatorReference animatorReference;
-        MovementHandler movementHandler;
 
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
@@ -561,6 +578,7 @@ namespace Vi.Core
             }
         }
 
+        AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
@@ -615,10 +633,15 @@ namespace Vi.Core
             StartCoroutine(ChangeCharacterCoroutine(PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character));
         }
 
+        Attributes attributes;
+        WeaponHandler weaponHandler;
+        LoadoutManager loadoutManager;
+        MovementHandler movementHandler;
         private void Awake()
         {
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+            loadoutManager = GetComponent<LoadoutManager>();
             movementHandler = GetComponent<MovementHandler>();
         }
 
