@@ -39,7 +39,6 @@ namespace Vi.Core
                 {
                     bHit = true;
                     floorHit = hit;
-
                     break;
                 }
 
