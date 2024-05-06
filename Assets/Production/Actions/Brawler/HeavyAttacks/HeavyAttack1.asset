@@ -1312,6 +1312,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 0500000006000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -1342,8 +1343,8 @@ MonoBehaviour:
   grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 1
-  canCancelHeavyAttacks: 0
-  canCancelAbilities: 0
+  canCancelHeavyAttacks: 1
+  canCancelAbilities: 1
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
