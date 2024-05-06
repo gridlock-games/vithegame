@@ -251,10 +251,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.15
+  transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  recoveryAnimationSpeed: 1.15
   agentStaminaCost: 35
   agentDefenseCost: 0
   agentRageCost: 0
@@ -266,8 +266,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.6
+  attackingNormalizedTime: 0.03
+  recoveryNormalizedTime: 0.38
   damage: 3
   healAmount: 0
   staminaDamage: 0
@@ -288,14 +288,14 @@ MonoBehaviour:
   grabDuration: 2
   grabDistance: 3
   dodgeLock: 0
-  canCancelLightAttacks: 0
-  canCancelHeavyAttacks: 0
+  canCancelLightAttacks: 1
+  canCancelHeavyAttacks: 1
   canCancelAbilities: 0
   canBeCancelledByLightAttacks: 0
-  canBeCancelledByHeavyAttacks: 0
+  canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 3c7ccecc924911c4984c92e07104862c, type: 3}
-  abilityCooldownTime: 20
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate:
   - status: 2
     value: 2

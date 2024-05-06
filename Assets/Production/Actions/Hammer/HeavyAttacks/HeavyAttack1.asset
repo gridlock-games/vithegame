@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -253,12 +253,13 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1.25
+  animationSpeed: 1.1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 1
   chargeAttackStateLoopCount: 1
@@ -287,7 +288,7 @@ MonoBehaviour:
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 1
+  dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 1
