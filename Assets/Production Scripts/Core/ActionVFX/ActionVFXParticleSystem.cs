@@ -66,7 +66,6 @@ namespace Vi.Core
                     foreach (RaycastHit hit in allHits)
                     {
                         bHit = true;
-                        Debug.Log(hit.collider + " " + hit.transform.root);
                         break;
                     }
 
