@@ -265,6 +265,11 @@ namespace Vi.Core
                 {
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
+                else if (attributes.IsGrabbed())
+                {
+                    Transform grabAssailant = attributes.GetGrabAssailant().transform;
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.1f) - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
                 else
                 {
                     curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;

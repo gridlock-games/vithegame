@@ -26,14 +26,21 @@ namespace Vi.Core
 
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
-            string animationStateName = actionClip.name.Contains("GrabAttack") ? "GrabAttack" : actionClip.name;
-            if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
             return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName);
+        }
+
+        private string GetActionClipAnimationStateName(ActionClip actionClip)
+        {
+            string animationStateName = actionClip.name;
+            if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            return animationStateName;
         }
 
         public float GetActionClipNormalizedTime(ActionClip actionClip)
         {
-            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
+            string stateName = GetActionClipAnimationStateName(actionClip);
             float normalizedTime = 0;
             if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
             {
@@ -93,6 +100,13 @@ namespace Vi.Core
         {
             if (!lastClipPlayed) { return false; }
             if (lastClipPlayed.GetHitReactionType() != ActionClip.HitReactionType.Blocking) { return false; }
+            return !IsAtRest();
+        }
+
+        public bool IsGrabAttacking()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
             return !IsAtRest();
         }
 
@@ -285,7 +299,7 @@ namespace Vi.Core
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
-            string animationStateName = actionClipName.Contains("GrabAttack") ? "GrabAttack" : actionClipName;
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
@@ -293,7 +307,6 @@ namespace Vi.Core
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["GrabReaction"] = attributes.GetGrabReactionClip();
-                    animationStateName = "GrabReaction";
                 }
                 else
                 {
@@ -490,7 +503,7 @@ namespace Vi.Core
 
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
-            string animationStateName = actionClipName.Contains("GrabAttack") ? "GrabAttack" : actionClipName;
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
@@ -498,12 +511,10 @@ namespace Vi.Core
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();
-                    animationStateName = "Grab_Reaction";
                 }
                 else
                 {
                     animatorOverrideController["Grab_Attack"] = actionClip.grabAttackClip;
-                    animationStateName = "Grab_Attack";
                 }
             }
 

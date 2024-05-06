@@ -346,6 +346,11 @@ namespace Vi.Core
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+
+            // Make grab people invinicible to all attacks except for the grab hits
+            if (IsGrabbed() & attacker != GetGrabAssailant()) { Debug.Log("1 " + Time.time); return false; }
+            if (animationHandler.IsGrabAttacking()) { Debug.Log("2 " + Time.time); return false; }
+
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
                 AddHP(attack.healAmount);
@@ -812,7 +817,7 @@ namespace Vi.Core
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
+        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
