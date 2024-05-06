@@ -7,12 +7,18 @@ namespace Vi.Core
 {
     public class ActionVFXPreview : ActionVFX
     {
-        Renderer[] renderers;
+        private ParticleSystem ps;
+        private Color originalParticleSystemColor;
+        private Color noVFXWillBeSpawnedColor = Color.red;
+        
         private void Start()
         {
-            renderers = GetComponentsInChildren<Renderer>();
+            ps = GetComponentInChildren<ParticleSystem>();
+            originalParticleSystemColor = ps.main.startColor.color;
+            noVFXWillBeSpawnedColor.a = originalParticleSystemColor.a;
         }
 
+        private bool lastColorState;
         private void LateUpdate()
         {
             if (transformType == TransformType.Projectile)
@@ -37,10 +43,7 @@ namespace Vi.Core
                     break;
                 }
 
-                foreach (Renderer renderer in renderers)
-                {
-                    renderer.forceRenderingOff = !bHit;
-                }
+                ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
 
                 if (bHit)
                 {
@@ -49,9 +52,25 @@ namespace Vi.Core
                 }
                 else
                 {
-                    transform.position = transform.parent.position + transform.parent.rotation * vfxPositionOffset;
+                    transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
+                    Vector3 normal = new Vector3(0, 1, 0);
+                    transform.rotation = Quaternion.LookRotation(Vector3.Cross(normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
                 }
             }
+        }
+
+        private Color lastColorSet;
+        private void ChangeParticleColor(Color color)
+        {
+            if (!ps) { return; }
+            if (color == lastColorSet) { return; }
+
+            var main = ps.main;
+            main.startColor = color;
+            ps.Clear();
+            ps.Play();
+
+            lastColorSet = color;
         }
     }
 }
