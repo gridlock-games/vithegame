@@ -1,7 +1,8 @@
 using UnityEngine;
 using Vi.UI.SimpleGoogleSignIn;
 
-
+namespace Vi.UI
+{
   public class DeepLinkProcessing : MonoBehaviour
   {
     public static DeepLinkProcessing Instance { get; private set; }
@@ -91,21 +92,29 @@ using Vi.UI.SimpleGoogleSignIn;
         case loginSiteSource.inactive:
           //Do Nothing
           break;
+
         case loginSiteSource.google:
           GoogleAuth.deeplinkListener(fullLoginData);
           break;
+
         case loginSiteSource.apple:
           break;
+
         case loginSiteSource.facebook:
           break;
+
         case loginSiteSource.elonfailure:
           break;
+
         case loginSiteSource.steam:
           break;
+
         case loginSiteSource.epic:
           break;
+
         case loginSiteSource.origin:
           break;
+
         default:
           break;
       }
@@ -114,15 +123,15 @@ using Vi.UI.SimpleGoogleSignIn;
       deeplinkURL = "[none]";
     }
 
-
-    private void demotest()
-    {
-      // Pass the data to whatever it is needed
-      DemoDeepLinkPassthru ddlp = this.GetComponent<DemoDeepLinkPassthru>();
-      if (ddlp != null)
-      {
-        Debug.Log("Detected File: " + deeplinkURL);
-        ddlp.updateOutputText(deeplinkURL);
-      }
-    }
+    //private void demotest()
+    //{
+    //  // Pass the data to whatever it is needed
+    //  DemoDeepLinkPassthru ddlp = this.GetComponent<DemoDeepLinkPassthru>();
+    //  if (ddlp != null)
+    //  {
+    //    Debug.Log("Detected File: " + deeplinkURL);
+    //    ddlp.updateOutputText(deeplinkURL);
+    //  }
+    //}
   }
+}
