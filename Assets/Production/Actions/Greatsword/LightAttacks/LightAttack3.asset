@@ -2176,39 +2176,16 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 0
-  cameraYOffsetAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   avatarLayer: 0
   transitionTime: 0.15
-  dodgeCancelTransitionTime: 0.15
+  dodgeCancelTransitionTime: 0.1
   animationSpeed: 1.2
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -2217,7 +2194,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.3
   damage: 4
   healAmount: 0
   staminaDamage: 0
@@ -2249,7 +2226,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 2668701750694916599, guid: b253f8747a5e845108b3a546ff3565b9, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1

@@ -250,30 +250,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 0
-  cameraYOffsetAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
@@ -283,6 +259,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 1
   chargeAttackStateLoopCount: 1
@@ -311,7 +288,7 @@ MonoBehaviour:
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 1
+  dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 1

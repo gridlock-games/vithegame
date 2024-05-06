@@ -132,6 +132,11 @@ PrefabInstance:
       propertyPath: InitialModule.maxNumParticles
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3284651317334449525, guid: 60afdf9765a3bea48b2e8416103d67b0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3284651317334449526, guid: 60afdf9765a3bea48b2e8416103d67b0,
         type: 3}
       propertyPath: simulationSpeed
@@ -144,13 +149,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6686027359308701497, guid: 60afdf9765a3bea48b2e8416103d67b0,
         type: 3}
+      propertyPath: transformType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6686027359308701497, guid: 60afdf9765a3bea48b2e8416103d67b0,
+        type: 3}
       propertyPath: vfxPositionOffset.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6686027359308701497, guid: 60afdf9765a3bea48b2e8416103d67b0,
         type: 3}
       propertyPath: vfxPositionOffset.z
-      value: 0.75
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6686027359308701497, guid: 60afdf9765a3bea48b2e8416103d67b0,
         type: 3}

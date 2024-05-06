@@ -10010,7 +10010,7 @@ MonoBehaviour:
   vfxPositionOffset: {x: 0, y: 0, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 0
+  transformType: 4
   onActivateVFXSpawnNormalizedTime: 0.48
   raycastOffset: {x: 0, y: 2, z: 0}
   raycastMaxDistance: 5
@@ -10018,6 +10018,11 @@ MonoBehaviour:
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   shouldUseAttackerPositionForHitAngles: 1
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
+  scaleVFXBasedOnEdges: 0
+  boundsPoint: {x: 0, y: 0, z: 2.5}
+  boundsLocalAxis: {x: 0, y: -1, z: 0}
 --- !u!54 &3730964296283589503
 Rigidbody:
   m_ObjectHideFlags: 0
