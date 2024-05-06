@@ -159,8 +159,6 @@ namespace Vi.ScriptableObjects
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
         public bool[] ailmentHitDefinition = new bool[0];
-        public float grabDuration = 2;
-        public float grabDistance = 3;
 
         public const float HitStopEffectDuration = 0.1f;
         public float GetTimeBetweenHits()
