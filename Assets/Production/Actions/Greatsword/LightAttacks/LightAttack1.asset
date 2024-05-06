@@ -2754,13 +2754,14 @@ MonoBehaviour:
   YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
-  dodgeCancelTransitionTime: 0.15
+  dodgeCancelTransitionTime: 0.1
   animationSpeed: 1
   recoveryAnimationSpeed: 2
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -2769,7 +2770,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.26
+  recoveryNormalizedTime: 0.25
   damage: 2
   healAmount: 0
   staminaDamage: 5
@@ -2789,7 +2790,7 @@ MonoBehaviour:
   ailmentHitDefinition: 
   grabDuration: 2
   grabDistance: 3
-  dodgeLock: 2
+  dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
   canCancelAbilities: 0
@@ -2801,7 +2802,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 2832310260636488776, guid: e9efebd7bdfe846b9ada899e353ccd9a, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
