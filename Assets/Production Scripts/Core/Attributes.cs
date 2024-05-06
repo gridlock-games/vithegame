@@ -463,7 +463,8 @@ namespace Vi.Core
                         grabAttackClipName.Value = attack.name;
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
-                    if (!IsGrabbed()) { animationHandler.PlayAction(hitReaction); }
+
+                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
                 }
             }
             else

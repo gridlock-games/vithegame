@@ -633,6 +633,11 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spActionVFXList);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
+                EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
