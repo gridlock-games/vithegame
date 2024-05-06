@@ -200,8 +200,18 @@ namespace Vi.Core
         public ActionClip CurrentActionClip { get; private set; }
         private string currentActionClipWeapon;
 
+        private const float abilityCancelledDuringAnticipationCooldownReductionPercent = 0.1f;
+
         public void SetActionClip(ActionClip actionClip, string weaponName)
         {
+            if (IsInAnticipation)
+            {
+                if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+                {
+                    weaponInstance.ReduceAbilityCooldownTime(CurrentActionClip, abilityCancelledDuringAnticipationCooldownReductionPercent);
+                }
+            }
+
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
@@ -782,6 +792,18 @@ namespace Vi.Core
             }
         }
 
+        public bool IsNextProjectileDamageMultiplied()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.GetNextDamageMultiplier() > 1;
+                }
+            }
+            return false;
+        }
+
         public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
 
         public bool IsAiming() { return aiming.Value & animationHandler.CanAim(); }
@@ -819,6 +841,18 @@ namespace Vi.Core
             else
             {
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
+            }
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                {
+                    runtimeWeapon.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
+                }
+                else
+                {
+                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
+                }
             }
         }
 

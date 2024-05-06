@@ -326,6 +326,30 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public void ReduceAbilityCooldownTime(ActionClip ability, float percent)
+        {
+            if (ability == ability1)
+            {
+                lastAbility1ActivateTime -= ability1.abilityCooldownTime * percent;
+            }
+            else if (ability == ability2)
+            {
+                lastAbility2ActivateTime -= ability2.abilityCooldownTime * percent;
+            }
+            else if (ability == ability3)
+            {
+                lastAbility3ActivateTime -= ability3.abilityCooldownTime * percent;
+            }
+            else if (ability == ability4)
+            {
+                lastAbility4ActivateTime -= ability4.abilityCooldownTime * percent;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+        }
+
         [SerializeField] private ActionClip flashAttack;
 
         public ActionClip GetFlashAttack() { return flashAttack; }

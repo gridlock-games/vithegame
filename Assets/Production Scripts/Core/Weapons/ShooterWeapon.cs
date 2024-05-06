@@ -102,6 +102,13 @@ namespace Vi.Core
             }
         }
 
+        public float GetNextDamageMultiplier()
+        {
+            if (!parentWeaponHandler) { return 1; }
+            int damageMultiplerIndex = parentWeaponHandler.GetMaxAmmoCount() - parentWeaponHandler.GetAmmoCount();
+            return ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1;
+        }
+
         private void OnDrawGizmos()
         {
             if (!parentWeaponHandler) { return; }

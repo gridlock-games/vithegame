@@ -41,6 +41,7 @@ namespace Vi.Editor
         private SerializedProperty spYAngleRotationOffset;
 
         private SerializedProperty spEffectedWeaponBones;
+        private SerializedProperty spWeaponBonesToHide;
         private SerializedProperty spMustBeAiming;
 
         private SerializedProperty spChargeAttackHasEndAnimation;
@@ -134,6 +135,7 @@ namespace Vi.Editor
             spAgentRageCost = serializedObject.FindProperty("agentRageCost");
 
             spEffectedWeaponBones = serializedObject.FindProperty("effectedWeaponBones");
+            spWeaponBonesToHide = serializedObject.FindProperty("weaponBonesToHide");
             spMustBeAiming = serializedObject.FindProperty("mustBeAiming");
 
             spChargeAttackHasEndAnimation = serializedObject.FindProperty("chargeAttackHasEndAnimation");
@@ -308,6 +310,7 @@ namespace Vi.Editor
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.LightAttack)
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
                 EditorGUILayout.PropertyField(spMustBeAiming);
 
                 EditorGUILayout.Space();
@@ -374,6 +377,7 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.HeavyAttack)
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
                 EditorGUILayout.PropertyField(spMustBeAiming);
 
                 EditorGUILayout.Space();
@@ -456,7 +460,8 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.FlashAttack)
             {
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
-                
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
+
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spAgentDefenseCost);
@@ -537,6 +542,7 @@ namespace Vi.Editor
             {
                 EditorGUILayout.PropertyField(spAbilityImageIcon);
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);

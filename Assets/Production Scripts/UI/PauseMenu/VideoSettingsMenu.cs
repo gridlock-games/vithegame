@@ -114,8 +114,8 @@ namespace Vi.UI
 
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
 
-            //msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
-            //msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
+            msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
+            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
 
             hdrToggle.isOn = pipeline.supportsHDR;
 
@@ -125,6 +125,7 @@ namespace Vi.UI
         private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
         {
             { "Disabled", 0 },
+            { "1x", 1 },
             { "2x", 2 },
             { "4x", 4 },
             { "8x", 8 }
@@ -132,22 +133,16 @@ namespace Vi.UI
 
         private void Update()
         {
-            //bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
-            //    | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
-            //    | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
-            //    | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
-            //    | originalGraphicsPreset != graphicsPresetDropdown.value
-            //    | originalRenderScaleValue != renderScaleSlider.value
-            //    | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
-            //    | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
-            //    | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
-            //    | originalHDR != hdrToggle.isOn;
-
             bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
                 | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
                 | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
-                | originalGraphicsPreset != graphicsPresetDropdown.value;
+                | originalGraphicsPreset != graphicsPresetDropdown.value
+                | originalRenderScaleValue != renderScaleSlider.value
+                | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
+                | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
+                | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
+                | originalHDR != hdrToggle.isOn;
 
             applyChangesButton.interactable = changesPresent;
             discardChangesButton.interactable = changesPresent;
