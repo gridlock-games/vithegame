@@ -158,6 +158,8 @@ namespace Vi.ScriptableObjects
         public bool canFlashAttack;
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
+        public AnimationClip grabAttackClip;
+        public AnimationClip grabVictimClip;
         public bool[] ailmentHitDefinition = new bool[0];
 
         public const float HitStopEffectDuration = 0.1f;
