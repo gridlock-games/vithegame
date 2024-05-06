@@ -238,7 +238,6 @@ namespace Vi.Player
                 cameraController.GetComponent<Camera>().enabled = true;
                 minimapCameraInstance.enabled = true;
 
-                PlayerInput playerInput = GetComponent<PlayerInput>();
                 playerInput.enabled = true;
                 string rebinds = PlayerPrefs.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
@@ -250,7 +249,7 @@ namespace Vi.Player
             {
                 Destroy(cameraController.gameObject);
                 Destroy(minimapCameraInstance.gameObject);
-                GetComponent<PlayerInput>().enabled = false;
+                playerInput.enabled = false;
             }
         }
 
@@ -267,6 +266,13 @@ namespace Vi.Player
             base.OnDestroy();
             if (cameraController) { Destroy(cameraController.gameObject); }
             if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
+        }
+
+        private PlayerInput playerInput;
+        private new void Awake()
+        {
+            base.Awake();
+            playerInput = GetComponent<PlayerInput>();
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -292,25 +298,10 @@ namespace Vi.Player
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
-                PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
                     foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-                        {
-                            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-                            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-                            foreach (RaycastHit hit in allHits)
-                            {
-                                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
-                                {
-                                    networkInteractable.Interact(gameObject);
-                                    break;
-                                }
-                            }
-                        }
-
                         if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
                         bool isTouchingJoystick = false;
@@ -323,6 +314,23 @@ namespace Vi.Player
                             }
                         }
 
+                        if (!isTouchingJoystick)
+                        {
+                            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+                            {
+                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                                foreach (RaycastHit hit in allHits)
+                                {
+                                    if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                                    {
+                                        networkInteractable.Interact(gameObject);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
                         if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
                         {
                             lookInputToAdd += touch.delta;

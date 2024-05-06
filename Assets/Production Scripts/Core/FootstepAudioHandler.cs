@@ -28,7 +28,7 @@ namespace Vi.Core
                 {
                     if (hit.distance <= footRaisedDistanceThreshold)
                     {
-                        AudioManager.Singleton.PlayClipAtPoint(footStepSounds[Random.Range(0, footStepSounds.Length)], transform.position, volume);
+                        AudioManager.Singleton.PlayClipAtPoint(gameObject, footStepSounds[Random.Range(0, footStepSounds.Length)], transform.position, volume);
                         footRaised = false;
                     }
                 }

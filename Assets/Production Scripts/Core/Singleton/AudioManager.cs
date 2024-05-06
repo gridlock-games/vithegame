@@ -39,31 +39,31 @@ namespace Vi.Core
             audioSources.Add(audioSource);
         }
 
-        public void PlayClipAtPoint(AudioClip audioClip, Vector3 position, float volume = 1)
+        public void PlayClipAtPoint(GameObject invoker, AudioClip audioClip, Vector3 position, float volume = 1)
         {
             GameObject g = Instantiate(audioSourcePrefab, position, Quaternion.identity);
-            StartCoroutine(Play3DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
+            StartCoroutine(Play3DSoundPrefab(invoker, g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play3DSoundPrefab(AudioSource audioSouce, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefab(GameObject invoker, AudioSource audioSouce, AudioClip audioClip, float volume = 1)
         {
             RegisterAudioSource(audioSouce);
             audioSouce.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSouce.isPlaying);
+            yield return new WaitUntil(() => !audioSouce.isPlaying | !invoker);
             Destroy(audioSouce.gameObject);
         }
 
-        public void Play2DClip(AudioClip audioClip, float volume = 1)
+        public void Play2DClip(GameObject invoker, AudioClip audioClip, float volume = 1)
         {
             GameObject g = Instantiate(audioSourcePrefab);
-            StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
+            StartCoroutine(Play2DSoundPrefab(invoker, g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play2DSoundPrefab(AudioSource audioSouce, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play2DSoundPrefab(GameObject invoker, AudioSource audioSouce, AudioClip audioClip, float volume = 1)
         {
             audioSouce.spatialBlend = 0;
             audioSouce.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSouce.isPlaying);
+            yield return new WaitUntil(() => !audioSouce.isPlaying | !invoker);
             Destroy(audioSouce.gameObject);
         }
 

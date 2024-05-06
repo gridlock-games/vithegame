@@ -57,10 +57,34 @@ namespace Vi.Core
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;
 
+        private Collider[] colliders;
+        private Renderer[] renderers;
+
         protected void Start()
         {
             parentAttributes = transform.root.GetComponent<Attributes>();
             parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
+
+            colliders = GetComponentsInChildren<Collider>(true);
+            renderers = GetComponentsInChildren<Renderer>(true);
+        }
+
+        private bool lastIsActiveCall = true;
+        public void SetActive(bool isActive)
+        {
+            if (isActive == lastIsActiveCall) { return; }
+
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = isActive;
+            }
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.enabled = isActive;
+            }
+
+            lastIsActiveCall = isActive;
         }
 
         protected bool isStowed;
