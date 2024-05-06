@@ -3870,7 +3870,7 @@ ParticleSystem:
     primitives: []
   SubModule:
     serializedVersion: 2
-    enabled: 1
+    enabled: 0
     subEmitters:
     - serializedVersion: 3
       emitter: {fileID: 3778793664378876130}
@@ -4899,7 +4899,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
@@ -4929,7 +4929,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0.07, z: 0}
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 4
@@ -4940,6 +4940,8 @@ MonoBehaviour:
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   shouldUseAttackerPositionForHitAngles: 1
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
 --- !u!1 &3778793664153062169
 GameObject:
   m_ObjectHideFlags: 0
