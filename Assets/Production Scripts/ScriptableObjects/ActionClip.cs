@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -92,6 +93,17 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
         
+        private readonly static ClipType[] attackClipTypes = new ClipType[]
+        {
+            ClipType.LightAttack,
+            ClipType.HeavyAttack,
+            ClipType.Ability,
+            ClipType.FlashAttack,
+            ClipType.GrabAttack
+        };
+
+        public bool IsAttack() { return attackClipTypes.Contains(clipType); }
+
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 

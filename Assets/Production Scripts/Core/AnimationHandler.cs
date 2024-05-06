@@ -13,7 +13,6 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip)
         {
-            Debug.Log(actionClip);
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name);
@@ -27,8 +26,9 @@ namespace Vi.Core
 
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
-            string stateName = actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack ? actionClip.name + "_Attack" : actionClip.name;
-            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName);
+            string animationStateName = actionClip.name.Contains("GrabAttack") ? "GrabAttack" : actionClip.name;
+            if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName);
         }
 
         public float GetActionClipNormalizedTime(ActionClip actionClip)

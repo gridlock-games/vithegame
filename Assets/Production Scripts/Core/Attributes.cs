@@ -458,7 +458,7 @@ namespace Vi.Core
                         grabAttackClipName.Value = attack.name;
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
-                    animationHandler.PlayAction(hitReaction);
+                    if (!IsGrabbed()) { animationHandler.PlayAction(hitReaction); }
                 }
             }
             else
@@ -828,8 +828,8 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -837,8 +837,8 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             isPulled.Value = false;
         }
 
@@ -846,10 +846,9 @@ namespace Vi.Core
         private IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
         {
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            string stateName = "Grab_Reaction";
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(stateName));
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(stateName));
-            isPulled.Value = false;
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            isGrabbed.Value = false;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()
