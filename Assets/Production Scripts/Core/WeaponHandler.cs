@@ -214,12 +214,9 @@ namespace Vi.Core
 
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
-            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
             {
-                foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
-                {
-                    weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
-                }
+                weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
             }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
