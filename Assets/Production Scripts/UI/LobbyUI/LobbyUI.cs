@@ -108,7 +108,39 @@ namespace Vi.UI
                 }
             }
 
+            SyncRoomSettingsFields();
+
             StartCoroutine(Init());
+        }
+
+        private void SyncRoomSettingsFields()
+        {
+            foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
+            {
+                foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
+                {
+                    string[] propertySplit = propertyString.Split(":");
+                    string propertyName = "";
+                    int value = 0;
+                    for (int i = 0; i < propertySplit.Length; i++)
+                    {
+                        if (i == 0)
+                        {
+                            propertyName = propertySplit[i];
+                        }
+                        else if (i == 1)
+                        {
+                            value = int.Parse(propertySplit[i]);
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure how to parse game mode property string " + propertyString);
+                        }
+                    }
+
+                    if (propertyName == customSettingsInputField.key) { customSettingsInputField.inputField.text = value.ToString(); }
+                }
+            }
         }
 
         private void RefreshMapOptions()
@@ -449,6 +481,10 @@ namespace Vi.UI
                 {
                     PlayerDataManager.Singleton.SetGameModeSettings(gameModeSettings);
                 }
+            }
+            else // Parse room settings into input fields
+            {
+                SyncRoomSettingsFields();
             }
 
             canCountDown &= roomSettingsParsedProperly;

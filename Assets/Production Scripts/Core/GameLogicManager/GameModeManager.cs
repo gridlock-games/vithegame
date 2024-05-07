@@ -483,7 +483,7 @@ namespace Vi.Core.GameModeManagers
                 }
                 catch
                 {
-                    Debug.LogError("Error whiel setting value for field: " + propertyName);
+                    Debug.LogError("Error while setting value for field: " + propertyName);
                 }
             }
         }

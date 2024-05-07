@@ -13,14 +13,26 @@ namespace Vi.UI
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
         [SerializeField] private Button closeServersMenuButton;
-        [SerializeField] private Button connectButton;
+        [SerializeField] private Button joinLobbyButton;
+        [SerializeField] private Button createLobbyButton;
         [SerializeField] private Button refreshServersButton;
+        [SerializeField] private Text errorText;
+
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
+        private void Start()
+        {
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            errorText.text = "";
+        }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
+        List<WebRequestManager.Server> emptyLobbyServerList = new List<WebRequestManager.Server>();
+        private float lastErrorTextDisplayTime = Mathf.NegativeInfinity;
+        private const float errorTextDisplayDuration = 5;
         private void Update()
         {
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
+            joinLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
+            createLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
@@ -30,9 +42,16 @@ namespace Vi.UI
 
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
-                        ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
-                        serverListElementInstance.Initialize(this, server);
-                        serverListElementList.Add(serverListElementInstance);
+                        if (server.population == 0)
+                        {
+                            if (!emptyLobbyServerList.Contains(server)) { emptyLobbyServerList.Add(server); }
+                        }
+                        else
+                        {
+                            ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                            serverListElementInstance.Initialize(this, server);
+                            serverListElementList.Add(serverListElementInstance);
+                        }
                     }
                 }
             }
@@ -42,6 +61,11 @@ namespace Vi.UI
             {
                 serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime >= 0);
                 serverListElementList[i].transform.SetSiblingIndex(i);
+            }
+
+            if (Time.time - lastErrorTextDisplayTime > errorTextDisplayDuration)
+            {
+                errorText.text = "";
             }
         }
 
@@ -53,11 +77,28 @@ namespace Vi.UI
                 Destroy(serverListElement.gameObject);
             }
             serverListElementList.Clear();
+            emptyLobbyServerList.Clear();
         }
 
         public void ConnectToLobbyServer()
         {
             NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
+        }
+
+        public void CreateNewLobbyRoom()
+        {
+            if (emptyLobbyServerList.Count > 0)
+            {
+                WebRequestManager.Server server = emptyLobbyServerList[0];
+                networkTransport.ConnectionData.Address = server.ip;
+                networkTransport.ConnectionData.Port = ushort.Parse(server.port);
+                NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
+            }
+            else
+            {
+                errorText.text = "Please Refresh and Try Again.";
+                lastErrorTextDisplayTime = Time.time;
+            }
         }
 
         private IEnumerator ConnectToLobbyServerCoroutine()
