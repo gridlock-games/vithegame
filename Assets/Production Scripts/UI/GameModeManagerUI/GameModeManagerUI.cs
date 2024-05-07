@@ -32,6 +32,9 @@ namespace Vi.UI
             roundResultText.enabled = false;
 
             roundWinThresholdText.text = "Rounds To Win Game: " + gameModeManager.GetNumberOfRoundsWinsToWinGame().ToString();
+
+            leftScoreText.text = gameModeManager.GetLeftScoreString();
+            rightScoreText.text = gameModeManager.GetRightScoreString();
         }
 
         private void OnDestroy()
