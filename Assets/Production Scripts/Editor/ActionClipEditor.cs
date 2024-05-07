@@ -644,7 +644,7 @@ namespace Vi.Editor
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
             }
-            else
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge)
             {
                 Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
             }
