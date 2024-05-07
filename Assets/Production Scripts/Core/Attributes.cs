@@ -573,6 +573,8 @@ namespace Vi.Core
                     {
                         grabAssailantDataId.Value = attacker.GetPlayerDataId();
                         isGrabbed.Value = true;
+                        if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+                        ailment.Value = ActionClip.Ailment.None;
                     }
                     else
                     {
