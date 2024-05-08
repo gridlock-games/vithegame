@@ -874,11 +874,13 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            Loadout defaultLoadout1 = GetDefaultLoadout1(character.raceAndGender);
-            Loadout defaultLoadout2 = GetDefaultLoadout2(character.raceAndGender);
+            Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender);
+            Loadout loadout2 = GetRandomizedLoadout(character.raceAndGender);
+            Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
+            Loadout loadout4 = GetRandomizedLoadout(character.raceAndGender);
 
             // Add items from default loadout to character inventory
-            foreach (FixedString32Bytes itemId in defaultLoadout1.GetLoadoutAsList())
+            foreach (FixedString32Bytes itemId in loadout1.GetLoadoutAsList())
             {
                 if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
                 {
@@ -887,7 +889,25 @@ namespace Vi.Core
                 }
             }
 
-            foreach (FixedString32Bytes itemId in defaultLoadout2.GetLoadoutAsList())
+            foreach (FixedString32Bytes itemId in loadout2.GetLoadoutAsList())
+            {
+                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
+                {
+                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
+                }
+            }
+
+            foreach (FixedString32Bytes itemId in loadout3.GetLoadoutAsList())
+            {
+                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
+                {
+                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
+                }
+            }
+
+            foreach (FixedString32Bytes itemId in loadout4.GetLoadoutAsList())
             {
                 if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
                 {
@@ -898,13 +918,13 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout1);
-            defaultLoadout2.loadoutSlot = "2";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout2);
-            defaultLoadout1.loadoutSlot = "3";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout1);
-            defaultLoadout1.loadoutSlot = "4";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, defaultLoadout1);
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout1);
+            loadout2.loadoutSlot = "2";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout2);
+            loadout3.loadoutSlot = "3";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout3);
+            loadout4.loadoutSlot = "4";
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout4);
 
             yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
@@ -937,18 +957,20 @@ namespace Vi.Core
         }
 
         public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1,
-            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
-            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
-            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
-            GetDefaultLoadout1(CharacterReference.RaceAndGender.HumanMale),
-            CharacterReference.RaceAndGender.HumanMale); }
+            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+            CharacterReference.RaceAndGender.HumanMale);
+        }
 
-        public Loadout GetDefaultLoadout1(CharacterReference.RaceAndGender raceAndGender)
+        public Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             var beltOption = armorOptions.Find(item => item.name == "Runic Belt");
+            var capeOption = armorOptions.Find(item => item.name == "Runic Cape");
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.name == "Runic Chest").itemWebId,
@@ -957,28 +979,38 @@ namespace Vi.Core
                 armorOptions.Find(item => item.name == "Runic Pants").itemWebId,
                 beltOption == null ? "" : beltOption.itemWebId,
                 armorOptions.Find(item => item.name == "Runic Gloves").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Cape").itemWebId,
+                capeOption == null ? "" : capeOption.itemWebId,
                 "",
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
         }
 
-        public Loadout GetDefaultLoadout2(CharacterReference.RaceAndGender raceAndGender)
+        public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
+            var helmOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Helm);
+            var chestOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Chest);
+            var shoulderOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Shoulders);
+            var bootsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Boots);
+            var pantsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Pants);
+            var beltOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Belt);
+            var gloveOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Gloves);
+            var capeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Cape);
+            var robeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Robe);
+
             return new Loadout("1",
-                armorOptions.Find(item => item.name == "Arab Helm").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Chest").itemWebId,
-                "",
-                armorOptions.Find(item => item.name == "Arab Boots").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Pants").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Belt").itemWebId,
-                armorOptions.Find(item => item.name == "Arab Gloves").itemWebId,
-                "",
-                "",
+                helmOptions.Count == 0 ? "" : helmOptions[Random.Range(0, helmOptions.Count)].itemWebId,
+                chestOptions.Count == 0 ? "" : chestOptions[Random.Range(0, chestOptions.Count)].itemWebId,
+                shoulderOptions.Count == 0 ? "" : shoulderOptions[Random.Range(0, shoulderOptions.Count)].itemWebId,
+                bootsOptions.Count == 0 ? "" : bootsOptions[Random.Range(0, bootsOptions.Count)].itemWebId,
+                pantsOptions.Count == 0 ? "" : pantsOptions[Random.Range(0, pantsOptions.Count)].itemWebId,
+                beltOptions.Count == 0 ? "" : beltOptions[Random.Range(0, beltOptions.Count)].itemWebId,
+                gloveOptions.Count == 0 ? "" : gloveOptions[Random.Range(0, gloveOptions.Count)].itemWebId,
+                capeOptions.Count == 0 ? "" : capeOptions[Random.Range(0, capeOptions.Count)].itemWebId,
+                robeOptions.Count == 0 ? "" : robeOptions[Random.Range(0, robeOptions.Count)].itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
                 System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
                 true);
@@ -1112,7 +1144,7 @@ namespace Vi.Core
                         return loadoutPreset4;
                     default:
                         Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
-                        return Singleton.GetDefaultLoadout1(raceAndGender);
+                        return Singleton.GetRandomizedLoadout(raceAndGender);
                 }
             }
 
@@ -1321,10 +1353,10 @@ namespace Vi.Core
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    loadout1Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                    loadout2Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                    loadout3Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                    loadout4Index == -1 ? Singleton.GetDefaultLoadout1(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                    loadout1Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
             }
         }
