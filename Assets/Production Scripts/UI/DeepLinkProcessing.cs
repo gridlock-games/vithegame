@@ -16,7 +16,7 @@ namespace Vi.UI
       google,
       apple,
       facebook,
-      elonfailure,
+      elonMistake,
       steam,
       epic,
       origin
@@ -91,7 +91,7 @@ namespace Vi.UI
       string fullLoginData = "?" + loginData;
 
       //Temp Setup
-      lss = loginSiteSource.google;
+      //lss = loginSiteSource.google;
 
       switch (lss)
       {
@@ -109,7 +109,7 @@ namespace Vi.UI
         case loginSiteSource.facebook:
           break;
 
-        case loginSiteSource.elonfailure:
+        case loginSiteSource.elonMistake:
           break;
 
         case loginSiteSource.steam:
