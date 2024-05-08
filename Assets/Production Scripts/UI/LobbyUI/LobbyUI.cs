@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Vi.UI
 {
@@ -258,6 +259,8 @@ namespace Vi.UI
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
             RefreshGameMode();
+
+            RefreshPlayerCards();
         }
 
         public static string FromCamelCase(string inputString)
@@ -529,45 +532,13 @@ namespace Vi.UI
             leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
-            string playersString = "";
+            string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
-                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString() + PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
+                playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
             }
 
-            if (lastPlayersString != playersString)
-            {
-                Debug.Log("Updating player list display");
-                foreach (Transform child in leftTeamParent.transformParent)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                foreach (Transform child in rightTeamParent.transformParent)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                bool leftTeamJoinInteractable = false;
-                bool rightTeamJoinInteractable = false;
-                foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
-                {
-                    if (teamParentDict.ContainsKey(playerData.team))
-                    {
-                        AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                        accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
-
-                        if (playerData.id == (int)NetworkManager.LocalClientId)
-                        {
-                            leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
-                            rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
-                        }
-                    }
-                }
-
-                leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
-                rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
-            }
+            if (lastPlayersString != playersString) { RefreshPlayerCards(); }
             lastPlayersString = playersString;
 
             if (IsClient)
@@ -613,6 +584,39 @@ namespace Vi.UI
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+        }
+
+        private void RefreshPlayerCards()
+        {
+            foreach (Transform child in leftTeamParent.transformParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in rightTeamParent.transformParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            bool leftTeamJoinInteractable = false;
+            bool rightTeamJoinInteractable = false;
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+            {
+                if (teamParentDict.ContainsKey(playerData.team))
+                {
+                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                    accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+
+                    if (playerData.id == (int)NetworkManager.LocalClientId)
+                    {
+                        leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
+                        rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
+                    }
+                }
+            }
+
+            leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
+            rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
         }
 
         private new void OnDestroy()
