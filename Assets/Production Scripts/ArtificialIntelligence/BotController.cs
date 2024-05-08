@@ -115,7 +115,6 @@ namespace Vi.ArtificialIntelligence
             {
                 inputDir = Vector3.zero;
             }
-            //Debug.Log(Vector3.Distance(navMeshAgent.destination, currentPosition.Value));
 
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
