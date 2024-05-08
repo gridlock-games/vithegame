@@ -280,7 +280,7 @@ namespace Vi.UI
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
                     // Order player cards by distance
-                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)
