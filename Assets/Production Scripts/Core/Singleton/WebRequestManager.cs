@@ -879,40 +879,25 @@ namespace Vi.Core
             Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
             Loadout loadout4 = GetRandomizedLoadout(character.raceAndGender);
 
-            // Add items from default loadout to character inventory
-            foreach (FixedString32Bytes itemId in loadout1.GetLoadoutAsList())
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            
+            // Add all items into character inventory
+            foreach (var option in armorOptions)
             {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
+                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == option.itemWebId))
                 {
                     Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
+                    yield return AddItemToInventory(postRequest.downloadHandler.text, option.itemWebId);
                 }
             }
 
-            foreach (FixedString32Bytes itemId in loadout2.GetLoadoutAsList())
+            foreach (var option in weaponOptions)
             {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
+                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == option.itemWebId))
                 {
                     Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
-                }
-            }
-
-            foreach (FixedString32Bytes itemId in loadout3.GetLoadoutAsList())
-            {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
-                {
-                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
-                }
-            }
-
-            foreach (FixedString32Bytes itemId in loadout4.GetLoadoutAsList())
-            {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == itemId))
-                {
-                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, itemId.ToString());
+                    yield return AddItemToInventory(postRequest.downloadHandler.text, option.itemWebId);
                 }
             }
 
