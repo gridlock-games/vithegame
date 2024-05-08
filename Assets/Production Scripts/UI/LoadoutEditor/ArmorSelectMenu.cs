@@ -12,22 +12,11 @@ namespace Vi.UI
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private WeaponOptionElement weaponOptionPrefab;
 
-        private static readonly List<CharacterReference.EquipmentType> nullableEquipmentTypes = new List<CharacterReference.EquipmentType>()
-        {
-            CharacterReference.EquipmentType.Belt,
-            CharacterReference.EquipmentType.Cape,
-            CharacterReference.EquipmentType.Gloves,
-            CharacterReference.EquipmentType.Helm,
-            CharacterReference.EquipmentType.Shoulders,
-        };
-
         private List<Button> buttonList = new List<Button>();
         private int playerDataId;
-        private LoadoutManager loadoutManager;
-        public void Initialize(CharacterReference.EquipmentType equipmentType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
+        public void Initialize(CharacterReference.EquipmentType equipmentType, int loadoutSlot, int playerDataId)
         {
             this.playerDataId = playerDataId;
-            this.loadoutManager = loadoutManager;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
             CharacterReference.WearableEquipmentOption initialWearableEquipmentOption = null;
@@ -67,7 +56,7 @@ namespace Vi.UI
             }
 
             Button invokeThis = null;
-            if (nullableEquipmentTypes.Contains(equipmentType))
+            if (WebRequestManager.NullableEquipmentTypes.Contains(equipmentType))
             {
                 WeaponOptionElement emptyEle = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
                 emptyEle.InitializeEquipment(null);

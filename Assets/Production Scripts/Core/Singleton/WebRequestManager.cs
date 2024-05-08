@@ -956,12 +956,14 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter() { return new Character("", "Human_Male", "", 0, 1,
-            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-            GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-            CharacterReference.RaceAndGender.HumanMale);
+        public Character GetDefaultCharacter()
+        {
+            return new Character("", "Human_Male", "", 0, 1,
+                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+                CharacterReference.RaceAndGender.HumanMale);
         }
 
         public Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
@@ -986,6 +988,15 @@ namespace Vi.Core
                 true);
         }
 
+        public static readonly List<CharacterReference.EquipmentType> NullableEquipmentTypes = new List<CharacterReference.EquipmentType>()
+        {
+            CharacterReference.EquipmentType.Belt,
+            CharacterReference.EquipmentType.Cape,
+            CharacterReference.EquipmentType.Gloves,
+            CharacterReference.EquipmentType.Helm,
+            CharacterReference.EquipmentType.Shoulders,
+        };
+
         public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
@@ -1001,18 +1012,38 @@ namespace Vi.Core
             var capeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Cape);
             var robeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Robe);
 
+            int helmIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
+            int chestIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Chest) ? -1 : 0, chestOptions.Count);
+            int shoulderIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
+            int bootsIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Boots) ? -1 : 0, bootsOptions.Count);
+            int pantsIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Pants) ? -1 : 0, pantsOptions.Count);
+            int beltIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Belt) ? -1 : 0, beltOptions.Count);
+            int gloveIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
+            int capeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
+            int robeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
+
+            int weapon1Index = Random.Range(0, weaponOptions.Length);
+            int weapon2Index = Random.Range(0, weaponOptions.Length);
+
+            if (weapon1Index == weapon2Index)
+            {
+                weapon2Index++;
+                // If weapon 2 index is out of the weapon options range, set it to 0
+                if (weapon2Index >= weaponOptions.Length) { weapon2Index = 0; }
+            }
+
             return new Loadout("1",
-                helmOptions.Count == 0 ? "" : helmOptions[Random.Range(0, helmOptions.Count)].itemWebId,
-                chestOptions.Count == 0 ? "" : chestOptions[Random.Range(0, chestOptions.Count)].itemWebId,
-                shoulderOptions.Count == 0 ? "" : shoulderOptions[Random.Range(0, shoulderOptions.Count)].itemWebId,
-                bootsOptions.Count == 0 ? "" : bootsOptions[Random.Range(0, bootsOptions.Count)].itemWebId,
-                pantsOptions.Count == 0 ? "" : pantsOptions[Random.Range(0, pantsOptions.Count)].itemWebId,
-                beltOptions.Count == 0 ? "" : beltOptions[Random.Range(0, beltOptions.Count)].itemWebId,
-                gloveOptions.Count == 0 ? "" : gloveOptions[Random.Range(0, gloveOptions.Count)].itemWebId,
-                capeOptions.Count == 0 ? "" : capeOptions[Random.Range(0, capeOptions.Count)].itemWebId,
-                robeOptions.Count == 0 ? "" : robeOptions[Random.Range(0, robeOptions.Count)].itemWebId,
-                System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
-                System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
+                helmOptions.Count == 0 ? "" : (helmIndex == -1 ? "" : helmOptions[helmIndex].itemWebId),
+                chestOptions.Count == 0 ? "" : (chestIndex == -1 ? "" : chestOptions[chestIndex].itemWebId),
+                shoulderOptions.Count == 0 ? "" : (shoulderIndex == -1 ? "" : shoulderOptions[shoulderIndex].itemWebId),
+                bootsOptions.Count == 0 ? "" : (bootsIndex == -1 ? "" : bootsOptions[bootsIndex].itemWebId),
+                pantsOptions.Count == 0 ? "" : (pantsIndex == -1 ? "" : pantsOptions[pantsIndex].itemWebId),
+                beltOptions.Count == 0 ? "" : (beltIndex == -1 ? "" : beltOptions[beltIndex].itemWebId),
+                gloveOptions.Count == 0 ? "" : (gloveIndex == -1 ? "" : gloveOptions[gloveIndex].itemWebId),
+                capeOptions.Count == 0 ? "" : (capeIndex == -1 ? "" : capeOptions[capeIndex].itemWebId),
+                robeOptions.Count == 0 ? "" : (robeIndex == -1 ? "" : robeOptions[robeIndex].itemWebId),
+                weaponOptions[weapon1Index].itemWebId,
+                weaponOptions[weapon2Index].itemWebId,
                 true);
         }
 
