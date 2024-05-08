@@ -968,10 +968,16 @@ namespace Vi.Core
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
 
-            // If we are in recovery, and not transitioning to a different action
-            if (IsInRecovery) // & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))
+            // If we are in recovery
+            if (IsInRecovery)
             {
-                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
+                ActionClip actionClip = null;
+                // If not transitioning to a different action
+                if (!animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+                {
+                    actionClip = SelectAttack(inputAttackType, inputHistory);
+                }
+
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())
