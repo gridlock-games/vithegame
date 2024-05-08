@@ -260,6 +260,17 @@ namespace Vi.ArtificialIntelligence
                             weaponHandler.LightAttack(true);
                         }
                     }
+                    else
+                    {
+                        if (navMeshAgent.isOnNavMesh)
+                        {
+                            float walkRadius = 0.5f;
+                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                            randomDirection += transform.position;
+                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                            if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance) { navMeshAgent.destination = hit.position; }
+                        }
+                    }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
