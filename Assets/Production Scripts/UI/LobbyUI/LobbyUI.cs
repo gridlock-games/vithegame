@@ -550,7 +550,7 @@ namespace Vi.UI
 
                 bool leftTeamJoinInteractable = false;
                 bool rightTeamJoinInteractable = false;
-                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
                 {
                     if (teamParentDict.ContainsKey(playerData.team))
                     {
