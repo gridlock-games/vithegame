@@ -303,7 +303,7 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
-            if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
+            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
             {
                 loadoutManager.SwitchWeapon();
                 lastWeaponSwapTime = Time.time;
