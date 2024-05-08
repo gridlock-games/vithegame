@@ -326,6 +326,60 @@ namespace Vi.Core
                     "Yi",
                     "Jia"
                 }
+            },
+            { CharacterReference.RaceAndGender.Universal, new List<string>()
+                {
+                    "BlazeX",
+                    "FrostyZ",
+                    "NovaKid",
+                    "ThunderZ",
+                    "FlameX",
+                    "ViperX",
+                    "WraithZ",
+                    "MysticZ",
+                    "NinjaKid",
+                    "TitanZ",
+                    "GhostX",
+                    "LunaZ",
+                    "DragonZ",
+                    "QuakeX",
+                    "StormZ",
+                    "PulseZ",
+                    "BlazeZ",
+                    "FlameY",
+                    "CosmoZ",
+                    "PhoenixZ",
+                    "SamuZ",
+                    "RageX",
+                    "HunterX",
+                    "EnigmaX",
+                    "SpartanX",
+                    "FangX",
+                    "GGuard",
+                    "NinjaX",
+                    "SaviorX",
+                    "BlastX",
+                    "NeonZ",
+                    "TitanX",
+                    "SorcX",
+                    "EchoX",
+                    "ShogunX",
+                    "FireX",
+                    "Nemesis",
+                    "Tempest",
+                    "FuryX",
+                    "LanceX",
+                    "Inferno",
+                    "QuasarX",
+                    "Icebound",
+                    "StormX",
+                    "EchoZ",
+                    "ChampX",
+                    "DoomZ",
+                    "Striker",
+                    "ThornX",
+                    "EnigmaY"
+                }
             }
         };
 
@@ -337,7 +391,10 @@ namespace Vi.Core
                 botClientId--;
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
-                botCharacter.name = botNames[botCharacter.raceAndGender][Random.Range(0, botNames[botCharacter.raceAndGender].Count)];
+
+                List<string> potentialNames = botNames[botCharacter.raceAndGender];
+                potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
+                botCharacter.name = potentialNames[Random.Range(0, potentialNames.Count)];
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
