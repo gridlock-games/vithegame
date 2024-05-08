@@ -281,21 +281,24 @@ namespace Vi.UI
                 {
                     // Order player cards by distance
                     List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
-                    string s = "";
-                    foreach (Attributes attributes in teammateAttributes)
+
+                    string debug = "";
+                    foreach (Attributes a in teammateAttributes)
                     {
-                        s += attributes.name + " - ";
+                        debug += a + " -";
                     }
-                    Debug.Log(s);
-                    
+                    Debug.Log(debug + " " + Time.time);
+
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)
                         {
+                            Debug.Log(teammateAttributes[i]);
                             teammatePlayerCards[i].Initialize(teammateAttributes[i]);
                         }
                         else
                         {
+                            Debug.Log(null);
                             teammatePlayerCards[i].Initialize(null);
                         }
                     }
