@@ -223,15 +223,6 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private const float chargeAttackDuration = 3f;
-        private float chargeAttackTime;
-
-        private const float dodgeWaitDuration = 5;
-        private float lastDodgeTime;
-
-        private const float weaponSwapDuration = 20;
-        private float lastWeaponSwapTime;
-
         private void Update()
         {
             if (!CanMove()) { return; }
@@ -295,6 +286,21 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
+        private const float lightAttackDistance = 3;
+        private const float heavyAttackDistance = 7;
+
+        private const float chargeAttackDuration = 3f;
+        private float chargeAttackTime;
+
+        private const float dodgeWaitDuration = 5;
+        private float lastDodgeTime;
+
+        private const float weaponSwapDuration = 20;
+        private float lastWeaponSwapTime;
+
+        private const float abilityWaitDuration = 3;
+        private float lastAbilityTime;
+
         private void EvaluteAction()
         {
             if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
@@ -305,13 +311,13 @@ namespace Vi.ArtificialIntelligence
 
             if (targetAttributes)
             {
-                if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                if (Vector3.Distance(navMeshAgent.destination, transform.position) < lightAttackDistance)
                 {
                     if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
 
                     weaponHandler.LightAttack(true);
                 }
-                else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 15)
+                else if (Vector3.Distance(navMeshAgent.destination, transform.position) < heavyAttackDistance)
                 {
                     weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration - 0.1f);
                     chargeAttackTime += Time.deltaTime;
@@ -325,6 +331,31 @@ namespace Vi.ArtificialIntelligence
             {
                 OnDodge();
                 lastDodgeTime = Time.time;
+            }
+
+            if (Time.time - lastAbilityTime > abilityWaitDuration)
+            {
+                int abilityNum = Random.Range(1, 5);
+                if (abilityNum == 1)
+                {
+                    weaponHandler.Ability1(true);
+                }
+                else if (abilityNum == 2)
+                {
+                    weaponHandler.Ability2(true);
+                }
+                else if (abilityNum == 3)
+                {
+                    weaponHandler.Ability3(true);
+                }
+                else if (abilityNum == 4)
+                {
+                    weaponHandler.Ability4(true);
+                }
+                else
+                {
+                    Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
+                }
             }
 
             if (chargeAttackTime >= chargeAttackDuration) { chargeAttackTime = 0; }
