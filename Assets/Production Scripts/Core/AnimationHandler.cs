@@ -157,9 +157,10 @@ namespace Vi.Core
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
+            bool isInTransition = Animator.IsInTransition(Animator.GetLayerIndex("Actions"));
             bool shouldUseDodgeCancelTransitionTime = false;
             // If we are not at rest
-            if (!currentStateInfo.IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
+            if (!currentStateInfo.IsName("Empty") | isInTransition)
             {
                 bool shouldEvaluatePreviousState = true;
                 switch (actionClip.GetClipType())
@@ -183,6 +184,9 @@ namespace Vi.Core
                         }
                         else if (currentStateInfo.IsTag("CanDodge"))
                         {
+                            // If we are in transition and not returning to the empty state
+                            if (isInTransition & !nextStateInfo.IsName("Empty")) { return; }
+
                             shouldEvaluatePreviousState = false;
                         }
                         else
