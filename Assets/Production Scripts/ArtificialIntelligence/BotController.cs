@@ -316,6 +316,8 @@ namespace Vi.ArtificialIntelligence
                     if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
 
                     weaponHandler.LightAttack(true);
+
+                    EvaluateAbility();
                 }
                 else if (Vector3.Distance(navMeshAgent.destination, transform.position) < heavyAttackDistance)
                 {
@@ -324,31 +326,8 @@ namespace Vi.ArtificialIntelligence
 
                     if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
                     else if (chargeAttackTime <= chargeAttackDuration - 0.1f) { chargeAttackTime += Time.deltaTime; }
-                }
 
-                if (Time.time - lastAbilityTime > abilityWaitDuration)
-                {
-                    int abilityNum = Random.Range(1, 5);
-                    if (abilityNum == 1)
-                    {
-                        weaponHandler.Ability1(true);
-                    }
-                    else if (abilityNum == 2)
-                    {
-                        weaponHandler.Ability2(true);
-                    }
-                    else if (abilityNum == 3)
-                    {
-                        weaponHandler.Ability3(true);
-                    }
-                    else if (abilityNum == 4)
-                    {
-                        weaponHandler.Ability4(true);
-                    }
-                    else
-                    {
-                        Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
-                    }
+                    EvaluateAbility();
                 }
             }
 
@@ -359,6 +338,34 @@ namespace Vi.ArtificialIntelligence
             }
 
             if (chargeAttackTime >= chargeAttackDuration) { chargeAttackTime = 0; }
+        }
+
+        private void EvaluateAbility()
+        {
+            if (Time.time - lastAbilityTime > abilityWaitDuration)
+            {
+                int abilityNum = Random.Range(1, 5);
+                if (abilityNum == 1)
+                {
+                    weaponHandler.Ability1(true);
+                }
+                else if (abilityNum == 2)
+                {
+                    weaponHandler.Ability2(true);
+                }
+                else if (abilityNum == 3)
+                {
+                    weaponHandler.Ability3(true);
+                }
+                else if (abilityNum == 4)
+                {
+                    weaponHandler.Ability4(true);
+                }
+                else
+                {
+                    Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
+                }
+            }
         }
 
         private float positionStrength = 1;
