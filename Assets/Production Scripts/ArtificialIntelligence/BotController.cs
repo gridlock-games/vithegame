@@ -115,7 +115,7 @@ namespace Vi.ArtificialIntelligence
             }
             //Debug.Log(Vector3.Distance(navMeshAgent.destination, currentPosition.Value));
 
-            Vector3 lookDirection = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
             Quaternion newRotation = currentRotation.Value;
@@ -219,7 +219,12 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
-        private float dodgeWaitDuration = 5;
+        private Attributes targetAttributes;
+
+        private const float chargeAttackDuration = 0.4f;
+        private float chargeAttackTime;
+
+        private const float dodgeWaitDuration = 5;
         private float lastDodgeTime;
         private void Update()
         {
@@ -241,7 +246,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
-                    Attributes targetAttributes = null;
+                    targetAttributes = null;
                     foreach (Attributes player in activePlayers)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
@@ -250,6 +255,7 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
+                    bool shouldResetChargeTime = true;
                     if (targetAttributes)
                     {
                         if (navMeshAgent.isOnNavMesh)
@@ -259,7 +265,17 @@ namespace Vi.ArtificialIntelligence
 
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
                         {
+                            if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+
                             weaponHandler.LightAttack(true);
+                        }
+                        else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
+                        {
+                            Debug.Log(chargeAttackTime);
+                            weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration);
+                            
+                            if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
+                            else { chargeAttackTime += Time.deltaTime; shouldResetChargeTime = false; }
                         }
                     }
                     else
@@ -282,6 +298,8 @@ namespace Vi.ArtificialIntelligence
                         OnDodge();
                         lastDodgeTime = Time.time;
                     }
+
+                    if (shouldResetChargeTime) { chargeAttackTime = 0; }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {

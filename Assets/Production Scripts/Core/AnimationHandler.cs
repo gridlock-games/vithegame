@@ -364,7 +364,7 @@ namespace Vi.Core
                 if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
-                    if (Application.isEditor) { Debug.Log(chargeTime); }
+                    //if (Application.isEditor) { Debug.Log(chargeTime); }
                 }
 
                 if (actionClip.canEnhance)
@@ -661,9 +661,16 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
-            if (IsLocalPlayer)
+            if (IsOwner)
             {
-                aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                if (NetworkObject.IsPlayerObject)
+                {
+                    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                }
+                else
+                {
+                    aimPoint.Value = transform.position + transform.up * 0.5f + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                }
                 meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
             }
 

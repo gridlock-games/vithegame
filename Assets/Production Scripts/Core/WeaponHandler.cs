@@ -623,7 +623,7 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
-        private void HeavyAttack(bool isPressed)
+        public void HeavyAttack(bool isPressed)
         {
             if (isPressed)
             {
@@ -642,17 +642,24 @@ namespace Vi.Core
 
             if (CanAim)
             {
-                if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                if (NetworkObject.IsPlayerObject)
                 {
-                    if (isPressed) { aiming.Value = !aiming.Value; }
-                }
-                else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
-                {
-                    aiming.Value = isPressed;
+                    if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                    {
+                        if (isPressed) { aiming.Value = !aiming.Value; }
+                    }
+                    else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
+                    {
+                        aiming.Value = isPressed;
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                    aiming.Value = isPressed;
                 }
             }
             else if (isPressed)
