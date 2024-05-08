@@ -274,6 +274,61 @@ namespace Vi.Core
             return false;
         }
 
+        private static readonly Dictionary<CharacterReference.RaceAndGender, List<string>> botNames = new Dictionary<CharacterReference.RaceAndGender, List<string>>()
+        {
+            { CharacterReference.RaceAndGender.HumanMale, new List<string>()
+                {
+                    "Omar",
+                    "Ahmed",
+                    "Tom",
+                    "Justin",
+                    "David",
+                    "Adam",
+                    "Tyler",
+                    "James",
+                    "John",
+                    "Michael",
+                    "Liam",
+                    "Oliver",
+                    "Ren",
+                    "Haruto",
+                    "Yuto",
+                    "Miguel",
+                    "Arthur",
+                    "Aarav",
+                    "Alexander",
+                    "Wei",
+                    "Min",
+                    "Jun",
+                    ""
+                }
+            },
+            { CharacterReference.RaceAndGender.HumanFemale, new List<string>()
+                {
+                    "Rebecca",
+                    "Irene",
+                    "Farin",
+                    "Maria",
+                    "Lin",
+                    "Sofia",
+                    "Hanna",
+                    "Emma",
+                    "Julia",
+                    "Olivia",
+                    "Anna",
+                    "Mary",
+                    "Yui",
+                    "Sakura",
+                    "Akari",
+                    "Emilia",
+                    "Saanvi",
+                    "Xiao",
+                    "Yi",
+                    "Jia"
+                }
+            }
+        };
+
         private int botClientId = 0;
         public void AddBotData(Team team)
         {
@@ -281,8 +336,8 @@ namespace Vi.Core
             {
                 botClientId--;
 
-                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
-                botCharacter.name = "Bot " + (botClientId * -1).ToString();
+                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
+                botCharacter.name = botNames[botCharacter.raceAndGender][Random.Range(0, botNames[botCharacter.raceAndGender].Count)];
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,

@@ -944,11 +944,33 @@ namespace Vi.Core
         public Character GetDefaultCharacter()
         {
             return new Character("", "Human_Male", "", 0, 1,
-                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetRandomizedLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                 CharacterReference.RaceAndGender.HumanMale);
+        }
+
+        public Character GetRandomizedCharacter()
+        {
+            List<CharacterReference.RaceAndGender> raceAndGenderList = new List<CharacterReference.RaceAndGender>()
+            {
+                CharacterReference.RaceAndGender.HumanMale,
+                CharacterReference.RaceAndGender.HumanFemale
+            };
+
+            CharacterReference.RaceAndGender raceAndGender = raceAndGenderList[Random.Range(0, raceAndGenderList.Count)];
+
+            string[] raceAndGenderStrings = Regex.Matches(raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            string race = raceAndGenderStrings[0];
+            string gender = raceAndGenderStrings[1];
+
+            return new Character("", race + "_" + gender, "", 0, 1,
+                GetRandomizedLoadout(raceAndGender),
+                GetRandomizedLoadout(raceAndGender),
+                GetRandomizedLoadout(raceAndGender),
+                GetRandomizedLoadout(raceAndGender),
+                raceAndGender);
         }
 
         public Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
