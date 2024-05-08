@@ -8,7 +8,7 @@ namespace Vi.UI
     public static DeepLinkProcessing Instance { get; private set; }
     public string deeplinkURL;
 
-    public loginSiteSource lss;
+    private loginSiteSource lss;
 
     public enum loginSiteSource
     {
@@ -20,6 +20,11 @@ namespace Vi.UI
       steam,
       epic,
       origin
+    }
+
+    public void SetLoginSource(loginSiteSource source)
+    {
+      lss = source;
     }
 
     private void Awake()
@@ -87,6 +92,7 @@ namespace Vi.UI
 
       //Temp Setup
       lss = loginSiteSource.google;
+
       switch (lss)
       {
         case loginSiteSource.inactive:
@@ -118,8 +124,8 @@ namespace Vi.UI
         default:
           break;
       }
-
-      //Sentitive item - Erase Deeplink after use
+      //Sentitive item - Erase Deeplink content after use
+      lss = loginSiteSource.inactive;
       deeplinkURL = "[none]";
     }
 
