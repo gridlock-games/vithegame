@@ -274,6 +274,115 @@ namespace Vi.Core
             return false;
         }
 
+        private static readonly Dictionary<CharacterReference.RaceAndGender, List<string>> botNames = new Dictionary<CharacterReference.RaceAndGender, List<string>>()
+        {
+            { CharacterReference.RaceAndGender.HumanMale, new List<string>()
+                {
+                    "Omar",
+                    "Ahmed",
+                    "Tom",
+                    "Justin",
+                    "David",
+                    "Adam",
+                    "Tyler",
+                    "James",
+                    "John",
+                    "Michael",
+                    "Liam",
+                    "Oliver",
+                    "Ren",
+                    "Haruto",
+                    "Yuto",
+                    "Miguel",
+                    "Arthur",
+                    "Aarav",
+                    "Alexander",
+                    "Wei",
+                    "Min",
+                    "Jun",
+                    ""
+                }
+            },
+            { CharacterReference.RaceAndGender.HumanFemale, new List<string>()
+                {
+                    "Rebecca",
+                    "Irene",
+                    "Farin",
+                    "Maria",
+                    "Lin",
+                    "Sofia",
+                    "Hanna",
+                    "Emma",
+                    "Julia",
+                    "Olivia",
+                    "Anna",
+                    "Mary",
+                    "Yui",
+                    "Sakura",
+                    "Akari",
+                    "Emilia",
+                    "Saanvi",
+                    "Xiao",
+                    "Yi",
+                    "Jia"
+                }
+            },
+            { CharacterReference.RaceAndGender.Universal, new List<string>()
+                {
+                    "BlazeX",
+                    "FrostyZ",
+                    "NovaKid",
+                    "ThunderZ",
+                    "FlameX",
+                    "ViperX",
+                    "WraithZ",
+                    "MysticZ",
+                    "NinjaKid",
+                    "TitanZ",
+                    "GhostX",
+                    "LunaZ",
+                    "DragonZ",
+                    "QuakeX",
+                    "StormZ",
+                    "PulseZ",
+                    "BlazeZ",
+                    "FlameY",
+                    "CosmoZ",
+                    "PhoenixZ",
+                    "SamuZ",
+                    "RageX",
+                    "HunterX",
+                    "EnigmaX",
+                    "SpartanX",
+                    "FangX",
+                    "GGuard",
+                    "NinjaX",
+                    "SaviorX",
+                    "BlastX",
+                    "NeonZ",
+                    "TitanX",
+                    "SorcX",
+                    "EchoX",
+                    "ShogunX",
+                    "FireX",
+                    "Nemesis",
+                    "Tempest",
+                    "FuryX",
+                    "LanceX",
+                    "Inferno",
+                    "QuasarX",
+                    "Icebound",
+                    "StormX",
+                    "EchoZ",
+                    "ChampX",
+                    "DoomZ",
+                    "Striker",
+                    "ThornX",
+                    "EnigmaY"
+                }
+            }
+        };
+
         private int botClientId = 0;
         public void AddBotData(Team team)
         {
@@ -281,8 +390,11 @@ namespace Vi.Core
             {
                 botClientId--;
 
-                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetDefaultCharacter();
-                botCharacter.name = "Bot " + (botClientId * -1).ToString();
+                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
+
+                List<string> potentialNames = botNames[botCharacter.raceAndGender];
+                potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
+                botCharacter.name = potentialNames[Random.Range(0, potentialNames.Count)];
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
@@ -632,7 +744,8 @@ namespace Vi.Core
                         {
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -641,7 +754,8 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.RemoveAt:
                     if (IsServer)
                     {
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:

@@ -1581,9 +1581,9 @@ MonoBehaviour:
   canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 5
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
@@ -1592,7 +1592,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: dec3e6f08deb98d46b3b6d158139b9d0, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 10
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 11

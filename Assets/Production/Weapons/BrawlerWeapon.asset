@@ -80,13 +80,13 @@ MonoBehaviour:
   - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2001834763269464374, guid: 3ce56f1a15f747241bb148d9d3d5bcfe,
+    - weaponPrefab: {fileID: 1759638753737419903, guid: bc922f42576d28a4c81060d33ec9a8d1,
         type: 3}
       weaponBone: 17
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponPositionOffset: {x: -0.00102, y: 0.0008, z: 0.00015}
+      weaponRotationOffset: {x: 12.01361, y: 4.604093, z: 233.164}
+      stowedWeaponPositionOffset: {x: 0.035, y: 0.111, z: 0.1089}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 39.75}
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -94,13 +94,13 @@ MonoBehaviour:
       weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 2001834763269464374, guid: 3b0a39ccde5409d47ab2cbbb8f234471,
+    - weaponPrefab: {fileID: 1759638753737419903, guid: bc922f42576d28a4c81060d33ec9a8d1,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponPositionOffset: {x: 0.00083, y: -0.00066, z: 0.00009}
+      weaponRotationOffset: {x: 3.987836, y: 4.775546, z: 45.21958}
+      stowedWeaponPositionOffset: {x: 0.0341, y: 0.1055, z: -0.085}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 40}
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
@@ -218,8 +218,8 @@ MonoBehaviour:
     shouldAlreadyHaveAilment: 0
   ability1: {fileID: 11400000, guid: 37533bdf5386df04b90799a58da70ded, type: 2}
   ability2: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
-  ability3: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
-  ability4: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
+  ability3: {fileID: 11400000, guid: 76afa4d6daa89c04ebe29cc893cad0ce, type: 2}
+  ability4: {fileID: 11400000, guid: 9662a212efaab7842b5ac038d89316cf, type: 2}
   flashAttack: {fileID: 11400000, guid: c8ddfd40cd7cc43e8a254b19600b53e7, type: 2}
   attackList:
   - inputs: 00000000
@@ -238,7 +238,7 @@ MonoBehaviour:
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
   grabAttackClipList:
-  - attack: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
+  - attack: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
     grabAttackClip: {fileID: 11400000, guid: 9292437416b69594da2ba61a8cae1ee5, type: 2}
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}

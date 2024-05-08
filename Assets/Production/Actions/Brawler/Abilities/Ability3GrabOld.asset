@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: Ability4
+  m_Name: Ability3GrabOld
   m_EditorClassIdentifier: 
   clipType: 4
   hitReactionType: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 1.75
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 1.75
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -258,7 +258,7 @@ MonoBehaviour:
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
-  effectedWeaponBones: 12000000
+  effectedWeaponBones: 06000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -267,43 +267,40 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.4
-  damage: 3
+  attackingNormalizedTime: 0
+  recoveryNormalizedTime: 1
+  damage: 5
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 3
+  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 2
-  timeBetweenHits: 0.5
+  maxHitLimit: 1
+  timeBetweenHits: 1
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
-  grabAttackClip: {fileID: 0}
-  grabVictimClip: {fileID: 0}
+  ailment: 7
+  grabAttackClip: {fileID: 7400000, guid: 6b868ae9684898d4fb4fca9e0285ed1d, type: 3}
+  grabVictimClip: {fileID: 7400000, guid: 77a6a122458e2e1499714b46a41f333e, type: 3}
   ailmentHitDefinition: 
-  dodgeLock: 0
+  dodgeLock: 2
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
   canCancelAbilities: 0
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
-  abilityImageIcon: {fileID: 21300000, guid: 0d57b8fc116439f4bb1a2eff72541866, type: 3}
-  abilityCooldownTime: 30
+  abilityImageIcon: {fileID: 21300000, guid: 7601e10f958babe478c3d5a5dadf41af, type: 3}
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: -6163045294197270457, guid: 96283ce958aaaa049bad792b96428ce5, type: 3}
-  - {fileID: -6163045294197270457, guid: 81b456dce9b80784c8c58be03d52c43f, type: 3}
-  - {fileID: -6163045294197270457, guid: e77e1cb598886f144898c2c6ec52c768, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1

@@ -623,7 +623,7 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
-        private void HeavyAttack(bool isPressed)
+        public void HeavyAttack(bool isPressed)
         {
             if (isPressed)
             {
@@ -642,17 +642,24 @@ namespace Vi.Core
 
             if (CanAim)
             {
-                if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                if (NetworkObject.IsPlayerObject)
                 {
-                    if (isPressed) { aiming.Value = !aiming.Value; }
-                }
-                else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
-                {
-                    aiming.Value = isPressed;
+                    if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                    {
+                        if (isPressed) { aiming.Value = !aiming.Value; }
+                    }
+                    else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
+                    {
+                        aiming.Value = isPressed;
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                    aiming.Value = isPressed;
                 }
             }
             else if (isPressed)
@@ -698,12 +705,17 @@ namespace Vi.Core
 
         void OnAbility1(InputValue value)
         {
+            Ability1(value.isPressed);
+        }
+
+        public void Ability1(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -725,12 +737,17 @@ namespace Vi.Core
 
         void OnAbility2(InputValue value)
         {
+            Ability2(value.isPressed);
+        }
+
+        public void Ability2(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -752,12 +769,17 @@ namespace Vi.Core
 
         void OnAbility3(InputValue value)
         {
+            Ability3(value.isPressed);
+        }
+
+        public void Ability3(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -779,12 +801,17 @@ namespace Vi.Core
 
         void OnAbility4(InputValue value)
         {
+            Ability4(value.isPressed);
+        }
+
+        public void Ability4(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }

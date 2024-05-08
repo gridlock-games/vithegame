@@ -157,9 +157,10 @@ namespace Vi.Core
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
+            bool isInTransition = Animator.IsInTransition(Animator.GetLayerIndex("Actions"));
             bool shouldUseDodgeCancelTransitionTime = false;
             // If we are not at rest
-            if (!currentStateInfo.IsName("Empty") | Animator.IsInTransition(Animator.GetLayerIndex("Actions")))
+            if (!currentStateInfo.IsName("Empty") | isInTransition)
             {
                 bool shouldEvaluatePreviousState = true;
                 switch (actionClip.GetClipType())
@@ -183,6 +184,9 @@ namespace Vi.Core
                         }
                         else if (currentStateInfo.IsTag("CanDodge"))
                         {
+                            // If we are in transition and not returning to the empty state
+                            if (isInTransition & !nextStateInfo.IsName("Empty")) { return; }
+
                             shouldEvaluatePreviousState = false;
                         }
                         else
@@ -364,7 +368,7 @@ namespace Vi.Core
                 if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
-                    if (Application.isEditor) { Debug.Log(chargeTime); }
+                    //if (Application.isEditor) { Debug.Log(chargeTime); }
                 }
 
                 if (actionClip.canEnhance)
@@ -661,10 +665,18 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
-            if (IsLocalPlayer)
+            if (IsOwner)
             {
-                aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
+                if (NetworkObject.IsPlayerObject)
+                {
+                    aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
+                }
+                else
+                {
+                    aimPoint.Value = transform.position + transform.up * 0.5f + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    meleeVerticalAimConstraintOffset.Value = 0;
+                }
             }
 
             LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? meleeVerticalAimConstraintOffset.Value : 0);
