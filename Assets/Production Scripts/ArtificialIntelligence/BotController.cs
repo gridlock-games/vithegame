@@ -312,6 +312,7 @@ namespace Vi.ArtificialIntelligence
                     if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
                     {
                         loadoutManager.SwitchWeapon();
+                        lastWeaponSwapTime = Time.time;
                     }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
