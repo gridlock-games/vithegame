@@ -630,7 +630,8 @@ MonoBehaviour:
       shapeDistance: 0.0377
     customSkinningSetting:
       enable: 0
-      skinningBones: []
+      skinningBones:
+      - {fileID: 0}
     normalAlignmentSetting:
       alignmentMode: 0
       adjustmentTransform: {fileID: 0}
@@ -761,7 +762,7 @@ MonoBehaviour:
     angleRestorationConstraint:
       useAngleRestoration: 1
       stiffness:
-        value: 0.2
+        value: 0.6
         useCurve: 1
         curve:
           serializedVersion: 2
@@ -790,7 +791,7 @@ MonoBehaviour:
       velocityAttenuation: 0.8
       gravityFalloff: 0
     angleLimitConstraint:
-      useAngleLimit: 0
+      useAngleLimit: 1
       limitAngle:
         value: 60
         useCurve: 1
@@ -820,7 +821,7 @@ MonoBehaviour:
           m_RotationOrder: 4
       stiffness: 1
     motionConstraint:
-      useMaxDistance: 0
+      useMaxDistance: 1
       maxDistance:
         value: 0.3
         useCurve: 0
@@ -911,7 +912,7 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
     selfCollisionConstraint:
-      selfMode: 0
+      selfMode: 2
       surfaceThickness:
         value: 0.005
         useCurve: 0
