@@ -266,7 +266,7 @@ namespace Vi.ArtificialIntelligence
                         {
                             if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance)
                             {
-                                float walkRadius = 100;
+                                float walkRadius = 500;
                                 Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
                                 randomDirection += transform.position;
                                 NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
