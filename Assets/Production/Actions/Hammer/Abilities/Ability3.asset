@@ -259,6 +259,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -284,9 +285,9 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 0
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 2
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -295,7 +296,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 521d188f691f925488b018c3f7fb014a, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 10
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 13
