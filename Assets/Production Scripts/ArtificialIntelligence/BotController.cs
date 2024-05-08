@@ -62,12 +62,14 @@ namespace Vi.ArtificialIntelligence
 
         private NavMeshAgent navMeshAgent;
         private Attributes attributes;
+        private LoadoutManager loadoutManager;
         private AnimationHandler animationHandler;
         private new void Awake()
         {
             base.Awake();
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
+            loadoutManager = GetComponent<LoadoutManager>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
@@ -221,11 +223,15 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private const float chargeAttackDuration = 1.5f;
+        private const float chargeAttackDuration = 0.3f;
         private float chargeAttackTime;
 
         private const float dodgeWaitDuration = 5;
         private float lastDodgeTime;
+
+        private const float weaponSwapDuration = 20;
+        private float lastWeaponSwapTime;
+
         private void Update()
         {
             if (!CanMove()) { return; }
@@ -255,6 +261,7 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
+                    bool shouldResetAttackTime = true;
                     float randomChargeAttackDuration = chargeAttackDuration;
                     if (targetAttributes)
                     {
@@ -263,25 +270,21 @@ namespace Vi.ArtificialIntelligence
                             if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
                         }
 
-                        Debug.Log(chargeAttackTime);
-                        Debug.Log(chargeAttackTime <= randomChargeAttackDuration);
-                        weaponHandler.HeavyAttack(chargeAttackTime <= randomChargeAttackDuration - 0.1f);
-                        chargeAttackTime += Time.deltaTime;
+                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                        {
+                            if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
 
-                        //if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                        //{
-                        //    if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+                            weaponHandler.LightAttack(true);
+                        }
+                        else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
+                        {
+                            Debug.Log(chargeAttackTime);
+                            weaponHandler.HeavyAttack(chargeAttackTime <= randomChargeAttackDuration - 0.1f);
+                            chargeAttackTime += Time.deltaTime;
 
-                        //    weaponHandler.LightAttack(true);
-                        //}
-                        //else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
-                        //{
-                        //    //Debug.Log(chargeAttackTime);
-                        //    weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration);
-                            
-                        //    if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
-                        //    else if (chargeAttackTime < chargeAttackDuration) { chargeAttackTime += Time.deltaTime; shouldResetChargeTime = false; }
-                        //}
+                            if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
+                            else { chargeAttackTime += Time.deltaTime; shouldResetAttackTime = false; }
+                        }
                     }
                     else
                     {
@@ -304,7 +307,12 @@ namespace Vi.ArtificialIntelligence
                         lastDodgeTime = Time.time;
                     }
 
-                    if (chargeAttackTime >= randomChargeAttackDuration) { chargeAttackTime = 0; }
+                    if (shouldResetAttackTime & chargeAttackTime >= randomChargeAttackDuration) { chargeAttackTime = 0; }
+
+                    if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
+                    {
+                        loadoutManager.SwitchWeapon();
+                    }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
