@@ -687,7 +687,8 @@ namespace Vi.Core
                         {
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -696,7 +697,8 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.RemoveAt:
                     if (IsServer)
                     {
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
