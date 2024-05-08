@@ -374,6 +374,22 @@ namespace Vi.ScriptableObjects
             public ActionClip attackClip;
         }
 
+        public ActionClip GetGrabAttackClip(ActionClip attack)
+        {
+            GrabAttackCrosswalk crosswalk = System.Array.Find(grabAttackClipList, item => item.attack == attack);
+            if (crosswalk == null) { Debug.LogError("Can't find grab attack crosswalk for " + attack); }
+            return crosswalk.grabAttackClip;
+        }
+
+        [System.Serializable]
+        private class GrabAttackCrosswalk
+        {
+            public ActionClip attack;
+            public ActionClip grabAttackClip;
+        }
+
+        [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
+
         [Header("Dodge Assignments")]
         public float dodgeStaminaCost = 20;
         [SerializeField] private ActionClip dodgeF;
@@ -475,6 +491,19 @@ namespace Vi.ScriptableObjects
                         if (attack.attackClip)
                         {
                             if (attack.attackClip.name == clipName) { return attack.attackClip; }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(GrabAttackCrosswalk[]))
+                {
+                    var AttackArrayObject = propertyInfo.GetValue(this);
+                    GrabAttackCrosswalk[] attacks = (GrabAttackCrosswalk[])AttackArrayObject;
+
+                    foreach (GrabAttackCrosswalk attack in attacks)
+                    {
+                        if (attack.grabAttackClip)
+                        {
+                            if (attack.grabAttackClip.name == clipName) { return attack.grabAttackClip; }
                         }
                     }
                 }

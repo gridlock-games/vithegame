@@ -187,6 +187,9 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: 5ea22a3e631747f40b1d6a2cbe07247e, type: 2}
     shouldAlreadyHaveAilment: 0
   - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: 1789c1d6050919045b4fd84c10954a42, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: a114819f2c0ea204fbef7303261d6fba, type: 2}
     shouldAlreadyHaveAilment: 0
   - hitLocation: 0
@@ -214,9 +217,9 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: b896f757d35339a408512cb7b113cc8c, type: 2}
     shouldAlreadyHaveAilment: 0
   ability1: {fileID: 11400000, guid: 37533bdf5386df04b90799a58da70ded, type: 2}
-  ability2: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
-  ability3: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
-  ability4: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
+  ability2: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
+  ability3: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
+  ability4: {fileID: 11400000, guid: 14aa06f315c18db439640b1ba200a7ea, type: 2}
   flashAttack: {fileID: 11400000, guid: c8ddfd40cd7cc43e8a254b19600b53e7, type: 2}
   attackList:
   - inputs: 00000000
@@ -234,12 +237,9 @@ MonoBehaviour:
   - inputs: 01000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
-  - inputs: 0100000001000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: c3ee966b76e1695448b68582c5ef2d0e, type: 2}
-  - inputs: 010000000100000001000000
-    comboCondition: 2
-    attackClip: {fileID: 11400000, guid: 9c2945988dc26f6429300db2e7342824, type: 2}
+  grabAttackClipList:
+  - attack: {fileID: 11400000, guid: 10500de1e30f621439ed764266393f30, type: 2}
+    grabAttackClip: {fileID: 11400000, guid: 9292437416b69594da2ba61a8cae1ee5, type: 2}
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}

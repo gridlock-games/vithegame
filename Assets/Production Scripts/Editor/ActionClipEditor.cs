@@ -69,9 +69,9 @@ namespace Vi.Editor
         private SerializedProperty spCanFlashAttack;
         private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
+        private SerializedProperty spGrabAttackClip;
+        private SerializedProperty spGrabVictimClip;
         private SerializedProperty spAilmentHitDefinition;
-        private SerializedProperty spGrabDuration;
-        private SerializedProperty spGrabDistance;
         private SerializedProperty spDodgeLock;
 
         private SerializedProperty spCanCancelLightAttacks;
@@ -163,9 +163,9 @@ namespace Vi.Editor
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
+            spGrabAttackClip = serializedObject.FindProperty("grabAttackClip");
+            spGrabVictimClip = serializedObject.FindProperty("grabVictimClip");
             spAilmentHitDefinition = serializedObject.FindProperty("ailmentHitDefinition");
-            spGrabDuration = serializedObject.FindProperty("grabDuration");
-            spGrabDistance = serializedObject.FindProperty("grabDistance");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
@@ -347,8 +347,8 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spGrabDuration);
-                    EditorGUILayout.PropertyField(spGrabDistance);
+                    EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
@@ -424,8 +424,8 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spGrabDuration);
-                    EditorGUILayout.PropertyField(spGrabDistance);
+                    EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
@@ -506,8 +506,8 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spGrabDuration);
-                    EditorGUILayout.PropertyField(spGrabDistance);
+                    EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spActionVFXList);
@@ -582,8 +582,8 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
-                    EditorGUILayout.PropertyField(spGrabDuration);
-                    EditorGUILayout.PropertyField(spGrabDistance);
+                    EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
@@ -617,6 +617,36 @@ namespace Vi.Editor
                 {
                     EditorGUILayout.PropertyField(spRequiredAmmoAmount);
                 }
+            }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.GrabAttack)
+            {
+                EditorGUILayout.PropertyField(spEffectedWeaponBones);
+                EditorGUILayout.PropertyField(spWeaponBonesToHide);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spHealAmount);
+                EditorGUILayout.PropertyField(spStaminaDamage);
+                EditorGUILayout.PropertyField(spDefenseDamage);
+                EditorGUILayout.PropertyField(spMaxHitLimit);
+                if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spActionVFXList);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAilment);
+                EditorGUILayout.PropertyField(spAilmentHitDefinition);
+                EditorGUILayout.PropertyField(spDodgeLock);
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
+                spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
+                spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+            }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge)
+            {
+                Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -250,8 +250,32 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   YAngleRotationOffset: 0
+  cameraYOffsetAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   avatarLayer: 0
-  transitionTime: 0.15
+  transitionTime: 0
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1.5
@@ -271,7 +295,7 @@ MonoBehaviour:
   damage: 5
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 1
+  defenseDamage: 1.5
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0

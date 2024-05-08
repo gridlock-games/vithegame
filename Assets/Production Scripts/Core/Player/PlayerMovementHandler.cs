@@ -89,7 +89,9 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     newRotation = attributes.GetAilmentRotation();
-                if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+                else if (animationHandler.IsGrabAttacking())
+                    newRotation = inputPayload.rotation;
+                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
                 else if (!attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);

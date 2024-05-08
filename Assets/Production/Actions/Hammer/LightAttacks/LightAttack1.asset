@@ -12517,6 +12517,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -12525,7 +12526,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.35
   damage: 5
   healAmount: 0
   staminaDamage: 0
@@ -12557,7 +12558,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 6232432804204378051, guid: a6d0b65fd8cde4dfeb28f4d56d2c745f, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1

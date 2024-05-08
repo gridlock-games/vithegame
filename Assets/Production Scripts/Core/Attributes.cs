@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -316,6 +317,41 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
+        private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
+        private NetworkVariable<FixedString32Bytes> grabAttackClipName = new NetworkVariable<FixedString32Bytes>();
+        private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
+
+        public bool IsGrabbed() { return isGrabbed.Value; }
+
+        public Attributes GetGrabAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
+
+        public AnimationClip GetGrabReactionClip()
+        {
+            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
+            {
+                if (weaponOption.weapon.name == GetGrabAssailant().GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
+                {
+                    return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
+                }
+            }
+            Debug.LogError("Couldn't find grab reaction clip!");
+            return null;
+        }
+
+        public void CancelGrab()
+        {
+            if (IsGrabbed())
+            {
+                if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
+                isGrabbed.Value = false;
+            }
+
+            if (animationHandler.IsGrabAttacking())
+            {
+                animationHandler.CancelAllActions();
+            }
+        }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -324,6 +360,11 @@ namespace Vi.Core
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+
+            // Make grab people invinicible to all attacks except for the grab hits
+            if (IsGrabbed() & attacker != GetGrabAssailant()) { Debug.Log("1 " + Time.time); return false; }
+            if (animationHandler.IsGrabAttacking()) { Debug.Log("2 " + Time.time); return false; }
+
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
                 AddHP(attack.healAmount);
@@ -350,46 +391,42 @@ namespace Vi.Core
 
             // Combination ailment logic here
             bool applyAilmentRegardless = false;
-            ActionClip.Ailment attackAilment = attack.ailment == ActionClip.Ailment.Grab ? ActionClip.Ailment.None : attack.ailment;
-
-            if (attack.ailment != ActionClip.Ailment.Grab)
+            ActionClip.Ailment attackAilment;
+            // These hit numbers are BEFORE the hit has been added to the weapon
+            if (hitCounter.ContainsKey(this))
             {
-                // These hit numbers are BEFORE the hit has been added to the weapon
-                if (hitCounter.ContainsKey(this))
+                if (attack.ailmentHitDefinition.Length > hitCounter[this].hitNumber)
                 {
-                    if (attack.ailmentHitDefinition.Length > hitCounter[this].hitNumber)
-                    {
-                        if (attack.ailmentHitDefinition[hitCounter[this].hitNumber]) // If we are in the ailment hit definition and it is true
-                        {
-                            attackAilment = attack.ailment;
-                        }
-                        else // If we are in the ailment hit definition, but it is false
-                        {
-                            attackAilment = ActionClip.Ailment.None;
-                        }
-                    }
-                    else // If we are out of the range of the ailment hit array
+                    if (attack.ailmentHitDefinition[hitCounter[this].hitNumber]) // If we are in the ailment hit definition and it is true
                     {
                         attackAilment = attack.ailment;
+                    }
+                    else // If we are in the ailment hit definition, but it is false
+                    {
+                        attackAilment = ActionClip.Ailment.None;
                     }
                 }
-                else // First hit
+                else // If we are out of the range of the ailment hit array
                 {
-                    if (attack.ailmentHitDefinition.Length > 0)
-                    {
-                        if (attack.ailmentHitDefinition[0]) // If we are in the ailment hit definition and it is true
-                        {
-                            attackAilment = attack.ailment;
-                        }
-                        else // If we are in the ailment hit definition, but it is false
-                        {
-                            attackAilment = ActionClip.Ailment.None;
-                        }
-                    }
-                    else // If the ailment hit definition array is empty
+                    attackAilment = attack.ailment;
+                }
+            }
+            else // First hit
+            {
+                if (attack.ailmentHitDefinition.Length > 0)
+                {
+                    if (attack.ailmentHitDefinition[0]) // If we are in the ailment hit definition and it is true
                     {
                         attackAilment = attack.ailment;
                     }
+                    else // If we are in the ailment hit definition, but it is false
+                    {
+                        attackAilment = ActionClip.Ailment.None;
+                    }
+                }
+                else // If the ailment hit definition array is empty
+                {
+                    attackAilment = attack.ailment;
                 }
             }
 
@@ -433,7 +470,22 @@ namespace Vi.Core
 
             if (damage != 0)
             {
-                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death) { animationHandler.PlayAction(hitReaction); }
+                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
+                {
+                    if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
+                    {
+                        GetGrabAssailant().CancelGrab();
+                        CancelGrab();
+                    }
+
+                    if (hitReaction.ailment == ActionClip.Ailment.Grab)
+                    {
+                        grabAttackClipName.Value = attack.name;
+                        attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                    }
+
+                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
+                }
             }
             else
             {
@@ -510,13 +562,19 @@ namespace Vi.Core
                     endPos.y = 0;
                     ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
 
-                    if (attackAilment == ActionClip.Ailment.Pull) { pullAssailantDataId.Value = attacker.GetPlayerDataId(); }
-
                     shouldApplyAilment = true;
 
                     if (attackAilment == ActionClip.Ailment.Pull)
                     {
+                        pullAssailantDataId.Value = attacker.GetPlayerDataId();
                         isPulled.Value = true;
+                    }
+                    else if (attackAilment == ActionClip.Ailment.Grab)
+                    {
+                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                        isGrabbed.Value = true;
+                        if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+                        ailment.Value = ActionClip.Ailment.None;
                     }
                     else
                     {
@@ -561,11 +619,12 @@ namespace Vi.Core
                         case ActionClip.Ailment.Death:
                             break;
                         default:
-                            if (attackAilment != ActionClip.Ailment.Pull) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
+                            if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
                             break;
                     }
 
                     if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
+                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(hitReaction)); }
                 }
             }
 
@@ -781,7 +840,7 @@ namespace Vi.Core
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
+        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
@@ -797,8 +856,8 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -806,9 +865,18 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            yield return new WaitUntil(() => animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
-            yield return new WaitUntil(() => !animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(hitReaction.name));
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             isPulled.Value = false;
+        }
+
+        private Coroutine grabResetCoroutine;
+        private IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
+        {
+            if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
+            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            isGrabbed.Value = false;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()
