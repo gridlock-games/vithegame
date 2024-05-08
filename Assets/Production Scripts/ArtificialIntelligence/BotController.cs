@@ -223,7 +223,7 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private const float chargeAttackDuration = 0.3f;
+        private const float chargeAttackDuration = 3f;
         private float chargeAttackTime;
 
         private const float dodgeWaitDuration = 5;
@@ -261,29 +261,11 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    bool shouldResetAttackTime = true;
-                    float randomChargeAttackDuration = chargeAttackDuration;
                     if (targetAttributes)
                     {
                         if (navMeshAgent.isOnNavMesh)
                         {
                             if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
-                        }
-
-                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                        {
-                            if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
-
-                            weaponHandler.LightAttack(true);
-                        }
-                        else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
-                        {
-                            Debug.Log(chargeAttackTime);
-                            weaponHandler.HeavyAttack(chargeAttackTime <= randomChargeAttackDuration - 0.1f);
-                            chargeAttackTime += Time.deltaTime;
-
-                            if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
-                            else { chargeAttackTime += Time.deltaTime; shouldResetAttackTime = false; }
                         }
                     }
                     else
@@ -301,19 +283,7 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    if (Time.time - lastDodgeTime > dodgeWaitDuration)
-                    {
-                        OnDodge();
-                        lastDodgeTime = Time.time;
-                    }
-
-                    if (shouldResetAttackTime & chargeAttackTime >= randomChargeAttackDuration) { chargeAttackTime = 0; }
-
-                    if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
-                    {
-                        loadoutManager.SwitchWeapon();
-                        lastWeaponSwapTime = Time.time;
-                    }
+                    EvaluteAction();
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
@@ -323,6 +293,41 @@ namespace Vi.ArtificialIntelligence
                     }
                 }
             }
+        }
+
+        private void EvaluteAction()
+        {
+            if (Time.time - lastWeaponSwapTime > weaponSwapDuration)
+            {
+                loadoutManager.SwitchWeapon();
+                lastWeaponSwapTime = Time.time;
+            }
+
+            if (targetAttributes)
+            {
+                if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                {
+                    if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+
+                    weaponHandler.LightAttack(true);
+                }
+                else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 15)
+                {
+                    weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration - 0.1f);
+                    chargeAttackTime += Time.deltaTime;
+
+                    if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
+                    else if (chargeAttackTime <= chargeAttackDuration - 0.1f) { chargeAttackTime += Time.deltaTime; }
+                }
+            }
+
+            if (Time.time - lastDodgeTime > dodgeWaitDuration)
+            {
+                OnDodge();
+                lastDodgeTime = Time.time;
+            }
+
+            if (chargeAttackTime >= chargeAttackDuration) { chargeAttackTime = 0; }
         }
 
         private float positionStrength = 1;
