@@ -221,7 +221,7 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private const float chargeAttackDuration = 0.4f;
+        private const float chargeAttackDuration = 1.5f;
         private float chargeAttackTime;
 
         private const float dodgeWaitDuration = 5;
@@ -255,7 +255,7 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    bool shouldResetChargeTime = true;
+                    float randomChargeAttackDuration = chargeAttackDuration;
                     if (targetAttributes)
                     {
                         if (navMeshAgent.isOnNavMesh)
@@ -263,20 +263,25 @@ namespace Vi.ArtificialIntelligence
                             if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
                         }
 
-                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
-                        {
-                            if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+                        Debug.Log(chargeAttackTime);
+                        Debug.Log(chargeAttackTime <= randomChargeAttackDuration);
+                        weaponHandler.HeavyAttack(chargeAttackTime <= randomChargeAttackDuration - 0.1f);
+                        chargeAttackTime += Time.deltaTime;
 
-                            weaponHandler.LightAttack(true);
-                        }
-                        else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
-                        {
-                            Debug.Log(chargeAttackTime);
-                            weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration);
+                        //if (Vector3.Distance(navMeshAgent.destination, transform.position) < 3)
+                        //{
+                        //    if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+
+                        //    weaponHandler.LightAttack(true);
+                        //}
+                        //else if (Vector3.Distance(navMeshAgent.destination, transform.position) < 7)
+                        //{
+                        //    //Debug.Log(chargeAttackTime);
+                        //    weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration);
                             
-                            if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
-                            else { chargeAttackTime += Time.deltaTime; shouldResetChargeTime = false; }
-                        }
+                        //    if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
+                        //    else if (chargeAttackTime < chargeAttackDuration) { chargeAttackTime += Time.deltaTime; shouldResetChargeTime = false; }
+                        //}
                     }
                     else
                     {
@@ -299,7 +304,7 @@ namespace Vi.ArtificialIntelligence
                         lastDodgeTime = Time.time;
                     }
 
-                    if (shouldResetChargeTime) { chargeAttackTime = 0; }
+                    if (chargeAttackTime >= randomChargeAttackDuration) { chargeAttackTime = 0; }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
                 {
