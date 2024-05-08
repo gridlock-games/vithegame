@@ -172,7 +172,14 @@ namespace Vi.ArtificialIntelligence
             }
             else if (animationHandler.ShouldApplyRootMotion())
             {
-                movement = attributes.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown ? Vector3.zero : rootMotion;
+                if (attributes.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                {
+                    movement = Vector3.zero;
+                }
+                else
+                {
+                    movement = rootMotion;
+                }
             }
             else
             {
@@ -180,7 +187,7 @@ namespace Vi.ArtificialIntelligence
                 Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                movement = attributes.IsRooted() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
@@ -215,7 +222,17 @@ namespace Vi.ArtificialIntelligence
                 moveSidesTarget.Value = animDir.x;
             }
 
-            currentPosition.Value += movement + gravity;
+            Vector3 newPosition;
+            if (Mathf.Approximately(movement.y, 0))
+            {
+                newPosition = currentPosition.Value + movement + gravity;
+            }
+            else
+            {
+                newPosition = currentPosition.Value + movement;
+            }
+
+            currentPosition.Value = newPosition;
             currentRotation.Value = newRotation;
             navMeshAgent.nextPosition = currentPosition.Value;
             lastMovement = movement;
