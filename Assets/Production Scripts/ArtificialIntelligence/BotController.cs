@@ -264,11 +264,14 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (navMeshAgent.isOnNavMesh)
                         {
-                            float walkRadius = 0.5f;
-                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                            randomDirection += transform.position;
-                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance) { navMeshAgent.destination = hit.position; }
+                            if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance)
+                            {
+                                float walkRadius = 100;
+                                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                                randomDirection += transform.position;
+                                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                                navMeshAgent.destination = hit.position;
+                            }
                         }
                     }
                 }
