@@ -5,9 +5,7 @@ using Vi.ScriptableObjects;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
-using TMPro;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 
 namespace Vi.UI
 {

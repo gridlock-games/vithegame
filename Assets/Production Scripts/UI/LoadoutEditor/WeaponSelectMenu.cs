@@ -14,11 +14,9 @@ namespace Vi.UI
 
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
-        private LoadoutManager loadoutManager;
         private int playerDataId;
-        public void Initialize(CharacterReference.WeaponOption initialOption, CharacterReference.WeaponOption otherWeapon, LoadoutManager.WeaponSlotType weaponType, LoadoutManager loadoutManager, int loadoutSlot, int playerDataId)
+        public void Initialize(CharacterReference.WeaponOption initialOption, CharacterReference.WeaponOption otherWeapon, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot, int playerDataId)
         {
-            this.loadoutManager = loadoutManager;
             this.weaponType = weaponType;
             this.playerDataId = playerDataId;
             Button invokeThis = null;
