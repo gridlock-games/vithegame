@@ -100,6 +100,7 @@ namespace Vi.UI
           break;
 
         case loginSiteSource.google:
+          //TODO: Add additional verification like source domain checking ie. "www.googleapis.com"
           GoogleAuth.deeplinkListener(fullLoginData);
           break;
 
