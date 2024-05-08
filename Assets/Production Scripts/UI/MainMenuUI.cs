@@ -227,11 +227,11 @@ namespace Vi.UI
     public void LoginWithGoogle()
     {
       Debug.Log("Logging in with Google");
+      dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
       GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
       {
         if (success)
         {
-          dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
           StartCoroutine(WaitForGoogleAuth(tokenData));
         }
         else
