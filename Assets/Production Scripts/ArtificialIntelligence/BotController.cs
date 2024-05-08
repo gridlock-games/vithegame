@@ -219,6 +219,8 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
+        private float dodgeWaitDuration = 5;
+        private float lastDodgeTime;
         private void Update()
         {
             if (!CanMove()) { return; }
@@ -235,7 +237,7 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
 
-                if (IsOwner & !bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                if (IsOwner) // & !bool.Parse(PlayerPrefs.GetString("DisableBots"))
                 {
                     List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
@@ -273,6 +275,12 @@ namespace Vi.ArtificialIntelligence
                                 navMeshAgent.destination = hit.position;
                             }
                         }
+                    }
+
+                    if (Time.time - lastDodgeTime > dodgeWaitDuration)
+                    {
+                        OnDodge();
+                        lastDodgeTime = Time.time;
                     }
                 }
                 else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
@@ -345,7 +353,7 @@ namespace Vi.ArtificialIntelligence
 
         void OnDodge()
         {
-            Vector3 moveInput = (navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 moveInput = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
