@@ -272,8 +272,6 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                //rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
-
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
@@ -283,6 +281,13 @@ namespace Vi.UI
                 {
                     // Order player cards by distance
                     List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    string s = "";
+                    foreach (Attributes attributes in teammateAttributes)
+                    {
+                        s += attributes.name + " - ";
+                    }
+                    Debug.Log(s);
+                    
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)
