@@ -32,8 +32,7 @@ namespace Vi.UI
         private void Update()
         {
             joinLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
-            createLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
-
+            
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
                 foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
