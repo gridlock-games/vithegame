@@ -393,13 +393,13 @@ namespace Vi.UI
 
             gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
-            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
-            spectatorCountText.text = "Spectator Count: " + playerDataList.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
-            playerDataList = playerDataList.FindAll(item => item.team != PlayerDataManager.Team.Spectator);
+            List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            spectatorCountText.text = "Spectator Count: " + playerDataListWithSpectators.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
 
             // Timer logic
-            bool startingGame = playerDataList.Count != 0;
-            foreach (PlayerDataManager.PlayerData playerData in playerDataList)
+            bool startingGame = playerDataListWithoutSpectators.Count != 0;
+            foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
             {
                 if (playerData.id >= 0)
                 {
@@ -421,21 +421,21 @@ namespace Vi.UI
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for game mode none"; }
                     break;
                 case PlayerDataManager.GameMode.FreeForAll:
-                    canCountDown = playerDataList.Count >= 2;
+                    canCountDown = playerDataListWithoutSpectators.Count >= 2;
 
                     if (!canCountDown) { cannotCountDownMessage = "Need 2 or more players to play"; }
                     break;
                 case PlayerDataManager.GameMode.TeamElimination:
-                    List<PlayerDataManager.PlayerData> team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    List<PlayerDataManager.PlayerData> team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    List<PlayerDataManager.PlayerData> team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    List<PlayerDataManager.PlayerData> team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 3 & team2List.Count >= 3 & team1List.Count == team2List.Count;
 
                     if (!(team1List.Count >= 3 & team2List.Count >= 3)) { cannotCountDownMessage = "Need 3 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
-                    team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = (team1List.Count == 3 & team2List.Count == 3) | (team1List.Count == 5 & team2List.Count == 5);
 
                     if (!canCountDown) { cannotCountDownMessage = "Essence War is 3v3 or 5v5 only"; }
@@ -445,8 +445,8 @@ namespace Vi.UI
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
                     break;
                 case PlayerDataManager.GameMode.TeamDeathmatch:
-                    team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 2 & team2List.Count >= 2 & team1List.Count == team2List.Count;
 
                     if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 2 or more players on each team to play"; }
@@ -530,13 +530,14 @@ namespace Vi.UI
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
             string playersString = "";
-            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
                 playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString() + PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             }
 
             if (lastPlayersString != playersString)
             {
+                Debug.Log("Updating player list display");
                 foreach (Transform child in leftTeamParent.transformParent)
                 {
                     Destroy(child.gameObject);

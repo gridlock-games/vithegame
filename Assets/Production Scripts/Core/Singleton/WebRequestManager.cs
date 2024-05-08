@@ -1026,7 +1026,7 @@ namespace Vi.Core
             public Loadout loadoutPreset2;
             public Loadout loadoutPreset3;
             public Loadout loadoutPreset4;
-            public FixedString32Bytes userId;
+            public FixedString64Bytes userId;
             public int slot;
             public int level;
             public int experience;
