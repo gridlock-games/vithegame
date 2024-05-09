@@ -27,7 +27,7 @@ namespace Vi.UI
                 canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
             }
             gameModeManager = GetComponentInParent<GameModeManager>();
-            gameModeManager.RegisterCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
             roundResultText.enabled = false;
 
@@ -39,7 +39,7 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            gameModeManager.UnsubscribeCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
         }
 
         protected void OnScoreListChanged()

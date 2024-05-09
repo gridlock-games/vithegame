@@ -506,12 +506,12 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public void RegisterCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        public void SubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
             scoreList.OnListChanged += onListChangedDelegate;
         }
 
-        public void UnsubscribeCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        public void UnsubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
             scoreList.OnListChanged -= onListChangedDelegate;
         }

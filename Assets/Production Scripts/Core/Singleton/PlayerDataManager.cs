@@ -947,6 +947,17 @@ namespace Vi.Core
         }
 
         private NetworkList<PlayerData> playerDataList;
+
+        public void SubscribeDataListCallback(NetworkList<PlayerData>.OnListChangedDelegate onListChangedDelegate)
+        {
+            playerDataList.OnListChanged += onListChangedDelegate;
+        }
+
+        public void UnsubscribeDataListCallback(NetworkList<PlayerData>.OnListChangedDelegate onListChangedDelegate)
+        {
+            playerDataList.OnListChanged -= onListChangedDelegate;
+        }
+
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
         [System.Serializable]
