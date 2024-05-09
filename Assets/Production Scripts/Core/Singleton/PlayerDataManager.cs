@@ -648,9 +648,9 @@ namespace Vi.Core
             {
                 if (NetSceneManager.Singleton.ShouldSpawnPlayer())
                 {
-                    foreach (PlayerData playerData in playerDataList)
+                    for (int i = 0; i < playerDataList.Count; i++)
                     {
-                        playersToSpawnQueue.Enqueue(playerData);
+                        playersToSpawnQueue.Enqueue(playerDataList[i]);
                     }
                 }
             }
