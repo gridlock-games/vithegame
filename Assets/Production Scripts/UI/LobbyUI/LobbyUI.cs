@@ -6,6 +6,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -261,22 +262,6 @@ namespace Vi.UI
             RefreshPlayerCards();
         }
 
-        public static string FromCamelCase(string inputString)
-        {
-            string returnValue = inputString;
-
-            //Strip leading "_" character
-            returnValue = Regex.Replace(returnValue, "^_", "").Trim();
-            //Add a space between each lower case character and upper case character
-            returnValue = Regex.Replace(returnValue, "([a-z])([A-Z])", "$1 $2").Trim();
-            //Add a space between 2 upper case characters when the second one is followed by a lower space character
-            returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
-
-            if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
-
-            return returnValue;
-        }
-
         public override void OnNetworkSpawn()
         {
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
@@ -392,7 +377,7 @@ namespace Vi.UI
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
             }
 
-            gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
             List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
@@ -468,11 +453,11 @@ namespace Vi.UI
                     {
                         roomSettingsParsedProperly = result > 0 & roomSettingsParsedProperly;
                         gameModeSettings += customSettingsInputField.key + ":" + result.ToString() + "|";
-                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
+                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = StringUtility.FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
                     }
                     else
                     {
-                        cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
+                        cannotCountDownMessage = StringUtility.FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
                         roomSettingsParsedProperly = false & roomSettingsParsedProperly;
                         break;
                     }
@@ -556,7 +541,7 @@ namespace Vi.UI
                 RefreshGameMode();
             }
 
-            gameModeText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
+            gameModeText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();

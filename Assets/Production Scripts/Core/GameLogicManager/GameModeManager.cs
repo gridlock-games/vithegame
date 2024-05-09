@@ -330,7 +330,7 @@ namespace Vi.Core.GameModeManagers
             {
                 StartCoroutine(WaitForSpawnToAddPlayerData(id, characterId));
             }
-            else
+            else if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
                 PlayerScore playerScore = new PlayerScore(id);
                 if (scoreList.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
@@ -372,7 +372,7 @@ namespace Vi.Core.GameModeManagers
         {
             int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
-            disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index]));
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index])); }
             scoreList.RemoveAt(index);
         }
 

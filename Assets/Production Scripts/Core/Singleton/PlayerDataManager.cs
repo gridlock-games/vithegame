@@ -389,6 +389,7 @@ namespace Vi.Core
             if (IsServer)
             {
                 botClientId--;
+                Debug.Log("Adding bot data " + botClientId);
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
 

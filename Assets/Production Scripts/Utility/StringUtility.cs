@@ -1,8 +1,9 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace Vi.Utility
 {
-    public static class LevenshteinDistance
+    public static class StringUtility
     {
         /// <summary>
         ///     Calculate the difference between 2 strings using the Levenshtein distance algorithm
@@ -43,5 +44,22 @@ namespace Vi.Utility
             // return result
             return matrix[source1Length, source2Length];
         }
+
+        public static string FromCamelCase(string inputString)
+        {
+            string returnValue = inputString;
+
+            //Strip leading "_" character
+            returnValue = Regex.Replace(returnValue, "^_", "").Trim();
+            //Add a space between each lower case character and upper case character
+            returnValue = Regex.Replace(returnValue, "([a-z])([A-Z])", "$1 $2").Trim();
+            //Add a space between 2 upper case characters when the second one is followed by a lower space character
+            returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
+
+            if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
+
+            return returnValue;
+        }
+
     }
 }

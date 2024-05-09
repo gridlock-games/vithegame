@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
-using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -27,7 +27,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
                 scoreboardHeaderText.text = "No Game Mode | " + PlayerDataManager.Singleton.GetMapName();
             else
-                scoreboardHeaderText.text = LobbyUI.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " | " + PlayerDataManager.Singleton.GetMapName();
+                scoreboardHeaderText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " | " + PlayerDataManager.Singleton.GetMapName();
 
             List<ScoreboardElement> elementList = new List<ScoreboardElement>();
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
