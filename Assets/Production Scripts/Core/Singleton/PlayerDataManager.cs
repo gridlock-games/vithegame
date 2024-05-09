@@ -119,16 +119,16 @@ namespace Vi.Core
                 return IsServer;
         }
 
-        public PlayerData GetLobbyLeader()
+        public KeyValuePair<bool, PlayerData> GetLobbyLeader()
         {
             List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
             if (playerDataList.Count > 0)
-                return playerDataList[0];
+                return new KeyValuePair<bool, PlayerData>(true, playerDataList[0]);
             else
-                return new PlayerData();
+                return new KeyValuePair<bool, PlayerData>(false, new PlayerData());
         }
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
@@ -745,7 +745,9 @@ namespace Vi.Core
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
+
+                        KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : GetGameMode().ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -755,7 +757,9 @@ namespace Vi.Core
                     if (IsServer)
                     {
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
+
+                        KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : GetGameMode().ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:

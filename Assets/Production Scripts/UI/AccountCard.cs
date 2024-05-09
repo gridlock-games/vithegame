@@ -26,7 +26,7 @@ namespace Vi.UI
 
             lockedUIImage.sprite = isLocked | playerDataId < 0 ? lockedSprite : unlockedSprite;
 
-            lobbyLeaderImage.gameObject.SetActive(PlayerDataManager.Singleton.GetLobbyLeader().id == playerDataId);
+            lobbyLeaderImage.gameObject.SetActive(PlayerDataManager.Singleton.GetLobbyLeader().Value.id == playerDataId);
 
             kickButton.gameObject.SetActive(!lobbyLeaderImage.gameObject.activeSelf & PlayerDataManager.Singleton.IsLobbyLeader());
         }
