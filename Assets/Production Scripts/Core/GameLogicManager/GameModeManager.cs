@@ -330,7 +330,7 @@ namespace Vi.Core.GameModeManagers
             {
                 StartCoroutine(WaitForSpawnToAddPlayerData(id, characterId));
             }
-            else if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+            else
             {
                 PlayerScore playerScore = new PlayerScore(id);
                 if (scoreList.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
@@ -357,7 +357,12 @@ namespace Vi.Core.GameModeManagers
             AddPlayerScore(id, characterId);
         }
 
-        public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
+        public PlayerScore GetPlayerScore(int id)
+        {
+            int index = scoreList.IndexOf(new PlayerScore(id));
+            if (index == -1) { Debug.LogError("Could not find player score with id: " + id); return new PlayerScore(); }
+            return scoreList[index];
+        }
 
         public PlayerScore GetDisconnectedPlayerScore(int id)
         {
