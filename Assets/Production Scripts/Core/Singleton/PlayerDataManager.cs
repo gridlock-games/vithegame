@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -748,7 +749,7 @@ namespace Vi.Core
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : GetGameMode().ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -760,7 +761,7 @@ namespace Vi.Core
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : GetGameMode().ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
