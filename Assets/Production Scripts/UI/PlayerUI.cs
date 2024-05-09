@@ -132,8 +132,19 @@ namespace Vi.UI
             fadeToWhiteImage.color = Color.black;
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
+            PlayerDataManager.Singleton.SubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
 
             UpdateWeapon(false);
+        }
+
+        private void OnDestroy()
+        {
+            PlayerDataManager.Singleton.UnsubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
+        }
+
+        private void UpdateTeammateAttributesList()
+        {
+            teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
         }
 
         public void OnRebinding()
@@ -256,6 +267,7 @@ namespace Vi.UI
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
+        List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
@@ -280,7 +292,7 @@ namespace Vi.UI
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
                     // Order player cards by distance
-                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    teammateAttributes.Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)
