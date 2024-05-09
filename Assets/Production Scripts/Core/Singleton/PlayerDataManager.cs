@@ -445,8 +445,9 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(int clientId)
         {
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
+                PlayerData playerData = playerDataList[i];
                 if (playerData.id == clientId)
                 {
                     return playerData;
