@@ -783,6 +783,20 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
+
+            DataListWasUpdatedThisFrame = true;
+
+            if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
+            resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
+        }
+
+        public bool DataListWasUpdatedThisFrame { get; private set; } = false;
+
+        private Coroutine resetDataListBoolCoroutine;
+        private IEnumerator ResetDataListWasUpdatedBool()
+        {
+            yield return null;
+            DataListWasUpdatedThisFrame = false;
         }
 
         private void OnClientConnectCallback(ulong clientId)
@@ -957,16 +971,6 @@ namespace Vi.Core
         }
 
         private NetworkList<PlayerData> playerDataList;
-
-        public void SubscribeDataListCallback(NetworkList<PlayerData>.OnListChangedDelegate onListChangedDelegate)
-        {
-            playerDataList.OnListChanged += onListChangedDelegate;
-        }
-
-        public void UnsubscribeDataListCallback(NetworkList<PlayerData>.OnListChangedDelegate onListChangedDelegate)
-        {
-            playerDataList.OnListChanged -= onListChangedDelegate;
-        }
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 

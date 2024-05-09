@@ -62,13 +62,7 @@ namespace Vi.UI
             transform.localScale = Vector3.zero;
             healthBarParent.localScale = Vector3.zero;
 
-            PlayerDataManager.Singleton.SubscribeDataListCallback(delegate { UpdateNameTextAndColors(); });
             UpdateNameTextAndColors();
-        }
-
-        private void OnDestroy()
-        {
-            PlayerDataManager.Singleton.UnsubscribeDataListCallback(delegate { UpdateNameTextAndColors(); });
         }
 
         private void UpdateNameTextAndColors()
@@ -103,6 +97,8 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
             }
+
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateNameTextAndColors(); }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!rendererToFollow) { RefreshRendererToFollow(); }
