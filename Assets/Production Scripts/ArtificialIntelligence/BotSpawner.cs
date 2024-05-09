@@ -12,7 +12,10 @@ namespace Vi.ArtificialIntelligence
 
         private void Start()
         {
-            StartCoroutine(SpawnBots());
+            if (NetworkManager.Singleton.IsServer)
+            {
+                StartCoroutine(SpawnBots());
+            }
         }
 
         private IEnumerator SpawnBots()

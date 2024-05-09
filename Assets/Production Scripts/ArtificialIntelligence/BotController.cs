@@ -50,9 +50,12 @@ namespace Vi.ArtificialIntelligence
 
         public override void OnNetworkSpawn()
         {
-            currentPosition.Value = transform.position;
-            currentRotation.Value = transform.rotation;
-            if (IsServer) { NetworkManager.NetworkTickSystem.Tick += ProcessMovementTick; }
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick += ProcessMovementTick;
+                currentPosition.Value = transform.position;
+                currentRotation.Value = transform.rotation;
+            }
         }
 
         public override void OnNetworkDespawn()
