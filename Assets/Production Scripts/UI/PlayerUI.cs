@@ -133,21 +133,9 @@ namespace Vi.UI
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
-            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
-            {
-                PlayerDataManager.Singleton.SubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
-                UpdateTeammateAttributesList();
-            }
+            UpdateTeammateAttributesList();
 
             UpdateWeapon(false);
-        }
-
-        private void OnDestroy()
-        {
-            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
-            {
-                PlayerDataManager.Singleton.UnsubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
-            }
         }
 
         private void UpdateTeammateAttributesList()
@@ -299,6 +287,8 @@ namespace Vi.UI
 
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
+                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
+
                     // Order player cards by distance
                     teammateAttributes.Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)

@@ -214,21 +214,31 @@ namespace Vi.Core
             Peaceful
         }
 
+        public bool LocalPlayersWasUpdatedThisFrame { get; private set; } = false;
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
         public void AddPlayerObject(int clientId, Attributes playerObject)
         {
             localPlayers.Add(clientId, playerObject);
+            LocalPlayersWasUpdatedThisFrame = true;
 
-            //// Remove empty player object references from local player object references
-            //foreach (var item in localPlayers.Where(kvp => kvp.Value == null).ToList())
-            //{
-            //    localPlayers.Remove(item.Key);
-            //}
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
         }
 
         public void RemovePlayerObject(int clientId)
         {
             localPlayers.Remove(clientId);
+            LocalPlayersWasUpdatedThisFrame = true;
+
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
+        }
+
+        private Coroutine resetLocalPlayerBoolCoroutine;
+        private IEnumerator ResetLocalPlayersWasUpdatedBool()
+        {
+            yield return null;
+            LocalPlayersWasUpdatedThisFrame = false;
         }
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)

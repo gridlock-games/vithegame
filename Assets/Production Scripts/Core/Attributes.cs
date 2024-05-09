@@ -323,7 +323,17 @@ namespace Vi.Core
 
         public bool IsGrabbed() { return isGrabbed.Value; }
 
-        public Attributes GetGrabAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
+        public Attributes GetGrabAssailant()
+        {
+            if (PlayerDataManager.Singleton.ContainsId(pullAssailantDataId.Value))
+            {
+                return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value);
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public AnimationClip GetGrabReactionClip()
         {

@@ -260,6 +260,8 @@ namespace Vi.UI
             RefreshGameMode();
 
             RefreshPlayerCards();
+
+            if (!IsSpawned) { Destroy(gameObject); }
         }
 
         public override void OnNetworkSpawn()
