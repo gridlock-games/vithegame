@@ -996,6 +996,23 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4300596619227593027}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3635405745145013158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6388804318130185158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f2ecd6e147dc7c4f8f3c75ebc705f6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refreshMode: 0
+  simulationFrequency: 30
+  maxSimulationCountPerFrame: 3
+  initializationLocation: 1
+  updateLocation: 0
 --- !u!114 &8978075441841705566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1994,7 +2011,7 @@ MonoBehaviour:
       maxConnectionDistance: 0.17786813
       userEdit: 1
     preBuildData:
-      enabled: 1
+      enabled: 0
       buildId: b8170bab
       preBuildScriptableObject: {fileID: 11400000, guid: 7877656cb5843a24eb50c519b2a9ceeb,
         type: 2}
@@ -2251,23 +2268,6 @@ MonoBehaviour:
   worldInertiaProperty: 0
   localInertiaProperty: 0
   windInfluenceProperty: 0
---- !u!114 &3635405745145013158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6388804318130185158}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f2ecd6e147dc7c4f8f3c75ebc705f6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  refreshMode: 0
-  simulationFrequency: 30
-  maxSimulationCountPerFrame: 3
-  initializationLocation: 1
-  updateLocation: 0
 --- !u!4 &6591490628996610007 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6978156215748972180, guid: 771bb58bd1fee9543883a4e4a195eb0c,
