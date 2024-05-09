@@ -304,14 +304,6 @@ namespace Vi.Core.GameModeManagers
                 //roundTimer.Value = roundDuration;
                 nextGameActionTimer.Value = nextGameActionDuration;
             }
-
-            #if UNITY_EDITOR
-            if (!IsClient)
-            {
-                gameObject.AddComponent<AudioListener>();
-                AudioListener.volume = 0;
-            }
-            #endif
         }
 
         public override void OnNetworkDespawn()

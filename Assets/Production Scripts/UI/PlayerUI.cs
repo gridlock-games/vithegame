@@ -132,14 +132,22 @@ namespace Vi.UI
             fadeToWhiteImage.color = Color.black;
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
-            PlayerDataManager.Singleton.SubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
+
+            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+            {
+                PlayerDataManager.Singleton.SubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
+                UpdateTeammateAttributesList();
+            }
 
             UpdateWeapon(false);
         }
 
         private void OnDestroy()
         {
-            PlayerDataManager.Singleton.UnsubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
+            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+            {
+                PlayerDataManager.Singleton.UnsubscribeDataListCallback(delegate { UpdateTeammateAttributesList(); });
+            }
         }
 
         private void UpdateTeammateAttributesList()
