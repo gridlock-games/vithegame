@@ -448,10 +448,7 @@ namespace Vi.Core
             for (int i = 0; i < playerDataList.Count; i++)
             {
                 PlayerData playerData = playerDataList[i];
-                if (playerData.id == clientId)
-                {
-                    return playerData;
-                }
+                if (playerData.id == clientId) { return playerData; }
             }
             Debug.LogError("Could not find player data with ID: " + clientId);
             return new PlayerData();
@@ -459,8 +456,9 @@ namespace Vi.Core
 
         public PlayerData GetDisconnectedPlayerData(int clientId)
         {
-            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            for (int i = 0; i < disconnectedPlayerDataList.Count; i++)
             {
+                DisconnectedPlayerData disconnectedPlayerData = disconnectedPlayerDataList[i];
                 if (clientId == disconnectedPlayerData.playerData.id) { return disconnectedPlayerData.playerData; }
             }
             Debug.LogError("Could not find disconnected player data with ID: " + clientId);
@@ -471,12 +469,10 @@ namespace Vi.Core
         {
             try
             {
-                foreach (PlayerData playerData in playerDataList)
+                for (int i = 0; i < playerDataList.Count; i++)
                 {
-                    if (playerData.id == (int)clientId)
-                    {
-                        return playerData;
-                    }
+                    PlayerData playerData = playerDataList[i];
+                    if (playerData.id == (int)clientId) { return playerData; }
                 }
                 Debug.LogError("Could not find player data with ID: " + clientId);
             }
