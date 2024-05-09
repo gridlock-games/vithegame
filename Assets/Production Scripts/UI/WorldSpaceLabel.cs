@@ -98,9 +98,10 @@ namespace Vi.UI
                 canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
             }
 
+            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+
             if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateNameTextAndColors(); }
 
-            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
