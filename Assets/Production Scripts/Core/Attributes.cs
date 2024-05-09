@@ -882,9 +882,9 @@ namespace Vi.Core
         public List<ActionClip.Status> GetActiveStatuses()
         {
             List<ActionClip.Status> statusList = new List<ActionClip.Status>();
-            foreach (ActionClip.Status status in activeStatuses)
+            for (int i = 0; i < activeStatuses.Count; i++)
             {
-                statusList.Add(status);
+                statusList.Add((ActionClip.Status)activeStatuses[i]);
             }
             return statusList;
         }

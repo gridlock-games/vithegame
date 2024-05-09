@@ -361,8 +361,9 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerScore GetDisconnectedPlayerScore(int id)
         {
-            foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
+                DisconnectedPlayerScore disconnectedPlayerScore = disconnectedScoreList[i];
                 if (disconnectedPlayerScore.playerScore.id == id) { return disconnectedPlayerScore.playerScore; }
             }
             return new PlayerScore();

@@ -532,7 +532,7 @@ namespace Vi.Core
             if (index == -1) { Debug.LogError("Could not find player data to remove for id: " + clientId); return; }
             if (GameModeManager.Singleton)
             {
-                disconnectedPlayerDataList.Add(new DisconnectedPlayerData(playerDataList[index]));
+                if (GetGameMode() != GameMode.None) { disconnectedPlayerDataList.Add(new DisconnectedPlayerData(playerDataList[index])); }
                 GameModeManager.Singleton.RemovePlayerScore(clientId, playerDataList[index].character._id);
             }
             playerDataList.RemoveAt(index);
@@ -919,9 +919,9 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
-                playerDatas.Add(playerData);
+                playerDatas.Add(playerDataList[i]);
             }
             return playerDatas;
         }
@@ -929,8 +929,9 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithoutSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
+                PlayerData playerData = playerDataList[i];
                 if (playerData.team == Team.Spectator) { continue; }
                 playerDatas.Add(playerData);
             }
@@ -940,9 +941,9 @@ namespace Vi.Core
         public List<PlayerData> GetDisconnectedPlayerDataList()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            for (int i = 0; i < disconnectedPlayerDataList.Count; i++)
             {
-                playerDatas.Add(disconnectedPlayerData.playerData);
+                playerDatas.Add(disconnectedPlayerDataList[i].playerData);
             }
             return playerDatas;
         }
