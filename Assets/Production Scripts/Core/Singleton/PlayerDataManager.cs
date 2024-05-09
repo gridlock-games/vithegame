@@ -811,6 +811,7 @@ namespace Vi.Core
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
                 playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
+                kvp.Value.SwapWeaponsOnRespawn();
             }
         }
 

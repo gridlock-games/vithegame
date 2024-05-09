@@ -162,9 +162,9 @@ namespace Vi.Core.GameModeManagers
         public List<KillHistoryElement> GetKillHistory()
         {
             List<KillHistoryElement> killHistoryList = new List<KillHistoryElement>();
-            foreach (KillHistoryElement ele in killHistory)
+            for (int i = 0; i < killHistory.Count; i++)
             {
-                killHistoryList.Add(ele);
+                killHistoryList.Add(killHistory[i]);
             }
             return killHistoryList;
         }
@@ -246,9 +246,9 @@ namespace Vi.Core.GameModeManagers
                 if (index == -1)
                 {
                     List<DisconnectedPlayerScore> cachedList = new List<DisconnectedPlayerScore>();
-                    foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+                    for (int i = 0; i < disconnectedScoreList.Count; i++)
                     {
-                        cachedList.Add(disconnectedPlayerScore);
+                        cachedList.Add(disconnectedScoreList[i]);
                     }
 
                     int disconnectedIndex = cachedList.FindIndex(item => item.playerScore.id == id);
@@ -423,8 +423,9 @@ namespace Vi.Core.GameModeManagers
         protected List<PlayerScore> GetHighestKillPlayers()
         {
             List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
-            foreach (PlayerScore playerScore in scoreList)
+            for (int i = 0; i < scoreList.Count; i++)
             {
+                PlayerScore playerScore = scoreList[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
                     if (playerScore.kills > highestKillPlayerScores[0].kills)
