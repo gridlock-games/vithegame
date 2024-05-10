@@ -34,6 +34,11 @@ namespace Vi.UI
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
 
+        [Header("OAuth")]
+        [SerializeField] private GameObject oAuthParent;
+        [SerializeField] private Button oAuthReturnBtn;
+        [SerializeField] private Text oAuthMessageText;
+
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
 
@@ -230,6 +235,7 @@ namespace Vi.UI
         {
             Debug.Log("Logging in with Google");
             dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
+            openDialogue("Google");
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
@@ -253,12 +259,14 @@ namespace Vi.UI
             if (task.IsCanceled)
             {
                 loginErrorText.text = "Login with google was cancelled.";
+                oAuthParent.SetActive(false);
                 yield break;
             }
 
             if (task.IsFaulted)
             {
                 loginErrorText.text = "Login with google encountered an error.";
+                oAuthParent.SetActive(false);
                 yield break;
             }
 
@@ -268,6 +276,7 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
+                oAuthParent.SetActive(false);
                 welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
                 PersistentLocalObjects.Singleton.SetString("LastSignInType", "Google");
                 PersistentLocalObjects.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
@@ -350,8 +359,21 @@ namespace Vi.UI
             DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
             dlp.SetLoginSource(loginSource);
         }
+        public void CloseOAuthDialogue()
+        {
+          oAuthParent.SetActive(false);
+          
+          //Shutdown any possible Listner - Google
+          GoogleAuth.ShutdownListner();
+        }
 
-        private void Update()
+        private void openDialogue(string platformname)
+    {
+      oAuthParent.SetActive(true);
+      oAuthMessageText.text = $"Waiting for {platformname} Login";
+    }
+
+    private void Update()
         {
             loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
 
