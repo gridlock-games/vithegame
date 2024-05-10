@@ -234,6 +234,7 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
         }
 
+        private Attributes lastAttackingAttributes;
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
@@ -242,9 +243,17 @@ namespace Vi.Core
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
-                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
+                if (lastAttackingAttributes)
+                {
+                    SetKiller(lastAttackingAttributes);
+                }
+                else
+                {
+                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                }
+                
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             RenderHitGlowOnly();
@@ -260,8 +269,16 @@ namespace Vi.Core
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
-                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (lastAttackingAttributes)
+                {
+                    SetKiller(lastAttackingAttributes);
+                }
+                else
+                {
+                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                }
 
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
@@ -372,8 +389,8 @@ namespace Vi.Core
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { Debug.Log("1 " + Time.time); return false; }
-            if (animationHandler.IsGrabAttacking()) { Debug.Log("2 " + Time.time); return false; }
+            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (animationHandler.IsGrabAttacking()) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
@@ -541,6 +558,7 @@ namespace Vi.Core
                 }
             }
 
+            lastAttackingAttributes = attacker;
             return true;
         }
 
