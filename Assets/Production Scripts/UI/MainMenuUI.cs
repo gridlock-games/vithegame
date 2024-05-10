@@ -366,7 +366,7 @@ namespace Vi.UI
       oAuthParent.SetActive(false);
 
       //Shutdown any possible Listner - Google
-      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { GoogleAuth.ShutdownListner(); }
     }
 

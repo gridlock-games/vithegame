@@ -42,7 +42,7 @@ namespace Vi.UI.SimpleGoogleSignIn
       Auth();
 
       //Not needed for mobile version/used on windows version
-      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { Listen(); }
 
       //if (Application.platform == RuntimePlatform.Android)
