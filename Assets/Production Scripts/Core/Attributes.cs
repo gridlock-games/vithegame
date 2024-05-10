@@ -234,6 +234,7 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
         }
 
+        private Attributes lastAttackingAttributes;
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
@@ -242,10 +243,18 @@ namespace Vi.Core
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
-                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                if (lastAttackingAttributes)
+                {
+                    SetKiller(lastAttackingAttributes);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingAttributes, this); }
+                }
+                else
+                {
+                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                }
             }
             RenderHitGlowOnly();
             AddHP(damage);
@@ -260,10 +269,18 @@ namespace Vi.Core
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
-                killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                if (lastAttackingAttributes)
+                {
+                    SetKiller(lastAttackingAttributes);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingAttributes, this); }
+                }
+                else
+                {
+                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                }
             }
             else
             {
@@ -325,9 +342,9 @@ namespace Vi.Core
 
         public Attributes GetGrabAssailant()
         {
-            if (PlayerDataManager.Singleton.ContainsId(pullAssailantDataId.Value))
+            if (PlayerDataManager.Singleton.ContainsId(grabAssailantDataId.Value))
             {
-                return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value);
+                return PlayerDataManager.Singleton.GetPlayerObjectById(grabAssailantDataId.Value);
             }
             else
             {
@@ -339,7 +356,10 @@ namespace Vi.Core
         {
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
-                if (weaponOption.weapon.name == GetGrabAssailant().GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
+                Attributes grabAssailant = GetGrabAssailant();
+                if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+
+                if (weaponOption.weapon.name == grabAssailant.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
                 {
                     return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
                 }
@@ -372,8 +392,8 @@ namespace Vi.Core
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { Debug.Log("1 " + Time.time); return false; }
-            if (animationHandler.IsGrabAttacking()) { Debug.Log("2 " + Time.time); return false; }
+            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (animationHandler.IsGrabAttacking()) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
@@ -491,6 +511,8 @@ namespace Vi.Core
                     if (hitReaction.ailment == ActionClip.Ailment.Grab)
                     {
                         grabAttackClipName.Value = attack.name;
+                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                        isGrabbed.Value = true;
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
 
@@ -505,11 +527,7 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            shouldShake = true;
-            attacker.shouldShake = false;
-
-            hitFreezeStartTime = Time.time;
-            attacker.hitFreezeStartTime = Time.time;
+            StartHitStop(attacker);
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
@@ -518,7 +536,8 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
+                if (evaluateAfterHitStopCoroutine != null) { StopCoroutine(evaluateAfterHitStopCoroutine); }
+                evaluateAfterHitStopCoroutine = StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
 
                 if (damage != 0)
                 {
@@ -541,7 +560,33 @@ namespace Vi.Core
                 }
             }
 
+            lastAttackingAttributes = attacker;
             return true;
+        }
+
+        private void StartHitStop(Attributes attacker)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
+
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
+
+            StartHitStopClientRpc(attacker.NetworkObjectId);
+        }
+
+        [ClientRpc]
+        private void StartHitStopClientRpc(ulong attackerNetObjId)
+        {
+            Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
+
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
         }
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
@@ -551,6 +596,7 @@ namespace Vi.Core
 
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
+        private Coroutine evaluateAfterHitStopCoroutine;
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
@@ -581,8 +627,6 @@ namespace Vi.Core
                     }
                     else if (attackAilment == ActionClip.Ailment.Grab)
                     {
-                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
-                        isGrabbed.Value = true;
                         if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
                         ailment.Value = ActionClip.Ailment.None;
                     }
@@ -887,11 +931,6 @@ namespace Vi.Core
             yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
             yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             isGrabbed.Value = false;
-        }
-
-        public void SwapWeaponsOnRespawn()
-        {
-            Debug.Log("TODO Implement swapping weapons on respawn here");
         }
 
         public List<ActionClip.Status> GetActiveStatuses()

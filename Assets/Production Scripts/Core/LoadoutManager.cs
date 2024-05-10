@@ -84,19 +84,39 @@ namespace Vi.Core
         }
 
         private Coroutine applyLoadoutCoroutine;
-        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath = false)
+        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn = false)
         {
             if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
-            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForDeath));
+            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
         }
 
-        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath)
+        private bool canApplyLoadoutThisFrame;
+        public void SwapLoadoutOnRespawn()
         {
-            if (waitForDeath)
-            {
-                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
-                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
-            }
+            if (!IsServer) { Debug.LogError("LoadoutManager.SwapWeaponsOnRespawn() should only be called on the server!"); return; }
+            AllowLoadoutSwap();
+            SwapWeaponOnRespawnClientRpc();
+        }
+
+        [ClientRpc] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
+
+        private void AllowLoadoutSwap()
+        {
+            canApplyLoadoutThisFrame = true;
+            if (resetCanApplyLoadoutThisFrameCorountine != null) { StopCoroutine(resetCanApplyLoadoutThisFrameCorountine); }
+            resetCanApplyLoadoutThisFrameCorountine = StartCoroutine(ResetCanApplyLoadoutThisFrameBool());
+        }
+
+        private Coroutine resetCanApplyLoadoutThisFrameCorountine;
+        private IEnumerator ResetCanApplyLoadoutThisFrameBool()
+        {
+            yield return null;
+            canApplyLoadoutThisFrame = false;
+        }
+
+        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn)
+        {
+            if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 

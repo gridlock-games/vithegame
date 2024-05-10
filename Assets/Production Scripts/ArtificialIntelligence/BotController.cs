@@ -270,7 +270,8 @@ namespace Vi.ArtificialIntelligence
                 if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
-
+                    
+                    UpdateActivePlayersList();
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
@@ -318,7 +319,7 @@ namespace Vi.ArtificialIntelligence
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 3f;
+        private const float chargeAttackDuration = 2;
         private float chargeAttackTime;
 
         private const float dodgeWaitDuration = 5;

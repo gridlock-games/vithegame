@@ -400,7 +400,6 @@ namespace Vi.Core
             if (IsServer)
             {
                 botClientId--;
-                Debug.Log("Adding bot data " + botClientId);
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
 
@@ -822,6 +821,7 @@ namespace Vi.Core
             attributesToRespawn.ResetStats(1, false);
             attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions();
             attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
+            attributesToRespawn.GetComponent<LoadoutManager>().SwapLoadoutOnRespawn();
         }
 
         public void RevivePlayer(Attributes attributesToRevive)
@@ -835,7 +835,6 @@ namespace Vi.Core
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
                 playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
-                kvp.Value.SwapWeaponsOnRespawn();
             }
         }
 
