@@ -13,7 +13,14 @@ namespace Vi.Core
     {
         [SerializeField] private ScenePayload[] scenePayloads;
 
-        public static NetSceneManager Singleton { get { return _singleton; } }
+        public static NetSceneManager Singleton
+        {
+            get
+            {
+                if (!_singleton) { Debug.LogError("Net Scene Manager is null"); }
+                return _singleton;
+            }
+        }
         private static NetSceneManager _singleton;
 
         private NetworkList<int> activeSceneGroupIndicies;
@@ -42,6 +49,11 @@ namespace Vi.Core
                     Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
                     break;
             }
+        }
+
+        public void CheckStatus()
+        {
+            Debug.Log(IsServer + " " + NetworkManager.IsServer + " " + NetworkManager.Singleton.IsServer);
         }
 
         public Sprite GetSceneGroupIcon(string sceneGroupName)

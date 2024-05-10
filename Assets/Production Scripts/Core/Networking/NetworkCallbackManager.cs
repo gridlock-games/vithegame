@@ -15,13 +15,17 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
+        private GameObject netSceneManagerInstance;
+        private GameObject playerDataManagerInstance;
+
         private void Start()
         {
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
-            DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
+            CreatePlayerDataManager();
+            CreateNetSceneManager();
+            
             NetSceneManager.Singleton.LoadScene("Main Menu");
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
@@ -29,6 +33,24 @@ namespace Vi.Core
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
+        }
+
+        private void CreatePlayerDataManager()
+        {
+            if (!playerDataManagerInstance)
+            {
+                playerDataManagerInstance = Instantiate(playerDataManagerPrefab.gameObject);
+                DontDestroyOnLoad(playerDataManagerInstance);
+            }
+        }
+
+        private void CreateNetSceneManager()
+        {
+            if (!netSceneManagerInstance)
+            {
+                netSceneManagerInstance = Instantiate(networkSceneManagerPrefab.gameObject);
+                DontDestroyOnLoad(netSceneManagerInstance);
+            }
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -164,16 +186,18 @@ namespace Vi.Core
 
         private IEnumerator ClientConnectTimeout()
         {
-            float startTime = Time.time;
-            while (Time.time - startTime < clientConnectTimeoutThreshold)
+            yield return new WaitForSeconds(clientConnectTimeoutThreshold);
+
+            if (!NetworkManager.Singleton.IsConnectedClient)
             {
-                if (NetSceneManager.Singleton.IsSpawned) { yield break; }
-                yield return null;
+                NetworkManager.Singleton.Shutdown(true);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+                if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
             }
 
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
-            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
-            Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
+            CreatePlayerDataManager();
+            CreateNetSceneManager();
         }
 
         private void OnClientStopped(bool test)

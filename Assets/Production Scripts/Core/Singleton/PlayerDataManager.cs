@@ -274,7 +274,10 @@ namespace Vi.Core
             }
         }
 
-        public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
+        public bool ContainsId(int clientId)
+        {
+            return playerDataList.Contains(new PlayerData(clientId));
+        }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
         {
@@ -547,7 +550,15 @@ namespace Vi.Core
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
-        public static PlayerDataManager Singleton { get { return _singleton; } }
+        public static PlayerDataManager Singleton
+        {
+            get
+            {
+                if (!_singleton) { Debug.LogError("Player Data Manager is null"); }
+                return _singleton;
+            }
+        }
+
         private static PlayerDataManager _singleton;
 
         private void Awake()
@@ -919,7 +930,8 @@ namespace Vi.Core
             if (IsClient)
             {
                 // This object gets despawned, so make sure to not start this on a networkobject
-                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
+                //PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
+                Debug.Log(NetworkManager.IsListening + " " + NetworkManager.IsApproved);
             }
         }
 
