@@ -319,7 +319,7 @@ namespace Vi.ArtificialIntelligence
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 3f;
+        private const float chargeAttackDuration = 2;
         private float chargeAttackTime;
 
         private const float dodgeWaitDuration = 5;
