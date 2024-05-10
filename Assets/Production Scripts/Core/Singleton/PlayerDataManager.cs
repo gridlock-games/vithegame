@@ -930,13 +930,16 @@ namespace Vi.Core
             if (IsClient)
             {
                 // This object gets despawned, so make sure to not start this on a networkobject
-                //PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
-                Debug.Log(NetworkManager.IsListening + " " + NetworkManager.IsApproved);
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());
             }
         }
 
-        private IEnumerator ReturnToCharacterSelect()
+        private IEnumerator ReturnToCharacterSelectOnServerShutdown()
         {
+            Debug.Log(NetworkManager.Singleton.IsListening);
+            yield return null;
+            Debug.Log(NetworkManager.Singleton.IsListening);
+            yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening);
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {

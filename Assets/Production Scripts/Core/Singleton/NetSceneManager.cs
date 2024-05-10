@@ -27,6 +27,8 @@ namespace Vi.Core
 
         public void LoadScene(string sceneGroupName)
         {
+            if (IsSceneGroupLoaded(sceneGroupName) | IsSceneGroupLoading(sceneGroupName)) { return; }
+
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return; }
@@ -276,6 +278,15 @@ namespace Vi.Core
                 if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }
             }
             return true;
+        }
+
+        private bool IsSceneGroupLoading(string sceneGroupName)
+        {
+            foreach (AsyncOperationUI asyncOperationUI in PersistentLocalObjects.Singleton.LoadingOperations.FindAll(item => item.sceneName == sceneGroupName))
+            {
+                if (!asyncOperationUI.asyncOperation.IsDone) { return true; }
+            }
+            return false;
         }
 
         public bool IsEnvironmentLoaded()
