@@ -245,6 +245,7 @@ namespace Vi.UI
         else
         {
           Debug.LogError("Google sign in error - " + error);
+          oAuthParent.SetActive(false);
         }
       });
     }
@@ -283,6 +284,7 @@ namespace Vi.UI
       }
       else
       {
+        oAuthParent.SetActive(false);
         initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
       }
     }
