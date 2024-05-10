@@ -372,7 +372,7 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
+            //if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
             
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
