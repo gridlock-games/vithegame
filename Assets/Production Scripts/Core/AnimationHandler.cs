@@ -514,12 +514,14 @@ namespace Vi.Core
             if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
+            Debug.Log(name + " " + animationStateName);
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
                 AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(Animator.runtimeAnimatorController);
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
+                    Debug.Log(attributes.GetGrabReactionClip());
                     animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();
                 }
                 else

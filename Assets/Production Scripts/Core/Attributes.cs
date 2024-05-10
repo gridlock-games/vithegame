@@ -342,9 +342,9 @@ namespace Vi.Core
 
         public Attributes GetGrabAssailant()
         {
-            if (PlayerDataManager.Singleton.ContainsId(pullAssailantDataId.Value))
+            if (PlayerDataManager.Singleton.ContainsId(grabAssailantDataId.Value))
             {
-                return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value);
+                return PlayerDataManager.Singleton.GetPlayerObjectById(grabAssailantDataId.Value);
             }
             else
             {
@@ -356,7 +356,10 @@ namespace Vi.Core
         {
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
-                if (weaponOption.weapon.name == GetGrabAssailant().GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
+                Attributes grabAssailant = GetGrabAssailant();
+                if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+
+                if (weaponOption.weapon.name == grabAssailant.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
                 {
                     return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
                 }
@@ -508,6 +511,8 @@ namespace Vi.Core
                     if (hitReaction.ailment == ActionClip.Ailment.Grab)
                     {
                         grabAttackClipName.Value = attack.name;
+                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                        isGrabbed.Value = true;
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
 
@@ -599,8 +604,6 @@ namespace Vi.Core
                     }
                     else if (attackAilment == ActionClip.Ailment.Grab)
                     {
-                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
-                        isGrabbed.Value = true;
                         if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
                         ailment.Value = ActionClip.Ailment.None;
                     }

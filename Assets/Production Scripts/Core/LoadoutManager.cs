@@ -116,10 +116,7 @@ namespace Vi.Core
 
         public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn)
         {
-            if (waitForRespawn)
-            {
-                yield return new WaitUntil(() => canApplyLoadoutThisFrame);
-            }
+            if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 

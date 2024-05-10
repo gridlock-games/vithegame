@@ -92,7 +92,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.75
+      value: 5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1.75
+      value: 5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -267,8 +267,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.35
+  recoveryNormalizedTime: 0.55
   damage: 5
   healAmount: 0
   staminaDamage: 0
