@@ -186,7 +186,12 @@ namespace Vi.Core
 
         private IEnumerator ClientConnectTimeout()
         {
-            yield return new WaitForSeconds(clientConnectTimeoutThreshold);
+            float startTime = Time.time;
+            while (Time.time - startTime < clientConnectTimeoutThreshold)
+            {
+                if (NetworkManager.Singleton.IsConnectedClient) { yield break; }
+                yield return null;
+            }
 
             if (!NetworkManager.Singleton.IsConnectedClient)
             {
