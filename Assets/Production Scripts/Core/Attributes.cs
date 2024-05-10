@@ -248,13 +248,13 @@ namespace Vi.Core
                 if (lastAttackingAttributes)
                 {
                     SetKiller(lastAttackingAttributes);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingAttributes, this); }
                 }
                 else
                 {
                     killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
-                
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             RenderHitGlowOnly();
             AddHP(damage);
@@ -274,13 +274,13 @@ namespace Vi.Core
                 if (lastAttackingAttributes)
                 {
                     SetKiller(lastAttackingAttributes);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingAttributes, this); }
                 }
                 else
                 {
                     killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
-
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
             }
             else
             {
