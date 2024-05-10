@@ -588,10 +588,7 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening)
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
 
             StartCoroutine(RefreshCharacterCards());
 

@@ -171,7 +171,7 @@ namespace Vi.Core
                 yield return null;
             }
 
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
             Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
         }

@@ -66,7 +66,7 @@ namespace Vi.UI
 
         public void ReturnToCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
