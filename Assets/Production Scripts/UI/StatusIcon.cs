@@ -15,6 +15,11 @@ namespace Vi.UI
 
         public void InitializeStatusIcon(ActionClip.Status status) { Status = status; }
 
+        public void SetActive(bool isActive)
+        {
+            transform.GetChild(0).gameObject.SetActive(isActive);
+        }
+
         private void Update()
         {
             iconImage.sprite = statusImageReference.GetStatusIcon(Status);

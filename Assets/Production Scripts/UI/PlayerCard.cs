@@ -85,7 +85,7 @@ namespace Vi.UI
             {
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
+                    statusIcon.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
                 }
             }
         }

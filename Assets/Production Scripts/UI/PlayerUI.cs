@@ -282,7 +282,7 @@ namespace Vi.UI
             {
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
+                    statusIcon.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
                 }
 
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
