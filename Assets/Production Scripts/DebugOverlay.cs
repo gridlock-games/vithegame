@@ -65,7 +65,7 @@ public class DebugOverlay : MonoBehaviour
     private void FindLocalPlayer()
     {
         if (localPlayer) { return; }
-        if (!PlayerDataManager.Singleton) { return; }
+        if (!PlayerDataManager.DoesExist()) { return; }
         localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
     }
 

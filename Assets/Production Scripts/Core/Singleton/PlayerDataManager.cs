@@ -550,6 +550,8 @@ namespace Vi.Core
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
+        public static bool DoesExist() { return Singleton; }
+
         public static PlayerDataManager Singleton
         {
             get

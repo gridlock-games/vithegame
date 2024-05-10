@@ -96,7 +96,7 @@ namespace Vi.UI
         private void FindPlayerInput()
         {
             if (playerInput) { return; }
-            if (!PlayerDataManager.Singleton) { return; }
+            if (!PlayerDataManager.DoesExist()) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
         }
