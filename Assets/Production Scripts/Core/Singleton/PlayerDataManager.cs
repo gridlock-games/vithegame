@@ -936,10 +936,8 @@ namespace Vi.Core
 
         private IEnumerator ReturnToCharacterSelectOnServerShutdown()
         {
-            Debug.Log(NetworkManager.Singleton.IsListening);
             yield return null;
-            Debug.Log(NetworkManager.Singleton.IsListening);
-            yield return new WaitUntil(() => !NetworkManager.Singleton.IsListening);
+            if (NetworkManager.Singleton.IsListening) { yield break; }
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
