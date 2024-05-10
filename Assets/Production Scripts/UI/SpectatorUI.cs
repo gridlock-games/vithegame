@@ -20,7 +20,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             spectator = GetComponentInParent<Spectator>();
@@ -54,7 +54,7 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();

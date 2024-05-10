@@ -241,7 +241,7 @@ namespace Vi.Player
                 minimapCameraInstance.enabled = true;
 
                 playerInput.enabled = true;
-                string rebinds = PlayerPrefs.GetString("Rebinds");
+                string rebinds = PersistentLocalObjects.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 GetComponent<ActionMapHandler>().enabled = true;
@@ -416,7 +416,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(PlayerPrefs.GetString("AutoAim")))
+            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("AutoAim")))
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {

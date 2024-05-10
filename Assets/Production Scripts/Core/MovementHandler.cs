@@ -30,10 +30,10 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            Vector2 lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity")) * (bool.Parse(PlayerPrefs.GetString("InvertMouse")) ? -1 : 1);
+            Vector2 lookSensitivity = new Vector2(PersistentLocalObjects.Singleton.GetFloat("MouseXSensitivity"), PersistentLocalObjects.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(PersistentLocalObjects.Singleton.GetString("InvertMouse")) ? -1 : 1);
             if (weaponHandler)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= PlayerPrefs.GetFloat("ZoomSensitivityMultiplier"); }
+                if (weaponHandler.IsAiming()) { lookSensitivity *= PersistentLocalObjects.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
             }
             return lookInput * lookSensitivity;
         }

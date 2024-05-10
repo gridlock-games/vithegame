@@ -257,8 +257,8 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
-
-                if (IsOwner) // & !bool.Parse(PlayerPrefs.GetString("DisableBots"))
+                
+                if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
                     List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
@@ -295,7 +295,7 @@ namespace Vi.ArtificialIntelligence
 
                     EvaluteAction();
                 }
-                else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
                     if (navMeshAgent.isOnNavMesh)
                     {

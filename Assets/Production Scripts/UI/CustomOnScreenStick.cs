@@ -35,7 +35,7 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private void Start()
         {
-            if (PlayerPrefs.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = PlayerPrefs.GetFloat(joystickValueMultiplierPlayerPref); }
+            if (PersistentLocalObjects.Singleton.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = PersistentLocalObjects.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
 
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;

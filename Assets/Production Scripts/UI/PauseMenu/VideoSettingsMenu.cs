@@ -270,7 +270,7 @@ namespace Vi.UI
             }
 
             Application.targetFrameRate = targetFrameRate;
-            PlayerPrefs.SetInt("TargetFrameRate", targetFrameRate);
+            PersistentLocalObjects.Singleton.SetInt("TargetFrameRate", targetFrameRate);
         }
     }
 }

@@ -109,7 +109,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
@@ -270,7 +270,7 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
