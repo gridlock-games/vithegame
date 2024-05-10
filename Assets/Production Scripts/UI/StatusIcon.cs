@@ -11,18 +11,26 @@ namespace Vi.UI
         [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Image iconImage;
 
+        private Image image;
+
         public ActionClip.Status Status { get; private set; }
 
-        public void InitializeStatusIcon(ActionClip.Status status) { Status = status; }
+        public void InitializeStatusIcon(ActionClip.Status status)
+        {
+            Status = status;
+            iconImage.sprite = statusImageReference.GetStatusIcon(Status);
+        }
+
+        private void Awake()
+        {
+            image = GetComponent<Image>();
+            SetActive(false);
+        }
 
         public void SetActive(bool isActive)
         {
             transform.GetChild(0).gameObject.SetActive(isActive);
-        }
-
-        private void Update()
-        {
-            iconImage.sprite = statusImageReference.GetStatusIcon(Status);
+            image.enabled = isActive;
         }
     }
 }
