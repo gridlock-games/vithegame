@@ -527,11 +527,7 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            shouldShake = true;
-            attacker.shouldShake = false;
-
-            hitFreezeStartTime = Time.time;
-            attacker.hitFreezeStartTime = Time.time;
+            StartHitStop(attacker);
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
@@ -565,6 +561,31 @@ namespace Vi.Core
 
             lastAttackingAttributes = attacker;
             return true;
+        }
+
+        private void StartHitStop(Attributes attacker)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
+
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
+
+            StartHitStopClientRpc(attacker.NetworkObjectId);
+        }
+
+        [ClientRpc]
+        private void StartHitStopClientRpc(ulong attackerNetObjId)
+        {
+            Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
+
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
         }
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
