@@ -536,7 +536,8 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
+                if (evaluateAfterHitStopCoroutine != null) { StopCoroutine(evaluateAfterHitStopCoroutine); }
+                evaluateAfterHitStopCoroutine = StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
 
                 if (damage != 0)
                 {
@@ -595,6 +596,7 @@ namespace Vi.Core
 
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
+        private Coroutine evaluateAfterHitStopCoroutine;
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
