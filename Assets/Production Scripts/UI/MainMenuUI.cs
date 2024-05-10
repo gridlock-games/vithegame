@@ -51,6 +51,7 @@ namespace Vi.UI
         {
             if (startServerCalled) { return; }
             startServerCalled = true;
+            AudioListener.volume = 0;
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
@@ -70,6 +71,7 @@ namespace Vi.UI
         {
             if (startServerCalled) { return; }
             startServerCalled = true;
+            AudioListener.volume = 0;
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();

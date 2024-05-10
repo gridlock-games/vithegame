@@ -907,11 +907,6 @@ namespace Vi.Core
             isGrabbed.Value = false;
         }
 
-        public void SwapWeaponsOnRespawn()
-        {
-            Debug.Log("TODO Implement swapping weapons on respawn here");
-        }
-
         public List<ActionClip.Status> GetActiveStatuses()
         {
             List<ActionClip.Status> statusList = new List<ActionClip.Status>();
