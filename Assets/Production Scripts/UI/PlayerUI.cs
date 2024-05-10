@@ -109,7 +109,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
@@ -133,7 +133,14 @@ namespace Vi.UI
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
+            UpdateTeammateAttributesList();
+
             UpdateWeapon(false);
+        }
+
+        private void UpdateTeammateAttributesList()
+        {
+            teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
         }
 
         public void OnRebinding()
@@ -256,13 +263,14 @@ namespace Vi.UI
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
+        List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
@@ -279,8 +287,10 @@ namespace Vi.UI
 
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
+                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
+
                     // Order player cards by distance
-                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    teammateAttributes.Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)

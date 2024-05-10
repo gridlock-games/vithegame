@@ -41,7 +41,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             attributes = GetComponentInParent<Attributes>();
@@ -61,6 +61,17 @@ namespace Vi.UI
 
             transform.localScale = Vector3.zero;
             healthBarParent.localScale = Vector3.zero;
+
+            UpdateNameTextAndColors();
+        }
+
+        private void UpdateNameTextAndColors()
+        {
+            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
+            Color relativeTeamColor = attributes.GetRelativeTeamColor();
+            nameBackground.color = relativeTeamColor;
+            nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
+            healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
         }
 
         private void RefreshRendererToFollow()
@@ -84,18 +95,15 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
+
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateNameTextAndColors(); }
+
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
-
-            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
-            Color relativeTeamColor = attributes.GetRelativeTeamColor();
-            nameBackground.color = relativeTeamColor;
-            nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
-            healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
 
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;

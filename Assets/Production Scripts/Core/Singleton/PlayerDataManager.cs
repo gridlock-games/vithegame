@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -119,16 +120,16 @@ namespace Vi.Core
                 return IsServer;
         }
 
-        public PlayerData GetLobbyLeader()
+        public KeyValuePair<bool, PlayerData> GetLobbyLeader()
         {
             List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
             if (playerDataList.Count > 0)
-                return playerDataList[0];
+                return new KeyValuePair<bool, PlayerData>(true, playerDataList[0]);
             else
-                return new PlayerData();
+                return new KeyValuePair<bool, PlayerData>(false, new PlayerData());
         }
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
@@ -213,21 +214,31 @@ namespace Vi.Core
             Peaceful
         }
 
+        public bool LocalPlayersWasUpdatedThisFrame { get; private set; } = false;
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
         public void AddPlayerObject(int clientId, Attributes playerObject)
         {
             localPlayers.Add(clientId, playerObject);
+            LocalPlayersWasUpdatedThisFrame = true;
 
-            //// Remove empty player object references from local player object references
-            //foreach (var item in localPlayers.Where(kvp => kvp.Value == null).ToList())
-            //{
-            //    localPlayers.Remove(item.Key);
-            //}
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
         }
 
         public void RemovePlayerObject(int clientId)
         {
             localPlayers.Remove(clientId);
+            LocalPlayersWasUpdatedThisFrame = true;
+
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
+        }
+
+        private Coroutine resetLocalPlayerBoolCoroutine;
+        private IEnumerator ResetLocalPlayersWasUpdatedBool()
+        {
+            yield return null;
+            LocalPlayersWasUpdatedThisFrame = false;
         }
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
@@ -389,6 +400,7 @@ namespace Vi.Core
             if (IsServer)
             {
                 botClientId--;
+                Debug.Log("Adding bot data " + botClientId);
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
 
@@ -443,12 +455,10 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(int clientId)
         {
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
-                if (playerData.id == clientId)
-                {
-                    return playerData;
-                }
+                PlayerData playerData = playerDataList[i];
+                if (playerData.id == clientId) { return playerData; }
             }
             Debug.LogError("Could not find player data with ID: " + clientId);
             return new PlayerData();
@@ -456,8 +466,9 @@ namespace Vi.Core
 
         public PlayerData GetDisconnectedPlayerData(int clientId)
         {
-            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            for (int i = 0; i < disconnectedPlayerDataList.Count; i++)
             {
+                DisconnectedPlayerData disconnectedPlayerData = disconnectedPlayerDataList[i];
                 if (clientId == disconnectedPlayerData.playerData.id) { return disconnectedPlayerData.playerData; }
             }
             Debug.LogError("Could not find disconnected player data with ID: " + clientId);
@@ -468,12 +479,10 @@ namespace Vi.Core
         {
             try
             {
-                foreach (PlayerData playerData in playerDataList)
+                for (int i = 0; i < playerDataList.Count; i++)
                 {
-                    if (playerData.id == (int)clientId)
-                    {
-                        return playerData;
-                    }
+                    PlayerData playerData = playerDataList[i];
+                    if (playerData.id == (int)clientId) { return playerData; }
                 }
                 Debug.LogError("Could not find player data with ID: " + clientId);
             }
@@ -530,7 +539,7 @@ namespace Vi.Core
             if (index == -1) { Debug.LogError("Could not find player data to remove for id: " + clientId); return; }
             if (GameModeManager.Singleton)
             {
-                disconnectedPlayerDataList.Add(new DisconnectedPlayerData(playerDataList[index]));
+                if (GetGameMode() != GameMode.None) { disconnectedPlayerDataList.Add(new DisconnectedPlayerData(playerDataList[index])); }
                 GameModeManager.Singleton.RemovePlayerScore(clientId, playerDataList[index].character._id);
             }
             playerDataList.RemoveAt(index);
@@ -649,9 +658,9 @@ namespace Vi.Core
             {
                 if (NetSceneManager.Singleton.ShouldSpawnPlayer())
                 {
-                    foreach (PlayerData playerData in playerDataList)
+                    for (int i = 0; i < playerDataList.Count; i++)
                     {
-                        playersToSpawnQueue.Enqueue(playerData);
+                        playersToSpawnQueue.Enqueue(playerDataList[i]);
                     }
                 }
             }
@@ -745,7 +754,9 @@ namespace Vi.Core
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
+
+                        KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -755,7 +766,9 @@ namespace Vi.Core
                     if (IsServer)
                     {
                         //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count, GetLobbyLeader().character.name.ToString()));
+
+                        KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
@@ -770,6 +783,20 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
+
+            DataListWasUpdatedThisFrame = true;
+
+            if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
+            resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
+        }
+
+        public bool DataListWasUpdatedThisFrame { get; private set; } = false;
+
+        private Coroutine resetDataListBoolCoroutine;
+        private IEnumerator ResetDataListWasUpdatedBool()
+        {
+            yield return null;
+            DataListWasUpdatedThisFrame = false;
         }
 
         private void OnClientConnectCallback(ulong clientId)
@@ -808,6 +835,7 @@ namespace Vi.Core
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
                 playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
+                kvp.Value.SwapWeaponsOnRespawn();
             }
         }
 
@@ -913,9 +941,9 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
-                playerDatas.Add(playerData);
+                playerDatas.Add(playerDataList[i]);
             }
             return playerDatas;
         }
@@ -923,8 +951,9 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithoutSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (PlayerData playerData in playerDataList)
+            for (int i = 0; i < playerDataList.Count; i++)
             {
+                PlayerData playerData = playerDataList[i];
                 if (playerData.team == Team.Spectator) { continue; }
                 playerDatas.Add(playerData);
             }
@@ -934,14 +963,15 @@ namespace Vi.Core
         public List<PlayerData> GetDisconnectedPlayerDataList()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            foreach (DisconnectedPlayerData disconnectedPlayerData in disconnectedPlayerDataList)
+            for (int i = 0; i < disconnectedPlayerDataList.Count; i++)
             {
-                playerDatas.Add(disconnectedPlayerData.playerData);
+                playerDatas.Add(disconnectedPlayerDataList[i].playerData);
             }
             return playerDatas;
         }
 
         private NetworkList<PlayerData> playerDataList;
+
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
         [System.Serializable]

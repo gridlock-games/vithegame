@@ -22,7 +22,7 @@ namespace Vi.UI
         public void ChangeMasterVolume()
         {
             AudioListener.volume = volumeSlider.value;
-            PlayerPrefs.SetFloat("MasterVolume", AudioListener.volume);
+            PersistentLocalObjects.Singleton.SetFloat("MasterVolume", AudioListener.volume);
         }
 
         public void ChangeSpeakerMode()
@@ -63,7 +63,7 @@ namespace Vi.UI
         private void Start()
         {
             errorText.text = "";
-            volumeSlider.value = PlayerPrefs.GetFloat("MasterVolume");
+            volumeSlider.value = PersistentLocalObjects.Singleton.GetFloat("MasterVolume");
 
             AudioConfiguration currentAudioConfiguration = AudioSettings.GetConfiguration();
 

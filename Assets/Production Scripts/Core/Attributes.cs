@@ -323,7 +323,17 @@ namespace Vi.Core
 
         public bool IsGrabbed() { return isGrabbed.Value; }
 
-        public Attributes GetGrabAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
+        public Attributes GetGrabAssailant()
+        {
+            if (PlayerDataManager.Singleton.ContainsId(pullAssailantDataId.Value))
+            {
+                return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value);
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public AnimationClip GetGrabReactionClip()
         {
@@ -879,12 +889,17 @@ namespace Vi.Core
             isGrabbed.Value = false;
         }
 
+        public void SwapWeaponsOnRespawn()
+        {
+            Debug.Log("TODO Implement swapping weapons on respawn here");
+        }
+
         public List<ActionClip.Status> GetActiveStatuses()
         {
             List<ActionClip.Status> statusList = new List<ActionClip.Status>();
-            foreach (ActionClip.Status status in activeStatuses)
+            for (int i = 0; i < activeStatuses.Count; i++)
             {
-                statusList.Add(status);
+                statusList.Add((ActionClip.Status)activeStatuses[i]);
             }
             return statusList;
         }

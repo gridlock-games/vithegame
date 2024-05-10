@@ -162,9 +162,9 @@ namespace Vi.Core.GameModeManagers
         public List<KillHistoryElement> GetKillHistory()
         {
             List<KillHistoryElement> killHistoryList = new List<KillHistoryElement>();
-            foreach (KillHistoryElement ele in killHistory)
+            for (int i = 0; i < killHistory.Count; i++)
             {
-                killHistoryList.Add(ele);
+                killHistoryList.Add(killHistory[i]);
             }
             return killHistoryList;
         }
@@ -246,9 +246,9 @@ namespace Vi.Core.GameModeManagers
                 if (index == -1)
                 {
                     List<DisconnectedPlayerScore> cachedList = new List<DisconnectedPlayerScore>();
-                    foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+                    for (int i = 0; i < disconnectedScoreList.Count; i++)
                     {
-                        cachedList.Add(disconnectedPlayerScore);
+                        cachedList.Add(disconnectedScoreList[i]);
                     }
 
                     int disconnectedIndex = cachedList.FindIndex(item => item.playerScore.id == id);
@@ -304,14 +304,6 @@ namespace Vi.Core.GameModeManagers
                 //roundTimer.Value = roundDuration;
                 nextGameActionTimer.Value = nextGameActionDuration;
             }
-
-            #if UNITY_EDITOR
-            if (!IsClient)
-            {
-                gameObject.AddComponent<AudioListener>();
-                AudioListener.volume = 0;
-            }
-            #endif
         }
 
         public override void OnNetworkDespawn()
@@ -357,12 +349,18 @@ namespace Vi.Core.GameModeManagers
             AddPlayerScore(id, characterId);
         }
 
-        public PlayerScore GetPlayerScore(int id) { return scoreList[scoreList.IndexOf(new PlayerScore(id))]; }
+        public PlayerScore GetPlayerScore(int id)
+        {
+            int index = scoreList.IndexOf(new PlayerScore(id));
+            if (index == -1) { Debug.LogError("Could not find player score with id: " + id); return new PlayerScore(); }
+            return scoreList[index];
+        }
 
         public PlayerScore GetDisconnectedPlayerScore(int id)
         {
-            foreach (DisconnectedPlayerScore disconnectedPlayerScore in disconnectedScoreList)
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
+                DisconnectedPlayerScore disconnectedPlayerScore = disconnectedScoreList[i];
                 if (disconnectedPlayerScore.playerScore.id == id) { return disconnectedPlayerScore.playerScore; }
             }
             return new PlayerScore();
@@ -372,7 +370,7 @@ namespace Vi.Core.GameModeManagers
         {
             int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
-            disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index]));
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index])); }
             scoreList.RemoveAt(index);
         }
 
@@ -422,8 +420,9 @@ namespace Vi.Core.GameModeManagers
         protected List<PlayerScore> GetHighestKillPlayers()
         {
             List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
-            foreach (PlayerScore playerScore in scoreList)
+            for (int i = 0; i < scoreList.Count; i++)
             {
+                PlayerScore playerScore = scoreList[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
                     if (playerScore.kills > highestKillPlayerScores[0].kills)
@@ -499,12 +498,12 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public void RegisterCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        public void SubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
             scoreList.OnListChanged += onListChangedDelegate;
         }
 
-        public void UnsubscribeCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
+        public void UnsubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
             scoreList.OnListChanged -= onListChangedDelegate;
         }

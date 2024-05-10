@@ -109,23 +109,17 @@ namespace Vi.ScriptableObjects
         }
 
         private bool bonesCanMove;
-        private const int capeBonesToSync = 70;
         private Dictionary<Transform, Transform> boneMapToFollow = new Dictionary<Transform, Transform>();
         private void LateUpdate()
         {
             if (bonesCanMove)
             {
-                int counter = 0;
                 foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
                 {
-                    if (counter > capeBonesToSync) { continue; }
-
-                    kvp.Value.localPosition = kvp.Key.localPosition;
-                    kvp.Value.localRotation = kvp.Key.localRotation;
-                    counter++;
+                    kvp.Value.position = kvp.Key.position;
+                    kvp.Value.rotation = kvp.Key.rotation;
                 }
             }
-
             bonesCanMove = true;
         }
     }

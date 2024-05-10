@@ -236,9 +236,9 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (PlayerPrefs.HasKey(customizablePlayerPrefName))
+            if (PersistentLocalObjects.Singleton.HasKey(customizablePlayerPrefName))
             {
-                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PlayerPrefs.GetString(customizablePlayerPrefName));
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString(customizablePlayerPrefName));
 
                 foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                 {

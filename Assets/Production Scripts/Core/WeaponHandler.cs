@@ -644,17 +644,17 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                    if (PersistentLocalObjects.Singleton.GetString("ZoomMode") == "TOGGLE")
                     {
                         if (isPressed) { aiming.Value = !aiming.Value; }
                     }
-                    else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
+                    else if (PersistentLocalObjects.Singleton.GetString("ZoomMode") == "HOLD")
                     {
                         aiming.Value = isPressed;
                     }
                     else
                     {
-                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PersistentLocalObjects.Singleton.GetString("ZoomMode"));
                     }
                 }
                 else
@@ -946,17 +946,17 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             bool isPressed = value.isPressed;
-            if (PlayerPrefs.GetString("BlockingMode") == "TOGGLE")
+            if (PersistentLocalObjects.Singleton.GetString("BlockingMode") == "TOGGLE")
             {
                 if (isPressed) { isBlocking.Value = !isBlocking.Value; }
             }
-            else if (PlayerPrefs.GetString("BlockingMode") == "HOLD")
+            else if (PersistentLocalObjects.Singleton.GetString("BlockingMode") == "HOLD")
             {
                 isBlocking.Value = isPressed;
             }
             else
             {
-                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PlayerPrefs.GetString("BlockingMode"));
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PersistentLocalObjects.Singleton.GetString("BlockingMode"));
             }
         }
 
@@ -977,9 +977,9 @@ namespace Vi.Core
         void OnDisableBots()
         {
             if (!Application.isEditor) { return; }
-            PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+            PersistentLocalObjects.Singleton.SetString("DisableBots", (!bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots"))).ToString());
 
-            if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
             {
                 Debug.Log("Disabled Bot AI");
             }

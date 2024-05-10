@@ -50,9 +50,12 @@ namespace Vi.ArtificialIntelligence
 
         public override void OnNetworkSpawn()
         {
-            currentPosition.Value = transform.position;
-            currentRotation.Value = transform.rotation;
-            if (IsServer) { NetworkManager.NetworkTickSystem.Tick += ProcessMovementTick; }
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick += ProcessMovementTick;
+                currentPosition.Value = transform.position;
+                currentRotation.Value = transform.rotation;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -79,6 +82,7 @@ namespace Vi.ArtificialIntelligence
         private void Start()
         {
             networkColliderRigidbody.transform.SetParent(null, true);
+            UpdateActivePlayersList();
         }
 
         private new void OnDestroy()
@@ -237,6 +241,14 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
+
+        private List<Attributes> activePlayers = new List<Attributes>();
+
+        private void UpdateActivePlayersList()
+        {
+            activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+        }
+
         private Attributes targetAttributes;
 
         private void Update()
@@ -254,10 +266,11 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
-
-                if (IsOwner) // & !bool.Parse(PlayerPrefs.GetString("DisableBots"))
+                
+                if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
-                    List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
@@ -292,7 +305,7 @@ namespace Vi.ArtificialIntelligence
 
                     EvaluteAction();
                 }
-                else if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+                else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
                     if (navMeshAgent.isOnNavMesh)
                     {

@@ -99,8 +99,8 @@ namespace Vi.UI
 
         public void LoginWithVi()
         {
-            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
-            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             initialParent.SetActive(false);
 
@@ -136,8 +136,8 @@ namespace Vi.UI
 
         public void OpenViLogin()
         {
-            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
-            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             viLogo.enabled = false;
             initialParent.SetActive(false);
@@ -184,8 +184,8 @@ namespace Vi.UI
 
         public IEnumerator CreateAccount()
         {
-            PlayerPrefs.SetString("username", usernameInput.text);
-            PlayerPrefs.SetString("password", passwordInput.text);
+            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
+            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
 
             emailInput.interactable = false;
             usernameInput.interactable = false;
@@ -205,15 +205,15 @@ namespace Vi.UI
 
         public IEnumerator Login()
         {
-            PlayerPrefs.SetString("LastSignInType", "Vi");
-            PlayerPrefs.SetString("username", usernameInput.text);
-            PlayerPrefs.SetString("password", passwordInput.text);
+            PersistentLocalObjects.Singleton.SetString("LastSignInType", "Vi");
+            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
+            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
             usernameInput.interactable = false;
             passwordInput.interactable = false;
 
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
-            welcomeUserText.text = "Welcome " + PlayerPrefs.GetString("username");
+            welcomeUserText.text = "Welcome " + PersistentLocalObjects.Singleton.GetString("username");
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
@@ -267,8 +267,8 @@ namespace Vi.UI
             {
                 initialParent.SetActive(false);
                 welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
-                PlayerPrefs.SetString("LastSignInType", "Google");
-                PlayerPrefs.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
+                PersistentLocalObjects.Singleton.SetString("LastSignInType", "Google");
+                PersistentLocalObjects.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
             else
             {
@@ -311,13 +311,13 @@ namespace Vi.UI
 
         private IEnumerator AutomaticallyAttemptLogin()
         {
-            if (PlayerPrefs.HasKey("LastSignInType"))
+            if (PersistentLocalObjects.Singleton.HasKey("LastSignInType"))
             {
-                switch (PlayerPrefs.GetString("LastSignInType"))
+                switch (PersistentLocalObjects.Singleton.GetString("LastSignInType"))
                 {
                     case "Vi":
-                        usernameInput.text = PlayerPrefs.GetString("username");
-                        passwordInput.text = PlayerPrefs.GetString("password");
+                        usernameInput.text = PersistentLocalObjects.Singleton.GetString("username");
+                        passwordInput.text = PersistentLocalObjects.Singleton.GetString("password");
                         yield return Login();
 
                         if (WebRequestManager.Singleton.IsLoggedIn)
@@ -331,12 +331,12 @@ namespace Vi.UI
                         break;
 
                     case "Google":
-                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PlayerPrefs.GetString("GoogleIdTokenResponse")));
+                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PersistentLocalObjects.Singleton.GetString("GoogleIdTokenResponse")));
 
                         break;
 
                     default:
-                        Debug.LogError("Not sure how to handle last sign in type " + PlayerPrefs.GetString("LastSignInType"));
+                        Debug.LogError("Not sure how to handle last sign in type " + PersistentLocalObjects.Singleton.GetString("LastSignInType"));
                         break;
                 }
             }
