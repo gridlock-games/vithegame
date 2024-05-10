@@ -271,8 +271,8 @@ namespace Vi.ArtificialIntelligence
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
                     
-                    UpdateActivePlayersList();
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+                    
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
                     {

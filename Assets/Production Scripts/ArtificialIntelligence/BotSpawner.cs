@@ -24,6 +24,7 @@ namespace Vi.ArtificialIntelligence
             foreach (BotDefinition botDefinition in botDefinitions)
             {
                 PlayerDataManager.Singleton.AddBotData(botDefinition.team);
+                yield return new WaitForSeconds(1);
             }
         }
 
