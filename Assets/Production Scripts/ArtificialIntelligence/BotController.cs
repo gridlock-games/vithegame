@@ -82,6 +82,7 @@ namespace Vi.ArtificialIntelligence
         private void Start()
         {
             networkColliderRigidbody.transform.SetParent(null, true);
+            UpdateActivePlayersList();
         }
 
         private new void OnDestroy()
@@ -240,6 +241,14 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
+
+        private List<Attributes> activePlayers = new List<Attributes>();
+
+        private void UpdateActivePlayersList()
+        {
+            activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+        }
+
         private Attributes targetAttributes;
 
         private void Update()
@@ -260,7 +269,8 @@ namespace Vi.ArtificialIntelligence
                 
                 if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
-                    List<Attributes> activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
+                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
