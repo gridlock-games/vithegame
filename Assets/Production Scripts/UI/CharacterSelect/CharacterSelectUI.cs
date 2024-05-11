@@ -654,9 +654,15 @@ namespace Vi.UI
         public void GoToTrainingRoom()
         {
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
-            NetworkManager.Singleton.StartHost();
-            NetSceneManager.Singleton.LoadScene("Training Room");
-            NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+            if (NetworkManager.Singleton.StartHost())
+            {
+                NetSceneManager.Singleton.LoadScene("Training Room");
+                NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+            }
+            else
+            {
+                Debug.LogError("Error trying to start host to go to training room");
+            }
         }
 
         public IEnumerator AutoConnectToHubServer()

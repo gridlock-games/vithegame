@@ -274,7 +274,10 @@ namespace Vi.Core
             }
         }
 
-        public bool ContainsId(int clientId) { return playerDataList.Contains(new PlayerData(clientId)); }
+        public bool ContainsId(int clientId)
+        {
+            return playerDataList.Contains(new PlayerData(clientId));
+        }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
         {
@@ -547,7 +550,17 @@ namespace Vi.Core
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
-        public static PlayerDataManager Singleton { get { return _singleton; } }
+        public static bool DoesExist() { return Singleton; }
+
+        public static PlayerDataManager Singleton
+        {
+            get
+            {
+                if (!_singleton) { Debug.LogError("Player Data Manager is null"); }
+                return _singleton;
+            }
+        }
+
         private static PlayerDataManager _singleton;
 
         private void Awake()
@@ -919,12 +932,14 @@ namespace Vi.Core
             if (IsClient)
             {
                 // This object gets despawned, so make sure to not start this on a networkobject
-                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect());
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());
             }
         }
 
-        private IEnumerator ReturnToCharacterSelect()
+        private IEnumerator ReturnToCharacterSelectOnServerShutdown()
         {
+            yield return null;
+            if (NetworkManager.Singleton.IsListening) { yield break; }
             yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
