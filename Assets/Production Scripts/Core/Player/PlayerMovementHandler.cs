@@ -65,9 +65,6 @@ namespace Vi.Player
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
-
-        private static readonly Vector3 rootMotionLimitOffset = new Vector3(0, 1, 0);
-
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded = true;

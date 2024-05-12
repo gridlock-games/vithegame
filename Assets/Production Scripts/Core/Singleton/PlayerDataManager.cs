@@ -882,10 +882,14 @@ namespace Vi.Core
             if (playerSpawnPoints)
             {
                 (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                while (!spawnPointFound)
+                {
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                    yield return null;
+                }
+
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
-
-                if (!spawnPointFound) { Debug.LogError("Could not find a spawn point for this player!"); }
             }
             else
             {
