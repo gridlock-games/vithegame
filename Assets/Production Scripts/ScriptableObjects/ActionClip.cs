@@ -216,6 +216,8 @@ namespace Vi.ScriptableObjects
         public float boxCastDistance = 5;
         public float maximumTargetingRotationAngle = 60;
 
+        public const float maximumRootMotionLimitRotationAngle = 60;
+
         // Only for shooter characters
         public bool aimDuringAnticipation;
         public bool aimDuringAttack;
