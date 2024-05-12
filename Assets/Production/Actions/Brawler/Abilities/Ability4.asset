@@ -267,8 +267,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.6
+  attackingNormalizedTime: 0.35
+  recoveryNormalizedTime: 0.55
   damage: 0
   healAmount: 0
   staminaDamage: 0
@@ -319,7 +319,7 @@ MonoBehaviour:
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0, z: 0}
-  boxCastHalfExtents: {x: 0.2, y: 0.2, z: 0.2}
+  boxCastHalfExtents: {x: 0.25, y: 0.25, z: 0}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
   aimDuringAnticipation: 0
