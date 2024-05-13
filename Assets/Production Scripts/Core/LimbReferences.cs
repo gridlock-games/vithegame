@@ -160,7 +160,9 @@ namespace Vi.Core
         [SerializeField] private RigWeightTarget leftHandReachRig;
         [SerializeField] private RigWeightTarget meleeVerticalAimRig;
         [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
+        [Header("Animation Rotation Offset Settings")]
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
+        [SerializeField] private Axis rotationOffsetAxis = Axis.Z;
         [Header("Weapon Swapping")]
         [SerializeField] private Transform stowedWeaponParent;
 
@@ -176,15 +178,38 @@ namespace Vi.Core
             meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
         }
 
-        public void SetRotationOffset(float zAngle)
+        public void SetRotationOffset(float angle)
         {
-            rotationOffsetConstraint.data.offset = Vector3.Lerp(rotationOffsetConstraint.data.offset, new Vector3(0, 0, zAngle), Time.deltaTime * rotationConstraintOffsetSpeed);
+            Vector3 targetOffset = Vector3.zero;
+            switch (rotationOffsetAxis)
+            {
+                case Axis.X:
+                    targetOffset = new Vector3(angle, 0, 0);
+                    break;
+                case Axis.Y:
+                    targetOffset = new Vector3(0, angle, 0);
+                    break;
+                case Axis.Z:
+                    targetOffset = new Vector3(0, 0, angle);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle rotation offset axis " + rotationOffsetAxis);
+                    break;
+            }
+            rotationOffsetConstraint.data.offset = Vector3.Lerp(rotationOffsetConstraint.data.offset, targetOffset, Time.deltaTime * rotationConstraintOffsetSpeed);
         }
 
         public enum BodyAimType
         {
             Normal,
             Inverted
+        }
+
+        private enum Axis
+        {
+            X,
+            Y,
+            Z
         }
     }
 }
