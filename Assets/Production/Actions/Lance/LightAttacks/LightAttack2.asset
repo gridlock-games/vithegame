@@ -1852,6 +1852,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -1860,7 +1861,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.6
+  recoveryNormalizedTime: 0.5
   damage: 4
   healAmount: 0
   staminaDamage: 0
@@ -1877,9 +1878,9 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 0
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
