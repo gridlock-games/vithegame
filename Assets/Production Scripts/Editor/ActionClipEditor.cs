@@ -13,6 +13,8 @@ namespace Vi.Editor
     {
         private SerializedProperty spClipType;
 
+        private SerializedProperty spFollowUpActionClipsToPlay;
+
         private SerializedProperty spHitReactionClipType;
 
         private SerializedProperty spAgentStaminaCost;
@@ -111,6 +113,8 @@ namespace Vi.Editor
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
+
+            spFollowUpActionClipsToPlay = serializedObject.FindProperty("followUpActionClipsToPlay");
 
             spHitReactionClipType = serializedObject.FindProperty("hitReactionType");
 
@@ -219,6 +223,7 @@ namespace Vi.Editor
         private AnimationClip animationClip;
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.PropertyField(spFollowUpActionClipsToPlay);
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }

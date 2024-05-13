@@ -8,22 +8,23 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Children:
   - {fileID: 3}
+  - {fileID: 19}
   m_Position:
     serializedVersion: 2
     x: 0
     y: 30
-    width: 1920
-    height: 947
+    width: 1280
+    height: 660
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
-  vertical: 1
-  controlID: 170
+  vertical: 0
+  controlID: 160
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -32,23 +33,23 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12141, guid: 0000000000000000e000000000000000, type: 0}
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 300, y: 360}
+  m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Navigation
-    m_Image: {fileID: 1087843850482249999, guid: 0000000000000000d000000000000000,
+    m_Text: Console
+    m_Image: {fileID: -4950941429401207979, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1343
-    y: 73
-    width: 576
-    height: 926
+    x: 860
+    y: 72
+    width: 419
+    height: 639
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -62,24 +63,23 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Children:
   - {fileID: 4}
-  - {fileID: 12}
-  - {fileID: 22}
+  - {fileID: 13}
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1920
-    height: 947
-  m_MinSize: {x: 300, y: 200}
-  m_MaxSize: {x: 24288, y: 16192}
-  vertical: 0
-  controlID: 171
+    width: 860
+    height: 660
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 16192, y: 16192}
+  vertical: 1
+  controlID: 41
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -99,12 +99,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 406
-    height: 947
-  m_MinSize: {x: 100, y: 200}
-  m_MaxSize: {x: 8096, y: 16192}
-  vertical: 1
-  controlID: 25
+    width: 860
+    height: 414
+  m_MinSize: {x: 200, y: 100}
+  m_MaxSize: {x: 16192, y: 8096}
+  vertical: 0
+  controlID: 42
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -113,17 +113,17 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneHierarchyWindow
+  m_Name: 
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 406
-    height: 635
+    width: 263
+    height: 414
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 6}
@@ -147,15 +147,15 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Hierarchy
-    m_Image: {fileID: 7966133145522015247, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: -3734745235275155857, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 19
-    width: 405
-    height: 614
+    y: 72
+    width: 262
+    height: 393
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -163,10 +163,10 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 1219}
-      m_SelectedIDs: b697dfff2e960400289c040004970400109a040024950400ca9c0400809e04002a960400127adfff4286dffff891dfff307fdfff2a7fdfff227fdfff6c83dfffd69c04007890dfff98940400ae82dfff0685dfffb27fdfff1a7fdfff3692dfff147fdfff2c8bdfff1289dfffdc89dfffb686dfff0c85dfff648ddfff547ddfffd088dfffd07ddfff2e81dfffd295dfff427cdfffb287dfff1284dfffde90dfffee91dffff87edfffcc8ddfff1c8bdfffe281dffffa84dfff6e81dfffac8edfff2a97dfffa68edfff6c90dfff689d04001c8fdfffdc7fdfffd691dfffe496dfff8e86dfff0e95dfff7290dfffee92dfff0e87dffffc85dfffe483dfff567edfffec8edfff6a8ddfff9287dfff0e83dfff4292dfff0e92dfffe291dfff3c82dfffb491dfff588fdfff7888dfff3c86dfff7492dfffe086dfff2c8edfffa282dfffe891dfffec7edfffbe91dfff7e8ddfffe27edffff49804009887dfff1483dfff5683dfffaa90dfffe884dfff0e7fdfffcc7edfff2c82dfffe881dfff228fdfff288fdfff1e8cdfffe08bdfffac86dfffca88dfffa67cdfff8e95dfff0688dfff9e950400fc82dfff2682dfff8284dfff7e97dfff6e8adfffcc95dfff9c8adfffa091dfff3c85dfffd67fdfff0a7ddfff8a8cdfffd67ddfff6696dfff9291dfff0085dfff6e92dfff0895dfff1285dfff4285dfffd88ddfffa490dfffd890dfffb080dfff2881dfffd284dfffd88cdfffdc91dfff907edfffb28fdfff90990400ea96dffffa89dfff107ddfff4097dfff748adfffca7ddfffa480dfff3496dfff9296dfffc693dfff128bdfffe887dfff5095dfff4c8bdfff2c83dfffa283dfffd883dfff1887dfff4c94dfff2a84dfff3c92dfff9e87dfffa882dfff2490dfff9085dfffec80dfffc684dfff5e8ddfffe289dfffe28edfff3a91dfff7282dfff3286dfffd27edfffa691dfffc67edfff2281dfff6481dfffdc81dfff669604009a91dfffb87fdfff5286dfff0483dfff6680dfff2880dfff208ddfffc492dfff8a94dfff1096dfff7288dfff8a8bdfffa08edfff4e7ddfff5689dfffd496dfff747fdfff7c91dfff3294dfff3092dfff648fdfff0889dfff7c84dfff089604004a86dfffe680dfffb497dfff808cdfff2497dfff5e80dfff308adfff628edfffce8cdfff6096dfffa28bdfff9e9e04000c9c0400
-      m_LastClickedID: -2128212
-      m_ExpandedIDs: 307fdfffb697dfffda3de0ff228ce0ff468ce0ff848ce0ffaa8ce0ffd08ce0fff48ce0fffa8de0fffe8de0ff008ee0ff268ee0ff4a8ee0ff708ee0ffa28ee0ffe08ee0ff148fe0ff388fe0ff888fe0ffc68fe0ff0490e0ff4890e0ff8490e0ff8a90e0ffc490e0ff0091e0ff4891e0ff6a91e0ffae91e0ffe691e0ff1092e0ff1c92e0ff5a92e0ff9892e0ffde92e0ff2093e0ff5c93e0ff9e93e0ffe093e0ff1694e0ff6094e0ffac94e0ffd294e0ff0095e0ff3695e0ff6695e0ff8a95e0ffa695e0ffdc95e0ff1296e0ff4696e0ff6496e0ffb696e0ff0097e0ff2297e0ff7097e0ffb497e0ffca97e0fff097e0ff1698e0ff6c98e0ffb098e0ffe698e0ff1499e0ff4299e0ff7699e0ff9c99e0ffc099e0ff229ae0ff409ae0ff6e9ae0ffac9ae0ff049be0ff109be0ff369be0ff909be0ffbe9be0ffd49be0ff349ce0ff6a9ce0ffa89ce0ffd69ce0ff0e9de0ff469de0ff5c9de0ff869de0ffc49de0ffdc9de0ff1a9ee0ff589ee0ff849ee0ffba9ee0fff09ee0ff089fe0ff5a9fe0ff989fe0fff09fe0ff06a0e0ff36a0e0ff5aa0e0ff9ca0e0ffdaa0e0ff1ca1e0ff4aa1e0ff8ca1e0ffeca1e0ff22a2e0ff58a2e0ff96a2e0ffd8a2e0ff0ca3e0ff3ea3e0ff74a3e0ffb6a3e0ff48a4e0ff54a4e0ff6aa4e0fffea4e0ff22a5e0ff4ca5e0ffc2a5e0ff00a6e0ff06a6e0ff2aa6e0ff6ca6e0ffc4a6e0ffe8a6e0ff54a7e0ff8aa7e0ffc8a7e0fff0a7e0ff06a8e0ff4aa8e0ff6ea8e0ff94a8e0ffcca8e0ff0ea9e0ff5ea9e0ffb8a9e0ffeea9e0fff0a9e0ffda64e1ffba73e1ffde73e1ff1c74e1ff4274e1ff6874e1ff8c74e1ff9275e1ff9675e1ff9875e1ffbe75e1ffe275e1ff0876e1ff3a76e1ff7876e1ffac76e1ffd076e1ff2077e1ff5e77e1ff9c77e1ffe077e1ff1c78e1ff5c78e1ff9878e1ffe078e1ff0279e1ff4679e1ff7e79e1ffa879e1fff279e1ff307ae1ff767ae1ffb87ae1fff47ae1ff367be1ff787be1ffae7be1fff87be1ff447ce1ff6a7ce1ffce7ce1ff227de1ff3e7de1ff747de1ffaa7de1ffde7de1ff4e7ee1ff987ee1ffba7ee1ff087fe1ff4c7fe1ff627fe1ff887fe1ffae7fe1ff0480e1ff4880e1ff7e80e1ffac80e1ffda80e1ff0e81e1ff3481e1ff5881e1ffba81e1ffd881e1ff0682e1ff4482e1ff9c82e1ffce82e1ff2883e1ff5683e1ff0284e1ff4084e1ff6e84e1ffa684e1ffde84e1ff5c85e1ffb285e1fff085e1ff1c86e1ff5286e1ff8886e1fff286e1ff3087e1ff8887e1ff9e87e1ffce87e1fff287e1ff3488e1ff7288e1ffb488e1ffe288e1ff2489e1ff8489e1ffba89e1fff089e1ff2e8ae1ff708ae1ffa48ae1ffd68ae1ff0c8be1ff4e8be1ffe08be1ffec8be1ff028ce1ff968ce1ffba8ce1ffe48ce1ff5a8de1ff988de1ffc28de1ff048ee1ff5c8ee1ff808ee1ffec8ee1ff228fe1ff608fe1ff888fe1ff9e8fe1ffe28fe1ff0690e1ff2c90e1ff6490e1ffa690e1fff690e1ff5091e1ff8691e1ff8891e1ff7c92e1ff229ae1ffa29be1ff329ee1ff4c9fe1ff28a8e1ffa6abe1ffdeabe1ffecabe1fffaabe1ff6aade1ff7eb0e1ff98cee1ffa2cee1ffa4cee1ffaecee1ffb8cee1ffc2cee1ff4ed5e1ff5cd8e1ff66d8e1ffaadae1ff44dee1ff4edee1ff6a03e3ff8404e3ff9c0de3ffd610e3ff6617e3ff781ae3ffc81ce3ff6e20e3ffde21e3fff624e3ff0025e3ff0a25e3ff1425e3ff1e25e3ffaa2be3ffb82ee3ffc22ee3ff0631e3ffa034e3ffaa34e3ff1edee8ff28dee8ff2cdee8ff34dee8ff54dee8ff58dee8ff66dee8ffb2e8e8ffe036e9ffc86deaffd26deaffd66deaffde6deafffe6deaff026eeaff106eeaff5c78eaff1cc9eaff8e70edff9870edff9c70edffa470edffc470edffc870edffd670edff227bedff1ccbedff5068eeff5a68eeff6468eeff6868eeffcc68eeffd668eeffda68eeffe268eeff0269eeff0669eeff1469eeff6073eeff78c2eeff3eacffff58adffff26b6ffff40b6ffffa6b9ffffb4b9ffff44c0ffff56c3ffffa6c5ffff4cc9ffffbecaffff20cbffff34ceffff64ceffff6eceffff78ceffff82ceffff8cceffff18d5ffff26d8ffff30d8ffff74daffff0edeffff18deffffd2eaffff18350400c435040020360400463604008c360400ac36040004370400843704009c3704006c380400b4390400023a0400123a0400943a04004e3b04004c3c0400d63c04004e3d0400523d0400ea3d0400203f0400403f04001c650400a8650400c665040022660400486604008c660400ae6604000867040088670400a06704006e680400b4690400046a0400146a0400946a04004e6b04004c6c0400d66c04004e6d0400526d0400ec6d0400246f0400446f04002a960400
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: d0a11400
+      m_LastClickedID: 0
+      m_ExpandedIDs: c2b4f1ff2a6cf2ffdeeef2ffcaf2f2ffbc22f3ffbe22f3ff6c37f3ffa4b2f7ff7eb6f7ff3e69faff666ffaff2074faffea74faff1cfbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -198,25 +198,26 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ProjectBrowser
+  m_Name: SceneView
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 0
-    y: 635
-    width: 406
-    height: 312
-  m_MinSize: {x: 231, y: 271}
-  m_MaxSize: {x: 10001, y: 10021}
+    x: 263
+    y: 0
+    width: 597
+    height: 414
+  m_MinSize: {x: 202, y: 221}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 8}
   m_Panes:
   - {fileID: 8}
   - {fileID: 9}
   - {fileID: 10}
   - {fileID: 11}
+  - {fileID: 12}
   m_Selected: 0
   m_LastSelected: 1
 --- !u!114 &8
@@ -227,643 +228,23 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
-  m_TitleContent:
-    m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 0
-    y: 654
-    width: 405
-    height: 291
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_SearchFilter:
-    m_NameFilter: 
-    m_ClassNames: []
-    m_AssetLabels: []
-    m_AssetBundleNames: []
-    m_ReferencingInstanceIDs: 
-    m_SceneHandles: 
-    m_ShowAllHits: 0
-    m_SkipHidden: 0
-    m_SearchArea: 1
-    m_Folders:
-    - Assets/Production/Scenes/Environment
-    m_Globs: []
-    m_OriginalText: 
-    m_FilterByTypeIntersection: 0
-  m_ViewMode: 1
-  m_StartGridSize: 16
-  m_LastFolders:
-  - Assets/Production/Scenes/Environment
-  m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\patse\Unity Projects\vithegame
-  m_LockTracker:
-    m_IsLocked: 1
-  m_FolderTreeState:
-    scrollPos: {x: 0, y: 767}
-    m_SelectedIDs: 54a80200
-    m_LastClickedID: 174164
-    m_ExpandedIDs: 000000005ac10000aac10000f6c1000000ca9a3b
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_AssetTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 000000005ac10000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_ListAreaState:
-    m_SelectedInstanceIDs: b697dfff2e960400289c040004970400109a040024950400ca9c0400809e04002a960400127adfff4286dffff891dfff307fdfff2a7fdfff227fdfff6c83dfffd69c04007890dfff98940400ae82dfff0685dfffb27fdfff1a7fdfff3692dfff147fdfff2c8bdfff1289dfffdc89dfffb686dfff0c85dfff648ddfff547ddfffd088dfffd07ddfff2e81dfffd295dfff427cdfffb287dfff1284dfffde90dfffee91dffff87edfffcc8ddfff1c8bdfffe281dffffa84dfff6e81dfffac8edfff2a97dfffa68edfff6c90dfff689d04001c8fdfffdc7fdfffd691dfffe496dfff8e86dfff0e95dfff7290dfffee92dfff0e87dffffc85dfffe483dfff567edfffec8edfff6a8ddfff9287dfff0e83dfff4292dfff0e92dfffe291dfff3c82dfffb491dfff588fdfff7888dfff3c86dfff7492dfffe086dfff2c8edfffa282dfffe891dfffec7edfffbe91dfff7e8ddfffe27edffff49804009887dfff1483dfff5683dfffaa90dfffe884dfff0e7fdfffcc7edfff2c82dfffe881dfff228fdfff288fdfff1e8cdfffe08bdfffac86dfffca88dfffa67cdfff8e95dfff0688dfff9e950400fc82dfff2682dfff8284dfff7e97dfff6e8adfffcc95dfff9c8adfffa091dfff3c85dfffd67fdfff0a7ddfff8a8cdfffd67ddfff6696dfff9291dfff0085dfff6e92dfff0895dfff1285dfff4285dfffd88ddfffa490dfffd890dfffb080dfff2881dfffd284dfffd88cdfffdc91dfff907edfffb28fdfff90990400ea96dffffa89dfff107ddfff4097dfff748adfffca7ddfffa480dfff3496dfff9296dfffc693dfff128bdfffe887dfff5095dfff4c8bdfff2c83dfffa283dfffd883dfff1887dfff4c94dfff2a84dfff3c92dfff9e87dfffa882dfff2490dfff9085dfffec80dfffc684dfff5e8ddfffe289dfffe28edfff3a91dfff7282dfff3286dfffd27edfffa691dfffc67edfff2281dfff6481dfffdc81dfff669604009a91dfffb87fdfff5286dfff0483dfff6680dfff2880dfff208ddfffc492dfff8a94dfff1096dfff7288dfff8a8bdfffa08edfff4e7ddfff5689dfffd496dfff747fdfff7c91dfff3294dfff3092dfff648fdfff0889dfff7c84dfff089604004a86dfffe680dfffb497dfff808cdfff2497dfff5e80dfff308adfff628edfffce8cdfff6096dfffa28bdfff9e9e04000c9c0400
-    m_LastClickedInstanceID: -2128212
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: 
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-    m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
-    m_GridSize: 16
-  m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 159
---- !u!114 &9
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
-  m_TitleContent:
-    m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 0
-    y: 708
-    width: 405
-    height: 291
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_SearchFilter:
-    m_NameFilter: 
-    m_ClassNames: []
-    m_AssetLabels: []
-    m_AssetBundleNames: []
-    m_ReferencingInstanceIDs: 
-    m_SceneHandles: 
-    m_ShowAllHits: 0
-    m_SkipHidden: 1
-    m_SearchArea: 1
-    m_Folders:
-    - Assets/Production/Prefabs
-    m_Globs: []
-    m_OriginalText: 
-    m_FilterByTypeIntersection: 0
-  m_ViewMode: 1
-  m_StartGridSize: 16
-  m_LastFolders:
-  - Assets/Production/Prefabs
-  m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\patse\Unity Projects\vithegame
-  m_LockTracker:
-    m_IsLocked: 1
-  m_FolderTreeState:
-    scrollPos: {x: 0, y: 623}
-    m_SelectedIDs: d8c10000
-    m_LastClickedID: 49624
-    m_ExpandedIDs: 000000005ac10000aac10000d8c10000f4c1000074a8020000ca9a3b
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_AssetTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 000000005ac10000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_ListAreaState:
-    m_SelectedInstanceIDs: 6694e0ff
-    m_LastClickedInstanceID: -2059162
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: 
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: Cape
-      m_OriginalName: Cape
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 44322
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 0
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-    m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 12}
-    m_GridSize: 16
-  m_SkipHiddenPackages: 1
-  m_DirectoriesAreaWidth: 200
---- !u!114 &10
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
-  m_TitleContent:
-    m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 0
-    y: 708
-    width: 549
-    height: 291
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_SearchFilter:
-    m_NameFilter: 
-    m_ClassNames: []
-    m_AssetLabels: []
-    m_AssetBundleNames: []
-    m_ReferencingInstanceIDs: 
-    m_SceneHandles: 
-    m_ShowAllHits: 0
-    m_SkipHidden: 0
-    m_SearchArea: 1
-    m_Folders:
-    - Assets/Production/Actions/Brawler/Abilities
-    m_Globs: []
-    m_OriginalText: 
-    m_FilterByTypeIntersection: 0
-  m_ViewMode: 1
-  m_StartGridSize: 16
-  m_LastFolders:
-  - Assets/Production/Actions/Brawler/Abilities
-  m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\patse\Unity Projects\vithegame
-  m_LockTracker:
-    m_IsLocked: 1
-  m_FolderTreeState:
-    scrollPos: {x: 0, y: 671}
-    m_SelectedIDs: 0aae0200
-    m_LastClickedID: 175626
-    m_ExpandedIDs: 000000005ac10000aac10000d8c10000dac10000f2c100000cae020000ca9a3b
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_AssetTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 000000005ac10000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: 
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-    m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
-    m_GridSize: 16
-  m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 175
---- !u!114 &11
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
-  m_TitleContent:
-    m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 0
-    y: 708
-    width: 549
-    height: 291
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_SearchFilter:
-    m_NameFilter: 
-    m_ClassNames: []
-    m_AssetLabels: []
-    m_AssetBundleNames: []
-    m_ReferencingInstanceIDs: 
-    m_SceneHandles: 
-    m_ShowAllHits: 0
-    m_SkipHidden: 0
-    m_SearchArea: 1
-    m_Folders:
-    - Assets/Production/Prefabs/CharacterSkins
-    m_Globs: []
-    m_OriginalText: 
-    m_FilterByTypeIntersection: 0
-  m_ViewMode: 1
-  m_StartGridSize: 16
-  m_LastFolders:
-  - Assets/Production/Prefabs/CharacterSkins
-  m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\patse\Unity Projects\vithegame
-  m_LockTracker:
-    m_IsLocked: 1
-  m_FolderTreeState:
-    scrollPos: {x: 0, y: 1713}
-    m_SelectedIDs: e8c10000
-    m_LastClickedID: 49640
-    m_ExpandedIDs: 000000005ac100009ec10000aac10000d8c1000024ae020026ae020028ae0200a2ae0200eeae0200f0ae020000ca9a3b
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_AssetTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 000000005ac10000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: 66a9000006cb000032cb0000b6ca0000cccb000012cc0000b42f03004eb10000c2b000003ab1000002b200005ab100001ab1000032b20000deb00000f6b100002ab20000f2b00000188c00008aa200005aa30000e42e0800e22e08008e9d0100a8850300748a0300348d03001ee106001ae10600c6760800885e0800
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-    m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
-    m_GridSize: 16
-  m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 178
---- !u!114 &12
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Children:
-  - {fileID: 13}
-  - {fileID: 20}
-  m_Position:
-    serializedVersion: 2
-    x: 406
-    y: 0
-    width: 937
-    height: 947
-  m_MinSize: {x: 100, y: 200}
-  m_MaxSize: {x: 8096, y: 16192}
-  vertical: 1
-  controlID: 106
---- !u!114 &13
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneView
-  m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 937
-    height: 619
-  m_MinSize: {x: 102, y: 121}
-  m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 14}
-  m_Panes:
-  - {fileID: 14}
-  - {fileID: 15}
-  - {fileID: 16}
-  - {fileID: 17}
-  - {fileID: 18}
-  - {fileID: 19}
-  m_Selected: 0
-  m_LastSelected: 5
---- !u!114 &14
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_EditorHideFlags: 1
   m_Script: {fileID: 12013, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
+  m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Scene
-    m_Image: {fileID: 2593428753322112591, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: 8634526014445323508, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 406
-    y: 73
-    width: 935
-    height: 598
+    x: 263
+    y: 72
+    width: 595
+    height: 393
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -874,7 +255,7 @@ MonoBehaviour:
       collapsed: 0
       displayed: 1
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: -101, y: -26}
+      snapOffsetDelta: {x: -98, y: -26}
       snapCorner: 3
       id: Tool Settings
       index: 0
@@ -917,7 +298,7 @@ MonoBehaviour:
       floating: 0
       collapsed: 0
       displayed: 1
-      snapOffset: {x: 0, y: 25}
+      snapOffset: {x: 0, y: 26}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: unity-transform-toolbar
@@ -947,12 +328,12 @@ MonoBehaviour:
       layout: 4
     - dockPosition: 1
       containerId: overlay-container--right
-      floating: 1
+      floating: 0
       collapsed: 0
       displayed: 0
-      snapOffset: {x: 4, y: -148}
+      snapOffset: {x: 0, y: 25}
       snapOffsetDelta: {x: 0, y: 0}
-      snapCorner: 2
+      snapCorner: 0
       id: Scene View/Camera
       index: 1
       layout: 4
@@ -982,8 +363,8 @@ MonoBehaviour:
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
-      displayed: 1
-      snapOffset: {x: 0, y: 25}
+      displayed: 0
+      snapOffset: {x: 0, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: Scene View/Navmesh Display
@@ -994,7 +375,7 @@ MonoBehaviour:
       floating: 0
       collapsed: 0
       displayed: 0
-      snapOffset: {x: 0, y: 25}
+      snapOffset: {x: 0, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: Scene View/Agent Display
@@ -1049,9 +430,9 @@ MonoBehaviour:
       floating: 0
       collapsed: 0
       displayed: 0
-      snapOffset: {x: -231, y: -217}
+      snapOffset: {x: 0, y: 25}
       snapOffsetDelta: {x: 0, y: 0}
-      snapCorner: 3
+      snapCorner: 0
       id: Scene View/Particles
       index: 10
       layout: 4
@@ -1111,19 +492,19 @@ MonoBehaviour:
       index: 15
       layout: 4
     m_OverlaysVisible: 1
-  m_WindowGUID: 435a3a6a4b3d30340af8ee30ba6e4d88
+  m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
   m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
-  m_SceneIsLit: 0
+  m_SceneIsLit: 1
   m_SceneLighting: 1
   m_2DMode: 0
   m_isRotationLocked: 0
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 24.021238, y: -17.474941, z: -24.21461}
+    m_Target: {x: 0.64110076, y: 2.1988754, z: -0.9646676}
     speed: 2
-    m_Value: {x: 24.021238, y: -17.474941, z: -24.21461}
+    m_Value: {x: 0.64110076, y: 2.1988754, z: -0.9646676}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1170,13 +551,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.009246932, y: 0.92521465, z: -0.37869248, w: 0.022770941}
+    m_Target: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
     speed: 2
-    m_Value: {x: 0.009280918, y: 0.92462987, z: -0.3800734, w: 0.022756658}
+    m_Value: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_Size:
-    m_Target: 16.990545
+    m_Target: 22.550667
     speed: 2
-    m_Value: 16.990545
+    m_Value: 22.550667
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1184,7 +565,7 @@ MonoBehaviour:
   m_CameraSettings:
     m_Speed: 1
     m_SpeedNormalized: 0.5
-    m_SpeedMin: 0.01
+    m_SpeedMin: 0.001
     m_SpeedMax: 2
     m_EasingEnabled: 1
     m_EasingDuration: 0.4
@@ -1194,14 +575,14 @@ MonoBehaviour:
     m_FarClip: 10000
     m_DynamicClip: 1
     m_OcclusionCulling: 0
-  m_LastSceneViewRotation: {x: -0.0464834, y: 0.0014680038, z: -0.000017825403, w: -0.99897814}
+  m_LastSceneViewRotation: {x: -0.10046581, y: 0.017002767, z: -0.0017342208, w: -0.99481815}
   m_LastSceneViewOrtho: 0
   m_ReplacementShader: {fileID: 0}
   m_ReplacementString: 
   m_SceneVisActive: 1
   m_LastLockedObject: {fileID: 0}
   m_ViewIsLockedToObject: 0
---- !u!114 &15
+--- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1209,909 +590,93 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb55afc2c109f42f2af37941a8c9300e, type: 3}
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12015, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 600, y: 300}
+  m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Controls (Input Actions)
-    m_Image: {fileID: 0}
+    m_Text: Game
+    m_Image: {fileID: 4621777727084837110, guid: 0000000000000000d000000000000000,
+      type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 536
-    y: 73
-    width: 869
-    height: 587
+    x: 300
+    y: 72
+    width: 679.5
+    height: 393
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
-  m_ActionMapsTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 64f05d3e
-    m_LastClickedID: 1046343780
-    m_ExpandedIDs: 00000000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 0
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-  m_ActionsTreeState:
-    scrollPos: {x: 0, y: 12}
-    m_SelectedIDs: 980343db
-    m_LastClickedID: -616365160
-    m_ExpandedIDs: af4ac98847f1288c3546a08fa418e194a81a8799abb3969dbeac5a9f5e4f98abda2930bbcc1b05be5cc451c9129275d6c5c491d85ff176d9bb55d3d9980343dbd43c9af10ec359f25eb7a1f2ddaa6ffe53bd9b0482ef2a0d48609b139657ab13c1b7d316c5402018fad9011ad12c581e1b47cd1e54669322a6a7d223f88d2828795f072e730cf82e0cd52c2f64f05d3ed20d5041348b364f7e39c04f3b3fe5537f013667e7ab79680c837f69e85f89698fdc1c6b3163c76dce5ec26f49d294722b651677bf853479633b387c6244ad7f
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 0
-      m_ClientGUIView: {fileID: 13}
-    m_SearchString: 
-  m_ControlPickerViewState:
-    m_AdvancedDropdownState:
-      states:
-      - itemId: 371857150
-        selectedIndex: 0
-        scroll: {x: 0, y: 0}
-      - itemId: 1275948795
-        selectedIndex: 2
-        scroll: {x: 0, y: 47.5}
-      - itemId: -728233463
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1019278396
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 656259478
-        selectedIndex: 0
-        scroll: {x: 0, y: 0}
-      - itemId: 1923899077
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -376880915
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 403810634
-        selectedIndex: 0
-        scroll: {x: 0, y: 0}
-      - itemId: 378383742
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1672011147
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 1277967432
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -252459189
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 1581240744
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 998472819
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1790278178
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 78987070
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1184068216
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1184013745
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -2053868959
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 538257768
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 1919352497
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -732189348
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -206068285
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: 813934635
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -1184024587
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-      - itemId: -654788001
-        selectedIndex: -1
-        scroll: {x: 0, y: 0}
-    m_ManualPathEditMode: 0
-  m_ActionAssetManager:
-    m_AssetObjectForEditing: {fileID: 0}
-    m_ImportedAssetObject: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
-      type: 3}
-    m_AssetGUID: 89394a0546c86d141bf6aafeb721c454
-    m_ImportedAssetJson: "{\n    \"name\": \"Controls\",\n    \"maps\": [\n       
-      {\n            \"name\": \"Base\",\n            \"id\": \"c1bb6074-7e45-473f-9156-c781361fe814\",\n           
-      \"actions\": [\n                {\n                    \"name\": \"Look\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"9735ea84-85ec-4c78-af16-549a1d5029fa\",\n                   
-      \"expectedControlType\": \"Vector2\",\n                    \"processors\":
-      \"\",\n                    \"interactions\": \"\",\n                    \"initialStateCheck\":
-      true\n                },\n                {\n                    \"name\":
-      \"Move\",\n                    \"type\": \"Value\",\n                    \"id\":
-      \"0324046b-2815-498d-a70b-0536e218492f\",\n                    \"expectedControlType\":
-      \"Vector2\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Interact\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"139d8343-46ac-4af4-898c-188c322fe2f7\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Dodge\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d4373a15-c790-4dd1-9d2f-3b30a67e8736\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Block\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"05c67adf-7287-4e24-af24-895f8e736c3a\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"LightAttack\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"deecc639-3b4b-4735-8cf4-8462adb4c6ff\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"LightAttackHold\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"9f0e2966-fe01-4a0a-a9ae-c0251f559cee\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"HeavyAttack\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"020ea129-7f33-4dae-bf36-6d4c69f3c8bd\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"HeavyAttackHold\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"971a3916-4d44-40cd-991e-cc890eae8a86\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Ability1\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"70ef5d0b-59ff-4f78-9fdf-ed0267580554\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Ability2\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"6f524f15-6bd4-482f-b988-f4a9fa43a383\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Ability3\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"ec96c199-aeba-430f-b05b-5ee935931565\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Ability4\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"b5ec45a3-9d42-4b1e-89ea-8027e7ee6eb2\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Reload\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"69fa2700-3608-4b5a-a217-c058f4b1c188\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Pause\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"ea665137-2646-4c9f-b5d2-0dda16a8a43d\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Inventory\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d8379ac4-7af3-4b53-a700-81036a39e48a\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Scoreboard\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"104e51ef-c538-4eb4-b833-6b1c7d35e494\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Minimap\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"c9db039e-09b7-45e9-a5d8-12b324c8a7a6\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Weapon1\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"34cd7cb1-fda2-4428-8e12-d488a8d59177\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Weapon2\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d5a61448-ebbf-4476-b5e8-57809fbde8ef\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"SwitchWeapon\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"4f0eea53-c759-4370-b316-0751f15be24e\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"DisableBots\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"788e612b-1b33-4ef0-ba01-1b9fe58a4d25\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"TimeScaleChange\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"278c55b5-e282-4818-8540-62980d72c28e\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"IncrementFollowPlayer\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"99a8075a-7c7c-4567-b413-ff71f15308d1\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"DecrementFollowPlayer\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d5e4b67c-0a93-452a-9a68-f5b4d1ccdab0\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      }\n            ],\n            \"bindings\": [\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"5aca7c3d-b779-4791-b720-ce3bb68910a0\",\n                   
-      \"path\": \"<Mouse>/delta\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Look\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"5679ec3b-e81b-42e2-aa4c-9fa6b3bec338\",\n                   
-      \"path\": \"<Gamepad>/rightStick\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"ScaleVector2(x=2,y=2)\",\n                   
-      \"groups\": \"Gamepad;Touchscreen\",\n                    \"action\": \"Look\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"2D Vector\",\n                   
-      \"id\": \"b425bfea-24a2-4174-b22c-7522d1db13d1\",\n                    \"path\":
-      \"2DVector\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": true,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"up\",\n                    \"id\": \"ee86a181-916e-4e1e-aaba-5a2f5d0b4e60\",\n                   
-      \"path\": \"<Keyboard>/w\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"down\",\n                    \"id\": \"533a77f6-a8d5-4841-ae0f-d2a3ee1fbc31\",\n                   
-      \"path\": \"<Keyboard>/s\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"left\",\n                    \"id\": \"82288449-4c72-4728-97fe-b0262dedb064\",\n                   
-      \"path\": \"<Keyboard>/a\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"right\",\n                    \"id\": \"f476b54d-d1b1-475e-8129-5d519e9553d1\",\n                   
-      \"path\": \"<Keyboard>/d\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"b90efffb-cc63-44ed-a24a-6efb6205fa47\",\n                   
-      \"path\": \"<Gamepad>/leftStick\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"96e0cb2e-6fc2-4bf8-96cc-e86a5c712bc9\",\n                   
-      \"path\": \"<Keyboard>/q\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Ability1\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"595d2c78-ea98-4a2c-b0ec-e71d186bbcba\",\n                   
-      \"path\": \"<Gamepad>/buttonSouth\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Ability1\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"cb4212a7-81ce-477d-93b8-b20c75add290\",\n                    \"path\":
-      \"<Keyboard>/e\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Ability2\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"2d1fbe9c-9b6f-42be-a439-5b99ab76794d\",\n                   
-      \"path\": \"<Gamepad>/buttonEast\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Ability2\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"085b40ad-2a0d-4cd0-a5c0-257b2df83ee8\",\n                    \"path\":
-      \"<Keyboard>/f\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Ability3\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"d6b84b86-aa9f-4b20-b151-70faba5965fd\",\n                   
-      \"path\": \"<Gamepad>/buttonNorth\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Ability3\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"dd6bd757-f007-4830-8799-6ed87db01c3a\",\n                    \"path\":
-      \"<Keyboard>/v\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Ability4\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"a95cde2e-2047-4579-88e5-be6bbb8550c6\",\n                   
-      \"path\": \"<Gamepad>/buttonWest\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Ability4\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"b5c62c6c-c9cf-4df6-9382-d796a6f44367\",\n                    \"path\":
-      \"<Keyboard>/g\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Interact\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"86f60dc5-d518-4caf-b493-dabd8c68c756\",\n                   
-      \"path\": \"<Gamepad>/buttonSouth\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Interact\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"3bb53d45-398c-4db3-b92e-4eced3764997\",\n                    \"path\":
-      \"<Keyboard>/space\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Dodge\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"b1dc3d71-3057-43ba-a8b7-31f7edd0dcba\",\n                   
-      \"path\": \"<Gamepad>/leftStickPress\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Dodge\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"04231d37-cfc5-4a4a-917d-c1a7f49ba38a\",\n                    \"path\":
-      \"<Keyboard>/r\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Reload\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"5571cbe2-de03-4ec9-8059-97b061e216b2\",\n                   
-      \"path\": \"<Gamepad>/rightStickPress\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Reload\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"258a3fc9-1968-4fee-acaa-800b14144d8c\",\n                    \"path\":
-      \"<Mouse>/leftButton\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"LightAttack\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"4963394c-29fb-4f3d-bbf2-37b006f90917\",\n                   
-      \"path\": \"<Mouse>/rightButton\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"HeavyAttack\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"66a25f1b-daf6-44e5-80bf-ef21bec2893e\",\n                   
-      \"path\": \"<Keyboard>/leftShift\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Keyboard & Mouse\",\n                    \"action\": \"Block\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"ea2b757e-9397-483c-a6d8-396058ec1a02\",\n                    \"path\":
-      \"<Gamepad>/rightShoulder\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"Block\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"e7f267a4-ecfd-40b3-9a22-0dc44b4bbbdd\",\n                   
-      \"path\": \"<Keyboard>/tab\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Scoreboard\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"bdbdbee9-d70e-4c95-a06f-ea4c03ce6bc9\",\n                   
-      \"path\": \"<Gamepad>/dpad/left\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"Scoreboard\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"3a78c96b-7bba-4e2b-89cc-cdd9fb0d29bc\",\n                   
-      \"path\": \"<Keyboard>/escape\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"26e64a5f-8638-4cd4-926b-37a7f3b76728\",\n                   
-      \"path\": \"<Gamepad>/start\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"dcbc4062-f178-47ad-b35e-186dfe605a98\",\n                   
-      \"path\": \"<Keyboard>/p\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"TimeScaleChange\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"2eb95d8a-94cf-40f7-a52b-d7199c6009d7\",\n                   
-      \"path\": \"<Keyboard>/m\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Minimap\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"5f8c2b21-3964-4cd3-b6f3-a2fec2200bc5\",\n                   
-      \"path\": \"<Gamepad>/dpad/right\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad;Touchscreen\",\n                    \"action\": \"Minimap\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"aac1c7f1-fc97-48d5-ab71-b851a9fecfd5\",\n                    \"path\":
-      \"<Gamepad>/rightTrigger\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"LightAttackHold\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"40be45e8-f56d-463b-9578-53efdd25a84f\",\n                   
-      \"path\": \"<Gamepad>/leftTrigger\",\n                    \"interactions\":
-      \"Press\",\n                    \"processors\": \"\",\n                   
-      \"groups\": \"Gamepad;Touchscreen\",\n                    \"action\": \"HeavyAttackHold\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"3dcc3ad7-9e2b-432f-801d-78a1ccd3b81f\",\n                    \"path\":
-      \"<Keyboard>/i\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Inventory\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"52872837-540b-44ea-ab52-48aa9fa56209\",\n                   
-      \"path\": \"<Gamepad>/select\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad;Touchscreen\",\n                   
-      \"action\": \"Inventory\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"ed573a54-b3d6-45e6-aba5-ef2359698e10\",\n                   
-      \"path\": \"<Keyboard>/1\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Weapon1\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"a04f7a3c-a5c4-4e14-9839-ae5e2379298a\",\n                   
-      \"path\": \"<Keyboard>/2\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Weapon2\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"0c164bc4-cb67-4967-b518-63e813fa52e9\",\n                   
-      \"path\": \"<Keyboard>/o\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"DisableBots\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"6314e0f9-8983-4507-b6b2-ea70dbc1e925\",\n                   
-      \"path\": \"<Gamepad>/rightShoulder\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"IncrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"12c56ef5-5bd5-4d26-aacd-ff3215158dac\",\n                    \"path\":
-      \"<Keyboard>/w\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"IncrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"849cbc45-6b72-4c0e-bc09-2e27fc1beee7\",\n                   
-      \"path\": \"<Gamepad>/rightShoulder\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Touchscreen\",\n                    \"action\": \"IncrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"dc69909e-513b-4b55-90cb-71c5f3c84533\",\n                    \"path\":
-      \"<Gamepad>/leftShoulder\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"DecrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"bd6c9cb3-fc87-4083-84e0-57ae1da3ffc4\",\n                   
-      \"path\": \"<Keyboard>/s\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"DecrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"f3dd8c87-e7fb-4d1e-8749-e5ac1f5a296b\",\n                   
-      \"path\": \"<Gamepad>/leftShoulder\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Touchscreen\",\n                    \"action\": \"DecrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"40be275f-c13f-4dd4-a5dc-7ec6341e32d7\",\n                    \"path\":
-      \"<Gamepad>/dpad/up\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"SwitchWeapon\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                }\n            ]\n        },\n       
-      {\n            \"name\": \"UI\",\n            \"id\": \"9e1fbe52-b476-424a-85b4-805b2e2fd8d2\",\n           
-      \"actions\": [\n                {\n                    \"name\": \"Pause\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d849a84c-a16c-404f-b664-c13e9ef20835\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Inventory\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"87a36c8f-aa56-43d7-a170-5b2890e9a685\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      }\n            ],\n            \"bindings\": [\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"50a1165a-3d46-44e7-8c9f-403951196990\",\n                   
-      \"path\": \"<Gamepad>/start\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"279ce17a-ce39-46d7-9193-eabb8df16ebc\",\n                   
-      \"path\": \"<Keyboard>/escape\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"906cf4cc-3e6d-4b93-a48e-2d11b6b36d5c\",\n                   
-      \"path\": \"<Gamepad>/select\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Inventory\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"924e16c2-cf27-4a20-9596-107d07028aa2\",\n                   
-      \"path\": \"<Keyboard>/i\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Inventory\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                }\n            ]\n        },\n       
-      {\n            \"name\": \"Spectator\",\n            \"id\": \"91702ec1-75d0-4d44-9996-ec3eec3d85dc\",\n           
-      \"actions\": [\n                {\n                    \"name\": \"Look\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"6bab895e-11a8-4388-9f7e-deabf1e5be58\",\n                   
-      \"expectedControlType\": \"Vector2\",\n                    \"processors\":
-      \"\",\n                    \"interactions\": \"\",\n                    \"initialStateCheck\":
-      true\n                },\n                {\n                    \"name\":
-      \"Move\",\n                    \"type\": \"Value\",\n                    \"id\":
-      \"ed3ba7ed-4e63-4618-8235-e04927b9d595\",\n                    \"expectedControlType\":
-      \"Vector2\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Sprint\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"5dd2ece2-4b75-444e-8dcd-be06d434e070\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Ascend\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"9f15579f-1a66-4abe-8955-39ab125c3f01\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Descend\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"dedfd422-4f05-428e-bf45-aca4d10c694a\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"Pause\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"501a2057-4bfa-4fe5-8378-b30672d71dd0\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"Scoreboard\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"6298a398-9e92-4174-9522-8ba4ab9451c8\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      },\n                {\n                    \"name\": \"FollowPlayer1\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"a28c48f5-93a9-4f83-a27d-6359062b449c\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer2\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"5a1af0fb-da6f-4e45-bf9c-1b7284fc8dee\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer3\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"8248eb5d-d6f3-4975-8ef7-c275e17d2ca8\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer4\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"40eafeb2-b664-4152-a50b-1950b6038149\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer5\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"e390f5c3-195a-48ba-a112-03e147ff1f2d\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer6\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"54a708d8-6583-47e4-9cb6-6aa77c8efa6d\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer7\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"d7dabd8d-6206-4c7c-a605-cddff9e6f1b5\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer8\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"96655cd6-89be-4116-bb06-13737860f639\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer9\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"4d26db7e-1f4a-4354-af72-e24280f15d52\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"FollowPlayer10\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"6f64a08c-fa49-4ce5-b30c-8caf055af5a2\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"IncrementFollowPlayer\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"95d0b481-2d53-48c2-a24d-ea9d2f258e99\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"DecrementFollowPlayer\",\n                   
-      \"type\": \"Button\",\n                    \"id\": \"3457f314-2c6f-45ba-a9f1-f6a1e34ddcbd\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
-      },\n                {\n                    \"name\": \"EnvironmentViewModifier\",\n                   
-      \"type\": \"Value\",\n                    \"id\": \"2d5eb47f-3248-4d98-8011-c708e9d899c3\",\n                   
-      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
-      \"interactions\": \"\",\n                    \"initialStateCheck\": true\n               
-      }\n            ],\n            \"bindings\": [\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"1f889207-3809-49b6-af1f-7191231d5a21\",\n                   
-      \"path\": \"<Mouse>/delta\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Look\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"0ad5c4ba-3b10-4367-982f-8d929bc4950a\",\n                   
-      \"path\": \"<Gamepad>/rightStick\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"Look\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"bc96db25-3dc3-4b5f-b6d7-356f5c52c6ce\",\n                    \"path\":
-      \"<Gamepad>/rightStick\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Look\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"2D Vector\",\n                    \"id\": \"f2f468ae-0075-43b9-a4ab-7ea53a685d5d\",\n                   
-      \"path\": \"2DVector\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": true,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"up\",\n                    \"id\": \"8deb765d-61e5-4a60-9658-60b6cb07222a\",\n                   
-      \"path\": \"<Keyboard>/w\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"down\",\n                    \"id\": \"51173355-4017-475a-8f29-d62efdd79379\",\n                   
-      \"path\": \"<Keyboard>/s\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"left\",\n                    \"id\": \"76d3a4c2-3454-4d66-b9af-99c52c40550f\",\n                   
-      \"path\": \"<Keyboard>/a\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"right\",\n                    \"id\": \"c27203fb-557a-4b5c-a493-7401acf3740b\",\n                   
-      \"path\": \"<Keyboard>/d\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"022866b1-8fa2-4f3e-83b1-b7de8d7e3ff4\",\n                   
-      \"path\": \"<Gamepad>/leftStick\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"4b545af0-4d85-49c4-8312-7370bd3a804b\",\n                   
-      \"path\": \"<Gamepad>/leftStick\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Move\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"4d6aaf0d-2b42-47c4-8510-3f3fe5899105\",\n                   
-      \"path\": \"<Keyboard>/leftShift\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Keyboard & Mouse\",\n                    \"action\": \"Sprint\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"899af584-4ed4-4611-8546-0fc1cce89a64\",\n                    \"path\":
-      \"<Gamepad>/leftStickPress\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Sprint\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"1a8f59c8-0494-400d-bfad-40c93be16770\",\n                   
-      \"path\": \"<Gamepad>/leftStickPress\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Touchscreen\",\n                    \"action\": \"Sprint\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"466fb7b1-d71b-462a-a06e-e7921f43df68\",\n                    \"path\":
-      \"<Keyboard>/space\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Ascend\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"13d558a9-003a-45a6-9cb0-f84f1921f9ca\",\n                   
-      \"path\": \"<Gamepad>/leftTrigger\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"Ascend\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"0ce844e8-afda-445e-8458-76f09ebdfc96\",\n                    \"path\":
-      \"<Gamepad>/leftTrigger\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Ascend\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"b7c010c2-82c6-4cc6-b301-718950b1ba02\",\n                   
-      \"path\": \"<Keyboard>/leftCtrl\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Descend\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"97baf173-379b-4ead-9fee-1209d143a29d\",\n                   
-      \"path\": \"<Gamepad>/rightTrigger\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"Descend\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"0bdb3010-cd6f-432b-8cb5-430d09a176f8\",\n                    \"path\":
-      \"<Gamepad>/rightTrigger\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Descend\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"e885ca8c-0f3b-4f6d-b7cb-2f262d145ed5\",\n                   
-      \"path\": \"<Keyboard>/escape\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"6c52b18b-af88-4763-9026-25afe5921484\",\n                   
-      \"path\": \"<Gamepad>/start\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"f923b787-7348-4591-9c86-543de9d73127\",\n                   
-      \"path\": \"<Gamepad>/start\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Pause\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"b60a9e31-5b3e-4deb-a48e-7aa7905d2e38\",\n                   
-      \"path\": \"<Keyboard>/1\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer1\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"ffaa69e6-0a3c-4756-af82-b46f504524aa\",\n                   
-      \"path\": \"<Keyboard>/2\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer2\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"22dd93cb-28e3-4146-bc7c-8782cc9b3312\",\n                   
-      \"path\": \"<Keyboard>/3\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer3\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"ba68c26b-9785-4421-90f3-20bb4662160c\",\n                   
-      \"path\": \"<Keyboard>/4\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer4\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"a29d2920-efe9-47bf-84f4-8ab5ea99114a\",\n                   
-      \"path\": \"<Keyboard>/5\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer5\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"12f7b3e8-379c-4023-8b48-4eeba2895310\",\n                   
-      \"path\": \"<Keyboard>/6\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer6\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"847b898b-f031-48bd-84de-f0df3586da6d\",\n                   
-      \"path\": \"<Keyboard>/7\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer7\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"a7087221-ef3e-4cc1-b087-6cacf7750ff2\",\n                   
-      \"path\": \"<Keyboard>/8\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer8\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"6afafff9-9fe0-4d3a-93bf-37091219cb27\",\n                   
-      \"path\": \"<Keyboard>/9\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer9\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"3c90c7b7-66a1-46b6-8101-b58eaed806b7\",\n                   
-      \"path\": \"<Keyboard>/0\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"FollowPlayer10\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"89cce12e-2727-45d5-89ee-762930e22808\",\n                   
-      \"path\": \"<Gamepad>/rightShoulder\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"IncrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"744e762c-25b6-47d8-a863-dc65eb9e0d8e\",\n                    \"path\":
-      \"<Keyboard>/rightArrow\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"IncrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"67049656-10bd-4b1b-ae82-df5da736b9d3\",\n                   
-      \"path\": \"<Gamepad>/rightShoulder\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Touchscreen\",\n                    \"action\": \"IncrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"bd0a3484-5aa8-47fc-9cb0-0ad7af549848\",\n                    \"path\":
-      \"<Gamepad>/leftShoulder\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"DecrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"8e21d031-81af-414d-acb2-c0e252f2edc3\",\n                   
-      \"path\": \"<Keyboard>/leftArrow\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Keyboard & Mouse\",\n                    \"action\": \"DecrementFollowPlayer\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"d81f502f-2d8c-428b-a992-893f8a6340fc\",\n                    \"path\":
-      \"<Gamepad>/leftShoulder\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"DecrementFollowPlayer\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"64e4a88a-4eea-468c-87b3-d417c802bad8\",\n                   
-      \"path\": \"<Keyboard>/leftAlt\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"EnvironmentViewModifier\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"d5ae84b0-c7a1-498a-b85a-288f503bb9fb\",\n                   
-      \"path\": \"<Gamepad>/buttonSouth\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"Gamepad\",\n                    \"action\": \"EnvironmentViewModifier\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": false\n               
-      },\n                {\n                    \"name\": \"\",\n                   
-      \"id\": \"d04346d3-4b65-4f43-b1ef-73b29a437bf4\",\n                    \"path\":
-      \"<Gamepad>/buttonSouth\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"EnvironmentViewModifier\",\n                    \"isComposite\":
-      false,\n                    \"isPartOfComposite\": false\n                },\n               
-      {\n                    \"name\": \"\",\n                    \"id\": \"986facc5-2a54-4afc-902c-c2f6956dc751\",\n                   
-      \"path\": \"<Keyboard>/tab\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Keyboard & Mouse\",\n                   
-      \"action\": \"Scoreboard\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"32bb415d-076e-4851-9e67-89cc784f9e86\",\n                   
-      \"path\": \"<Gamepad>/dpad/left\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Gamepad\",\n                   
-      \"action\": \"Scoreboard\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"\",\n                    \"id\": \"9084cb9a-b47c-4b9b-91a8-8f5b568d3ac2\",\n                   
-      \"path\": \"<Gamepad>/dpad/left\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"Touchscreen\",\n                   
-      \"action\": \"Scoreboard\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                }\n            ]\n        }\n   
-      ],\n    \"controlSchemes\": [\n        {\n            \"name\": \"Keyboard
-      & Mouse\",\n            \"bindingGroup\": \"Keyboard & Mouse\",\n           
-      \"devices\": [\n                {\n                    \"devicePath\": \"<Keyboard>\",\n                   
-      \"isOptional\": false,\n                    \"isOR\": false\n               
-      },\n                {\n                    \"devicePath\": \"<Mouse>\",\n                   
-      \"isOptional\": false,\n                    \"isOR\": false\n               
-      }\n            ]\n        },\n        {\n            \"name\": \"Gamepad\",\n           
-      \"bindingGroup\": \"Gamepad\",\n            \"devices\": [\n               
-      {\n                    \"devicePath\": \"<Gamepad>\",\n                   
-      \"isOptional\": false,\n                    \"isOR\": false\n               
-      },\n                {\n                    \"devicePath\": \"<VirtualMouse>\",\n                   
-      \"isOptional\": true,\n                    \"isOR\": false\n               
-      }\n            ]\n        },\n        {\n            \"name\": \"Touchscreen\",\n           
-      \"bindingGroup\": \"Touchscreen\",\n            \"devices\": [\n               
-      {\n                    \"devicePath\": \"<Touchscreen>\",\n                   
-      \"isOptional\": false,\n                    \"isOR\": false\n               
-      },\n                {\n                    \"devicePath\": \"<Gamepad>\",\n                   
-      \"isOptional\": true,\n                    \"isOR\": false\n               
-      }\n            ]\n        }\n    ]\n}"
-    m_IsDirty: 0
-  m_Toolbar:
-    m_IsDirty: 0
-    m_SelectedControlSchemeIndex: -1
-    m_SelectedDeviceRequirementIndex: -1
-    m_ControlSchemes:
-    - m_Name: Keyboard & Mouse
-      m_BindingGroup: Keyboard & Mouse
-      m_DeviceRequirements:
-      - m_ControlPath: <Keyboard>
-        m_Flags: 0
-      - m_ControlPath: <Mouse>
-        m_Flags: 0
-    - m_Name: Gamepad
-      m_BindingGroup: Gamepad
-      m_DeviceRequirements:
-      - m_ControlPath: <Gamepad>
-        m_Flags: 0
-      - m_ControlPath: <VirtualMouse>
-        m_Flags: 1
-    - m_Name: Touchscreen
-      m_BindingGroup: Touchscreen
-      m_DeviceRequirements:
-      - m_ControlPath: <Touchscreen>
-        m_Flags: 0
-      - m_ControlPath: <Gamepad>
-        m_Flags: 1
-    m_SearchText: 
-  m_DirtyTitle:
-    m_Text: (*) Controls (Input Actions)
-    m_Image: {fileID: 0}
-    m_Tooltip: 
-  m_Title:
-    m_Text: Controls (Input Actions)
-    m_Image: {fileID: 0}
-    m_Tooltip: 
---- !u!114 &16
+  m_SerializedViewNames: []
+  m_SerializedViewValues: []
+  m_PlayModeViewName: GameView
+  m_ShowGizmos: 0
+  m_TargetDisplay: 0
+  m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
+  m_TargetSize: {x: 1920, y: 1080}
+  m_TextureFilterMode: 0
+  m_TextureHideFlags: 61
+  m_RenderIMGUI: 1
+  m_EnterPlayModeBehavior: 0
+  m_UseMipMap: 0
+  m_VSyncEnabled: 0
+  m_Gizmos: 0
+  m_Stats: 0
+  m_SelectedSizes: 0300000000000000000000000e000000000000000000000000000000000000000000000000000000
+  m_ZoomArea:
+    m_HRangeLocked: 0
+    m_VRangeLocked: 0
+    hZoomLockedByDefault: 0
+    vZoomLockedByDefault: 0
+    m_HBaseRangeMin: -480
+    m_HBaseRangeMax: 480
+    m_VBaseRangeMin: -270
+    m_VBaseRangeMax: 270
+    m_HAllowExceedBaseRangeMin: 1
+    m_HAllowExceedBaseRangeMax: 1
+    m_VAllowExceedBaseRangeMin: 1
+    m_VAllowExceedBaseRangeMax: 1
+    m_ScaleWithWindow: 0
+    m_HSlider: 0
+    m_VSlider: 0
+    m_IgnoreScrollWheelUntilClicked: 0
+    m_EnableMouseInput: 0
+    m_EnableSliderZoomHorizontal: 0
+    m_EnableSliderZoomVertical: 0
+    m_UniformScale: 1
+    m_UpDirection: 1
+    m_DrawArea:
+      serializedVersion: 2
+      x: 0
+      y: 21
+      width: 679.5
+      height: 372
+    m_Scale: {x: 0.6888889, y: 0.6888889}
+    m_Translation: {x: 339.75, y: 186}
+    m_MarginLeft: 0
+    m_MarginRight: 0
+    m_MarginTop: 0
+    m_MarginBottom: 0
+    m_LastShownAreaInsideMargins:
+      serializedVersion: 2
+      x: -493.1855
+      y: -270
+      width: 986.371
+      height: 540
+    m_MinimalGUI: 1
+  m_defaultScale: 0.6888889
+  m_LastWindowPixelSize: {x: 1359, y: 786}
+  m_ClearInEditMode: 1
+  m_NoCameraWarning: 1
+  m_LowResolutionForAspectRatios: 01000000000000000000
+  m_XRRenderMode: 0
+  m_RenderTexture: {fileID: 0}
+--- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2127,15 +692,15 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Animator
-    m_Image: {fileID: -1673928668082335149, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: 1711060831702674872, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 504
-    y: 73
-    width: 922
-    height: 598
+    x: 250.5
+    y: 72
+    width: 664.5
+    height: 409
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -2143,35 +708,18 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_ViewTransforms:
     m_KeySerializationHelper:
-    - {fileID: 7994521949432735617, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: 7423514320859596201, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: 7452362826262654329, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: -4436870615259694079, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: -4999889489365453203, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: -2901290626849677481, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: -2087931926972693667, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
-    - {fileID: 3696008767797152281, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: 1107310315690748488, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
-    - {fileID: 1107782975114508436, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
-    - {fileID: 1102756348614642094, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
     - {fileID: 368990730861908406, guid: 2bb71d63f065dc44d95493a4d2f51458, type: 2}
-    - {fileID: 1107811339074442772, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
-    - {fileID: 1102676722091324818, guid: 3f1e2f14ae32849fab8d6425e1c058cb, type: 2}
-    - {fileID: -6222088806502977341, guid: f43717b4443424143a76fa91375634b0, type: 2}
-    - {fileID: 7423514320859596201, guid: 760159f2de1adf944bee47902c6205ed, type: 2}
-    - {fileID: -4436870615259694079, guid: 760159f2de1adf944bee47902c6205ed, type: 2}
-    - {fileID: -5907395644689929575, guid: 49017a90bcc854f8abb778e146706258, type: 2}
-    - {fileID: 5262369737327261439, guid: 676f245ec15f9c640aa97b827e9d6c11, type: 2}
-    - {fileID: 2425291218371695194, guid: 676f245ec15f9c640aa97b827e9d6c11, type: 2}
+    - {fileID: 9154991271756052304, guid: bf9ee01a8dd3c354196e9f7eb6947fc8, type: 2}
+    - {fileID: 110712840, guid: ced0f870e7d59de4d96e7c2260a38b91, type: 2}
     m_ValueSerializationHelper:
-    - e00: 1.2839575
+    - e00: 0.2631579
       e01: 0
       e02: 0
-      e03: -694.8538
+      e03: 1.842102
       e10: 0
-      e11: 1.2839575
+      e11: 0.2631579
       e12: 0
-      e13: 614.7908
+      e13: 91.25
       e20: 0
       e21: 0
       e22: 1
@@ -2180,78 +728,14 @@ MonoBehaviour:
       e31: 0
       e32: 0
       e33: 1
-    - e00: 0.79473686
+    - e00: 0.16644432
       e01: 0
       e02: 0
-      e03: -75.00002
+      e03: 50.508408
       e10: 0
-      e11: 0.79473686
+      e11: 0.16644432
       e12: 0
-      e13: 205.75775
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.79473686
-      e01: 0
-      e02: 0
-      e03: 40
-      e10: 0
-      e11: 0.79473686
-      e12: 0
-      e13: 214.75775
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.6902559
-      e01: 0
-      e02: 0
-      e03: 240.21469
-      e10: 0
-      e11: 0.6902559
-      e12: 0
-      e13: -129.87001
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.38494623
-      e01: 0
-      e02: 0
-      e03: 210.6667
-      e10: 0
-      e11: 0.38494623
-      e12: 0
-      e13: 21.07527
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.79473686
-      e01: 0
-      e02: 0
-      e03: 40
-      e10: 0
-      e11: 0.79473686
-      e12: 0
-      e13: 214.75775
+      e13: 54.873177
       e20: 0
       e21: 0
       e22: 1
@@ -2263,219 +747,11 @@ MonoBehaviour:
     - e00: 1
       e01: 0
       e02: 0
-      e03: 99
+      e03: 0
       e10: 0
       e11: 1
       e12: 0
-      e13: 138.5
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.9340073
-      e01: 0
-      e02: 0
-      e03: 170.85686
-      e10: 0
-      e11: 0.9340073
-      e12: 0
-      e13: 158.7296
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 1
-      e01: 0
-      e02: 0
-      e03: 114
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 134.5
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 1
-      e01: 0
-      e02: 0
-      e03: 269.5
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 61
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.2885092
-      e01: 0
-      e02: 0
-      e03: 175.29205
-      e10: 0
-      e11: 0.2885092
-      e12: 0
-      e13: 13.339018
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.73473686
-      e01: 0
-      e02: 0
-      e03: -21.736847
-      e10: 0
-      e11: 0.73473686
-      e12: 0
-      e13: 203.7
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 1
-      e01: 0
-      e02: 0
-      e03: 114
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 134.5
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 1
-      e01: 0
-      e02: 0
-      e03: 56.5
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 216
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.79473686
-      e01: 0
-      e02: 0
-      e03: 40
-      e10: 0
-      e11: 0.79473686
-      e12: 0
-      e13: 214.75775
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.7927011
-      e01: 0
-      e02: 0
-      e03: 23.065174
-      e10: 0
-      e11: 0.7927011
-      e12: 0
-      e13: 174.49261
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.49784946
-      e01: 0
-      e02: 0
-      e03: 290.1667
-      e10: 0
-      e11: 0.49784946
-      e12: 0
-      e13: 12.510757
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.5613454
-      e01: 0
-      e02: 0
-      e03: 91.085205
-      e10: 0
-      e11: 0.5613454
-      e12: 0
-      e13: 262.44724
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.7827704
-      e01: 0
-      e02: 0
-      e03: -20.325684
-      e10: 0
-      e11: 0.7827704
-      e12: 0
-      e13: 235.96814
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    - e00: 0.59354836
-      e01: 0
-      e02: 0
-      e03: 208.50002
-      e10: 0
-      e11: 0.59354836
-      e12: 0
-      e13: 12.032257
+      e13: 0
       e20: 0
       e21: 0
       e22: 1
@@ -2485,11 +761,10 @@ MonoBehaviour:
       e32: 0
       e33: 1
   m_PreviewAnimator: {fileID: 0}
-  m_AnimatorController: {fileID: 9100000, guid: f43717b4443424143a76fa91375634b0,
+  m_AnimatorController: {fileID: 9100000, guid: ced0f870e7d59de4d96e7c2260a38b91,
     type: 2}
   m_BreadCrumbs:
-  - m_Target: {fileID: 7994521949432735617, guid: f43717b4443424143a76fa91375634b0,
-      type: 2}
+  - m_Target: {fileID: 110712840, guid: ced0f870e7d59de4d96e7c2260a38b91, type: 2}
     m_ScrollPosition: {x: 0, y: 0}
   stateMachineGraph: {fileID: 0}
   stateMachineGraphGUI: {fileID: 0}
@@ -2501,8 +776,8 @@ MonoBehaviour:
     m_IsLocked: 0
   m_CurrentEditor: 0
   m_LayerEditor:
-    m_SelectedLayerIndex: 4
---- !u!114 &17
+    m_SelectedLayerIndex: 0
+--- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2522,10 +797,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 504
-    y: 73
-    width: 917
-    height: 598
+    x: 259
+    y: 72
+    width: 692
+    height: 419
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -2534,9 +809,9 @@ MonoBehaviour:
   m_GroupEditor:
     m_TreeState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 18ca7ea7ffffffff73321c355587663b43196d6a
+      m_SelectedIDs: 20b0ddb1
+      m_LastClickedID: -1310871520
+      m_ExpandedIDs: 18ca7ea7ffffffff5587663b388bd566
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -2552,11 +827,11 @@ MonoBehaviour:
         m_IsRenaming: 0
         m_OriginalEventType: 11
         m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 13}
+        m_ClientGUIView: {fileID: 7}
       m_SearchString: 
     m_Mchs:
       m_Columns:
-      - width: 416.91223
+      - width: 264.5614
         sortedAscending: 0
         headerContent:
           m_Text: Group Name \ Addressable Name
@@ -2587,7 +862,7 @@ MonoBehaviour:
         allowToggleVisibility: 1
         canSort: 0
         userData: 0
-      - width: 240.52632
+      - width: 152.63158
         sortedAscending: 0
         headerContent:
           m_Text: Path
@@ -2602,7 +877,7 @@ MonoBehaviour:
         allowToggleVisibility: 1
         canSort: 1
         userData: 0
-      - width: 256.5615
+      - width: 162.807
         sortedAscending: 0
         headerContent:
           m_Text: Labels
@@ -2619,9 +894,9 @@ MonoBehaviour:
         userData: 0
       m_VisibleColumns: 00000000010000000200000003000000
       m_SortedColumns: 
-    window: {fileID: 17}
-    m_VerticalSplitterPercent: 0.8003914
---- !u!114 &18
+    window: {fileID: 11}
+    m_VerticalSplitterPercent: 0.8
+--- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2641,15 +916,516 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 501
-    y: 73
-    width: 874
-    height: 626
+    x: 250.5
+    y: 72
+    width: 664.5
+    height: 409
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
+--- !u!114 &13
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Children:
+  - {fileID: 14}
+  - {fileID: 17}
+  m_Position:
+    serializedVersion: 2
+    x: 0
+    y: 414
+    width: 860
+    height: 246
+  m_MinSize: {x: 200, y: 100}
+  m_MaxSize: {x: 16192, y: 8096}
+  vertical: 0
+  controlID: 105
+--- !u!114 &14
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: ProjectBrowser
+  m_EditorClassIdentifier: 
+  m_Children: []
+  m_Position:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 451.5
+    height: 246
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 15}
+  m_Panes:
+  - {fileID: 15}
+  - {fileID: 16}
+  m_Selected: 0
+  m_LastSelected: 1
+--- !u!114 &15
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MinSize: {x: 230, y: 250}
+  m_MaxSize: {x: 10000, y: 10000}
+  m_TitleContent:
+    m_Text: Project
+    m_Image: {fileID: -5179483145760003458, guid: 0000000000000000d000000000000000,
+      type: 0}
+    m_Tooltip: 
+  m_Pos:
+    serializedVersion: 2
+    x: 0
+    y: 486
+    width: 450.5
+    height: 225
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_OverlaysVisible: 1
+  m_SearchFilter:
+    m_NameFilter: 
+    m_ClassNames: []
+    m_AssetLabels: []
+    m_AssetBundleNames: []
+    m_ReferencingInstanceIDs: 
+    m_SceneHandles: 
+    m_ShowAllHits: 0
+    m_SkipHidden: 0
+    m_SearchArea: 1
+    m_Folders:
+    - Assets/Production/Actions/Brawler/LightAttacks
+    m_Globs: []
+    m_OriginalText: 
+    m_FilterByTypeIntersection: 0
+  m_ViewMode: 1
+  m_StartGridSize: 16
+  m_LastFolders:
+  - Assets/Production/Actions/Brawler/LightAttacks
+  m_LastFoldersGridSize: 16
+  m_LastProjectPath: C:\Users\patse\Desktop\Unity Projects\vithegame
+  m_LockTracker:
+    m_IsLocked: 1
+  m_FolderTreeState:
+    scrollPos: {x: 0, y: 639}
+    m_SelectedIDs: e69a1400
+    m_LastClickedID: 1350374
+    m_ExpandedIDs: 00000000b2961400e8991400609a1400e29a1400f09a140000ca9a3bffffff7f
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_AssetTreeState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 00000000b2961400
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_ListAreaState:
+    m_SelectedInstanceIDs: d0a11400
+    m_LastClickedInstanceID: 1352144
+    m_HadKeyboardFocusLastEvent: 1
+    m_ExpandedInstanceIDs: c623000022540700c27a0700681e0700b27e0700bc7a07007cc800006ea71500
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 14}
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+    m_NewAssetIndexInList: -1
+    m_ScrollPosition: {x: 0, y: 0}
+    m_GridSize: 16
+  m_SkipHiddenPackages: 0
+  m_DirectoriesAreaWidth: 207
+--- !u!114 &16
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MinSize: {x: 230, y: 250}
+  m_MaxSize: {x: 10000, y: 10000}
+  m_TitleContent:
+    m_Text: Project
+    m_Image: {fileID: -5179483145760003458, guid: 0000000000000000d000000000000000,
+      type: 0}
+    m_Tooltip: 
+  m_Pos:
+    serializedVersion: 2
+    x: 0
+    y: 486
+    width: 514.5
+    height: 225
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_OverlaysVisible: 1
+  m_SearchFilter:
+    m_NameFilter: 
+    m_ClassNames: []
+    m_AssetLabels: []
+    m_AssetBundleNames: []
+    m_ReferencingInstanceIDs: 
+    m_SceneHandles: 
+    m_ShowAllHits: 0
+    m_SkipHidden: 0
+    m_SearchArea: 1
+    m_Folders:
+    - Assets/Production/Scenes
+    m_Globs: []
+    m_OriginalText: 
+    m_FilterByTypeIntersection: 0
+  m_ViewMode: 1
+  m_StartGridSize: 16
+  m_LastFolders:
+  - Assets/Production/Scenes
+  m_LastFoldersGridSize: -1
+  m_LastProjectPath: C:\Users\patse\Desktop\Unity Projects\vithegame
+  m_LockTracker:
+    m_IsLocked: 1
+  m_FolderTreeState:
+    scrollPos: {x: 0, y: 763}
+    m_SelectedIDs: 5e9a1400
+    m_LastClickedID: 1350238
+    m_ExpandedIDs: 00000000b2961400e89914005e9a140000ca9a3bffffff7f
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_AssetTreeState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 00000000b2961400
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_ListAreaState:
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 0
+    m_ExpandedInstanceIDs: 
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 14}
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+    m_NewAssetIndexInList: -1
+    m_ScrollPosition: {x: 0, y: 0}
+    m_GridSize: 16
+  m_SkipHiddenPackages: 0
+  m_DirectoriesAreaWidth: 200
+--- !u!114 &17
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: ProjectBrowser
+  m_EditorClassIdentifier: 
+  m_Children: []
+  m_Position:
+    serializedVersion: 2
+    x: 451.5
+    y: 0
+    width: 408.5
+    height: 246
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
+  m_ActualView: {fileID: 18}
+  m_Panes:
+  - {fileID: 18}
+  m_Selected: 0
+  m_LastSelected: 0
+--- !u!114 &18
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MinSize: {x: 230, y: 250}
+  m_MaxSize: {x: 10000, y: 10000}
+  m_TitleContent:
+    m_Text: Project
+    m_Image: {fileID: -5179483145760003458, guid: 0000000000000000d000000000000000,
+      type: 0}
+    m_Tooltip: 
+  m_Pos:
+    serializedVersion: 2
+    x: 451.5
+    y: 486
+    width: 406.5
+    height: 225
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_OverlaysVisible: 1
+  m_SearchFilter:
+    m_NameFilter: 
+    m_ClassNames: []
+    m_AssetLabels: []
+    m_AssetBundleNames: []
+    m_ReferencingInstanceIDs: 
+    m_SceneHandles: 
+    m_ShowAllHits: 0
+    m_SkipHidden: 0
+    m_SearchArea: 1
+    m_Folders:
+    - Assets/Production/Prefabs/UI
+    m_Globs: []
+    m_OriginalText: 
+    m_FilterByTypeIntersection: 0
+  m_ViewMode: 1
+  m_StartGridSize: 16
+  m_LastFolders:
+  - Assets/Production/Prefabs/UI
+  m_LastFoldersGridSize: -1
+  m_LastProjectPath: C:\Users\patse\Desktop\Unity Projects\vithegame
+  m_LockTracker:
+    m_IsLocked: 1
+  m_FolderTreeState:
+    scrollPos: {x: 0, y: 807}
+    m_SelectedIDs: 889a1400
+    m_LastClickedID: 1350280
+    m_ExpandedIDs: 00000000b2961400e8991400709a140000ca9a3bffffff7f
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_AssetTreeState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 00000000b2961400
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_ListAreaState:
+    m_SelectedInstanceIDs: d0a11400
+    m_LastClickedInstanceID: 1352144
+    m_HadKeyboardFocusLastEvent: 0
+    m_ExpandedInstanceIDs: 
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_ClientGUIView: {fileID: 17}
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+    m_NewAssetIndexInList: -1
+    m_ScrollPosition: {x: 0, y: 112}
+    m_GridSize: 16
+  m_SkipHiddenPackages: 0
+  m_DirectoriesAreaWidth: 148
 --- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -2659,91 +1435,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
-  m_Script: {fileID: 12015, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: ConsoleWindow
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Game
-    m_Image: {fileID: -6423792434712278376, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
+  m_Children: []
+  m_Position:
     serializedVersion: 2
-    x: 406
-    y: 73
-    width: 935
-    height: 598
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_SerializedViewNames: []
-  m_SerializedViewValues: []
-  m_PlayModeViewName: GameView
-  m_ShowGizmos: 0
-  m_TargetDisplay: 0
-  m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 1920, y: 1080}
-  m_TextureFilterMode: 0
-  m_TextureHideFlags: 61
-  m_RenderIMGUI: 1
-  m_EnterPlayModeBehavior: 0
-  m_UseMipMap: 0
-  m_VSyncEnabled: 0
-  m_Gizmos: 0
-  m_Stats: 0
-  m_SelectedSizes: 0300000000000000000000000e000000000000000000000000000000000000000000000000000000
-  m_ZoomArea:
-    m_HRangeLocked: 0
-    m_VRangeLocked: 0
-    hZoomLockedByDefault: 0
-    vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -960
-    m_HBaseRangeMax: 960
-    m_VBaseRangeMin: -540
-    m_VBaseRangeMax: 540
-    m_HAllowExceedBaseRangeMin: 1
-    m_HAllowExceedBaseRangeMax: 1
-    m_VAllowExceedBaseRangeMin: 1
-    m_VAllowExceedBaseRangeMax: 1
-    m_ScaleWithWindow: 0
-    m_HSlider: 0
-    m_VSlider: 0
-    m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 0
-    m_EnableSliderZoomHorizontal: 0
-    m_EnableSliderZoomVertical: 0
-    m_UniformScale: 1
-    m_UpDirection: 1
-    m_DrawArea:
-      serializedVersion: 2
-      x: 0
-      y: 21
-      width: 935
-      height: 577
-    m_Scale: {x: 0.48697916, y: 0.4869792}
-    m_Translation: {x: 467.5, y: 288.5}
-    m_MarginLeft: 0
-    m_MarginRight: 0
-    m_MarginTop: 0
-    m_MarginBottom: 0
-    m_LastShownAreaInsideMargins:
-      serializedVersion: 2
-      x: -960
-      y: -592.4278
-      width: 1920
-      height: 1184.8556
-    m_MinimalGUI: 1
-  m_defaultScale: 0.48697916
-  m_LastWindowPixelSize: {x: 935, y: 598}
-  m_ClearInEditMode: 1
-  m_NoCameraWarning: 1
-  m_LowResolutionForAspectRatios: 01000001000000000000
-  m_XRRenderMode: 0
-  m_RenderTexture: {fileID: 0}
+    x: 860
+    y: 0
+    width: 420
+    height: 660
+  m_MinSize: {x: 101, y: 121}
+  m_MaxSize: {x: 4001, y: 4021}
+  m_ActualView: {fileID: 2}
+  m_Panes:
+  - {fileID: 20}
+  - {fileID: 21}
+  - {fileID: 2}
+  - {fileID: 22}
+  - {fileID: 23}
+  - {fileID: 24}
+  m_Selected: 2
+  m_LastSelected: 0
 --- !u!114 &20
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -2752,24 +1465,41 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ProfilerWindow
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
   m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
+  m_TitleContent:
+    m_Text: Inspector
+    m_Image: {fileID: -440750813802333266, guid: 0000000000000000d000000000000000,
+      type: 0}
+    m_Tooltip: 
+  m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 619
-    width: 937
-    height: 328
-  m_MinSize: {x: 882, y: 237}
-  m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 21}
-  m_Panes:
-  - {fileID: 21}
-  m_Selected: 0
-  m_LastSelected: 0
+    x: 860
+    y: 72
+    width: 419
+    height: 639
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_OverlaysVisible: 1
+  m_ObjectsLockedBeforeSerialization: []
+  m_InstanceIDsLockedBeforeSerialization: 
+  m_PreviewResizer:
+    m_CachedPref: -368.5
+    m_ControlHash: -371814159
+    m_PrefName: Preview_InspectorPreview
+  m_LastInspectedObjectInstanceID: -1
+  m_LastVerticalScrollValue: 0
+  m_GlobalObjectId: 
+  m_InspectorMode: 0
+  m_LockTracker:
+    m_IsLocked: 0
+  m_PreviewWindow: {fileID: 0}
 --- !u!114 &21
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -2779,1104 +1509,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 12070, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 880, y: 216}
+  m_MinSize: {x: 275, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Profiler
-    m_Image: {fileID: -1089619856830078684, guid: 0000000000000000d000000000000000,
+    m_Text: Inspector
+    m_Image: {fileID: -440750813802333266, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1
-    y: 638
-    width: 935
-    height: 307
+    x: 955
+    y: 72
+    width: 324
+    height: 639
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
-  m_Recording: 0
-  m_ActiveNativePlatformSupportModuleName: 
-  m_AllModules:
-  - rid: 8681580646446661632
-  - rid: 8681580646446661633
-  - rid: 8681580646446661634
-  - rid: 8681580646446661635
-  - rid: 8681580646446661636
-  - rid: 8681580646446661637
-  - rid: 8681580646446661638
-  - rid: 8681580646446661639
-  - rid: 8681580646446661640
-  - rid: 8681580646446661641
-  - rid: 8681580646446661642
-  - rid: 8681580646446661643
-  - rid: 8681580646446661644
-  - rid: 8681580646446661645
-  - rid: 8681580646446661646
-  - rid: 8681580646446661647
-  - rid: 8681580646446661648
-  - rid: 8681580646446661649
-  m_CallstackRecordMode: 1
-  m_ClearOnPlay: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 8681580646446661632
-      type: {class: CPUProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.CPUProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_ViewType: 0
-        updateViewLive: 0
-        m_CurrentFrameIndex: 17157
-        m_HierarchyOverruledThreadFromSelection: 0
-        m_ProfilerViewFilteringOptions: 1
-        m_FrameDataHierarchyView:
-          m_Serialized: 1
-          m_TreeViewState:
-            scrollPos: {x: 0, y: 0}
-            m_SelectedIDs: 04000000
-            m_LastClickedID: 4
-            m_ExpandedIDs: 0100000004000000
-            m_RenameOverlay:
-              m_UserAcceptedRename: 0
-              m_Name: 
-              m_OriginalName: 
-              m_EditFieldRect:
-                serializedVersion: 2
-                x: 0
-                y: 0
-                width: 0
-                height: 0
-              m_UserData: 0
-              m_IsWaitingForDelay: 0
-              m_IsRenaming: 0
-              m_OriginalEventType: 11
-              m_IsRenamingFilename: 0
-              m_ClientGUIView: {fileID: 0}
-            m_SearchString: 
-          m_MultiColumnHeaderState:
-            m_Columns:
-            - width: 417
-              sortedAscending: 1
-              headerContent:
-                m_Text: Overview
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 200
-              maxWidth: 1000000
-              autoResize: 1
-              allowToggleVisibility: 0
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Total
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Self
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Calls
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: GC Alloc
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Time ms
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Self ms
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 25
-              sortedAscending: 0
-              headerContent:
-                m_Text: 
-                m_Image: {fileID: -5161429177145976760, guid: 0000000000000000d000000000000000,
-                  type: 0}
-                m_Tooltip: Warnings
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 25
-              maxWidth: 25
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            m_VisibleColumns: 0000000001000000020000000300000004000000050000000600000007000000
-            m_SortedColumns: 0100000005000000
-          m_ThreadIndexInThreadNames: 0
-          m_DetailedViewType: 0
-          m_DetailedViewSpliterState:
-            ID: 0
-            splitterInitialOffset: 0
-            currentActiveSplitter: -1
-            realSizes:
-            - 0
-            - 0
-            relativeSizes:
-            - 0.7
-            - 0.3
-            minSizes:
-            - 450
-            - 50
-            maxSizes:
-            - 0
-            - 0
-            lastTotalSize: 0
-            splitSize: 6
-            xOffset: 0
-            m_Version: 1
-            oldRealSizes: 
-            oldMinSizes: 
-            oldMaxSizes: 
-            oldSplitSize: 0
-          m_DetailedObjectsView:
-            m_SelectedID: -1
-            m_TreeViewState:
-              scrollPos: {x: 0, y: 0}
-              m_SelectedIDs: 
-              m_LastClickedID: 0
-              m_ExpandedIDs: 
-              m_RenameOverlay:
-                m_UserAcceptedRename: 0
-                m_Name: 
-                m_OriginalName: 
-                m_EditFieldRect:
-                  serializedVersion: 2
-                  x: 0
-                  y: 0
-                  width: 0
-                  height: 0
-                m_UserData: 0
-                m_IsWaitingForDelay: 0
-                m_IsRenaming: 0
-                m_OriginalEventType: 11
-                m_IsRenamingFilename: 0
-                m_ClientGUIView: {fileID: 0}
-              m_SearchString: 
-            m_MultiColumnHeaderState:
-              m_Columns: []
-              m_VisibleColumns: 
-              m_SortedColumns: 
-            m_VertSplit:
-              ID: 0
-              splitterInitialOffset: 0
-              currentActiveSplitter: 0
-              realSizes: []
-              relativeSizes: []
-              minSizes: []
-              maxSizes: []
-              lastTotalSize: 0
-              splitSize: 0
-              xOffset: 0
-              m_Version: 1
-              oldRealSizes: 
-              oldMinSizes: 
-              oldMaxSizes: 
-              oldSplitSize: 0
-          m_DetailedCallsView:
-            m_SelectedID: -1
-            m_VertSplit:
-              ID: 0
-              splitterInitialOffset: 0
-              currentActiveSplitter: 0
-              realSizes: []
-              relativeSizes: []
-              minSizes: []
-              maxSizes: []
-              lastTotalSize: 0
-              splitSize: 0
-              xOffset: 0
-              m_Version: 1
-              oldRealSizes: 
-              oldMinSizes: 
-              oldMaxSizes: 
-              oldSplitSize: 0
-            m_CalleesTreeView:
-              m_ViewState:
-                scrollPos: {x: 0, y: 0}
-                m_SelectedIDs: 
-                m_LastClickedID: 0
-                m_ExpandedIDs: 
-                m_RenameOverlay:
-                  m_UserAcceptedRename: 0
-                  m_Name: 
-                  m_OriginalName: 
-                  m_EditFieldRect:
-                    serializedVersion: 2
-                    x: 0
-                    y: 0
-                    width: 0
-                    height: 0
-                  m_UserData: 0
-                  m_IsWaitingForDelay: 0
-                  m_IsRenaming: 0
-                  m_OriginalEventType: 11
-                  m_IsRenamingFilename: 0
-                  m_ClientGUIView: {fileID: 0}
-                m_SearchString: 
-              m_ViewHeaderState:
-                m_Columns:
-                - width: 150
-                  sortedAscending: 1
-                  headerContent:
-                    m_Text: Called From
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 'Parents the selected function is called from
-
-
-                      (Press
-                      ''F'' for frame selection)'
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 150
-                  maxWidth: 1000000
-                  autoResize: 1
-                  allowToggleVisibility: 0
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Calls
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total number of calls in a selected frame
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: GC Alloc
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time ms
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total time the selected function spends within a parent
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time %
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Shows how often the selected function was called from
-                      the parent call
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                m_VisibleColumns: 0000000001000000020000000300000004000000
-                m_SortedColumns: 03000000
-            m_CallersTreeView:
-              m_ViewState:
-                scrollPos: {x: 0, y: 0}
-                m_SelectedIDs: 
-                m_LastClickedID: 0
-                m_ExpandedIDs: 
-                m_RenameOverlay:
-                  m_UserAcceptedRename: 0
-                  m_Name: 
-                  m_OriginalName: 
-                  m_EditFieldRect:
-                    serializedVersion: 2
-                    x: 0
-                    y: 0
-                    width: 0
-                    height: 0
-                  m_UserData: 0
-                  m_IsWaitingForDelay: 0
-                  m_IsRenaming: 0
-                  m_OriginalEventType: 11
-                  m_IsRenamingFilename: 0
-                  m_ClientGUIView: {fileID: 0}
-                m_SearchString: 
-              m_ViewHeaderState:
-                m_Columns:
-                - width: 150
-                  sortedAscending: 1
-                  headerContent:
-                    m_Text: Called From
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 'Parents the selected function is called from
-
-
-                      (Press
-                      ''F'' for frame selection)'
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 150
-                  maxWidth: 1000000
-                  autoResize: 1
-                  allowToggleVisibility: 0
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Calls
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total number of calls in a selected frame
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: GC Alloc
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time ms
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total time the selected function spends within a parent
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time %
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Shows how often the selected function was called from
-                      the parent call
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                m_VisibleColumns: 0000000001000000020000000300000004000000
-                m_SortedColumns: 03000000
-          m_FullThreadName: Main Thread
-          m_ThreadName: Main Thread
-          <threadId>k__BackingField: 20724
-          <threadIndex>k__BackingField: 0
-          m_GroupName: 
-    - rid: 8681580646446661633
-      type: {class: GPUProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.GPUProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_ViewType: 0
-        updateViewLive: 0
-        m_CurrentFrameIndex: -1
-        m_HierarchyOverruledThreadFromSelection: 0
-        m_ProfilerViewFilteringOptions: 1
-        m_FrameDataHierarchyView:
-          m_Serialized: 1
-          m_TreeViewState:
-            scrollPos: {x: 0, y: 0}
-            m_SelectedIDs: 
-            m_LastClickedID: 0
-            m_ExpandedIDs: 
-            m_RenameOverlay:
-              m_UserAcceptedRename: 0
-              m_Name: 
-              m_OriginalName: 
-              m_EditFieldRect:
-                serializedVersion: 2
-                x: 0
-                y: 0
-                width: 0
-                height: 0
-              m_UserData: 0
-              m_IsWaitingForDelay: 0
-              m_IsRenaming: 0
-              m_OriginalEventType: 11
-              m_IsRenamingFilename: 0
-              m_ClientGUIView: {fileID: 0}
-            m_SearchString: 
-          m_MultiColumnHeaderState:
-            m_Columns:
-            - width: 200
-              sortedAscending: 1
-              headerContent:
-                m_Text: Overview
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 200
-              maxWidth: 1000000
-              autoResize: 1
-              allowToggleVisibility: 0
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: Total
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: DrawCalls
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            - width: 80
-              sortedAscending: 0
-              headerContent:
-                m_Text: GPU ms
-                m_Image: {fileID: 0}
-                m_Tooltip: 
-              contextMenuText: 
-              headerTextAlignment: 0
-              sortingArrowAlignment: 2
-              minWidth: 50
-              maxWidth: 1000000
-              autoResize: 0
-              allowToggleVisibility: 1
-              canSort: 1
-              userData: 0
-            m_VisibleColumns: 00000000010000000200000003000000
-            m_SortedColumns: 03000000
-          m_ThreadIndexInThreadNames: 0
-          m_DetailedViewType: 0
-          m_DetailedViewSpliterState:
-            ID: 0
-            splitterInitialOffset: 0
-            currentActiveSplitter: -1
-            realSizes:
-            - 0
-            - 0
-            relativeSizes:
-            - 0.7
-            - 0.3
-            minSizes:
-            - 450
-            - 50
-            maxSizes:
-            - 0
-            - 0
-            lastTotalSize: 0
-            splitSize: 6
-            xOffset: 0
-            m_Version: 1
-            oldRealSizes: 
-            oldMinSizes: 
-            oldMaxSizes: 
-            oldSplitSize: 0
-          m_DetailedObjectsView:
-            m_SelectedID: 0
-            m_TreeViewState:
-              scrollPos: {x: 0, y: 0}
-              m_SelectedIDs: 
-              m_LastClickedID: 0
-              m_ExpandedIDs: 
-              m_RenameOverlay:
-                m_UserAcceptedRename: 0
-                m_Name: 
-                m_OriginalName: 
-                m_EditFieldRect:
-                  serializedVersion: 2
-                  x: 0
-                  y: 0
-                  width: 0
-                  height: 0
-                m_UserData: 0
-                m_IsWaitingForDelay: 0
-                m_IsRenaming: 0
-                m_OriginalEventType: 11
-                m_IsRenamingFilename: 0
-                m_ClientGUIView: {fileID: 0}
-              m_SearchString: 
-            m_MultiColumnHeaderState:
-              m_Columns: []
-              m_VisibleColumns: 
-              m_SortedColumns: 
-            m_VertSplit:
-              ID: 0
-              splitterInitialOffset: 0
-              currentActiveSplitter: 0
-              realSizes: []
-              relativeSizes: []
-              minSizes: []
-              maxSizes: []
-              lastTotalSize: 0
-              splitSize: 0
-              xOffset: 0
-              m_Version: 1
-              oldRealSizes: 
-              oldMinSizes: 
-              oldMaxSizes: 
-              oldSplitSize: 0
-          m_DetailedCallsView:
-            m_SelectedID: -1
-            m_VertSplit:
-              ID: 0
-              splitterInitialOffset: 0
-              currentActiveSplitter: 0
-              realSizes: []
-              relativeSizes: []
-              minSizes: []
-              maxSizes: []
-              lastTotalSize: 0
-              splitSize: 0
-              xOffset: 0
-              m_Version: 1
-              oldRealSizes: 
-              oldMinSizes: 
-              oldMaxSizes: 
-              oldSplitSize: 0
-            m_CalleesTreeView:
-              m_ViewState:
-                scrollPos: {x: 0, y: 0}
-                m_SelectedIDs: 
-                m_LastClickedID: 0
-                m_ExpandedIDs: 
-                m_RenameOverlay:
-                  m_UserAcceptedRename: 0
-                  m_Name: 
-                  m_OriginalName: 
-                  m_EditFieldRect:
-                    serializedVersion: 2
-                    x: 0
-                    y: 0
-                    width: 0
-                    height: 0
-                  m_UserData: 0
-                  m_IsWaitingForDelay: 0
-                  m_IsRenaming: 0
-                  m_OriginalEventType: 11
-                  m_IsRenamingFilename: 0
-                  m_ClientGUIView: {fileID: 0}
-                m_SearchString: 
-              m_ViewHeaderState:
-                m_Columns:
-                - width: 150
-                  sortedAscending: 1
-                  headerContent:
-                    m_Text: Called From
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 'Parents the selected function is called from
-
-
-                      (Press
-                      ''F'' for frame selection)'
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 150
-                  maxWidth: 1000000
-                  autoResize: 1
-                  allowToggleVisibility: 0
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Calls
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total number of calls in a selected frame
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: GC Alloc
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time ms
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total time the selected function spends within a parent
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time %
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Shows how often the selected function was called from
-                      the parent call
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                m_VisibleColumns: 0000000001000000020000000300000004000000
-                m_SortedColumns: 03000000
-            m_CallersTreeView:
-              m_ViewState:
-                scrollPos: {x: 0, y: 0}
-                m_SelectedIDs: 
-                m_LastClickedID: 0
-                m_ExpandedIDs: 
-                m_RenameOverlay:
-                  m_UserAcceptedRename: 0
-                  m_Name: 
-                  m_OriginalName: 
-                  m_EditFieldRect:
-                    serializedVersion: 2
-                    x: 0
-                    y: 0
-                    width: 0
-                    height: 0
-                  m_UserData: 0
-                  m_IsWaitingForDelay: 0
-                  m_IsRenaming: 0
-                  m_OriginalEventType: 11
-                  m_IsRenamingFilename: 0
-                  m_ClientGUIView: {fileID: 0}
-                m_SearchString: 
-              m_ViewHeaderState:
-                m_Columns:
-                - width: 150
-                  sortedAscending: 1
-                  headerContent:
-                    m_Text: Called From
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 'Parents the selected function is called from
-
-
-                      (Press
-                      ''F'' for frame selection)'
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 150
-                  maxWidth: 1000000
-                  autoResize: 1
-                  allowToggleVisibility: 0
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Calls
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total number of calls in a selected frame
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: GC Alloc
-                    m_Image: {fileID: 0}
-                    m_Tooltip: 
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time ms
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Total time the selected function spends within a parent
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                - width: 60
-                  sortedAscending: 0
-                  headerContent:
-                    m_Text: Time %
-                    m_Image: {fileID: 0}
-                    m_Tooltip: Shows how often the selected function was called from
-                      the parent call
-                  contextMenuText: 
-                  headerTextAlignment: 0
-                  sortingArrowAlignment: 2
-                  minWidth: 60
-                  maxWidth: 1000000
-                  autoResize: 0
-                  allowToggleVisibility: 1
-                  canSort: 1
-                  userData: 0
-                m_VisibleColumns: 0000000001000000020000000300000004000000
-                m_SortedColumns: 03000000
-          m_FullThreadName: Main Thread
-          m_ThreadName: Main Thread
-          <threadId>k__BackingField: 12380
-          <threadIndex>k__BackingField: 0
-          m_GroupName: 
-    - rid: 8681580646446661634
-      type: {class: RenderingProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.RenderingProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661635
-      type: {class: MemoryProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.MemoryProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_ViewSplit:
-          ID: 0
-          splitterInitialOffset: 0
-          currentActiveSplitter: -1
-          realSizes:
-          - 0
-          - 0
-          relativeSizes:
-          - 0.7
-          - 0.3
-          minSizes:
-          - 450
-          - 50
-          maxSizes:
-          - 0
-          - 0
-          lastTotalSize: 0
-          splitSize: 6
-          xOffset: 0
-          m_Version: 1
-          oldRealSizes: 
-          oldMinSizes: 
-          oldMaxSizes: 
-          oldSplitSize: 0
-    - rid: 8681580646446661636
-      type: {class: AudioProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.AudioProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_ShowInactiveDSPChains: 0
-        m_HighlightAudibleDSPChains: 1
-        m_DSPGraphZoomFactor: 1
-    - rid: 8681580646446661637
-      type: {class: VideoProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.VideoProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661638
-      type: {class: PhysicsProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.PhysicsProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661639
-      type: {class: Physics2DProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.Physics2DProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661640
-      type: {class: NetworkingMessagesProfilerModule, ns: UnityEditorInternal.Profiling,
-        asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.NetworkingMessagesProfilerModule,
-          UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661641
-      type: {class: NetworkingOperationsProfilerModule, ns: UnityEditorInternal.Profiling,
-        asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.NetworkingOperationsProfilerModule,
-          UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_NetworkSplit:
-          ID: 0
-          splitterInitialOffset: 0
-          currentActiveSplitter: -1
-          realSizes:
-          - 0
-          - 0
-          relativeSizes:
-          - 0.2
-          - 0.8
-          minSizes:
-          - 100
-          - 100
-          maxSizes:
-          - 0
-          - 0
-          lastTotalSize: 0
-          splitSize: 6
-          xOffset: 0
-          m_Version: 1
-          oldRealSizes: 
-          oldMinSizes: 
-          oldMaxSizes: 
-          oldSplitSize: 0
-        msgNames:
-        - UserMessage
-        - ObjectDestroy
-        - ClientRpc
-        - ObjectSpawn
-        - Owner
-        - Command
-        - LocalPlayerTransform
-        - SyncEvent
-        - SyncVars
-        - SyncList
-        - ObjectSpawnScene
-        - NetworkInfo
-        - SpawnFinished
-        - ObjectHide
-        - CRC
-        - ClientAuthority
-    - rid: 8681580646446661642
-      type: {class: UIProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.UIProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661643
-      type: {class: UIDetailsProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.UIDetailsProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661644
-      type: {class: GlobalIlluminationProfilerModule, ns: UnityEditorInternal.Profiling,
-        asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.GlobalIlluminationProfilerModule,
-          UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661645
-      type: {class: VirtualTexturingProfilerModule, ns: UnityEditorInternal.Profiling,
-        asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.VirtualTexturingProfilerModule,
-          UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-        m_VTProfilerView:
-          rid: 8681580646446661650
-    - rid: 8681580646446661646
-      type: {class: FileIOProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.FileIOProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661647
-      type: {class: AssetLoadingProfilerModule, ns: UnityEditorInternal.Profiling,
-        asm: UnityEditor.CoreModule}
-      data:
-        m_Identifier: UnityEditorInternal.Profiling.AssetLoadingProfilerModule, UnityEditor.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        m_PaneScroll: {x: 0, y: 0}
-    - rid: 8681580646446661648
-      type: {class: NetcodeMessagesProfilerModule, ns: Unity.Multiplayer.Tools.NetworkProfiler.Editor,
-        asm: Unity.Multiplayer.Tools.NetworkProfiler.Editor}
-      data:
-        m_Identifier: Unity.Multiplayer.Tools.NetworkProfiler.Editor.NetcodeMessagesProfilerModule,
-          Unity.Multiplayer.Tools.NetworkProfiler.Editor, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-    - rid: 8681580646446661649
-      type: {class: NetcodeObjectsProfilerModule, ns: Unity.Multiplayer.Tools.NetworkProfiler.Editor,
-        asm: Unity.Multiplayer.Tools.NetworkProfiler.Editor}
-      data:
-        m_Identifier: Unity.Multiplayer.Tools.NetworkProfiler.Editor.NetcodeObjectsProfilerModule,
-          Unity.Multiplayer.Tools.NetworkProfiler.Editor, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-    - rid: 8681580646446661650
-      type: {class: VirtualTexturingProfilerView, ns: UnityEditor, asm: UnityEditor.CoreModule}
-      data:
-        m_SortAscending: 0
-        m_SortedColumn: -1
+  m_ObjectsLockedBeforeSerialization: []
+  m_InstanceIDsLockedBeforeSerialization: 
+  m_PreviewResizer:
+    m_CachedPref: -378
+    m_ControlHash: 1412526313
+    m_PrefName: Preview_InspectorPreview
+  m_LastInspectedObjectInstanceID: 1352144
+  m_LastVerticalScrollValue: 0
+  m_GlobalObjectId: 
+  m_InspectorMode: 0
+  m_LockTracker:
+    m_IsLocked: 0
+  m_PreviewWindow: {fileID: 0}
 --- !u!114 &22
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -3886,176 +1552,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: NavMeshEditorWindow
+  m_Script: {fileID: 12141, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
   m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
+  m_MinSize: {x: 300, y: 360}
+  m_MaxSize: {x: 4000, y: 4000}
+  m_TitleContent:
+    m_Text: Navigation
+    m_Image: {fileID: 1087843850482249999, guid: 0000000000000000d000000000000000,
+      type: 0}
+    m_Tooltip: 
+  m_Pos:
     serializedVersion: 2
-    x: 1343
-    y: 0
-    width: 577
-    height: 947
-  m_MinSize: {x: 301, y: 381}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 2}
-  m_Panes:
-  - {fileID: 23}
-  - {fileID: 2}
-  - {fileID: 24}
-  - {fileID: 25}
-  - {fileID: 26}
-  - {fileID: 27}
-  - {fileID: 28}
-  m_Selected: 1
-  m_LastSelected: 4
+    x: 940.5
+    y: 72
+    width: 338.5
+    height: 639
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_OverlaysVisible: 1
 --- !u!114 &23
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 275, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Inspector
-    m_Image: {fileID: -2667387946076563598, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 1343
-    y: 73
-    width: 576
-    height: 926
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_ObjectsLockedBeforeSerialization: []
-  m_InstanceIDsLockedBeforeSerialization: 
-  m_PreviewResizer:
-    m_CachedPref: -487
-    m_ControlHash: 1412526313
-    m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: -1
-  m_LastVerticalScrollValue: 0
-  m_GlobalObjectId: 
-  m_InspectorMode: 0
-  m_LockTracker:
-    m_IsLocked: 0
-  m_PreviewWindow: {fileID: 0}
---- !u!114 &24
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 275, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Inspector
-    m_Image: {fileID: -2667387946076563598, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 1343
-    y: 73
-    width: 576
-    height: 926
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
-  m_ObjectsLockedBeforeSerialization: []
-  m_InstanceIDsLockedBeforeSerialization: 
-  m_PreviewResizer:
-    m_CachedPref: -473
-    m_ControlHash: 1412526313
-    m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: -1
-  m_LastVerticalScrollValue: 0
-  m_GlobalObjectId: 
-  m_InspectorMode: 0
-  m_LockTracker:
-    m_IsLocked: 0
-  m_PreviewWindow: {fileID: 0}
---- !u!114 &25
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Console
-    m_Image: {fileID: -4327648978806127646, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 1343
-    y: 73
-    width: 576
-    height: 926
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
---- !u!114 &26
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12090, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 300, y: 250}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Occlusion
-    m_Image: {fileID: -3571815596324412722, guid: 0000000000000000d000000000000000,
-      type: 0}
-    m_Tooltip: 
-  m_Pos:
-    serializedVersion: 2
-    x: 1372
-    y: 73
-    width: 547
-    height: 926
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_OverlaysVisible: 1
---- !u!114 &27
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4071,21 +1589,21 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Lighting
-    m_Image: {fileID: -1347227620855488341, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: -1477008817101679558, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1394
-    y: 73
-    width: 525
-    height: 926
+    x: 898
+    y: 72
+    width: 381
+    height: 639
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
---- !u!114 &28
+--- !u!114 &24
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4094,46 +1612,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e51f1aa10d814ff4a85c671e5120de6f, type: 3}
+  m_Script: {fileID: 12090, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
+  m_MinSize: {x: 300, y: 250}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Addressables Analyze
-    m_Image: {fileID: 0}
+    m_Text: Occlusion
+    m_Image: {fileID: -6304520642066340446, guid: 0000000000000000d000000000000000,
+      type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1343
-    y: 73
-    width: 576
-    height: 926
+    x: 888.5
+    y: 72
+    width: 390.5
+    height: 639
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
-  m_AnalyzeEditor:
-    m_TreeState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 02da2066
-      m_LastClickedID: 1713428994
-      m_ExpandedIDs: 95508ac72cf05eef669194223fe9002a242c1b316e2dc06402da2066
-      m_RenameOverlay:
-        m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
-        m_EditFieldRect:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        m_UserData: 0
-        m_IsWaitingForDelay: 0
-        m_IsRenaming: 0
-        m_OriginalEventType: 11
-        m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 0}
-      m_SearchString: 
