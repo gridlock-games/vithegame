@@ -365,7 +365,6 @@ namespace Vi.Core
                     yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
-                Debug.Log(actionClip.followUpActionClipsToPlay[i].actionClip);
                 PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip, true);
             }
         }
