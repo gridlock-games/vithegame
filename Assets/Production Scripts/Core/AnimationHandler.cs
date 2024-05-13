@@ -101,6 +101,13 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
+        public bool IsLunging()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Lunge) { return false; }
+            return !IsAtRest();
+        }
+
         public bool IsPlayingBlockingHitReaction()
         {
             if (!lastClipPlayed) { return false; }
@@ -148,6 +155,49 @@ namespace Vi.Core
             if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
+
+            if (actionClip.IsAttack())
+            {
+                ActionClip lungeClip = weaponHandler.GetWeapon().GetLungeClip();
+                if (AreActionClipRequirementsMet(lungeClip))
+                {
+                    // Lunge mechanic
+                    ExtDebug.DrawBoxCastBox(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, Color.red);
+                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                            {
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                angleList.Add((networkCollider,
+                                    Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
+                                    hit));
+                            }
+                        }
+                    }
+
+                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                    {
+                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                        float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
+                        if (angle < ActionClip.maximumLungeAngle & dist >= lungeClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
+                        {
+                            PlayAction(lungeClip);
+                            waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (actionClip.GetClipType() != ActionClip.ClipType.Lunge)
+            {
+                if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
+            }
 
             AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
             AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
@@ -217,7 +267,10 @@ namespace Vi.Core
                         break;
                     case ActionClip.ClipType.HitReaction:
                         break;
+                    case ActionClip.ClipType.Lunge:
+                        break;
                     default:
+                        Debug.LogError("Unsure how to handle clip type " + actionClip.GetClipType());
                         break;
                 }
 
@@ -301,6 +354,15 @@ namespace Vi.Core
                 attributes.AddDefense(-actionClip.agentDefenseCost);
                 attributes.AddRage(-actionClip.agentRageCost);
             }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.Lunge)
+            {
+                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
+                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
+                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
+                attributes.AddStamina(-actionClip.agentStaminaCost);
+                attributes.AddDefense(-actionClip.agentDefenseCost);
+                attributes.AddRage(-actionClip.agentRageCost);
+            }
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
@@ -346,6 +408,23 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
+        }
+
+        private bool AreActionClipRequirementsMet(ActionClip actionClip)
+        {
+            if (actionClip.agentStaminaCost > attributes.GetStamina()) { return false; }
+            if (actionClip.agentDefenseCost > attributes.GetDefense()) { return false; }
+            if (actionClip.agentRageCost > attributes.GetRage()) { return false; }
+            return true;
+        }
+
+        private Coroutine waitForLungeThenPlayAttackCorountine;
+        private IEnumerator WaitForLungeThenPlayAttack(ActionClip attack)
+        {
+            if (!attack.IsAttack()) { Debug.LogError("Action Clip " + attack + " is not an attack clip!"); yield break; }
+            yield return new WaitUntil(() => IsLunging());
+            yield return new WaitUntil(() => !IsLunging());
+            PlayAction(attack);
         }
 
         private Coroutine playAdditionalClipsCoroutine;

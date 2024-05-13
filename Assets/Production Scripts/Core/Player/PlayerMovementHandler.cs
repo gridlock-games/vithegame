@@ -147,7 +147,7 @@ namespace Vi.Player
                 {
                     movement = Vector3.zero;
                 }
-                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking))
+                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | animationHandler.IsLunging())
                 {
                     movement = rootMotion;
                     ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.blue);
@@ -431,7 +431,7 @@ namespace Vi.Player
 
             if (bool.Parse(PersistentLocalObjects.Singleton.GetString("AutoAim")))
             {
-                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
+                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming | animationHandler.IsLunging())
                 {
                     if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
                     {
