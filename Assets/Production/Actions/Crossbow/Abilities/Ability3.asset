@@ -3270,10 +3270,11 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 30
+  agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 11000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -3299,9 +3300,9 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 3
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -3310,7 +3311,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: f41838d01b2171b4bbfd6237f6d4b9a9, type: 3}
-  abilityCooldownTime: 30
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -3319,7 +3320,7 @@ MonoBehaviour:
   - {fileID: -5220340233243105456, guid: a179a32d8977f7a468af39122f7f4f04, type: 3}
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
     type: 3}
-  previewActionVFXScale: {x: 0.7, y: 0.7, z: 0.7}
+  previewActionVFXScale: {x: 0.7, y: 0, z: 0.7}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
