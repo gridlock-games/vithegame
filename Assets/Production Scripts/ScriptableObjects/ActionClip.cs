@@ -104,6 +104,15 @@ namespace Vi.ScriptableObjects
 
         public bool IsAttack() { return attackClipTypes.Contains(clipType); }
 
+        public FollowUpActionClip[] followUpActionClipsToPlay = new FollowUpActionClip[0];
+
+        [System.Serializable]
+        public class FollowUpActionClip
+        {
+            public float normalizedTimeToPlayClip = 0.5f;
+            public ActionClip actionClip;
+        }
+
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 

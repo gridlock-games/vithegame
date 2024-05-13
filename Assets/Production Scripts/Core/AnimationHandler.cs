@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 using Vi.ScriptableObjects;
 
 namespace Vi.Core
@@ -11,16 +11,16 @@ namespace Vi.Core
         public bool WaitingForActionToPlay { get; private set; }
 
         // This method plays an action based on the provided ActionClip parameter
-        public void PlayAction(ActionClip actionClip)
+        public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
             if (IsServer)
             {
-                PlayActionOnServer(actionClip.name);
+                PlayActionOnServer(actionClip.name, isFollowUpClip);
             }
             else
             {
                 WaitingForActionToPlay = true;
-                PlayActionServerRpc(actionClip.name);
+                PlayActionServerRpc(actionClip.name, isFollowUpClip);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Vi.Core
         };
 
         // This method plays the action on the server
-        private void PlayActionOnServer(string actionClipName)
+        private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
             WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
@@ -230,7 +230,7 @@ namespace Vi.Core
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
                     }
                 }
-                
+
                 if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (currentStateInfo.IsName(actionClip.name)) { return; }
@@ -306,7 +306,7 @@ namespace Vi.Core
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
@@ -333,7 +333,13 @@ namespace Vi.Core
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
-                    playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
+
+                if (!isFollowUpClip)
+                {
+                    if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+                    playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
+                }
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -342,13 +348,34 @@ namespace Vi.Core
             lastClipPlayed = actionClip;
         }
 
+        private Coroutine playAdditionalClipsCoroutine;
+        private IEnumerator PlayAdditionalClips(ActionClip actionClip)
+        {
+            for (int i = 0; i < actionClip.followUpActionClipsToPlay.Length; i++)
+            {
+                if (i == 0)
+                {
+                    yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip));
+                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitForFixedUpdate();
+                }
+                else
+                {
+                    yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip.followUpActionClipsToPlay[i - 1].actionClip));
+                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitForFixedUpdate();
+                }
+                PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip, true);
+            }
+        }
+
         private bool heavyAttackReleased;
         [ServerRpc] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
         [ServerRpc] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
 
         public float HeavyAttackChargeTime { get; private set; }
-        private Coroutine playAdditionalStatesCoroutine;
-        private IEnumerator PlayAdditionalStates(ActionClip actionClip)
+        private Coroutine heavyAttackCoroutine;
+        private IEnumerator PlayHeavyAttack(ActionClip actionClip)
         {
             if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayAdditionalStates() should only be called for heavy attack action clips!"); yield break; }
 
@@ -490,9 +517,9 @@ namespace Vi.Core
 
         // Remote Procedure Call method for playing the action on the server
         [ServerRpc]
-        private void PlayActionServerRpc(string actionStateName)
+        private void PlayActionServerRpc(string actionStateName, bool isFollowUpClip)
         {
-            PlayActionOnServer(actionStateName);
+            PlayActionOnServer(actionStateName, isFollowUpClip);
             ResetActionClientRpc();
         }
 
@@ -511,7 +538,7 @@ namespace Vi.Core
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
-            if (playAdditionalStatesCoroutine != null) { StopCoroutine(playAdditionalStatesCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
@@ -536,7 +563,7 @@ namespace Vi.Core
                 else if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
                 else // If this is a heavy attack
-                    playAdditionalStatesCoroutine = StartCoroutine(PlayAdditionalStates(actionClip));
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
             }
 
             // Set the current action clip for the weapon handler
@@ -613,10 +640,10 @@ namespace Vi.Core
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
             }
-            
+
             yield return null;
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
-            
+
             // Apply materials and equipment
             CharacterReference.RaceAndGender raceAndGender = characterReference.GetPlayerModelOptions()[characterReference.GetPlayerModelOptionIndices(character.model.ToString()).Key].raceAndGender;
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(raceAndGender);
