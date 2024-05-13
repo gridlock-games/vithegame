@@ -72,14 +72,14 @@ namespace Vi.Core
 	public static class ExtDebug
 	{
 		//Draws just the box at where it is currently hitting.
-		public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float hitInfoDistance, Color color)
+		public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float hitInfoDistance, Color color, float duration)
 		{
 			origin = CastCenterOnCollision(origin, direction, hitInfoDistance);
-			DrawBox(origin, halfExtents, orientation, color);
+			DrawBox(origin, halfExtents, orientation, color, duration);
 		}
 
 		//Draws the full box from start of cast to its end distance. Can also pass in hitInfoDistance instead of full distance
-		public static void DrawBoxCastBox(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float distance, Color color)
+		public static void DrawBoxCastBox(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float distance, Color color, float duration)
 		{
 			direction.Normalize();
 			Box bottomBox = new Box(origin, halfExtents, orientation);
@@ -94,15 +94,16 @@ namespace Vi.Core
 			Debug.DrawLine(bottomBox.frontBottomLeft, topBox.frontBottomLeft, color);
 			Debug.DrawLine(bottomBox.frontBottomRight, topBox.frontBottomRight, color);
 
-			DrawBox(bottomBox, color);
-			DrawBox(topBox, color);
+			DrawBox(bottomBox, color, duration);
+			DrawBox(topBox, color, duration);
 		}
 
-		public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color)
+		public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color, float duration)
 		{
-			DrawBox(new Box(origin, halfExtents, orientation), color);
+			DrawBox(new Box(origin, halfExtents, orientation), color, duration);
 		}
-		public static void DrawBox(Box box, Color color)
+
+		public static void DrawBox(Box box, Color color, float duration)
 		{
 			Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color);
 			Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color);

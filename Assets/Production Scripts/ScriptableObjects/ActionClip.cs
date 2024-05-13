@@ -230,7 +230,8 @@ namespace Vi.ScriptableObjects
 
         // Lunge Settings
         public const float maximumLungeAngle = 60;
-        public float minLungeDistance = 2;
+        public bool canLunge;
+        public float minLungeDistance = 4;
         public float maxLungeDistance = 5;
 
         // Only for shooter characters

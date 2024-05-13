@@ -102,6 +102,7 @@ namespace Vi.Editor
         private SerializedProperty spBoxCastDistance;
         private SerializedProperty spMaximumTargetingRotationAngle;
 
+        private SerializedProperty spCanLunge;
         private SerializedProperty spMinLungeDistance;
         private SerializedProperty spMaxLungeDistance;
 
@@ -200,6 +201,7 @@ namespace Vi.Editor
             spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
             spMaximumTargetingRotationAngle = serializedObject.FindProperty("maximumTargetingRotationAngle");
 
+            spCanLunge = serializedObject.FindProperty("canLunge");
             spMinLungeDistance = serializedObject.FindProperty("minLungeDistance");
             spMaxLungeDistance = serializedObject.FindProperty("maxLungeDistance");
 
@@ -351,6 +353,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
+                    }
                 }
                 
                 EditorGUILayout.Space();
@@ -427,6 +436,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastHalfExtents);
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
                     }
                 }
 
@@ -510,6 +526,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -585,6 +608,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastHalfExtents);
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
                     }
                 }
 
@@ -663,7 +693,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spAgentRageCost);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spMinLungeDistance);
                 EditorGUILayout.PropertyField(spMaxLungeDistance);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge)

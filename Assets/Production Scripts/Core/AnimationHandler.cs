@@ -156,13 +156,13 @@ namespace Vi.Core
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
-            if (actionClip.IsAttack())
+            if (actionClip.IsAttack() & actionClip.canLunge)
             {
                 ActionClip lungeClip = weaponHandler.GetWeapon().GetLungeClip();
                 if (AreActionClipRequirementsMet(lungeClip))
                 {
                     // Lunge mechanic
-                    ExtDebug.DrawBoxCastBox(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, Color.red);
+                    ExtDebug.DrawBoxCastBox(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, Color.red, 1);
                     RaycastHit[] allHits = Physics.BoxCastAll(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                     foreach (RaycastHit hit in allHits)
@@ -184,7 +184,7 @@ namespace Vi.Core
                     {
                         Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                         float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
-                        if (angle < ActionClip.maximumLungeAngle & dist >= lungeClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
+                        if (angle < ActionClip.maximumLungeAngle & dist >= actionClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
                         {
                             PlayAction(lungeClip);
                             waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
