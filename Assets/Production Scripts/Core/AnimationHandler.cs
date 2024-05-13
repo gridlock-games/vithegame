@@ -11,16 +11,16 @@ namespace Vi.Core
         public bool WaitingForActionToPlay { get; private set; }
 
         // This method plays an action based on the provided ActionClip parameter
-        public void PlayAction(ActionClip actionClip)
+        public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
             if (IsServer)
             {
-                PlayActionOnServer(actionClip.name);
+                PlayActionOnServer(actionClip.name, isFollowUpClip);
             }
             else
             {
                 WaitingForActionToPlay = true;
-                PlayActionServerRpc(actionClip.name);
+                PlayActionServerRpc(actionClip.name, isFollowUpClip);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Vi.Core
         };
 
         // This method plays the action on the server
-        private void PlayActionOnServer(string actionClipName)
+        private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
             WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
@@ -230,7 +230,7 @@ namespace Vi.Core
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
                     }
                 }
-                
+
                 if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (currentStateInfo.IsName(actionClip.name)) { return; }
@@ -335,8 +335,11 @@ namespace Vi.Core
                 else // If this is a heavy attack
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
 
-                if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
-                playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
+                if (!isFollowUpClip)
+                {
+                    if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+                    playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
+                }
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -362,7 +365,8 @@ namespace Vi.Core
                     yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
-                PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip);
+                Debug.Log(actionClip.followUpActionClipsToPlay[i].actionClip);
+                PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip, true);
             }
         }
 
@@ -514,9 +518,9 @@ namespace Vi.Core
 
         // Remote Procedure Call method for playing the action on the server
         [ServerRpc]
-        private void PlayActionServerRpc(string actionStateName)
+        private void PlayActionServerRpc(string actionStateName, bool isFollowUpClip)
         {
-            PlayActionOnServer(actionStateName);
+            PlayActionOnServer(actionStateName, isFollowUpClip);
             ResetActionClientRpc();
         }
 
@@ -637,10 +641,10 @@ namespace Vi.Core
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
             }
-            
+
             yield return null;
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
-            
+
             // Apply materials and equipment
             CharacterReference.RaceAndGender raceAndGender = characterReference.GetPlayerModelOptions()[characterReference.GetPlayerModelOptionIndices(character.model.ToString()).Key].raceAndGender;
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(raceAndGender);
