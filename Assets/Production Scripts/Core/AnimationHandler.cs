@@ -163,7 +163,6 @@ namespace Vi.Core
             if (!currentStateInfo.IsName("Empty") | isInTransition)
             {
                 bool shouldEvaluatePreviousState = true;
-                Debug.Log(actionClip);
                 switch (actionClip.GetClipType())
                 {
                     case ActionClip.ClipType.Dodge:
