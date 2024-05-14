@@ -461,7 +461,20 @@ namespace Vi.Core
             {
                 IsBlocking = false;
             }
-            
+
+            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
+            {
+                float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
+                {
+                    if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                    if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                    {
+                        SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                    }
+                }
+            }
+
             if (currentActionClipWeapon != weaponInstance.name)
             {
                 IsInAnticipation = false;
@@ -477,15 +490,6 @@ namespace Vi.Core
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
-
-                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                    {
-                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
-                        {
-                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
-                        }
-                    }
                 }
                 else
                 {
