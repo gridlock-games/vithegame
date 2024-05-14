@@ -18,7 +18,8 @@ namespace Vi.ScriptableObjects
             Ability,
             FlashAttack,
             GrabAttack,
-            Lunge
+            Lunge,
+            Flinch
         }
 
         public enum HitReactionType

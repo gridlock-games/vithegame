@@ -234,6 +234,13 @@ namespace Vi.ScriptableObjects
             return hitReaction.reactionClip;
         }
 
+        [SerializeField] private ActionClip flinchClip;
+
+        public ActionClip GetFlinchClip()
+        {
+            return flinchClip;
+        }
+
         public enum InputAttackType
         {
             LightAttack,

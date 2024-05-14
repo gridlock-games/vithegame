@@ -242,6 +242,14 @@ namespace Vi.Editor
         private AnimationClip animationClip;
         public override void OnInspectorGUI()
         {
+            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Flinch)
+            {
+                EditorGUILayout.PropertyField(spClipType);
+                EditorGUILayout.PropertyField(spTransitionTime);
+                serializedObject.ApplyModifiedProperties();
+                return;
+            }
+
             EditorGUILayout.PropertyField(spFollowUpActionClipsToPlay);
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
@@ -717,7 +725,7 @@ namespace Vi.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spMaxLungeDistance);
             }
-            else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge)
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge & (ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Flinch)
             {
                 Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
             }

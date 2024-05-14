@@ -565,7 +565,12 @@ namespace Vi.Core
                 }
             }
 
-            if (attack.shouldFlinch) { movementHandler.Flinch(attack.GetFlinchAmount()); }
+            if (attack.shouldFlinch)
+            {
+                ActionClip flinchClip = weaponHandler.GetWeapon().GetFlinchClip();
+                animationHandler.PlayAction(flinchClip);
+                movementHandler.Flinch(attack.GetFlinchAmount());
+            }
 
             lastAttackingAttributes = attacker;
             return true;
