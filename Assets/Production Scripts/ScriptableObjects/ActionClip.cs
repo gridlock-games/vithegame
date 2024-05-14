@@ -17,7 +17,8 @@ namespace Vi.ScriptableObjects
             HitReaction,
             Ability,
             FlashAttack,
-            GrabAttack
+            GrabAttack,
+            Lunge
         }
 
         public enum HitReactionType
@@ -226,6 +227,12 @@ namespace Vi.ScriptableObjects
         public float maximumTargetingRotationAngle = 60;
 
         public const float maximumRootMotionLimitRotationAngle = 60;
+
+        // Lunge Settings
+        public const float maximumLungeAngle = 60;
+        public bool canLunge;
+        public float minLungeDistance = 2.5f;
+        public float maxLungeDistance = 5;
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

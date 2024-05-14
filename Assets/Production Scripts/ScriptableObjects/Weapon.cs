@@ -440,6 +440,11 @@ namespace Vi.ScriptableObjects
             return dodgeClip;
         }
 
+        [Header("Lunge Assignments")]
+        [SerializeField] private ActionClip lunge;
+
+        public ActionClip GetLungeClip() { return lunge; }
+
         public ActionClip GetActionClipByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();

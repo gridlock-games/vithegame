@@ -102,6 +102,10 @@ namespace Vi.Editor
         private SerializedProperty spBoxCastDistance;
         private SerializedProperty spMaximumTargetingRotationAngle;
 
+        private SerializedProperty spCanLunge;
+        private SerializedProperty spMinLungeDistance;
+        private SerializedProperty spMaxLungeDistance;
+
         private SerializedProperty spShouldAimBody;
         private SerializedProperty spShouldAimOffHand;
         private SerializedProperty spAimDuringAnticipation;
@@ -196,6 +200,10 @@ namespace Vi.Editor
             spBoxCastHalfExtents = serializedObject.FindProperty("boxCastHalfExtents");
             spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
             spMaximumTargetingRotationAngle = serializedObject.FindProperty("maximumTargetingRotationAngle");
+
+            spCanLunge = serializedObject.FindProperty("canLunge");
+            spMinLungeDistance = serializedObject.FindProperty("minLungeDistance");
+            spMaxLungeDistance = serializedObject.FindProperty("maxLungeDistance");
 
             spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
             spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
@@ -345,6 +353,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
+                    }
                 }
                 
                 EditorGUILayout.Space();
@@ -421,6 +436,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastHalfExtents);
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
+                    }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
                     }
                 }
 
@@ -504,6 +526,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -580,6 +609,13 @@ namespace Vi.Editor
                         EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(spCanLunge);
+                    if (spCanLunge.boolValue)
+                    {
+                        EditorGUILayout.PropertyField(spMinLungeDistance);
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -648,6 +684,16 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+            }
+            else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Lunge)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spAgentStaminaCost);
+                EditorGUILayout.PropertyField(spAgentDefenseCost);
+                EditorGUILayout.PropertyField(spAgentRageCost);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spMaxLungeDistance);
             }
             else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge)
             {
