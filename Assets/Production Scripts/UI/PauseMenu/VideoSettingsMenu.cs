@@ -187,13 +187,13 @@ namespace Vi.UI
 
             // Graphics settings
             if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
-            //pipeline.renderScale = renderScaleSlider.value;
-            //pipeline.upscalingFilter = (UpscalingFilterSelection)renderScalingModeDropdown.value;
-            //QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
-            //pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
-            //pipeline.supportsHDR = hdrToggle.isOn;
-            
-            //vsyncToggle.interactable = true;
+            pipeline.renderScale = renderScaleSlider.value;
+            pipeline.upscalingFilter = (UpscalingFilterSelection)renderScalingModeDropdown.value;
+            QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
+            pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
+            pipeline.supportsHDR = hdrToggle.isOn;
+
+            vsyncToggle.interactable = true;
 
             SetOriginalVariables();
         }
