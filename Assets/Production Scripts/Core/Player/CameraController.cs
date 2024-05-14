@@ -19,7 +19,7 @@ namespace Vi.Player
         [SerializeField] private float aimingTransitionSpeed = 8;
         [SerializeField] private Vector3 aimingPositionOffset = new Vector3(0, 0, 1);
         [Header("Camera collision settings")]
-        [SerializeField] private float collisionPositionOffset;
+        [SerializeField] private float collisionPositionOffset = -0.3f;
 
         public GameObject CameraPositionClone { get; private set; }
 

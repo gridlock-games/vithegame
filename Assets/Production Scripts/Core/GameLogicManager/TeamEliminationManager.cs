@@ -17,10 +17,9 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Team elimination starting! ";
-
             if (IsServer)
             {
+                roundResultMessage.Value = "Team elimination starting! ";
                 StartCoroutine(CreateDamageCircle());
             }
         }

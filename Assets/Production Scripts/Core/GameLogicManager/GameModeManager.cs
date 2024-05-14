@@ -289,8 +289,11 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
         public string GetNextGameActionTimerDisplayString() { return ((int)Mathf.Ceil(nextGameActionTimer.Value)).ToString(); }
 
+        private GameObject UIInstance;
         public override void OnNetworkSpawn()
         {
+            if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
+
             _singleton = this;
             if (IsServer)
             {
@@ -506,12 +509,6 @@ namespace Vi.Core.GameModeManagers
         public void UnsubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
             scoreList.OnListChanged -= onListChangedDelegate;
-        }
-
-        private GameObject UIInstance;
-        protected void Start()
-        {
-            if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
         }
 
         public bool IsWaitingForPlayers { get; private set; } = true;

@@ -15,15 +15,13 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
-        private GameObject netSceneManagerInstance;
-        private GameObject playerDataManagerInstance;
 
         private void Start()
         {
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            CreatePlayerDataManager();
+            CreatePlayerDataManager(false);
             CreateNetSceneManager();
             
             NetSceneManager.Singleton.LoadScene("Main Menu");
@@ -35,21 +33,20 @@ namespace Vi.Core
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
         }
 
-        private void CreatePlayerDataManager()
+        private void CreatePlayerDataManager(bool forceRefresh)
         {
-            if (!playerDataManagerInstance)
+            if (forceRefresh) { Destroy(PlayerDataManager.Singleton.gameObject); }
+            if (!PlayerDataManager.DoesExist() | forceRefresh)
             {
-                playerDataManagerInstance = Instantiate(playerDataManagerPrefab.gameObject);
-                DontDestroyOnLoad(playerDataManagerInstance);
+                DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
             }
         }
 
         private void CreateNetSceneManager()
         {
-            if (!netSceneManagerInstance)
+            if (!NetSceneManager.DoesExist())
             {
-                netSceneManagerInstance = Instantiate(networkSceneManagerPrefab.gameObject);
-                DontDestroyOnLoad(netSceneManagerInstance);
+                DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
             }
         }
 
@@ -126,7 +123,14 @@ namespace Vi.Core
                     StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
                 }
             }
+
+            if (!NetworkManager.Singleton.IsConnectedClient & lastConnectedClientState)
+            {
+                CreatePlayerDataManager(true);
+            }
+            lastConnectedClientState = NetworkManager.Singleton.IsConnectedClient;
         }
+        private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
         private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
@@ -201,13 +205,16 @@ namespace Vi.Core
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
             }
 
-            CreatePlayerDataManager();
+            CreatePlayerDataManager(false);
             CreateNetSceneManager();
         }
 
         private void OnClientStopped(bool wasHost)
         {
             Debug.Log("Stopped Client " + wasHost);
+
+            CreatePlayerDataManager(false);
+            CreateNetSceneManager();
         }
 
         private void OnTransportFailure()

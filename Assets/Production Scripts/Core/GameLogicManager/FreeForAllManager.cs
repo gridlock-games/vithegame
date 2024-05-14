@@ -16,7 +16,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Free for all starting! ";
+            if (IsServer) { roundResultMessage.Value = "Free for all starting! "; }
         }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)

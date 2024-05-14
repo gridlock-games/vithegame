@@ -477,6 +477,8 @@ namespace Vi.UI
 
             primaryWeaponIcon.gameObject.SetActive(false);
             secondaryWeaponIcon.gameObject.SetActive(false);
+
+            PlayerDataManager.Singleton.SetGameModeSettings("");
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
