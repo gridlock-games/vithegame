@@ -457,9 +457,9 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(int clientId)
         {
-            for (int i = 0; i < playerDataList.Count; i++)
+            for (int i = 0; i < cachedPlayerDataList.Count; i++)
             {
-                PlayerData playerData = playerDataList[i];
+                PlayerData playerData = cachedPlayerDataList[i];
                 if (playerData.id == clientId) { return playerData; }
             }
             Debug.LogError("Could not find player data with ID: " + clientId);
@@ -481,9 +481,9 @@ namespace Vi.Core
         {
             try
             {
-                for (int i = 0; i < playerDataList.Count; i++)
+                for (int i = 0; i < cachedPlayerDataList.Count; i++)
                 {
-                    PlayerData playerData = playerDataList[i];
+                    PlayerData playerData = cachedPlayerDataList[i];
                     if (playerData.id == (int)clientId) { return playerData; }
                 }
                 Debug.LogError("Could not find player data with ID: " + clientId);
@@ -733,6 +733,7 @@ namespace Vi.Core
             {
                 playerDataList.Clear();
             }
+            SyncCachedPlayerDataList();
         }
 
         public override void OnNetworkDespawn()
@@ -743,6 +744,16 @@ namespace Vi.Core
 
             localPlayers.Clear();
             botClientId = 0;
+            SyncCachedPlayerDataList();
+        }
+
+        private void SyncCachedPlayerDataList()
+        {
+            cachedPlayerDataList.Clear();
+            foreach (PlayerData playerData in playerDataList)
+            {
+                cachedPlayerDataList.Add(playerData);
+            }
         }
 
         private void Tick()
@@ -800,6 +811,8 @@ namespace Vi.Core
 
             if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
+
+            SyncCachedPlayerDataList();
         }
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
@@ -959,7 +972,7 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            for (int i = 0; i < playerDataList.Count; i++)
+            for (int i = 0; i < cachedPlayerDataList.Count; i++)
             {
                 playerDatas.Add(playerDataList[i]);
             }
@@ -969,7 +982,7 @@ namespace Vi.Core
         public List<PlayerData> GetPlayerDataListWithoutSpectators()
         {
             List<PlayerData> playerDatas = new List<PlayerData>();
-            for (int i = 0; i < playerDataList.Count; i++)
+            for (int i = 0; i < cachedPlayerDataList.Count; i++)
             {
                 PlayerData playerData = playerDataList[i];
                 if (playerData.team == Team.Spectator) { continue; }
@@ -989,6 +1002,7 @@ namespace Vi.Core
         }
 
         private NetworkList<PlayerData> playerDataList;
+        private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
