@@ -409,7 +409,6 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
-                EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -499,7 +498,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanBeCancelledByLightAttacks);
                 EditorGUILayout.PropertyField(spCanBeCancelledByHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanBeCancelledByAbilities);
-                EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -582,7 +580,6 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spGrabVictimClip);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
-                EditorGUILayout.PropertyField(spActionVFXList);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -672,9 +669,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanBeCancelledByHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanBeCancelledByAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
-                EditorGUILayout.PropertyField(spActionVFXList);
-                EditorGUILayout.PropertyField(spPreviewActionVFX);
-                EditorGUILayout.PropertyField(spPreviewActionVFXScale);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
@@ -711,9 +705,6 @@ namespace Vi.Editor
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(spActionVFXList);
-
-                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAilment);
                 EditorGUILayout.PropertyField(spAilmentHitDefinition);
                 EditorGUILayout.PropertyField(spDodgeLock);
@@ -736,6 +727,13 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Dodge & (ActionClip.ClipType)spClipType.enumValueIndex != ActionClip.ClipType.Flinch)
             {
                 Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
+            }
+
+            EditorGUILayout.PropertyField(spActionVFXList);
+            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Ability)
+            {
+                EditorGUILayout.PropertyField(spPreviewActionVFX);
+                EditorGUILayout.PropertyField(spPreviewActionVFXScale);
             }
 
             serializedObject.ApplyModifiedProperties();

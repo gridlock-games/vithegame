@@ -246,10 +246,13 @@ namespace Vi.Core
                                 }
                             }
                         }
-                        else if (currentStateInfo.IsTag("CanDodge"))
+                        else if (currentStateInfo.IsTag("CanDodge") | nextStateInfo.IsTag("CanDodge"))
                         {
-                            // If we are in transition and not returning to the empty state
-                            if (isInTransition & !nextStateInfo.IsName("Empty")) { return; }
+                            if (currentStateInfo.IsTag("CanDodge"))
+                            {
+                                // If we are in transition and not returning to the empty state
+                                if (isInTransition & !nextStateInfo.IsName("Empty")) { return; }
+                            }
 
                             shouldEvaluatePreviousState = false;
                         }
