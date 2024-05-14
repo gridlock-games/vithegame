@@ -3322,7 +3322,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 1
+  shouldPlayHitReaction: 0
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -3927,7 +3927,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.3
   damage: 3
   healAmount: 0
   staminaDamage: 0
@@ -3969,7 +3969,7 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.25, y: 0.25, z: 0}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
-  canLunge: 0
+  canLunge: 1
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0
