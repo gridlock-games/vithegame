@@ -458,6 +458,11 @@ namespace Vi.ScriptableObjects
                     if (ActionClip)
                     {
                         if (ActionClip.name == clipName) { return ActionClip; }
+
+                        foreach (ActionClip.FollowUpActionClip followUpClip in ActionClip.followUpActionClipsToPlay)
+                        {
+                            if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                        }
                     }
                 }
                 else if (propertyInfo.FieldType == typeof(List<ActionClip>))
@@ -470,6 +475,11 @@ namespace Vi.ScriptableObjects
                         if (ActionClip)
                         {
                             if (ActionClip.name == clipName) { return ActionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in ActionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
@@ -483,6 +493,11 @@ namespace Vi.ScriptableObjects
                         if (hitReaction.reactionClip)
                         {
                             if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in hitReaction.reactionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
@@ -496,6 +511,11 @@ namespace Vi.ScriptableObjects
                         if (attack.attackClip)
                         {
                             if (attack.attackClip.name == clipName) { return attack.attackClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in attack.attackClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
@@ -509,6 +529,11 @@ namespace Vi.ScriptableObjects
                         if (attack.grabAttackClip)
                         {
                             if (attack.grabAttackClip.name == clipName) { return attack.grabAttackClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in attack.grabAttackClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
