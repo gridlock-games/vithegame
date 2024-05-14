@@ -392,6 +392,7 @@ namespace Vi.Core
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            if (attacker.ShouldPlayHitStop()) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
             if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
