@@ -520,7 +520,7 @@ namespace Vi.Core
 
                     if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
                     {
-                        if (attack.shouldPlayHitReaction | ailment.Value != ActionClip.Ailment.None) { animationHandler.PlayAction(hitReaction); }
+                        if (attack.shouldPlayHitReaction | ailment.Value != ActionClip.Ailment.None | animationHandler.IsCharging()) { animationHandler.PlayAction(hitReaction); }
                     }
                 }
             }
