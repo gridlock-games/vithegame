@@ -332,6 +332,9 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
+            weaponHandler.LightAttack(true);
+            return;
+
             if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
             {
                 loadoutManager.SwitchWeapon();
@@ -394,6 +397,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
                 }
+                lastAbilityTime = Time.time;
             }
         }
 

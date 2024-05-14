@@ -30,6 +30,11 @@ namespace Vi.Editor
         private SerializedProperty spAttackRootMotionSidesMultiplier;
         private SerializedProperty spAttackRootMotionVerticalMultiplier;
 
+        private SerializedProperty spShouldFlinch;
+        private SerializedProperty spFlinchAmountMin;
+        private SerializedProperty spFlinchAmountMax;
+        private SerializedProperty spShouldPlayHitReaction;
+
         private SerializedProperty spDebugForwardMotion;
         private SerializedProperty spDebugSidesMotion;
         private SerializedProperty spDebugVerticalMotion;
@@ -131,6 +136,11 @@ namespace Vi.Editor
             spAttackRootMotionSidesMultiplier = serializedObject.FindProperty("attackRootMotionSidesMultiplier");
             spAttackRootMotionVerticalMultiplier = serializedObject.FindProperty("attackRootMotionVerticalMultiplier");
 
+            spShouldFlinch = serializedObject.FindProperty("shouldFlinch");
+            spFlinchAmountMin = serializedObject.FindProperty("flinchAmountMin");
+            spFlinchAmountMax = serializedObject.FindProperty("flinchAmountMax");
+            spShouldPlayHitReaction = serializedObject.FindProperty("shouldPlayHitReaction");
+
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spDodgeCancelTransitionTime = serializedObject.FindProperty("dodgeCancelTransitionTime");
@@ -223,7 +233,8 @@ namespace Vi.Editor
             ActionClip.ClipType.LightAttack,
             ActionClip.ClipType.HeavyAttack,
             ActionClip.ClipType.FlashAttack,
-            ActionClip.ClipType.Ability
+            ActionClip.ClipType.Ability,
+            ActionClip.ClipType.GrabAttack
         };
 
         private Weapon weapon;
@@ -308,10 +319,21 @@ namespace Vi.Editor
 
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex))
             {
-                EditorGUILayout.LabelField("These curves multiply the root motion of the hit reaction on the victim", EditorStyles.whiteLabel);
-                EditorGUILayout.PropertyField(spAttackRootMotionForwardMultiplier);
-                EditorGUILayout.PropertyField(spAttackRootMotionSidesMultiplier);
-                EditorGUILayout.PropertyField(spAttackRootMotionVerticalMultiplier);
+                EditorGUILayout.PropertyField(spShouldPlayHitReaction);
+                if (spShouldPlayHitReaction.boolValue)
+                {
+                    EditorGUILayout.LabelField("These curves multiply the root motion of the hit reaction on the victim", EditorStyles.whiteLabel);
+                    EditorGUILayout.PropertyField(spAttackRootMotionForwardMultiplier);
+                    EditorGUILayout.PropertyField(spAttackRootMotionSidesMultiplier);
+                    EditorGUILayout.PropertyField(spAttackRootMotionVerticalMultiplier);
+                }
+                
+                EditorGUILayout.PropertyField(spShouldFlinch);
+                if (spShouldFlinch.boolValue)
+                {
+                    EditorGUILayout.PropertyField(spFlinchAmountMin);
+                    EditorGUILayout.PropertyField(spFlinchAmountMax);
+                }
             }
 
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);

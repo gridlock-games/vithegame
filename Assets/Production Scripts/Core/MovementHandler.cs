@@ -27,6 +27,8 @@ namespace Vi.Core
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
+		public virtual void Flinch(Vector2 flinchAmount) { }
+
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {

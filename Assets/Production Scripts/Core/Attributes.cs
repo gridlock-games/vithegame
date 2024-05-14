@@ -177,12 +177,14 @@ namespace Vi.Core
 
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
+        private MovementHandler movementHandler;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
             activeStatuses = new NetworkList<int>();
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
+            movementHandler = GetComponent<MovementHandler>();
         }
 
         private GameObject teamIndicatorInstance;
@@ -516,7 +518,10 @@ namespace Vi.Core
                         attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                     }
 
-                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
+                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
+                    {
+                        if (attack.shouldPlayHitReaction) { animationHandler.PlayAction(hitReaction); }
+                    }
                 }
             }
             else
@@ -559,6 +564,8 @@ namespace Vi.Core
                     weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
                 }
             }
+
+            if (attack.shouldFlinch) { movementHandler.Flinch(attack.GetFlinchAmount()); }
 
             lastAttackingAttributes = attacker;
             return true;

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LightAttack2
   m_EditorClassIdentifier: 
   clipType: 1
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -168,6 +169,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 1
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -276,8 +281,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.22
-  recoveryNormalizedTime: 0.33
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.35
   damage: 6
   healAmount: 0
   staminaDamage: 0
@@ -294,9 +299,9 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 1
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -319,6 +324,9 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.05, y: 0.05, z: 0.05}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

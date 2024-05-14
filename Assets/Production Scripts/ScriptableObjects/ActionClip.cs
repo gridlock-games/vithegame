@@ -126,6 +126,13 @@ namespace Vi.ScriptableObjects
         public AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        public bool shouldFlinch;
+        [SerializeField] private Vector2 flinchAmountMin;
+        [SerializeField] private Vector2 flinchAmountMax;
+
+        public Vector2 GetFlinchAmount() { return new Vector2(Random.Range(flinchAmountMin.x, flinchAmountMax.x), Random.Range(flinchAmountMin.y, flinchAmountMax.y)); }
+
+        public bool shouldPlayHitReaction = true;
         public AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));

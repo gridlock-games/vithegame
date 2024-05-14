@@ -34,6 +34,11 @@ namespace Vi.Player
             cameraController.SetRotation(rotationX, rotationY);
         }
 
+        public override void Flinch(Vector2 flinchAmount)
+        {
+            cameraController.AddRotation(flinchAmount.x, flinchAmount.y);
+        }
+
         [Header("Collision Settings")]
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
