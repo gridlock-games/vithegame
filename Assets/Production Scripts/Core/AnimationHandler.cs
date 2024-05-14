@@ -170,7 +170,7 @@ namespace Vi.Core
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
-            if (actionClip.IsAttack() & actionClip.canLunge)
+            if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
             {
                 ActionClip lungeClip = weaponHandler.GetWeapon().GetLungeClip();
                 if (AreActionClipRequirementsMet(lungeClip))
@@ -454,7 +454,7 @@ namespace Vi.Core
             if (!attack.IsAttack()) { Debug.LogError("Action Clip " + attack + " is not an attack clip!"); yield break; }
             yield return new WaitUntil(() => IsLunging());
             yield return new WaitUntil(() => !IsLunging());
-            PlayAction(attack);
+            PlayAction(attack, true);
         }
 
         private Coroutine playAdditionalClipsCoroutine;
