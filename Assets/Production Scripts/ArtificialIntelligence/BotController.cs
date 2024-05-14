@@ -320,8 +320,9 @@ namespace Vi.ArtificialIntelligence
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 2;
-        private float chargeAttackTime;
+        private const float chargeAttackDuration = 0.75f;
+        private const float chargeWaitDuration = 2;
+        private float lastChargeAttackTime;
 
         private const float dodgeWaitDuration = 5;
         private float lastDodgeTime;
@@ -345,6 +346,7 @@ namespace Vi.ArtificialIntelligence
                 if (Vector3.Distance(navMeshAgent.destination, transform.position) < lightAttackDistance)
                 {
                     if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+                    else { weaponHandler.HeavyAttack(false); }
 
                     weaponHandler.LightAttack(true);
 
@@ -352,11 +354,10 @@ namespace Vi.ArtificialIntelligence
                 }
                 else if (Vector3.Distance(navMeshAgent.destination, transform.position) < heavyAttackDistance)
                 {
-                    weaponHandler.HeavyAttack(chargeAttackTime <= chargeAttackDuration - 0.1f);
-                    chargeAttackTime += Time.deltaTime;
-
                     if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
-                    else if (chargeAttackTime <= chargeAttackDuration - 0.1f) { chargeAttackTime += Time.deltaTime; }
+                    else { weaponHandler.LightAttack(false); }
+
+                    if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
 
                     EvaluateAbility();
                 }
@@ -367,8 +368,23 @@ namespace Vi.ArtificialIntelligence
                 OnDodge();
                 lastDodgeTime = Time.time;
             }
+        }
 
-            if (chargeAttackTime >= chargeAttackDuration) { chargeAttackTime = 0; }
+        private bool isHeavyAttacking;
+
+        private IEnumerator HeavyAttack()
+        {
+            if (isHeavyAttacking) { yield break; }
+            isHeavyAttacking = true;
+
+            weaponHandler.HeavyAttack(true);
+
+            yield return new WaitForSeconds(chargeAttackDuration);
+
+            lastChargeAttackTime = Time.time;
+            weaponHandler.HeavyAttack(false);
+
+            isHeavyAttacking = false;
         }
 
         private void EvaluateAbility()
