@@ -481,8 +481,12 @@ namespace Vi.UI
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private float lastTextChangeTime;
+        private bool lastClientState;
         private void Update()
         {
+            if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
+            lastClientState = NetworkManager.Singleton.IsClient;
+
             connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
 
             if (webRequestStatusText.gameObject.activeSelf)
