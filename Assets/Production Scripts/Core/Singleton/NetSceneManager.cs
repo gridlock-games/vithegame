@@ -297,7 +297,8 @@ namespace Vi.Core
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             //Debug.Log("Loaded " + scene.name);
-            if (IsServer)
+            // Need to check singleton because this object may be despawned and not know
+            if (NetworkManager.Singleton.IsServer)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
                 {
@@ -308,7 +309,7 @@ namespace Vi.Core
                 }
             }
 
-            if (IsClient)
+            if (NetworkManager.Singleton.IsClient)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
                 {
