@@ -520,7 +520,7 @@ namespace Vi.Core
 
                     if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
                     {
-                        if (attack.shouldPlayHitReaction) { animationHandler.PlayAction(hitReaction); }
+                        if (attack.shouldPlayHitReaction | ailment.Value != ActionClip.Ailment.None) { animationHandler.PlayAction(hitReaction); }
                     }
                 }
             }
@@ -567,9 +567,9 @@ namespace Vi.Core
 
             if (attack.shouldFlinch)
             {
+                movementHandler.Flinch(attack.GetFlinchAmount());
                 ActionClip flinchClip = weaponHandler.GetWeapon().GetFlinchClip(attackAngle);
                 animationHandler.PlayAction(flinchClip);
-                movementHandler.Flinch(attack.GetFlinchAmount());
             }
 
             lastAttackingAttributes = attacker;
