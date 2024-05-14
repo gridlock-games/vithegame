@@ -15,8 +15,6 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
-        private GameObject netSceneManagerInstance;
-        private GameObject playerDataManagerInstance;
 
         private void Start()
         {
@@ -37,19 +35,17 @@ namespace Vi.Core
 
         private void CreatePlayerDataManager()
         {
-            if (!playerDataManagerInstance)
+            if (!PlayerDataManager.DoesExist())
             {
-                playerDataManagerInstance = Instantiate(playerDataManagerPrefab.gameObject);
-                DontDestroyOnLoad(playerDataManagerInstance);
+                DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
             }
         }
 
         private void CreateNetSceneManager()
         {
-            if (!netSceneManagerInstance)
+            if (!NetSceneManager.DoesExist())
             {
-                netSceneManagerInstance = Instantiate(networkSceneManagerPrefab.gameObject);
-                DontDestroyOnLoad(netSceneManagerInstance);
+                DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
             }
         }
 
@@ -208,6 +204,9 @@ namespace Vi.Core
         private void OnClientStopped(bool wasHost)
         {
             Debug.Log("Stopped Client " + wasHost);
+
+            CreatePlayerDataManager();
+            CreateNetSceneManager();
         }
 
         private void OnTransportFailure()

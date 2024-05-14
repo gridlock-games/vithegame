@@ -13,6 +13,8 @@ namespace Vi.Core
     {
         [SerializeField] private ScenePayload[] scenePayloads;
 
+        public static bool DoesExist() { return _singleton; }
+
         public static NetSceneManager Singleton
         {
             get

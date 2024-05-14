@@ -666,7 +666,8 @@ namespace Vi.Core
             }
             //Debug.Log(scene.name + " " + playerSpawnPoints);
 
-            if (IsServer)
+            // Need to check singleton since this object may be despawned
+            if (NetworkManager.Singleton.IsServer)
             {
                 if (NetSceneManager.Singleton.ShouldSpawnPlayer())
                 {
