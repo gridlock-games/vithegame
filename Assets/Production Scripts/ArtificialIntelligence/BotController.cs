@@ -194,6 +194,8 @@ namespace Vi.ArtificialIntelligence
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
+            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+
             float stairMovement = 0;
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;

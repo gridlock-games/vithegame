@@ -115,6 +115,12 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
+        public const float flinchingMovementSpeedMultiplier = 0.8f;
+        public bool IsFlinching()
+        {
+            return !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Flinch")).IsName("Empty");
+        }
+
         public bool IsGrabAttacking()
         {
             if (!lastClipPlayed) { return false; }
