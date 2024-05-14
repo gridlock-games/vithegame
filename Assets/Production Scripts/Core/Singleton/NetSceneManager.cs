@@ -307,7 +307,8 @@ namespace Vi.Core
                     }
                 }
             }
-            else
+
+            if (IsClient)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
                 {

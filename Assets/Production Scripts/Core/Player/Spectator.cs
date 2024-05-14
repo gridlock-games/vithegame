@@ -302,6 +302,12 @@ namespace Vi.Player
 
         private Attributes followTarget;
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
+
+        private const float lerpSpeed = 8;
+        private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
+
+        [SerializeField] private float collisionPositionOffset = -0.3f;
+
         private void Update()
         {
             if (!IsLocalPlayer) { return; }
@@ -348,20 +354,28 @@ namespace Vi.Player
 
             if (shouldViewEnvironment)
             {
-                transform.position = Vector3.Lerp(transform.position, environmentViewPosition, Time.deltaTime * 8);
-                transform.rotation = Quaternion.Slerp(transform.rotation, environmentViewRotation, Time.deltaTime * 8);
+                transform.position = Vector3.Lerp(transform.position, environmentViewPosition, Time.deltaTime * lerpSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, environmentViewRotation, Time.deltaTime * lerpSpeed);
 
                 targetPosition = transform.position;
             }
             else if (followTarget)
             {
-                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * new Vector3(0, 3, -3);
+                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * followTargetOffset;
                 Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position - transform.position);
 
-                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8);
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lerpSpeed);
                 
                 this.targetPosition = transform.position;
+
+                // Move camera if there is a wall in the way
+                Vector3 dir = (transform.position - followTarget.transform.position).normalized;
+                Debug.DrawRay(followTarget.transform.position, dir * followTargetOffset.z, Color.blue, Time.deltaTime);
+                if (Physics.Raycast(followTarget.transform.position, dir, out RaycastHit hit, followTargetOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                {
+                    transform.position = transform.position + transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                }
             }
             else
             {
@@ -370,7 +384,7 @@ namespace Vi.Player
                 if (isDescending) { verticalSpeed = -1; }
 
                 targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
-                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
 
                 Vector2 lookInput = GetLookInput();
                 float xAngle = transform.eulerAngles.x - lookInput.y;
