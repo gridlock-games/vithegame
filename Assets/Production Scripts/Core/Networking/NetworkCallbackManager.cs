@@ -21,7 +21,7 @@ namespace Vi.Core
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            CreatePlayerDataManager();
+            CreatePlayerDataManager(false);
             CreateNetSceneManager();
             
             NetSceneManager.Singleton.LoadScene("Main Menu");
@@ -33,9 +33,10 @@ namespace Vi.Core
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
         }
 
-        private void CreatePlayerDataManager()
+        private void CreatePlayerDataManager(bool forceRefresh)
         {
-            if (!PlayerDataManager.DoesExist())
+            if (forceRefresh) { Destroy(PlayerDataManager.Singleton.gameObject); }
+            if (!PlayerDataManager.DoesExist() | forceRefresh)
             {
                 DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
             }
@@ -122,7 +123,14 @@ namespace Vi.Core
                     StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
                 }
             }
+
+            if (!NetworkManager.Singleton.IsConnectedClient & lastConnectedClientState)
+            {
+                CreatePlayerDataManager(true);
+            }
+            lastConnectedClientState = NetworkManager.Singleton.IsConnectedClient;
         }
+        private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
         private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
@@ -197,7 +205,7 @@ namespace Vi.Core
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
             }
 
-            CreatePlayerDataManager();
+            CreatePlayerDataManager(false);
             CreateNetSceneManager();
         }
 
@@ -205,7 +213,7 @@ namespace Vi.Core
         {
             Debug.Log("Stopped Client " + wasHost);
 
-            CreatePlayerDataManager();
+            CreatePlayerDataManager(false);
             CreateNetSceneManager();
         }
 
