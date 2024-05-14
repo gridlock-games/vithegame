@@ -234,6 +234,37 @@ namespace Vi.ScriptableObjects
             return hitReaction.reactionClip;
         }
 
+        [System.Serializable]
+        private class FlinchReaction
+        {
+            public HitLocation hitLocation = HitLocation.Front;
+            public ActionClip reactionClip;
+        }
+
+        [SerializeField] private List<FlinchReaction> flinchReactions = new List<FlinchReaction>();
+
+        public ActionClip GetFlinchClip(float attackAngle)
+        {
+            HitLocation hitLocation;
+            if (attackAngle <= 45.00f && attackAngle >= -45.00f)
+            {
+                hitLocation = HitLocation.Front;
+            }
+            else if (attackAngle > 45.00f && attackAngle < 135.00f)
+            {
+                hitLocation = HitLocation.Right;
+            }
+            else if (attackAngle < -45.00f && attackAngle > -135.00f)
+            {
+                hitLocation = HitLocation.Left;
+            }
+            else
+            {
+                hitLocation = HitLocation.Back;
+            }
+            return flinchReactions.Find(item => item.hitLocation == hitLocation).reactionClip;
+        }
+
         public enum InputAttackType
         {
             LightAttack,
@@ -495,6 +526,24 @@ namespace Vi.ScriptableObjects
                             if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
 
                             foreach (ActionClip.FollowUpActionClip followUpClip in hitReaction.reactionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<FlinchReaction>))
+                {
+                    var FlinchReactionListObject = propertyInfo.GetValue(this);
+                    List<FlinchReaction> hitReactions = (List<FlinchReaction>)FlinchReactionListObject;
+
+                    foreach (FlinchReaction flinchReaction in hitReactions)
+                    {
+                        if (flinchReaction.reactionClip)
+                        {
+                            if (flinchReaction.reactionClip.name == clipName) { return flinchReaction.reactionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in flinchReaction.reactionClip.followUpActionClipsToPlay)
                             {
                                 if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
                             }

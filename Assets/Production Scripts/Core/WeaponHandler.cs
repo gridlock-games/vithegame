@@ -218,6 +218,8 @@ namespace Vi.Core
 
         public void SetActionClip(ActionClip actionClip, string weaponName)
         {
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
+
             if (IsInAnticipation)
             {
                 if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)

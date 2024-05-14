@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LightAttack2
   m_EditorClassIdentifier: 
   clipType: 1
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -915,6 +916,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 1
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 0
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -1861,7 +1866,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.5
+  recoveryNormalizedTime: 0.6
   damage: 4
   healAmount: 0
   staminaDamage: 0
@@ -1902,6 +1907,9 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.15, y: 0.15, z: 0.15}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

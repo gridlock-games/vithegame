@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: LightAttack2
+  m_Name: FlinchRight
   m_EditorClassIdentifier: 
-  clipType: 1
+  clipType: 8
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
@@ -21,30 +21,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.65
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.3662508
-      value: 1.5
-      inSlope: 0.025776317
-      outSlope: 0.025776317
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.10144202
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 0.65
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -54,21 +45,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.75
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 0.75
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -78,21 +69,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.75
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 0.75
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -169,9 +160,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  shouldFlinch: 1
-  flinchAmountMin: {x: -10, y: -10}
-  flinchAmountMax: {x: 10, y: 10}
+  shouldFlinch: 0
+  flinchAmountMin: {x: 0, y: 0}
+  flinchAmountMax: {x: 0, y: 0}
   shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
@@ -267,12 +258,12 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 2
+  animationSpeed: 1.1
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
-  effectedWeaponBones: 12000000
+  effectedWeaponBones: 
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -282,11 +273,11 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.35
-  damage: 6
+  recoveryNormalizedTime: 0.75
+  damage: 20
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 1
+  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
@@ -298,7 +289,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 1
+  ailment: 0
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
@@ -314,14 +305,13 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 65199130667184395, guid: 52949c8e5dd4b4d9594e7ec186b4b4e1, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
-  boxCastOriginPositionOffset: {x: 0, y: 0, z: 0}
-  boxCastHalfExtents: {x: 0.05, y: 0.05, z: 0.05}
+  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
+  boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
   canLunge: 0

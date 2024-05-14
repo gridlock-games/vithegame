@@ -194,6 +194,8 @@ namespace Vi.ArtificialIntelligence
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
+            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+
             float stairMovement = 0;
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
@@ -241,8 +243,7 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
-
-        private List<Attributes> activePlayers = new List<Attributes>();
+        [SerializeField] private List<Attributes> activePlayers = new List<Attributes>();
 
         private void UpdateActivePlayersList()
         {
@@ -253,6 +254,8 @@ namespace Vi.ArtificialIntelligence
 
         private void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
             if (!CanMove()) { return; }
             if (!IsSpawned) { return; }
 
@@ -269,8 +272,6 @@ namespace Vi.ArtificialIntelligence
                 
                 if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
-                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
-                    
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
                     
                     targetAttributes = null;
@@ -395,6 +396,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
                 }
+                lastAbilityTime = Time.time;
             }
         }
 

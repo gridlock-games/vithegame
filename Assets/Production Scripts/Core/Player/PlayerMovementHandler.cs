@@ -34,6 +34,11 @@ namespace Vi.Player
             cameraController.SetRotation(rotationX, rotationY);
         }
 
+        public override void Flinch(Vector2 flinchAmount)
+        {
+            cameraController.AddRotation(flinchAmount.x, flinchAmount.y);
+        }
+
         [Header("Collision Settings")]
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
@@ -191,6 +196,8 @@ namespace Vi.Player
                 movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
+            
+            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
             float yOffset = 0.2f;

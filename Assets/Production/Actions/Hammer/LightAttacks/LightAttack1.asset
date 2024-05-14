@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LightAttack1
   m_EditorClassIdentifier: 
   clipType: 1
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -5046,6 +5047,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 1
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 0
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -12568,6 +12573,9 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.05, y: 0.05, z: 0.05}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
