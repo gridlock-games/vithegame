@@ -172,9 +172,9 @@ namespace Vi.Core
             Debug.Log("Finished Creating Server in API");
         }
 
-        private void OnServerStopped(bool test)
+        private void OnServerStopped(bool _)
         {
-            Debug.Log("Stopped Server " + test);
+            Debug.Log("Stopped Server " + _);
         }
 
         private void OnClientStarted()
@@ -205,9 +205,9 @@ namespace Vi.Core
             CreateNetSceneManager();
         }
 
-        private void OnClientStopped(bool test)
+        private void OnClientStopped(bool _)
         {
-            Debug.Log("Stopped Client " + test);
+            Debug.Log("Stopped Client " + _);
         }
 
         private void OnTransportFailure()
