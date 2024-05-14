@@ -269,6 +269,8 @@ namespace Vi.Core
                         break;
                     case ActionClip.ClipType.Lunge:
                         break;
+                    case ActionClip.ClipType.GrabAttack:
+                        break;
                     default:
                         Debug.LogError("Unsure how to handle clip type " + actionClip.GetClipType());
                         break;
@@ -374,7 +376,7 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                AnimatorOverrideController animatorOverrideController = loadoutManager.PrimaryWeaponOption.animationController;
+                AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["GrabReaction"] = attributes.GetGrabReactionClip();
@@ -386,7 +388,6 @@ namespace Vi.Core
             }
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
-            if (attributes.IsGrabbed()) { transitionTime = 0; }
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
@@ -623,7 +624,7 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(Animator.runtimeAnimatorController);
+                AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();
