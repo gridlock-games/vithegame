@@ -332,9 +332,6 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
-            weaponHandler.LightAttack(true);
-            return;
-
             if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
             {
                 loadoutManager.SwitchWeapon();
