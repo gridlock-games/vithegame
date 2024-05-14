@@ -729,6 +729,8 @@ namespace Vi.Editor
                 Debug.LogError("Unsure how to handle clip type " + (ActionClip.ClipType)spClipType.enumValueIndex);
             }
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Action VFX", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spActionVFXList);
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Ability)
             {
