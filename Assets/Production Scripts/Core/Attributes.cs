@@ -567,7 +567,7 @@ namespace Vi.Core
 
             if (attack.shouldFlinch)
             {
-                ActionClip flinchClip = weaponHandler.GetWeapon().GetFlinchClip();
+                ActionClip flinchClip = weaponHandler.GetWeapon().GetFlinchClip(attackAngle);
                 animationHandler.PlayAction(flinchClip);
                 movementHandler.Flinch(attack.GetFlinchAmount());
             }
