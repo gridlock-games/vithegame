@@ -368,14 +368,6 @@ namespace Vi.Player
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lerpSpeed);
                 
                 this.targetPosition = transform.position;
-
-                // Move camera if there is a wall in the way
-                Vector3 dir = (transform.position - followTarget.transform.position).normalized;
-                Debug.DrawRay(followTarget.transform.position, dir * followTargetOffset.z, Color.blue, Time.deltaTime);
-                if (Physics.Raycast(followTarget.transform.position, dir, out RaycastHit hit, followTargetOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
-                {
-                    transform.position = transform.position + transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
-                }
             }
             else
             {
