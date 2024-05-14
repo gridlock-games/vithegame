@@ -456,36 +456,39 @@ namespace Vi.Core.GameModeManagers
             disconnectedScoreList = new NetworkList<DisconnectedPlayerScore>();
             killHistory = new NetworkList<KillHistoryElement>();
 
-            foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
-                string[] propertySplit = propertyString.Split(":");
-                string propertyName = "";
-                int value = 0;
-                for (int i = 0; i < propertySplit.Length; i++)
+                foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
                 {
-                    if (i == 0)
+                    string[] propertySplit = propertyString.Split(":");
+                    string propertyName = "";
+                    int value = 0;
+                    for (int i = 0; i < propertySplit.Length; i++)
                     {
-                        propertyName = propertySplit[i];
+                        if (i == 0)
+                        {
+                            propertyName = propertySplit[i];
+                        }
+                        else if (i == 1)
+                        {
+                            value = int.Parse(propertySplit[i]);
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure how to parse game mode property string " + propertyString);
+                        }
                     }
-                    else if (i == 1)
-                    {
-                        value = int.Parse(propertySplit[i]);
-                    }
-                    else
-                    {
-                        Debug.LogError("Not sure how to parse game mode property string " + propertyString);
-                    }
-                }
 
-                if (string.IsNullOrWhiteSpace(propertyName)) { continue; }
+                    if (string.IsNullOrWhiteSpace(propertyName)) { continue; }
 
-                try
-                {
-                    GetType().GetField(propertyName, BindingFlags.NonPublic | BindingFlags.Instance).SetValue(this, value);
-                }
-                catch
-                {
-                    Debug.LogError("Error while setting value for field: " + propertyName);
+                    try
+                    {
+                        GetType().GetField(propertyName, BindingFlags.NonPublic | BindingFlags.Instance).SetValue(this, value);
+                    }
+                    catch
+                    {
+                        Debug.LogError("Error while setting value for field: " + propertyName);
+                    }
                 }
             }
         }
