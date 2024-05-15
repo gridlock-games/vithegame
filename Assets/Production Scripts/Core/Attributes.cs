@@ -53,7 +53,7 @@ namespace Vi.Core
         public void ResetStats(float hpPercentage, bool resetRage)
         {
             HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
-            defense.Value = 0;
+            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
             stamina.Value = 0;
             if (resetRage)
                 rage.Value = 0;
@@ -132,6 +132,7 @@ namespace Vi.Core
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
+            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
@@ -477,7 +478,7 @@ namespace Vi.Core
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
-            AddDefense(-attack.defenseDamage);
+            //AddDefense(-attack.defenseDamage);
             attacker.AddRage(attackerRageToBeAddedOnHit);
             AddRage(victimRageToBeAddedOnHit);
 
@@ -839,7 +840,7 @@ namespace Vi.Core
             isUninterruptable.Value = Time.time <= uninterruptableEndTime;
 
             UpdateStamina();
-            UpdateDefense();
+            //UpdateDefense();
             UpdateRage();
 
             roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
