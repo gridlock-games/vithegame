@@ -385,6 +385,7 @@ namespace Vi.Core
             }
         }
 
+        public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
         private const float notBlockingDefenseHitReactionPercentage = 0.4f;
         private const float blockingDefenseHitReactionPercentage = 0.5f;
 
