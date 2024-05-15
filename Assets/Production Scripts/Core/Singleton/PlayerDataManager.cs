@@ -84,13 +84,14 @@ namespace Vi.Core
             SetMap(map);
         }
 
-        private NetworkVariable<FixedString512Bytes> gameModeSettings = new NetworkVariable<FixedString512Bytes>();
+        private NetworkVariable<NetworkString512Bytes> gameModeSettings = new NetworkVariable<NetworkString512Bytes>();
 
         public string GetGameModeSettings() { return gameModeSettings.Value.ToString(); }
 
         public void SetGameModeSettings(string gameModeSettings)
         {
-            if (gameModeSettings == this.gameModeSettings.Value) { return; }
+            if (gameModeSettings == null) { Debug.LogError("Trying to set game mode settings to be null!"); return; }
+            if (gameModeSettings == this.gameModeSettings.Value.ToString()) { return; }
 
             if (IsServer)
             {
@@ -768,6 +769,8 @@ namespace Vi.Core
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
+            SyncCachedPlayerDataList();
+
             switch (networkListEvent.Type)
             {
                 case NetworkListEvent<PlayerData>.EventType.Add:
@@ -777,10 +780,10 @@ namespace Vi.Core
                         {
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
-                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
+                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -789,10 +792,10 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.RemoveAt:
                     if (IsServer)
                     {
-                        //StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count, GetLobbyLeader().character.name.ToString()));
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(playerDataList.Count, kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
+                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
@@ -812,8 +815,6 @@ namespace Vi.Core
 
             if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
-
-            SyncCachedPlayerDataList();
         }
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
@@ -970,27 +971,9 @@ namespace Vi.Core
             }
         }
 
-        public List<PlayerData> GetPlayerDataListWithSpectators()
-        {
-            List<PlayerData> playerDatas = new List<PlayerData>();
-            for (int i = 0; i < cachedPlayerDataList.Count; i++)
-            {
-                playerDatas.Add(playerDataList[i]);
-            }
-            return playerDatas;
-        }
+        public List<PlayerData> GetPlayerDataListWithSpectators() { return cachedPlayerDataList; }
 
-        public List<PlayerData> GetPlayerDataListWithoutSpectators()
-        {
-            List<PlayerData> playerDatas = new List<PlayerData>();
-            for (int i = 0; i < cachedPlayerDataList.Count; i++)
-            {
-                PlayerData playerData = playerDataList[i];
-                if (playerData.team == Team.Spectator) { continue; }
-                playerDatas.Add(playerData);
-            }
-            return playerDatas;
-        }
+        public List<PlayerData> GetPlayerDataListWithoutSpectators() { return cachedPlayerDataList.Where(item => item.team != Team.Spectator).ToList(); }
 
         public List<PlayerData> GetDisconnectedPlayerDataList()
         {
