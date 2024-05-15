@@ -476,8 +476,15 @@ namespace Vi.Core
 
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
+            AddStamina(-attack.staminaDamage);
+            AddDefense(-attack.defenseDamage);
+            attacker.AddRage(attackerRageToBeAddedOnHit);
+            AddRage(victimRageToBeAddedOnHit);
+
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle,
+                weaponHandler.IsBlocking & (GetDefense() > 0 | GetStamina() > 30),
+                attackAilment, ailment.Value);
             hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
             hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
             hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
@@ -553,10 +560,6 @@ namespace Vi.Core
             }
 
             attacker.comboCounter.Value += 1;
-
-            AddStamina(-attack.staminaDamage);
-            AddDefense(-attack.defenseDamage);
-            attacker.AddRage(rageToBeAddedOnHit);
 
             foreach (ActionVFX actionVFX in attack.actionVFXList)
             {
@@ -751,7 +754,8 @@ namespace Vi.Core
         private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
-        private const float rageToBeAddedOnHit = 2;
+        private const float attackerRageToBeAddedOnHit = 2;
+        private const float victimRageToBeAddedOnHit = 2;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
