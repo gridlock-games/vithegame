@@ -86,9 +86,9 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private Sprite environmentKillFeedIcon;
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {
-            public FixedString32Bytes killerName;
-            public FixedString32Bytes victimName;
-            public FixedString32Bytes weaponName;
+            public FixedString64Bytes killerName;
+            public FixedString64Bytes victimName;
+            public FixedString64Bytes weaponName;
             public KillType killType;
 
             public KillHistoryElement(Attributes killer, Attributes victim)
@@ -225,7 +225,7 @@ namespace Vi.Core.GameModeManagers
             }
             for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
-                FixedString32Bytes charId = disconnectedScoreList[i].characterId;
+                FixedString64Bytes charId = disconnectedScoreList[i].characterId;
                 PlayerScore playerScore = disconnectedScoreList[i].playerScore;
                 playerScore = new PlayerScore(playerScore.id, playerScore.roundWins);
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
@@ -255,7 +255,7 @@ namespace Vi.Core.GameModeManagers
                     if (disconnectedIndex == -1) { continue; }
 
                     PlayerScore score = disconnectedScoreList[disconnectedIndex].playerScore;
-                    FixedString32Bytes charId = disconnectedScoreList[disconnectedIndex].characterId;
+                    FixedString64Bytes charId = disconnectedScoreList[disconnectedIndex].characterId;
                     score.roundWins += 1;
                     disconnectedScoreList[disconnectedIndex] = new DisconnectedPlayerScore(charId, score);
 
@@ -319,7 +319,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public void AddPlayerScore(int id, FixedString32Bytes characterId)
+        public void AddPlayerScore(int id, FixedString64Bytes characterId)
         {
             if (!IsSpawned)
             {
@@ -346,7 +346,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        private IEnumerator WaitForSpawnToAddPlayerData(int id, FixedString32Bytes characterId)
+        private IEnumerator WaitForSpawnToAddPlayerData(int id, FixedString64Bytes characterId)
         {
             yield return new WaitUntil(() => IsSpawned);
             AddPlayerScore(id, characterId);
@@ -369,7 +369,7 @@ namespace Vi.Core.GameModeManagers
             return new PlayerScore();
         }
 
-        public void RemovePlayerScore(int id, FixedString32Bytes characterId)
+        public void RemovePlayerScore(int id, FixedString64Bytes characterId)
         {
             int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
@@ -578,10 +578,10 @@ namespace Vi.Core.GameModeManagers
 
         private struct DisconnectedPlayerScore : INetworkSerializable, System.IEquatable<DisconnectedPlayerScore>
         {
-            public FixedString32Bytes characterId;
+            public FixedString64Bytes characterId;
             public PlayerScore playerScore;
 
-            public DisconnectedPlayerScore(FixedString32Bytes characterId, PlayerScore playerScore)
+            public DisconnectedPlayerScore(FixedString64Bytes characterId, PlayerScore playerScore)
             {
                 this.characterId = characterId;
                 this.playerScore = playerScore;

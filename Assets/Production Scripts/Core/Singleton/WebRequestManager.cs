@@ -776,17 +776,17 @@ namespace Vi.Core
         {
             yield return GetCharacterInventory(characterId.ToString());
 
-            newLoadout.helmGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "");
-            newLoadout.capeGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "");
-            newLoadout.pantsGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "");
-            newLoadout.shouldersGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "");
-            newLoadout.chestArmorGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "");
-            newLoadout.glovesGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "");
-            newLoadout.beltGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "");
-            newLoadout.robeGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "");
-            newLoadout.bootsGearItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "");
-            newLoadout.weapon1ItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "");
-            newLoadout.weapon2ItemId = new FixedString32Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "");
+            newLoadout.helmGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "");
+            newLoadout.capeGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "");
+            newLoadout.pantsGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "");
+            newLoadout.shouldersGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "");
+            newLoadout.chestArmorGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "");
+            newLoadout.glovesGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "");
+            newLoadout.beltGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "");
+            newLoadout.robeGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "");
+            newLoadout.bootsGearItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "");
+            newLoadout.weapon1ItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "");
+            newLoadout.weapon2ItemId = new FixedString64Bytes(InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "");
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
@@ -1083,14 +1083,14 @@ namespace Vi.Core
 
         public struct Character : INetworkSerializable
         {
-            public FixedString32Bytes _id;
-            public FixedString32Bytes name;
-            public FixedString32Bytes model;
-            public FixedString32Bytes bodyColor;
-            public FixedString32Bytes eyeColor;
-            public FixedString32Bytes beard;
-            public FixedString32Bytes brows;
-            public FixedString32Bytes hair;
+            public FixedString64Bytes _id;
+            public FixedString64Bytes name;
+            public FixedString64Bytes model;
+            public FixedString64Bytes bodyColor;
+            public FixedString64Bytes eyeColor;
+            public FixedString64Bytes beard;
+            public FixedString64Bytes brows;
+            public FixedString64Bytes hair;
             public CharacterAttributes attributes;
             public Loadout loadoutPreset1;
             public Loadout loadoutPreset2;
@@ -1271,21 +1271,21 @@ namespace Vi.Core
 
         public struct Loadout : INetworkSerializable
         {
-            public FixedString32Bytes loadoutSlot;
-            public FixedString32Bytes helmGearItemId;
-            public FixedString32Bytes chestArmorGearItemId;
-            public FixedString32Bytes shouldersGearItemId;
-            public FixedString32Bytes bootsGearItemId;
-            public FixedString32Bytes pantsGearItemId;
-            public FixedString32Bytes beltGearItemId;
-            public FixedString32Bytes glovesGearItemId;
-            public FixedString32Bytes capeGearItemId;
-            public FixedString32Bytes robeGearItemId;
-            public FixedString32Bytes weapon1ItemId;
-            public FixedString32Bytes weapon2ItemId;
+            public FixedString64Bytes loadoutSlot;
+            public FixedString64Bytes helmGearItemId;
+            public FixedString64Bytes chestArmorGearItemId;
+            public FixedString64Bytes shouldersGearItemId;
+            public FixedString64Bytes bootsGearItemId;
+            public FixedString64Bytes pantsGearItemId;
+            public FixedString64Bytes beltGearItemId;
+            public FixedString64Bytes glovesGearItemId;
+            public FixedString64Bytes capeGearItemId;
+            public FixedString64Bytes robeGearItemId;
+            public FixedString64Bytes weapon1ItemId;
+            public FixedString64Bytes weapon2ItemId;
             public bool active;
 
-            public Loadout(FixedString32Bytes loadoutSlot, FixedString32Bytes helmGearItemId, FixedString32Bytes chestArmorGearItemId, FixedString32Bytes shouldersGearItemId, FixedString32Bytes bootsGearItemId, FixedString32Bytes pantsGearItemId, FixedString32Bytes beltGearItemId, FixedString32Bytes glovesGearItemId, FixedString32Bytes capeGearItemId, FixedString32Bytes robeGearItemId, FixedString32Bytes weapon1ItemId, FixedString32Bytes weapon2ItemId, bool active)
+            public Loadout(FixedString64Bytes loadoutSlot, FixedString64Bytes helmGearItemId, FixedString64Bytes chestArmorGearItemId, FixedString64Bytes shouldersGearItemId, FixedString64Bytes bootsGearItemId, FixedString64Bytes pantsGearItemId, FixedString64Bytes beltGearItemId, FixedString64Bytes glovesGearItemId, FixedString64Bytes capeGearItemId, FixedString64Bytes robeGearItemId, FixedString64Bytes weapon1ItemId, FixedString64Bytes weapon2ItemId, bool active)
             {
                 this.loadoutSlot = loadoutSlot;
                 this.helmGearItemId = helmGearItemId;
@@ -1302,9 +1302,9 @@ namespace Vi.Core
                 this.active = active;
             }
 
-            public List<FixedString32Bytes> GetLoadoutAsList()
+            public List<FixedString64Bytes> GetLoadoutAsList()
             {
-                return new List<FixedString32Bytes>()
+                return new List<FixedString64Bytes>()
                 {
                     helmGearItemId,
                     chestArmorGearItemId,
@@ -1320,9 +1320,9 @@ namespace Vi.Core
                 };
             }
 
-            public Dictionary<CharacterReference.EquipmentType, FixedString32Bytes> GetLoadoutArmorPiecesAsDictionary()
+            public Dictionary<CharacterReference.EquipmentType, FixedString64Bytes> GetLoadoutArmorPiecesAsDictionary()
             {
-                return new Dictionary<CharacterReference.EquipmentType, FixedString32Bytes>()
+                return new Dictionary<CharacterReference.EquipmentType, FixedString64Bytes>()
                 {
                     { CharacterReference.EquipmentType.Helm, helmGearItemId },
                     { CharacterReference.EquipmentType.Chest, chestArmorGearItemId },
@@ -1550,7 +1550,7 @@ namespace Vi.Core
                 };
             }
 
-            private static string EvaluateFixedString(FixedString32Bytes input)
+            private static string EvaluateFixedString(FixedString64Bytes input)
             {
                 if (input == "")
                 {

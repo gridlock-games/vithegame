@@ -337,7 +337,7 @@ namespace Vi.Core
         public int GetComboCounter() { return comboCounter.Value; }
 
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
-        private NetworkVariable<FixedString32Bytes> grabAttackClipName = new NetworkVariable<FixedString32Bytes>();
+        private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }
