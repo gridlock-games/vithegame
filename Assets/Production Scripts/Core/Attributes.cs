@@ -569,8 +569,7 @@ namespace Vi.Core
             if (attack.shouldFlinch)
             {
                 movementHandler.Flinch(attack.GetFlinchAmount());
-                ActionClip flinchClip = weaponHandler.GetWeapon().GetFlinchClip(attackAngle);
-                animationHandler.PlayAction(flinchClip);
+                animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle));
             }
 
             lastAttackingAttributes = attacker;
@@ -710,9 +709,16 @@ namespace Vi.Core
             {
                 if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                 {
-                    weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
+                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
+                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
                 }
             }
+        }
+
+        private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
+        {
+            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
+            if (vfxInstance) { Destroy(vfxInstance); }
         }
 
         [System.Serializable]

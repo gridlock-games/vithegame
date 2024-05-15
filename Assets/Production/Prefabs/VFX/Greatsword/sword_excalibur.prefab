@@ -100216,6 +100216,11 @@ MonoBehaviour:
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   shouldUseAttackerPositionForHitAngles: 0
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
+  scaleVFXBasedOnEdges: 0
+  boundsPoint: {x: 0, y: 0, z: 2.5}
+  boundsLocalAxis: {x: 0, y: -1, z: 0}
 --- !u!54 &5166609527337984315
 Rigidbody:
   m_ObjectHideFlags: 0
