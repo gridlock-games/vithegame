@@ -307,11 +307,11 @@ namespace Vi.Core
 
         private ActionVFXPreview actionVFXPreviewInstance;
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
-        public void SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        public GameObject SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
             bool isPreviewVFX = actionVFXPrefab.GetComponent<ActionVFXPreview>();
 
-            if (actionVFXTracker.Contains(actionVFXPrefab)) { return; }
+            if (actionVFXTracker.Contains(actionVFXPrefab)) { return null; }
             GameObject vfxInstance = null;
             switch (actionVFXPrefab.transformType)
             {
@@ -422,19 +422,45 @@ namespace Vi.Core
             }
 
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
+
+            return vfxInstance;
         }
 
         public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
+            if (particleSystem)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!particleSystem.isPlaying) { break; }
+                }
+            }
 
             AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
+            if (audioSource)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!audioSource.isPlaying) { break; }
+                }
+            }
 
             VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
-
+            if (visualEffect)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!visualEffect.HasAnySystemAwake()) { break; }
+                }
+            }
+            
             Destroy(vfxInstance);
         }
 
