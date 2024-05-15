@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ability4
   m_EditorClassIdentifier: 
   clipType: 4
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -6036,6 +6037,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -6897,10 +6902,11 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 30
   agentDefenseCost: 0
-  agentRageCost: 50
+  agentRageCost: 0
   effectedWeaponBones: 
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -6926,9 +6932,9 @@ MonoBehaviour:
   canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 0
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
@@ -6937,7 +6943,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 37a767b5efb338443aec7d906b16419f, type: 3}
-  abilityCooldownTime: 20
+  abilityCooldownTime: 30
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 11
@@ -6957,6 +6963,9 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 50
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

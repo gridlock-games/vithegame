@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ability4
   m_EditorClassIdentifier: 
   clipType: 4
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -159,6 +160,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -255,7 +260,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 30
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
@@ -268,7 +273,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.5
   damage: 15
   healAmount: 0
   staminaDamage: 0
@@ -315,10 +320,13 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.15, y: 0.15, z: 0.15}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
-  shouldAimBody: 1
-  shouldAimOffHand: 1
+  shouldAimBody: 0
+  shouldAimOffHand: 0
   requireAmmo: 0
   requiredAmmoAmount: 1
