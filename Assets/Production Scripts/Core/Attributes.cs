@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
-using Unity.Collections;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -338,7 +338,7 @@ namespace Vi.Core
         public int GetComboCounter() { return comboCounter.Value; }
 
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
-        private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
+        private NetworkVariable<NetworkString64Bytes> grabAttackClipName = new NetworkVariable<NetworkString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }

@@ -84,13 +84,14 @@ namespace Vi.Core
             SetMap(map);
         }
 
-        private NetworkVariable<FixedString512Bytes> gameModeSettings = new NetworkVariable<FixedString512Bytes>();
+        private NetworkVariable<NetworkString512Bytes> gameModeSettings = new NetworkVariable<NetworkString512Bytes>();
 
         public string GetGameModeSettings() { return gameModeSettings.Value.ToString(); }
 
         public void SetGameModeSettings(string gameModeSettings)
         {
-            if (gameModeSettings == this.gameModeSettings.Value) { return; }
+            if (gameModeSettings == null) { Debug.LogError("Trying to set game mode settings to be null!"); return; }
+            if (gameModeSettings == this.gameModeSettings.Value.ToString()) { return; }
 
             if (IsServer)
             {

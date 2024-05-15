@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Unity.Collections;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -143,7 +143,7 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
 
-            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
+            foreach (KeyValuePair<CharacterReference.EquipmentType, NetworkString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
                 if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
                 {

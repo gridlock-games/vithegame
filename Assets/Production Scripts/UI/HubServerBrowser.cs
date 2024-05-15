@@ -31,6 +31,7 @@ namespace Vi.UI
         private const float errorTextDisplayDuration = 5;
         private void Update()
         {
+            refreshServersButton.interactable = WebRequestManager.Singleton.IsRefreshingServers;
             joinLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
             
             if (!WebRequestManager.Singleton.IsRefreshingServers)
