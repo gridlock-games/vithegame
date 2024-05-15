@@ -203,7 +203,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 488.43607, y: 98.64909}
+  m_SizeDelta: {x: 490.77997, y: 99}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &64330723
 MonoBehaviour:
@@ -592,7 +592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &160895986
 RectTransform:
   m_ObjectHideFlags: 0
@@ -609,10 +609,10 @@ RectTransform:
   m_Father: {fileID: 2014850919}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 7.445, y: 0.0012512}
-  m_SizeDelta: {x: 1934.9, y: 1305.4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &306677441
 GameObject:
@@ -6120,9 +6120,6 @@ MonoBehaviour:
   - {fileID: 1294365462}
   - {fileID: 2033049993}
   - {fileID: 1453568422}
-  oAuthParent: {fileID: 160895985}
-  oAuthReturnBtn: {fileID: 676656267}
-  oAuthMessageText: {fileID: 1973996067}
   viLogo: {fileID: 1852155290}
   authenticationParent: {fileID: 774838218}
   usernameInput: {fileID: 1006636166}
@@ -6132,6 +6129,9 @@ MonoBehaviour:
   returnButton: {fileID: 1639054272}
   switchLoginFormButton: {fileID: 1922540303}
   loginErrorText: {fileID: 2010544571}
+  oAuthParent: {fileID: 160895985}
+  oAuthReturnBtn: {fileID: 676656267}
+  oAuthMessageText: {fileID: 1973996067}
   playParent: {fileID: 77962636}
   welcomeUserText: {fileID: 877958099}
   startHubServerButton: {fileID: 2019563764}
