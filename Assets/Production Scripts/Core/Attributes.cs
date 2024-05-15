@@ -385,6 +385,9 @@ namespace Vi.Core
             }
         }
 
+        private const float notBlockingDefenseHitReactionPercentage = 0.4f;
+        private const float blockingDefenseHitReactionPercentage = 0.5f;
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -483,60 +486,107 @@ namespace Vi.Core
             AddRage(victimRageToBeAddedOnHit);
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
-            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle,
-                weaponHandler.IsBlocking & (GetDefense() > 0 | GetStamina() > 30),
-                attackAilment, ailment.Value);
+            ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
             hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
             hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
 
-            float damage = hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? -attack.damage * 0.7f : -attack.damage;
-            damage *= attacker.damageMultiplier;
-            damage *= damageMultiplier;
+            float HPDamage = -attack.damage;
+            HPDamage *= attacker.damageMultiplier;
+            HPDamage *= damageMultiplier;
+
+            float defensePercentage = GetDefense() / GetMaxDefense();
+
+            bool shouldPlayHitReaction = false;
+            switch (hitReaction.GetHitReactionType())
+            {
+                case ActionClip.HitReactionType.Normal:
+                    if (defensePercentage >= notBlockingDefenseHitReactionPercentage)
+                    {
+                        AddDefense(HPDamage * 0.7f);
+                        HPDamage *= 0.7f;
+                    }
+                    else if (defensePercentage > 0)
+                    {
+                        AddDefense(HPDamage * 0.7f);
+                        shouldPlayHitReaction = true;
+                        HPDamage *= 0.7f;
+                    }
+                    else // Defense is at 0
+                    {
+                        AddDefense(attack.damage);
+                        shouldPlayHitReaction = true;
+                    }
+                    break;
+                case ActionClip.HitReactionType.Blocking:
+                    if (defensePercentage >= blockingDefenseHitReactionPercentage)
+                    {
+                        AddDefense(HPDamage * 0.5f);
+                        HPDamage = 0;
+                    }
+                    else if (defensePercentage > 0)
+                    {
+                        AddDefense(Mathf.NegativeInfinity);
+                        AddStamina(-GetMaxStamina() * 0.3f);
+                        shouldPlayHitReaction = true;
+                        HPDamage *= 0.7f;
+                    }
+                    else // Defense is at 0
+                    {
+                        AddStamina(-GetMaxStamina() * 0.3f);
+                        if (GetStamina() < GetMaxStamina() * 0.3f)
+                        {
+                            if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
+                        }
+                        shouldPlayHitReaction = true;
+                    }
+                    break;
+                default:
+                    Debug.Log("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
+                    break;
+            }
 
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
-                damage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                HPDamage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
                 if (attack.canEnhance & attacker.animationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
                 {
-                    damage *= attack.enhancedChargeDamageMultiplier;
+                    HPDamage *= attack.enhancedChargeDamageMultiplier;
                 }
             }
 
-            if (HP.Value + damage <= 0)
+            if (HP.Value + HPDamage <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
-            if (damage != 0)
+            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
             {
-                if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
+                if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
                 {
-                    if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
-                    {
-                        GetGrabAssailant().CancelGrab();
-                        CancelGrab();
-                    }
+                    GetGrabAssailant().CancelGrab();
+                    CancelGrab();
+                }
 
-                    if (hitReaction.ailment == ActionClip.Ailment.Grab)
-                    {
-                        grabAttackClipName.Value = attack.name;
-                        grabAssailantDataId.Value = attacker.GetPlayerDataId();
-                        isGrabbed.Value = true;
-                        attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
-                    }
+                if (hitReaction.ailment == ActionClip.Ailment.Grab)
+                {
+                    grabAttackClipName.Value = attack.name;
+                    grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                    isGrabbed.Value = true;
+                    attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                }
 
-                    if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
+                if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
+                {
+                    if (attack.shouldPlayHitReaction
+                        | ailment.Value != ActionClip.Ailment.None
+                        | animationHandler.IsCharging()
+                        | shouldPlayHitReaction)
                     {
-                        if (attack.shouldPlayHitReaction | ailment.Value != ActionClip.Ailment.None | animationHandler.IsCharging()) { animationHandler.PlayAction(hitReaction); }
+                        animationHandler.PlayAction(hitReaction);
                     }
                 }
-            }
-            else
-            {
-                if (Application.isEditor) { Debug.LogWarning("ActionClip " + attack.name + " is inflicting 0 damage!"); }
-                return false;
             }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
@@ -546,17 +596,17 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
-                AddHP(damage);
+                AddHP(HPDamage);
             }
             else // Not blocking
             {
                 if (evaluateAfterHitStopCoroutine != null) { StopCoroutine(evaluateAfterHitStopCoroutine); }
                 evaluateAfterHitStopCoroutine = StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
 
-                if (damage != 0)
+                if (HPDamage != 0)
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
-                    AddHP(damage);
+                    AddHP(HPDamage);
                 }
             }
 
