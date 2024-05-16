@@ -176,7 +176,6 @@ namespace Vi.ScriptableObjects
         public float damage = 20;
         public float healAmount = 0;
         public float staminaDamage = 0;
-        public float defenseDamage = 0;
         public float healthPenaltyOnMiss = 0;
         public float staminaPenaltyOnMiss = 0;
         public float defensePenaltyOnMiss = 0;

@@ -943,6 +943,13 @@ namespace Vi.Core
             AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
+        public void OnActivateRage()
+        {
+            if (GetRage() / GetMaxRage() < 1) { return; }
+
+
+        }
+
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
