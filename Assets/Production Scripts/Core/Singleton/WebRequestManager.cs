@@ -9,6 +9,7 @@ using Vi.ScriptableObjects;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Vi.Utility;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -1592,7 +1593,7 @@ namespace Vi.Core
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
-            StartCoroutine(VersionGetRequest());
+            CheckGameVersion();
         }
 
         private void Update()
@@ -1873,9 +1874,23 @@ namespace Vi.Core
             }
         }
 
-        public GameVersion gameVersion { get; private set; }
-        private IEnumerator VersionGetRequest()
+        public void CheckGameVersion()
         {
+            if (checkingGameVersion) { return; }
+            StartCoroutine(CheckGameVersionRequest());
+        }
+
+        public bool GameIsUpToDate { get; private set; }
+
+        public string GetGameVersion() { return gameVersion.Version; }
+
+        [SerializeField] private GameObject alertBoxPrefab;
+        private GameVersion gameVersion;
+        private bool checkingGameVersion;
+        private IEnumerator CheckGameVersionRequest()
+        {
+            checkingGameVersion = true;
+
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/version");
             yield return getRequest.SendWebRequest();
 
@@ -1890,9 +1905,14 @@ namespace Vi.Core
             gameVersion = version.gameversion;
 
             getRequest.Dispose();
+
+            GameIsUpToDate = Application.version == gameVersion.Version;
+            if (!GameIsUpToDate) { Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update."; }
+
+            checkingGameVersion = false;
         }
 
-        public class GameVersion
+        private class GameVersion
         {
             public string Version;
             public string Type;

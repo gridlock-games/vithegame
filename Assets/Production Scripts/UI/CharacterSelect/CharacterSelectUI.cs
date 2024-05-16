@@ -15,6 +15,7 @@ namespace Vi.UI
     {
         [SerializeField] private Button returnButton;
         [SerializeField] private Text webRequestStatusText;
+        [SerializeField] private Text gameVersionText;
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -75,8 +76,8 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             selectCharacterButton_autoConnectToHub.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
@@ -311,8 +312,8 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
@@ -486,6 +487,8 @@ namespace Vi.UI
         private bool lastClientState;
         private void Update()
         {
+            gameVersionText.text = WebRequestManager.Singleton.GameIsUpToDate ? "" : "GAME IS OUT OF DATE";
+
             if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
             lastClientState = NetworkManager.Singleton.IsClient;
 
