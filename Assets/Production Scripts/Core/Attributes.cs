@@ -114,8 +114,9 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitHP()); }
+            if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            rage.OnValueChanged += OnRageChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
@@ -128,7 +129,7 @@ namespace Vi.Core
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
-        private IEnumerator InitHP()
+        private IEnumerator InitStats()
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
@@ -144,6 +145,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            rage.OnValueChanged -= OnRageChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
@@ -167,6 +169,22 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+        }
+
+        [SerializeField] private GameObject rageAtMaxVFXPrefab;
+        private GameObject rageAtMaxVFXInstance;
+        private void OnRageChanged(float prev, float current)
+        {
+            float currentRagePercent = GetRage() / GetMaxRage();
+
+            if (currentRagePercent >= 1)
+            {
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, transform); }
+            }
+            else
+            {
+                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
             }
         }
 
