@@ -174,7 +174,7 @@ namespace Vi.Core
             }
         }
 
-        private const float rageEndPercent = 0.1f;
+        private const float rageEndPercent = 0.01f;
 
         [SerializeField] private GameObject rageAtMaxVFXPrefab;
         [SerializeField] private GameObject ragingVFXPrefab;
@@ -210,7 +210,7 @@ namespace Vi.Core
             }
             else
             {
-                if (ragingVFXInstance) { Destroy(rageAtMaxVFXInstance); }
+                if (ragingVFXInstance) { Destroy(ragingVFXInstance); }
             }
         }
 
@@ -970,15 +970,12 @@ namespace Vi.Core
         {
             if (IsRaging())
             {
-                Debug.Log(Time.time);
                 AddRage(-rageDepletionRate * Time.deltaTime);
             }
-            else
-            {
-                rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
-                if (rageDelayCooldown > 0) { return; }
-                AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
-            }
+
+            rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
+            if (rageDelayCooldown > 0) { return; }
+            AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
         public void OnActivateRage()
