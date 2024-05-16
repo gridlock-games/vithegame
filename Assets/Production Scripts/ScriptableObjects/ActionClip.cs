@@ -176,7 +176,6 @@ namespace Vi.ScriptableObjects
         public float damage = 20;
         public float healAmount = 0;
         public float staminaDamage = 0;
-        public float defenseDamage = 0;
         public float healthPenaltyOnMiss = 0;
         public float staminaPenaltyOnMiss = 0;
         public float defensePenaltyOnMiss = 0;
@@ -229,9 +228,9 @@ namespace Vi.ScriptableObjects
 
         public bool useRotationalTargetingSystem = true;
         public bool limitAttackMotionBasedOnTarget = true;
-        public Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
-        public Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
-        public float boxCastDistance = 5;
+        public static readonly Vector3 boxCastOriginPositionOffset = new Vector3(0, 0.5f, 0);
+        public static readonly Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
+        public const float boxCastDistance = 5;
         public float maximumTargetingRotationAngle = 60;
 
         public const float maximumRootMotionLimitRotationAngle = 60;

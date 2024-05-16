@@ -11,6 +11,7 @@ namespace Vi.Core
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -88,6 +89,15 @@ namespace Vi.Core
                 }
             }
             NetworkObject.Despawn(true);
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(prefab, transform.position, transform.rotation)));
+            }
         }
 
         private void OnDrawGizmos()

@@ -63,7 +63,6 @@ namespace Vi.Editor
         private SerializedProperty spDamage;
         private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
-        private SerializedProperty spDefenseDamage;
         private SerializedProperty spHealthPenaltyOnMiss;
         private SerializedProperty spStaminaPenaltyOnMiss;
         private SerializedProperty spDefensePenaltyOnMiss;
@@ -102,9 +101,9 @@ namespace Vi.Editor
 
         private SerializedProperty spUseRotationalTargetingSystem;
         private SerializedProperty spLimitAttackMotionBasedOnTarget;
-        private SerializedProperty spBoxCastOriginPositionOffset;
-        private SerializedProperty spBoxCastHalfExtents;
-        private SerializedProperty spBoxCastDistance;
+        //private SerializedProperty spBoxCastOriginPositionOffset;
+        //private SerializedProperty spBoxCastHalfExtents;
+        //private SerializedProperty spBoxCastDistance;
         private SerializedProperty spMaximumTargetingRotationAngle;
 
         private SerializedProperty spCanLunge;
@@ -168,7 +167,6 @@ namespace Vi.Editor
             spDamage = serializedObject.FindProperty("damage");
             spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
-            spDefenseDamage = serializedObject.FindProperty("defenseDamage");
             spHealthPenaltyOnMiss = serializedObject.FindProperty("healthPenaltyOnMiss");
             spStaminaPenaltyOnMiss = serializedObject.FindProperty("staminaPenaltyOnMiss");
             spDefensePenaltyOnMiss = serializedObject.FindProperty("defensePenaltyOnMiss");
@@ -206,9 +204,9 @@ namespace Vi.Editor
 
             spUseRotationalTargetingSystem = serializedObject.FindProperty("useRotationalTargetingSystem");
             spLimitAttackMotionBasedOnTarget = serializedObject.FindProperty("limitAttackMotionBasedOnTarget");
-            spBoxCastOriginPositionOffset = serializedObject.FindProperty("boxCastOriginPositionOffset");
-            spBoxCastHalfExtents = serializedObject.FindProperty("boxCastHalfExtents");
-            spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
+            //spBoxCastOriginPositionOffset = serializedObject.FindProperty("boxCastOriginPositionOffset");
+            //spBoxCastHalfExtents = serializedObject.FindProperty("boxCastHalfExtents");
+            //spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
             spMaximumTargetingRotationAngle = serializedObject.FindProperty("maximumTargetingRotationAngle");
 
             spCanLunge = serializedObject.FindProperty("canLunge");
@@ -368,7 +366,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
-                EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
 
@@ -386,9 +383,9 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
                     if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
                     {
-                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        //EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        //EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        //EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
 
@@ -450,7 +447,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
-                EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
 
@@ -469,9 +465,9 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
                     if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
                     {
-                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        //EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        //EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        //EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
 
@@ -534,7 +530,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
-                EditorGUILayout.PropertyField(spDefenseDamage);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spHealthPenaltyOnMiss);
@@ -557,9 +552,9 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
                     if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
                     {
-                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        //EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        //EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        //EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
 
@@ -622,7 +617,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
-                EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
                 EditorGUILayout.PropertyField(spIsBlockable);
@@ -639,9 +633,9 @@ namespace Vi.Editor
                     EditorGUILayout.PropertyField(spLimitAttackMotionBasedOnTarget);
                     if (spUseRotationalTargetingSystem.boolValue | spLimitAttackMotionBasedOnTarget.boolValue)
                     {
-                        EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
-                        EditorGUILayout.PropertyField(spBoxCastHalfExtents);
-                        EditorGUILayout.PropertyField(spBoxCastDistance);
+                        //EditorGUILayout.PropertyField(spBoxCastOriginPositionOffset);
+                        //EditorGUILayout.PropertyField(spBoxCastHalfExtents);
+                        //EditorGUILayout.PropertyField(spBoxCastDistance);
                         EditorGUILayout.PropertyField(spMaximumTargetingRotationAngle);
                     }
 
@@ -700,7 +694,6 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spDamage);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
-                EditorGUILayout.PropertyField(spDefenseDamage);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
 

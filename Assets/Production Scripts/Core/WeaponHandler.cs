@@ -411,7 +411,7 @@ namespace Vi.Core
             return vfxInstance;
         }
 
-        public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
+        public static IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem)

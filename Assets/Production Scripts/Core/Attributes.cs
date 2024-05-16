@@ -114,8 +114,9 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitHP()); }
+            if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            rage.OnValueChanged += OnRageChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
@@ -128,7 +129,7 @@ namespace Vi.Core
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
-        private IEnumerator InitHP()
+        private IEnumerator InitStats()
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
@@ -144,6 +145,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            rage.OnValueChanged -= OnRageChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
@@ -167,6 +169,24 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+        }
+
+        [SerializeField] private GameObject rageAtMaxVFXPrefab;
+        [SerializeField] private GameObject ragingVFXPrefab;
+        private GameObject rageAtMaxVFXInstance;
+        private GameObject ragingVFXInstance;
+        private void OnRageChanged(float prev, float current)
+        {
+            float currentRagePercent = GetRage() / GetMaxRage();
+
+            if (currentRagePercent >= 1)
+            {
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, transform); }
+            }
+            else
+            {
+                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
             }
         }
 
@@ -816,7 +836,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 GlowRenderer.RenderHit();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
@@ -828,7 +848,7 @@ namespace Vi.Core
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -858,7 +878,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 GlowRenderer.RenderBlock();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
@@ -868,7 +888,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -921,6 +941,13 @@ namespace Vi.Core
             rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
             if (rageDelayCooldown > 0) { return; }
             AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
+        }
+
+        public void OnActivateRage()
+        {
+            if (GetRage() / GetMaxRage() < 1) { return; }
+
+
         }
 
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
