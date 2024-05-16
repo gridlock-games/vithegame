@@ -477,7 +477,7 @@ namespace Vi.ArtificialIntelligence
         void OnDodge()
         {
             Vector3 moveInput = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
-            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z), transform.forward, Vector3.up);
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z) * (attributes.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
