@@ -173,7 +173,9 @@ namespace Vi.Core
         }
 
         [SerializeField] private GameObject rageAtMaxVFXPrefab;
+        [SerializeField] private GameObject ragingVFXPrefab;
         private GameObject rageAtMaxVFXInstance;
+        private GameObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
