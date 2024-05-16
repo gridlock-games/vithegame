@@ -12,6 +12,7 @@ namespace Vi.Core
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
         [SerializeField] private float timeToActivateGravity = 0;
         [SerializeField] private float killDistance = 50;
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
 
         private Attributes attacker;
         private ActionClip attack;
@@ -58,6 +59,14 @@ namespace Vi.Core
         private void Update()
         {
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(prefab, transform.position, transform.rotation)));
+            }
         }
 
         private void OnTriggerEnter(Collider other)
