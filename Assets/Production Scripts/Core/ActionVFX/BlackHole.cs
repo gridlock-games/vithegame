@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 
-namespace Vi.Misc
+namespace Vi.Core
 {
     public class BlackHole : MonoBehaviour
     {
