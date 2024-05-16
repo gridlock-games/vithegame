@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
@@ -10,6 +8,7 @@ namespace Vi.UI
     public class AbilityCard : MonoBehaviour
     {
         [SerializeField] private Image abilityIcon;
+        [SerializeField] private Image inactiveAbilityIcon;
         [SerializeField] private Image cooldownIcon;
         [SerializeField] private Text keybindText;
         [SerializeField] private ActionClip previewAbility;
@@ -21,6 +20,7 @@ namespace Vi.UI
             if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
             ability = previewAbility;
             abilityIcon.sprite = ability.abilityImageIcon;
+            inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             keybindText.text = previewAbility.name.Replace("Ability", "");
             cooldownIcon.fillAmount = 0;
         }
@@ -29,6 +29,7 @@ namespace Vi.UI
         {
             this.ability = ability;
             abilityIcon.sprite = ability.abilityImageIcon;
+            inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
         }
 
@@ -36,6 +37,7 @@ namespace Vi.UI
         private Color originalBorderImageColor;
         private WeaponHandler weaponHandler;
         private Attributes attributes;
+
         private void Start()
         {
             borderImage = GetComponent<Image>();
@@ -50,6 +52,7 @@ namespace Vi.UI
         {
             if (ability == null) { return; }
             cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
+            abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
 
             if (ability.agentStaminaCost > attributes.GetStamina())
             {

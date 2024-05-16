@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Unity.Collections;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -84,19 +84,39 @@ namespace Vi.Core
         }
 
         private Coroutine applyLoadoutCoroutine;
-        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath = false)
+        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn = false)
         {
             if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
-            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForDeath));
+            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
         }
 
-        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForDeath)
+        private bool canApplyLoadoutThisFrame;
+        public void SwapLoadoutOnRespawn()
         {
-            if (waitForDeath)
-            {
-                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.Death);
-                yield return new WaitUntil(() => attributes.GetAilment() == ActionClip.Ailment.None);
-            }
+            if (!IsServer) { Debug.LogError("LoadoutManager.SwapWeaponsOnRespawn() should only be called on the server!"); return; }
+            AllowLoadoutSwap();
+            SwapWeaponOnRespawnClientRpc();
+        }
+
+        [ClientRpc] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
+
+        private void AllowLoadoutSwap()
+        {
+            canApplyLoadoutThisFrame = true;
+            if (resetCanApplyLoadoutThisFrameCorountine != null) { StopCoroutine(resetCanApplyLoadoutThisFrameCorountine); }
+            resetCanApplyLoadoutThisFrameCorountine = StartCoroutine(ResetCanApplyLoadoutThisFrameBool());
+        }
+
+        private Coroutine resetCanApplyLoadoutThisFrameCorountine;
+        private IEnumerator ResetCanApplyLoadoutThisFrameBool()
+        {
+            yield return null;
+            canApplyLoadoutThisFrame = false;
+        }
+
+        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn)
+        {
+            if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
@@ -123,7 +143,7 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
 
-            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString32Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
+            foreach (KeyValuePair<CharacterReference.EquipmentType, NetworkString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
                 if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
                 {

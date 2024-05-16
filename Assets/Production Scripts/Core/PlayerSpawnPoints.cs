@@ -49,27 +49,34 @@ namespace Vi.Core
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
             if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
 
-            List<TransformData> verifiedSpawnPoints = new List<TransformData>();
+            List<(float, TransformData)> verifiedSpawnPoints = new List<(float, TransformData)>();
+            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects();
             foreach (TransformData transformData in possibleSpawnPoints)
             {
-                bool allAttributesMeetDistanceThreshold = true;
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                float minDistance = Mathf.Infinity;
+                foreach (Attributes attributes in activePlayerObjects)
                 {
-                    if (Vector3.Distance(attributes.transform.position, transformData.position) < 5)
-                    {
-                        allAttributesMeetDistanceThreshold = false;
-                        break;
-                    }
+                    float distance = Vector3.Distance(attributes.transform.position, transformData.position);
+                    if (distance < minDistance) { minDistance = distance; }
                 }
-                if (allAttributesMeetDistanceThreshold) { verifiedSpawnPoints.Add(transformData); }
+                verifiedSpawnPoints.Add((minDistance, transformData));
+            }
+            // Get the spawn points where we have the largest minimum distance to another player object
+            float minDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
+            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == minDistanceInList).ToList();
+
+            float distanceOfSelectedPoint = Mathf.Infinity;
+            TransformData spawnPoint = new TransformData();
+            if (verifiedSpawnPoints.Count > 0)
+            {
+                int randomIndex = Random.Range(0, verifiedSpawnPoints.Count);
+                (distanceOfSelectedPoint, spawnPoint) = verifiedSpawnPoints[randomIndex];
             }
 
-            int randomIndex = Random.Range(0, verifiedSpawnPoints.Count);
-            TransformData spawnPoint = new TransformData();
-            if (verifiedSpawnPoints.Count > 0) { spawnPoint = verifiedSpawnPoints[randomIndex]; }
-
-            return (verifiedSpawnPoints.Count > 0, spawnPoint);
+            return (distanceOfSelectedPoint > spawnDistanceThreshold, spawnPoint);
         }
+
+        private const float spawnDistanceThreshold = 5;
 
         private List<TransformData> GetPossibleSpawnOrientations(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {

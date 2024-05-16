@@ -43,13 +43,9 @@ namespace Vi.UI
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
-                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
-                {
-                    statusIcon.InitializeStatusIcon(status);
-                    statusIconGameObject.SetActive(false);
-                    statusIcons.Add(statusIcon);
-                }
+                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
+                statusIcon.InitializeStatusIcon(status);
+                statusIcons.Add(statusIcon);
             }
 
             healthFillImage.fillAmount = 0;
@@ -83,9 +79,18 @@ namespace Vi.UI
 
             if (!playerUI)
             {
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
                 }
             }
         }

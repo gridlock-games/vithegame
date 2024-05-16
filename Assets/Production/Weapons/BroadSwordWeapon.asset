@@ -97,6 +97,9 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: 5ea22a3e631747f40b1d6a2cbe07247e, type: 2}
     shouldAlreadyHaveAilment: 0
   - hitLocation: 0
+    reactionClip: {fileID: 11400000, guid: 1789c1d6050919045b4fd84c10954a42, type: 2}
+    shouldAlreadyHaveAilment: 0
+  - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: a114819f2c0ea204fbef7303261d6fba, type: 2}
     shouldAlreadyHaveAilment: 0
   - hitLocation: 0
@@ -123,6 +126,15 @@ MonoBehaviour:
   - hitLocation: 0
     reactionClip: {fileID: 11400000, guid: b896f757d35339a408512cb7b113cc8c, type: 2}
     shouldAlreadyHaveAilment: 0
+  flinchReactions:
+  - hitLocation: 1
+    reactionClip: {fileID: 11400000, guid: 2afc9ce2a09f51b4b9e171293b106eb3, type: 2}
+  - hitLocation: 2
+    reactionClip: {fileID: 11400000, guid: a3259634df2538042adf746c77cbfee8, type: 2}
+  - hitLocation: 3
+    reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
+  - hitLocation: 4
+    reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
   ability1: {fileID: 11400000, guid: 6811dfdd12e69e44a86ac56598d1efde, type: 2}
   ability2: {fileID: 11400000, guid: 66da9411a9d9a2145ac9aef728435278, type: 2}
   ability3: {fileID: 11400000, guid: 323e28a00eae6004fa0b5ae2d1c22780, type: 2}
@@ -138,6 +150,7 @@ MonoBehaviour:
   - inputs: 000000000000000000000000
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 60af0e0de973bdc4c88b94f3ad649d96, type: 2}
+  grabAttackClipList: []
   dodgeStaminaCost: 20
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
@@ -147,3 +160,4 @@ MonoBehaviour:
   dodgeBR: {fileID: 11400000, guid: 8e65494966795db4e988629afba64821, type: 2}
   dodgeL: {fileID: 11400000, guid: e3582b9581dbb1f4d8c0978182f5c8ba, type: 2}
   dodgeR: {fileID: 11400000, guid: 95469fd8448f39a4e9a6e64370077838, type: 2}
+  lunge: {fileID: 11400000, guid: 4da14dbdec2c94e4199de4cec41bb754, type: 2}

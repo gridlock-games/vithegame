@@ -152,12 +152,14 @@ namespace Vi.Core
         Attributes attributes;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
+        AnimationHandler animationHandler;
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
             weaponHandler = GetComponentInParent<WeaponHandler>();
+            animationHandler = weaponHandler.GetComponent<AnimationHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
@@ -237,20 +239,10 @@ namespace Vi.Core
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
-                float normalizedTime = 0;
-                bool shouldApplyCurves = false;
-                if (animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
-                {
-                    normalizedTime = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
-                    shouldApplyCurves = true;
-                }
-                else if (animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name))
-                {
-                    normalizedTime = animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).normalizedTime;
-                    shouldApplyCurves = true;
-                }
+                float normalizedTime = animationHandler.GetActionClipNormalizedTime(weaponHandler.CurrentActionClip);
+                bool shouldApplyCurves = animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip);
 
-                if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName(weaponHandler.CurrentActionClip.name + "_Attack"); }
+                if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip); }
 
                 Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
@@ -264,6 +256,11 @@ namespace Vi.Core
                 if (attributes.IsPulled())
                 {
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
+                else if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
+                {
+                    Transform grabAssailant = attributes.GetGrabAssailant().transform;
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
                 else
                 {

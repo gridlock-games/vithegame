@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using System.Text.RegularExpressions;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -110,7 +110,7 @@ namespace Vi.UI
             }
 
             string rebinds = playerInput.actions.SaveBindingOverridesAsJson();
-            PlayerPrefs.SetString("Rebinds", rebinds);
+            PersistentLocalObjects.Singleton.SetString("Rebinds", rebinds);
 
             Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
 

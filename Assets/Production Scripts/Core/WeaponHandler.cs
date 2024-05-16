@@ -18,21 +18,6 @@ namespace Vi.Core
             return weaponInstance;
         }
 
-        public override void OnNetworkSpawn()
-        {
-            isBlocking.OnValueChanged += OnIsBlockingChange;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            isBlocking.OnValueChanged -= OnIsBlockingChange;
-        }
-
-        private void OnIsBlockingChange(bool prev, bool current)
-        {
-            animationHandler.Animator.SetBool("Blocking", current);
-        }
-
         private Weapon weaponInstance;
         private Attributes attributes;
         private AnimationHandler animationHandler;
@@ -125,6 +110,7 @@ namespace Vi.Core
             CanAim = false;
             Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
+            List<RuntimeWeapon> runtimeWeapons = new List<RuntimeWeapon>();
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
@@ -133,6 +119,7 @@ namespace Vi.Core
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
                         GameObject instance = Instantiate(modelData.weaponPrefab);
+                        runtimeWeapons.Add(instance.GetComponent<RuntimeWeapon>());
                         instances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
@@ -179,6 +166,18 @@ namespace Vi.Core
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
             weaponInstances = instances;
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                {
+                    runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeapons);
+                }
+                else
+                {
+                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
+                }
+            }
         }
 
         public void PlayFlashAttack()
@@ -200,8 +199,20 @@ namespace Vi.Core
         public ActionClip CurrentActionClip { get; private set; }
         private string currentActionClipWeapon;
 
+        private const float abilityCancelledDuringAnticipationCooldownReductionPercent = 0.1f;
+
         public void SetActionClip(ActionClip actionClip, string weaponName)
         {
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
+
+            if (IsInAnticipation)
+            {
+                if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
+                {
+                    weaponInstance.ReduceAbilityCooldownTime(CurrentActionClip, abilityCancelledDuringAnticipationCooldownReductionPercent);
+                }
+            }
+
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
@@ -281,11 +292,11 @@ namespace Vi.Core
 
         private ActionVFXPreview actionVFXPreviewInstance;
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
-        public void SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        public GameObject SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
             bool isPreviewVFX = actionVFXPrefab.GetComponent<ActionVFXPreview>();
 
-            if (actionVFXTracker.Contains(actionVFXPrefab)) { return; }
+            if (actionVFXTracker.Contains(actionVFXPrefab)) { return null; }
             GameObject vfxInstance = null;
             switch (actionVFXPrefab.transformType)
             {
@@ -396,19 +407,45 @@ namespace Vi.Core
             }
 
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
+
+            return vfxInstance;
         }
 
         public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem) { yield return new WaitUntil(() => !particleSystem.isPlaying); }
+            if (particleSystem)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!particleSystem.isPlaying) { break; }
+                }
+            }
 
             AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource) { yield return new WaitUntil(() => !audioSource.isPlaying); }
+            if (audioSource)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!audioSource.isPlaying) { break; }
+                }
+            }
 
             VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect) { yield return new WaitUntil(() => !visualEffect.HasAnySystemAwake()); }
-
+            if (visualEffect)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!visualEffect.HasAnySystemAwake()) { break; }
+                }
+            }
+            
             Destroy(vfxInstance);
         }
 
@@ -421,8 +458,7 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
 
-            if (animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name)
-                    | animationHandler.Animator.GetNextAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName(CurrentActionClip.name))
+            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
             {
                 if (CurrentActionClip.isUninterruptable) { attributes.SetUninterruptable(Time.deltaTime * 2); }
                 if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.deltaTime * 2); }
@@ -430,21 +466,33 @@ namespace Vi.Core
 
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = isBlocking.Value;
+                IsBlocking = attributes.GetDefense() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {
                 IsBlocking = false;
             }
-            
-            ActionClip.ClipType[] attackClipTypes = new ActionClip.ClipType[] { ActionClip.ClipType.LightAttack, ActionClip.ClipType.HeavyAttack, ActionClip.ClipType.Ability, ActionClip.ClipType.FlashAttack };
+
+            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
+            {
+                float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
+                {
+                    if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                    if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                    {
+                        SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                    }
+                }
+            }
+
             if (currentActionClipWeapon != weaponInstance.name)
             {
                 IsInAnticipation = false;
                 IsAttacking = false;
                 IsInRecovery = false;
             }
-            else if (attackClipTypes.Contains(CurrentActionClip.GetClipType()))
+            else if (CurrentActionClip.IsAttack())
             {
                 bool lastIsAttacking = IsAttacking;
                 if (animationHandler.IsActionClipPlaying(CurrentActionClip))
@@ -453,15 +501,6 @@ namespace Vi.Core
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
-
-                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
-                    {
-                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
-                        {
-                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
-                        }
-                    }
                 }
                 else
                 {
@@ -479,7 +518,7 @@ namespace Vi.Core
                         {
                             AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
                             if (attackSoundEffect)
-                                AudioManager.Singleton.PlayClipAtPoint(attackSoundEffect, weaponInstances[weaponBone].transform.position);
+                                AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);
                             else if (Application.isEditor)
                                 Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
                         }
@@ -601,7 +640,7 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
-        private void HeavyAttack(bool isPressed)
+        public void HeavyAttack(bool isPressed)
         {
             if (isPressed)
             {
@@ -620,17 +659,24 @@ namespace Vi.Core
 
             if (CanAim)
             {
-                if (PlayerPrefs.GetString("ZoomMode") == "TOGGLE")
+                if (NetworkObject.IsPlayerObject)
                 {
-                    if (isPressed) { aiming.Value = !aiming.Value; }
-                }
-                else if (PlayerPrefs.GetString("ZoomMode") == "HOLD")
-                {
-                    aiming.Value = isPressed;
+                    if (PersistentLocalObjects.Singleton.GetString("ZoomMode") == "TOGGLE")
+                    {
+                        if (isPressed) { aiming.Value = !aiming.Value; }
+                    }
+                    else if (PersistentLocalObjects.Singleton.GetString("ZoomMode") == "HOLD")
+                    {
+                        aiming.Value = isPressed;
+                    }
+                    else
+                    {
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PersistentLocalObjects.Singleton.GetString("ZoomMode"));
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Not sure how to handle player prefs ZoomMode - " + PlayerPrefs.GetString("ZoomMode"));
+                    aiming.Value = isPressed;
                 }
             }
             else if (isPressed)
@@ -676,12 +722,17 @@ namespace Vi.Core
 
         void OnAbility1(InputValue value)
         {
+            Ability1(value.isPressed);
+        }
+
+        public void Ability1(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -703,12 +754,17 @@ namespace Vi.Core
 
         void OnAbility2(InputValue value)
         {
+            Ability2(value.isPressed);
+        }
+
+        public void Ability2(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -730,12 +786,17 @@ namespace Vi.Core
 
         void OnAbility3(InputValue value)
         {
+            Ability3(value.isPressed);
+        }
+
+        public void Ability3(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -757,12 +818,17 @@ namespace Vi.Core
 
         void OnAbility4(InputValue value)
         {
+            Ability4(value.isPressed);
+        }
+
+        public void Ability4(bool isPressed)
+        {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX)
+                if (actionClip.previewActionVFX & IsLocalPlayer)
                 {
-                    if (value.isPressed) // If we are holding down the key
+                    if (isPressed) // If we are holding down the key
                     {
                         SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
@@ -780,6 +846,18 @@ namespace Vi.Core
                     animationHandler.PlayAction(actionClip);
                 }
             }
+        }
+
+        public bool IsNextProjectileDamageMultiplied()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            {
+                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
+                {
+                    return shooterWeapon.GetNextDamageMultiplier() > 1;
+                }
+            }
+            return false;
         }
 
         public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
@@ -804,6 +882,8 @@ namespace Vi.Core
         private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
+            animationHandler.Animator.SetBool("Blocking", IsBlocking);
+
             if (IsServer)
             {
                 reloadingAnimParameterValue.Value = animationHandler.Animator.GetBool("Reloading");
@@ -819,6 +899,18 @@ namespace Vi.Core
             else
             {
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
+            }
+
+            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            {
+                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                {
+                    runtimeWeapon.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
+                }
+                else
+                {
+                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
+                }
             }
         }
 
@@ -873,17 +965,17 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             bool isPressed = value.isPressed;
-            if (PlayerPrefs.GetString("BlockingMode") == "TOGGLE")
+            if (PersistentLocalObjects.Singleton.GetString("BlockingMode") == "TOGGLE")
             {
                 if (isPressed) { isBlocking.Value = !isBlocking.Value; }
             }
-            else if (PlayerPrefs.GetString("BlockingMode") == "HOLD")
+            else if (PersistentLocalObjects.Singleton.GetString("BlockingMode") == "HOLD")
             {
                 isBlocking.Value = isPressed;
             }
             else
             {
-                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PlayerPrefs.GetString("BlockingMode"));
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + PersistentLocalObjects.Singleton.GetString("BlockingMode"));
             }
         }
 
@@ -904,9 +996,9 @@ namespace Vi.Core
         void OnDisableBots()
         {
             if (!Application.isEditor) { return; }
-            PlayerPrefs.SetString("DisableBots", (!bool.Parse(PlayerPrefs.GetString("DisableBots"))).ToString());
+            PersistentLocalObjects.Singleton.SetString("DisableBots", (!bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots"))).ToString());
 
-            if (bool.Parse(PlayerPrefs.GetString("DisableBots")))
+            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
             {
                 Debug.Log("Disabled Bot AI");
             }
@@ -922,10 +1014,16 @@ namespace Vi.Core
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
 
-            // If we are in recovery, and not transitioning to a different action
-            if (IsInRecovery) // & !animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions"))
+            // If we are in recovery
+            if (IsInRecovery)
             {
-                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
+                ActionClip actionClip = null;
+                // If not transitioning to a different action
+                if (!animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+                {
+                    actionClip = SelectAttack(inputAttackType, inputHistory);
+                }
+
                 if (actionClip)
                 {
                     if (ShouldUseAmmo())

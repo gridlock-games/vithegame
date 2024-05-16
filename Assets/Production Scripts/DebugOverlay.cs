@@ -65,7 +65,7 @@ public class DebugOverlay : MonoBehaviour
     private void FindLocalPlayer()
     {
         if (localPlayer) { return; }
-        if (!PlayerDataManager.Singleton) { return; }
+        if (!PlayerDataManager.DoesExist()) { return; }
         localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
     }
 
@@ -73,12 +73,12 @@ public class DebugOverlay : MonoBehaviour
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
-        bool consoleEnabled = bool.Parse(PlayerPrefs.GetString("ConsoleEnabled"));
+        bool consoleEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("ConsoleEnabled"));
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
 
-        bool fpsEnabled = bool.Parse(PlayerPrefs.GetString("FPSEnabled"));
-        bool pingEnabled = bool.Parse(PlayerPrefs.GetString("PingEnabled"));
+        bool fpsEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("FPSEnabled"));
+        bool pingEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("PingEnabled"));
 
         debugCanvas.SetActive(consoleEnabled | fpsEnabled | pingEnabled);
 

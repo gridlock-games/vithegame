@@ -17,12 +17,14 @@ namespace Vi.UI
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
+
         [SerializeField] private Text loginMethodText;
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
 
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
+
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -32,12 +34,19 @@ namespace Vi.UI
         [SerializeField] private Button switchLoginFormButton;
         [SerializeField] private Text loginErrorText;
 
+        [Header("OAuth")]
+        [SerializeField] private GameObject oAuthParent;
+        [SerializeField] private Button oAuthReturnBtn;
+        [SerializeField] private Text oAuthMessageText;
+
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
+
         [SerializeField] private Text welcomeUserText;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
+
         [SerializeField] private Button startLobbyServerButton;
 
         private bool startServerCalled;
@@ -47,6 +56,7 @@ namespace Vi.UI
         {
             if (startServerCalled) { return; }
             startServerCalled = true;
+            AudioListener.volume = 0;
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
@@ -66,6 +76,7 @@ namespace Vi.UI
         {
             if (startServerCalled) { return; }
             startServerCalled = true;
+            AudioListener.volume = 0;
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
@@ -74,7 +85,7 @@ namespace Vi.UI
             {
                 networkTransport.ConnectionData.Address = "127.0.0.1";
             }
-            
+
             List<int> portList = new List<int>();
             foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
             {
@@ -95,8 +106,8 @@ namespace Vi.UI
 
         public void LoginWithVi()
         {
-            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
-            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             initialParent.SetActive(false);
 
@@ -132,8 +143,8 @@ namespace Vi.UI
 
         public void OpenViLogin()
         {
-            if (PlayerPrefs.HasKey("username")) { usernameInput.text = PlayerPrefs.GetString("username"); } else { usernameInput.text = ""; }
-            if (PlayerPrefs.HasKey("password")) { passwordInput.text = PlayerPrefs.GetString("password"); } else { passwordInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             viLogo.enabled = false;
             initialParent.SetActive(false);
@@ -180,8 +191,8 @@ namespace Vi.UI
 
         public IEnumerator CreateAccount()
         {
-            PlayerPrefs.SetString("username", usernameInput.text);
-            PlayerPrefs.SetString("password", passwordInput.text);
+            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
+            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
 
             emailInput.interactable = false;
             usernameInput.interactable = false;
@@ -201,15 +212,15 @@ namespace Vi.UI
 
         public IEnumerator Login()
         {
-            PlayerPrefs.SetString("LastSignInType", "Vi");
-            PlayerPrefs.SetString("username", usernameInput.text);
-            PlayerPrefs.SetString("password", passwordInput.text);
+            PersistentLocalObjects.Singleton.SetString("LastSignInType", "Vi");
+            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
+            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
             usernameInput.interactable = false;
             passwordInput.interactable = false;
 
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
-            welcomeUserText.text = "Welcome " + PlayerPrefs.GetString("username");
+            welcomeUserText.text = "Welcome " + PersistentLocalObjects.Singleton.GetString("username");
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
@@ -217,13 +228,14 @@ namespace Vi.UI
         //private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
         //private const string googleSignInSecretId = "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";
 
-
         private const string googleSignInClientId = "583444002427-p8hrsdv9p38migp7db30mch3qeluodda.apps.googleusercontent.com";
         private const string googleSignInSecretId = "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";
 
         public void LoginWithGoogle()
         {
             Debug.Log("Logging in with Google");
+            dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
+            openDialogue("Google");
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
             {
                 if (success)
@@ -233,6 +245,7 @@ namespace Vi.UI
                 else
                 {
                     Debug.LogError("Google sign in error - " + error);
+                    oAuthParent.SetActive(false);
                 }
             });
         }
@@ -247,12 +260,14 @@ namespace Vi.UI
             if (task.IsCanceled)
             {
                 loginErrorText.text = "Login with google was cancelled.";
+                oAuthParent.SetActive(false);
                 yield break;
             }
 
             if (task.IsFaulted)
             {
                 loginErrorText.text = "Login with google encountered an error.";
+                oAuthParent.SetActive(false);
                 yield break;
             }
 
@@ -262,12 +277,14 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
+                oAuthParent.SetActive(false);
                 welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
-                PlayerPrefs.SetString("LastSignInType", "Google");
-                PlayerPrefs.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
+                PersistentLocalObjects.Singleton.SetString("LastSignInType", "Google");
+                PersistentLocalObjects.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
             else
             {
+                oAuthParent.SetActive(false);
                 initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
             }
         }
@@ -307,13 +324,13 @@ namespace Vi.UI
 
         private IEnumerator AutomaticallyAttemptLogin()
         {
-            if (PlayerPrefs.HasKey("LastSignInType"))
+            if (PersistentLocalObjects.Singleton.HasKey("LastSignInType"))
             {
-                switch (PlayerPrefs.GetString("LastSignInType"))
+                switch (PersistentLocalObjects.Singleton.GetString("LastSignInType"))
                 {
                     case "Vi":
-                        usernameInput.text = PlayerPrefs.GetString("username");
-                        passwordInput.text = PlayerPrefs.GetString("password");
+                        usernameInput.text = PersistentLocalObjects.Singleton.GetString("username");
+                        passwordInput.text = PersistentLocalObjects.Singleton.GetString("password");
                         yield return Login();
 
                         if (WebRequestManager.Singleton.IsLoggedIn)
@@ -327,15 +344,36 @@ namespace Vi.UI
                         break;
 
                     case "Google":
-                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PlayerPrefs.GetString("GoogleIdTokenResponse")));
+                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PersistentLocalObjects.Singleton.GetString("GoogleIdTokenResponse")));
 
                         break;
 
                     default:
-                        Debug.LogError("Not sure how to handle last sign in type " + PlayerPrefs.GetString("LastSignInType"));
+                        Debug.LogError("Not sure how to handle last sign in type " + PersistentLocalObjects.Singleton.GetString("LastSignInType"));
                         break;
                 }
             }
+        }
+
+        private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
+        {
+            Debug.Log($"Prepare deeplink login to look for {loginSource} Oauth");
+            DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
+            dlp.SetLoginSource(loginSource);
+        }
+        public void CloseOAuthDialogue()
+        {
+            oAuthParent.SetActive(false);
+
+            //Shutdown any possible Listner - Google
+            if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
+            { GoogleAuth.ShutdownListner(); }
+        }
+
+        private void openDialogue(string platformname)
+        {
+            oAuthParent.SetActive(true);
+            oAuthMessageText.text = $"Waiting for {platformname} Login";
         }
 
         private void Update()

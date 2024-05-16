@@ -34,6 +34,11 @@ namespace Vi.Player
             cameraController.SetRotation(rotationX, rotationY);
         }
 
+        public override void Flinch(Vector2 flinchAmount)
+        {
+            cameraController.AddRotation(flinchAmount.x, flinchAmount.y);
+        }
+
         [Header("Collision Settings")]
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
@@ -89,7 +94,9 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     newRotation = attributes.GetAilmentRotation();
-                if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+                else if (animationHandler.IsGrabAttacking())
+                    newRotation = inputPayload.rotation;
+                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
                 else if (!attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
@@ -145,21 +152,34 @@ namespace Vi.Player
                 {
                     movement = Vector3.zero;
                 }
-                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking))
+                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | animationHandler.IsLunging())
                 {
                     movement = rootMotion;
-                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.blue);
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
                     allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                     foreach (RaycastHit hit in allHits)
                     {
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes))
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
                             {
-                                movement = Vector3.ClampMagnitude(movement, hit.distance);
-                                break;
+                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
+                                angleList.Add((networkCollider,
+                                    Mathf.Abs(targetRot.eulerAngles.y - movementPrediction.CurrentRotation.eulerAngles.y),
+                                    hit));
                             }
+                        }
+                    }
+
+                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                    {
+                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
+                        if (angle < ActionClip.maximumRootMotionLimitRotationAngle)
+                        {
+                            movement = Vector3.ClampMagnitude(movement, hit.distance);
+                            break;
                         }
                     }
                 }
@@ -176,6 +196,8 @@ namespace Vi.Player
                 movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
+            
+            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
             float yOffset = 0.2f;
@@ -238,9 +260,8 @@ namespace Vi.Player
                 cameraController.GetComponent<Camera>().enabled = true;
                 minimapCameraInstance.enabled = true;
 
-                PlayerInput playerInput = GetComponent<PlayerInput>();
                 playerInput.enabled = true;
-                string rebinds = PlayerPrefs.GetString("Rebinds");
+                string rebinds = PersistentLocalObjects.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 GetComponent<ActionMapHandler>().enabled = true;
@@ -250,7 +271,7 @@ namespace Vi.Player
             {
                 Destroy(cameraController.gameObject);
                 Destroy(minimapCameraInstance.gameObject);
-                GetComponent<PlayerInput>().enabled = false;
+                playerInput.enabled = false;
             }
         }
 
@@ -267,6 +288,13 @@ namespace Vi.Player
             base.OnDestroy();
             if (cameraController) { Destroy(cameraController.gameObject); }
             if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
+        }
+
+        private PlayerInput playerInput;
+        private new void Awake()
+        {
+            base.Awake();
+            playerInput = GetComponent<PlayerInput>();
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -292,25 +320,10 @@ namespace Vi.Player
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
-                PlayerInput playerInput = GetComponent<PlayerInput>();
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                 {
                     foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                     {
-                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-                        {
-                            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
-                            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-                            foreach (RaycastHit hit in allHits)
-                            {
-                                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
-                                {
-                                    networkInteractable.Interact(gameObject);
-                                    break;
-                                }
-                            }
-                        }
-
                         if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
 
                         bool isTouchingJoystick = false;
@@ -323,6 +336,23 @@ namespace Vi.Player
                             }
                         }
 
+                        if (!isTouchingJoystick)
+                        {
+                            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+                            {
+                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                                foreach (RaycastHit hit in allHits)
+                                {
+                                    if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                                    {
+                                        networkInteractable.Interact(gameObject);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
                         if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
                         {
                             lookInputToAdd += touch.delta;
@@ -406,13 +436,13 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(PlayerPrefs.GetString("AutoAim")))
+            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("AutoAim")))
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
-                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking)
+                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | animationHandler.IsLunging())
                     {
-                        ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow);
+                        ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
                         RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                         List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                         foreach (RaycastHit hit in allHits)
@@ -453,7 +483,7 @@ namespace Vi.Player
         void OnDodge()
         {
             if (animationHandler.IsReloading()) { return; }
-            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y), transform.forward, Vector3.up);
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (attributes.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
 

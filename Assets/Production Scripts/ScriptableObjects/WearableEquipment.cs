@@ -16,34 +16,60 @@ namespace Vi.ScriptableObjects
         {
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
 
-            Transform target = GetComponentInParent<Animator>().transform;
+            Animator animator = GetComponentInParent<Animator>();
+            Transform target = animator.transform;
             FindRootBone(ref target, target);
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
-            List<SkinnedMeshRenderer> renderList = GetComponents<SkinnedMeshRenderer>().ToList();
-            renderList.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>());
+            SkinnedMeshRenderer[] renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
 
             //nothing to map
-            if (renderList.Count == 0)
+            if (renderList.Length == 0)
                 return;
 
-            foreach (var srenderer in renderList)
+            if (equipmentType == CharacterReference.EquipmentType.Cape)
             {
-                Transform[] newBones = new Transform[srenderer.bones.Length];
-
-                for (int i = 0; i < srenderer.bones.Length; ++i)
+                foreach (SkinnedMeshRenderer srenderer in renderList)
                 {
-                    GameObject bone = srenderer.bones[i].gameObject;
-
-                    if (!boneMap.TryGetValue(bone.name, out newBones[i]))
+                    foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {
-                        if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
+                        bool shouldSkip = false;
+                        foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
+                        {
+                            if (kvp.Key.name == potentialBone.name) { shouldSkip = true; break; }
+                        }
+                        
+                        if (shouldSkip) { break; }
+
+                        Transform boneToMap = System.Array.Find(srenderer.bones, item => item.name == potentialBone.name);
+                        if (boneToMap)
+                        {
+                            boneMapToFollow.Add(potentialBone, boneToMap);
+                        }
                     }
+                    srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
                 }
-                srenderer.bones = newBones;
-                srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
-                srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
+            }
+            else
+            {
+                foreach (SkinnedMeshRenderer srenderer in renderList)
+                {
+                    Transform[] newBones = new Transform[srenderer.bones.Length];
+
+                    for (int i = 0; i < srenderer.bones.Length; ++i)
+                    {
+                        GameObject bone = srenderer.bones[i].gameObject;
+
+                        if (!boneMap.TryGetValue(bone.name, out newBones[i]))
+                        {
+                            if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
+                        }
+                    }
+                    srenderer.bones = newBones;
+                    srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
+                    srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
+                }
             }
         }
 
@@ -80,6 +106,21 @@ namespace Vi.ScriptableObjects
                 if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
             }
             return _rootBone;
+        }
+
+        private bool bonesCanMove;
+        private Dictionary<Transform, Transform> boneMapToFollow = new Dictionary<Transform, Transform>();
+        private void LateUpdate()
+        {
+            if (bonesCanMove)
+            {
+                foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
+                {
+                    kvp.Value.position = kvp.Key.position;
+                    kvp.Value.rotation = kvp.Key.rotation;
+                }
+            }
+            bonesCanMove = true;
         }
     }
 }

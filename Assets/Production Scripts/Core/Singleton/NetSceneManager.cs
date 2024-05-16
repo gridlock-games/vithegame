@@ -13,13 +13,24 @@ namespace Vi.Core
     {
         [SerializeField] private ScenePayload[] scenePayloads;
 
-        public static NetSceneManager Singleton { get { return _singleton; } }
+        public static bool DoesExist() { return _singleton; }
+
+        public static NetSceneManager Singleton
+        {
+            get
+            {
+                if (!_singleton) { Debug.LogError("Net Scene Manager is null"); }
+                return _singleton;
+            }
+        }
         private static NetSceneManager _singleton;
 
         private NetworkList<int> activeSceneGroupIndicies;
 
         public void LoadScene(string sceneGroupName)
         {
+            if (IsSceneGroupLoaded(sceneGroupName) | IsSceneGroupLoading(sceneGroupName)) { return; }
+
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return; }
@@ -42,6 +53,11 @@ namespace Vi.Core
                     Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
                     break;
             }
+        }
+
+        public void CheckStatus()
+        {
+            Debug.Log(IsServer + " " + NetworkManager.IsServer + " " + NetworkManager.Singleton.IsServer);
         }
 
         public Sprite GetSceneGroupIcon(string sceneGroupName)
@@ -266,6 +282,15 @@ namespace Vi.Core
             return true;
         }
 
+        private bool IsSceneGroupLoading(string sceneGroupName)
+        {
+            foreach (AsyncOperationUI asyncOperationUI in PersistentLocalObjects.Singleton.LoadingOperations.FindAll(item => item.sceneName == sceneGroupName))
+            {
+                if (!asyncOperationUI.asyncOperation.IsDone) { return true; }
+            }
+            return false;
+        }
+
         public bool IsEnvironmentLoaded()
         {
             return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Environment).Count > 0;
@@ -274,7 +299,8 @@ namespace Vi.Core
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
             //Debug.Log("Loaded " + scene.name);
-            if (IsServer)
+            // Need to check singleton because this object may be despawned and not know
+            if (NetworkManager.Singleton.IsServer)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
                 {
@@ -284,7 +310,8 @@ namespace Vi.Core
                     }
                 }
             }
-            else
+
+            if (NetworkManager.Singleton.IsClient)
             {
                 foreach (GameObject g in scene.GetRootGameObjects())
                 {

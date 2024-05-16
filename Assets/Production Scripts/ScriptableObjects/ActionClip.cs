@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -15,7 +16,10 @@ namespace Vi.ScriptableObjects
             HeavyAttack,
             HitReaction,
             Ability,
-            FlashAttack
+            FlashAttack,
+            GrabAttack,
+            Lunge,
+            Flinch
         }
 
         public enum HitReactionType
@@ -91,6 +95,26 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ClipType clipType;
         public ClipType GetClipType() { return clipType; }
         
+        private readonly static ClipType[] attackClipTypes = new ClipType[]
+        {
+            ClipType.LightAttack,
+            ClipType.HeavyAttack,
+            ClipType.Ability,
+            ClipType.FlashAttack,
+            ClipType.GrabAttack
+        };
+
+        public bool IsAttack() { return attackClipTypes.Contains(clipType); }
+
+        public FollowUpActionClip[] followUpActionClipsToPlay = new FollowUpActionClip[0];
+
+        [System.Serializable]
+        public class FollowUpActionClip
+        {
+            public float normalizedTimeToPlayClip = 0.5f;
+            public ActionClip actionClip;
+        }
+
         [SerializeField] private HitReactionType hitReactionType;
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 
@@ -103,6 +127,13 @@ namespace Vi.ScriptableObjects
         public AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
+        public bool shouldFlinch;
+        [SerializeField] private Vector2 flinchAmountMin = new Vector2(-10, -10);
+        [SerializeField] private Vector2 flinchAmountMax = new Vector2(10, 10);
+
+        public Vector2 GetFlinchAmount() { return new Vector2(Random.Range(flinchAmountMin.x, flinchAmountMax.x), Random.Range(flinchAmountMin.y, flinchAmountMax.y)); }
+
+        public bool shouldPlayHitReaction = true;
         public AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         public AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
@@ -123,7 +154,8 @@ namespace Vi.ScriptableObjects
         public float agentDefenseCost = 0;
         public float agentRageCost = 50;
 
-        public Weapon.WeaponBone[] effectedWeaponBones;
+        public Weapon.WeaponBone[] effectedWeaponBones = new Weapon.WeaponBone[0];
+        public Weapon.WeaponBone[] weaponBonesToHide = new Weapon.WeaponBone[0];
         public bool mustBeAiming;
 
         public bool chargeAttackHasEndAnimation;
@@ -157,9 +189,9 @@ namespace Vi.ScriptableObjects
         public bool canFlashAttack;
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
+        public AnimationClip grabAttackClip;
+        public AnimationClip grabVictimClip;
         public bool[] ailmentHitDefinition = new bool[0];
-        public float grabDuration = 2;
-        public float grabDistance = 3;
 
         public const float HitStopEffectDuration = 0.1f;
         public float GetTimeBetweenHits()
@@ -201,6 +233,14 @@ namespace Vi.ScriptableObjects
         public Vector3 boxCastHalfExtents = new Vector3(2, 1, 1);
         public float boxCastDistance = 5;
         public float maximumTargetingRotationAngle = 60;
+
+        public const float maximumRootMotionLimitRotationAngle = 60;
+
+        // Lunge Settings
+        public const float maximumLungeAngle = 60;
+        public bool canLunge;
+        public float minLungeDistance = 2.5f;
+        public float maxLungeDistance = 5;
 
         // Only for shooter characters
         public bool aimDuringAnticipation;

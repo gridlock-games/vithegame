@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net;
 using System.Web;
 using UnityEngine;
 
@@ -25,7 +26,8 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static Action<bool, string, GoogleIdTokenResponse> _callback;
 
-
+    private static System.Net.HttpListener httpListener1 = null;
+    private static System.IO.Stream output1 = null;
     public static void Auth(string clientId, string clientSecret, Action<bool, string, GoogleIdTokenResponse> callback)
     {
       _clientId = clientId;
@@ -65,7 +67,7 @@ namespace Vi.UI.SimpleGoogleSignIn
       //}
     }
 
-    //Not needed for mobile version - please 
+    //Not needed for mobile version
     private static void Listen()
     {
       var httpListener = new System.Net.HttpListener();
@@ -73,19 +75,13 @@ namespace Vi.UI.SimpleGoogleSignIn
       httpListener.Prefixes.Add(_redirectUriLocalhost);
       httpListener.Start();
 
+      httpListener1 = httpListener;
+
       var context = System.Threading.SynchronizationContext.Current;
       var asyncResult = httpListener.BeginGetContext(result => context.Send(HandleHttpListenerCallback, result), httpListener);
 
       // Block the thread when background mode is not supported to serve HTTP response while the application is not in focus.
       if (!Application.runInBackground) asyncResult.AsyncWaitHandle.WaitOne();
-    }
-
-    //Handles deeplink listener request - MJM
-    public static void deeplinkListener(string content)
-    {
-      Debug.Log("Start verification");
-      NameValueCollection dlquery = HttpUtility.ParseQueryString(content);
-      HandleAuthResponse(dlquery);
     }
 
     private static void HandleHttpListenerCallback(object state)
@@ -102,11 +98,26 @@ namespace Vi.UI.SimpleGoogleSignIn
       response.ContentLength64 = buffer.Length;
       
       var output = response.OutputStream;
-
+      output1 = output;
       output.Write(buffer, 0, buffer.Length);
       output.Close();
       httpListener.Close();
       HandleAuthResponse(context.Request.QueryString);
+    }
+
+    //Implemented as a exploit prevention
+    public static void ShutdownListner()
+    {
+      httpListener1.Close();
+      output1.Close();
+    }
+
+    //Handles deeplink listener request - MJM
+    public static void deeplinkListener(string content)
+    {
+      Debug.Log("Start verification");
+      NameValueCollection dlquery = HttpUtility.ParseQueryString(content);
+      HandleAuthResponse(dlquery);
     }
 
     private static void Auth()

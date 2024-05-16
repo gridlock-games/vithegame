@@ -12,6 +12,9 @@ namespace Vi.Core
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
         [SerializeField] private bool shouldOverrideMaxHits;
         [SerializeField] private int maxHitOverride = 1;
+        [SerializeField] private bool scaleVFXBasedOnEdges;
+        [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
+        [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
         private Attributes attacker;
         private ActionClip attack;
@@ -39,6 +42,39 @@ namespace Vi.Core
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
+            }
+        }
+        
+        private float DivideBounds(float originalBounds, float newBounds)
+        {
+            if (Mathf.Approximately(originalBounds, 0)) { return 1; }
+            return newBounds / originalBounds;
+        }
+
+        private void Start()
+        {
+            if (scaleVFXBasedOnEdges)
+            {
+                Vector3 endBoundsPoint = boundsPoint;
+                while (endBoundsPoint != Vector3.zero)
+                {
+                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+
+                    bool bHit = false;
+                    foreach (RaycastHit hit in allHits)
+                    {
+                        bHit = true;
+                        break;
+                    }
+
+                    if (bHit) { break; }
+
+                    endBoundsPoint = Vector3.MoveTowards(endBoundsPoint, Vector3.zero, 0.1f);
+                }
+                Vector3 newScale = new Vector3(DivideBounds(boundsPoint.x, endBoundsPoint.x), DivideBounds(boundsPoint.y, endBoundsPoint.y), DivideBounds(boundsPoint.z, endBoundsPoint.z));
+                transform.localScale = Vector3.Scale(transform.localScale, newScale);
             }
         }
 
@@ -156,6 +192,15 @@ namespace Vi.Core
 
             ps.SetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
             ps.SetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!Application.isPlaying)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(transform.rotation * boundsPoint, transform.rotation * boundsLocalAxis);
+            }
         }
     }
 }

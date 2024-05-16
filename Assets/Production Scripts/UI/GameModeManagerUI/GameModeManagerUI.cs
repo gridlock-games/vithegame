@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
-using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -24,19 +24,22 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
             gameModeManager = GetComponentInParent<GameModeManager>();
-            gameModeManager.RegisterCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
             roundResultText.enabled = false;
 
             roundWinThresholdText.text = "Rounds To Win Game: " + gameModeManager.GetNumberOfRoundsWinsToWinGame().ToString();
+
+            leftScoreText.text = gameModeManager.GetLeftScoreString();
+            rightScoreText.text = gameModeManager.GetRightScoreString();
         }
 
         private void OnDestroy()
         {
-            gameModeManager.UnsubscribeCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
         }
 
         protected void OnScoreListChanged()
@@ -49,7 +52,7 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             if (!gameModeManager.IsSpawned) { return; }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: HeavyAttack1
   m_EditorClassIdentifier: 
   clipType: 2
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -20,7 +21,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 3
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29,7 +30,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 3
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -159,6 +160,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -253,25 +258,26 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1.25
+  animationSpeed: 1.1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 12000000
+  weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 1
   chargeAttackStateLoopCount: 1
   canEnhance: 1
-  chargeTimeDamageMultiplier: 1
-  enhancedChargeDamageMultiplier: 1
+  chargeTimeDamageMultiplier: 1.1
+  enhancedChargeDamageMultiplier: 1.2
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 1
-  damage: 1
+  damage: 12
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 4
+  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
@@ -284,10 +290,10 @@ MonoBehaviour:
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 2
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
-  grabDuration: 2
-  grabDistance: 3
-  dodgeLock: 1
+  dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
   canCancelAbilities: 1
@@ -314,6 +320,9 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.2, y: 0.2, z: 0.2}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

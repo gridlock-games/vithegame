@@ -20,8 +20,9 @@ namespace Vi.Core
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
-            DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
+            CreatePlayerDataManager(false);
+            CreateNetSceneManager();
+            
             NetSceneManager.Singleton.LoadScene("Main Menu");
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
@@ -29,6 +30,23 @@ namespace Vi.Core
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
+        }
+
+        private void CreatePlayerDataManager(bool forceRefresh)
+        {
+            if (forceRefresh) { Destroy(PlayerDataManager.Singleton.gameObject); }
+            if (!PlayerDataManager.DoesExist() | forceRefresh)
+            {
+                DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
+            }
+        }
+
+        private void CreateNetSceneManager()
+        {
+            if (!NetSceneManager.DoesExist())
+            {
+                DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
+            }
         }
 
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -104,7 +122,14 @@ namespace Vi.Core
                     StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
                 }
             }
+
+            if (!NetworkManager.Singleton.IsConnectedClient & lastConnectedClientState)
+            {
+                CreatePlayerDataManager(true);
+            }
+            lastConnectedClientState = NetworkManager.Singleton.IsConnectedClient;
         }
+        private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
         private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
@@ -134,6 +159,8 @@ namespace Vi.Core
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
+                yield return WebRequestManager.Singleton.SetGameVersion();
+
                 yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
             }
@@ -150,9 +177,9 @@ namespace Vi.Core
             Debug.Log("Finished Creating Server in API");
         }
 
-        private void OnServerStopped(bool test)
+        private void OnServerStopped(bool wasHost)
         {
-            Debug.Log("Stopped Server " + test);
+            Debug.Log("Stopped Server " + wasHost);
         }
 
         private void OnClientStarted()
@@ -167,18 +194,28 @@ namespace Vi.Core
             float startTime = Time.time;
             while (Time.time - startTime < clientConnectTimeoutThreshold)
             {
-                if (NetSceneManager.Singleton.IsSpawned) { yield break; }
+                if (NetworkManager.Singleton.IsConnectedClient) { yield break; }
                 yield return null;
             }
 
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
-            if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
-            Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
+            if (!NetworkManager.Singleton.IsConnectedClient)
+            {
+                NetworkManager.Singleton.Shutdown(true);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+                if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
+            }
+
+            CreatePlayerDataManager(false);
+            CreateNetSceneManager();
         }
 
-        private void OnClientStopped(bool test)
+        private void OnClientStopped(bool wasHost)
         {
-            Debug.Log("Stopped Client " + test);
+            Debug.Log("Stopped Client " + wasHost);
+
+            CreatePlayerDataManager(false);
+            CreateNetSceneManager();
         }
 
         private void OnTransportFailure()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -15,7 +16,7 @@ namespace Vi.UI
         public IEnumerator Initialize(PlayerDataManager.GameMode gameMode, Sprite gameModeIcon)
         {
             this.gameMode = gameMode;
-            gameModeText.text = LobbyUI.FromCamelCase(gameMode.ToString());
+            gameModeText.text = StringUtility.FromCamelCase(gameMode.ToString());
             GetComponent<Image>().sprite = gameModeIcon;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
@@ -32,7 +33,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (!PlayerDataManager.Singleton) { button.interactable = false; return; }
+            if (!PlayerDataManager.DoesExist()) { button.interactable = false; return; }
             if (!PlayerDataManager.Singleton.IsSpawned) { button.interactable = false; return; }
 
             button.interactable = PlayerDataManager.Singleton.GetGameMode() != gameMode;

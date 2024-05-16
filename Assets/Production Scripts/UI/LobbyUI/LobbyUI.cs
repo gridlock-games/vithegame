@@ -5,8 +5,8 @@ using Vi.ScriptableObjects;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
-using TMPro;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -108,7 +108,39 @@ namespace Vi.UI
                 }
             }
 
+            SyncRoomSettingsFields();
+
             StartCoroutine(Init());
+        }
+
+        private void SyncRoomSettingsFields()
+        {
+            foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
+            {
+                foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
+                {
+                    string[] propertySplit = propertyString.Split(":");
+                    string propertyName = "";
+                    int value = 0;
+                    for (int i = 0; i < propertySplit.Length; i++)
+                    {
+                        if (i == 0)
+                        {
+                            propertyName = propertySplit[i];
+                        }
+                        else if (i == 1)
+                        {
+                            value = int.Parse(propertySplit[i]);
+                        }
+                        else
+                        {
+                            Debug.LogError("Not sure how to parse game mode property string " + propertyString);
+                        }
+                    }
+
+                    if (propertyName == customSettingsInputField.key) { customSettingsInputField.inputField.text = value.ToString(); }
+                }
+            }
         }
 
         private void RefreshMapOptions()
@@ -226,22 +258,10 @@ namespace Vi.UI
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
             RefreshGameMode();
-        }
 
-        public static string FromCamelCase(string inputString)
-        {
-            string returnValue = inputString;
+            RefreshPlayerCards();
 
-            //Strip leading "_" character
-            returnValue = Regex.Replace(returnValue, "^_", "").Trim();
-            //Add a space between each lower case character and upper case character
-            returnValue = Regex.Replace(returnValue, "([a-z])([A-Z])", "$1 $2").Trim();
-            //Add a space between 2 upper case characters when the second one is followed by a lower space character
-            returnValue = Regex.Replace(returnValue, "([A-Z])([A-Z][a-z])", "$1 $2").Trim();
-
-            if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
-
-            return returnValue;
+            if (!IsSpawned) { Destroy(gameObject); }
         }
 
         public override void OnNetworkSpawn()
@@ -337,7 +357,7 @@ namespace Vi.UI
 
         public void ReturnToCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
@@ -352,22 +372,22 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
+            //if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
             
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
             }
 
-            gameModeSpecificSettingsTitleText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
-            List<PlayerDataManager.PlayerData> playerDataList = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
-            spectatorCountText.text = "Spectator Count: " + playerDataList.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
-            playerDataList = playerDataList.FindAll(item => item.team != PlayerDataManager.Team.Spectator);
+            List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            spectatorCountText.text = "Spectator Count: " + playerDataListWithSpectators.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
 
             // Timer logic
-            bool startingGame = playerDataList.Count != 0;
-            foreach (PlayerDataManager.PlayerData playerData in playerDataList)
+            bool startingGame = playerDataListWithoutSpectators.Count != 0;
+            foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
             {
                 if (playerData.id >= 0)
                 {
@@ -389,21 +409,21 @@ namespace Vi.UI
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for game mode none"; }
                     break;
                 case PlayerDataManager.GameMode.FreeForAll:
-                    canCountDown = playerDataList.Count >= 2;
+                    canCountDown = playerDataListWithoutSpectators.Count >= 2;
 
                     if (!canCountDown) { cannotCountDownMessage = "Need 2 or more players to play"; }
                     break;
                 case PlayerDataManager.GameMode.TeamElimination:
-                    List<PlayerDataManager.PlayerData> team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    List<PlayerDataManager.PlayerData> team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    List<PlayerDataManager.PlayerData> team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    List<PlayerDataManager.PlayerData> team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 3 & team2List.Count >= 3 & team1List.Count == team2List.Count;
 
                     if (!(team1List.Count >= 3 & team2List.Count >= 3)) { cannotCountDownMessage = "Need 3 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
-                    team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = (team1List.Count == 3 & team2List.Count == 3) | (team1List.Count == 5 & team2List.Count == 5);
 
                     if (!canCountDown) { cannotCountDownMessage = "Essence War is 3v3 or 5v5 only"; }
@@ -413,8 +433,8 @@ namespace Vi.UI
                     if (!canCountDown) { cannotCountDownMessage = "Not sure how to count down for outpost rush"; }
                     break;
                 case PlayerDataManager.GameMode.TeamDeathmatch:
-                    team1List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
-                    team2List = playerDataList.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
+                    team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
+                    team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 2 & team2List.Count >= 2 & team1List.Count == team2List.Count;
 
                     if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 2 or more players on each team to play"; }
@@ -435,11 +455,11 @@ namespace Vi.UI
                     {
                         roomSettingsParsedProperly = result > 0 & roomSettingsParsedProperly;
                         gameModeSettings += customSettingsInputField.key + ":" + result.ToString() + "|";
-                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
+                        if (!roomSettingsParsedProperly) { cannotCountDownMessage = StringUtility.FromCamelCase(customSettingsInputField.key) + " must be greater than 0. Please edit room settings"; break; }
                     }
                     else
                     {
-                        cannotCountDownMessage = FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
+                        cannotCountDownMessage = StringUtility.FromCamelCase(customSettingsInputField.key) + " must have an integer value. Please edit room settings";
                         roomSettingsParsedProperly = false & roomSettingsParsedProperly;
                         break;
                     }
@@ -449,6 +469,10 @@ namespace Vi.UI
                 {
                     PlayerDataManager.Singleton.SetGameModeSettings(gameModeSettings);
                 }
+            }
+            else // Parse room settings into input fields
+            {
+                SyncRoomSettingsFields();
             }
 
             canCountDown &= roomSettingsParsedProperly;
@@ -493,44 +517,13 @@ namespace Vi.UI
             leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
-            string playersString = "";
-            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
+            foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
-                playersString += data.id.ToString() + data.team.ToString() + data.character.name.ToString() + lockedClients.Contains((ulong)data.id).ToString() + PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
+                playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
             }
 
-            if (lastPlayersString != playersString)
-            {
-                foreach (Transform child in leftTeamParent.transformParent)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                foreach (Transform child in rightTeamParent.transformParent)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                bool leftTeamJoinInteractable = false;
-                bool rightTeamJoinInteractable = false;
-                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
-                {
-                    if (teamParentDict.ContainsKey(playerData.team))
-                    {
-                        AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
-                        accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
-
-                        if (playerData.id == (int)NetworkManager.LocalClientId)
-                        {
-                            leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
-                            rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
-                        }
-                    }
-                }
-
-                leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
-                rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
-            }
+            if (lastPlayersString != playersString) { RefreshPlayerCards(); }
             lastPlayersString = playersString;
 
             if (IsClient)
@@ -550,7 +543,7 @@ namespace Vi.UI
                 RefreshGameMode();
             }
 
-            gameModeText.text = FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
+            gameModeText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
@@ -576,6 +569,39 @@ namespace Vi.UI
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+        }
+
+        private void RefreshPlayerCards()
+        {
+            foreach (Transform child in leftTeamParent.transformParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in rightTeamParent.transformParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            bool leftTeamJoinInteractable = false;
+            bool rightTeamJoinInteractable = false;
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+            {
+                if (teamParentDict.ContainsKey(playerData.team))
+                {
+                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                    accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
+
+                    if (playerData.id == (int)NetworkManager.LocalClientId)
+                    {
+                        leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
+                        rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
+                    }
+                }
+            }
+
+            leftTeamParent.joinTeamButton.interactable = leftTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
+            rightTeamParent.joinTeamButton.interactable = rightTeamJoinInteractable & !lockedClients.Contains(NetworkManager.LocalClientId);
         }
 
         private new void OnDestroy()

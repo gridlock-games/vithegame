@@ -15,7 +15,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Team deathmatch starting! ";
+            if (IsServer) { roundResultMessage.Value = "Team deathmatch starting! "; }
         }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)

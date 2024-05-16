@@ -28,7 +28,7 @@ namespace LightPat.Core
 
         private NetworkVariable<bool> allPlayersSpawned = new NetworkVariable<bool>();
 
-        private NetworkVariable<FixedString32Bytes> countdownTimeMessage = new NetworkVariable<FixedString32Bytes>("Starting the match!");
+        private NetworkVariable<FixedString64Bytes> countdownTimeMessage = new NetworkVariable<FixedString64Bytes>("Starting the match!");
 
         public override void OnPlayerDeath(ulong deathClientId)
         {

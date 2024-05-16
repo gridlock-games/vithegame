@@ -15,6 +15,7 @@ namespace Vi.UI
     {
         [SerializeField] private Button returnButton;
         [SerializeField] private Text webRequestStatusText;
+        [SerializeField] private Text gameVersionText;
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -75,8 +76,8 @@ namespace Vi.UI
         {
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             selectCharacterButton_autoConnectToHub.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
         }
@@ -311,8 +312,8 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
+            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
@@ -423,7 +424,7 @@ namespace Vi.UI
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
 
-                if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultLoadout1(raceAndGender), character._id.ToString()); }
+                if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
@@ -477,12 +478,20 @@ namespace Vi.UI
 
             primaryWeaponIcon.gameObject.SetActive(false);
             secondaryWeaponIcon.gameObject.SetActive(false);
+
+            PlayerDataManager.Singleton.SetGameModeSettings("");
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private float lastTextChangeTime;
+        private bool lastClientState;
         private void Update()
         {
+            gameVersionText.text = WebRequestManager.Singleton.GameIsUpToDate ? "" : "GAME IS OUT OF DATE";
+
+            if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
+            lastClientState = NetworkManager.Singleton.IsClient;
+
             connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
 
             if (webRequestStatusText.gameObject.activeSelf)
@@ -588,10 +597,7 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening)
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
 
             StartCoroutine(RefreshCharacterCards());
 
@@ -657,9 +663,15 @@ namespace Vi.UI
         public void GoToTrainingRoom()
         {
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
-            NetworkManager.Singleton.StartHost();
-            NetSceneManager.Singleton.LoadScene("Training Room");
-            NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+            if (NetworkManager.Singleton.StartHost())
+            {
+                NetSceneManager.Singleton.LoadScene("Training Room");
+                NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+            }
+            else
+            {
+                Debug.LogError("Error trying to start host to go to training room");
+            }
         }
 
         public IEnumerator AutoConnectToHubServer()
@@ -667,8 +679,11 @@ namespace Vi.UI
             selectCharacterButton_autoConnectToHub.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.CheckGameVersion();
 
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
+
+            if (!WebRequestManager.Singleton.GameIsUpToDate) { yield break; }
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {

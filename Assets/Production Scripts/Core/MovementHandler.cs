@@ -27,13 +27,15 @@ namespace Vi.Core
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
+		public virtual void Flinch(Vector2 flinchAmount) { }
+
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            Vector2 lookSensitivity = new Vector2(PlayerPrefs.GetFloat("MouseXSensitivity"), PlayerPrefs.GetFloat("MouseYSensitivity")) * (bool.Parse(PlayerPrefs.GetString("InvertMouse")) ? -1 : 1);
+            Vector2 lookSensitivity = new Vector2(PersistentLocalObjects.Singleton.GetFloat("MouseXSensitivity"), PersistentLocalObjects.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(PersistentLocalObjects.Singleton.GetString("InvertMouse")) ? -1 : 1);
             if (weaponHandler)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= PlayerPrefs.GetFloat("ZoomSensitivityMultiplier"); }
+                if (weaponHandler.IsAiming()) { lookSensitivity *= PersistentLocalObjects.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
             }
             return lookInput * lookSensitivity;
         }
@@ -72,52 +74,53 @@ namespace Vi.Core
 	public static class ExtDebug
 	{
 		//Draws just the box at where it is currently hitting.
-		public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float hitInfoDistance, Color color)
+		public static void DrawBoxCastOnHit(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float hitInfoDistance, Color color, float duration)
 		{
 			origin = CastCenterOnCollision(origin, direction, hitInfoDistance);
-			DrawBox(origin, halfExtents, orientation, color);
+			DrawBox(origin, halfExtents, orientation, color, duration);
 		}
 
 		//Draws the full box from start of cast to its end distance. Can also pass in hitInfoDistance instead of full distance
-		public static void DrawBoxCastBox(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float distance, Color color)
+		public static void DrawBoxCastBox(Vector3 origin, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float distance, Color color, float duration)
 		{
 			direction.Normalize();
 			Box bottomBox = new Box(origin, halfExtents, orientation);
 			Box topBox = new Box(origin + (direction * distance), halfExtents, orientation);
 
-			Debug.DrawLine(bottomBox.backBottomLeft, topBox.backBottomLeft, color);
-			Debug.DrawLine(bottomBox.backBottomRight, topBox.backBottomRight, color);
-			Debug.DrawLine(bottomBox.backTopLeft, topBox.backTopLeft, color);
-			Debug.DrawLine(bottomBox.backTopRight, topBox.backTopRight, color);
-			Debug.DrawLine(bottomBox.frontTopLeft, topBox.frontTopLeft, color);
-			Debug.DrawLine(bottomBox.frontTopRight, topBox.frontTopRight, color);
-			Debug.DrawLine(bottomBox.frontBottomLeft, topBox.frontBottomLeft, color);
-			Debug.DrawLine(bottomBox.frontBottomRight, topBox.frontBottomRight, color);
+			Debug.DrawLine(bottomBox.backBottomLeft, topBox.backBottomLeft, color, duration);
+			Debug.DrawLine(bottomBox.backBottomRight, topBox.backBottomRight, color, duration);
+			Debug.DrawLine(bottomBox.backTopLeft, topBox.backTopLeft, color, duration);
+			Debug.DrawLine(bottomBox.backTopRight, topBox.backTopRight, color, duration);
+			Debug.DrawLine(bottomBox.frontTopLeft, topBox.frontTopLeft, color, duration);
+			Debug.DrawLine(bottomBox.frontTopRight, topBox.frontTopRight, color, duration);
+			Debug.DrawLine(bottomBox.frontBottomLeft, topBox.frontBottomLeft, color, duration);
+			Debug.DrawLine(bottomBox.frontBottomRight, topBox.frontBottomRight, color, duration);
 
-			DrawBox(bottomBox, color);
-			DrawBox(topBox, color);
+			DrawBox(bottomBox, color, duration);
+			DrawBox(topBox, color, duration);
 		}
 
-		public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color)
+		public static void DrawBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Color color, float duration)
 		{
-			DrawBox(new Box(origin, halfExtents, orientation), color);
+			DrawBox(new Box(origin, halfExtents, orientation), color, duration);
 		}
-		public static void DrawBox(Box box, Color color)
+
+		public static void DrawBox(Box box, Color color, float duration)
 		{
-			Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color);
-			Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color);
-			Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color);
-			Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color);
+			Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color, duration);
+			Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color, duration);
+			Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color, duration);
+			Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color, duration);
 
-			Debug.DrawLine(box.backTopLeft, box.backTopRight, color);
-			Debug.DrawLine(box.backTopRight, box.backBottomRight, color);
-			Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color);
-			Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color);
+			Debug.DrawLine(box.backTopLeft, box.backTopRight, color, duration);
+			Debug.DrawLine(box.backTopRight, box.backBottomRight, color, duration);
+			Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color, duration);
+			Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color, duration);
 
-			Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color);
-			Debug.DrawLine(box.frontTopRight, box.backTopRight, color);
-			Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color);
-			Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color);
+			Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color, duration);
+			Debug.DrawLine(box.frontTopRight, box.backTopRight, color, duration);
+			Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color, duration);
+			Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color, duration);
 		}
 
 		public struct Box

@@ -32,7 +32,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (!PlayerDataManager.Singleton) { button.interactable = false; return; }
+            if (!PlayerDataManager.DoesExist()) { button.interactable = false; return; }
             if (!PlayerDataManager.Singleton.IsSpawned) { button.interactable = false; return; }
 
             button.interactable = PlayerDataManager.Singleton.GetMapName() != mapName;

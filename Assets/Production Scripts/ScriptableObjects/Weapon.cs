@@ -234,6 +234,37 @@ namespace Vi.ScriptableObjects
             return hitReaction.reactionClip;
         }
 
+        [System.Serializable]
+        private class FlinchReaction
+        {
+            public HitLocation hitLocation = HitLocation.Front;
+            public ActionClip reactionClip;
+        }
+
+        [SerializeField] private List<FlinchReaction> flinchReactions = new List<FlinchReaction>();
+
+        public ActionClip GetFlinchClip(float attackAngle)
+        {
+            HitLocation hitLocation;
+            if (attackAngle <= 45.00f && attackAngle >= -45.00f)
+            {
+                hitLocation = HitLocation.Front;
+            }
+            else if (attackAngle > 45.00f && attackAngle < 135.00f)
+            {
+                hitLocation = HitLocation.Right;
+            }
+            else if (attackAngle < -45.00f && attackAngle > -135.00f)
+            {
+                hitLocation = HitLocation.Left;
+            }
+            else
+            {
+                hitLocation = HitLocation.Back;
+            }
+            return flinchReactions.Find(item => item.hitLocation == hitLocation).reactionClip;
+        }
+
         public enum InputAttackType
         {
             LightAttack,
@@ -326,6 +357,30 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public void ReduceAbilityCooldownTime(ActionClip ability, float percent)
+        {
+            if (ability == ability1)
+            {
+                lastAbility1ActivateTime -= ability1.abilityCooldownTime * percent;
+            }
+            else if (ability == ability2)
+            {
+                lastAbility2ActivateTime -= ability2.abilityCooldownTime * percent;
+            }
+            else if (ability == ability3)
+            {
+                lastAbility3ActivateTime -= ability3.abilityCooldownTime * percent;
+            }
+            else if (ability == ability4)
+            {
+                lastAbility4ActivateTime -= ability4.abilityCooldownTime * percent;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+        }
+
         [SerializeField] private ActionClip flashAttack;
 
         public ActionClip GetFlashAttack() { return flashAttack; }
@@ -349,6 +404,22 @@ namespace Vi.ScriptableObjects
             public ComboCondition comboCondition = ComboCondition.None;
             public ActionClip attackClip;
         }
+
+        public ActionClip GetGrabAttackClip(ActionClip attack)
+        {
+            GrabAttackCrosswalk crosswalk = System.Array.Find(grabAttackClipList, item => item.attack == attack);
+            if (crosswalk == null) { Debug.LogError("Can't find grab attack crosswalk for " + attack); }
+            return crosswalk.grabAttackClip;
+        }
+
+        [System.Serializable]
+        private class GrabAttackCrosswalk
+        {
+            public ActionClip attack;
+            public ActionClip grabAttackClip;
+        }
+
+        [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
 
         [Header("Dodge Assignments")]
         public float dodgeStaminaCost = 20;
@@ -400,6 +471,11 @@ namespace Vi.ScriptableObjects
             return dodgeClip;
         }
 
+        [Header("Lunge Assignments")]
+        [SerializeField] private ActionClip lunge;
+
+        public ActionClip GetLungeClip() { return lunge; }
+
         public ActionClip GetActionClipByName(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
@@ -413,6 +489,11 @@ namespace Vi.ScriptableObjects
                     if (ActionClip)
                     {
                         if (ActionClip.name == clipName) { return ActionClip; }
+
+                        foreach (ActionClip.FollowUpActionClip followUpClip in ActionClip.followUpActionClipsToPlay)
+                        {
+                            if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                        }
                     }
                 }
                 else if (propertyInfo.FieldType == typeof(List<ActionClip>))
@@ -425,6 +506,11 @@ namespace Vi.ScriptableObjects
                         if (ActionClip)
                         {
                             if (ActionClip.name == clipName) { return ActionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in ActionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
@@ -438,6 +524,29 @@ namespace Vi.ScriptableObjects
                         if (hitReaction.reactionClip)
                         {
                             if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in hitReaction.reactionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(List<FlinchReaction>))
+                {
+                    var FlinchReactionListObject = propertyInfo.GetValue(this);
+                    List<FlinchReaction> hitReactions = (List<FlinchReaction>)FlinchReactionListObject;
+
+                    foreach (FlinchReaction flinchReaction in hitReactions)
+                    {
+                        if (flinchReaction.reactionClip)
+                        {
+                            if (flinchReaction.reactionClip.name == clipName) { return flinchReaction.reactionClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in flinchReaction.reactionClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }
@@ -451,6 +560,29 @@ namespace Vi.ScriptableObjects
                         if (attack.attackClip)
                         {
                             if (attack.attackClip.name == clipName) { return attack.attackClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in attack.attackClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
+                        }
+                    }
+                }
+                else if (propertyInfo.FieldType == typeof(GrabAttackCrosswalk[]))
+                {
+                    var AttackArrayObject = propertyInfo.GetValue(this);
+                    GrabAttackCrosswalk[] attacks = (GrabAttackCrosswalk[])AttackArrayObject;
+
+                    foreach (GrabAttackCrosswalk attack in attacks)
+                    {
+                        if (attack.grabAttackClip)
+                        {
+                            if (attack.grabAttackClip.name == clipName) { return attack.grabAttackClip; }
+
+                            foreach (ActionClip.FollowUpActionClip followUpClip in attack.grabAttackClip.followUpActionClipsToPlay)
+                            {
+                                if (followUpClip.actionClip.name == clipName) { return followUpClip.actionClip; }
+                            }
                         }
                     }
                 }

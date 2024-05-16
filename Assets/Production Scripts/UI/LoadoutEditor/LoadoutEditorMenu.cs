@@ -30,12 +30,10 @@ namespace Vi.UI
         [SerializeField] private Button beltButton;
         [SerializeField] private Button capeButton;
 
-        private LoadoutManager loadoutManager;
         private Attributes attributes;
         private GameObject camInstance;
         private void Awake()
         {
-            loadoutManager = GetComponentInParent<LoadoutManager>();
             attributes = GetComponentInParent<Attributes>();
 
             camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform.parent);
@@ -136,7 +134,7 @@ namespace Vi.UI
             GameObject _weaponSelect = Instantiate(weaponSelectMenu.gameObject);
             WeaponSelectMenu menu = _weaponSelect.GetComponent<WeaponSelectMenu>();
             menu.SetLastMenu(gameObject);
-            menu.Initialize(weaponOption, otherOption, weaponType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
+            menu.Initialize(weaponOption, otherOption, weaponType, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
             camInstance.SetActive(false);
             gameObject.SetActive(false);
@@ -147,7 +145,7 @@ namespace Vi.UI
             GameObject _armorSelect = Instantiate(armorSelectMenu.gameObject);
             ArmorSelectMenu menu = _armorSelect.GetComponent<ArmorSelectMenu>();
             menu.SetLastMenu(gameObject);
-            menu.Initialize(equipmentType, loadoutManager, loadoutSlot, attributes.GetPlayerDataId());
+            menu.Initialize(equipmentType, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _armorSelect;
             camInstance.SetActive(true);
             gameObject.SetActive(false);

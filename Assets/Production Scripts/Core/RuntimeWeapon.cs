@@ -2,11 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
+        private List<RuntimeWeapon> associatedRuntimeWeapons = new List<RuntimeWeapon>();
+        public void SetAssociatedRuntimeWeapons(List<RuntimeWeapon> runtimeWeapons)
+        {
+            associatedRuntimeWeapons = runtimeWeapons;
+        }
+
         public struct HitCounterData
         {
             public int hitNumber;
@@ -21,7 +28,28 @@ namespace Vi.Core
 
         protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
 
-        public Dictionary<Attributes, HitCounterData> GetHitCounter() { return hitCounter; }
+        public Dictionary<Attributes, HitCounterData> GetHitCounter()
+        {
+            Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
+            foreach (RuntimeWeapon runtimeWeapon in associatedRuntimeWeapons)
+            {
+                foreach (KeyValuePair<Attributes, HitCounterData> kvp in runtimeWeapon.hitCounter)
+                {
+                    if (hitCounter.ContainsKey(kvp.Key))
+                    {
+                        HitCounterData newData = hitCounter[kvp.Key];
+                        if (kvp.Value.timeOfHit > newData.timeOfHit) { newData.timeOfHit = kvp.Value.timeOfHit; }
+                        newData.hitNumber += kvp.Value.hitNumber;
+                        hitCounter[kvp.Key] = newData;
+                    }
+                    else
+                    {
+                        hitCounter.Add(kvp.Key, kvp.Value);
+                    }
+                }
+            }
+            return hitCounter;
+        }
 
         public void AddHit(Attributes attributes)
         {
@@ -42,6 +70,7 @@ namespace Vi.Core
         
         public bool CanHit(Attributes attributes)
         {
+            Dictionary<Attributes, HitCounterData> hitCounter = GetHitCounter();
             if (hitCounter.ContainsKey(attributes))
             {
                 if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
@@ -57,10 +86,34 @@ namespace Vi.Core
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;
 
+        private Collider[] colliders;
+        private Renderer[] renderers;
+
         protected void Start()
         {
             parentAttributes = transform.root.GetComponent<Attributes>();
             parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
+
+            colliders = GetComponentsInChildren<Collider>(true);
+            renderers = GetComponentsInChildren<Renderer>(true);
+        }
+
+        private bool lastIsActiveCall = true;
+        public void SetActive(bool isActive)
+        {
+            if (isActive == lastIsActiveCall) { return; }
+
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = isActive;
+            }
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.enabled = isActive;
+            }
+
+            lastIsActiveCall = isActive;
         }
 
         protected bool isStowed;

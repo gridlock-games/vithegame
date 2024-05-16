@@ -14,7 +14,7 @@ namespace Vi.UI
         [SerializeField] private GameSettingsMenu gameSettingsMenu;
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private UIModificationMenu UIModificationMenu;
-        [SerializeField] private Button goBackScenesButton;
+        [SerializeField] private Button returnToCharSelectButton;
 
         public void OpenVideoMenu()
         {
@@ -58,17 +58,23 @@ namespace Vi.UI
 
         private void Start()
         {
-            goBackScenesButton.onClick.AddListener(delegate { ReturnToCharacterSelect(); });
-            goBackScenesButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
-
-            goBackScenesButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
+            returnToCharSelectButton.onClick.AddListener(delegate { PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect()); });
+            returnToCharSelectButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
+            returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
         }
 
-        public void ReturnToCharacterSelect()
+        public IEnumerator ReturnToCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(); }
+            returnToCharSelectButton.interactable = false;
+            if (NetworkManager.Singleton.IsListening)
+            {
+                NetworkManager.Singleton.Shutdown(true);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
+            // The button gets destroyed when the networkmanager shuts down due to the player object despawning
+            if (returnToCharSelectButton) { returnToCharSelectButton.interactable = true; }
         }
     }
 }

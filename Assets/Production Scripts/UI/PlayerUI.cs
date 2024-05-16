@@ -109,18 +109,14 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
-                GameObject statusIconGameObject = Instantiate(statusImagePrefab.gameObject, statusImageParent);
-                if (statusIconGameObject.TryGetComponent(out StatusIcon statusIcon))
-                {
-                    statusIcon.InitializeStatusIcon(status);
-                    statusIconGameObject.SetActive(false);
-                    statusIcons.Add(statusIcon);
-                }
+                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
+                statusIcon.InitializeStatusIcon(status);
+                statusIcons.Add(statusIcon);
             }
 
             equippedWeaponCardAnchoredPosition = primaryWeaponCard.transform.localPosition;
@@ -133,7 +129,14 @@ namespace Vi.UI
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 
+            UpdateTeammateAttributesList();
+
             UpdateWeapon(false);
+        }
+
+        private void UpdateTeammateAttributesList()
+        {
+            teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
         }
 
         public void OnRebinding()
@@ -256,13 +259,14 @@ namespace Vi.UI
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
+        List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PlayerPrefs.GetFloat("UIOpacity");
+                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
@@ -272,17 +276,26 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                //rightMouseClickImage.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
-
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.gameObject.SetActive(attributes.GetActiveStatuses().Contains(statusIcon.Status));
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
                 }
 
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
+                    if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
+
                     // Order player cards by distance
-                    List<Attributes> teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    teammateAttributes.Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < teammateAttributes.Count)

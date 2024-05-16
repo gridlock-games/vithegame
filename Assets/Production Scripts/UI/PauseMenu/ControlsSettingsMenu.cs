@@ -51,11 +51,11 @@ namespace Vi.UI
 
         private void Start()
         {
-            invertLookToggle.isOn = bool.Parse(PlayerPrefs.GetString("InvertMouse"));
-            mouseXSensitivityInput.text = PlayerPrefs.GetFloat("MouseXSensitivity").ToString();
-            mouseYSensitivityInput.text = PlayerPrefs.GetFloat("MouseYSensitivity").ToString();
-            zoomMultiplierInput.text = PlayerPrefs.GetFloat("ZoomSensitivityMultiplier").ToString();
-            mobileLookJoystickSensitivityInput.text = PlayerPrefs.GetFloat("MobileLookJoystickSensitivity").ToString();
+            invertLookToggle.isOn = bool.Parse(PersistentLocalObjects.Singleton.GetString("InvertMouse"));
+            mouseXSensitivityInput.text = PersistentLocalObjects.Singleton.GetFloat("MouseXSensitivity").ToString();
+            mouseYSensitivityInput.text = PersistentLocalObjects.Singleton.GetFloat("MouseYSensitivity").ToString();
+            zoomMultiplierInput.text = PersistentLocalObjects.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
+            mobileLookJoystickSensitivityInput.text = PersistentLocalObjects.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
 
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
@@ -66,10 +66,10 @@ namespace Vi.UI
             }
 
             zoomModeDropdown.AddOptions(holdToggleOptions);
-            zoomModeDropdown.value = holdToggleOptions.IndexOf(PlayerPrefs.GetString("ZoomMode"));
+            zoomModeDropdown.value = holdToggleOptions.IndexOf(PersistentLocalObjects.Singleton.GetString("ZoomMode"));
 
             blockingModeDropdown.AddOptions(holdToggleOptions);
-            blockingModeDropdown.value = holdToggleOptions.IndexOf(PlayerPrefs.GetString("BlockingMode"));
+            blockingModeDropdown.value = holdToggleOptions.IndexOf(PersistentLocalObjects.Singleton.GetString("BlockingMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
@@ -162,7 +162,7 @@ namespace Vi.UI
             }
 
             string rebinds = playerInput.actions.SaveBindingOverridesAsJson();
-            PlayerPrefs.SetString("Rebinds", rebinds);
+            PersistentLocalObjects.Singleton.SetString("Rebinds", rebinds);
 
             RegenerateInputBindingMenu();
 
@@ -185,7 +185,7 @@ namespace Vi.UI
 
         public void SetInvertMouse()
         {
-            PlayerPrefs.SetString("InvertMouse", invertLookToggle.isOn.ToString());
+            PersistentLocalObjects.Singleton.SetString("InvertMouse", invertLookToggle.isOn.ToString());
         }
 
         public void ChangeMouseXSensitivity()
@@ -193,7 +193,7 @@ namespace Vi.UI
             mouseXSensitivityInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
             if (float.TryParse(mouseXSensitivityInput.text, out float mouseXSens))
             {
-                if (mouseXSens > 0) { PlayerPrefs.SetFloat("MouseXSensitivity", mouseXSens); }
+                if (mouseXSens > 0) { PersistentLocalObjects.Singleton.SetFloat("MouseXSensitivity", mouseXSens); }
             }
         }
 
@@ -202,7 +202,7 @@ namespace Vi.UI
             mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
             if (float.TryParse(mouseYSensitivityInput.text, out float mouseYSens))
             {
-                if (mouseYSens > 0) { PlayerPrefs.SetFloat("MouseYSensitivity", mouseYSens); }
+                if (mouseYSens > 0) { PersistentLocalObjects.Singleton.SetFloat("MouseYSensitivity", mouseYSens); }
             }
         }
 
@@ -211,18 +211,18 @@ namespace Vi.UI
             zoomMultiplierInput.text = Regex.Replace(zoomMultiplierInput.text, @"[^0-9|.]", "");
             if (float.TryParse(zoomMultiplierInput.text, out float zoomMultiplier))
             {
-                if (zoomMultiplier > 0) { PlayerPrefs.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier); }
+                if (zoomMultiplier > 0) { PersistentLocalObjects.Singleton.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier); }
             }
         }
 
         public void ChangeZoomMode()
         {
-            PlayerPrefs.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
+            PersistentLocalObjects.Singleton.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
         }
 
         public void ChangeBlockingMode()
         {
-            PlayerPrefs.SetString("BlockingMode", holdToggleOptions[blockingModeDropdown.value]);
+            PersistentLocalObjects.Singleton.SetString("BlockingMode", holdToggleOptions[blockingModeDropdown.value]);
         }
 
         public void ChangeMobileLookJoystickSensitivity()
@@ -230,7 +230,7 @@ namespace Vi.UI
             mobileLookJoystickSensitivityInput.text = Regex.Replace(mobileLookJoystickSensitivityInput.text, @"[^0-9|.]", "");
             if (float.TryParse(mobileLookJoystickSensitivityInput.text, out float sensitivity))
             {
-                PlayerPrefs.SetFloat("MobileLookJoystickSensitivity", sensitivity);
+                PersistentLocalObjects.Singleton.SetFloat("MobileLookJoystickSensitivity", sensitivity);
             }
         }
     }

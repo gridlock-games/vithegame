@@ -110,9 +110,9 @@ namespace Vi.UI
 
                     if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
                     {
-                        if (PlayerPrefs.HasKey("UIOverrides"))
+                        if (PersistentLocalObjects.Singleton.HasKey("UIOverrides"))
                         {
-                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
+                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString("UIOverrides"));
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                             {
                                 GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
@@ -135,9 +135,9 @@ namespace Vi.UI
             GameObject prefabRef = prefabCrosswalk[draggableUIObject.gameObject];
 
             List<PlatformUIDefinition.PositionOverrideDefinition> overridesList;
-            if (PlayerPrefs.HasKey("UIOverrides"))
+            if (PersistentLocalObjects.Singleton.HasKey("UIOverrides"))
             {
-                overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PlayerPrefs.GetString("UIOverrides"));
+                overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString("UIOverrides"));
             }
             else
             {
@@ -151,12 +151,12 @@ namespace Vi.UI
                 newAnchoredY = modifiedRect.anchoredPosition.y
             });
             
-            PlayerPrefs.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
+            PersistentLocalObjects.Singleton.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
         }
 
         public void ResetUI()
         {
-            PlayerPrefs.DeleteKey("UIOverrides");
+            PersistentLocalObjects.Singleton.DeleteKey("UIOverrides");
             Start();
         }
     }

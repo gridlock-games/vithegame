@@ -38,7 +38,7 @@ public class PlatformVersionChecker : MonoBehaviour
 
     Version GetCurrentServerVersion()
     {
-        string versionData = WebRequestManager.Singleton.gameVersion.Version;
+        string versionData = WebRequestManager.Singleton.GetGameVersion();
         Debug.Log(versionData);
         return new Version(versionData);
     }
