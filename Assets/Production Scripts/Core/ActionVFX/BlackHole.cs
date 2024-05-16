@@ -4,11 +4,18 @@ using UnityEngine;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(FollowUpVFX))]
     public class BlackHole : MonoBehaviour
     {
         [SerializeField] private float radius = 2;
         [SerializeField] private float forceMultiplier = 10;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
+
+        private FollowUpVFX vfx;
+        private void Start()
+        {
+            vfx = GetComponent<FollowUpVFX>();
+        }
 
         Collider[] colliders = new Collider[20];
         private void FixedUpdate()
@@ -18,8 +25,23 @@ namespace Vi.Core
             {
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
-                    movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
+                    bool shouldAffect = false;
+                    if (networkCollider.Attributes == vfx.Attacker)
+                    {
+                        if (vfx.shouldAffectSelf) { shouldAffect = true; }
+                    }
+                    else
+                    {
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.Attacker);
+                        if (vfx.shouldAffectEnemies & canHit) { shouldAffect = true; }
+                        if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
+                    }
+
+                    if (shouldAffect)
+                    {
+                        MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                        movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
+                    }
                 }
                 else if (colliders[i].TryGetComponent(out Rigidbody rb))
                 {

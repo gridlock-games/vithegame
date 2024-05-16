@@ -75,6 +75,21 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1678338494779658425}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &-5467905512432266006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494871026038834521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eabb63d96fe6ba842bb323f0e0078468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shouldAffectSelf: 0
+  shouldAffectTeammates: 1
+  shouldAffectEnemies: 1
 --- !u!114 &2654175274349702557
 MonoBehaviour:
   m_ObjectHideFlags: 0
