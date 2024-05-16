@@ -341,45 +341,16 @@ namespace Vi.Core
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
+            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+
             // Check stamina and rage requirements and apply statuses for specific actions
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (weaponHandler.GetWeapon().dodgeStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-weaponHandler.GetWeapon().dodgeStaminaCost);
                 StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
                 if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.Lunge)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
             }
 
             // Set the current action clip for the weapon handler
@@ -443,12 +414,60 @@ namespace Vi.Core
             lastClipPlayed = actionClip;
         }
 
-        private bool AreActionClipRequirementsMet(ActionClip actionClip)
+        public bool AreActionClipRequirementsMet(ActionClip actionClip)
         {
-            if (actionClip.agentStaminaCost > attributes.GetStamina()) { return false; }
-            if (actionClip.agentDefenseCost > attributes.GetDefense()) { return false; }
-            if (actionClip.agentRageCost > attributes.GetRage()) { return false; }
+            float staminaCost = GetStaminaCostOfClip(actionClip);
+            if (staminaCost > attributes.GetStamina()) { return false; }
+
+            float rageCost = GetRageCostOfClip(actionClip);
+            if (rageCost > attributes.GetRage()) { return false; }
+
             return true;
+        }
+
+        private float GetStaminaCostOfClip(ActionClip actionClip)
+        {
+            switch (actionClip.GetClipType())
+            {
+                case ActionClip.ClipType.Dodge:
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? -weaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : -weaponHandler.GetWeapon().dodgeStaminaCost;
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.HeavyAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.FlashAttack:
+                case ActionClip.ClipType.Lunge:
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? -actionClip.agentStaminaCost * Attributes.ragingStaminaCostMultiplier : -actionClip.agentStaminaCost;
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.GrabAttack:
+                    return -1;
+                default:
+                    Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
+                    break;
+            }
+            return -1;
+        }
+
+        private float GetRageCostOfClip(ActionClip actionClip)
+        {
+            switch (actionClip.GetClipType())
+            {
+                case ActionClip.ClipType.FlashAttack:
+                case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Ability:
+                    return -actionClip.agentRageCost;
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.HeavyAttack:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.Flinch:
+                    return -1;
+                default:
+                    Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
+                    break;
+            }
+            return -1;
         }
 
         private Coroutine waitForLungeThenPlayAttackCorountine;

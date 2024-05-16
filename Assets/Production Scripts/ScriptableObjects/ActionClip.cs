@@ -151,7 +151,6 @@ namespace Vi.ScriptableObjects
         public float recoveryAnimationSpeed = 1;
 
         public float agentStaminaCost = 20;
-        public float agentDefenseCost = 0;
         public float agentRageCost = 50;
 
         public Weapon.WeaponBone[] effectedWeaponBones = new Weapon.WeaponBone[0];
@@ -173,12 +172,12 @@ namespace Vi.ScriptableObjects
 
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;
+        public bool isAffectedByRage = true;
         public float damage = 20;
         public float healAmount = 0;
         public float staminaDamage = 0;
         public float healthPenaltyOnMiss = 0;
         public float staminaPenaltyOnMiss = 0;
-        public float defensePenaltyOnMiss = 0;
         public float ragePenaltyOnMiss = 0;
         public int maxHitLimit = 1;
         [SerializeField] private float timeBetweenHits = 1;
