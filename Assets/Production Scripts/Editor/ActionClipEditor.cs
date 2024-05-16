@@ -18,7 +18,6 @@ namespace Vi.Editor
         private SerializedProperty spHitReactionClipType;
 
         private SerializedProperty spAgentStaminaCost;
-        private SerializedProperty spAgentDefenseCost;
         private SerializedProperty spAgentRageCost;
 
         private SerializedProperty spShouldApplyRootMotion;
@@ -60,12 +59,12 @@ namespace Vi.Editor
 
         private SerializedProperty spAttackingNormalizedTime;
         private SerializedProperty spRecoveryNormalizedTime;
+        private SerializedProperty spIsAffectedByRage;
         private SerializedProperty spDamage;
         private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
         private SerializedProperty spHealthPenaltyOnMiss;
         private SerializedProperty spStaminaPenaltyOnMiss;
-        private SerializedProperty spDefensePenaltyOnMiss;
         private SerializedProperty spRagePenaltyOnMiss;
         private SerializedProperty spMaxHitLimit;
         private SerializedProperty spTimeBetweenHits;
@@ -148,7 +147,6 @@ namespace Vi.Editor
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
-            spAgentDefenseCost = serializedObject.FindProperty("agentDefenseCost");
             spAgentRageCost = serializedObject.FindProperty("agentRageCost");
 
             spEffectedWeaponBones = serializedObject.FindProperty("effectedWeaponBones");
@@ -164,12 +162,12 @@ namespace Vi.Editor
 
             spAttackingNormalizedTime = serializedObject.FindProperty("attackingNormalizedTime");
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
+            spIsAffectedByRage = serializedObject.FindProperty("isAffectedByRage");
             spDamage = serializedObject.FindProperty("damage");
             spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
             spHealthPenaltyOnMiss = serializedObject.FindProperty("healthPenaltyOnMiss");
             spStaminaPenaltyOnMiss = serializedObject.FindProperty("staminaPenaltyOnMiss");
-            spDefensePenaltyOnMiss = serializedObject.FindProperty("defensePenaltyOnMiss");
             spRagePenaltyOnMiss = serializedObject.FindProperty("ragePenaltyOnMiss");
             spMaxHitLimit = serializedObject.FindProperty("maxHitLimit");
             spTimeBetweenHits = serializedObject.FindProperty("timeBetweenHits");
@@ -361,6 +359,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spWeaponBonesToHide);
                 EditorGUILayout.PropertyField(spMustBeAiming);
+                EditorGUILayout.PropertyField(spIsAffectedByRage);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
@@ -433,6 +432,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spEffectedWeaponBones);
                 EditorGUILayout.PropertyField(spWeaponBonesToHide);
                 EditorGUILayout.PropertyField(spMustBeAiming);
+                EditorGUILayout.PropertyField(spIsAffectedByRage);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Charge Attack Settings", EditorStyles.whiteLargeLabel);
@@ -523,7 +523,6 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
-                EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
 
                 EditorGUILayout.Space();
@@ -534,7 +533,6 @@ namespace Vi.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spHealthPenaltyOnMiss);
                 EditorGUILayout.PropertyField(spStaminaPenaltyOnMiss);
-                EditorGUILayout.PropertyField(spDefensePenaltyOnMiss);
                 EditorGUILayout.PropertyField(spRagePenaltyOnMiss);
                 EditorGUILayout.PropertyField(spMaxHitLimit);
                 if (spMaxHitLimit.intValue > 1) { EditorGUILayout.PropertyField(spTimeBetweenHits); }
@@ -610,7 +608,6 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
-                EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
 
                 EditorGUILayout.Space();
@@ -711,7 +708,6 @@ namespace Vi.Editor
             {
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
-                EditorGUILayout.PropertyField(spAgentDefenseCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
 
                 EditorGUILayout.Space();

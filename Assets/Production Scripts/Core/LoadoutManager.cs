@@ -212,9 +212,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
-                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
-                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(1);
                         currentEquippedWeapon.Value = 1;
                         lastPrimaryFlashAttackTime = Time.time;
@@ -238,9 +236,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
-                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
-                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(2);
                         currentEquippedWeapon.Value = 2;
                         lastSecondaryFlashAttackTime = Time.time;
@@ -286,14 +282,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentRageCost > attributes.GetRage())
-                            canFlashAttack = false;
-                        else
-                            canFlashAttack = true;
+                        canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
@@ -307,14 +296,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentRageCost > attributes.GetRage())
-                            canFlashAttack = false;
-                        else
-                            canFlashAttack = true;
+                        canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);

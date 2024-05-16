@@ -546,7 +546,6 @@ namespace Vi.Core
                         {
                             attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
                             attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
-                            attributes.AddDefense(-CurrentActionClip.defensePenaltyOnMiss);
                             attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
