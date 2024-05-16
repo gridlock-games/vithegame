@@ -176,8 +176,8 @@ namespace Vi.Core
                 if (AreActionClipRequirementsMet(lungeClip))
                 {
                     // Lunge mechanic
-                    ExtDebug.DrawBoxCastBox(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, Color.red, 1);
-                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
+                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                     foreach (RaycastHit hit in allHits)
                     {
