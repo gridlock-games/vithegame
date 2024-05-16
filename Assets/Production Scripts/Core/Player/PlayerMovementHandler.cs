@@ -237,6 +237,10 @@ namespace Vi.Player
                     moveSidesTarget.Value = animDir.x;
                 }
             }
+
+            movement += forceAccumulated;
+            forceAccumulated = Vector3.zero;
+
             lastMovement = movement;
 
             Vector3 newPosition;
@@ -375,6 +379,12 @@ namespace Vi.Player
             }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
+        }
+
+        Vector3 forceAccumulated;
+        public override void AddForce(Vector3 force)
+        {
+            forceAccumulated += force * Time.fixedDeltaTime;
         }
 
         private float positionStrength = 1;

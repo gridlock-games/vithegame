@@ -17,10 +17,14 @@ namespace Vi.Misc
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].TryGetComponent(out Rigidbody rb))
+                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    float dist = Vector3.Distance(transform.position, rb.position);
-                    rb.AddForce((transform.position - rb.position).normalized * forceMultiplier, ForceMode.VelocityChange);
+                    MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                    movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
+                }
+                else if (colliders[i].TryGetComponent(out Rigidbody rb))
+                {
+                    rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
                 }
             }
         }
