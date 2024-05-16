@@ -882,7 +882,7 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            
+
             // Add all items into character inventory
             foreach (var option in armorOptions)
             {
@@ -1876,7 +1876,7 @@ namespace Vi.Core
 
         public void CheckGameVersion()
         {
-            if (checkingGameVersion) { return; }
+            if (IsCheckingGameVersion) { return; }
             StartCoroutine(CheckGameVersionRequest());
         }
 
@@ -1885,11 +1885,11 @@ namespace Vi.Core
         public string GetGameVersion() { return gameVersion.Version; }
 
         [SerializeField] private GameObject alertBoxPrefab;
+        public bool IsCheckingGameVersion { get; private set; }
         private GameVersion gameVersion;
-        private bool checkingGameVersion;
         private IEnumerator CheckGameVersionRequest()
         {
-            checkingGameVersion = true;
+            IsCheckingGameVersion = true;
 
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/version");
             yield return getRequest.SendWebRequest();
@@ -1909,7 +1909,7 @@ namespace Vi.Core
             GameIsUpToDate = Application.version == gameVersion.Version;
             if (!GameIsUpToDate) { Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update."; }
 
-            checkingGameVersion = false;
+            IsCheckingGameVersion = false;
         }
 
         private class GameVersion

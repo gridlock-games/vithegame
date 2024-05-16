@@ -215,8 +215,6 @@ namespace Vi.Core
 
             CreatePlayerDataManager(false);
             CreateNetSceneManager();
-
-            WebRequestManager.Singleton.CheckGameVersion();
         }
 
         private void OnTransportFailure()

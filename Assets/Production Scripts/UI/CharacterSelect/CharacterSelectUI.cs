@@ -679,8 +679,9 @@ namespace Vi.UI
             selectCharacterButton_autoConnectToHub.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.CheckGameVersion();
 
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
