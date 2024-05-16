@@ -11,6 +11,7 @@ namespace Vi.Core
     {
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
         [SerializeField] private float timeToActivateGravity = 0;
+        [SerializeField] private float killDistance = 50;
 
         private Attributes attacker;
         private ActionClip attack;
@@ -46,6 +47,17 @@ namespace Vi.Core
             GetComponent<Rigidbody>().useGravity = false;
             yield return new WaitForSeconds(timeToActivateGravity);
             GetComponent<Rigidbody>().useGravity = true;
+        }
+
+        private Vector3 startPosition;
+        private void Start()
+        {
+            startPosition = transform.position;
+        }
+
+        private void Update()
+        {
+            if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
         }
 
         private void OnTriggerEnter(Collider other)

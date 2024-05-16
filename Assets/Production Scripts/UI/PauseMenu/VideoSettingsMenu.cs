@@ -27,6 +27,7 @@ namespace Vi.UI
         [Header("Action Buttons")]
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
+        [SerializeField] private Text fpsWarningText;
 
         private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
@@ -36,6 +37,8 @@ namespace Vi.UI
         {
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
+
+            fpsWarningText.text = "";
 
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
@@ -196,6 +199,8 @@ namespace Vi.UI
             vsyncToggle.interactable = true;
 
             SetOriginalVariables();
+
+            fpsWarningText.text = "IF THE GAME FEELS CHOPPY AFTER CHANGES, RESTART YOUR GAME";
         }
 
         public void DiscardChanges()

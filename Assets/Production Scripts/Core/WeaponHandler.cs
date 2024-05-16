@@ -18,21 +18,6 @@ namespace Vi.Core
             return weaponInstance;
         }
 
-        public override void OnNetworkSpawn()
-        {
-            isBlocking.OnValueChanged += OnIsBlockingChange;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            isBlocking.OnValueChanged -= OnIsBlockingChange;
-        }
-
-        private void OnIsBlockingChange(bool prev, bool current)
-        {
-            animationHandler.Animator.SetBool("Blocking", current);
-        }
-
         private Weapon weaponInstance;
         private Attributes attributes;
         private AnimationHandler animationHandler;
@@ -481,7 +466,7 @@ namespace Vi.Core
 
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = isBlocking.Value;
+                IsBlocking = attributes.GetDefense() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {
@@ -897,6 +882,8 @@ namespace Vi.Core
         private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
+            animationHandler.Animator.SetBool("Blocking", IsBlocking);
+
             if (IsServer)
             {
                 reloadingAnimParameterValue.Value = animationHandler.Animator.GetBool("Reloading");

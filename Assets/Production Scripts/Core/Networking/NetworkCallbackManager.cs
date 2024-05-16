@@ -15,7 +15,6 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
-
         private void Start()
         {
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
@@ -160,6 +159,8 @@ namespace Vi.Core
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
+                yield return WebRequestManager.Singleton.SetGameVersion();
+
                 yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString()));
             }
