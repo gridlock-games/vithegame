@@ -5,7 +5,7 @@ using Vi.Core;
 
 namespace Vi.Misc
 {
-    public class PullRigidboiesToMe : MonoBehaviour
+    public class BlackHole : MonoBehaviour
     {
         [SerializeField] private float radius = 2;
         [SerializeField] private float forceMultiplier = 10;
@@ -14,7 +14,7 @@ namespace Vi.Misc
         Collider[] colliders = new Collider[20];
         private void FixedUpdate()
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Ignore);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
