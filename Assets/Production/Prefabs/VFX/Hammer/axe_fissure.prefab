@@ -14731,8 +14731,8 @@ Transform:
   m_GameObject: {fileID: 744258597443500299}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.5}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8686052685149429567}
   - {fileID: 5616400912222579255}
@@ -19752,6 +19752,11 @@ MonoBehaviour:
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   shouldUseAttackerPositionForHitAngles: 1
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
+  scaleVFXBasedOnEdges: 0
+  boundsPoint: {x: 0, y: 0, z: 2.5}
+  boundsLocalAxis: {x: 0, y: -1, z: 0}
 --- !u!54 &7474609792757252775
 Rigidbody:
   m_ObjectHideFlags: 0
