@@ -962,7 +962,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 15
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
@@ -976,7 +976,7 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.35
   recoveryNormalizedTime: 0.55
-  damage: 1
+  damage: 10
   healAmount: 0
   staminaDamage: 0
   defenseDamage: 0
@@ -1017,7 +1017,7 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 0.25, y: 0.25, z: 0}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
-  canLunge: 0
+  canLunge: 1
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0
