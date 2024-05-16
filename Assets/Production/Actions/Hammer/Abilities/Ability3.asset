@@ -264,7 +264,7 @@ MonoBehaviour:
   agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 12000000
-  weaponBonesToHide: 
+  weaponBonesToHide: 12000000
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
@@ -301,20 +301,16 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 521d188f691f925488b018c3f7fb014a, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 0
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit:
-  - status: 13
-    value: 0
-    duration: 8
-    delay: 0
+  statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
-  - {fileID: 6515331773666235339, guid: 973656b742417994d89339df56df859c, type: 3}
+  - {fileID: 8362852654185497884, guid: d1d36cbc73e0346f1a890f406101834a, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 0, y: 0, z: 0}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
