@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Vi.Utility;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 namespace Vi.Core
 {
@@ -1896,7 +1897,7 @@ namespace Vi.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "servers/duels");
+                Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "game/version");
                 getRequest.Dispose();
                 yield break;
             }
@@ -1907,7 +1908,7 @@ namespace Vi.Core
             getRequest.Dispose();
 
             GameIsUpToDate = Application.version == gameVersion.Version;
-            if (!GameIsUpToDate) { Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update."; }
+            if (!GameIsUpToDate & SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null) { Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update."; }
 
             IsCheckingGameVersion = false;
         }
@@ -1916,11 +1917,47 @@ namespace Vi.Core
         {
             public string Version;
             public string Type;
+
+            public GameVersion(string version, string type)
+            {
+                Version = version;
+                Type = type;
+            }
         }
 
         private class Version
         {
             public GameVersion gameversion;
+
+            public Version(string version, string type)
+            {
+                gameversion = new GameVersion(version, type);
+            }
+        }
+
+        public IEnumerator SetGameVersion()
+        {
+            Version payload = new Version(Application.version, "Live");
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "game/version", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "game/version", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
+            }
+            postRequest.Dispose();
         }
     }
 }
