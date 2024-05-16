@@ -200,7 +200,7 @@ namespace Vi.UI
 
             SetOriginalVariables();
 
-            fpsWarningText.text = "IF CHOPPY FPS OCCURS AFTER CHANGES, RESTART YOUR GAME";
+            fpsWarningText.text = "IF THE GAME FEELS CHOPPY AFTER CHANGES, RESTART YOUR GAME";
         }
 
         public void DiscardChanges()
