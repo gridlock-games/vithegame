@@ -41,14 +41,14 @@ namespace LightPat.Core
 
         private struct Server : INetworkSerializable, System.IEquatable<Server>
         {
-            public FixedString32Bytes _id;
+            public FixedString64Bytes _id;
             public int type;
             public int population;
             public int progress;
-            public FixedString32Bytes ip;
-            public FixedString32Bytes label;
-            public FixedString32Bytes __v;
-            public FixedString32Bytes port;
+            public FixedString64Bytes ip;
+            public FixedString64Bytes label;
+            public FixedString64Bytes __v;
+            public FixedString64Bytes port;
 
             public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port)
             {
