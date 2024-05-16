@@ -976,10 +976,10 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.5
-  damage: 1
+  damage: 6
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 5
+  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   defensePenaltyOnMiss: 0
@@ -1017,7 +1017,7 @@ MonoBehaviour:
   boxCastHalfExtents: {x: 2, y: 1, z: 1}
   boxCastDistance: 5
   maximumTargetingRotationAngle: 60
-  canLunge: 1
+  canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0
