@@ -807,7 +807,7 @@ namespace Vi.Core
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
         private const float attackerRageToBeAddedOnHit = 2;
-        private const float victimRageToBeAddedOnHit = 2;
+        private const float victimRageToBeAddedOnHit = 1;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
