@@ -683,6 +683,8 @@ namespace Vi.UI
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
+            if (!WebRequestManager.Singleton.GameIsUpToDate) { yield break; }
+
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
                 networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
