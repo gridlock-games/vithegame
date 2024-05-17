@@ -153,7 +153,6 @@ namespace Vi.Core
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
         private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.15f;
 
-
         private readonly static List<ActionClip.ClipType> clipTypesToCheckForCancellation = new List<ActionClip.ClipType>()
         {
             ActionClip.ClipType.LightAttack,
