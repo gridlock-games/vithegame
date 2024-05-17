@@ -1028,6 +1028,7 @@ namespace Vi.Core
             }
             else if (prev == ActionClip.Ailment.Death)
             {
+                isRaging.Value = false;
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
