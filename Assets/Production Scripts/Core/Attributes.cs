@@ -854,7 +854,7 @@ namespace Vi.Core
         private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
-        private const float attackerRageToBeAddedOnHit = 2;
+        private const float attackerRageToBeAddedOnHit = 98;
         private const float victimRageToBeAddedOnHit = 1;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
@@ -964,7 +964,7 @@ namespace Vi.Core
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
-        private const float rageDepletionRate = 10;
+        private const float rageDepletionRate = 1;
         private float rageDelayCooldown;
         private void UpdateRage()
         {
