@@ -43,11 +43,14 @@ namespace Vi.Player
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
@@ -56,11 +59,14 @@ namespace Vi.Player
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
