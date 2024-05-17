@@ -116,7 +116,7 @@ namespace Vi.Player
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -133,7 +133,7 @@ namespace Vi.Player
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
                 }
@@ -209,7 +209,7 @@ namespace Vi.Player
             float yOffset = 0.2f;
             Vector3 startPos = movementPrediction.CurrentPosition;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {
@@ -325,7 +325,7 @@ namespace Vi.Player
         {
             if (!IsSpawned) { return; }
 
-            #if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
@@ -350,7 +350,7 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                                 foreach (RaycastHit hit in allHits)
                                 {
@@ -371,7 +371,7 @@ namespace Vi.Player
                 }
             lookInput += lookInputToAdd;
             }
-            #endif
+#endif
 
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
@@ -380,7 +380,7 @@ namespace Vi.Player
 
             if (minimapCameraInstance)
             {
-                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                 minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
             }
 
@@ -505,7 +505,7 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {
