@@ -138,6 +138,9 @@ namespace Vi.Core
 
         public void CancelAllActions()
         {
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
@@ -149,7 +152,6 @@ namespace Vi.Core
         private ActionClip lastClipPlayed;
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
         private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.15f;
-
 
         private readonly static List<ActionClip.ClipType> clipTypesToCheckForCancellation = new List<ActionClip.ClipType>()
         {
@@ -343,8 +345,8 @@ namespace Vi.Core
 
             if (!AreActionClipRequirementsMet(actionClip)) { return; }
 
-            if (ShouldApplyStaminaCost(actionClip)) { attributes.AddStamina(GetStaminaCostOfClip(actionClip)); }
-            if (ShouldApplyRageCost(actionClip)) { attributes.AddRage(GetRageCostOfClip(actionClip)); }
+            if (ShouldApplyStaminaCost(actionClip)) { attributes.AddStamina(-GetStaminaCostOfClip(actionClip)); }
+            if (ShouldApplyRageCost(actionClip)) { attributes.AddRage(-GetRageCostOfClip(actionClip)); }
 
             // Check stamina and rage requirements and apply statuses for specific actions
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
@@ -453,13 +455,13 @@ namespace Vi.Core
             switch (actionClip.GetClipType())
             {
                 case ActionClip.ClipType.Dodge:
-                    return attributes.IsRaging() & actionClip.isAffectedByRage ? -weaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : -weaponHandler.GetWeapon().dodgeStaminaCost;
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? weaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : weaponHandler.GetWeapon().dodgeStaminaCost;
                 case ActionClip.ClipType.LightAttack:
                 case ActionClip.ClipType.HeavyAttack:
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.FlashAttack:
                 case ActionClip.ClipType.Lunge:
-                    return attributes.IsRaging() & actionClip.isAffectedByRage ? -actionClip.agentStaminaCost * Attributes.ragingStaminaCostMultiplier : -actionClip.agentStaminaCost;
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * Attributes.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
                 case ActionClip.ClipType.GrabAttack:
@@ -490,7 +492,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.FlashAttack:
                 case ActionClip.ClipType.Lunge:
                 case ActionClip.ClipType.Ability:
-                    return -actionClip.agentRageCost;
+                    return actionClip.agentRageCost;
                 case ActionClip.ClipType.LightAttack:
                 case ActionClip.ClipType.HeavyAttack:
                 case ActionClip.ClipType.GrabAttack:

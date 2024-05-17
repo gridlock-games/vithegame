@@ -39,7 +39,7 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
-            AudioManager.Singleton.PlayClipAtPoint(attacker.gameObject, soundToPlayOnSpawn, transform.position);
+            AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position);
 
             startPosition = transform.position;
 
