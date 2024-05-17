@@ -121,8 +121,12 @@ namespace Vi.UI
             switchLoginFormButton.onClick.RemoveAllListeners();
             switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
         }
+    public void LoginWithSteam()
+    {
+      initialErrorText.text = "Login with Steam has not been implemented yet";
+    }
 
-        public void OpenCreateAccount()
+      public void OpenCreateAccount()
         {
             usernameInput.text = "";
             passwordInput.text = "";
