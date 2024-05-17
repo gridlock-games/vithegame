@@ -865,7 +865,7 @@ namespace Vi.Core
 
         private void Aim(bool isAiming, bool instantAim)
         {
-            animationHandler.Animator.SetBool("Aiming", isAiming & !animationHandler.IsReloading());
+            animationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
             {
                 if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))

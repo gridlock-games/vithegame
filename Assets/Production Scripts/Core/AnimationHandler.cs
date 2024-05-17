@@ -870,6 +870,8 @@ namespace Vi.Core
         private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         [SerializeField] private Transform cameraPivot;
 
+        private const float aimPointYAxisLerpSpeed = 24;
+
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -879,6 +881,28 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
+                    //bool setAimPointToDefault = true;
+                    //Vector3 newAimPointValue = Vector3.zero;
+                    //bool bHit = Physics.Raycast(cameraPivot.position, Camera.main.transform.forward, out RaycastHit hit, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    //if (bHit)
+                    //{
+                    //    if (hit.transform.root != transform.root)
+                    //    {
+                    //        newAimPointValue = hit.point;
+                    //        setAimPointToDefault = false;
+                    //    }
+                    //}
+                    //if (setAimPointToDefault) { newAimPointValue = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset; }
+                    
+                    //if (IsAiming())
+                    //{
+                    //    aimPoint.Value = Vector3.Lerp(aimPoint.Value, newAimPointValue, Time.deltaTime * aimPointYAxisLerpSpeed);
+                    //}
+                    //else
+                    //{
+                    //    aimPoint.Value = newAimPointValue;
+                    //}
+
                     aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                     meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
                 }
