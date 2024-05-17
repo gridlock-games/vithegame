@@ -66,7 +66,7 @@ namespace Vi.Core
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
                 GameObject g = Instantiate(prefab, transform.position, transform.rotation);
-                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker); }
+                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
                 PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
             }
         }
