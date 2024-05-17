@@ -160,6 +160,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -255,7 +259,7 @@ MonoBehaviour:
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  recoveryAnimationSpeed: 0.75
   agentStaminaCost: 20
   agentDefenseCost: 0
   agentRageCost: 50
@@ -269,7 +273,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.75
+  recoveryNormalizedTime: 1
   damage: 1
   healAmount: 0
   staminaDamage: 0
@@ -285,10 +289,10 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
+  ailment: 1
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
-  ailmentHitDefinition: 
+  ailmentHitDefinition: 0000000000000000000000000001
   dodgeLock: 1
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
