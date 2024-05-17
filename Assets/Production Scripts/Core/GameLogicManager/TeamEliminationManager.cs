@@ -65,7 +65,11 @@ namespace Vi.Core.GameModeManagers
 
         public bool IsViEssenceSpawned() { return NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value); }
 
-        private TeamEliminationViEssence GetViEssenceInstance() { return NetworkManager.SpawnManager.SpawnedObjects[viEssenceNetObjId.Value].GetComponent<TeamEliminationViEssence>(); }
+        private TeamEliminationViEssence GetViEssenceInstance()
+        {
+            if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value)) { return null; }
+            return NetworkManager.SpawnManager.SpawnedObjects[viEssenceNetObjId.Value].GetComponent<TeamEliminationViEssence>();
+        }
 
         private NetworkVariable<ulong> viEssenceNetObjId = new NetworkVariable<ulong>();
         public override void OnPlayerKill(Attributes killer, Attributes victim)
