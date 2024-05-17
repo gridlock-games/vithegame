@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Utility;
+using UnityEngine.AI;
 
 namespace Vi.Core
 {
@@ -834,11 +835,22 @@ namespace Vi.Core
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
             (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            float waitTime = 0;
             while (!spawnPointFound)
             {
                 attributesToRespawn.isWaitingForSpawnPoint = true;
                 (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
                 yield return null;
+                waitTime += Time.deltaTime;
+                if (waitTime > maxSpawnPointWaitTime) { break; }
+            }
+
+            if (!spawnPointFound)
+            {
+                Debug.Log("Spawning player on random point on navmesh since we can't find a good spawn point");
+                Vector3 randomDirection = Random.insideUnitSphere * 50;
+                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, 50, 1);
+                transformData.position = hit.position;
             }
 
             attributesToRespawn.isWaitingForSpawnPoint = false;
@@ -874,6 +886,7 @@ namespace Vi.Core
             }
         }
 
+        private const float maxSpawnPointWaitTime = 5;
         private bool spawnPlayerRunning;
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
@@ -897,10 +910,21 @@ namespace Vi.Core
             if (playerSpawnPoints)
             {
                 (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                float waitTime = 0;
                 while (!spawnPointFound)
                 {
                     (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
                     yield return null;
+                    waitTime += Time.deltaTime;
+                    if (waitTime > maxSpawnPointWaitTime) { break; }
+                }
+                
+                if (!spawnPointFound)
+                {
+                    Debug.Log("Spawning player on random point on navmesh since we can't find a good spawn point");
+                    Vector3 randomDirection = Random.insideUnitSphere * 50;
+                    NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, 50, 1);
+                    transformData.position = hit.position;
                 }
 
                 spawnPosition = transformData.position;
@@ -935,7 +959,7 @@ namespace Vi.Core
             else
                 playerObject.GetComponent<NetworkObject>().Spawn(true);
 
-            yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             spawnPlayerRunning = false;
         }
 
