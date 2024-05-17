@@ -889,15 +889,19 @@ namespace Vi.Core
 
             if (spawnPlayerCoroutine != null) { StopCoroutine(spawnPlayerCoroutine); }
             spawnPlayerRunning = false;
-            if (playerObjectToSpawn.GetComponent<NetworkObject>().IsSpawned)
-            {
-                playerObjectToSpawn.GetComponent<NetworkObject>().Despawn(true);
-            }
-            else
-            {
-                Destroy(playerObjectToSpawn);
-            }
 
+            if (playerObjectToSpawn)
+            {
+                if (playerObjectToSpawn.GetComponent<NetworkObject>().IsSpawned)
+                {
+                    playerObjectToSpawn.GetComponent<NetworkObject>().Despawn(true);
+                }
+                else
+                {
+                    Destroy(playerObjectToSpawn);
+                }
+            }
+            
             if (playerIdThatIsBeingSpawned >= 0)
             {
                 if (NetworkManager.ConnectedClientsIds.Contains((ulong)playerIdThatIsBeingSpawned))
@@ -986,7 +990,7 @@ namespace Vi.Core
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
