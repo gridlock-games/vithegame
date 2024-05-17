@@ -411,7 +411,7 @@ namespace Vi.Core
             return vfxInstance;
         }
 
-        public IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
+        public static IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem)
@@ -546,7 +546,6 @@ namespace Vi.Core
                         {
                             attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
                             attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
-                            attributes.AddDefense(-CurrentActionClip.defensePenaltyOnMiss);
                             attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }

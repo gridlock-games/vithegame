@@ -114,8 +114,10 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitHP()); }
+            if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            rage.OnValueChanged += OnRageChanged;
+            isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
@@ -128,7 +130,7 @@ namespace Vi.Core
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
-        private IEnumerator InitHP()
+        private IEnumerator InitStats()
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
@@ -144,6 +146,8 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            rage.OnValueChanged -= OnRageChanged;
+            isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
@@ -167,6 +171,46 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+        }
+
+        private const float rageEndPercent = 0.01f;
+
+        [SerializeField] private GameObject rageAtMaxVFXPrefab;
+        [SerializeField] private GameObject ragingVFXPrefab;
+        private GameObject rageAtMaxVFXInstance;
+        private GameObject ragingVFXInstance;
+        private void OnRageChanged(float prev, float current)
+        {
+            float currentRagePercent = GetRage() / GetMaxRage();
+            if (currentRagePercent >= 1)
+            {
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, transform); }
+            }
+            else
+            {
+                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
+            }
+
+            if (IsServer)
+            {
+                if (currentRagePercent < rageEndPercent)
+                {
+                    isRaging.Value = false;
+                }
+            }
+        }
+
+        private void OnIsRagingChanged(bool prev, bool current)
+        {
+            if (current)
+            {
+                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
+                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, transform); }
+            }
+            else
+            {
+                if (ragingVFXInstance) { Destroy(ragingVFXInstance); }
             }
         }
 
@@ -389,6 +433,8 @@ namespace Vi.Core
         private const float notBlockingDefenseHitReactionPercentage = 0.4f;
         private const float blockingDefenseHitReactionPercentage = 0.5f;
 
+        private const float rageDamageMultiplier = 1.15f;
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -556,6 +602,8 @@ namespace Vi.Core
                 }
             }
 
+            if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
+
             if (HP.Value + HPDamage <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
@@ -585,7 +633,7 @@ namespace Vi.Core
                         | animationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        animationHandler.PlayAction(hitReaction);
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
                     }
                 }
             }
@@ -621,7 +669,7 @@ namespace Vi.Core
                 }
             }
 
-            if (attack.shouldFlinch)
+            if (attack.shouldFlinch | IsRaging())
             {
                 movementHandler.Flinch(attack.GetFlinchAmount());
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle));
@@ -816,7 +864,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 GlowRenderer.RenderHit();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
@@ -828,7 +876,7 @@ namespace Vi.Core
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -858,7 +906,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 GlowRenderer.RenderBlock();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
@@ -868,7 +916,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -915,12 +963,48 @@ namespace Vi.Core
             AddDefense(weaponHandler.GetWeapon().GetDefenseRecoveryRate() * Time.deltaTime, false);
         }
 
+        public const float ragingStaminaCostMultiplier = 1.25f;
+        private const float rageDepletionRate = 10;
         private float rageDelayCooldown;
         private void UpdateRage()
         {
+            if (IsRaging())
+            {
+                AddRage(-rageDepletionRate * Time.deltaTime);
+            }
+
             rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
             if (rageDelayCooldown > 0) { return; }
             AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
+        }
+
+        public void OnActivateRage()
+        {
+            if (GetRage() / GetMaxRage() < 1) { return; }
+            ActivateRage();
+        }
+
+        public bool IsRaging() { return isRaging.Value; }
+        private NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
+        private void ActivateRage()
+        {
+            if (!IsSpawned) { Debug.LogError("Calling Attributes.ActivateRage() before this object is spawned!"); return; }
+
+            if (IsServer)
+            {
+                if (GetRage() / GetMaxRage() < 1) { return; }
+                isRaging.Value = true;
+            }
+            else
+            {
+                ActivateRageServerRpc();
+            }
+        }
+
+        [ServerRpc]
+        private void ActivateRageServerRpc()
+        {
+            ActivateRage();
         }
 
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
