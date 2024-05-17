@@ -446,6 +446,12 @@ namespace Vi.UI
                     break;
             }
 
+            if (playerDataListWithoutSpectators.Count > NetworkCallbackManager.maxActivePlayersInLobby)
+            {
+                canCountDown = false;
+                cannotCountDownMessage = "Cannot play a match with more than 8 players";
+            }
+
             bool roomSettingsParsedProperly = true;
             if (PlayerDataManager.Singleton.IsLobbyLeader())
             {
@@ -515,8 +521,12 @@ namespace Vi.UI
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
+            
             leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
+
+            leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
+            rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
 
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)

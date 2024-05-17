@@ -99,6 +99,8 @@ namespace Vi.Core
             }
         }
 
+        public const int maxActivePlayersInLobby = 8;
+
         private Queue<PlayerDataInput> playerDataQueue = new Queue<PlayerDataInput>();
         private void Update()
         {
@@ -114,7 +116,7 @@ namespace Vi.Core
                     }
                     else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                     {
-                        clientTeam = PlayerDataManager.Team.Competitor;
+                        clientTeam = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count >= 8 ? PlayerDataManager.Team.Spectator : PlayerDataManager.Team.Competitor;
                     }
                     else // Game in progress
                     {
