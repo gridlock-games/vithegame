@@ -516,6 +516,9 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone])
                         {
+                            // Don't play sound effects for shooter weapons here
+                            if (weaponInstances[weaponBone].GetComponent<ShooterWeapon>()) { continue; }
+
                             AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
                             if (attackSoundEffect)
                                 AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);

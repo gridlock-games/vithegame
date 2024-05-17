@@ -12,6 +12,7 @@ namespace Vi.Core
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
+        [SerializeField] private AudioClip soundToPlayOnSpawn;
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -38,6 +39,8 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
+            AudioManager.Singleton.PlayClipAtPoint(attacker.gameObject, soundToPlayOnSpawn, transform.position);
+
             startPosition = transform.position;
 
             Collider[] colliders = GetComponentsInChildren<Collider>();
