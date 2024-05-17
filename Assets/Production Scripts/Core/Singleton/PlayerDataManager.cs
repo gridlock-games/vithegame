@@ -845,14 +845,6 @@ namespace Vi.Core
                 if (waitTime > maxSpawnPointWaitTime) { break; }
             }
 
-            if (!spawnPointFound)
-            {
-                Debug.Log("Spawning player on random point on navmesh since we can't find a good spawn point");
-                Vector3 randomDirection = Random.insideUnitSphere * 50;
-                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, 50, 1);
-                transformData.position = hit.position;
-            }
-
             attributesToRespawn.isWaitingForSpawnPoint = false;
 
             Vector3 spawnPosition = transformData.position;
@@ -919,14 +911,6 @@ namespace Vi.Core
                     if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
                 
-                if (!spawnPointFound)
-                {
-                    Debug.Log("Spawning player on random point on navmesh since we can't find a good spawn point");
-                    Vector3 randomDirection = Random.insideUnitSphere * 50;
-                    NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, 50, 1);
-                    transformData.position = hit.position;
-                }
-
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
