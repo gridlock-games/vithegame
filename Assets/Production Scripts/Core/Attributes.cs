@@ -449,6 +449,9 @@ namespace Vi.Core
             if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
             if (animationHandler.IsGrabAttacking()) { return false; }
 
+            // Don't let grab attack hit players that aren't grabbed
+            if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
+
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
                 AddHP(attack.healAmount);
