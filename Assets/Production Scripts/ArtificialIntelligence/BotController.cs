@@ -394,6 +394,13 @@ namespace Vi.ArtificialIntelligence
         {
             if (Time.time - lastAbilityTime > abilityWaitDuration)
             {
+                if (attributes.GetRage() / attributes.GetMaxRage() >= 1)
+                {
+                    attributes.OnActivateRage();
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
                 int abilityNum = Random.Range(1, 5);
                 if (abilityNum == 1)
                 {
