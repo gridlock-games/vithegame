@@ -763,7 +763,12 @@ namespace Vi.Core
         {
             if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
             {
-                StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+            }
+
+            if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold)
+            {
+                EndSpawnPlayerCoroutine();
             }
         }
 
@@ -878,11 +883,43 @@ namespace Vi.Core
             }
         }
 
+        private void EndSpawnPlayerCoroutine()
+        {
+            if (!IsServer) { Debug.LogError("PlayerDataManager.EndSpawnPlayerCoroutine() shold only be called on the server!"); return; }
+
+            if (spawnPlayerCoroutine != null) { StopCoroutine(spawnPlayerCoroutine); }
+            spawnPlayerRunning = false;
+            if (playerObjectToSpawn.GetComponent<NetworkObject>().IsSpawned)
+            {
+                playerObjectToSpawn.GetComponent<NetworkObject>().Despawn(true);
+            }
+            else
+            {
+                Destroy(playerObjectToSpawn);
+            }
+
+            if (playerIdThatIsBeingSpawned >= 0)
+            {
+                if (NetworkManager.ConnectedClientsIds.Contains((ulong)playerIdThatIsBeingSpawned))
+                {
+                    NetworkManager.DisconnectClient((ulong)playerIdThatIsBeingSpawned, "Timed out while spawning player object");
+                }
+            }
+        }
+
+        private const float spawnPlayerTimeoutThreshold = 10;
         private const float maxSpawnPointWaitTime = 5;
+
+        private int playerIdThatIsBeingSpawned;
         private bool spawnPlayerRunning;
+        private Coroutine spawnPlayerCoroutine;
+        private float lastSpawnPlayerStartTime;
+        private GameObject playerObjectToSpawn;
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
             spawnPlayerRunning = true;
+            playerIdThatIsBeingSpawned = playerData.id;
+            lastSpawnPlayerStartTime = Time.time;
             if (playerData.id >= 0)
             {
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
@@ -923,25 +960,24 @@ namespace Vi.Core
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            GameObject playerObject;
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
-                playerObject = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+                playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
             else
             {
                 if (playerData.id >= 0)
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
 
-                playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+                playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
 
             if (playerData.id >= 0)
-                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+                playerObjectToSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
             else
-                playerObject.GetComponent<NetworkObject>().Spawn(true);
+                playerObjectToSpawn.GetComponent<NetworkObject>().Spawn(true);
 
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             spawnPlayerRunning = false;
