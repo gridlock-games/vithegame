@@ -529,8 +529,8 @@ namespace Vi.Core
 
             AddStamina(-attack.staminaDamage);
             //AddDefense(-attack.defenseDamage);
-            attacker.AddRage(attackerRageToBeAddedOnHit);
-            AddRage(victimRageToBeAddedOnHit);
+            if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
