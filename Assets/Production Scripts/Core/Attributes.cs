@@ -964,7 +964,7 @@ namespace Vi.Core
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
-        private const float rageDepletionRate = 10;
+        private const float rageDepletionRate = 1;
         private float rageDelayCooldown;
         private void UpdateRage()
         {
