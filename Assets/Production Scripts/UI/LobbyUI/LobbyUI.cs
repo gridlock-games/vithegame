@@ -382,11 +382,12 @@ namespace Vi.UI
             gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
-            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             spectatorCountText.text = "Spectator Count: " + playerDataListWithSpectators.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
 
             // Timer logic
-            bool startingGame = playerDataListWithoutSpectators.Count != 0;
+            KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
+            bool startingGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
             foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
             {
                 if (playerData.id >= 0)
