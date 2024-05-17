@@ -210,8 +210,13 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
+      propertyPath: vfxPositionOffset.x
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
       propertyPath: vfxPositionOffset.y
-      value: 2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
@@ -238,7 +243,7 @@ PrefabInstance:
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
       propertyPath: onActivateVFXSpawnNormalizedTime
-      value: 0.5
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d94a3a70b41f3244b3209af5df04e4a, type: 3}
