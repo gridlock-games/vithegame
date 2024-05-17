@@ -766,7 +766,7 @@ namespace Vi.Core
                 spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
             }
 
-            if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold)
+            if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold & spawnPlayerRunning)
             {
                 EndSpawnPlayerCoroutine();
             }

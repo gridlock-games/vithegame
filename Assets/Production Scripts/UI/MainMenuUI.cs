@@ -64,6 +64,10 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = hubPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+            networkTransport.MaxSendQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
             NetSceneManager.Singleton.LoadScene("Player Hub Environment");
@@ -97,6 +101,10 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = (ushort)lobbyPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+            networkTransport.MaxSendQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
