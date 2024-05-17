@@ -43,7 +43,7 @@ namespace Vi.Player
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            if (!animationHandler.IsGrabAttacking())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
                 if (collision.collider.GetComponent<NetworkCollider>())
                 {
@@ -59,7 +59,7 @@ namespace Vi.Player
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (!animationHandler.IsGrabAttacking())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
                 if (collision.collider.GetComponent<NetworkCollider>())
                 {

@@ -25,7 +25,7 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (!animationHandler.IsGrabAttacking())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
                 if (collision.collider.GetComponent<NetworkCollider>())
                 {
@@ -41,7 +41,7 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (!animationHandler.IsGrabAttacking())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
                 if (collision.collider.GetComponent<NetworkCollider>())
                 {
