@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
@@ -79,8 +80,12 @@ namespace Vi.Core
                         ActionClip copy = Instantiate(vfx.ActionClip);
                         copy.name = vfx.ActionClip.name;
                         copy.ailment = ailmentToTriggerOnEnd;
-                        networkCollider.Attributes.ProcessProjectileHit(vfx.Attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
+
+                        if (NetworkManager.Singleton.IsServer)
+                        {
+                            networkCollider.Attributes.ProcessProjectileHit(vfx.Attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
                             copy, networkCollider.Attributes.transform.position, transform.position);
+                        }
                     }
                 }
                 else if (colliders[i].TryGetComponent(out Rigidbody rb))

@@ -15,9 +15,12 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
         {
-            if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+
+            if (clientConnectTimeoutThreshold >= 60) { Debug.LogError("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             CreatePlayerDataManager(false);
@@ -152,7 +155,6 @@ namespace Vi.Core
         private IEnumerator CreateServerInAPI()
         {
             if (NetworkManager.Singleton.IsClient) { yield break; }
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 
             yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") | NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"));
@@ -184,7 +186,6 @@ namespace Vi.Core
 
         private void OnClientStarted()
         {
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             StartCoroutine(ClientConnectTimeout());
         }
