@@ -8,7 +8,7 @@ namespace Vi.Core
     public class FootstepAudioHandler : MonoBehaviour
     {
         [SerializeField] private AudioClip[] footStepSounds;
-        [SerializeField] private float volume = 1;
+        private const float volume = 0.25f;
 
         Attributes attributes;
         private void Awake()
