@@ -21,6 +21,8 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
+		public virtual void AddForce(Vector3 force) { }
+
         protected WeaponHandler weaponHandler;
         protected void Awake()
         {

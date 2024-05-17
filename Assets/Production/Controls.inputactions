@@ -195,6 +195,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ActivateRage",
+                    "type": "Button",
+                    "id": "4dd09bbf-3e1b-492e-a039-bfa74bf67e63",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "DisableBots",
                     "type": "Button",
                     "id": "788e612b-1b33-4ef0-ba01-1b9fe58a4d25",
@@ -746,6 +755,39 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "SwitchWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3f714184-ae3f-4a6d-8147-a92ca9784047",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "ActivateRage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37d3bc22-729d-4f53-8aca-8fb8a1580e3d",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ActivateRage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0574ae28-b173-4ac3-9e71-e6273eacc9a6",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touchscreen",
+                    "action": "ActivateRage",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

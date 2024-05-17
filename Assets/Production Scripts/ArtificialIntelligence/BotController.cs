@@ -227,6 +227,9 @@ namespace Vi.ArtificialIntelligence
                 moveSidesTarget.Value = animDir.x;
             }
 
+            movement += forceAccumulated;
+            forceAccumulated = Vector3.zero;
+
             Vector3 newPosition;
             if (Mathf.Approximately(movement.y, 0))
             {
@@ -391,6 +394,13 @@ namespace Vi.ArtificialIntelligence
         {
             if (Time.time - lastAbilityTime > abilityWaitDuration)
             {
+                if (attributes.GetRage() / attributes.GetMaxRage() >= 1)
+                {
+                    attributes.OnActivateRage();
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
                 int abilityNum = Random.Range(1, 5);
                 if (abilityNum == 1)
                 {
@@ -414,6 +424,12 @@ namespace Vi.ArtificialIntelligence
                 }
                 lastAbilityTime = Time.time;
             }
+        }
+
+        Vector3 forceAccumulated;
+        public override void AddForce(Vector3 force)
+        {
+            forceAccumulated += force * Time.fixedDeltaTime;
         }
 
         private float positionStrength = 1;

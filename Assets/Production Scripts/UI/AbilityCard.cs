@@ -36,14 +36,14 @@ namespace Vi.UI
         private Image borderImage;
         private Color originalBorderImageColor;
         private WeaponHandler weaponHandler;
-        private Attributes attributes;
+        private AnimationHandler animationHandler;
 
         private void Start()
         {
             borderImage = GetComponent<Image>();
             originalBorderImageColor = borderImage.color;
             weaponHandler = GetComponentInParent<WeaponHandler>();
-            attributes = GetComponentInParent<Attributes>();
+            animationHandler = weaponHandler.GetComponent<AnimationHandler>();
 
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
@@ -54,21 +54,13 @@ namespace Vi.UI
             cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
             abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
 
-            if (ability.agentStaminaCost > attributes.GetStamina())
+            if (animationHandler.AreActionClipRequirementsMet(ability))
             {
-                borderImage.color = Color.red;
-            }
-            else if (ability.agentDefenseCost > attributes.GetDefense())
-            {
-                borderImage.color = Color.red;
-            }
-            else if (ability.agentRageCost > attributes.GetRage())
-            {
-                borderImage.color = Color.red;
+                borderImage.color = originalBorderImageColor;
             }
             else
             {
-                borderImage.color = originalBorderImageColor;
+                borderImage.color = Color.red;
             }
         }
     }
