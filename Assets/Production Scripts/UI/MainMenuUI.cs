@@ -66,7 +66,6 @@ namespace Vi.UI
             networkTransport.ConnectionData.Port = hubPort;
 
             networkTransport.MaxPacketQueueSize = 512;
-            networkTransport.MaxSendQueueSize = 512;
 
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
