@@ -17,7 +17,7 @@ namespace Vi.Core
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool instantAim, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
+        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
         {
             float weight = isAiming ? 1 : 0;
             if (hand == Hand.RightHand)
@@ -46,8 +46,6 @@ namespace Vi.Core
                         Debug.LogError("Not sure how to handle body type " + bodyAimType);
                         break;
                 }
-
-                if (instantAim) { rightHandAimRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
@@ -75,8 +73,6 @@ namespace Vi.Core
                         Debug.LogError("Not sure how to handle body type " + bodyAimType);
                         break;
                 }
-
-                if (instantAim) { leftHandAimRig.GetRig().weight = weight; }
             }
             animator.SetLayerWeight(animator.GetLayerIndex("Aiming"), weight);
             StartCoroutine(SetHandAimingBool(hand, isAiming));
@@ -88,7 +84,7 @@ namespace Vi.Core
             aimingDictionary[hand] = isAiming;
         }
 
-        public void ReachHand(Hand hand, Transform reachTarget, bool isReaching, bool instantReach)
+        public void ReachHand(Hand hand, Transform reachTarget, bool isReaching)
         {
             float weight = isReaching & reachTarget ? 1 : 0;
             if (hand == Hand.RightHand)
@@ -96,14 +92,12 @@ namespace Vi.Core
                 if (!rightHandReachRig.GetRig()) { return; }
                 rightHandReachRig.weight = weight;
                 RightHandFollowTarget.target = reachTarget;
-                if (instantReach) { rightHandReachRig.GetRig().weight = weight; }
             }
             else if (hand == Hand.LeftHand)
             {
                 if (!leftHandReachRig.GetRig()) { return; }
                 leftHandReachRig.weight = weight;
                 LeftHandFollowTarget.target = reachTarget;
-                if (instantReach) { leftHandReachRig.GetRig().weight = weight; }
             }
         }
 
