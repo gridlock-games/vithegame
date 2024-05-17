@@ -980,7 +980,7 @@ namespace Vi.Core
 
         public void OnActivateRage()
         {
-            if (GetRage() / GetMaxRage() < 1) { return; }
+            if (!CanActivateRage()) { return; }
             ActivateRage();
         }
 
@@ -992,7 +992,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                if (GetRage() / GetMaxRage() < 1) { return; }
+                if (!CanActivateRage()) { return; }
                 isRaging.Value = true;
             }
             else
@@ -1000,6 +1000,8 @@ namespace Vi.Core
                 ActivateRageServerRpc();
             }
         }
+
+        private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
         [ServerRpc]
         private void ActivateRageServerRpc()
