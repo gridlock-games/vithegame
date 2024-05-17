@@ -138,6 +138,9 @@ namespace Vi.Core
 
         public void CancelAllActions()
         {
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
