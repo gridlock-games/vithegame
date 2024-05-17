@@ -8,7 +8,7 @@ namespace Vi.Core
     public class FootstepAudioHandler : MonoBehaviour
     {
         [SerializeField] private AudioClip[] footStepSounds;
-        private const float volume = 0.25f;
+        private const float volume = 0.5f;
 
         Attributes attributes;
         private void Awake()
@@ -23,7 +23,7 @@ namespace Vi.Core
             if (!attributes.IsSpawned) { return; }
             if (attributes.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (footRaised)
                 {
