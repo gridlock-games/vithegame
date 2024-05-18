@@ -1254,6 +1254,7 @@ GameObject:
   - component: {fileID: 3836432101649399340}
   - component: {fileID: 5639070937106706744}
   - component: {fileID: 9113915521782264894}
+  - component: {fileID: 107173336407060532}
   m_Layer: 7
   m_Name: TestPlayer
   m_TagString: Untagged
@@ -1342,6 +1343,20 @@ MonoBehaviour:
   m_DefaultActionMap: Base
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!136 &107173336407060532
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2468984518559370555}
+  m_Material: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2775333296744785756
 GameObject:
   m_ObjectHideFlags: 0
@@ -3411,7 +3426,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6573539055250136146}
   - component: {fileID: 998051056261432872}
-  - component: {fileID: 1326484576491579090}
   - component: {fileID: 4004324319839056177}
   m_Layer: 7
   m_Name: M_Naked
@@ -3471,20 +3485,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!136 &1326484576491579090
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5796755446860023528}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4004324319839056177
 MonoBehaviour:
   m_ObjectHideFlags: 0
