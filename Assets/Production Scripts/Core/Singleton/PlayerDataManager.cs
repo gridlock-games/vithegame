@@ -276,6 +276,8 @@ namespace Vi.Core
             }
         }
 
+        public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
+
         public bool ContainsId(int clientId)
         {
             return playerDataList.Contains(new PlayerData(clientId));
