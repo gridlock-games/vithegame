@@ -11,6 +11,12 @@ namespace Vi.Core
     {
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
 
+		public static readonly string[] layersToAccountForInMovement = new string[]
+		{
+			"Default",
+			"Projectile"
+		};
+
         public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             transform.position = newPosition;
@@ -20,6 +26,8 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
+
+		public virtual void AddForce(Vector3 force) { }
 
         protected WeaponHandler weaponHandler;
         protected void Awake()

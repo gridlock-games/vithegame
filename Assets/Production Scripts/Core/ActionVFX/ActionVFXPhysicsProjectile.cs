@@ -12,6 +12,7 @@ namespace Vi.Core
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
         [SerializeField] private float timeToActivateGravity = 0;
         [SerializeField] private float killDistance = 50;
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
 
         private Attributes attacker;
         private ActionClip attack;
@@ -37,7 +38,7 @@ namespace Vi.Core
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
             }
 
-            if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
 
             StartCoroutine(ActivateGravityCoroutine());
         }
@@ -58,6 +59,16 @@ namespace Vi.Core
         private void Update()
         {
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                GameObject g = Instantiate(prefab, transform.position, transform.rotation);
+                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
+            }
         }
 
         private void OnTriggerEnter(Collider other)

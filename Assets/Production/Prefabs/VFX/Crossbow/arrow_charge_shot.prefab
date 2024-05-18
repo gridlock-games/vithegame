@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4626636668758901643}
   - component: {fileID: 4820386558630090161}
   - component: {fileID: 4819460045311159243}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4893,7 +4893,7 @@ GameObject:
   - component: {fileID: 4626486369294885395}
   - component: {fileID: 4820259491528109233}
   - component: {fileID: 4819084659632013143}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LongSparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9775,7 +9775,7 @@ GameObject:
   - component: {fileID: 4626671186893907923}
   - component: {fileID: 4820671722592694167}
   - component: {fileID: 4819492941989452583}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: StartSparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14666,7 +14666,7 @@ GameObject:
   - component: {fileID: 4626813272502593249}
   - component: {fileID: 4820501696017586371}
   - component: {fileID: 4819259385230321437}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RayWaves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19499,7 +19499,7 @@ GameObject:
   - component: {fileID: 4626370218968266733}
   - component: {fileID: 4820315156583034243}
   - component: {fileID: 4819432462537534511}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DarkCone1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24381,7 +24381,7 @@ GameObject:
   - component: {fileID: 4623725182715784797}
   - component: {fileID: 4799534909153581677}
   - component: {fileID: 4819264100554167693}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DarkCone4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29263,7 +29263,7 @@ GameObject:
   - component: {fileID: 4626745259912539307}
   - component: {fileID: 4799603678202997725}
   - component: {fileID: 4819230899388618413}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DarkCone3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34145,7 +34145,7 @@ GameObject:
   - component: {fileID: 4623695458322165877}
   - component: {fileID: 4820775405945038833}
   - component: {fileID: 4819050830511671967}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LightCone2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39030,7 +39030,7 @@ GameObject:
   - component: {fileID: 7655699095433700820}
   - component: {fileID: 4319973253862051002}
   - component: {fileID: 2787262321084904294}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: arrow_charge_shot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43916,7 +43916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0, y: 0, z: 0}
-  vfxRotationOffset: {x: -0.5, y: 4, z: 0}
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 3
   onActivateVFXSpawnNormalizedTime: 0.45

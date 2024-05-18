@@ -11,6 +11,8 @@ namespace Vi.Core
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
+        [SerializeField] private AudioClip soundToPlayOnSpawn;
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -37,6 +39,8 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
+            AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position);
+
             startPosition = transform.position;
 
             Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -46,7 +50,7 @@ namespace Vi.Core
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
             }
 
-            if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
         private void Update()
@@ -88,6 +92,17 @@ namespace Vi.Core
                 }
             }
             NetworkObject.Despawn(true);
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                GameObject g = Instantiate(prefab, transform.position, transform.rotation);
+                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
+            }
         }
 
         private void OnDrawGizmos()

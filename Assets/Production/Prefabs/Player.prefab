@@ -33,7 +33,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3945128955595459076}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -112,6 +112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 891803348
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -180,6 +181,10 @@ MonoBehaviour:
   worldSpaceLabelPrefab: {fileID: 7095846274849915327, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
   teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
+    type: 3}
+  rageAtMaxVFXPrefab: {fileID: 336164999827634716, guid: 5a308568762c642ed83c871052987399,
+    type: 3}
+  ragingVFXPrefab: {fileID: 4984412621585767899, guid: b5cd0ef0388361744a299cefe6d989d4,
     type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3
@@ -277,7 +282,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 1271
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -430,7 +435,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!136 &6750394594016454577
 CapsuleCollider:
   m_ObjectHideFlags: 0

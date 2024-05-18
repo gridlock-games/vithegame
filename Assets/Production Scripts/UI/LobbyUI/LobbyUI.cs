@@ -382,11 +382,12 @@ namespace Vi.UI
             gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
-            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
+            List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
             spectatorCountText.text = "Spectator Count: " + playerDataListWithSpectators.FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
 
             // Timer logic
-            bool startingGame = playerDataListWithoutSpectators.Count != 0;
+            KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
+            bool startingGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
             foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
             {
                 if (playerData.id >= 0)
@@ -443,6 +444,12 @@ namespace Vi.UI
                 default:
                     Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());
                     break;
+            }
+
+            if (playerDataListWithoutSpectators.Count > NetworkCallbackManager.maxActivePlayersInLobby)
+            {
+                canCountDown = false;
+                cannotCountDownMessage = "Cannot play a match with more than 8 players";
             }
 
             bool roomSettingsParsedProperly = true;
@@ -514,8 +521,12 @@ namespace Vi.UI
 
             roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
+            
             leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
             rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
+
+            leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
+            rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
 
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)

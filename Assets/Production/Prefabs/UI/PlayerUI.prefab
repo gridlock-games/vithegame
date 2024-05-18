@@ -5328,7 +5328,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 16.755993
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 6932058376124054148, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
@@ -6625,12 +6625,31 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 2867680468260877654}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4119404631715492097}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c048147a016cf2f47aff91701dbda92a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4119404631715492097 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2226780009572582487, guid: d34ae0266bd40c04ab75b9a69e9a4935,
+    type: 3}
+  m_PrefabInstance: {fileID: 2867680468260877654}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6331103108047785342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4119404631715492097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d54531977ecb194c95e2d3aa7a5d72a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ControlPath: <Gamepad>/dpad/down
 --- !u!1001 &3268625078682554819
 PrefabInstance:
   m_ObjectHideFlags: 0

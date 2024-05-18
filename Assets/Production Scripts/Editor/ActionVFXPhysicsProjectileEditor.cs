@@ -13,6 +13,7 @@ namespace Vi.Editor
         private SerializedProperty spProjectileForce;
         private SerializedProperty spTimeToActivateGravity;
         private SerializedProperty spKillDistance;
+        private SerializedProperty spVFXToPlayOnDestroy;
 
         private new void OnEnable()
         {
@@ -20,6 +21,7 @@ namespace Vi.Editor
             spProjectileForce = serializedObject.FindProperty("projectileForce");
             spTimeToActivateGravity = serializedObject.FindProperty("timeToActivateGravity");
             spKillDistance = serializedObject.FindProperty("killDistance");
+            spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
         }
 
         public override void OnInspectorGUI()
@@ -28,6 +30,7 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spProjectileForce);
             EditorGUILayout.PropertyField(spTimeToActivateGravity);
             EditorGUILayout.PropertyField(spKillDistance);
+            EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);
             serializedObject.ApplyModifiedProperties();
         }
     }

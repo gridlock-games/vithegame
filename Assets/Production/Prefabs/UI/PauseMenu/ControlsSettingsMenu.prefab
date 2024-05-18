@@ -1267,6 +1267,12 @@ MonoBehaviour:
     - {fileID: -2013674324404209891, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
+  - overrideActionName: Activate Rage
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -5435891241600975454, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
   - overrideActionName: 
     actionGroup: 1
     inputActionReferences:
@@ -5057,8 +5063,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5769415177699500259}
   m_HandleRect: {fileID: 7176835145930708437}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.9089983
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

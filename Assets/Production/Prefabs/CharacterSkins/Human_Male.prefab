@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &3227059422155854706
 MonoBehaviour:
@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weight: 0
-  instantWeight: 1
+  instantWeight: 0
 --- !u!1 &2004643534936861010
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &2861792349196924068
 MonoBehaviour:
@@ -477,7 +477,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weight: 0
-  instantWeight: 1
+  instantWeight: 0
 --- !u!1 &3191117865598644356
 GameObject:
   m_ObjectHideFlags: 0
@@ -571,7 +571,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &2634057710867190123
 MonoBehaviour:
@@ -586,7 +586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weight: 0
-  instantWeight: 1
+  instantWeight: 0
 --- !u!1 &3597475324256507524
 GameObject:
   m_ObjectHideFlags: 0
@@ -1082,7 +1082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &562075623262482044
 MonoBehaviour:
@@ -1097,7 +1097,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weight: 0
-  instantWeight: 1
+  instantWeight: 0
 --- !u!1 &8135193435576956177
 GameObject:
   m_ObjectHideFlags: 0
@@ -2933,6 +2933,7 @@ MonoBehaviour:
   meleeVerticalAimRig: {fileID: 928111209206620082}
   meleeVerticalAimConstraint: {fileID: 8577034352154996663}
   rotationOffsetConstraint: {fileID: 4279257392001951054}
+  rotationOffsetAxis: 2
   stowedWeaponParent: {fileID: 6174404207658052272}
 --- !u!114 &3131407962465346050
 MonoBehaviour:

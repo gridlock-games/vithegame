@@ -25,11 +25,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -38,11 +41,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -137,7 +143,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -154,7 +160,7 @@ namespace Vi.ArtificialIntelligence
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded.Value = true;
                 }
@@ -200,7 +206,7 @@ namespace Vi.ArtificialIntelligence
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {
@@ -226,6 +232,9 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
+
+            movement += forceAccumulated;
+            forceAccumulated = Vector3.zero;
 
             Vector3 newPosition;
             if (Mathf.Approximately(movement.y, 0))
@@ -391,6 +400,13 @@ namespace Vi.ArtificialIntelligence
         {
             if (Time.time - lastAbilityTime > abilityWaitDuration)
             {
+                if (attributes.GetRage() / attributes.GetMaxRage() >= 1)
+                {
+                    attributes.OnActivateRage();
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
                 int abilityNum = Random.Range(1, 5);
                 if (abilityNum == 1)
                 {
@@ -414,6 +430,12 @@ namespace Vi.ArtificialIntelligence
                 }
                 lastAbilityTime = Time.time;
             }
+        }
+
+        Vector3 forceAccumulated;
+        public override void AddForce(Vector3 force)
+        {
+            forceAccumulated += force * Time.fixedDeltaTime;
         }
 
         private float positionStrength = 1;

@@ -138,6 +138,9 @@ namespace Vi.Core
 
         public void CancelAllActions()
         {
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
             Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
@@ -149,7 +152,6 @@ namespace Vi.Core
         private ActionClip lastClipPlayed;
         private const float canAttackFromDodgeNormalizedTimeThreshold = 0.55f;
         private const float canAttackFromBlockingHitReactionNormalizedTimeThreshold = 0.15f;
-
 
         private readonly static List<ActionClip.ClipType> clipTypesToCheckForCancellation = new List<ActionClip.ClipType>()
         {
@@ -176,8 +178,8 @@ namespace Vi.Core
                 if (AreActionClipRequirementsMet(lungeClip))
                 {
                     // Lunge mechanic
-                    ExtDebug.DrawBoxCastBox(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, Color.red, 1);
-                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + actionClip.boxCastOriginPositionOffset, actionClip.boxCastHalfExtents, transform.forward, transform.rotation, actionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
+                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                     foreach (RaycastHit hit in allHits)
                     {
@@ -341,45 +343,19 @@ namespace Vi.Core
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
+            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+
+            if (ShouldApplyStaminaCost(actionClip)) { attributes.AddStamina(-GetStaminaCostOfClip(actionClip)); }
+            if (ShouldApplyRageCost(actionClip)) { attributes.AddRage(-GetRageCostOfClip(actionClip)); }
+
             // Check stamina and rage requirements and apply statuses for specific actions
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (weaponHandler.GetWeapon().dodgeStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-weaponHandler.GetWeapon().dodgeStaminaCost);
                 StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
                 if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
-            }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.Lunge)
-            {
-                if (actionClip.agentStaminaCost > attributes.GetStamina()) { return; }
-                if (actionClip.agentDefenseCost > attributes.GetDefense()) { return; }
-                if (actionClip.agentRageCost > attributes.GetRage()) { return; }
-                attributes.AddStamina(-actionClip.agentStaminaCost);
-                attributes.AddDefense(-actionClip.agentDefenseCost);
-                attributes.AddRage(-actionClip.agentRageCost);
             }
 
             // Set the current action clip for the weapon handler
@@ -443,12 +419,92 @@ namespace Vi.Core
             lastClipPlayed = actionClip;
         }
 
-        private bool AreActionClipRequirementsMet(ActionClip actionClip)
+        public bool AreActionClipRequirementsMet(ActionClip actionClip)
         {
-            if (actionClip.agentStaminaCost > attributes.GetStamina()) { return false; }
-            if (actionClip.agentDefenseCost > attributes.GetDefense()) { return false; }
-            if (actionClip.agentRageCost > attributes.GetRage()) { return false; }
+            if (ShouldApplyStaminaCost(actionClip))
+            {
+                float staminaCost = GetStaminaCostOfClip(actionClip);
+                if (staminaCost > attributes.GetStamina()) { return false; }
+            }
+
+            if (ShouldApplyRageCost(actionClip))
+            {
+                float rageCost = GetRageCostOfClip(actionClip);
+                if (rageCost > attributes.GetRage()) { return false; }
+            }
+
             return true;
+        }
+
+        private static readonly List<ActionClip.ClipType> staminaCostActionClipTypes = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.Ability,
+            ActionClip.ClipType.Dodge,
+            ActionClip.ClipType.FlashAttack,
+            ActionClip.ClipType.HeavyAttack,
+            ActionClip.ClipType.Lunge
+        };
+
+        private bool ShouldApplyStaminaCost(ActionClip actionClip)
+        {
+            return staminaCostActionClipTypes.Contains(actionClip.GetClipType());
+        }
+
+        private float GetStaminaCostOfClip(ActionClip actionClip)
+        {
+            switch (actionClip.GetClipType())
+            {
+                case ActionClip.ClipType.Dodge:
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? weaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : weaponHandler.GetWeapon().dodgeStaminaCost;
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.HeavyAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.FlashAttack:
+                case ActionClip.ClipType.Lunge:
+                    return attributes.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * Attributes.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.GrabAttack:
+                    return -1;
+                default:
+                    Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
+                    break;
+            }
+            return -1;
+        }
+
+        private static readonly List<ActionClip.ClipType> rageCostActionClipTypes = new List<ActionClip.ClipType>()
+        {
+            ActionClip.ClipType.Ability,
+            ActionClip.ClipType.FlashAttack,
+            ActionClip.ClipType.Lunge
+        };
+
+        private bool ShouldApplyRageCost(ActionClip actionClip)
+        {
+            return rageCostActionClipTypes.Contains(actionClip.GetClipType());
+        }
+
+        private float GetRageCostOfClip(ActionClip actionClip)
+        {
+            switch (actionClip.GetClipType())
+            {
+                case ActionClip.ClipType.FlashAttack:
+                case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Ability:
+                    return actionClip.agentRageCost;
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.HeavyAttack:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.Flinch:
+                    return -1;
+                default:
+                    Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
+                    break;
+            }
+            return -1;
         }
 
         private Coroutine waitForLungeThenPlayAttackCorountine;
@@ -816,6 +872,8 @@ namespace Vi.Core
         private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         [SerializeField] private Transform cameraPivot;
 
+        private const float aimPointYAxisLerpSpeed = 24;
+
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -825,6 +883,28 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
+                    //bool setAimPointToDefault = true;
+                    //Vector3 newAimPointValue = Vector3.zero;
+                    //bool bHit = Physics.Raycast(cameraPivot.position, Camera.main.transform.forward, out RaycastHit hit, 50, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                    //if (bHit)
+                    //{
+                    //    if (hit.transform.root != transform.root)
+                    //    {
+                    //        newAimPointValue = hit.point;
+                    //        setAimPointToDefault = false;
+                    //    }
+                    //}
+                    //if (setAimPointToDefault) { newAimPointValue = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset; }
+                    
+                    //if (IsAiming())
+                    //{
+                    //    aimPoint.Value = Vector3.Lerp(aimPoint.Value, newAimPointValue, Time.deltaTime * aimPointYAxisLerpSpeed);
+                    //}
+                    //else
+                    //{
+                    //    aimPoint.Value = newAimPointValue;
+                    //}
+
                     aimPoint.Value = Camera.main.transform.position + Camera.main.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                     meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
                 }
