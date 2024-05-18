@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace AssetDevTools
 {
@@ -24,17 +25,20 @@ namespace AssetDevTools
             rb = GetComponent<Rigidbody>();
         }
 
+        void OnLook(InputValue value)
+        {
+            lookInput = value.Get<Vector2>();
+        }
+
         private void Update()
         {
-            lookInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
-            if (Input.mouseScrollDelta != Vector2.zero)
+            Vector2 scrollValue = Vector2.ClampMagnitude(Mouse.current.scroll.value, 0.1f);
+            if (scrollValue != Vector2.zero)
             {
-                sensitivity.x += Input.mouseScrollDelta.y;
-                sensitivity.y += Input.mouseScrollDelta.y;
+                sensitivity.x += scrollValue.y;
+                sensitivity.y += scrollValue.y;
                 Debug.Log("Updating sensitivity " + sensitivity);
             }
-            
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -55,6 +59,8 @@ namespace AssetDevTools
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.6f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.6f;
 
+        private static readonly string[] layerMaskArray = new string[] { "Default", "Projectile" };
+
         private void ProcessMovement()
         {
             Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
@@ -65,7 +71,7 @@ namespace AssetDevTools
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(transform.position + transform.rotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -83,7 +89,7 @@ namespace AssetDevTools
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(transform.position + transform.rotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
                 }
@@ -95,10 +101,10 @@ namespace AssetDevTools
             }
 
             Vector2 inputVector = Vector2.zero;
-            if (Input.GetKey(KeyCode.W)) { inputVector.y += 1; }
-            if (Input.GetKey(KeyCode.A)) { inputVector.x += -1; }
-            if (Input.GetKey(KeyCode.S)) { inputVector.y += -1; }
-            if (Input.GetKey(KeyCode.D)) { inputVector.x += 1; }
+            if (Keyboard.current.wKey.IsPressed()) { inputVector.y += 1; }
+            if (Keyboard.current.aKey.IsPressed()) { inputVector.x += -1; }
+            if (Keyboard.current.sKey.IsPressed()) { inputVector.y += -1; }
+            if (Keyboard.current.dKey.IsPressed()) { inputVector.x += 1; }
             inputVector = inputVector.normalized;
 
             Vector3 targetDirection = newRotation * new Vector3(inputVector.x, 0, inputVector.y);
@@ -111,7 +117,7 @@ namespace AssetDevTools
             float yOffset = 0.2f;
             Vector3 startPos = transform.position;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {
