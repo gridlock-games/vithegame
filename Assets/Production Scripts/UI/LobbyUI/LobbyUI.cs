@@ -56,7 +56,7 @@ namespace Vi.UI
             }
         }
 
-        private const float characterLockTime = 10;
+        private const float characterLockTime = 60;
         private const float startGameTime = 5;
 
         private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(characterLockTime);
@@ -410,7 +410,7 @@ namespace Vi.UI
                 if (lobbyLeaderKvp.Key) // If a lobby leader exists
                 {
                     // Start game is true if all players have locked in, or if the lock timer is at 0.
-                    canStartGame = playerDataListWithoutSpectators.TrueForAll(item => lockedClients.Contains((ulong)item.id));
+                    canStartGame = playerDataListWithoutSpectators.TrueForAll(item => lockedClients.Contains((ulong)item.id) | item.id < 0);
                 }
             }
             
