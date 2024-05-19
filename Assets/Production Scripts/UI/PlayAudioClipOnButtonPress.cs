@@ -12,7 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private AudioClip audioClip;
 
-        private const float volume = 1;
+        private const float volume = 2;
 
         private void Start()
         {
