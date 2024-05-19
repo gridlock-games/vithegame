@@ -45,7 +45,6 @@ namespace Vi.ScriptableObjects
         public Weapon.WeaponBone weaponBone = Weapon.WeaponBone.RightHand;
 
         [SerializeField] private AudioClip audioClipToPlayOnAwake;
-
         [SerializeField] private AudioClip audioClipToPlayOnDestroy;
 
         protected void Awake()
