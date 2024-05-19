@@ -132,15 +132,17 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
+            float randomMaxAngleOfRotation = Random.Range(0f, 120f);
+
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
             else if (animationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation);
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation);
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
