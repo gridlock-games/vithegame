@@ -14,7 +14,7 @@ namespace Vi.UI
 
         private const float volume = 1;
 
-        private void Awake()
+        private void Start()
         {
             GetComponent<Button>().onClick.AddListener(Play2DAudio);
         }
