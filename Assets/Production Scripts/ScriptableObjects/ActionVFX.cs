@@ -44,8 +44,8 @@ namespace Vi.ScriptableObjects
         // Only used for TransformType.SpawnAtWeaponPoint
         public Weapon.WeaponBone weaponBone = Weapon.WeaponBone.RightHand;
 
-        [SerializeField] private AudioClip audioClipToPlayOnAwake;
-        [SerializeField] private AudioClip audioClipToPlayOnDestroy;
+        [SerializeField] protected AudioClip audioClipToPlayOnAwake;
+        [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
         protected void Awake()
         {

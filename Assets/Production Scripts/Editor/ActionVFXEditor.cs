@@ -25,8 +25,8 @@ namespace Vi.Editor
 
         private SerializedProperty spWeaponBone;
 
-        private SerializedProperty spAudioClipToPlayOnAwake;
-        private SerializedProperty spAudioClipToPlayOnDestroy;
+        protected SerializedProperty spAudioClipToPlayOnAwake;
+        protected SerializedProperty spAudioClipToPlayOnDestroy;
 
         protected void OnEnable()
         {
