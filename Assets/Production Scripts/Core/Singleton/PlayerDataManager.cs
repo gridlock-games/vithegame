@@ -1005,7 +1005,7 @@ namespace Vi.Core
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
             }
-            if (IsClient)
+            if (IsClient & !IsServer)
             {
                 // This object gets despawned, so make sure to not start this on a networkobject
                 PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());

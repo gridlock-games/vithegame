@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -126,6 +127,8 @@ namespace Vi.Utility
             {
                 audioSource.pitch = Time.timeScale;
             }
+
+            Debug.Log(NetworkManager.Singleton.IsConnectedClient);
         }
     }
 }
