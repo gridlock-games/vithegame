@@ -140,9 +140,9 @@ namespace Vi.ArtificialIntelligence
             else if (animationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation);
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation);
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
