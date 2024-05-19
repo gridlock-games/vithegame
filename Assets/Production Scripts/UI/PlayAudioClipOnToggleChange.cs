@@ -7,8 +7,8 @@ using Vi.Utility;
 namespace Vi.UI
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(Button))]
-    public class PlayAudioClipOnButtonPress : MonoBehaviour
+    [RequireComponent(typeof(Toggle))]
+    public class PlayAudioClipOnToggleChange : MonoBehaviour
     {
         [SerializeField] private AudioClip audioClip;
 
@@ -16,10 +16,10 @@ namespace Vi.UI
 
         private void Awake()
         {
-            GetComponent<Button>().onClick.AddListener(Play2DAudio);
+            GetComponent<Toggle>().onValueChanged.AddListener(Play2DAudio);
         }
 
-        public void Play2DAudio()
+        public void Play2DAudio(bool isOn)
         {
             AudioManager.Singleton.Play2DClip(audioClip, volume);
         }
