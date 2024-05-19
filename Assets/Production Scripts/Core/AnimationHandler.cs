@@ -362,7 +362,11 @@ namespace Vi.Core
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+            if (heavyAttackCoroutine != null)
+            {
+                StopCoroutine(heavyAttackCoroutine);
+                Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
+            }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
