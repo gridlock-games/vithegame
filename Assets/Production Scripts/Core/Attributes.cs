@@ -185,7 +185,7 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, transform); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
@@ -206,7 +206,7 @@ namespace Vi.Core
             if (current)
             {
                 if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, transform); }
+                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
@@ -850,7 +850,7 @@ namespace Vi.Core
         private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
-        private const float attackerRageToBeAddedOnHit = 2;
+        private const float attackerRageToBeAddedOnHit = 98;
         private const float victimRageToBeAddedOnHit = 1;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
