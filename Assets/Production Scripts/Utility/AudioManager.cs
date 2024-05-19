@@ -108,6 +108,7 @@ namespace Vi.Utility
             _singleton = this;
         }
 
+        private AudioSource musicSource;
         private void Start()
         {
             foreach (AudioSource audioSouce in FindObjectsOfType<AudioSource>())
@@ -116,9 +117,11 @@ namespace Vi.Utility
             }
 
             // This is for music
-            if (TryGetComponent(out AudioSource audioSource))
-                audioSource.spatialBlend = 0;
+            if (TryGetComponent(out musicSource))
+                musicSource.spatialBlend = 0;
         }
+
+        private const float musicFadeTime = 0.5f;
 
         private void Update()
         {
@@ -128,7 +131,7 @@ namespace Vi.Utility
                 audioSource.pitch = Time.timeScale;
             }
 
-            Debug.Log(NetworkManager.Singleton.IsConnectedClient);
+            if (musicSource) { musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : 1, Time.deltaTime * musicFadeTime); }
         }
     }
 }

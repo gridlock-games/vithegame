@@ -21,8 +21,6 @@ namespace Vi.UI
             cam = GetComponent<Camera>();
             cam.cullingMask = LayerMask.GetMask(layerMask);
             cam.depth = -1;
-
-            if (TryGetComponent(out AudioListener audioListener)) { Destroy(audioListener); }
         }
 
         private bool lastCamState;
