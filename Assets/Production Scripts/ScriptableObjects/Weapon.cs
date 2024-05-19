@@ -476,52 +476,64 @@ namespace Vi.ScriptableObjects
 
         public ActionClip GetLungeClip() { return lunge; }
 
-        public ActionClip GetActionClipByName(string clipName)
+        private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+
+        private void Awake()
         {
-            if (dodgeF) { if (dodgeF.name == clipName) { return dodgeF; } }
-            if (dodgeFL) { if (dodgeFL.name == clipName) { return dodgeFL; } }
-            if (dodgeFR) { if (dodgeFR.name == clipName) { return dodgeFR; } }
-            if (dodgeB) { if (dodgeB.name == clipName) { return dodgeB; } }
-            if (dodgeBL) { if (dodgeBL.name == clipName) { return dodgeBL; } }
-            if (dodgeBR) { if (dodgeBR.name == clipName) { return dodgeBR; } }
-            if (dodgeL) { if (dodgeL.name == clipName) { return dodgeL; } }
-            if (dodgeR) { if (dodgeR.name == clipName) { return dodgeR; } }
+            if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
+            if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
+            if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
+            if (dodgeB) { actionClipLookup.TryAdd(dodgeB.name, dodgeB); }
+            if (dodgeBL) { actionClipLookup.TryAdd(dodgeBL.name, dodgeBL); }
+            if (dodgeBR) { actionClipLookup.TryAdd(dodgeBR.name, dodgeBR); }
+            if (dodgeL) { actionClipLookup.TryAdd(dodgeL.name, dodgeL); }
+            if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
 
-            if (lunge) { if (lunge.name == clipName) { return lunge; } }
+            if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
 
-            if (ability1) { if (ability1.name == clipName) { return ability1; } }
-            if (ability2) { if (ability2.name == clipName) { return ability2; } }
-            if (ability3) { if (ability3.name == clipName) { return ability3; } }
-            if (ability4) { if (ability4.name == clipName) { return ability4; } }
+            if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
+            if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }
+            if (ability3) { actionClipLookup.TryAdd(ability3.name, ability3); }
+            if (ability4) { actionClipLookup.TryAdd(ability4.name, ability4); }
 
-            if (flashAttack) { if (flashAttack.name == clipName) { return flashAttack; } }
+            if (flashAttack) { actionClipLookup.TryAdd(flashAttack.name, flashAttack); }
 
             foreach (HitReaction hitReaction in hitReactions)
             {
                 if (!hitReaction.reactionClip) { continue; }
-                if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
+                actionClipLookup.TryAdd(hitReaction.reactionClip.name, hitReaction.reactionClip);
             }
 
             foreach (FlinchReaction flinchReaction in flinchReactions)
             {
                 if (!flinchReaction.reactionClip) { continue; }
-                if (flinchReaction.reactionClip.name == clipName) { return flinchReaction.reactionClip; }
+                actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
             }
 
             foreach (Attack attack in attackList)
             {
                 if (!attack.attackClip) { continue; }
-                if (attack.attackClip.name == clipName) { return attack.attackClip; }
+                actionClipLookup.TryAdd(attack.attackClip.name, attack.attackClip);
             }
 
             foreach (GrabAttackCrosswalk grabAttackCrosswalk in grabAttackClipList)
             {
-                if (grabAttackCrosswalk.attack) { if (grabAttackCrosswalk.attack.name == clipName) { return grabAttackCrosswalk.attack; } }
-                if (grabAttackCrosswalk.grabAttackClip) { if (grabAttackCrosswalk.grabAttackClip.name == clipName) { return grabAttackCrosswalk.grabAttackClip; } }
+                if (grabAttackCrosswalk.attack) { actionClipLookup.TryAdd(grabAttackCrosswalk.attack.name, grabAttackCrosswalk.attack); }
+                if (grabAttackCrosswalk.grabAttackClip) { actionClipLookup.TryAdd(grabAttackCrosswalk.grabAttackClip.name, grabAttackCrosswalk.grabAttackClip); }
             }
+        }
 
-            if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
-            return null;
+        public ActionClip GetActionClipByName(string clipName)
+        {
+            if (actionClipLookup.ContainsKey(clipName))
+            {
+                return actionClipLookup[clipName];
+            }
+            else
+            {
+                if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
+                return null;
+            }
         }
 
         public ActionClip GetActionClipByNameUsingReflection(string clipName)

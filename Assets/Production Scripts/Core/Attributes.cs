@@ -401,18 +401,13 @@ namespace Vi.Core
 
         public AnimationClip GetGrabReactionClip()
         {
-            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
-            {
-                Attributes grabAssailant = GetGrabAssailant();
-                if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+            Attributes grabAssailant = GetGrabAssailant();
+            if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
 
-                if (weaponOption.weapon.name == grabAssailant.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
-                {
-                    return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
-                }
-            }
-            Debug.LogError("Couldn't find grab reaction clip!");
-            return null;
+            ActionClip grabAttackClip = grabAssailant.weaponHandler.GetWeapon().GetActionClipByName(grabAttackClipName.Value.ToString());
+
+            if (!grabAttackClip.grabVictimClip) { Debug.LogError("Couldn't find grab reaction clip!"); }
+            return grabAttackClip.grabVictimClip;
         }
 
         public void CancelGrab()
