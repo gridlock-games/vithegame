@@ -88,17 +88,17 @@ namespace Vi.Utility
             Destroy(audioSource.gameObject);
         }
 
-        public void Play2DClip(GameObject invoker, AudioClip audioClip, float volume = 1)
+        public void Play2DClip(AudioClip audioClip, float volume = 1)
         {
             GameObject g = Instantiate(audioSourcePrefab);
-            StartCoroutine(Play2DSoundPrefab(invoker, g.GetComponent<AudioSource>(), audioClip, volume));
+            StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play2DSoundPrefab(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
             audioSource.spatialBlend = 0;
             audioSource.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
+            yield return new WaitUntil(() => !audioSource.isPlaying);
             Destroy(audioSource.gameObject);
         }
 
