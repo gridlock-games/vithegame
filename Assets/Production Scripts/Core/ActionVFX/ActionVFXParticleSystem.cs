@@ -78,9 +78,12 @@ namespace Vi.Core
             }
         }
 
+        private const string layersToHit = "NetworkPrediction";
+
         private void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+            if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             foreach (ParticleSystem ps in particleSystems)
             {

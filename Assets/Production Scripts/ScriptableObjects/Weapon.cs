@@ -12,7 +12,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float walkSpeed = 2.5f;
         [SerializeField] private BlockingLocomotion blockingLocomotion = BlockingLocomotion.CanRun;
-        
+
         public enum BlockingLocomotion
         {
             NoMovement,
@@ -187,7 +187,7 @@ namespace Vi.ScriptableObjects
                 // Block the attack
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
-            
+
             if (hitReaction == null) // If attack wasn't blocked
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
@@ -477,6 +477,54 @@ namespace Vi.ScriptableObjects
         public ActionClip GetLungeClip() { return lunge; }
 
         public ActionClip GetActionClipByName(string clipName)
+        {
+            if (dodgeF) { if (dodgeF.name == clipName) { return dodgeF; } }
+            if (dodgeFL) { if (dodgeFL.name == clipName) { return dodgeFL; } }
+            if (dodgeFR) { if (dodgeFR.name == clipName) { return dodgeFR; } }
+            if (dodgeB) { if (dodgeB.name == clipName) { return dodgeB; } }
+            if (dodgeBL) { if (dodgeBL.name == clipName) { return dodgeBL; } }
+            if (dodgeBR) { if (dodgeBR.name == clipName) { return dodgeBR; } }
+            if (dodgeL) { if (dodgeL.name == clipName) { return dodgeL; } }
+            if (dodgeR) { if (dodgeR.name == clipName) { return dodgeR; } }
+
+            if (lunge) { if (lunge.name == clipName) { return lunge; } }
+
+            if (ability1) { if (ability1.name == clipName) { return ability1; } }
+            if (ability2) { if (ability2.name == clipName) { return ability2; } }
+            if (ability3) { if (ability3.name == clipName) { return ability3; } }
+            if (ability4) { if (ability4.name == clipName) { return ability4; } }
+
+            if (flashAttack) { if (flashAttack.name == clipName) { return flashAttack; } }
+
+            foreach (HitReaction hitReaction in hitReactions)
+            {
+                if (!hitReaction.reactionClip) { continue; }
+                if (hitReaction.reactionClip.name == clipName) { return hitReaction.reactionClip; }
+            }
+
+            foreach (FlinchReaction flinchReaction in flinchReactions)
+            {
+                if (!flinchReaction.reactionClip) { continue; }
+                if (flinchReaction.reactionClip.name == clipName) { return flinchReaction.reactionClip; }
+            }
+
+            foreach (Attack attack in attackList)
+            {
+                if (!attack.attackClip) { continue; }
+                if (attack.attackClip.name == clipName) { return attack.attackClip; }
+            }
+
+            foreach (GrabAttackCrosswalk grabAttackCrosswalk in grabAttackClipList)
+            {
+                if (grabAttackCrosswalk.attack) { if (grabAttackCrosswalk.attack.name == clipName) { return grabAttackCrosswalk.attack; } }
+                if (grabAttackCrosswalk.grabAttackClip) { if (grabAttackCrosswalk.grabAttackClip.name == clipName) { return grabAttackCrosswalk.grabAttackClip; } }
+            }
+
+            if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
+            return null;
+        }
+
+        public ActionClip GetActionClipByNameUsingReflection(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
             foreach (FieldInfo propertyInfo in propertyList)
