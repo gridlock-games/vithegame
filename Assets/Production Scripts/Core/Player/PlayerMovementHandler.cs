@@ -283,6 +283,7 @@ namespace Vi.Player
                 Destroy(minimapCameraInstance.gameObject);
                 playerInput.enabled = false;
             }
+            movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()

@@ -62,6 +62,7 @@ namespace Vi.ArtificialIntelligence
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
             }
+            networkColliderRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()
