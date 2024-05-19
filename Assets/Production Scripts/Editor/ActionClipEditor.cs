@@ -738,7 +738,7 @@ namespace Vi.Editor
             {
                 Weapon weapon = AssetDatabase.LoadAssetAtPath<Weapon>(filepath);
                 ActionClip thisActionClip = serializedObject.targetObject as ActionClip;
-                ActionClip weaponClip = weapon.GetActionClipByName(serializedObject.targetObject.name);
+                ActionClip weaponClip = weapon.GetActionClipByNameUsingReflection(serializedObject.targetObject.name);
 
                 if (weaponClip == thisActionClip)
                 {

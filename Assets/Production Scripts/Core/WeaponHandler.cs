@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -642,6 +643,8 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
+        private bool lastHeavyAttackPressedState;
+
         public void HeavyAttack(bool isPressed)
         {
             if (isPressed)
@@ -652,11 +655,11 @@ namespace Vi.Core
                     return;
                 }
 
-                animationHandler.HeavyAttackPressedServerRpc();
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
             }
             else
             {
-                animationHandler.HeavyAttackReleasedServerRpc();
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
             }
 
             if (CanAim)
@@ -690,6 +693,8 @@ namespace Vi.Core
                         animationHandler.PlayAction(actionClip);
                 }
             }
+
+            lastHeavyAttackPressedState = isPressed;
         }
 
         public void HeavyAttackHold(bool isPressed)

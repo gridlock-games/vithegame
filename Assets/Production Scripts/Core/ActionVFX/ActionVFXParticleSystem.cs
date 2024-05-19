@@ -26,8 +26,9 @@ namespace Vi.Core
         }
 
         private ParticleSystem[] particleSystems;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {
@@ -78,9 +79,12 @@ namespace Vi.Core
             }
         }
 
+        private const string layersToHit = "NetworkPrediction";
+
         private void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+            if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             foreach (ParticleSystem ps in particleSystems)
             {

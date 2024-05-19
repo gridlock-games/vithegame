@@ -5,7 +5,7 @@ using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
-    public class FollowUpVFX : MonoBehaviour
+    public class FollowUpVFX : ActionVFX
     {
         public bool shouldAffectSelf;
         public bool shouldAffectTeammates;

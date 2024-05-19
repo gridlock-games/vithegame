@@ -1121,6 +1121,7 @@ GameObject:
   - component: {fileID: 593332744}
   - component: {fileID: 593332746}
   - component: {fileID: 593332747}
+  - component: {fileID: 593332748}
   m_Layer: 0
   m_Name: UICamera
   m_TagString: Untagged
@@ -1233,6 +1234,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerMask:
   - UI
+--- !u!81 &593332748
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593332742}
+  m_Enabled: 1
 --- !u!1001 &676656265
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1768,6 +1777,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 77962637}
     m_Modifications:
+    - target: {fileID: 1158701598287882, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
       propertyPath: m_Name
       value: Download Content Menu Button
@@ -1775,6 +1788,22 @@ PrefabInstance:
     - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1401582574189918, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446604962388884, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1508661511253696, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823090285350844, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114280218122535670, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -1790,6 +1819,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.r
       value: 0.12941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 114280218122535670, guid: 4abbb9b2178b0d74a945436a1669b6e7,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114286057846976786, guid: 4abbb9b2178b0d74a945436a1669b6e7,
+        type: 3}
+      propertyPath: m_Interactable
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114286057846976786, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -5374,6 +5413,7 @@ GameObject:
   - component: {fileID: 1885853832}
   - component: {fileID: 1885853831}
   - component: {fileID: 1885853830}
+  - component: {fileID: 1885853833}
   m_Layer: 5
   m_Name: main_quit
   m_TagString: Untagged
@@ -5495,6 +5535,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1885853828}
   m_CullTransparentMesh: 1
+--- !u!114 &1885853833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885853828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1001 &1922540301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5788,6 +5841,7 @@ GameObject:
   - component: {fileID: 1938353912}
   - component: {fileID: 1938353911}
   - component: {fileID: 1938353910}
+  - component: {fileID: 1938353913}
   m_Layer: 5
   m_Name: main_settings
   m_TagString: Untagged
@@ -5909,6 +5963,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1938353908}
   m_CullTransparentMesh: 1
+--- !u!114 &1938353913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938353908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1001 &1968964140
 PrefabInstance:
   m_ObjectHideFlags: 0

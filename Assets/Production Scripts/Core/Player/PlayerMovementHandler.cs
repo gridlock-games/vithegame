@@ -266,7 +266,7 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
-                cameraController.GetComponent<AudioListener>().enabled = true;
+                cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.GetComponent<Camera>().enabled = true;
                 minimapCameraInstance.enabled = true;
 
@@ -283,6 +283,7 @@ namespace Vi.Player
                 Destroy(minimapCameraInstance.gameObject);
                 playerInput.enabled = false;
             }
+            movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()

@@ -62,6 +62,7 @@ namespace Vi.ArtificialIntelligence
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
             }
+            networkColliderRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()
@@ -119,7 +120,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 inputDir = navMeshAgent.nextPosition - currentPosition.Value;
+            inputDir.y = 0;
+            inputDir = transform.InverseTransformDirection(inputDir).normalized;
             
             if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
             {
@@ -129,15 +132,17 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
+            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
+
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
             else if (animationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;

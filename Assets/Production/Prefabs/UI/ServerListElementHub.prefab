@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 5963148001009072904}
   - component: {fileID: 891351128052412945}
   - component: {fileID: 3220075515378137082}
+  - component: {fileID: 1486299681252090985}
   m_Layer: 5
   m_Name: ServerListElementHub
   m_TagString: Untagged
@@ -293,6 +294,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1486299681252090985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3609182152768403013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &7877894964390858889
 GameObject:
   m_ObjectHideFlags: 0

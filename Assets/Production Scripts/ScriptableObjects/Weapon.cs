@@ -12,7 +12,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float walkSpeed = 2.5f;
         [SerializeField] private BlockingLocomotion blockingLocomotion = BlockingLocomotion.CanRun;
-        
+
         public enum BlockingLocomotion
         {
             NoMovement,
@@ -187,7 +187,7 @@ namespace Vi.ScriptableObjects
                 // Block the attack
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
-            
+
             if (hitReaction == null) // If attack wasn't blocked
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
@@ -476,7 +476,67 @@ namespace Vi.ScriptableObjects
 
         public ActionClip GetLungeClip() { return lunge; }
 
+        private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+
+        private void Awake()
+        {
+            if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
+            if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
+            if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
+            if (dodgeB) { actionClipLookup.TryAdd(dodgeB.name, dodgeB); }
+            if (dodgeBL) { actionClipLookup.TryAdd(dodgeBL.name, dodgeBL); }
+            if (dodgeBR) { actionClipLookup.TryAdd(dodgeBR.name, dodgeBR); }
+            if (dodgeL) { actionClipLookup.TryAdd(dodgeL.name, dodgeL); }
+            if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
+
+            if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
+
+            if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
+            if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }
+            if (ability3) { actionClipLookup.TryAdd(ability3.name, ability3); }
+            if (ability4) { actionClipLookup.TryAdd(ability4.name, ability4); }
+
+            if (flashAttack) { actionClipLookup.TryAdd(flashAttack.name, flashAttack); }
+
+            foreach (HitReaction hitReaction in hitReactions)
+            {
+                if (!hitReaction.reactionClip) { continue; }
+                actionClipLookup.TryAdd(hitReaction.reactionClip.name, hitReaction.reactionClip);
+            }
+
+            foreach (FlinchReaction flinchReaction in flinchReactions)
+            {
+                if (!flinchReaction.reactionClip) { continue; }
+                actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
+            }
+
+            foreach (Attack attack in attackList)
+            {
+                if (!attack.attackClip) { continue; }
+                actionClipLookup.TryAdd(attack.attackClip.name, attack.attackClip);
+            }
+
+            foreach (GrabAttackCrosswalk grabAttackCrosswalk in grabAttackClipList)
+            {
+                if (grabAttackCrosswalk.attack) { actionClipLookup.TryAdd(grabAttackCrosswalk.attack.name, grabAttackCrosswalk.attack); }
+                if (grabAttackCrosswalk.grabAttackClip) { actionClipLookup.TryAdd(grabAttackCrosswalk.grabAttackClip.name, grabAttackCrosswalk.grabAttackClip); }
+            }
+        }
+
         public ActionClip GetActionClipByName(string clipName)
+        {
+            if (actionClipLookup.ContainsKey(clipName))
+            {
+                return actionClipLookup[clipName];
+            }
+            else
+            {
+                if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
+                return null;
+            }
+        }
+
+        public ActionClip GetActionClipByNameUsingReflection(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
             foreach (FieldInfo propertyInfo in propertyList)

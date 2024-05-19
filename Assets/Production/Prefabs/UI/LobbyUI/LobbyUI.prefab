@@ -1135,6 +1135,7 @@ GameObject:
   - component: {fileID: 8310292229285994054}
   - component: {fileID: 5011642027630348695}
   - component: {fileID: 6765176898971233439}
+  - component: {fileID: 3432394406535032954}
   m_Layer: 5
   m_Name: Preset Button 3
   m_TagString: Untagged
@@ -1258,6 +1259,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &3432394406535032954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2271703052472504973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &2617754411667687158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1514,6 +1528,7 @@ GameObject:
   - component: {fileID: 2732927496224795992}
   - component: {fileID: 2841766015194180390}
   - component: {fileID: 2841110915471093088}
+  - component: {fileID: 5327049391445513220}
   m_Layer: 5
   m_Name: JoinLeftTeamButton
   m_TagString: Untagged
@@ -1664,6 +1679,19 @@ MonoBehaviour:
   m_TargetCanvasGroup: {fileID: 0}
   m_UseToggle: 0
   m_TargetToggle: {fileID: 0}
+--- !u!114 &5327049391445513220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2809641381564984144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &2896504357691943919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1867,6 +1895,7 @@ GameObject:
   - component: {fileID: 6981150427490818567}
   - component: {fileID: 9132222792252125605}
   - component: {fileID: 5026475493646627401}
+  - component: {fileID: 1698421559917638774}
   m_Layer: 5
   m_Name: Preset Button 4
   m_TagString: Untagged
@@ -1990,6 +2019,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &1698421559917638774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3059244869388615224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &3164244250738762884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2820,6 +2862,7 @@ GameObject:
   - component: {fileID: 7221645280033756950}
   - component: {fileID: 5648238763975845847}
   - component: {fileID: 5386308325341498827}
+  - component: {fileID: 2057932639486922418}
   m_Layer: 5
   m_Name: Preset Button 2
   m_TagString: Untagged
@@ -2943,6 +2986,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &2057932639486922418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4656209189178772361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &4760553058185570530
 GameObject:
   m_ObjectHideFlags: 0
@@ -3499,6 +3555,7 @@ GameObject:
   - component: {fileID: 2469276832232351418}
   - component: {fileID: 108116646450333438}
   - component: {fileID: 7397423801922416088}
+  - component: {fileID: 4505862274635057108}
   m_Layer: 5
   m_Name: JoinRightTeamButton
   m_TagString: Untagged
@@ -3649,6 +3706,19 @@ MonoBehaviour:
   m_TargetCanvasGroup: {fileID: 0}
   m_UseToggle: 0
   m_TargetToggle: {fileID: 0}
+--- !u!114 &4505862274635057108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5249614783053326772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &5489615746279588296
 GameObject:
   m_ObjectHideFlags: 0
@@ -4489,6 +4559,7 @@ GameObject:
   - component: {fileID: 7521998419655838344}
   - component: {fileID: 6006549408772654638}
   - component: {fileID: 1089975312262636323}
+  - component: {fileID: 8198970370479849072}
   m_Layer: 5
   m_Name: Preset Button 1
   m_TagString: Untagged
@@ -4612,6 +4683,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &8198970370479849072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6362573498471870080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &6556951697995805417
 GameObject:
   m_ObjectHideFlags: 0
