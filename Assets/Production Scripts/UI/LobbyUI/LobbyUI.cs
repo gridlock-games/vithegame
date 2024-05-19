@@ -18,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
         [SerializeField] private Button lockCharacterButton;
+        [SerializeField] private Button startGameButton;
         [SerializeField] private Text characterLockTimeText;
         [SerializeField] private AccountCard playerAccountCardPrefab;
         [SerializeField] private AccountCardParent leftTeamParent;
@@ -55,8 +56,11 @@ namespace Vi.UI
             }
         }
 
-        private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(60);
-        private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(5);
+        private const float characterLockTime = 60;
+        private const float startGameTime = 5;
+
+        private NetworkVariable<float> characterLockTimer = new NetworkVariable<float>(characterLockTime);
+        private NetworkVariable<float> startGameTimer = new NetworkVariable<float>(startGameTime);
 
         [System.Serializable]
         private class AccountCardParent
@@ -387,19 +391,29 @@ namespace Vi.UI
 
             // Timer logic
             KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
-            bool startingGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
-            foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
+            //bool canStartGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
+            //foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
+            //{
+            //    if (playerData.id >= 0)
+            //    {
+            //        if (!lockedClients.Contains((ulong)playerData.id))
+            //        {
+            //            canStartGame = false;
+            //            break;
+            //        }
+            //    }
+            //}
+
+            bool canStartGame = characterLockTimer.Value <= 0;
+            if (!canStartGame)
             {
-                if (playerData.id >= 0)
+                if (lobbyLeaderKvp.Key) // If a lobby leader exists
                 {
-                    if (!lockedClients.Contains((ulong)playerData.id))
-                    {
-                        startingGame = false;
-                        break;
-                    }
+                    // Start game is true if all players have locked in, or if the lock timer is at 0.
+                    canStartGame = playerDataListWithoutSpectators.TrueForAll(item => lockedClients.Contains((ulong)item.id) | item.id < 0);
                 }
             }
-
+            
             bool canCountDown = false;
             string cannotCountDownMessage = "";
             switch (PlayerDataManager.Singleton.GetGameMode())
@@ -483,32 +497,40 @@ namespace Vi.UI
             }
 
             canCountDown &= roomSettingsParsedProperly;
-            
+
             if (IsServer)
             {
                 if (canCountDown)
                 {
-                    if (startingGame)
+                    if (canStartGame)
                     {
-                        startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity);
+                        if (startGameCalled.Value) { startGameTimer.Value = Mathf.Clamp(startGameTimer.Value - Time.deltaTime, 0, Mathf.Infinity); }
                     }
                     else
                     {
                         characterLockTimer.Value = Mathf.Clamp(characterLockTimer.Value - Time.deltaTime, 0, Mathf.Infinity);
-                        startGameTimer.Value = 5;
+                        startGameTimer.Value = startGameTime;
+
+                        startGameCalled.Value = false;
                     }
                 }
                 else
                 {
-                    characterLockTimer.Value = 60;
-                    startGameTimer.Value = 5;
+                    characterLockTimer.Value = characterLockTime;
+                    startGameTimer.Value = startGameTime;
+
+                    startGameCalled.Value = false;
                 }
             }
 
-            //characterLockTimeText.text = startingGame & canCountDown ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Locking Characters in " + characterLockTimer.Value.ToString("F0");
-            if (startingGame & canCountDown)
+            startGameButton.interactable = !startGameCalled.Value & !startGameServerRpcInProgress;
+
+            startGameButton.gameObject.SetActive(canCountDown & canStartGame & PlayerDataManager.Singleton.IsLobbyLeader());
+            lockCharacterButton.gameObject.SetActive(!(canCountDown & canStartGame));
+
+            if (canStartGame & canCountDown)
             {
-                characterLockTimeText.text = "Starting game in " + startGameTimer.Value.ToString("F0");
+                characterLockTimeText.text = startGameCalled.Value ? "Starting game in " + startGameTimer.Value.ToString("F0") : "Waiting for lobby leader to start game";
             }
             else if (!canCountDown)
             {
@@ -519,11 +541,11 @@ namespace Vi.UI
                 characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
             }
 
-            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown));
+            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
             
-            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
-            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(startingGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
+            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
+            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
             leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
             rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
@@ -687,6 +709,35 @@ namespace Vi.UI
             }
         }
 
+        private NetworkVariable<bool> startGameCalled = new NetworkVariable<bool>();
+        private bool startGameServerRpcInProgress;
+
+        public void StartGame()
+        {
+            if (IsServer)
+            {
+                startGameCalled.Value = true;
+            }
+            else
+            {
+                startGameServerRpcInProgress = true;
+                StartGameServerRpc(NetworkManager.LocalClientId);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void StartGameServerRpc(ulong clientId)
+        {
+            StartGame();
+            EndStartGameClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } } });
+        }
+
+        [ClientRpc]
+        private void EndStartGameClientRpc(ClientRpcParams clientRpcParams)
+        {
+            startGameServerRpcInProgress = false;
+        }
+
         public void LockCharacter()
         {
             if (IsClient)
@@ -695,7 +746,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (var playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     if (playerData.id >= 0)
                     {

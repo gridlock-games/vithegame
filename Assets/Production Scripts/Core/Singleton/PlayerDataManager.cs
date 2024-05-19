@@ -276,9 +276,11 @@ namespace Vi.Core
             }
         }
 
+        public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
+
         public bool ContainsId(int clientId)
         {
-            return playerDataList.Contains(new PlayerData(clientId));
+            return cachedPlayerDataList.Contains(new PlayerData(clientId));
         }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
@@ -718,6 +720,13 @@ namespace Vi.Core
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+        }
+
         private void Update()
         {
             if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
@@ -1016,6 +1025,10 @@ namespace Vi.Core
             if (!string.IsNullOrWhiteSpace(NetworkManager.DisconnectReason))
             {
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = NetworkManager.DisconnectReason;
+            }
+            else
+            {
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Disconnected From Server.";
             }
         }
 
