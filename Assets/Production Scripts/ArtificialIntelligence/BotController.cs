@@ -316,7 +316,7 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    //EvaluteAction();
+                    EvaluteAction();
                 }
                 else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
