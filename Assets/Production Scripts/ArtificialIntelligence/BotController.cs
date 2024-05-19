@@ -132,7 +132,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
-            float randomMaxAngleOfRotation = Random.Range(0f, 120f);
+            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
 
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
