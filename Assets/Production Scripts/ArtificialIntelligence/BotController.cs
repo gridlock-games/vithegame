@@ -119,7 +119,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 inputDir = navMeshAgent.nextPosition - currentPosition.Value;
+            inputDir.y = 0;
+            inputDir = transform.InverseTransformDirection(inputDir).normalized;
             
             if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
             {
@@ -314,7 +316,7 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    EvaluteAction();
+                    //EvaluteAction();
                 }
                 else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
                 {
