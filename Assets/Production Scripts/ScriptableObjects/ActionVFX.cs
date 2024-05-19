@@ -50,6 +50,14 @@ namespace Vi.ScriptableObjects
 
         protected void Awake()
         {
+            if (Application.isEditor)
+            {
+                foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
+                {
+                    Debug.LogError("Action VFX " + name + " should not have an audio source component!");
+                }
+            }
+
             if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }
         }
 
