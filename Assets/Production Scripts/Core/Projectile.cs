@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core
 {

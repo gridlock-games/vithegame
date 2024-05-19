@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.Core
+namespace Vi.Utility
 {
     public class AudioManager : MonoBehaviour
     {
@@ -39,18 +39,53 @@ namespace Vi.Core
             audioSources.Add(audioSource);
         }
 
-        public void PlayClipAtPoint(GameObject invoker, AudioClip audioClip, Vector3 position, float volume = 1)
+        /// <summary>
+        /// Plays a clip in 3D space, pass null for the first parameter if you want this to play completely before destruction
+        /// </summary>
+        /// <param name="objectToDestroyWith"></param>
+        /// <param name="audioClip"></param>
+        /// <param name="position"></param>
+        /// <param name="volume"></param>
+        public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume = 1)
         {
             GameObject g = Instantiate(audioSourcePrefab, position, Quaternion.identity);
-            StartCoroutine(Play3DSoundPrefab(invoker, g.GetComponent<AudioSource>(), audioClip, volume));
+            if (objectToDestroyWith)
+                StartCoroutine(Play3DSoundPrefabWithInvoker(objectToDestroyWith, g.GetComponent<AudioSource>(), audioClip, volume));
+            else
+                StartCoroutine(Play3DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play3DSoundPrefab(GameObject invoker, AudioSource audioSouce, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
-            RegisterAudioSource(audioSouce);
-            audioSouce.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSouce.isPlaying | !invoker);
-            Destroy(audioSouce.gameObject);
+            RegisterAudioSource(audioSource);
+            audioSource.PlayOneShot(audioClip, volume);
+            yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
+            Destroy(audioSource.gameObject);
+        }
+
+        private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        {
+            RegisterAudioSource(audioSource);
+            audioSource.PlayOneShot(audioClip, volume);
+            yield return new WaitUntil(() => !audioSource.isPlaying);
+            Destroy(audioSource.gameObject);
+        }
+
+        /// <summary>
+        /// Plays an audio clip in 3D sound space while following a transform's position
+        /// </summary>
+        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, float volume = 1)
+        {
+            GameObject g = Instantiate(audioSourcePrefab, transformToFollow);
+            StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, volume));
+        }
+
+        private IEnumerator Play3DSoundPrefabOnTransform(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        {
+            RegisterAudioSource(audioSource);
+            audioSource.PlayOneShot(audioClip, volume);
+            yield return new WaitUntil(() => !audioSource.isPlaying);
+            Destroy(audioSource.gameObject);
         }
 
         public void Play2DClip(GameObject invoker, AudioClip audioClip, float volume = 1)
@@ -59,12 +94,12 @@ namespace Vi.Core
             StartCoroutine(Play2DSoundPrefab(invoker, g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play2DSoundPrefab(GameObject invoker, AudioSource audioSouce, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play2DSoundPrefab(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
-            audioSouce.spatialBlend = 0;
-            audioSouce.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSouce.isPlaying | !invoker);
-            Destroy(audioSouce.gameObject);
+            audioSource.spatialBlend = 0;
+            audioSource.PlayOneShot(audioClip, volume);
+            yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
+            Destroy(audioSource.gameObject);
         }
 
         private void Awake()

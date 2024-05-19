@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
@@ -42,5 +43,19 @@ namespace Vi.ScriptableObjects
 
         // Only used for TransformType.SpawnAtWeaponPoint
         public Weapon.WeaponBone weaponBone = Weapon.WeaponBone.RightHand;
+
+        [SerializeField] private AudioClip audioClipToPlayOnAwake;
+
+        [SerializeField] private AudioClip audioClipToPlayOnDestroy;
+
+        protected void Awake()
+        {
+            if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }
+        }
+
+        protected void OnDestroy()
+        {
+            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnAwake, transform.position); }
+        }
     }
 }
