@@ -1121,7 +1121,6 @@ GameObject:
   - component: {fileID: 593332744}
   - component: {fileID: 593332746}
   - component: {fileID: 593332747}
-  - component: {fileID: 593332748}
   m_Layer: 0
   m_Name: UICamera
   m_TagString: Untagged
@@ -1234,14 +1233,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerMask:
   - UI
---- !u!81 &593332748
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 593332742}
-  m_Enabled: 1
 --- !u!1001 &676656265
 PrefabInstance:
   m_ObjectHideFlags: 0

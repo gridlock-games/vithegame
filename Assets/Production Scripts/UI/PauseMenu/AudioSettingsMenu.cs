@@ -12,6 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private Text errorText;
         [SerializeField] private Slider volumeSlider;
+        [SerializeField] private Slider musicVolumeSlider;
         [SerializeField] private TMP_Dropdown speakerModeDropdown;
         [SerializeField] private TMP_Dropdown dspBufferSizeDropdown;
         [SerializeField] private TMP_Dropdown sampleRateDropdown;
@@ -28,7 +29,7 @@ namespace Vi.UI
 
         public void ChangeMusicVolume()
         {
-            //FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", AudioListener.volume);
+            FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", musicVolumeSlider.value);
         }
 
         public void ChangeSpeakerMode()
@@ -71,6 +72,8 @@ namespace Vi.UI
             errorText.text = "";
             volumeSlider.value = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
 
+            musicVolumeSlider.value = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
+
             AudioConfiguration currentAudioConfiguration = AudioSettings.GetConfiguration();
 
             List<string> speakerModeOptions = new List<string>();
@@ -92,7 +95,7 @@ namespace Vi.UI
             }
             speakerModeDropdown.ClearOptions();
             speakerModeDropdown.AddOptions(speakerModeOptions);
-            speakerModeDropdown.value = currentIndex;
+            speakerModeDropdown.SetValueWithoutNotify(currentIndex);
 
             List<string> dspBufferSizeOptions = new List<string>();
             currentIndex = 0;
@@ -103,7 +106,7 @@ namespace Vi.UI
             }
             dspBufferSizeDropdown.ClearOptions();
             dspBufferSizeDropdown.AddOptions(dspBufferSizeOptions);
-            dspBufferSizeDropdown.value = currentIndex;
+            dspBufferSizeDropdown.SetValueWithoutNotify(currentIndex);
 
             List<string> sampleRateOptions = new List<string>();
             currentIndex = 0;
@@ -114,7 +117,7 @@ namespace Vi.UI
             }
             sampleRateDropdown.ClearOptions();
             sampleRateDropdown.AddOptions(sampleRateOptions);
-            sampleRateDropdown.value = currentIndex;
+            sampleRateDropdown.SetValueWithoutNotify(currentIndex);
 
             List<string> numRealVoicesOptions = new List<string>();
             currentIndex = 0;
@@ -125,7 +128,7 @@ namespace Vi.UI
             }
             numRealVoicesDropdown.ClearOptions();
             numRealVoicesDropdown.AddOptions(sampleRateOptions);
-            numRealVoicesDropdown.value = currentIndex;
+            numRealVoicesDropdown.SetValueWithoutNotify(currentIndex);
 
             List<string> numVirtualVoicesOptions = new List<string>();
             currentIndex = 0;
@@ -136,7 +139,7 @@ namespace Vi.UI
             }
             numVirtualVoicesDropdown.ClearOptions();
             numVirtualVoicesDropdown.AddOptions(sampleRateOptions);
-            numVirtualVoicesDropdown.value = currentIndex;
+            numVirtualVoicesDropdown.SetValueWithoutNotify(currentIndex);
         }
 
         static AudioSpeakerMode[] validSpeakerModes =

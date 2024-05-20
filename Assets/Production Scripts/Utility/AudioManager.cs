@@ -118,7 +118,10 @@ namespace Vi.Utility
 
             // This is for music
             if (TryGetComponent(out musicSource))
+            {
+                musicSource.volume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
                 musicSource.spatialBlend = 0;
+            }
         }
 
         private const float musicFadeTime = 0.5f;
@@ -131,7 +134,11 @@ namespace Vi.Utility
                 audioSource.pitch = Time.timeScale;
             }
 
-            if (musicSource) { musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : 1, Time.deltaTime * musicFadeTime); }
+            if (musicSource)
+            {
+                if (!musicSource.isPlaying) { musicSource.Play(); }
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : FasterPlayerPrefs.Singleton.GetFloat("MusicVolume"), Time.deltaTime * musicFadeTime);
+            }
         }
     }
 }
