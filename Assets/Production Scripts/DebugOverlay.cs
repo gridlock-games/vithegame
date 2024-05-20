@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
+using Vi.Utility;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -73,12 +74,12 @@ public class DebugOverlay : MonoBehaviour
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
-        bool consoleEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("ConsoleEnabled"));
+        bool consoleEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
 
-        bool fpsEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("FPSEnabled"));
-        bool pingEnabled = bool.Parse(PersistentLocalObjects.Singleton.GetString("PingEnabled"));
+        bool fpsEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
+        bool pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
 
         debugCanvas.SetActive(consoleEnabled | fpsEnabled | pingEnabled);
 

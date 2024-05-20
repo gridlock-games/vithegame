@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using TMPro;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -22,7 +23,12 @@ namespace Vi.UI
         public void ChangeMasterVolume()
         {
             AudioListener.volume = volumeSlider.value;
-            PersistentLocalObjects.Singleton.SetFloat("MasterVolume", AudioListener.volume);
+            FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", AudioListener.volume);
+        }
+
+        public void ChangeMusicVolume()
+        {
+            //FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", AudioListener.volume);
         }
 
         public void ChangeSpeakerMode()
@@ -63,7 +69,7 @@ namespace Vi.UI
         private void Start()
         {
             errorText.text = "";
-            volumeSlider.value = PersistentLocalObjects.Singleton.GetFloat("MasterVolume");
+            volumeSlider.value = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
 
             AudioConfiguration currentAudioConfiguration = AudioSettings.GetConfiguration();
 

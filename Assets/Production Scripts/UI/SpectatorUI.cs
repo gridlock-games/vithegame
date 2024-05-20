@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Vi.Core;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -20,7 +21,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
             spectator = GetComponentInParent<Spectator>();
@@ -54,7 +55,7 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
