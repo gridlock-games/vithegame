@@ -376,6 +376,7 @@ GameObject:
   - component: {fileID: 682783815354880592}
   - component: {fileID: 8469022263998776827}
   - component: {fileID: 2043122454960353093}
+  - component: {fileID: 8788432372206729613}
   m_Layer: 5
   m_Name: KickButton
   m_TagString: Untagged
@@ -497,3 +498,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8788432372206729613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8706492659028408026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}

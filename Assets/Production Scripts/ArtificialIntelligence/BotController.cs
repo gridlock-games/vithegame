@@ -25,11 +25,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -38,11 +41,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -56,6 +62,7 @@ namespace Vi.ArtificialIntelligence
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
             }
+            networkColliderRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()
@@ -113,7 +120,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 inputDir = navMeshAgent.nextPosition - currentPosition.Value;
+            inputDir.y = 0;
+            inputDir = transform.InverseTransformDirection(inputDir).normalized;
             
             if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
             {
@@ -123,21 +132,23 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
+            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
+
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
             else if (animationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -154,7 +165,7 @@ namespace Vi.ArtificialIntelligence
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded.Value = true;
                 }
@@ -200,7 +211,7 @@ namespace Vi.ArtificialIntelligence
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {

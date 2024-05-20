@@ -185,7 +185,7 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, transform); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
@@ -206,7 +206,7 @@ namespace Vi.Core
             if (current)
             {
                 if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, transform); }
+                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
@@ -401,18 +401,13 @@ namespace Vi.Core
 
         public AnimationClip GetGrabReactionClip()
         {
-            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
-            {
-                Attributes grabAssailant = GetGrabAssailant();
-                if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+            Attributes grabAssailant = GetGrabAssailant();
+            if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
 
-                if (weaponOption.weapon.name == grabAssailant.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
-                {
-                    return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
-                }
-            }
-            Debug.LogError("Couldn't find grab reaction clip!");
-            return null;
+            ActionClip grabAttackClip = grabAssailant.weaponHandler.GetWeapon().GetActionClipByName(grabAttackClipName.Value.ToString());
+
+            if (!grabAttackClip.grabVictimClip) { Debug.LogError("Couldn't find grab reaction clip!"); }
+            return grabAttackClip.grabVictimClip;
         }
 
         public void CancelGrab()
@@ -448,6 +443,9 @@ namespace Vi.Core
             // Make grab people invinicible to all attacks except for the grab hits
             if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
             if (animationHandler.IsGrabAttacking()) { return false; }
+
+            // Don't let grab attack hit players that aren't grabbed
+            if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
@@ -529,8 +527,8 @@ namespace Vi.Core
 
             AddStamina(-attack.staminaDamage);
             //AddDefense(-attack.defenseDamage);
-            attacker.AddRage(attackerRageToBeAddedOnHit);
-            AddRage(victimRageToBeAddedOnHit);
+            if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
@@ -649,8 +647,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (evaluateAfterHitStopCoroutine != null) { StopCoroutine(evaluateAfterHitStopCoroutine); }
-                evaluateAfterHitStopCoroutine = StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
+                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
 
                 if (HPDamage != 0)
                 {
@@ -711,7 +708,6 @@ namespace Vi.Core
 
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
-        private Coroutine evaluateAfterHitStopCoroutine;
         private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
             yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
@@ -980,7 +976,7 @@ namespace Vi.Core
 
         public void OnActivateRage()
         {
-            if (GetRage() / GetMaxRage() < 1) { return; }
+            if (!CanActivateRage()) { return; }
             ActivateRage();
         }
 
@@ -992,7 +988,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                if (GetRage() / GetMaxRage() < 1) { return; }
+                if (!CanActivateRage()) { return; }
                 isRaging.Value = true;
             }
             else
@@ -1000,6 +996,8 @@ namespace Vi.Core
                 ActivateRageServerRpc();
             }
         }
+
+        private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
         [ServerRpc]
         private void ActivateRageServerRpc()
@@ -1023,6 +1021,7 @@ namespace Vi.Core
             }
             else if (prev == ActionClip.Ailment.Death)
             {
+                isRaging.Value = false;
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }

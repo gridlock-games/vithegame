@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -336,7 +337,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
-                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(startPos, Vector3.down * actionVFXPrefab.raycastMaxDistance, Color.red, 3);
 
                     if (bHit)
@@ -516,6 +517,9 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone])
                         {
+                            // Don't play sound effects for shooter weapons here
+                            if (weaponInstances[weaponBone].GetComponent<ShooterWeapon>()) { continue; }
+
                             AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
                             if (attackSoundEffect)
                                 AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);
@@ -639,6 +643,8 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
+        private bool lastHeavyAttackPressedState;
+
         public void HeavyAttack(bool isPressed)
         {
             if (isPressed)
@@ -649,11 +655,11 @@ namespace Vi.Core
                     return;
                 }
 
-                animationHandler.HeavyAttackPressedServerRpc();
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
             }
             else
             {
-                animationHandler.HeavyAttackReleasedServerRpc();
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
             }
 
             if (CanAim)
@@ -687,6 +693,8 @@ namespace Vi.Core
                         animationHandler.PlayAction(actionClip);
                 }
             }
+
+            lastHeavyAttackPressedState = isPressed;
         }
 
         public void HeavyAttackHold(bool isPressed)

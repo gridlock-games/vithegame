@@ -26,8 +26,9 @@ namespace Vi.Core
         }
 
         private ParticleSystem[] particleSystems;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {
@@ -58,7 +59,7 @@ namespace Vi.Core
                 Vector3 endBoundsPoint = boundsPoint;
                 while (endBoundsPoint != Vector3.zero)
                 {
-                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
+                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                     Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
@@ -78,9 +79,12 @@ namespace Vi.Core
             }
         }
 
+        private const string layersToHit = "NetworkPrediction";
+
         private void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+            if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             foreach (ParticleSystem ps in particleSystems)
             {

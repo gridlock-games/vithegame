@@ -15,7 +15,7 @@ PrefabInstance:
     - target: {fileID: 86045586829760881, guid: 937f93a2dcd49ec408b3912942286860,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 86045586829760910, guid: 937f93a2dcd49ec408b3912942286860,
         type: 3}
@@ -95,12 +95,12 @@ PrefabInstance:
     - target: {fileID: 6403134118963820828, guid: 937f93a2dcd49ec408b3912942286860,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7552030703396208649, guid: 937f93a2dcd49ec408b3912942286860,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 937f93a2dcd49ec408b3912942286860, type: 3}
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4250591613
+  GlobalObjectIdHash: 152036828
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -175,6 +175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   killDistance: 500
   VFXToPlayOnDestroy: []
+  soundToPlayOnSpawn: {fileID: 8300000, guid: 267c41f5b671a4541869a15be3f6e889, type: 3}
 --- !u!114 &6544803431402953921
 MonoBehaviour:
   m_ObjectHideFlags: 0

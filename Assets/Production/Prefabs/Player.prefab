@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1977550921
+  GlobalObjectIdHash: 891803348
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -226,7 +226,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3945128956232022071}
   - component: {fileID: 3945128956232022068}
-  - component: {fileID: 3945128956232022069}
   - component: {fileID: 3945128956232022056}
   - component: {fileID: 3945128956232022059}
   m_Layer: 0
@@ -282,7 +281,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 1271
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -294,14 +293,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &3945128956232022069
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3945128956232022066}
-  m_Enabled: 1
 --- !u!114 &3945128956232022056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,7 +426,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!136 &6750394594016454577
 CapsuleCollider:
   m_ObjectHideFlags: 0

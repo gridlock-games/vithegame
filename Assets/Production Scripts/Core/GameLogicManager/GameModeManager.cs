@@ -514,6 +514,8 @@ namespace Vi.Core.GameModeManagers
         public bool IsWaitingForPlayers { get; private set; } = true;
         private bool AreAllPlayersConnected()
         {
+            if (!PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().TrueForAll(item => PlayerDataManager.Singleton.IdHasLocalPlayer(item.id))) { return false; }
+
             List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
             if (players.Count == 0) { return false; }
             return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());

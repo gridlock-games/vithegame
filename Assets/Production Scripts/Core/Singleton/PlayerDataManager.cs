@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Utility;
+using UnityEngine.AI;
 
 namespace Vi.Core
 {
@@ -275,9 +276,11 @@ namespace Vi.Core
             }
         }
 
+        public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
+
         public bool ContainsId(int clientId)
         {
-            return playerDataList.Contains(new PlayerData(clientId));
+            return cachedPlayerDataList.Contains(new PlayerData(clientId));
         }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
@@ -717,6 +720,13 @@ namespace Vi.Core
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+        }
+
         private void Update()
         {
             if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
@@ -762,7 +772,12 @@ namespace Vi.Core
         {
             if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
             {
-                StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+            }
+
+            if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold & spawnPlayerRunning)
+            {
+                EndSpawnPlayerCoroutine();
             }
         }
 
@@ -834,11 +849,14 @@ namespace Vi.Core
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
             (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            float waitTime = 0;
             while (!spawnPointFound)
             {
                 attributesToRespawn.isWaitingForSpawnPoint = true;
                 (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
                 yield return null;
+                waitTime += Time.deltaTime;
+                if (waitTime > maxSpawnPointWaitTime) { break; }
             }
 
             attributesToRespawn.isWaitingForSpawnPoint = false;
@@ -874,10 +892,47 @@ namespace Vi.Core
             }
         }
 
+        private void EndSpawnPlayerCoroutine()
+        {
+            if (!IsServer) { Debug.LogError("PlayerDataManager.EndSpawnPlayerCoroutine() shold only be called on the server!"); return; }
+
+            if (spawnPlayerCoroutine != null) { StopCoroutine(spawnPlayerCoroutine); }
+            spawnPlayerRunning = false;
+
+            if (playerObjectToSpawn)
+            {
+                if (playerObjectToSpawn.GetComponent<NetworkObject>().IsSpawned)
+                {
+                    playerObjectToSpawn.GetComponent<NetworkObject>().Despawn(true);
+                }
+                else
+                {
+                    Destroy(playerObjectToSpawn);
+                }
+            }
+            
+            if (playerIdThatIsBeingSpawned >= 0)
+            {
+                if (NetworkManager.ConnectedClientsIds.Contains((ulong)playerIdThatIsBeingSpawned))
+                {
+                    NetworkManager.DisconnectClient((ulong)playerIdThatIsBeingSpawned, "Timed out while spawning player object");
+                }
+            }
+        }
+
+        private const float spawnPlayerTimeoutThreshold = 10;
+        private const float maxSpawnPointWaitTime = 5;
+
+        private int playerIdThatIsBeingSpawned;
         private bool spawnPlayerRunning;
+        private Coroutine spawnPlayerCoroutine;
+        private float lastSpawnPlayerStartTime;
+        private GameObject playerObjectToSpawn;
         private IEnumerator SpawnPlayer(PlayerData playerData)
         {
             spawnPlayerRunning = true;
+            playerIdThatIsBeingSpawned = playerData.id;
+            lastSpawnPlayerStartTime = Time.time;
             if (playerData.id >= 0)
             {
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
@@ -897,12 +952,15 @@ namespace Vi.Core
             if (playerSpawnPoints)
             {
                 (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                float waitTime = 0;
                 while (!spawnPointFound)
                 {
                     (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
                     yield return null;
+                    waitTime += Time.deltaTime;
+                    if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
-
+                
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
@@ -915,34 +973,33 @@ namespace Vi.Core
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            GameObject playerObject;
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
-                playerObject = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+                playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
             else
             {
                 if (playerData.id >= 0)
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
                 else
-                    playerObject = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
 
-                playerObject.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
+                playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
 
             if (playerData.id >= 0)
-                playerObject.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+                playerObjectToSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
             else
-                playerObject.GetComponent<NetworkObject>().Spawn(true);
+                playerObjectToSpawn.GetComponent<NetworkObject>().Spawn(true);
 
-            yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             spawnPlayerRunning = false;
         }
 
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            //Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
@@ -968,6 +1025,10 @@ namespace Vi.Core
             if (!string.IsNullOrWhiteSpace(NetworkManager.DisconnectReason))
             {
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = NetworkManager.DisconnectReason;
+            }
+            else
+            {
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Disconnected From Server.";
             }
         }
 

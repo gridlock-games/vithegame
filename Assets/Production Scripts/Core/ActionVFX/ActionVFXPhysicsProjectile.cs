@@ -29,8 +29,9 @@ namespace Vi.Core
             GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
         }
 
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -38,7 +39,7 @@ namespace Vi.Core
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
             }
 
-            if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
 
             StartCoroutine(ActivateGravityCoroutine());
         }
@@ -61,8 +62,9 @@ namespace Vi.Core
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
         }
 
-        private void OnDestroy()
+        private new void OnDestroy()
         {
+            base.OnDestroy();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
                 GameObject g = Instantiate(prefab, transform.position, transform.rotation);

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
@@ -42,5 +43,26 @@ namespace Vi.ScriptableObjects
 
         // Only used for TransformType.SpawnAtWeaponPoint
         public Weapon.WeaponBone weaponBone = Weapon.WeaponBone.RightHand;
+
+        [SerializeField] protected AudioClip audioClipToPlayOnAwake;
+        [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
+
+        protected void Awake()
+        {
+            if (Application.isEditor)
+            {
+                foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
+                {
+                    Debug.LogError("Action VFX " + name + " should not have an audio source component!");
+                }
+            }
+
+            if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }
+        }
+
+        protected void OnDestroy()
+        {
+            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnAwake, transform.position); }
+        }
     }
 }

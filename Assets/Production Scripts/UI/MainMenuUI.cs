@@ -17,14 +17,12 @@ namespace Vi.UI
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
-
         [SerializeField] private Text loginMethodText;
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
 
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
-
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
@@ -41,13 +39,12 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
-
         [SerializeField] private Text welcomeUserText;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
-
         [SerializeField] private Button startLobbyServerButton;
+        [SerializeField] private Button startAutoClientButton;
 
         private bool startServerCalled;
         private const int hubPort = 7777;
@@ -67,6 +64,9 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = hubPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
             NetSceneManager.Singleton.LoadScene("Player Hub Environment");
@@ -100,8 +100,52 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = (ushort)lobbyPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+            networkTransport.MaxSendQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
+        }
+
+        private const string automatedClientUsername = "roxasodale91";
+        private const string automatedClientPassword = "123456";
+
+        private bool startAutomatedClientCalled;
+        public void StartAutomatedClient()
+        {
+            if (startAutomatedClientCalled) { return; }
+            startAutomatedClientCalled = true;
+            AudioListener.volume = 0;
+
+            StartCoroutine(LaunchAutoClient());
+        }
+
+        private IEnumerator LaunchAutoClient()
+        {
+            LoginWithVi();
+
+            usernameInput.text = automatedClientUsername;
+            passwordInput.text = automatedClientPassword;
+
+            yield return Login();
+
+            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); yield break; }
+
+            WebRequestManager.Singleton.RefreshCharacters();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+
+            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
+
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
+
+            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
+            networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+
+            NetworkManager.Singleton.StartClient();
         }
 
         public void LoginWithVi()
@@ -317,6 +361,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
+            startAutoClientButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
             if (!WebRequestManager.IsServerBuild())
@@ -386,6 +431,7 @@ namespace Vi.UI
 
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
@@ -396,6 +442,10 @@ namespace Vi.UI
                 else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
                 {
                     StartLobbyServer();
+                }
+                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
+                {
+                    StartAutomatedClient();
                 }
             }
 

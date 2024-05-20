@@ -197,6 +197,7 @@ GameObject:
   - component: {fileID: 5792422628302646675}
   - component: {fileID: 5792422628302646676}
   - component: {fileID: 6669089199141518085}
+  - component: {fileID: 8049135123004635289}
   m_Layer: 5
   m_Name: CharacterCard
   m_TagString: Untagged
@@ -339,6 +340,19 @@ MonoBehaviour:
   characterIcon: {fileID: 5792422628476092344}
   nameText: {fileID: 5792422628803437116}
   levelText: {fileID: 5792422627677354676}
+--- !u!114 &8049135123004635289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5792422628302646687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &5792422628476092358
 GameObject:
   m_ObjectHideFlags: 0

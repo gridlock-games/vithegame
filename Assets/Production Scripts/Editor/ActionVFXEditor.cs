@@ -25,6 +25,9 @@ namespace Vi.Editor
 
         private SerializedProperty spWeaponBone;
 
+        protected SerializedProperty spAudioClipToPlayOnAwake;
+        protected SerializedProperty spAudioClipToPlayOnDestroy;
+
         protected void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
@@ -41,6 +44,9 @@ namespace Vi.Editor
             spOnActivateVFXSpawnNormalizedTime = serializedObject.FindProperty("onActivateVFXSpawnNormalizedTime");
 
             spWeaponBone = serializedObject.FindProperty("weaponBone");
+
+            spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
+            spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
         }
 
         public override void OnInspectorGUI()
@@ -67,6 +73,9 @@ namespace Vi.Editor
             {
                 EditorGUILayout.PropertyField(spWeaponBone);
             }
+
+            EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
+            EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
 
             serializedObject.ApplyModifiedProperties();
         }

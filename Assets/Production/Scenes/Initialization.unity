@@ -2117,6 +2117,7 @@ GameObject:
   - component: {fileID: 1849969101}
   - component: {fileID: 1849969100}
   - component: {fileID: 1849969099}
+  - component: {fileID: 1849969102}
   m_Layer: 5
   m_Name: Exit_Game_Btn
   m_TagString: Untagged
@@ -2238,6 +2239,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849969097}
   m_CullTransparentMesh: 1
+--- !u!114 &1849969102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849969097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &1863482480
 GameObject:
   m_ObjectHideFlags: 0

@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 8843715931406178875}
   - component: {fileID: 9153494507779794127}
   - component: {fileID: 1620798866562940665}
+  - component: {fileID: 6530613206052222535}
   m_Layer: 5
   m_Name: WeaponOptionIcon
   m_TagString: Untagged
@@ -201,6 +202,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6530613206052222535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6646849029147819835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &9200674099130155556
 GameObject:
   m_ObjectHideFlags: 0
