@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlatformAPI
+namespace Vi.PlatformAPI
 {
   [CreateAssetMenu(fileName = "Achievements", menuName = "PlatformAPI/Achievement", order = 1)]
-  public class AchivementScriptableObject : MonoBehaviour
+  public class AchivementScriptableObject : ScriptableObject
   {
     public string achievementID;
     public string achievementName;
@@ -14,5 +14,7 @@ namespace PlatformAPI
     [Header("steam")]
     public string steamAchievementID;
 
+    [Header("Google/PlayStore/Playgame")]
+    public string playgameAchievementID;
   }
 }
