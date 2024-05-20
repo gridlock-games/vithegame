@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -109,7 +110,7 @@ namespace Vi.UI
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
@@ -266,7 +267,7 @@ namespace Vi.UI
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }

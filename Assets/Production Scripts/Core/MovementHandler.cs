@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
-using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -40,10 +40,10 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            Vector2 lookSensitivity = new Vector2(PersistentLocalObjects.Singleton.GetFloat("MouseXSensitivity"), PersistentLocalObjects.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(PersistentLocalObjects.Singleton.GetString("InvertMouse")) ? -1 : 1);
+            Vector2 lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);
             if (weaponHandler)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= PersistentLocalObjects.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
+                if (weaponHandler.IsAiming()) { lookSensitivity *= FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
             }
             return lookInput * lookSensitivity;
         }

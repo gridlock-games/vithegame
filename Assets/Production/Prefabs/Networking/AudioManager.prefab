@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4872733447277483533}
   - component: {fileID: 4872733447277483534}
-  - component: {fileID: 2789783360216441984}
+  - component: {fileID: 7774390028603397925}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -47,7 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSourcePrefab: {fileID: 1966421921068733855, guid: 7540728959cc9cc4188124a1defba4f3,
     type: 3}
---- !u!82 &2789783360216441984
+  musicClips: []
+--- !u!82 &7774390028603397925
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,11 +58,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: a1bc214c95f6ee142bbd5e4f1ea7fa18, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

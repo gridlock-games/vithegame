@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using static ViNetAnalytics.Deviceinfo;
-using Vi.Core;
+using Vi.Utility;
 
 namespace ViNetAnalytics
 {
@@ -38,7 +38,7 @@ namespace ViNetAnalytics
             {
                 yield break; //No permission was granted voiding transfer
             }
-            alreadyCapture = Convert.ToBoolean(PersistentLocalObjects.Singleton.GetInt("deviceAnalyticsSent"));
+            alreadyCapture = Convert.ToBoolean(FasterPlayerPrefs.Singleton.GetInt("deviceAnalyticsSent"));
             if (alreadyCapture == true) //Replace with legal stuff
             {
                 yield break; //No permission was granted voiding transfer
@@ -94,7 +94,7 @@ namespace ViNetAnalytics
                 else
                 {
                     alreadyCapture = true;
-                    PersistentLocalObjects.Singleton.SetInt("deviceAnalyticsSent", Convert.ToInt32(alreadyCapture));
+                    FasterPlayerPrefs.Singleton.SetInt("deviceAnalyticsSent", Convert.ToInt32(alreadyCapture));
                     //Mark this send complete and save to localSaveData.
                 }
                 sentRequest.Dispose();

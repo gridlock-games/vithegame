@@ -8,6 +8,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -275,7 +276,7 @@ namespace Vi.UI
             }
 
             Application.targetFrameRate = targetFrameRate;
-            PersistentLocalObjects.Singleton.SetInt("TargetFrameRate", targetFrameRate);
+            FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
         }
     }
 }
