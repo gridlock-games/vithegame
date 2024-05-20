@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.PlatformAPI
+namespace PlatformAPI
 {
-  public class PlatformController : MonoBehaviour
+  public class PlatformAchievement : MonoBehaviour
   {
     // Start is called before the first frame update
     void Start()
@@ -17,13 +17,5 @@ namespace Vi.PlatformAPI
     {
 
     }
-
-    public void unlockAchievement(string achievementID)
-    {
-
-    }
-
-    public void changeRichPresence()
-    { }
   }
 }
