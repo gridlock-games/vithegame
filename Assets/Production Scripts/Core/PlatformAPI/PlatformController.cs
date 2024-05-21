@@ -18,7 +18,7 @@ namespace Vi.PlatformAPI
   }
   public class PlatformController : MonoBehaviour
   {
-    GamePlatform activePlayform = GamePlatform.inHouse;
+    [SerializeField] GamePlatform activePlayform = GamePlatform.inHouse;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,10 +28,9 @@ namespace Vi.PlatformAPI
       }
     }
 
-    // Update is called once per frame
-    void Update()
+    public GamePlatform getPlatform()
     {
-
+      return activePlayform;
     }
 
     bool AttmptSteam()

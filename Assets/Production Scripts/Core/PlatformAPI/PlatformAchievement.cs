@@ -10,7 +10,7 @@ namespace Vi.PlatformAPI
   public class PlatformAchievement : MonoBehaviour
   {
     [SerializeField] private List<AchivementScriptableObject> achievementsList;
-    
+    [SerializeField] private List<StatisticsScriptableObject> StatisticsList;
     public void GrantAchievement(string ID)
     {
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);
@@ -29,7 +29,7 @@ namespace Vi.PlatformAPI
       
     }
 
-    public void UpdateStats( string ID, int value)
+    public void UpdateStats(string ID, int value)
     {
       //Steam
       if (SteamManager.Initialized)
