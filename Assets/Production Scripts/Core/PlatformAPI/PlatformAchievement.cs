@@ -11,6 +11,19 @@ namespace jomarcentermjm.PlatformAPI
   {
     [SerializeField] private List<AchivementScriptableObject> achievementsList;
     [SerializeField] private List<StatisticsScriptableObject> StatisticsList;
+
+    public static PlatformAchievement instance;
+
+    private void Awake()
+    {
+      if (instance == null)
+        instance = this;
+      else
+        Destroy(gameObject);
+
+      DontDestroyOnLoad(gameObject);
+    }
+
     public void GrantAchievement(string ID)
     {
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);

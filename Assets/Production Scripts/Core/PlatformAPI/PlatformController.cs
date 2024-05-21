@@ -18,8 +18,23 @@ namespace jomarcentermjm.PlatformAPI
   }
   public class PlatformController : MonoBehaviour
   {
+
     [SerializeField] GamePlatform activePlayform = GamePlatform.inHouse;
     // Start is called before the first frame update
+
+    public static PlatformController instance;
+
+    private void Awake()
+    {
+      if (instance == null)
+        instance = this;
+      else
+        Destroy(gameObject);
+
+      DontDestroyOnLoad(gameObject);
+    }
+
+
     void Start()
     {
       if (activePlayform == GamePlatform.Steam)
