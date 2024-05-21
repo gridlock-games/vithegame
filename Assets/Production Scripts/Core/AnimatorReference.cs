@@ -164,18 +164,18 @@ namespace Vi.Core
 
         private void Start()
         {
-            SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
             }
-            StartCoroutine(TurnRenderersBackOn(smrs));
+            StartCoroutine(TurnRenderersBackOn());
         }
 
-        private IEnumerator TurnRenderersBackOn(SkinnedMeshRenderer[] smrs)
+        private IEnumerator TurnRenderersBackOn()
         {
             yield return null;
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>(true))
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
             }
