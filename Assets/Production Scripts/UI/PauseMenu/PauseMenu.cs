@@ -16,6 +16,7 @@ namespace Vi.UI
         [SerializeField] private ControlsSettingsMenu controlSettingsMenu;
         [SerializeField] private UIModificationMenu UIModificationMenu;
         [SerializeField] private Button returnToCharSelectButton;
+        [SerializeField] private Text applicationVersionText;
 
         public void OpenVideoMenu()
         {
@@ -62,6 +63,8 @@ namespace Vi.UI
             returnToCharSelectButton.onClick.AddListener(delegate { PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect()); });
             returnToCharSelectButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
             returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
+
+            applicationVersionText.text = "Version: " + Application.version;
         }
 
         public IEnumerator ReturnToCharacterSelect()

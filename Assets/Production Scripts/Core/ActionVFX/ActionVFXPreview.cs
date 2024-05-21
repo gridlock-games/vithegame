@@ -29,7 +29,7 @@ namespace Vi.Core
             {
                 Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
                 RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                Debug.DrawRay(startPos, Vector3.down * raycastMaxDistance, Color.red, 3);
+                if (Application.isEditor) { Debug.DrawRay(startPos, Vector3.down * raycastMaxDistance, Color.red, 3); }
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                 bool bHit = false;
