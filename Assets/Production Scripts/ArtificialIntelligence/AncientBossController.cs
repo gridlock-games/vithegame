@@ -123,7 +123,7 @@ namespace Vi.ArtificialIntelligence
                     break;
                 }
 
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
 
