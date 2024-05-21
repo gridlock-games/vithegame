@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -597,7 +598,7 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             StartCoroutine(RefreshCharacterCards());
 
