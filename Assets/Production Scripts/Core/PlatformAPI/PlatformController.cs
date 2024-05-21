@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.PlatformAPI
+namespace jomarcentermjm.PlatformAPI
 {
   public enum GamePlatform
   {

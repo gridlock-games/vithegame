@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.PlatformAPI
+namespace jomarcentermjm.PlatformAPI
 {
   [CreateAssetMenu(fileName = "Statistics", menuName = "PlatformAPI/Statistics", order = 2)]
   public class StatisticsScriptableObject : ScriptableObject
