@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
 
-namespace Vi.PlatformAPI
+namespace jomarcentermjm.PlatformAPI
 {
   public class PlatformRichPresence : MonoBehaviour
   {

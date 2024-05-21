@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Discord;
-namespace Vi.PlatformAPI
+namespace jomarcentermjm.PlatformAPI
 {
   public class DiscordManager : MonoBehaviour
   {
