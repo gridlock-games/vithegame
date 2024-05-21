@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -68,7 +69,7 @@ namespace Vi.UI
             returnToCharSelectButton.interactable = false;
             if (NetworkManager.Singleton.IsListening)
             {
-                NetworkManager.Singleton.Shutdown(true);
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
