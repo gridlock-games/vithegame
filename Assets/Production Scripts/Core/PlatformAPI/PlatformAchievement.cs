@@ -4,6 +4,7 @@ using UnityEngine;
 using Steamworks;
 
 
+
 namespace Vi.PlatformAPI
 {
   public class PlatformAchievement : MonoBehaviour
@@ -28,10 +29,30 @@ namespace Vi.PlatformAPI
       
     }
 
-    public void UpdateStats()
+    public void UpdateStats( string ID, int value)
     {
-
+      //Steam
+      if (SteamManager.Initialized)
+      {
+        SteamUserStats.SetStat(ID, value);
+      }
     }
+
+    public int GetStats(GamePlatform platform , string ID)
+    {
+      int output = 0;
+
+      //Steam
+      if (SteamManager.Initialized && platform == GamePlatform.Steam)
+      {
+        SteamUserStats.GetStat(ID, out output);
+      }
+
+
+
+      return output;
+    }
+
 
   }
 }
