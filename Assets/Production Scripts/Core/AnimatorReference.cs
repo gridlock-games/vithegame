@@ -90,11 +90,7 @@ namespace Vi.Core
                             SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                             if (equipmentSkinnedMeshRenderers.Length > 1)
                                 equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
-                            if (animationHandler.IsLocalPlayer & wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Boots)
-                            {
-                                Debug.Log(wearableEquipmentOption.name + " " + model.shouldDisableCharSkinRenderer + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i]);
-                            }
-                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
+                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
                         }
                         else
                         {

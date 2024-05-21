@@ -12,6 +12,8 @@ namespace Vi.ScriptableObjects
         public CharacterReference.EquipmentType equipmentType;
         public bool shouldDisableCharSkinRenderer;
 
+        private const bool shouldDebugWarnings = false;
+
         private void Start()
         {
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
@@ -60,7 +62,7 @@ namespace Vi.ScriptableObjects
 
                         if (!boneMap.TryGetValue(bone.name, out newBones[i]))
                         {
-                            if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
+                            if (Application.isEditor & shouldDebugWarnings) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
                         }
                     }
                     srenderer.bones = newBones;
@@ -100,7 +102,7 @@ namespace Vi.ScriptableObjects
         {
             if (!boneMap.TryGetValue(_name, out Transform _rootBone))
             {
-                if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
+                if (Application.isEditor & shouldDebugWarnings) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
             }
             return _rootBone;
         }
