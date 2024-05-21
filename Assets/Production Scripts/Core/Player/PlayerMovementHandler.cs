@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.ScriptableObjects;
-using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -271,7 +271,7 @@ namespace Vi.Player
                 minimapCameraInstance.enabled = true;
 
                 playerInput.enabled = true;
-                string rebinds = PersistentLocalObjects.Singleton.GetString("Rebinds");
+                string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 GetComponent<ActionMapHandler>().enabled = true;
@@ -453,7 +453,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("AutoAim")))
+            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim")))
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {

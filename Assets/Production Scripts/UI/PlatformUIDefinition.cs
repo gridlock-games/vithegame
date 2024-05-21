@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Vi.Core;
 using UnityEngine.InputSystem.OnScreen;
 using Newtonsoft.Json;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -236,9 +237,9 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (PersistentLocalObjects.Singleton.HasKey(customizablePlayerPrefName))
+            if (FasterPlayerPrefs.Singleton.HasKey(customizablePlayerPrefName))
             {
-                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString(customizablePlayerPrefName));
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString(customizablePlayerPrefName));
 
                 foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                 {

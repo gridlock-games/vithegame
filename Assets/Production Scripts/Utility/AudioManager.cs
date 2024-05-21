@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -107,6 +108,7 @@ namespace Vi.Utility
             _singleton = this;
         }
 
+        private AudioSource musicSource;
         private void Start()
         {
             foreach (AudioSource audioSouce in FindObjectsOfType<AudioSource>())
@@ -115,9 +117,14 @@ namespace Vi.Utility
             }
 
             // This is for music
-            if (TryGetComponent(out AudioSource audioSource))
-                audioSource.spatialBlend = 0;
+            if (TryGetComponent(out musicSource))
+            {
+                musicSource.volume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
+                musicSource.spatialBlend = 0;
+            }
         }
+
+        private const float musicFadeTime = 0.5f;
 
         private void Update()
         {
@@ -125,6 +132,12 @@ namespace Vi.Utility
             foreach (AudioSource audioSource in audioSources)
             {
                 audioSource.pitch = Time.timeScale;
+            }
+
+            if (musicSource)
+            {
+                if (!musicSource.isPlaying) { musicSource.Play(); }
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : FasterPlayerPrefs.Singleton.GetFloat("MusicVolume"), Time.deltaTime * musicFadeTime);
             }
         }
     }

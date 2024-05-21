@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using Vi.Core;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -110,7 +110,7 @@ namespace Vi.UI
             }
 
             string rebinds = playerInput.actions.SaveBindingOverridesAsJson();
-            PersistentLocalObjects.Singleton.SetString("Rebinds", rebinds);
+            FasterPlayerPrefs.Singleton.SetString("Rebinds", rebinds);
 
             Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
 

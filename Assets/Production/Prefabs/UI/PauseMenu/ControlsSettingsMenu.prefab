@@ -1964,6 +1964,7 @@ GameObject:
   - component: {fileID: 5999279810444107728}
   - component: {fileID: 7293902400429350920}
   - component: {fileID: 9017153566365258255}
+  - component: {fileID: 8900962094430269854}
   m_Layer: 5
   m_Name: Switch Toggle
   m_TagString: Untagged
@@ -2107,6 +2108,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8900962094430269854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2963394179987931987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76dfed6d0f43518419f7bdd1d7bd68f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: 9f35106e76c6c40fa9c9e04a7cd7dca6, type: 3}
 --- !u!1 &3155291787586826704
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using Vi.Core;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using UnityEngine.AI;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -284,7 +285,7 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
                 
-                if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
+                if (IsOwner & !bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
                     
@@ -321,7 +322,7 @@ namespace Vi.ArtificialIntelligence
 
                     EvaluteAction();
                 }
-                else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
+                else if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
                 {
                     if (navMeshAgent.isOnNavMesh)
                     {

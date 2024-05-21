@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
-using Vi.Core;
+using Vi.Utility;
 using Unity.Netcode;
 
 namespace Vi.Player
@@ -24,7 +24,7 @@ namespace Vi.Player
             canvasRectTransform = (RectTransform)transform;
             controllerCursorPlayerInput = GetComponent<PlayerInput>();
 
-            string rebinds = PersistentLocalObjects.Singleton.GetString("Rebinds");
+            string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
             controllerCursorPlayerInput.actions.LoadBindingOverridesFromJson(rebinds);
         }
 
