@@ -116,7 +116,7 @@ namespace Vi.UI
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Build\VitheGame.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\VitheGame.exe";
             }
             else
             {
