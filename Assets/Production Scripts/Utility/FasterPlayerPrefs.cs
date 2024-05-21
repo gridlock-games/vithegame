@@ -10,6 +10,8 @@ namespace Vi.Utility
         public static FasterPlayerPrefs Singleton { get { return _singleton; } }
         private static FasterPlayerPrefs _singleton;
 
+        public const bool shouldDiscardMessageQueueOnNetworkShutdown = true;
+
         private void Awake()
         {
             _singleton = this;

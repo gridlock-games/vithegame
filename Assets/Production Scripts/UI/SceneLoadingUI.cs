@@ -26,12 +26,21 @@ namespace Vi.UI
             if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
 
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject) | (NetworkManager.Singleton.ShutdownInProgress));
             progressBarParent.SetActive(PersistentLocalObjects.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
 
             if (spawningPlayerObjectParent.activeSelf)
             {
-                string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                string topText;
+                if (NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    topText = "Network Shutdown In Progress";
+                }
+                else
+                {
+                    topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                }
+                
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
 
                 if (Time.time - lastTextChangeTime > 0.5f)

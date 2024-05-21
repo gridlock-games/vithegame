@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Vi.Core;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -103,7 +104,7 @@ namespace Vi.UI
 
         private IEnumerator ConnectToLobbyServerCoroutine()
         {
-            NetworkManager.Singleton.Shutdown(true);
+            NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             NetworkManager.Singleton.StartClient();
         }

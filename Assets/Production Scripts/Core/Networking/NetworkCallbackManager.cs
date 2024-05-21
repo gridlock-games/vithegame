@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using UnityEngine.UI;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -203,7 +203,7 @@ namespace Vi.Core
 
             if (!NetworkManager.Singleton.IsConnectedClient)
             {
-                NetworkManager.Singleton.Shutdown(true);
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
                 if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";
