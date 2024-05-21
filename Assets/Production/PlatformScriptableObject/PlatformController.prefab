@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8539632833300673004}
   - component: {fileID: -1560243224139373652}
   - component: {fileID: -3356860417409291547}
+  - component: {fileID: 5294813849185493016}
   m_Layer: 0
   m_Name: PlatformController
   m_TagString: Untagged
@@ -62,3 +63,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e25b305cf382b5c4b8ff72c1e81a4c83, type: 2}
   StatisticsList:
   - {fileID: 11400000, guid: fa165587bcadf354592fcc51d16d4df6, type: 2}
+--- !u!114 &5294813849185493016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7594400213786824013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 268eca6ce56b90c48af7d78ca2a33145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultMainImageID: vi_game_logo
+  defaultSubImageID: vi_game_logo

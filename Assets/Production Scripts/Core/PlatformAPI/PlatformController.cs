@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Steamworks;
 namespace jomarcentermjm.PlatformAPI
 {
   public enum GamePlatform
@@ -37,11 +37,11 @@ namespace jomarcentermjm.PlatformAPI
 
     void Start()
     {
-      DontDestroyOnLoad(gameObject);
 
       if (activePlayform == GamePlatform.Steam)
       {
         AttmptSteam();
+        AttemptDiscord();
       }
     }
 
@@ -61,6 +61,5 @@ namespace jomarcentermjm.PlatformAPI
       this.gameObject.AddComponent<DiscordManager>();
       return true;
     }
-
   }
 }
