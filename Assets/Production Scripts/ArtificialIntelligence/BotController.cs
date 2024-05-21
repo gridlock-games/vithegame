@@ -91,6 +91,7 @@ namespace Vi.ArtificialIntelligence
         {
             networkColliderRigidbody.transform.SetParent(null, true);
             UpdateActivePlayersList();
+            StartCoroutine(EvaluateBotLogic());
         }
 
         private new void OnDestroy()
@@ -219,7 +220,7 @@ namespace Vi.ArtificialIntelligence
                     break;
                 }
 
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
 
@@ -284,11 +285,17 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
-                
+            }
+        }
+
+        private IEnumerator EvaluateBotLogic()
+        {
+            while (true)
+            {
                 if (IsOwner & !bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
-                    
+
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
                     {
@@ -329,13 +336,15 @@ namespace Vi.ArtificialIntelligence
                         if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { navMeshAgent.destination = currentPosition.Value; }
                     }
                 }
+
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 0.75f;
+        private const float chargeAttackDuration = 0.5f;
         private const float chargeWaitDuration = 2;
         private float lastChargeAttackTime;
 
