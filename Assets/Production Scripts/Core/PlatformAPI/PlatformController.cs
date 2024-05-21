@@ -14,11 +14,11 @@ namespace jomarcentermjm.PlatformAPI
     GameCenter,
     PSN,
     Xbox,
+    meta,
     Nintendo
   }
   public class PlatformController : MonoBehaviour
   {
-
     [SerializeField] GamePlatform activePlayform = GamePlatform.inHouse;
     // Start is called before the first frame update
 
