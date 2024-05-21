@@ -17,19 +17,61 @@ namespace jomarcentermjm.PlatformAPI
       var activity = new Discord.Activity
       {
         State = "Login Menu",
-        Details = "Logging in to Vi"
+        Details = "Logging in to Vi",
+        Assets = {
+          LargeImage = "vi_game_logo",
+          SmallImage = "vi_game_logo"
+        }
       };
       activityManager.UpdateActivity(activity, (res) =>
       {
         if (res == Discord.Result.Ok)
         {
-          Debug.Log("Successful discord access");
+          Debug.Log("Successful activity change");
         }
       });
     }
 
+    public void ChangeActivityMessage(string state, string details, string largeimg, string largetext, string smallimage, string smalltext)
+    {
+      var activityManager = discord.GetActivityManager();
+      var activity = new Discord.Activity
+      {
+        State = "Login Menu",
+        Details = "Logging in to Vi",
+        Assets = {
+        LargeImage = largeimg,
+        SmallImage = smallimage,
+        SmallText = smalltext,
+        LargeText = largetext
+        }
+      };
+      activityManager.UpdateActivity(activity, (res) =>
+      {
+        if (res == Discord.Result.Ok)
+        {
+          Debug.Log("Successful activity change");
+        }
+      });
+    }
+
+    public void clearActivity()
+    {
+      var activityManager = discord.GetActivityManager();
+      activityManager.ClearActivity((result) =>
+      {
+        if (result == Discord.Result.Ok)
+        {
+          Debug.Log("End");
+        }
+        else
+        {
+          Debug.Log("Failed");
+        }
+      });
+    }
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
       discord.RunCallbacks();
     }
