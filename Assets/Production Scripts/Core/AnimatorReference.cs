@@ -90,7 +90,11 @@ namespace Vi.Core
                             SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                             if (equipmentSkinnedMeshRenderers.Length > 1)
                                 equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
-                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
+                            if (animationHandler.IsLocalPlayer & wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Boots)
+                            {
+                                Debug.Log(wearableEquipmentOption.name + " " + model.shouldDisableCharSkinRenderer + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i]);
+                            }
+                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
                         }
                         else
                         {
@@ -164,14 +168,14 @@ namespace Vi.Core
 
         private void Start()
         {
-            List<SkinnedMeshRenderer> skinnedMeshRenderersToEvaluate = new List<SkinnedMeshRenderer>();
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>())
-            {
-                if (skinnedMeshRenderer.GetComponentInParent<RuntimeWeapon>()) { continue; }
-                skinnedMeshRenderer.enabled = false;
-                skinnedMeshRenderersToEvaluate.Add(skinnedMeshRenderer);
-            }
-            StartCoroutine(DisplayRenderersBasedOnEquipment(skinnedMeshRenderersToEvaluate.ToArray()));
+            //List<SkinnedMeshRenderer> skinnedMeshRenderersToEvaluate = new List<SkinnedMeshRenderer>();
+            //foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>())
+            //{
+            //    if (skinnedMeshRenderer.GetComponentInParent<RuntimeWeapon>()) { continue; }
+            //    skinnedMeshRenderer.enabled = false;
+            //    skinnedMeshRenderersToEvaluate.Add(skinnedMeshRenderer);
+            //}
+            //StartCoroutine(DisplayRenderersBasedOnEquipment(skinnedMeshRenderersToEvaluate.ToArray()));
         }
 
         private IEnumerator DisplayRenderersBasedOnEquipment(SkinnedMeshRenderer[] skinnedMeshRenderersToEvaluate)
