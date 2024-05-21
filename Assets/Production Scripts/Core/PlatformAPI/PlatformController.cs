@@ -37,6 +37,8 @@ namespace jomarcentermjm.PlatformAPI
 
     void Start()
     {
+      DontDestroyOnLoad(gameObject);
+
       if (activePlayform == GamePlatform.Steam)
       {
         AttmptSteam();
@@ -52,6 +54,12 @@ namespace jomarcentermjm.PlatformAPI
     {
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
+    }
+
+    bool AttemptDiscord()
+    {
+      this.gameObject.AddComponent<DiscordManager>();
+      return true;
     }
 
   }
