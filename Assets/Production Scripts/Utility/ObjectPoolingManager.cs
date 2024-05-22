@@ -27,6 +27,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn);
+                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
             }
             else
             {
@@ -58,6 +59,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation);
+                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
             }
             else
             {
@@ -89,6 +91,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, parentTransform);
+                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
             }
             else
             {
