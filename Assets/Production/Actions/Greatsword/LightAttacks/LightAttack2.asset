@@ -3613,9 +3613,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.15
+  transitionTime: 0.1
   dodgeCancelTransitionTime: 0.1
-  animationSpeed: 1.1
+  animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
@@ -3628,8 +3628,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.33
+  attackingNormalizedTime: 0.08
+  recoveryNormalizedTime: 0.2
   isAffectedByRage: 1
   damage: 6
   healAmount: 0
@@ -3667,7 +3667,7 @@ MonoBehaviour:
   limitAttackMotionBasedOnTarget: 1
   maximumTargetingRotationAngle: 60
   canLunge: 1
-  minLungeDistance: 2.5
+  minLungeDistance: 2
   maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
