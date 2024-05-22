@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Utility;
+using Unity.Netcode;
 
 namespace Vi.ScriptableObjects
 {
@@ -55,6 +56,12 @@ namespace Vi.ScriptableObjects
                 {
                     Debug.LogError("Action VFX " + name + " should not have an audio source component!");
                 }
+            }
+
+            foreach (ParticleSystem ps in GetComponentsInChildren<ParticleSystem>())
+            {
+                ParticleSystem.MainModule main = ps.main;
+                main.cullingMode = NetworkManager.Singleton.IsServer ? ParticleSystemCullingMode.PauseAndCatchup : ParticleSystemCullingMode.AlwaysSimulate;
             }
 
             if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }
