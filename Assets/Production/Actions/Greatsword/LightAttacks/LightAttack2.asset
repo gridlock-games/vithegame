@@ -3615,7 +3615,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.1
-  animationSpeed: 1
+  animationSpeed: 1.1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
@@ -3629,7 +3629,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.33
   isAffectedByRage: 1
   damage: 6
   healAmount: 0
@@ -3660,8 +3660,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 2668701750694916599, guid: b253f8747a5e845108b3a546ff3565b9, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
