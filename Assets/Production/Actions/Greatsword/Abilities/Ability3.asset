@@ -258,7 +258,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
+  animationSpeed: 2
   recoveryAnimationSpeed: 1
   agentStaminaCost: 15
   agentRageCost: 0
@@ -299,9 +299,9 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 3daf3a15cfd146543942e4b6524260ad, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 25
   statusesToApplyToSelfOnActivate:
-  - status: 5
+  - status: 1
     value: 0.5
     duration: 10
     delay: 1
