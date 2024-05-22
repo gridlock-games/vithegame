@@ -223,14 +223,14 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (attributes.IsPulled())
-                {
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
-                }
-                else if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
+                if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
                 {
                     Transform grabAssailant = attributes.GetGrabAssailant().transform;
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
+                else if (attributes.IsPulled())
+                {
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
                 else
                 {
