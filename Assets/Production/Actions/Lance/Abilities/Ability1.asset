@@ -21,7 +21,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 1.15
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -30,7 +30,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 1.15
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -261,7 +261,6 @@ MonoBehaviour:
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 15
-  agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 12000000
   weaponBonesToHide: 
@@ -274,13 +273,12 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.6
+  isAffectedByRage: 1
   damage: 10
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 1
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 2
   timeBetweenHits: 0.15
@@ -310,9 +308,6 @@ MonoBehaviour:
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
-  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
-  boxCastHalfExtents: {x: 2, y: 1, z: 1}
-  boxCastDistance: 5
   maximumTargetingRotationAngle: 60
   canLunge: 0
   minLungeDistance: 2.5

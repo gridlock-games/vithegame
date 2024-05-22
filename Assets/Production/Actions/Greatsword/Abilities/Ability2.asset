@@ -7732,7 +7732,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.4
+  attackingNormalizedTime: 0.35
   recoveryNormalizedTime: 0.5
   isAffectedByRage: 1
   damage: 10
@@ -7764,7 +7764,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 9
-    value: 0.05
+    value: 0.5
     duration: 5
     delay: 0
   statusesToApplyToTeammateOnHit: []
