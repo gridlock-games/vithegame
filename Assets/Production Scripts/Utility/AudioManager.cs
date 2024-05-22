@@ -128,9 +128,12 @@ namespace Vi.Utility
 
         private void Update()
         {
-            foreach (AudioSource audioSource in audioSources)
+            if (Application.isEditor)
             {
-                audioSource.pitch = Time.timeScale;
+                foreach (AudioSource audioSource in audioSources)
+                {
+                    audioSource.pitch = Time.timeScale;
+                }
             }
 
             if (musicSource)
