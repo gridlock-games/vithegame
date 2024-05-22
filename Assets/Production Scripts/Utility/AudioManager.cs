@@ -128,7 +128,6 @@ namespace Vi.Utility
 
         private void Update()
         {
-            audioSources.RemoveAll(item => item == null);
             foreach (AudioSource audioSource in audioSources)
             {
                 audioSource.pitch = Time.timeScale;
