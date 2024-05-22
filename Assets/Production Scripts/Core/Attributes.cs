@@ -124,7 +124,7 @@ namespace Vi.Core
             statuses.OnListChanged += OnStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
@@ -154,7 +154,7 @@ namespace Vi.Core
             statuses.OnListChanged -= OnStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -185,11 +185,11 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = Instantiate(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
-                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
+                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
             }
 
             if (IsServer)
@@ -205,12 +205,12 @@ namespace Vi.Core
         {
             if (current)
             {
-                if (rageAtMaxVFXInstance) { Destroy(rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = Instantiate(ragingVFXPrefab, animationHandler.Animator.transform); }
+                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.transform); }
             }
             else
             {
-                if (ragingVFXInstance) { Destroy(ragingVFXInstance); }
+                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ragingVFXInstance); }
             }
         }
 
@@ -235,7 +235,7 @@ namespace Vi.Core
         private GameObject teamIndicatorInstance;
         private void Start()
         {
-            teamIndicatorInstance = Instantiate(teamIndicatorPrefab, transform);
+            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
         private void OnEnable()
@@ -860,7 +860,7 @@ namespace Vi.Core
             if (!IsClient)
             {
                 GlowRenderer.RenderHit();
-                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
                 Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
             }
@@ -872,7 +872,7 @@ namespace Vi.Core
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -898,11 +898,11 @@ namespace Vi.Core
         private void RenderBlock(Vector3 impactPosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
-
+            
             if (!IsClient)
             {
                 GlowRenderer.RenderBlock();
-                StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+                StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
                 AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
             }
 
@@ -912,7 +912,7 @@ namespace Vi.Core
         [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 

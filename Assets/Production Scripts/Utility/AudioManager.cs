@@ -49,7 +49,7 @@ namespace Vi.Utility
         /// <param name="volume"></param>
         public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume = 1)
         {
-            GameObject g = Instantiate(audioSourcePrefab, position, Quaternion.identity);
+            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, position, Quaternion.identity);
             if (objectToDestroyWith)
                 StartCoroutine(Play3DSoundPrefabWithInvoker(objectToDestroyWith, g.GetComponent<AudioSource>(), audioClip, volume));
             else
@@ -61,7 +61,7 @@ namespace Vi.Utility
             RegisterAudioSource(audioSource);
             audioSource.PlayOneShot(audioClip, volume);
             yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
-            Destroy(audioSource.gameObject);
+            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 
         private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
@@ -69,7 +69,7 @@ namespace Vi.Utility
             RegisterAudioSource(audioSource);
             audioSource.PlayOneShot(audioClip, volume);
             yield return new WaitUntil(() => !audioSource.isPlaying);
-            Destroy(audioSource.gameObject);
+            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Vi.Utility
         /// </summary>
         public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, float volume = 1)
         {
-            GameObject g = Instantiate(audioSourcePrefab, transformToFollow);
+            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow);
             StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
@@ -86,12 +86,12 @@ namespace Vi.Utility
             RegisterAudioSource(audioSource);
             audioSource.PlayOneShot(audioClip, volume);
             yield return new WaitUntil(() => !audioSource.isPlaying);
-            Destroy(audioSource.gameObject);
+            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 
         public void Play2DClip(AudioClip audioClip, float volume = 1)
         {
-            GameObject g = Instantiate(audioSourcePrefab);
+            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab);
             StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
@@ -100,7 +100,7 @@ namespace Vi.Utility
             audioSource.spatialBlend = 0;
             audioSource.PlayOneShot(audioClip, volume);
             yield return new WaitUntil(() => !audioSource.isPlaying);
-            Destroy(audioSource.gameObject);
+            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 
         private void Awake()
