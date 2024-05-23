@@ -13,15 +13,15 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
-            if (IsServer)
-            {
-                PlayActionOnServer(actionClip.name, isFollowUpClip);
-            }
-            else
-            {
-                WaitingForActionToPlay = true;
-                PlayActionServerRpc(actionClip.name, isFollowUpClip);
-            }
+            //if (IsServer)
+            //{
+            //    PlayActionOnServer(actionClip.name, isFollowUpClip);
+            //}
+            //else
+            //{
+            //    WaitingForActionToPlay = true;
+            //    PlayActionServerRpc(actionClip.name, isFollowUpClip);
+            //}
         }
 
         public bool IsActionClipPlaying(ActionClip actionClip)
