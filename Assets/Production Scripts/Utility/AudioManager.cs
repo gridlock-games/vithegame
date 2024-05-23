@@ -17,7 +17,6 @@ namespace Vi.Utility
             public AudioClip song;
         }
 
-        private static List<AudioSource> audioSources = new List<AudioSource>();
         private static AudioManager _singleton;
 
         public static AudioManager Singleton
@@ -37,7 +36,6 @@ namespace Vi.Utility
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
-            audioSources.Add(audioSource);
         }
 
         /// <summary>
@@ -128,14 +126,6 @@ namespace Vi.Utility
 
         private void Update()
         {
-            if (Application.isEditor)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    audioSource.pitch = Time.timeScale;
-                }
-            }
-
             if (musicSource)
             {
                 if (!musicSource.isPlaying) { musicSource.Play(); }
