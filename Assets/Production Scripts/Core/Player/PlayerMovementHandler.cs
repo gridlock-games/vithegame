@@ -281,7 +281,7 @@ namespace Vi.Player
             {
                 Destroy(cameraController.gameObject);
                 Destroy(minimapCameraInstance.gameObject);
-                playerInput.enabled = false;
+                Destroy(playerInput);
             }
             movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }

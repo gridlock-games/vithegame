@@ -450,6 +450,44 @@ namespace Vi.Core
             Destroy(vfxInstance);
         }
 
+        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
+        {
+            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!particleSystem.isPlaying) { break; }
+                }
+            }
+
+            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
+            if (audioSource)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!audioSource.isPlaying) { break; }
+                }
+            }
+
+            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
+            if (visualEffect)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!visualEffect.HasAnySystemAwake()) { break; }
+                }
+            }
+
+            ObjectPoolingManager.ReturnObjectToPool(vfxInstance);
+        }
+
         public bool IsInAnticipation { get; private set; }
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
