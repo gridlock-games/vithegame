@@ -85,7 +85,7 @@ namespace Vi.Core
             SetMap(map);
         }
 
-        private NetworkVariable<NetworkString512Bytes> gameModeSettings = new NetworkVariable<NetworkString512Bytes>();
+        private NetworkVariable<FixedString512Bytes> gameModeSettings = new NetworkVariable<FixedString512Bytes>();
 
         public string GetGameModeSettings() { return gameModeSettings.Value.ToString(); }
 

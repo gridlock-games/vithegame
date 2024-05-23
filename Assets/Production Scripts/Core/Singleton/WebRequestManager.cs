@@ -11,6 +11,7 @@ using System.Linq;
 using Vi.Utility;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -1085,20 +1086,20 @@ namespace Vi.Core
 
         public struct Character : INetworkSerializable
         {
-            public NetworkString64Bytes _id;
-            public NetworkString64Bytes name;
-            public NetworkString64Bytes model;
-            public NetworkString64Bytes bodyColor;
-            public NetworkString64Bytes eyeColor;
-            public NetworkString64Bytes beard;
-            public NetworkString64Bytes brows;
-            public NetworkString64Bytes hair;
+            public FixedString64Bytes _id;
+            public FixedString64Bytes name;
+            public FixedString64Bytes model;
+            public FixedString64Bytes bodyColor;
+            public FixedString64Bytes eyeColor;
+            public FixedString64Bytes beard;
+            public FixedString64Bytes brows;
+            public FixedString64Bytes hair;
             public CharacterAttributes attributes;
             public Loadout loadoutPreset1;
             public Loadout loadoutPreset2;
             public Loadout loadoutPreset3;
             public Loadout loadoutPreset4;
-            public NetworkString64Bytes userId;
+            public FixedString64Bytes userId;
             public int slot;
             public int level;
             public int experience;
@@ -1273,21 +1274,21 @@ namespace Vi.Core
 
         public struct Loadout : INetworkSerializable
         {
-            public NetworkString64Bytes loadoutSlot;
-            public NetworkString64Bytes helmGearItemId;
-            public NetworkString64Bytes chestArmorGearItemId;
-            public NetworkString64Bytes shouldersGearItemId;
-            public NetworkString64Bytes bootsGearItemId;
-            public NetworkString64Bytes pantsGearItemId;
-            public NetworkString64Bytes beltGearItemId;
-            public NetworkString64Bytes glovesGearItemId;
-            public NetworkString64Bytes capeGearItemId;
-            public NetworkString64Bytes robeGearItemId;
-            public NetworkString64Bytes weapon1ItemId;
-            public NetworkString64Bytes weapon2ItemId;
+            public FixedString64Bytes loadoutSlot;
+            public FixedString64Bytes helmGearItemId;
+            public FixedString64Bytes chestArmorGearItemId;
+            public FixedString64Bytes shouldersGearItemId;
+            public FixedString64Bytes bootsGearItemId;
+            public FixedString64Bytes pantsGearItemId;
+            public FixedString64Bytes beltGearItemId;
+            public FixedString64Bytes glovesGearItemId;
+            public FixedString64Bytes capeGearItemId;
+            public FixedString64Bytes robeGearItemId;
+            public FixedString64Bytes weapon1ItemId;
+            public FixedString64Bytes weapon2ItemId;
             public bool active;
 
-            public Loadout(NetworkString64Bytes loadoutSlot, NetworkString64Bytes helmGearItemId, NetworkString64Bytes chestArmorGearItemId, NetworkString64Bytes shouldersGearItemId, NetworkString64Bytes bootsGearItemId, NetworkString64Bytes pantsGearItemId, NetworkString64Bytes beltGearItemId, NetworkString64Bytes glovesGearItemId, NetworkString64Bytes capeGearItemId, NetworkString64Bytes robeGearItemId, NetworkString64Bytes weapon1ItemId, NetworkString64Bytes weapon2ItemId, bool active)
+            public Loadout(FixedString64Bytes loadoutSlot, FixedString64Bytes helmGearItemId, FixedString64Bytes chestArmorGearItemId, FixedString64Bytes shouldersGearItemId, FixedString64Bytes bootsGearItemId, FixedString64Bytes pantsGearItemId, FixedString64Bytes beltGearItemId, FixedString64Bytes glovesGearItemId, FixedString64Bytes capeGearItemId, FixedString64Bytes robeGearItemId, FixedString64Bytes weapon1ItemId, FixedString64Bytes weapon2ItemId, bool active)
             {
                 this.loadoutSlot = loadoutSlot;
                 this.helmGearItemId = helmGearItemId;
@@ -1304,9 +1305,9 @@ namespace Vi.Core
                 this.active = active;
             }
 
-            public List<NetworkString64Bytes> GetLoadoutAsList()
+            public List<FixedString64Bytes> GetLoadoutAsList()
             {
-                return new List<NetworkString64Bytes>()
+                return new List<FixedString64Bytes>()
                 {
                     helmGearItemId,
                     chestArmorGearItemId,
@@ -1322,9 +1323,9 @@ namespace Vi.Core
                 };
             }
 
-            public Dictionary<CharacterReference.EquipmentType, NetworkString64Bytes> GetLoadoutArmorPiecesAsDictionary()
+            public Dictionary<CharacterReference.EquipmentType, FixedString64Bytes> GetLoadoutArmorPiecesAsDictionary()
             {
-                return new Dictionary<CharacterReference.EquipmentType, NetworkString64Bytes>()
+                return new Dictionary<CharacterReference.EquipmentType, FixedString64Bytes>()
                 {
                     { CharacterReference.EquipmentType.Helm, helmGearItemId },
                     { CharacterReference.EquipmentType.Chest, chestArmorGearItemId },
@@ -1552,7 +1553,7 @@ namespace Vi.Core
                 };
             }
 
-            private static string EvaluateFixedString(NetworkString64Bytes input)
+            private static string EvaluateFixedString(FixedString64Bytes input)
             {
                 if (input == "")
                 {

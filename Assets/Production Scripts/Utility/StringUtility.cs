@@ -63,38 +63,4 @@ namespace Vi.Utility
             return returnValue;
         }
     }
-
-    public struct NetworkString64Bytes : INetworkSerializeByMemcpy
-    {
-        private ForceNetworkSerializeByMemcpy<FixedString64Bytes> _info;
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref _info);
-        }
-
-        public override string ToString()
-        {
-            return _info.Value.ToString();
-        }
-
-        public static implicit operator string(NetworkString64Bytes s) => s.ToString();
-        public static implicit operator NetworkString64Bytes(string s) => new NetworkString64Bytes() { _info = new FixedString64Bytes(s) };
-    }
-
-    public struct NetworkString512Bytes : INetworkSerializeByMemcpy
-    {
-        private ForceNetworkSerializeByMemcpy<FixedString512Bytes> _info;
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref _info);
-        }
-
-        public override string ToString()
-        {
-            return _info.Value.ToString();
-        }
-
-        public static implicit operator string(NetworkString512Bytes s) => s.ToString();
-        public static implicit operator NetworkString512Bytes(string s) => new NetworkString512Bytes() { _info = new FixedString512Bytes(s) };
-    }
 }
