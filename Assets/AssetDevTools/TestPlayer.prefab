@@ -82,7 +82,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraInstance: {fileID: 828209863542041428}
-  animator: {fileID: 0}
+  animator: {fileID: 5977701589233126846}
   gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
   gravitySphereCastRadius: 0.6
 --- !u!54 &5639070937106706744
@@ -352,11 +352,27 @@ PrefabInstance:
       propertyPath: m_Name
       value: Male_Base
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 42d14d95accb3a246b319505d0ba43a7,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 760159f2de1adf944bee47902c6205ed, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 42d14d95accb3a246b319505d0ba43a7,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42d14d95accb3a246b319505d0ba43a7, type: 3}
 --- !u!4 &294180074406188996 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 42d14d95accb3a246b319505d0ba43a7,
+    type: 3}
+  m_PrefabInstance: {fileID: 261096926370852911}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5977701589233126846 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 42d14d95accb3a246b319505d0ba43a7,
     type: 3}
   m_PrefabInstance: {fileID: 261096926370852911}
   m_PrefabAsset: {fileID: 0}
